@@ -37,7 +37,8 @@ format:
     colorlinks: true
     fig-cap-location: bottom
     tbl-cap-location: top
-  docx: default
+  docx:
+    reference-doc: styles/reference.docx
 
 crossref:
   fig-title: Figure
