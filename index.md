@@ -27,9 +27,8 @@ A Practical Approach
 :::
 
 ::: {.book-hero__datasets}
-[Northwind Traders]{.dataset-badge .dataset-nw}
-[AdventureWorks Cycles]{.dataset-badge .dataset-aw}
-[ERPNext Demo Company]{.dataset-badge .dataset-erp}
+[Charles River Accounting Dataset]{.dataset-badge .dataset-nw}
+
 :::
 
 ::: {.book-hero__oer}
@@ -37,7 +36,7 @@ Open Educational Resource
 :::
 :::
 
-## Accounting Analytics: A Practical Approach
+# Accounting Analytics: A Practical Approach
 
 This is an open educational resource textbook that teaches accounting students to extract, prepare, analyze, and visualize financial and operational data using three tools widely adopted in professional practice. The book is designed for undergraduate and graduate accounting and business students with no prior analytics or programming experience.
 
@@ -49,27 +48,23 @@ The book is organized into twenty chapters across five parts. Part I establishes
 Every chapter follows a consistent structure that includes learning objectives, a professional scenario, conceptual narrative with embedded guided tutorials, and end-of-chapter assessments. Applied exercises are organized across three accounting perspectives: financial accounting, managerial accounting, and auditing. Five comprehensive cases, one per part, provide extended multi-tool investigations. The Preface describes the pedagogical design in detail.
 
 
-## The Datasets
+## The Dataset
 
-Three realistic datasets accompany this book, provided in both Excel workbook and SQLite database formats. Students use the same data across all three tools throughout all twenty chapters.
+One integrated dataset accompanies this book: the Charles River Accounting Dataset. Charles River is a fictional mid-size home furnishings company that sells furniture, lighting, textiles, and accessories, manufactures selected product lines in-house, and operates an hourly design services practice. The database contains 77 tables organized into ten groups covering order-to-cash, procure-to-pay, manufacturing, payroll and time, accounting core, fixed assets and financing, master data, organizational planning, and demand planning. The dataset is provided in three formats: an SQLite database, an Excel workbook, and a CSV package.
 
-**Northwind Traders** is a small wholesale food distribution company with eight core tables. It serves as the primary dataset for foundational chapters due to its simplicity and accessibility.
-
-**Adventure Works Cycles** is a mid-size multinational bicycle manufacturer with approximately seventy tables spanning sales, production, purchasing, and human resources. It supports cost accounting, production analysis, and purchasing cycle exercises.
-
-**ERPNext Demo Company** is a full enterprise resource planning environment with a complete accounting module including a chart of accounts, general ledger, journal entries, cost centers, and budgets. It supports financial statement preparation, audit testing, and integrated reporting.
+Using a single company throughout the entire book means students learn one business deeply rather than multiple businesses superficially. Every chapter builds on the same data environment, and the book introduces table groups progressively as students build skill. A customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built later.
 
 
 ## Open Access
 
-This textbook is an open educational resource distributed at no cost. All software tools used in the exercises are free or included with standard institutional licenses. The datasets are freely available in both Excel and SQLite formats. SQLite requires no server installation and runs on any operating system. No student should be prevented from developing analytics skills because of software cost or platform limitations.
+This textbook is an open educational resource distributed at no cost. All software tools used in the exercises are free or included with standard institutional licenses. The dataset is freely available in SQLite, Excel, and CSV formats. SQLite requires no server installation and runs on any operating system. No student should be prevented from developing analytics skills because of software cost or platform limitations.
 
-This work is licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/). You are free to share and adapt the material for any purpose, including commercial use, provided you give appropriate attribution and distribute any adapted versions under the same license.
+This work is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). You are free to share and adapt the material for noncommercial purposes, provided you give appropriate attribution and distribute any adapted versions under the same license.
 
 
 ## About the Author
 
-**Mauricio Codesso** is Assistant Teaching Professor at Northeastern Unversity, where he teaches courses in accounting, data analytics and conducts research in accounting information systems, information management, and emerging technologies.
+**Mauricio Codesso** is Associate Teaching Professor at Northeastern University, where he teaches courses in Accounting and conducts research in accounting information systems, information management, and emerging technologies.
 
 
 ## Contributing
@@ -79,7 +74,6 @@ This book is a living project. Contributions from instructors, students, and pra
 If you encounter an error in the text, examples, datasets, or links, please report it on the [GitHub Issues page](https://github.com/mmcodesso/Accounting_Analytics/issues). Issue reports help us correct problems quickly and keep the book reliable for everyone using it.
 
 If you are an instructor using this book in your course and would like to share your experience or adapted materials, please reach out through the repository. The OER model works best when the community around the resource is active.
-
 
 ## Citation
 

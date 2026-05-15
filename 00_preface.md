@@ -7,12 +7,11 @@ format:
 
 # Preface {.unnumbered}
 
-
 This book exists because the accounting profession has changed faster than most accounting curricula have adapted. Organizations now generate financial and operational data at a scale that makes traditional manual methods of analysis insufficient. Enterprise resource planning systems capture every transaction, every journal entry, every payment, and every production order in relational databases that contain millions of records. Auditors are expected to test entire populations rather than small samples. Management accountants are asked to explain variances, forecast performance, and identify operational drivers using data that lives in systems they were never trained to access. Financial reporting teams must reconcile, validate, and analyze data that flows from dozens of interconnected tables before it reaches the financial statements. The profession needs practitioners who can work directly with data, and accounting education needs textbooks that teach them how.
 
 This textbook teaches accounting students to extract, prepare, analyze, and visualize data using three tools that are widely used in professional practice. Microsoft Excel serves as the foundation for data preparation, descriptive analytics, statistical modeling, and audit testing. SQL provides the ability to query relational databases directly, joining tables, aggregating results, and performing population-level analysis without relying on pre-built reports. Microsoft Power BI enables the creation of interactive dashboards and reports that communicate analytical findings to diverse audiences. These three tools cover the full analytics workflow from data access through communication of results, and they represent the toolkit that employers consistently identify as most relevant for entry-level accounting professionals (Sledgianowski, Gomaa, and Tan, 2017).
 
-The book is built around three realistic datasets that students use throughout all twenty chapters, progressing from a simple wholesale distributor (Northwind Traders) through a mid-size manufacturer (Adventure Works Cycles) to a full enterprise resource planning environment with a complete accounting module (ERPNext Demo Company). All three are provided in both Excel workbook and SQLite database formats, so students work with the same underlying data regardless of which tool a given chapter uses. The About the Datasets section that follows this preface provides full descriptions of each database, including table counts, functional coverage, and a chapter-by-chapter appearance map.
+The book is built around one integrated dataset that students use throughout all twenty chapters. The Charles River Accounting Dataset is a process-to-ledger teaching database that follows a single fictional company through its complete business cycles. Charles River is a mid-size home furnishings company that designs and sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels, manufactures selected product lines in-house, and operates an interior design services practice that bills customers by the hour. The database contains 77 tables organized into ten groups covering order-to-cash, procure-to-pay, manufacturing, payroll and time, design services, accounting core, fixed assets and financing, master data, organizational planning, and demand planning. The dataset is provided in three formats: an SQLite database for SQL work, an Excel workbook for spreadsheet analysis, and a CSV package for flexible import into any tool including Power BI. Using a single company throughout the entire book means students learn one business deeply rather than multiple businesses superficially, and every chapter builds on the same data environment so that a customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built in a later chapter. The About the Dataset section that follows this preface provides full descriptions of each table group, the progressive introduction approach, and the distribution formats.
 
 
 ## Why This Book
@@ -25,14 +24,14 @@ The second is its three-perspective exercise structure. Every chapter includes a
 
 The third is its integrated tool progression. Many textbooks teach Excel, SQL, and visualization tools in isolation. This book teaches them as complementary stages of a single workflow. Part II covers Excel. Part III covers SQL. Part IV covers Power BI. Part V brings all three tools together in integrated projects where students extract data using SQL, analyze it in Excel, and present results in Power BI within a single engagement. This progression mirrors how analytics projects work in practice, where no single tool handles every stage.
 
-The fourth is its design as an open educational resource. The book and all companion datasets are freely available, and every tool used in the exercises is either free or included with standard institutional licenses. The Open Access section on the book's landing page describes the licensing terms in detail.
+The fourth is its design as an open educational resource. The book and its companion dataset are freely available, and every tool used in the exercises is either free or included with standard institutional licenses. The Open Access section on the book's landing page describes the licensing terms in detail.
 
 
 ## Pedagogical Design
 
 The book follows a consistent pedagogical structure that reflects research on how students learn technical skills most effectively. Worked examples, immediate practice opportunities, and progressive complexity have been shown to support skill acquisition in technology-intensive courses (Borthick and Jones, 2000). Every chapter in this book applies these principles through a structured sequence.
 
-Each chapter opens with four to six learning objectives written in measurable terms using action verbs drawn from Bloom's taxonomy. The objectives span multiple cognitive levels, from foundational understanding through application and analysis, so that both undergraduate and graduate students find appropriate challenges. Following the objectives, an opening scenario places the student in a realistic professional situation drawn from one of the three datasets. The scenario names a role, describes a concrete task, and motivates the material that follows by showing students why it matters before they learn how to do it.
+Each chapter opens with four to six learning objectives written in measurable terms using action verbs drawn from Bloom's taxonomy. The objectives span multiple cognitive levels, from foundational understanding through application and analysis, so that both undergraduate and graduate students find appropriate challenges. Following the objectives, an opening scenario places the student in a realistic professional situation at Charles River, the company whose data students use throughout the book. The scenario names a role, describes a concrete task, and motivates the material that follows by showing students why it matters before they learn how to do it.
 
 The body of each chapter presents concepts in narrative paragraph form, supported by figures, tables, and diagrams. One to three guided tutorials are embedded within the conceptual content at the point where the relevant technique is introduced, so students read about a concept and immediately practice it before moving to the next topic. Each tutorial includes numbered steps, expected outputs, and a checkpoint that allows students to verify their work. Three types of callout boxes appear throughout the narrative. "In Practice" notes describe how the technique is used in professional settings. "Watch Out" notes warn about common errors and pitfalls. "Connecting the Dots" notes link the current topic to material in other chapters or other tools, helping students see the book as an integrated whole.
 
@@ -46,6 +45,15 @@ In-text citations in APA format appear throughout the narrative to support claim
 This textbook serves both undergraduate and graduate four-credit courses in accounting analytics or accounting information systems. A single text serves both audiences. The instructor controls the depth and rigor of classroom discussions and analyses to match the course level. Undergraduate courses can focus on the guided tutorials and foundational exercises. Graduate courses can emphasize the analytical judgment required by the applied exercises and comprehensive cases, assign additional readings from the Further Reading sections, and incorporate extended discussion of professional standards and research findings.
 
 The book assumes no prior analytics or programming experience. Students need only the accounting knowledge gained from introductory financial and managerial accounting courses. Every technical concept is introduced from the ground up, and every tool is taught through step-by-step instruction before students are asked to work independently. Students who have prior experience with Excel, SQL, or Power BI will move through the early chapters faster and can focus their effort on the accounting applications and the more advanced techniques in later chapters.
+
+
+## Suggested Course Schedules
+
+The following schedules are suggestions, not prescriptions. Instructors should adapt them to their program's requirements, their students' preparation, and their own areas of emphasis.
+
+For an undergraduate course spanning fifteen weeks, Week 1 covers Chapters 1 and 2, introducing analytics and understanding data through the Charles River order-to-cash tables. Week 2 covers Chapter 3, the accounting data environment, where students explore the full Charles River schema. Weeks 3 through 4 cover Chapters 4 and 5, Excel essentials and data preparation. Weeks 5 through 6 cover Chapters 6 and 7, descriptive analytics and modeling. Week 7 covers Chapter 8, Excel for audit analytics, introducing the Accounting Core and procure-to-pay tables. Weeks 8 through 9 cover Chapters 9 and 10, introduction to SQL and joining data. Week 10 covers Chapters 11 and 12, intermediate SQL and audit analytics. Week 11 covers Chapter 13, visualization principles. Weeks 12 through 13 cover Chapters 14 and 15, Power BI fundamentals and data modeling. Week 14 covers Chapter 16, building accounting dashboards. Week 15 covers selected topics from Chapters 17 through 20, along with the capstone project presentation.
+
+For a graduate course spanning fifteen weeks, the pace is faster and the emphasis shifts toward analytical judgment and integration. Week 1 covers Chapters 1 through 3 as a combined foundational session. Week 2 covers Chapters 4 and 5 at an accelerated pace. Week 3 covers Chapters 6 and 7 with emphasis on modeling and analytical judgment. Week 4 covers Chapter 8 with deeper discussion of audit standards and professional skepticism. Weeks 5 through 6 cover Chapters 9 through 11 with emphasis on CTEs, window functions, and the full Charles River schema. Week 7 covers Chapter 12 with extended case analysis requiring multi-step SQL investigation. Week 8 covers Chapters 13 and 14. Week 9 covers Chapter 15 with advanced DAX and complex multi-group data models. Week 10 covers Chapter 16 with emphasis on dashboard design for different stakeholder audiences. Week 11 covers Chapter 17, financial reporting analytics. Week 12 covers Chapter 18, cost and management accounting analytics. Week 13 covers Chapter 19, forensic accounting and fraud analytics. Week 14 covers Chapter 20, emerging technologies, supplemented by assigned readings from the academic literature. Week 15 involves the capstone project presentation and discussion.
 
 
 ## How This Book Is Organized
@@ -85,14 +93,16 @@ Microsoft Excel is the tool you will use first. Chapters 4 through 8 teach you t
 
 SQL is introduced in Chapters 9 through 12. SQL stands for Structured Query Language, and it is the standard language for retrieving data from relational databases. You will use a free, lightweight database system called SQLite that requires no server and runs on any operating system. SQL is most powerful when working with large datasets, when data spans multiple related tables that must be combined, and when you want to save and reuse your analytical procedures.
 
-Microsoft Power BI is introduced in Chapters 13 through 16. Power BI is a business intelligence platform that lets you build interactive dashboards and reports. You will connect Power BI to the same datasets you used in Excel and SQL, create data models, write DAX formulas for calculated measures, and design dashboards that stakeholders can explore on their own.
+Microsoft Power BI is introduced in Chapters 13 through 16. Power BI is a business intelligence platform that lets you build interactive dashboards and reports. You will connect Power BI to the same Charles River data you used in Excel and SQL, create data models, write DAX formulas for calculated measures, and design dashboards that stakeholders can explore on their own.
 
 In Part V of the book, you will use all three tools together. You will extract data with SQL, analyze it in Excel, and present results in Power BI within a single integrated project.
 
 
-## The Three Datasets
+## The Dataset
 
-You will work with three datasets throughout this book. All three are provided as both Excel workbooks and SQLite databases. You will become deeply familiar with them because you use them repeatedly across chapters, building cumulative knowledge of their structures, contents, and quirks. The datasets progress from a compact wholesale distributor (Northwind Traders, eight tables) through a mid-size manufacturer (Adventure Works Cycles, approximately seventy tables) to a full enterprise resource planning environment with a complete accounting module (ERPNext Demo Company). The About the Datasets section provides full descriptions of each database, including the specific chapters where each one appears.
+You will work with one dataset throughout this book: the Charles River Accounting Dataset. Charles River is a fictional mid-size home furnishings company that sells furniture, lighting, textiles, and accessories, manufactures selected product lines in-house, and operates an hourly design services practice. The database contains 77 tables organized into ten groups that cover the full range of business activity from customer orders and supplier payments through manufacturing, payroll, and general ledger posting. The dataset is provided as an SQLite database, an Excel workbook, and a CSV package, so you can use the same data in every tool the book covers.
+
+Using one company throughout the entire book is a deliberate design choice. Instead of learning three different businesses at a surface level, you will learn one business deeply. A sales order you analyze in an Excel chapter will appear in the general ledger you query in a SQL chapter and will surface again in a Power BI dashboard you build later. This continuity mirrors professional practice, where accountants work within one company's data for extended periods. The book introduces the table groups progressively, starting with the simplest tables and expanding as you build skill. The About the Dataset section provides full descriptions of each table group and the progressive introduction approach.
 
 
 ## How to Succeed
@@ -105,33 +115,62 @@ Finally, pay attention to the connections across chapters and tools. The "Connec
 
 ---
 
-# About the Datasets
+# About the Dataset
 
-This textbook is built around three datasets that students use throughout all twenty chapters. All three are provided in both Microsoft Excel workbook format and SQLite database format, so students work with the same underlying data regardless of whether a given chapter uses Excel, SQL, or Power BI. The datasets represent three different types of businesses at three levels of complexity, and the textbook introduces them from simplest to most complex.
+This textbook is built around one integrated dataset: the Charles River Accounting Dataset. Rather than using multiple databases at different levels of complexity, this book uses a single company that students learn deeply over the course of twenty chapters. Every chapter builds on the same data environment, so a customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built later. This continuity reinforces learning and mirrors real professional practice, where accountants work within one company's data for extended periods.
 
-**Northwind Traders** is a fictional small wholesale food distribution company. It buys specialty food products from suppliers around the world and sells them to retail and restaurant customers. The Northwind database contains eight core tables covering customers, orders, order details, products, product categories, suppliers, employees, and shippers. The database includes approximately 830 orders, 2,100 order line items, 77 products, and 91 customers. Northwind is compact and easy to understand, which makes it the primary dataset for the foundational chapters where students are learning new tools and techniques. It supports exercises in sales analysis, customer analytics, purchasing evaluation, and inventory review.
 
-Northwind appears in Chapters 1 through 10, 12, 13, 14, 16, and 19.
+## The Company
 
-**Adventure Works Cycles** is a fictional mid-size multinational bicycle manufacturer that designs, produces, and sells bicycles, components, clothing, and accessories through multiple sales territories. The AdventureWorks database contains approximately seventy tables organized across five functional areas covering sales, production, purchasing, human resources, and person management. The database includes manufacturing cost data such as bills of materials, work orders, production routing, and scrap tracking, along with multi-territory sales transactions and vendor purchase orders. AdventureWorks introduces the data complexity that students will encounter in manufacturing and multi-division organizations, and it supports exercises in cost accounting, production analysis, sales performance evaluation, and purchasing cycle testing.
+Charles River is a fictional mid-size company situated in the greater Boston area that designs and sells home furnishings through wholesale and direct-to-business channels. The product catalog includes furniture, lighting, textiles, and decorative accessories organized into product families that students can visualize and compare analytically. Charles River manufactures selected product lines in-house from raw materials and packaging, purchases other finished goods from domestic and international suppliers, and warehouses inventory across multiple locations. The company also operates an interior design services practice that bills customers by the hour, giving students a second revenue model within the same business. Charles River employs approximately 60 people across six departments and maintains a full chart of accounts with cost center tracking.
 
-AdventureWorks appears in Chapters 1, 3, 5 through 7, 10 through 13, 15 through 19.
+This hybrid operating model is a deliberate design choice. A company that both buys and makes products, sells both goods and services, and manages both manufacturing labor and salaried professionals creates the range of accounting transactions that students need to encounter. Students can compare purchased products with manufactured products, trace how customer demand drives purchasing and production decisions, analyze how labor supports both operations and services, and see how all of these activities flow into the general ledger.
 
-**ERPNext Demo Company** is a fictional company operating within a full enterprise resource planning environment that includes a complete accounting module. The ERPNext database contains a chart of accounts, general ledger entries, journal entries, sales and purchase invoices, cost centers, budgets, payment entries, bank reconciliation records, stock ledger entries, and asset registers. ERPNext is the most accounting-rich dataset of the three. Students use it for financial statement preparation, general ledger analysis, budgetary control, audit testing, and integrated financial reporting. Because ERPNext mirrors the structure of a production ERP system, working with it gives students familiarity with the kind of data environment they will encounter in professional practice.
 
-ERPNext appears in Chapters 1 through 3, 8, 11 through 13, 15 through 20.
+## The Table Groups
 
-The textbook introduces Northwind first because it is the simplest. AdventureWorks enters in the middle chapters as exercises grow more complex and students have built enough skill to work with richer data. ERPNext appears once students have enough analytical experience to work with a full accounting system. By the final chapters, students move fluently across all three datasets in integrated exercises. Complete documentation for every table in all three databases, including column names, data types, primary and foreign key relationships, and Entity-Relationship diagrams, appears in Appendix B.
+The Charles River database contains 77 tables organized into ten groups. The book introduces these groups progressively, starting with the simplest tables in the early chapters and expanding into more complex groups as students build skill.
+
+The Accounting Core group contains three tables: Account, JournalEntry, and GLEntry. These represent the chart of accounts, the finance-controlled journal headers, and the posted ledger detail. Every business cycle in the database ultimately flows into GLEntry, making it the single source of truth for the company's financial position. This group is the anchor for financial reporting, audit analytics, and period-close analysis.
+
+The Order-to-Cash group contains 22 tables covering the full revenue cycle from customer order through cash collection, including sales orders, shipments, invoices, cash receipts, commercial pricing, design service engagements and billing, sales commissions, and a complete returns and credits chain through credit memos and customer refunds. This is the richest group in the database.
+
+The Procure-to-Pay group contains nine tables covering the full purchasing cycle from internal requisition through vendor payment, including purchase orders, goods receipts, supplier invoices, and disbursement payments. This group supports three-way matching, vendor analytics, and accounts payable management.
+
+The Manufacturing group contains 14 tables covering production planning, material usage, labor support, completion, and variance analysis. Tables include bills of material, routings, work centers, work orders, material issues, production completions, and work order close records.
+
+The Payroll and Time group contains 14 tables covering workforce management from shift scheduling through payroll settlement. Tables include shift definitions, employee rosters, time clock entries, labor time entries, payroll registers, payroll payments, and liability remittances. This group supports labor cost analysis and payroll compliance testing.
+
+The Fixed Assets and Financing group contains four tables covering the fixed asset subledger including acquisition, depreciation, and disposal, along with note-payable financing through debt agreements and amortization schedules.
+
+The Master Data group contains three shared reference tables: Item, Warehouse, and Employee. These are used across all other groups for product, location, and people information.
+
+The Organizational Planning group contains three tables: CostCenter, Budget, and BudgetLine. These support budgetary control and responsibility accounting exercises.
+
+The Demand Planning and MRP group contains five tables covering demand forecasting, inventory policy, supply plan recommendations, material requirements planning, and rough-cut capacity planning.
+
+The Design Services tables are distributed within the Order-to-Cash group but represent a distinct business process. Service engagements, employee assignments, approved time entries, and billing lines give students a complete service revenue cycle alongside the goods revenue cycle.
+
+
+## How the Table Groups Connect
+
+The table groups are not isolated. Cross-group bridge keys connect operational activity to the posted ledger and to shared master data. ItemID links product-level analysis across sales, purchasing, manufacturing, and planning. AccountID connects the general ledger, budgets, and the chart of accounts. EmployeeID links payroll, time, labor entries, and service engagements. CostCenterID connects operating activity, labor, budgets, and reporting by organizational unit. Most importantly, the GLEntry table includes SourceDocumentType, SourceDocumentID, and SourceLineID fields that allow students to trace any ledger posting back to the operational event that created it. This source-to-ledger traceability is one of the most valuable features of the dataset for teaching purposes, because it lets students see exactly how a shipment becomes revenue, how a goods receipt becomes an inventory entry, or how a payroll register becomes a wage expense.
+
+
+## Progressive Introduction
+
+The book does not ask students to work with all 77 tables from the beginning. Chapters in Part I introduce the company, its business model, and the table group structure at a conceptual level. Part II chapters use primarily the Order-to-Cash core tables (Customer, SalesOrder, SalesOrderLine, Item) for Excel exercises, expanding into Accounting Core and Procure-to-Pay tables for audit analytics in Chapter 8. Part III chapters use progressively larger subsets of the database as SQL skills develop, and by Chapter 12 students work across multiple table groups in a single query. Part IV chapters model relationships across groups in Power BI, building dashboards that span the full database. Part V chapters require students to move fluently across all table groups and all three tools within integrated projects.
+
+
+## Distribution Formats
+
+The dataset is provided in three formats. The SQLite database is used for all SQL work in Chapters 9 through 12 and for data extraction in Part V. It requires no server installation, runs on any operating system, and works with DB Browser for SQLite, the free database tool used throughout the book. The Excel workbook is used for all spreadsheet work in Chapters 4 through 8. The CSV package provides maximum flexibility for import into any tool, including Power BI. All three formats contain identical data, so students work with the same underlying information regardless of which tool a given chapter uses.
+
+Complete documentation for every table in the database, including column names, data types, primary and foreign key relationships, cross-group bridge keys, and Entity-Relationship diagrams for each table group, appears in Appendix B.
 
 ---
 
-# Acknowledgments
-
-*[This section will acknowledge individuals and institutions that contributed to the development of this textbook, including reviewers, colleagues who class-tested draft chapters, students who provided feedback, and the open-source communities that maintain the tools and datasets used throughout the book.]*
-
----
-
-# References
+## References
 
 AICPA (American Institute of Certified Public Accountants). (2017). *Guide to audit data analytics.* AICPA.
 
