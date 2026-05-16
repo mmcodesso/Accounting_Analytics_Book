@@ -255,6 +255,7 @@ def run() -> int:
     args = parse_args()
     src_dir = args.src_dir.resolve()
     out_dir = args.out_dir.resolve()
+    force_export = args.force or os.environ.get("GITHUB_ACTIONS") == "true"
 
     if args.padding < 0:
         raise ExportError(f"Padding must be greater than or equal to 0: {args.padding}")
@@ -270,6 +271,8 @@ def run() -> int:
     drawio_bin = find_drawio_executable(args.drawio_bin)
     print(f"Using Draw.io executable: {drawio_bin}")
     print(f"Using transparent SVG padding: {format_number(args.padding)}")
+    if force_export and not args.force:
+        print("GitHub Actions detected; exporting all diagrams because checkout timestamps are not reliable.")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     exported = 0
@@ -278,7 +281,7 @@ def run() -> int:
         validate_single_page_drawio(source)
         output = out_dir / f"{source.stem}.svg"
 
-        if not args.force and is_output_current(source, output):
+        if not force_export and is_output_current(source, output):
             print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
             skipped += 1
             continue

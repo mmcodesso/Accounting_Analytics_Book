@@ -26,8 +26,52 @@ jobs:
         with:
           tinytex: true
 
-      - name: Install SVG converter for DOCX builds
-        run: sudo apt-get update && sudo apt-get install --yes librsvg2-bin
+      - name: Install render dependencies
+        run: sudo apt-get update && sudo apt-get install --yes librsvg2-bin xvfb
+
+      - name: Install Draw.io CLI
+        run: |
+          drawio_deb_url="$(python3 - <<'PY'
+          import json
+          import sys
+          import urllib.request
+
+          with urllib.request.urlopen("https://api.github.com/repos/jgraph/drawio-desktop/releases/latest") as response:
+              release = json.load(response)
+
+          for asset in release["assets"]:
+              name = asset["name"]
+              if name.endswith(".deb") and "amd64" in name:
+                  print(asset["browser_download_url"])
+                  break
+          else:
+              print("No amd64 .deb asset found in latest drawio-desktop release", file=sys.stderr)
+              sys.exit(1)
+          PY
+          )"
+          curl --fail --location --show-error --silent "${drawio_deb_url}" --output /tmp/drawio.deb
+          sudo apt-get install --yes /tmp/drawio.deb
+
+          drawio_path="$(command -v drawio || command -v draw.io || true)"
+          if [ -z "${drawio_path}" ]; then
+            echo "Draw.io installed, but no drawio executable was found on PATH"
+            exit 1
+          fi
+
+          cat > /tmp/drawio-xvfb <<EOF
+          #!/usr/bin/env bash
+          exec xvfb-run -a "${drawio_path}" "\$@"
+          EOF
+          chmod +x /tmp/drawio-xvfb
+          echo "DRAWIO_BIN=/tmp/drawio-xvfb" >> "${GITHUB_ENV}"
+
+          smoke_source="$(find visuals/src -maxdepth 1 -type f -name '*.drawio' | head -n 1)"
+          if [ -z "${smoke_source}" ]; then
+            echo "No Draw.io source file found for smoke test"
+            exit 1
+          fi
+          /tmp/drawio-xvfb -x -f svg -o /tmp/drawio-smoke.svg "${smoke_source}"
+          test -s /tmp/drawio-smoke.svg
 
       - name: Create staging directory for downloadable files
         run: mkdir -p dist/downloads
