@@ -1,5 +1,7 @@
 project:
   type: book
+  pre-render:
+    - python scripts/export_drawio_svgs.py
 
 book:
   title: "Accounting Analytics"

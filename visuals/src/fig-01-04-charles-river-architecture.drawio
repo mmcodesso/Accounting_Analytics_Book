@@ -1,0 +1,118 @@
+<mxfile>
+  <diagram name="Charles River Architecture" id="fig0104v2">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="gl" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;Single source of truth&lt;br&gt;for financial position&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=13;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="480" y="310" width="240" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="acct_core" value="&lt;b&gt;Accounting Core&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;3 tables: Account,&lt;br&gt;JournalEntry, GLEntry&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=2;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="480" y="170" width="240" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="o2c" value="&lt;b&gt;Order-to-Cash&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;22 tables: SalesOrder,&lt;br&gt;Shipment, SalesInvoice,&lt;br&gt;CashReceipt, ...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ds" value="&lt;b&gt;Design Services&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;(within O2C)&lt;br&gt;ServiceEngagement,&lt;br&gt;ServiceTimeEntry&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;dashed=1;dashPattern=5 3;" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p2p" value="&lt;b&gt;Procure-to-Pay&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;9 tables: PurchaseOrder,&lt;br&gt;GoodsReceipt, PurchaseInvoice,&lt;br&gt;DisbursementPayment, ...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mfg" value="&lt;b&gt;Manufacturing&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;14 tables: WorkOrder,&lt;br&gt;BillOfMaterial, MaterialIssue,&lt;br&gt;ProductionCompletion, ...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="440" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pay" value="&lt;b&gt;Payroll and Time&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;14 tables: PayrollRegister,&lt;br&gt;LaborTimeEntry,&lt;br&gt;PayrollPayment, ...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="570" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fa" value="&lt;b&gt;Fixed Assets&lt;br&gt;and Financing&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;4 tables&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="60" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="md" value="&lt;b&gt;Master Data&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;3 tables: Item,&lt;br&gt;Warehouse, Employee&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="190" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="org" value="&lt;b&gt;Organizational&lt;br&gt;Planning&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;3 tables: CostCenter,&lt;br&gt;Budget, BudgetLine&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="320" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dp" value="&lt;b&gt;Demand Planning&lt;br&gt;and MRP&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:10px'&gt;5 tables&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="450" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#17A589;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="o2c" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1_lbl" value="via SalesInvoice" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="310" y="200" width="110" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#17A589;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="p2p" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2_lbl" value="via PurchaseInvoice" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="300" y="325" width="130" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#17A589;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="mfg" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3_lbl" value="via WorkOrderClose" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="300" y="460" width="130" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#17A589;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="pay" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4_lbl" value="via PayrollRegister" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="300" y="590" width="120" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#1A5276;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="acct_core" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5_lbl" value="via JournalEntry" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="615" y="260" width="110" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="md" target="acct_core" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a6_lbl" value="shared keys" style="text;html=1;align=center;verticalAlign=middle;fontColor=#F39C12;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="760" y="195" width="70" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=classic;" edge="1" source="org" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a7_lbl" value="CostCenterID" style="text;html=1;align=center;verticalAlign=middle;fontColor=#F39C12;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="760" y="345" width="80" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="title" value="&lt;font style='font-size:16px'&gt;&lt;b&gt;Charles River Accounting Dataset&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:11px;color:#5D6D7E'&gt;77 tables across 10 groups, all flowing into GLEntry&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="340" y="720" width="500" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend1" value="&lt;font color='#17A589'&gt;&#9632;&lt;/font&gt; Operational cycle groups" style="text;html=1;align=left;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="700" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend2" value="&lt;font color='#1A5276'&gt;&#9632;&lt;/font&gt; Accounting Core (anchor)" style="text;html=1;align=left;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="720" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend3" value="&lt;font color='#F39C12'&gt;&#9632;&lt;/font&gt; Reference and planning groups" style="text;html=1;align=left;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="740" width="220" height="20" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

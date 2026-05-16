@@ -1,0 +1,74 @@
+<mxfile>
+  <diagram name="Accounting Core ER" id="fig0106v2">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="acct" value="&lt;b&gt;Account&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK AccountID&lt;br&gt;AccountName&lt;br&gt;AccountType&lt;br&gt;FK ParentAccountID (self)&lt;br&gt;IsGroup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="220" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="self_ref" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#1A5276;strokeWidth=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" source="acct" target="acct" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="10" y="159"/>
+              <mxPoint x="10" y="211"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="self_lbl" value="parent of" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="-35" y="170" width="55" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="je" value="&lt;b&gt;JournalEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK JournalEntryID&lt;br&gt;PostingDate&lt;br&gt;EntryType&lt;br&gt;FK PostedByEmployeeID&lt;br&gt;FK ReversesJournalEntryID&lt;br&gt;Description&lt;br&gt;Status&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="240" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="gl" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK GLEntryID&lt;br&gt;PostingDate&lt;br&gt;FK AccountID&lt;br&gt;Debit&lt;br&gt;Credit&lt;br&gt;SourceDocumentType&lt;br&gt;SourceDocumentID&lt;br&gt;SourceLineID&lt;br&gt;FK CostCenterID&lt;br&gt;FK JournalEntryID (nullable)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F6F3;strokeColor=#1A5276;strokeWidth=2;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="400" y="320" width="240" height="230" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="src_docs" value="&lt;font style='font-size:10px;color:#5D6D7E'&gt;&lt;i&gt;Source documents from&lt;br&gt;other table groups:&lt;br&gt;&lt;br&gt;SalesInvoice (O2C)&lt;br&gt;PurchaseInvoice (P2P)&lt;br&gt;WorkOrderClose (Mfg)&lt;br&gt;PayrollRegister (Payroll)&lt;br&gt;FixedAssetEvent (FA)&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontSize=10;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=8;dashed=1;dashPattern=5 3;" vertex="1" parent="1">
+          <mxGeometry x="780" y="340" width="210" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cc" value="&lt;b&gt;CostCenter&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;(Org Planning group)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="380" width="210" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="emp" value="&lt;b&gt;Employee&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;(Master Data group)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="780" y="130" width="210" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r1" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#5D6D7E;strokeWidth=1;" edge="1" source="acct" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="310"/>
+              <mxPoint x="400" y="310"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r2" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#5D6D7E;strokeWidth=1;" edge="1" source="je" target="gl" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="r3" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;" edge="1" source="cc" target="gl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r4" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;" edge="1" source="emp" target="je" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;dashed=1;dashPattern=5 3;endArrow=classic;" edge="1" source="src_docs" target="gl" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="r5_lbl" value="SourceDocumentType +&lt;br&gt;SourceDocumentID" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="660" y="440" width="120" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="&lt;font color='#1A5276'&gt;&#9632;&lt;/font&gt; Accounting Core tables    &lt;font color='#F39C12'&gt;&#9632;&lt;/font&gt; Cross-group references    &lt;font color='#D5D8DC'&gt;&#9632;&lt;/font&gt; Source documents (other groups)" style="text;html=1;align=left;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="560" width="600" height="20" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

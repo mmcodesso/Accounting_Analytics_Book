@@ -6,10 +6,9 @@ title: "The Role of Analytics in Accounting"
 [Conceptual Chapter]{.chapter-pill}
 :::
 
----
+## Learning Objectives {.unnumbered}
 
-## Learning Objectives
-
+::: {.learning-objectives}
 After completing this chapter, you will be able to:
 
 1. Explain how data analytics has changed the work accountants perform and the skills the profession demands.
@@ -17,10 +16,9 @@ After completing this chapter, you will be able to:
 3. Describe the purpose and capabilities of Excel, SQL, and Power BI as complementary tools for accounting analytics.
 4. Describe the Charles River Accounting Dataset, its business model, and how its ten table groups map to the company's business cycles.
 5. Map the stages of an accounting analytics workflow from question formulation through communication of results.
+:::
 
----
-
-## Opening Scenario
+## Opening Scenario  {.unnumbered}
 
 You have just started a position as a staff accountant at Charles River, a mid-size home furnishings company in the greater Boston area. During your first week, the controller asks you to investigate why gross margins on the Furniture product line declined in the most recent quarter. She tells you the data you need is spread across several tables in the company's database, including sales orders, product cost records, and the general ledger. Your accounting coursework prepared you to interpret financial statements, calculate ratios, and apply standards, but you have never pulled data directly from a database, cleaned it for analysis, or built an interactive report that the management team can explore on their own. You realize that answering the controller's question will require more than accounting knowledge. It will require the ability to extract, prepare, analyze, and communicate data. This chapter introduces the analytical mindset and the toolkit you will develop throughout this book to handle exactly this kind of challenge.
 
@@ -36,8 +34,10 @@ This growth in data has created both a challenge and an opportunity for the prof
 
 Professional bodies have recognized this shift and responded by updating their competency frameworks. The American Institute of Certified Public Accountants has integrated data analytics into its pre-certification curriculum and its continuing education requirements. The Institute of Management Accountants has emphasized technology and analytics in its Certified Management Accountant examination content. The International Federation of Accountants has published guidance on the skills that accounting graduates need in a data-rich environment (IFAC, 2019). These developments signal that analytics is not a niche specialization within accounting. It is a core competency that every practitioner will need.
 
-> **[IN PRACTICE]**
-> Accounting firms of all sizes now recruit for analytics skills alongside traditional accounting knowledge. Major firms have established dedicated data analytics practices, and even small and mid-size firms use data analysis tools for audit testing, tax planning, and advisory engagements. A 2019 survey by the Institute of Management Accountants found that data analytics ranked among the top five skills employers seek when hiring management accountants (IMA, 2019).
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Accounting firms of all sizes now recruit for analytics skills alongside traditional accounting knowledge. Major firms have established dedicated data analytics practices, and even small and mid-size firms use data analysis tools for audit testing, tax planning, and advisory engagements. A 2019 survey by the Institute of Management Accountants found that data analytics ranked among the top five skills employers seek when hiring management accountants (IMA, 2019).
+::: 
 
 The purpose of this textbook is to help you develop these skills in a structured and practical way. You will learn to work with data using three tools that are widely used in practice: Microsoft Excel, SQL, and Microsoft Power BI. You will apply these tools to realistic accounting data drawn from the Charles River Accounting Dataset, a single integrated database that you will use throughout the entire book. And you will practice solving problems from three accounting perspectives: financial accounting, managerial accounting, and auditing. By the end of this book, you will be able to extract data from a database, prepare it for analysis, summarize and model it, visualize the results, and communicate your findings to professional audiences.
 
@@ -52,7 +52,8 @@ It is important to distinguish accounting analytics from related terms that stud
 
 A useful framework for understanding the scope of analytics divides it into three categories: descriptive, predictive, and prescriptive. These categories represent increasing levels of analytical complexity and are not mutually exclusive. Most real-world accounting analytics projects involve more than one type.
 
-*[Figure 1.1: The Analytics Continuum. A horizontal diagram showing three stages from left to right: Descriptive Analytics ("What happened?"), Predictive Analytics ("What might happen?"), and Prescriptive Analytics ("What should we do?"). Each stage includes a brief accounting example beneath it.]*
+![The Analytics Continuum.](visuals/svg/fig-01-01-analytics-continuum.svg){#fig-01-01 fig-alt="A horizontal diagram showing three stages from left to right: Descriptive Analytics What happened?, Predictive Analytics What might happen?, and Prescriptive Analytics What should we do?. Each stage includes a brief accounting example beneath it."}
+
 
 **Descriptive analytics** answers the question "what happened?" It involves summarizing historical data to understand past performance, identify trends, and describe the current state of affairs. Descriptive analytics is the foundation of most accounting work. When a financial analyst prepares a comparative income statement showing revenue by product line for the past four quarters, that is descriptive analytics. When an auditor stratifies accounts receivable by aging bucket to assess the adequacy of the allowance for doubtful accounts, that is also descriptive analytics. The tools of descriptive analytics include aggregation, grouping, sorting, filtering, and basic statistical measures such as totals, averages, and counts.
 
@@ -66,8 +67,10 @@ In this textbook, predictive analytics appears in the modeling chapter of the Ex
 
 This textbook introduces prescriptive analytics through optimization exercises in Chapter 7 (using Solver and Scenario Manager in Excel) and through scenario analysis in the integrated chapters of Part V. The emphasis throughout the book, however, is on descriptive and predictive analytics because these represent the analytical work that accounting professionals perform most frequently.
 
-> **[WATCH OUT]**
-> Students sometimes assume that descriptive analytics is "basic" and that the goal is to reach prescriptive analytics as quickly as possible. In practice, most accounting analytics work is descriptive, and doing it well requires substantial skill. A poorly constructed summary can mislead decision makers just as easily as a sophisticated model can. The value of analytics lies not in its complexity but in the quality of the questions it answers and the rigor of the process behind it.
+::: {.callout-warning .watch-out icon=false}
+## Watch out 
+Students sometimes assume that descriptive analytics is "basic" and that the goal is to reach prescriptive analytics as quickly as possible. In practice, most accounting analytics work is descriptive, and doing it well requires substantial skill. A poorly constructed summary can mislead decision makers just as easily as a sophisticated model can. The value of analytics lies not in its complexity but in the quality of the questions it answers and the rigor of the process behind it.
+:::
 
 
 ## Why Accountants Need Analytics Skills
@@ -82,8 +85,10 @@ The third driver is the expansion of the accountant's role from preparer and ver
 
 The fourth driver is competitive pressure in the labor market. Graduates who can combine accounting knowledge with data analysis skills are more attractive to employers than those with accounting knowledge alone. This is true across all areas of the profession, from public accounting to industry to government. The ability to write a SQL query, build a PivotTable, or create an interactive dashboard distinguishes a candidate in a hiring process and opens career paths that were previously reserved for specialists in information systems or data science.
 
-> **[IN PRACTICE]**
-> A survey of accounting professionals conducted by Kokina and Dagiliene (2017) found that respondents identified data analysis and technology skills as the area of greatest change in the competencies required of accountants. Respondents across audit, tax, and advisory roles reported that they spend more time working with data tools than they did five years earlier and expected that trend to continue.
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+A survey of accounting professionals conducted by Kokina and Dagiliene (2017) found that respondents identified data analysis and technology skills as the area of greatest change in the competencies required of accountants. Respondents across audit, tax, and advisory roles reported that they spend more time working with data tools than they did five years earlier and expected that trend to continue.
+:::
 
 *[Table 1.1: Examples of Analytics Applications by Accounting Role. A table with three columns (Role, Descriptive Example, Predictive Example) and four rows (Financial Reporting, Managerial Accounting, External Audit, Internal Audit), showing a specific analytics application for each combination.]*
 
@@ -92,7 +97,7 @@ The fourth driver is competitive pressure in the labor market. Graduates who can
 
 Before learning specific tools, it is helpful to understand the general process that all accounting analytics projects follow. Whether you are building a revenue summary in Excel, writing an audit query in SQL, or designing a dashboard in Power BI, the work progresses through the same sequence of stages. This textbook is organized around these stages, and understanding them now will help you see how the chapters connect.
 
-*[Figure 1.2: The Accounting Analytics Workflow. A process flowchart showing six stages in sequence: (1) Define the Question, (2) Identify and Access the Data, (3) Prepare and Clean the Data, (4) Analyze the Data, (5) Visualize and Present the Results, (6) Communicate Findings and Recommendations. Each stage includes a one-sentence description.]*
+![The Accounting Analytics Workflow.](visuals/svg/fig-01-02-analytics-workflow.svg){#fig-01-01 fig-alt="A process flowchart showing six stages in sequence: (1) Define the Question, (2) Identify and Access the Data, (3) Prepare and Clean the Data, (4) Analyze the Data, (5) Visualize and Present the Results, (6) Communicate Findings and Recommendations. Each stage includes a one-sentence description."}
 
 The first stage is defining the question. Every analytics project begins with a clear statement of the problem or question to be addressed. In the opening scenario of this chapter, the controller's question was specific: why did gross margins on the Furniture product line decline in the most recent quarter? A well-defined question guides every subsequent decision, from which data to collect to which visualizations to create. Vague questions produce vague answers. The ability to translate a business concern into an analytical question is one of the most important skills an accountant can develop.
 
@@ -106,9 +111,10 @@ The fifth stage is visualizing and presenting the results. Data visualization tr
 
 The sixth stage is communicating findings and recommendations. The final product of an analytics project is not a spreadsheet or a dashboard but a communication to decision makers. That communication might take the form of a written memorandum to an audit committee, a presentation to management, or an interactive report that stakeholders can explore. The ability to translate analytical results into clear, professional language is essential. This skill is practiced throughout the textbook in the applied exercises and comprehensive cases, each of which asks students to produce a written interpretation alongside their technical work.
 
-> **[CONNECTING THE DOTS]**
-> The six-stage workflow described here is not unique to accounting. It closely parallels the data analysis process described in data science and business intelligence literature (Provost and Fawcett, 2013). What makes accounting analytics distinctive is not the process itself but the data it works with (financial and operational transactions), the questions it addresses (reporting, control, assurance), and the professional standards that govern the work (GAAP, GAAS, IMA ethical standards). Throughout this book, the workflow provides the thread that connects every chapter and every tool.
-
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+The six-stage workflow described here is not unique to accounting. It closely parallels the data analysis process described in data science and business intelligence literature (Provost and Fawcett, 2013). What makes accounting analytics distinctive is not the process itself but the data it works with (financial and operational transactions), the questions it addresses (reporting, control, assurance), and the professional standards that govern the work (GAAP, GAAS, IMA ethical standards). Throughout this book, the workflow provides the thread that connects every chapter and every tool.
+:::
 
 ## The Tools of This Textbook
 
@@ -140,9 +146,10 @@ Part IV of this textbook (Chapters 13 through 16) is devoted to Power BI. Studen
 
 *[Figure 1.3: The Three Tools and Their Roles in the Analytics Workflow. A diagram showing Excel, SQL, and Power BI mapped to the six stages of the analytics workflow, indicating where each tool is primarily used. SQL maps primarily to stages 2 and 3 (accessing and preparing data). Excel maps primarily to stages 3 and 4 (preparing and analyzing data). Power BI maps primarily to stages 4 and 5 (analyzing and visualizing data). All three tools contribute to stage 6 (communication).]*
 
-> **[CONNECTING THE DOTS]**
-> Part V of this textbook (Chapters 17 through 20) integrates all three tools using the full Charles River database. In those chapters, you will work through scenarios that begin with SQL to extract data from the database, move to Excel for detailed analysis and modeling, and finish in Power BI for visualization and presentation. This integrated approach mirrors how analytics projects work in practice, where no single tool handles every stage of the workflow.
-
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Part V of this textbook (Chapters 17 through 20) integrates all three tools using the full Charles River database. In those chapters, you will work through scenarios that begin with SQL to extract data from the database, move to Excel for detailed analysis and modeling, and finish in Power BI for visualization and presentation. This integrated approach mirrors how analytics projects work in practice, where no single tool handles every stage of the workflow.
+:::
 
 ## The Charles River Accounting Dataset
 
@@ -191,6 +198,7 @@ The table groups map to six business cycles that define how Charles River operat
 *[Figure 1.5: Simplified O2C Process Flow. A horizontal flowchart showing the Order-to-Cash path: Customer places a SalesOrder, which generates SalesOrderLines. The order is fulfilled through a Shipment, which triggers a SalesInvoice. The customer pays through a CashReceipt, which is applied via CashReceiptApplication. The SalesInvoice generates GLEntry records in the Accounting Core.]*
 
 *[Figure 1.6: Simplified Accounting Core ER Diagram. Shows the three Accounting Core tables (Account, JournalEntry, GLEntry) and their relationships. Account has a self-referencing parent hierarchy. JournalEntry connects to GLEntry through JournalEntryID. GLEntry also receives entries from source documents identified by SourceDocumentType and SourceDocumentID.]*
+
 
 > **[WATCH OUT]**
 > The Charles River dataset is a fictional company created for educational purposes. It is designed to illustrate realistic data structures and analytical challenges, but it does not represent the full complexity or messiness of real-world data. Real ERP systems may contain hundreds of tables, custom fields, and data quality problems that exceed what you will encounter in this dataset. The skills you learn here will transfer to real-world environments, but you should expect that professional practice will require additional adaptation and judgment.

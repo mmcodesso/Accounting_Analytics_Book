@@ -1,0 +1,63 @@
+<mxfile>
+  <diagram name="Book Organization Map" id="fig0108v2">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="p1" value="&lt;b&gt;Part I&lt;/b&gt;&lt;br&gt;Foundations&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;Ch. 1-3&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#5D6D7E;fontSize=12;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="130" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1_tg" value="All groups (overview)" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="255" width="130" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p2" value="&lt;b&gt;Part II: Excel&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#FFFFFF'&gt;Ch. 4-8&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=12;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="290" y="40" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2_tg" value="O2C + Acct Core" style="text;html=1;align=center;verticalAlign=middle;fontColor=#17A589;fontSize=9;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="290" y="115" width="150" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p3" value="&lt;b&gt;Part III: SQL&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#FFFFFF'&gt;Ch. 9-12&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=12;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="290" y="170" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3_tg" value="+ P2P + Mfg" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontSize=9;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="290" y="245" width="150" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p4" value="&lt;b&gt;Part IV: Power BI&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#FFFFFF'&gt;Ch. 13-16&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=12;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="290" y="300" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="p4_tg" value="Cross-group models" style="text;html=1;align=center;verticalAlign=middle;fontColor=#F39C12;fontSize=9;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="290" y="375" width="150" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p5" value="&lt;b&gt;Part V&lt;/b&gt;&lt;br&gt;Integrated Topics&lt;br&gt;&lt;font style='font-size:9px;color:#FFFFFF'&gt;Ch. 17-20&lt;br&gt;All three tools&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5D6D7E;fontColor=#FFFFFF;strokeColor=#5D6D7E;fontSize=12;fontFamily=Arial;arcSize=20;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="570" y="130" width="170" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="p5_tg" value="All table groups integrated" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=9;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="570" y="275" width="170" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cases" value="5 comprehensive cases&lt;br&gt;(one per part)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontColor=#5D6D7E;strokeColor=#5D6D7E;fontSize=10;fontFamily=Arial;dashed=1;dashPattern=5 3;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="830" y="170" width="150" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p1" target="p2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p1" target="p3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p1" target="p4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="a25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" source="p2" target="p5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p3" target="p5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a45" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" edge="1" source="p4" target="p5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="a5c" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;dashed=1;dashPattern=5 3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p5" target="cases" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="dataset_lbl" value="&lt;font style='font-size:10px'&gt;All parts use the &lt;b&gt;Charles River Accounting Dataset&lt;/b&gt; (77 tables, 10 groups). Table groups are introduced progressively.&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontFamily=Arial;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="200" y="460" width="650" height="30" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
