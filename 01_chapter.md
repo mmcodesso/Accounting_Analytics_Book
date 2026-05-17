@@ -90,8 +90,14 @@ The fourth driver is competitive pressure in the labor market. Graduates who can
 A survey of accounting professionals conducted by Kokina and Dagiliene (2017) found that respondents identified data analysis and technology skills as the area of greatest change in the competencies required of accountants. Respondents across audit, tax, and advisory roles reported that they spend more time working with data tools than they did five years earlier and expected that trend to continue.
 :::
 
-*[Table 1.1: Examples of Analytics Applications by Accounting Role. A table with three columns (Role, Descriptive Example, Predictive Example) and four rows (Financial Reporting, Managerial Accounting, External Audit, Internal Audit), showing a specific analytics application for each combination.]*
+## Table 1.1: Examples of Analytics Applications by Accounting Role
 
+| Role | Descriptive Example | Predictive Example |
+|---|---|---|
+| Financial Reporting | Comparative income statement showing revenue by item group for the past four quarters | Revenue forecast for the next fiscal quarter using trend extrapolation of historical Charles River sales data |
+| Managerial Accounting | Product profitability ranking by item group based on standard cost and list price from the Item table | Cost-volume-profit model projecting break-even points for the Furniture product line under three pricing scenarios |
+| External Audit | Stratification of Charles River sales invoices by aging bucket to evaluate the allowance for doubtful accounts | Regression-based expectation for monthly revenue used as a substantive analytical procedure |
+| Internal Audit | Frequency distribution of DisbursementPayment amounts to identify concentrations near approval thresholds | Risk scoring of journal entries from the Accounting Core based on multiple indicators to prioritize selections for testing |
 
 ## The Accounting Analytics Workflow
 
@@ -144,7 +150,7 @@ Power BI is most powerful when the goal is to create a reusable, interactive rep
 
 Part IV of this textbook (Chapters 13 through 16) is devoted to Power BI. Students will build data models that span multiple Charles River table groups, learning visualization principles, the Power BI interface, data modeling with DAX, and interactive dashboard design.
 
-*[Figure 1.3: The Three Tools and Their Roles in the Analytics Workflow. A diagram showing Excel, SQL, and Power BI mapped to the six stages of the analytics workflow, indicating where each tool is primarily used. SQL maps primarily to stages 2 and 3 (accessing and preparing data). Excel maps primarily to stages 3 and 4 (preparing and analyzing data). Power BI maps primarily to stages 4 and 5 (analyzing and visualizing data). All three tools contribute to stage 6 (communication).]*
+![The Three Tools and Their Roles in the Analytics Workflow.](visuals/svg/fig-01-03-tools-workflow-mapping.svg){#fig-01-03 fig-alt="he Three Tools and Their Roles in the Analytics Workflow. A diagram showing Excel, SQL, and Power BI mapped to the six stages of the analytics workflow, indicating where each tool is primarily used. SQL maps primarily to stages 2 and 3 (accessing and preparing data). Excel maps primarily to stages 3 and 4 (preparing and analyzing data). Power BI maps primarily to stages 4 and 5 (analyzing and visualizing data). All three tools contribute to stage 6 (communication)."}
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
@@ -187,22 +193,35 @@ The **Organizational Planning** group contains three tables: CostCenter, Budget,
 
 The **Demand Planning and MRP** group contains five tables covering demand forecasting, inventory policy, supply plan recommendations, material requirements planning, and rough-cut capacity planning.
 
-*[Table 1.2: The Charles River Table Groups. A table with four columns (Table Group, Number of Tables, Key Tables, Primary Accounting Use) and ten rows, one for each table group. Example row: "Accounting Core | 3 | Account, JournalEntry, GLEntry | Financial reporting, audit analytics, period-close analysis."]*
+## Table 1.2: The Charles River Table Groups
+
+| Table Group | Number of Tables | Key Tables | Primary Accounting Use |
+|---|---|---|---|
+| Accounting Core | 3 | Account, JournalEntry, GLEntry | Financial reporting, audit analytics, period-close analysis |
+| Order-to-Cash (O2C) | 22 | Customer, SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, ServiceEngagement | Revenue analysis, receivables management, design services margin analysis |
+| Procure-to-Pay (P2P) | 9 | PurchaseOrder, PurchaseOrderLine, GoodsReceipt, PurchaseInvoice, DisbursementPayment | Purchasing analytics, three-way matching, vendor evaluation, duplicate payment detection |
+| Manufacturing | 14 | WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, WorkOrderClose | Standard cost versus actual cost analysis, production performance, material usage variance |
+| Payroll and Time | 14 | PayrollRegister, LaborTimeEntry, PayrollPayment, TimeClockEntry | Labor cost analysis, payroll compliance testing, workforce analytics |
+| Fixed Assets and Financing | 4 | FixedAsset, FixedAssetEvent, DebtAgreement, DebtScheduleLine | Depreciation analysis, asset lifecycle tracking, debt amortization |
+| Master Data | 3 | Item, Warehouse, Employee | Shared reference data for products, locations, and people across all groups |
+| Organizational Planning | 3 | CostCenter, Budget, BudgetLine | Departmental budgetary control, responsibility accounting, budget-versus-actual analysis |
+| Demand Planning and MRP | 5 | DemandForecast, InventoryPolicy, SupplyPlanRecommendation, MaterialRequirementPlan, RoughCutCapacityPlan | Demand forecasting, inventory optimization, production planning |
+
 
 ### The Business Cycles
 
 The table groups map to six business cycles that define how Charles River operates. The Order-to-Cash cycle traces customer demand from sales orders through shipments, invoicing, and cash receipts. The Design Services cycle (a branch within the O2C group) covers hourly consulting engagements that are staffed, approved, and billed monthly, creating a second revenue path alongside product sales. The Procure-to-Pay cycle covers replenishment from requisition through purchasing, goods receipt, and vendor payment. The Manufacturing cycle turns selected products into finished goods through planning, work orders, material issue, labor support, and production completion. The Payroll cycle processes employee time records into payroll registers, payments, and remittances. The Manual Journals and Close cycle handles accruals, reclassifications, and period-end adjustments through the JournalEntry table. Every one of these cycles ultimately flows into GLEntry, where the entire company's financial activity is recorded.
 
-*[Figure 1.4: Charles River High-Level Architecture Diagram. A diagram showing the ten table groups as connected blocks, with GLEntry at the center. Arrows show how each business cycle flows into the general ledger. The O2C group connects through SalesInvoice, the P2P group connects through PurchaseInvoice, the Manufacturing group connects through WorkOrderClose, the Payroll group connects through PayrollRegister, and the JournalEntry table handles manual entries.]*
+![Charles River High-Level Architecture Diagram.](visuals/svg/fig-01-04-charles-river-architecture.svg){#fig-01-04 fig-alt="A diagram showing the ten table groups as connected blocks, with GLEntry at the center. Arrows show how each business cycle flows into the general ledger. The O2C group connects through SalesInvoice, the P2P group connects through PurchaseInvoice, the Manufacturing group connects through WorkOrderClose, the Payroll group connects through PayrollRegister, and the JournalEntry table handles manual entries."}
 
-*[Figure 1.5: Simplified O2C Process Flow. A horizontal flowchart showing the Order-to-Cash path: Customer places a SalesOrder, which generates SalesOrderLines. The order is fulfilled through a Shipment, which triggers a SalesInvoice. The customer pays through a CashReceipt, which is applied via CashReceiptApplication. The SalesInvoice generates GLEntry records in the Accounting Core.]*
+![Simplified O2C Process Flow.](visuals/svg/fig-01-05-o2c-process-flow.svg){#fig-01-05 fig-alt="A horizontal flowchart showing the Order-to-Cash path: Customer places a SalesOrder, which generates SalesOrderLines. The order is fulfilled through a Shipment, which triggers a SalesInvoice. The customer pays through a CashReceipt, which is applied via CashReceiptApplication. The SalesInvoice generates GLEntry records in the Accounting Core."}
 
-*[Figure 1.6: Simplified Accounting Core ER Diagram. Shows the three Accounting Core tables (Account, JournalEntry, GLEntry) and their relationships. Account has a self-referencing parent hierarchy. JournalEntry connects to GLEntry through JournalEntryID. GLEntry also receives entries from source documents identified by SourceDocumentType and SourceDocumentID.]*
+![Simplified Accounting Core ER Diagram.](visuals/svg/fig-01-06-accounting-core-er.svg){#fig-01-06 fig-alt="Shows the three Accounting Core tables (Account, JournalEntry, GLEntry) and their relationships. Account has a self-referencing parent hierarchy. JournalEntry connects to GLEntry through JournalEntryID. GLEntry also receives entries from source documents identified by SourceDocumentType and SourceDocumentID."}
 
-
-> **[WATCH OUT]**
-> The Charles River dataset is a fictional company created for educational purposes. It is designed to illustrate realistic data structures and analytical challenges, but it does not represent the full complexity or messiness of real-world data. Real ERP systems may contain hundreds of tables, custom fields, and data quality problems that exceed what you will encounter in this dataset. The skills you learn here will transfer to real-world environments, but you should expect that professional practice will require additional adaptation and judgment.
-
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+The Charles River dataset is a fictional company created for educational purposes. It is designed to illustrate realistic data structures and analytical challenges, but it does not represent the full complexity or messiness of real-world data. Real ERP systems may contain hundreds of tables, custom fields, and data quality problems that exceed what you will encounter in this dataset. The skills you learn here will transfer to real-world environments, but you should expect that professional practice will require additional adaptation and judgment.
+:::
 
 ## Guided Tutorial 1.1: Exploring the Charles River Database
 
@@ -245,19 +264,19 @@ This textbook is organized into five parts that follow the progression of the an
 
 **Part V, Integrated and Applied Topics** (Chapters 17 through 20), brings everything together. These chapters apply the full toolkit to financial reporting analytics, cost and management accounting analytics, forensic accounting and fraud detection, and emerging technologies. Part V integrates across all table groups, and the chapters require you to move between Excel, SQL, and Power BI within a single project, just as you would in professional practice.
 
-*[Figure 1.8: Book Organization Map. A visual roadmap showing the five parts of the book as a progression from left to right. Part I (Foundations, all groups at overview) leads to Part II (Excel, O2C and Accounting Core), Part III (SQL, adds P2P and Manufacturing), and Part IV (Power BI, cross-group models), which converge into Part V (Integrated Topics, all groups). Each part shows its chapter numbers and the primary table groups used.]*
+![Book Organization Map.](visuals/svg/fig-01-08-book-organization-map.svg){#fig-01-08 fig-alt="A visual roadmap showing the five parts of the book as a progression from left to right. Part I (Foundations, all groups at overview) leads to Part II (Excel, O2C and Accounting Core), Part III (SQL, adds P2P and Manufacturing), and Part IV (Power BI, cross-group models), which converge into Part V (Integrated Topics, all groups). Each part shows its chapter numbers and the primary table groups used."}
 
 Each chapter follows a consistent structure. It opens with learning objectives and a motivating scenario set at Charles River, presents concepts through narrative explanation and guided tutorials, and closes with a summary, key terms, review questions, and applied exercises organized by three accounting perspectives: Financial Accounting, Managerial Accounting, and Auditing. Five comprehensive cases, one at the end of each part, provide extended multi-tool investigations that integrate the material from all chapters in that part.
 
-> **[IN PRACTICE]**
-> The three-perspective exercise structure in this book reflects how analytics is used across the accounting profession. The same technique, such as aging analysis, serves different purposes depending on the role. A financial accountant uses aging analysis to estimate the allowance for doubtful accounts. A managerial accountant uses it to assess collection efficiency and cash flow timing. An auditor uses it to evaluate management's estimates and to identify balances for confirmation testing. Seeing these connections will help you understand why a single analytical skill has broad professional value.
-
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+The three-perspective exercise structure in this book reflects how analytics is used across the accounting profession. The same technique, such as aging analysis, serves different purposes depending on the role. A financial accountant uses aging analysis to estimate the allowance for doubtful accounts. A managerial accountant uses it to assess collection efficiency and cash flow timing. An auditor uses it to evaluate management's estimates and to identify balances for confirmation testing. Seeing these connections will help you understand why a single analytical skill has broad professional value.
+:::
 
 ## Looking Ahead
 
 This chapter has introduced the concept of accounting analytics, defined the three types of analytics, described the tools and the Charles River dataset you will use throughout the book, and outlined the analytical workflow that connects every chapter. In the next chapter, you will take a closer look at accounting data itself. You will learn to distinguish different data types, identify common data quality problems, and understand why the quality of your data determines the quality of your analysis. The practical skills begin in Chapter 2, and they build steadily from that point forward.
 
----
 
 ## Chapter Summary
 
@@ -268,8 +287,6 @@ Analytics in accounting takes three forms. Descriptive analytics summarizes hist
 This textbook teaches accounting analytics using three tools (Excel, SQL, and Power BI) applied to the Charles River Accounting Dataset, a single integrated database containing 77 tables organized in ten groups. The tools cover the full analytics workflow from data access through visualization and communication. The book introduces the table groups progressively, starting with the O2C and Accounting Core groups in the Excel chapters, expanding into P2P and Manufacturing in the SQL chapters, building cross-group models in Power BI, and integrating all groups in the applied chapters of Part V.
 
 Every analytical project follows a consistent workflow: define the question, access the data, prepare and clean the data, analyze it, visualize the results, and communicate findings. This workflow provides the organizing thread for the entire book. The chapters are arranged so that students develop foundational skills in Parts I through IV and then apply them in integrated, multi-tool projects in Part V.
-
----
 
 ## Key Terms
 
@@ -308,8 +325,6 @@ Every analytical project follows a consistent workflow: define the question, acc
 **SQLite.** A lightweight relational database system that stores the entire database in a single file. This textbook uses SQLite because it requires no server installation and runs on any operating system.
 
 **Table group.** A named subset of related tables within the Charles River database that corresponds to a business process or functional area. The ten table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
-
----
 
 ## Multiple Choice Questions
 
@@ -418,82 +433,127 @@ B. Predictive analytics
 C. Prescriptive analytics
 D. The regression would not be considered analytics because it involves statistics
 
----
-
 ## Applied Exercises
 
 ### Financial Accounting Exercises
 
-**Exercise 1.1 (Financial Accounting): Mapping Table Groups to the Financial Reporting Cycle**
+**Exercise 1.1: Mapping Table Groups to the Financial Reporting Cycle**
 
 **Table group:** All groups (overview level)
 
 **Scenario.** You are a financial reporting analyst at Charles River. Your supervisor has asked you to prepare a memorandum that maps the company's data environment to common financial reporting needs. The supervisor wants to understand which table groups and specific tables contain the data needed for revenue analysis, accounts receivable management, inventory valuation, and general ledger reporting.
 
-**Requirements.** (1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing. For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold. (2) For each of the four financial reporting areas listed above, identify the specific tables and columns you would use. Write a brief explanation (two to three sentences) for each area. (3) Identify one financial reporting task that requires combining data from the O2C group with data from the Accounting Core group, and explain which tables you would need from each group and why. (4) Prepare a one-page summary memorandum presenting your findings in a format suitable for your supervisor.
+**Requirements.** 
+
+(1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing. For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold. 
+
+(2) For each of the four financial reporting areas listed above, identify the specific tables and columns you would use. Write a brief explanation (two to three sentences) for each area. 
+
+(3) Identify one financial reporting task that requires combining data from the O2C group with data from the Accounting Core group, and explain which tables you would need from each group and why. 
+
+(4) Prepare a one-page summary memorandum presenting your findings in a format suitable for your supervisor.
 
 **Deliverable.** A one-page written memorandum that maps Charles River table groups to financial reporting needs, identifying specific tables and explaining your reasoning.
 
 
-**Exercise 1.2 (Financial Accounting): Tracing the Revenue Path from Order to Ledger**
+**Exercise 1.2: Tracing the Revenue Path from Order to Ledger**
 
 **Table group:** O2C and Accounting Core
 
 **Scenario.** You are a staff accountant preparing for the quarterly close. Your manager has asked you to document the complete path that a revenue transaction follows through the Charles River database, from the initial customer order through cash collection and general ledger posting.
 
-**Requirements.** (1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, and GLEntry. For each table, note the key columns that link it to the next table in the sequence. (2) Write a narrative description (one paragraph per table) explaining what each table records and how it connects to the next step in the revenue process. (3) Identify the column in GLEntry that tells you the entry originated from a sales invoice rather than a journal entry or a payroll transaction. (4) Write a brief comparison (three to five sentences) explaining what information is available in the SalesInvoice table that is not available in the GLEntry table, and why an analyst might need to access both.
+**Requirements.** 
+
+(1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, and GLEntry. For each table, note the key columns that link it to the next table in the sequence. 
+
+(2) Write a narrative description (one paragraph per table) explaining what each table records and how it connects to the next step in the revenue process. 
+
+(3) Identify the column in GLEntry that tells you the entry originated from a sales invoice rather than a journal entry or a payroll transaction. 
+
+(4) Write a brief comparison (three to five sentences) explaining what information is available in the SalesInvoice table that is not available in the GLEntry table, and why an analyst might need to access both.
 
 **Deliverable.** A written description of the revenue transaction path through the Charles River database, with specific table and column references.
 
 
 ### Managerial Accounting Exercises
 
-**Exercise 1.3 (Managerial Accounting): Evaluating Table Groups for Cost Analysis**
+**Exercise 1.3: Evaluating Table Groups for Cost Analysis**
 
 **Table group:** Manufacturing, Organizational Planning, and Payroll
 
 **Scenario.** You are a management accountant at Charles River. Your controller has asked you to assess which table groups contain the information needed for a product cost analysis and a departmental budget review.
 
-**Requirements.** (1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing group (such as WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, and WorkOrderClose). List the table names and the columns most relevant to understanding product costs. (2) Examine worksheets from the Organizational Planning group (CostCenter, Budget, BudgetLine). List the table names and columns relevant to departmental budgeting. (3) Determine which group is better suited for product-level cost analysis (comparing standard cost to actual production cost) and which is better suited for departmental budget analysis (comparing budgeted amounts to actual spending by department). Explain your reasoning in three to five sentences. (4) Identify one managerial accounting question that requires data from both the Manufacturing group and the Payroll group, and explain what tables from each group you would need.
+**Requirements.** 
+
+(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing group (such as WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, and WorkOrderClose). List the table names and the columns most relevant to understanding product costs. 
+
+(2) Examine worksheets from the Organizational Planning group (CostCenter, Budget, BudgetLine). List the table names and columns relevant to departmental budgeting. 
+
+(3) Determine which group is better suited for product-level cost analysis (comparing standard cost to actual production cost) and which is better suited for departmental budget analysis (comparing budgeted amounts to actual spending by department). Explain your reasoning in three to five sentences. 
+
+(4) Identify one managerial accounting question that requires data from both the Manufacturing group and the Payroll group, and explain what tables from each group you would need.
 
 **Deliverable.** A written assessment that compares the cost analysis capabilities of the Manufacturing and Organizational Planning table groups, with specific references to tables and columns.
 
 
-**Exercise 1.4 (Managerial Accounting): Understanding Manufacturing Data Structures**
+**Exercise 1.4: Understanding Manufacturing Data Structures**
 
 **Table group:** Manufacturing and Master Data
 
 **Scenario.** You have been asked to prepare a brief overview of the production-related data available in the Charles River database for a new operations manager who will be using this data to evaluate production performance.
 
-**Requirements.** (1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing table group. Identify at least four tables that a production manager would find relevant. (2) For each table you identified, write one sentence describing what information it contains and how it might be used to evaluate production performance. (3) Examine the Item table in the Master Data group and identify the columns that connect manufacturing tables to product information. Write two to three sentences explaining how these shared columns (such as ItemID) allow you to combine information across tables for a more complete analysis. (4) Prepare a brief written overview (one half to one page) that the new manager could use as a reference when requesting reports.
+**Requirements.** 
+
+(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing table group. Identify at least four tables that a production manager would find relevant. 
+
+(2) For each table you identified, write one sentence describing what information it contains and how it might be used to evaluate production performance. 
+
+(3) Examine the Item table in the Master Data group and identify the columns that connect manufacturing tables to product information. Write two to three sentences explaining how these shared columns (such as ItemID) allow you to combine information across tables for a more complete analysis. 
+
+(4) Prepare a brief written overview (one half to one page) that the new manager could use as a reference when requesting reports.
 
 **Deliverable.** A written overview of the production-related data in the Charles River Manufacturing table group, suitable for a non-technical manager audience.
 
 
 ### Auditing Exercises
 
-**Exercise 1.5 (Auditing): Assessing Data Availability for Audit Testing**
+**Exercise 1.5: Assessing Data Availability for Audit Testing**
 
 **Table group:** O2C, P2P, and Accounting Core
 
 **Scenario.** You are a first-year auditor who has been assigned to plan the data analytics procedures for the Charles River engagement. Your senior has asked you to assess what data is available for three common audit tests: aging of receivables, testing for duplicate payments, and journal entry testing for management override of controls.
 
-**Requirements.** (1) For each of the three audit tests listed above, identify which Charles River table group and specific tables contain the data needed to perform the test. For aging of receivables, look at the O2C group (SalesInvoice and CashReceipt). For duplicate payment detection, look at the P2P group (DisbursementPayment). For journal entry testing, look at the Accounting Core group (JournalEntry and GLEntry). Be specific about which columns you would use. (2) Explain how the SourceDocumentType column in GLEntry allows an auditor to distinguish between journal entries made by the accounting team and entries generated automatically by business transactions such as sales invoices or payroll. (3) Identify one audit test that would require combining data from the O2C group with data from the Accounting Core group, and explain why neither group alone would be sufficient. (4) Write a planning memorandum (one page) that documents the data available for each test and identifies the specific tables and columns to be used.
+**Requirements.** 
+
+(1) For each of the three audit tests listed above, identify which Charles River table group and specific tables contain the data needed to perform the test. For aging of receivables, look at the O2C group (SalesInvoice and CashReceipt). For duplicate payment detection, look at the P2P group (DisbursementPayment). For journal entry testing, look at the Accounting Core group (JournalEntry and GLEntry). Be specific about which columns you would use. 
+
+(2) Explain how the SourceDocumentType column in GLEntry allows an auditor to distinguish between journal entries made by the accounting team and entries generated automatically by business transactions such as sales invoices or payroll. 
+
+(3) Identify one audit test that would require combining data from the O2C group with data from the Accounting Core group, and explain why neither group alone would be sufficient. 
+
+(4) Write a planning memorandum (one page) that documents the data available for each test and identifies the specific tables and columns to be used.
 
 **Deliverable.** A one-page audit planning memorandum documenting data availability for three specified audit procedures within the Charles River database.
 
 
-**Exercise 1.6 (Auditing): Evaluating Journal Entry Data for Audit Purposes**
+**Exercise 1.6: Evaluating Journal Entry Data for Audit Purposes**
 
 **Table group:** Accounting Core
 
 **Scenario.** You are preparing for journal entry testing as part of the Charles River audit engagement. Before writing any queries or performing any analysis, you need to understand the structure of the journal entry data in the company's system.
 
-**Requirements.** (1) Open the Charles River Excel workbook and examine the JournalEntry and GLEntry worksheets. Identify all columns available in each table. (2) Determine which columns would be most useful for identifying journal entries that warrant audit attention. Consider columns related to the person who posted the entry, the date and time of posting, the amount, and any descriptions or references. Look for columns such as PostedByEmployeeID, PostingDate, Debit, Credit, and Description. (3) Write a brief assessment (three to five sentences) of whether the Charles River data provides sufficient information to test for three common fraud risk indicators: entries posted outside of normal business hours, entries with round-dollar amounts, and entries posted just below an approval threshold. For any indicator where the data may be insufficient, explain what additional information would be needed. (4) The JournalEntry table includes a ReversesJournalEntryID column. Write one paragraph explaining how this column could be used in an audit test for window dressing at period end.
+**Requirements.** 
+
+(1) Open the Charles River Excel workbook and examine the JournalEntry and GLEntry worksheets. Identify all columns available in each table. 
+
+(2) Determine which columns would be most useful for identifying journal entries that warrant audit attention. Consider columns related to the person who posted the entry, the date and time of posting, the amount, and any descriptions or references. Look for columns such as PostedByEmployeeID, PostingDate, Debit, Credit, and Description. 
+
+(3) Write a brief assessment (three to five sentences) of whether the Charles River data provides sufficient information to test for three common fraud risk indicators: entries posted outside of normal business hours, entries with round-dollar amounts, and entries posted just below an approval threshold. For any indicator where the data may be insufficient, explain what additional information would be needed.
+
+(4) The JournalEntry table includes a ReversesJournalEntryID column. Write one paragraph explaining how this column could be used in an audit test for window dressing at period end.
 
 **Deliverable.** A written assessment of the journal entry data structure in the Charles River Accounting Core group, evaluating its suitability for audit testing of management override of controls.
 
----
 
 ## Further Reading
 
