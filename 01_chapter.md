@@ -14,7 +14,7 @@ After completing this chapter, you will be able to:
 1. Explain how data analytics has changed the work accountants perform and the skills the profession demands.
 2. Define descriptive, predictive, and prescriptive analytics and identify examples of each in financial accounting, managerial accounting, and auditing.
 3. Describe the purpose and capabilities of Excel, SQL, and Power BI as complementary tools for accounting analytics.
-4. Describe the Charles River Accounting Dataset, its business model, and how its ten table groups map to the company's business cycles.
+4. Recognize the Charles River business and how its integrated dataset supports analytics across the chapters of this book.
 5. Map the stages of an accounting analytics workflow from question formulation through communication of results.
 :::
 
@@ -39,7 +39,7 @@ Professional bodies have recognized this shift and responded by updating their c
 Accounting firms of all sizes now recruit for analytics skills alongside traditional accounting knowledge. Major firms have established dedicated data analytics practices, and even small and mid-size firms use data analysis tools for audit testing, tax planning, and advisory engagements. A 2019 survey by the Institute of Management Accountants found that data analytics ranked among the top five skills employers seek when hiring management accountants (IMA, 2019).
 ::: 
 
-The purpose of this textbook is to help you develop these skills in a structured and practical way. You will learn to work with data using three tools that are widely used in practice: Microsoft Excel, SQL, and Microsoft Power BI. You will apply these tools to realistic accounting data drawn from the Charles River Accounting Dataset, a single integrated database that you will use throughout the entire book. And you will practice solving problems from three accounting perspectives: financial accounting, managerial accounting, and auditing. By the end of this book, you will be able to extract data from a database, prepare it for analysis, summarize and model it, visualize the results, and communicate your findings to professional audiences.
+The purpose of this textbook is to help you develop these skills in a structured and practical way. You will learn to work with data using three tools that are widely used in practice, namely Microsoft Excel, SQL, and Microsoft Power BI. You will apply these tools to realistic accounting data drawn from the Charles River Accounting Dataset, a single integrated database that you will use throughout the entire book. And you will practice solving problems from three accounting perspectives, namely financial accounting, managerial accounting, and auditing. By the end of this book, you will be able to extract data from a database, prepare it for analysis, summarize and model it, visualize the results, and communicate your findings to professional audiences.
 
 
 ## Defining Accounting Analytics
@@ -50,7 +50,7 @@ It is important to distinguish accounting analytics from related terms that stud
 
 ### The Three Types of Analytics
 
-A useful framework for understanding the scope of analytics divides it into three categories: descriptive, predictive, and prescriptive. These categories represent increasing levels of analytical complexity and are not mutually exclusive. Most real-world accounting analytics projects involve more than one type.
+A useful framework for understanding the scope of analytics divides it into three categories, namely descriptive, predictive, and prescriptive. These categories represent increasing levels of analytical complexity and are not mutually exclusive. Most real-world accounting analytics projects involve more than one type.
 
 ![The Analytics Continuum.](visuals/svg/fig-01-01-analytics-continuum.svg){#fig-01-01 fig-alt="A horizontal diagram showing three stages from left to right: Descriptive Analytics What happened?, Predictive Analytics What might happen?, and Prescriptive Analytics What should we do?. Each stage includes a brief accounting example beneath it."}
 
@@ -103,9 +103,9 @@ A survey of accounting professionals conducted by Kokina and Dagiliene (2017) fo
 
 Before learning specific tools, it is helpful to understand the general process that all accounting analytics projects follow. Whether you are building a revenue summary in Excel, writing an audit query in SQL, or designing a dashboard in Power BI, the work progresses through the same sequence of stages. This textbook is organized around these stages, and understanding them now will help you see how the chapters connect.
 
-![The Accounting Analytics Workflow.](visuals/svg/fig-01-02-analytics-workflow.svg){#fig-01-01 fig-alt="A process flowchart showing six stages in sequence: (1) Define the Question, (2) Identify and Access the Data, (3) Prepare and Clean the Data, (4) Analyze the Data, (5) Visualize and Present the Results, (6) Communicate Findings and Recommendations. Each stage includes a one-sentence description."}
+![The Accounting Analytics Workflow.](visuals/svg/fig-01-02-analytics-workflow.svg){#fig-01-02 fig-alt="A process flowchart showing six stages in sequence: (1) Define the Question, (2) Identify and Access the Data, (3) Prepare and Clean the Data, (4) Analyze the Data, (5) Visualize and Present the Results, (6) Communicate Findings and Recommendations. Each stage includes a one-sentence description."}
 
-The first stage is defining the question. Every analytics project begins with a clear statement of the problem or question to be addressed. In the opening scenario of this chapter, the controller's question was specific: why did gross margins on the Furniture product line decline in the most recent quarter? A well-defined question guides every subsequent decision, from which data to collect to which visualizations to create. Vague questions produce vague answers. The ability to translate a business concern into an analytical question is one of the most important skills an accountant can develop.
+The first stage is defining the question. Every analytics project begins with a clear statement of the problem or question to be addressed. In the opening scenario of this chapter, the controller's question was specific, namely why did gross margins on the Furniture product line decline in the most recent quarter. A well-defined question guides every subsequent decision, from which data to collect to which visualizations to create. Vague questions produce vague answers. The ability to translate a business concern into an analytical question is one of the most important skills an accountant can develop.
 
 The second stage is identifying and accessing the data. Once the question is defined, the accountant must determine which data is needed and where it resides. In many organizations, the relevant data is stored in databases that are part of the company's ERP system or accounting software. Accessing this data may require writing SQL queries to extract the relevant tables and columns. In other cases, the data may be available in spreadsheet exports or flat files. Chapter 2 and Chapter 3 of this textbook address this stage by teaching students how accounting data is structured and stored within the Charles River database.
 
@@ -124,33 +124,9 @@ The six-stage workflow described here is not unique to accounting. It closely pa
 
 ## The Tools of This Textbook
 
-This textbook uses three tools: Microsoft Excel, SQL (Structured Query Language), and Microsoft Power BI. These tools were selected because they are widely used in accounting practice, they are accessible to students without programming backgrounds, and together they cover the full analytics workflow from data preparation through visualization.
+This textbook uses three tools that practitioners widely adopt, namely Microsoft Excel, SQL (Structured Query Language), and Microsoft Power BI. These tools were selected because they are widely used in accounting practice, they are accessible to students without programming backgrounds, and together they cover the full analytics workflow from data preparation through visualization. Figure 1.3 maps each tool to the workflow stages introduced in the previous section. SQL handles most of the work in data access and preparation. Excel dominates preparation and analysis. Power BI takes the lead in visualization and presentation. All three tools contribute to the communication of results. The To the Student section in the front matter describes what each tool does and the chapter range in which each one appears.
 
-### Microsoft Excel
-
-Excel is the most widely used analytical tool in the accounting profession. Nearly every accountant works with Excel on a daily basis, and most accounting graduates enter the workforce with at least basic spreadsheet skills. This textbook builds on that foundation and extends it into areas that many students have not explored, including structured Excel Tables, PivotTables, statistical functions, Power Query for data preparation, the Data Analysis ToolPak for regression, and Solver for optimization.
-
-Excel is most powerful when working with datasets that fit comfortably in a spreadsheet, typically up to a few hundred thousand rows. It excels at ad hoc analysis, where the accountant needs to explore data interactively, try different approaches, and produce results quickly. Excel is also the primary tool for building financial models, conducting what-if analysis, and preparing workpapers that document analytical procedures.
-
-Part II of this textbook (Chapters 4 through 8) is devoted to Excel. Students will work primarily with the Charles River Order-to-Cash and Accounting Core table groups, learning to import, clean, summarize, model, and test accounting data using features that go well beyond basic formulas and formatting.
-
-### SQL (Structured Query Language)
-
-SQL is the standard language for accessing data stored in relational databases. It allows accountants to extract exactly the data they need from large, complex databases without relying on pre-built reports or IT intermediaries. SQL is particularly important for accountants who work with ERP systems, because the underlying data in these systems is stored in relational databases that SQL can query directly.
-
-SQL is most powerful when working with large datasets, when the data spans multiple related tables that must be joined together, and when the same analysis needs to be performed repeatedly. An auditor who writes a SQL query to identify duplicate payments in the Charles River DisbursementPayment table can run that same query every quarter with no additional effort. A financial analyst who writes a query to produce a revenue summary by item group and customer segment can reuse that query whenever the data is updated.
-
-Part III of this textbook (Chapters 9 through 12) is devoted to SQL. Students will expand into the Procure-to-Pay and Manufacturing table groups, where relational joins become essential for combining data across multiple tables.
-
-### Microsoft Power BI
-
-Power BI is a business intelligence platform that enables accountants to build interactive dashboards and reports. It connects to a wide range of data sources (including Excel files and SQL databases), provides a data modeling layer for defining relationships and calculations, and offers a rich set of visualization tools for presenting results.
-
-Power BI is most powerful when the goal is to create a reusable, interactive report that multiple stakeholders can explore. A management accountant who builds a budget-versus-actual dashboard in Power BI gives every department manager the ability to filter the report to their own cost center, drill down into specific line items, and compare results across periods. An audit team that builds an anomaly detection dashboard creates a monitoring tool that can be refreshed with new data each audit cycle.
-
-Part IV of this textbook (Chapters 13 through 16) is devoted to Power BI. Students will build data models that span multiple Charles River table groups, learning visualization principles, the Power BI interface, data modeling with DAX, and interactive dashboard design.
-
-![The Three Tools and Their Roles in the Analytics Workflow.](visuals/svg/fig-01-03-tools-workflow-mapping.svg){#fig-01-03 fig-alt="he Three Tools and Their Roles in the Analytics Workflow. A diagram showing Excel, SQL, and Power BI mapped to the six stages of the analytics workflow, indicating where each tool is primarily used. SQL maps primarily to stages 2 and 3 (accessing and preparing data). Excel maps primarily to stages 3 and 4 (preparing and analyzing data). Power BI maps primarily to stages 4 and 5 (analyzing and visualizing data). All three tools contribute to stage 6 (communication)."}
+![The Three Tools and Their Roles in the Analytics Workflow.](visuals/svg/fig-01-03-tools-workflow-mapping.svg){#fig-01-03 fig-alt="A diagram showing Excel, SQL, and Power BI mapped to the six stages of the analytics workflow, indicating where each tool is primarily used. SQL maps primarily to stages 2 and 3 (accessing and preparing data). Excel maps primarily to stages 3 and 4 (preparing and analyzing data). Power BI maps primarily to stages 4 and 5 (analyzing and visualizing data). All three tools contribute to stage 6 (communication)."}
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
@@ -159,60 +135,13 @@ Part V of this textbook (Chapters 17 through 20) integrates all three tools usin
 
 ## The Charles River Accounting Dataset
 
-This textbook is built around one integrated dataset: the Charles River Accounting Dataset, a process-to-ledger teaching database that follows a single fictional company through its complete business cycles. The dataset is provided in three formats: an SQLite database for SQL work, an Excel workbook for spreadsheet analysis, and a CSV package for flexible import into any tool including Power BI. This means you will work with the same underlying data regardless of whether you are using Excel, SQL, or Power BI in a given chapter.
+This textbook is built around one integrated dataset that you will use across all twenty chapters. The Charles River Accounting Dataset follows a single fictional mid-size home furnishings company in the greater Boston area that designs and sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels, manufactures selected product lines in-house, and operates an interior design services practice that bills customers by the hour. Charles River employs approximately 60 people across six departments and maintains a full chart of accounts with cost center tracking. Working with one company throughout the book means you learn one business deeply rather than several superficially, and every chapter builds on the same data environment.
 
-### The Company
-
-Charles River is a fictional mid-size company situated in the greater Boston area that designs and sells home furnishings through wholesale and direct-to-business channels. The product catalog includes furniture, lighting, textiles, and decorative accessories organized into product families that you can visualize and compare analytically. Charles River manufactures selected product lines in-house from raw materials and packaging, purchases other finished goods from domestic and international suppliers, and warehouses inventory across multiple locations. The company also operates an interior design services practice that bills customers by the hour, giving students a second revenue model within the same business. Charles River employs approximately 60 people across six departments and maintains a full chart of accounts with cost center tracking.
-
-This hybrid operating model is a deliberate design choice. A company that both buys and makes products, sells both goods and services, and manages both manufacturing labor and salaried professionals creates the range of accounting transactions that students need to encounter. You can compare purchased products with manufactured products, trace how customer demand drives purchasing and production decisions, analyze how labor supports both operations and services, and see how all of these activities flow into the general ledger.
-
-### Why One Dataset
-
-Using a single company throughout the entire book means you learn one business deeply rather than multiple businesses superficially. Every chapter builds on the same data environment. A customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built in a later chapter. This continuity reinforces learning and mirrors real professional practice, where accountants work within one company's data for extended periods.
-
-### The Table Groups
-
-The Charles River database contains 77 tables organized into ten groups. The book introduces these groups progressively, starting with the most accessible tables and expanding as you build skill.
-
-The **Accounting Core** group contains three tables: Account, JournalEntry, and GLEntry. These represent the chart of accounts, the finance-controlled journal headers, and the posted ledger detail. Every business cycle in the database ultimately flows into GLEntry, making it the single source of truth for the company's financial position. This group is the anchor for financial reporting, audit analytics, and period-close analysis throughout the book.
-
-The **Order-to-Cash** group contains 22 tables covering the full revenue cycle from customer order through cash collection. This group includes sales orders, shipments, invoices, cash receipts, commercial pricing, design service engagements and billing, sales commissions, and a complete returns and credits chain. It is the richest group in the database, and the one you will work with first in the Excel and SQL chapters.
-
-The **Procure-to-Pay** group contains nine tables covering the full purchasing cycle from internal requisition through vendor payment, including purchase orders, goods receipts, supplier invoices, and disbursement payments. This group supports three-way matching, vendor analytics, and accounts payable management exercises.
-
-The **Manufacturing** group contains 14 tables covering production planning, material usage, labor support, production completion, and variance analysis. Tables include bills of material, routings, work centers, work orders, material issues, and work order close records. This group is particularly valuable for cost accounting exercises.
-
-The **Payroll and Time** group contains 14 tables covering workforce management from shift scheduling through payroll settlement, including time clock entries, labor time entries, payroll registers, payroll payments, and liability remittances. This group supports labor cost analysis and payroll compliance testing.
-
-The **Fixed Assets and Financing** group contains four tables covering the fixed asset subledger including acquisition, depreciation, and disposal, along with note-payable financing through debt agreements and amortization schedules.
-
-The **Master Data** group contains three shared reference tables: Item, Warehouse, and Employee. These are used across all other groups for product, location, and people information.
-
-The **Organizational Planning** group contains three tables: CostCenter, Budget, and BudgetLine. These define the departmental structure and monthly budget allocations for management reporting.
-
-The **Demand Planning and MRP** group contains five tables covering demand forecasting, inventory policy, supply plan recommendations, material requirements planning, and rough-cut capacity planning.
-
-## Table 1.2: The Charles River Table Groups
-
-| Table Group | Number of Tables | Key Tables | Primary Accounting Use |
-|---|---|---|---|
-| Accounting Core | 3 | Account, JournalEntry, GLEntry | Financial reporting, audit analytics, period-close analysis |
-| Order-to-Cash (O2C) | 22 | Customer, SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, ServiceEngagement | Revenue analysis, receivables management, design services margin analysis |
-| Procure-to-Pay (P2P) | 9 | PurchaseOrder, PurchaseOrderLine, GoodsReceipt, PurchaseInvoice, DisbursementPayment | Purchasing analytics, three-way matching, vendor evaluation, duplicate payment detection |
-| Manufacturing | 14 | WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, WorkOrderClose | Standard cost versus actual cost analysis, production performance, material usage variance |
-| Payroll and Time | 14 | PayrollRegister, LaborTimeEntry, PayrollPayment, TimeClockEntry | Labor cost analysis, payroll compliance testing, workforce analytics |
-| Fixed Assets and Financing | 4 | FixedAsset, FixedAssetEvent, DebtAgreement, DebtScheduleLine | Depreciation analysis, asset lifecycle tracking, debt amortization |
-| Master Data | 3 | Item, Warehouse, Employee | Shared reference data for products, locations, and people across all groups |
-| Organizational Planning | 3 | CostCenter, Budget, BudgetLine | Departmental budgetary control, responsibility accounting, budget-versus-actual analysis |
-| Demand Planning and MRP | 5 | DemandForecast, InventoryPolicy, SupplyPlanRecommendation, MaterialRequirementPlan, RoughCutCapacityPlan | Demand forecasting, inventory optimization, production planning |
-
-
-### The Business Cycles
-
-The table groups map to six business cycles that define how Charles River operates. The Order-to-Cash cycle traces customer demand from sales orders through shipments, invoicing, and cash receipts. The Design Services cycle (a branch within the O2C group) covers hourly consulting engagements that are staffed, approved, and billed monthly, creating a second revenue path alongside product sales. The Procure-to-Pay cycle covers replenishment from requisition through purchasing, goods receipt, and vendor payment. The Manufacturing cycle turns selected products into finished goods through planning, work orders, material issue, labor support, and production completion. The Payroll cycle processes employee time records into payroll registers, payments, and remittances. The Manual Journals and Close cycle handles accruals, reclassifications, and period-end adjustments through the JournalEntry table. Every one of these cycles ultimately flows into GLEntry, where the entire company's financial activity is recorded.
+The database contains 77 tables organized into ten groups that cover the full range of business activity from customer orders and supplier payments through manufacturing, payroll, and general ledger posting. The book introduces these groups progressively, starting with the most accessible tables in the early Excel chapters and expanding into the more complex groups as your skills develop. Figure 1.4 shows how the table groups connect through the general ledger, where every business cycle ultimately posts its financial activity. The About the Dataset section in the front matter describes each table group in full, and Appendix B provides complete Entity-Relationship diagrams along with column-level documentation.
 
 ![Charles River High-Level Architecture Diagram.](visuals/svg/fig-01-04-charles-river-architecture.svg){#fig-01-04 fig-alt="A diagram showing the ten table groups as connected blocks, with GLEntry at the center. Arrows show how each business cycle flows into the general ledger. The O2C group connects through SalesInvoice, the P2P group connects through PurchaseInvoice, the Manufacturing group connects through WorkOrderClose, the Payroll group connects through PayrollRegister, and the JournalEntry table handles manual entries."}
+
+Two visual examples illustrate the structure you will work with throughout the book. Figure 1.5 traces the Order-to-Cash cycle from a sales order through shipment, invoice, and cash receipt, with each stage generating records in tables that appear in the Excel and SQL chapters. Figure 1.6 shows the three Accounting Core tables that anchor financial reporting and audit analytics, namely the chart of accounts, the journal entry headers, and the posted ledger detail. Every transaction in the database eventually flows into GLEntry, making it the single source of truth for the company's financial position.
 
 ![Simplified O2C Process Flow.](visuals/svg/fig-01-05-o2c-process-flow.svg){#fig-01-05 fig-alt="A horizontal flowchart showing the Order-to-Cash path: Customer places a SalesOrder, which generates SalesOrderLines. The order is fulfilled through a Shipment, which triggers a SalesInvoice. The customer pays through a CashReceipt, which is applied via CashReceiptApplication. The SalesInvoice generates GLEntry records in the Accounting Core."}
 
@@ -247,7 +176,7 @@ The Charles River dataset is a fictional company created for educational purpose
 
 **Step 7.** Click on one manufacturing table (such as WorkOrder) and one payroll table (such as PayrollRegister). Examine the columns briefly. Notice that the database contains far more than just sales and accounting data. Work orders track production with columns for product, quantity, start date, and status. Payroll registers track pay periods with columns for employee, gross pay, deductions, and net pay. These table groups will become important in the SQL and Power BI sections of the book.
 
-**Checkpoint.** At this point, you should have examined worksheets from at least four table groups (O2C, Master Data, Accounting Core, and either Manufacturing or Payroll). You should be able to answer the following questions: How many item groups does Charles River sell? (Four: Furniture, Lighting, Textiles, and Accessories.) What column in GLEntry traces each entry back to its source document? (SourceDocumentType.) Which worksheet contains the chart of accounts? (Account.) If you can answer these three questions, you are ready to proceed.
+**Checkpoint.** At this point, you should have examined worksheets from at least four table groups (O2C, Master Data, Accounting Core, and either Manufacturing or Payroll). You should be able to answer the following questions. How many item groups does Charles River sell? (Four, namely Furniture, Lighting, Textiles, and Accessories.) What column in GLEntry traces each entry back to its source document? (SourceDocumentType.) Which worksheet contains the chart of accounts? (Account.) If you can answer these three questions, you are ready to proceed.
 
 
 ## How This Book Is Organized
@@ -266,11 +195,9 @@ This textbook is organized into five parts that follow the progression of the an
 
 ![Book Organization Map.](visuals/svg/fig-01-08-book-organization-map.svg){#fig-01-08 fig-alt="A visual roadmap showing the five parts of the book as a progression from left to right. Part I (Foundations, all groups at overview) leads to Part II (Excel, O2C and Accounting Core), Part III (SQL, adds P2P and Manufacturing), and Part IV (Power BI, cross-group models), which converge into Part V (Integrated Topics, all groups). Each part shows its chapter numbers and the primary table groups used."}
 
-Each chapter follows a consistent structure. It opens with learning objectives and a motivating scenario set at Charles River, presents concepts through narrative explanation and guided tutorials, and closes with a summary, key terms, review questions, and applied exercises organized by three accounting perspectives: Financial Accounting, Managerial Accounting, and Auditing. Five comprehensive cases, one at the end of each part, provide extended multi-tool investigations that integrate the material from all chapters in that part.
-
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-The three-perspective exercise structure in this book reflects how analytics is used across the accounting profession. The same technique, such as aging analysis, serves different purposes depending on the role. A financial accountant uses aging analysis to estimate the allowance for doubtful accounts. A managerial accountant uses it to assess collection efficiency and cash flow timing. An auditor uses it to evaluate management's estimates and to identify balances for confirmation testing. Seeing these connections will help you understand why a single analytical skill has broad professional value.
+The three-perspective exercise structure in this book reflects how analytics is used across the accounting profession. The same technique can serve different purposes depending on the role. A duplicate-payment analysis, for example, supports controls assurance in an audit context, vendor management in a procurement context, and cash flow review in a controllership context. Seeing these connections will help you understand why a single analytical skill has broad professional value.
 :::
 
 ## Looking Ahead
@@ -286,7 +213,7 @@ Analytics in accounting takes three forms. Descriptive analytics summarizes hist
 
 This textbook teaches accounting analytics using three tools (Excel, SQL, and Power BI) applied to the Charles River Accounting Dataset, a single integrated database containing 77 tables organized in ten groups. The tools cover the full analytics workflow from data access through visualization and communication. The book introduces the table groups progressively, starting with the O2C and Accounting Core groups in the Excel chapters, expanding into P2P and Manufacturing in the SQL chapters, building cross-group models in Power BI, and integrating all groups in the applied chapters of Part V.
 
-Every analytical project follows a consistent workflow: define the question, access the data, prepare and clean the data, analyze it, visualize the results, and communicate findings. This workflow provides the organizing thread for the entire book. The chapters are arranged so that students develop foundational skills in Parts I through IV and then apply them in integrated, multi-tool projects in Part V.
+Every analytical project follows a consistent workflow. The accountant defines the question, accesses the data, prepares and cleans the data, analyzes it, visualizes the results, and communicates findings. This workflow provides the organizing thread for the entire book. The chapters are arranged so that students develop foundational skills in Parts I through IV and then apply them in integrated, multi-tool projects in Part V.
 
 ## Key Terms
 

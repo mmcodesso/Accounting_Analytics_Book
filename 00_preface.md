@@ -11,7 +11,7 @@ This book exists because the accounting profession has changed faster than most 
 
 This textbook teaches accounting students to extract, prepare, analyze, and visualize data using three tools that are widely used in professional practice. Microsoft Excel serves as the foundation for data preparation, descriptive analytics, statistical modeling, and audit testing. SQL provides the ability to query relational databases directly, joining tables, aggregating results, and performing population-level analysis without relying on pre-built reports. Microsoft Power BI enables the creation of interactive dashboards and reports that communicate analytical findings to diverse audiences. These three tools cover the full analytics workflow from data access through communication of results, and they represent the toolkit that employers consistently identify as most relevant for entry-level accounting professionals (Sledgianowski, Gomaa, and Tan, 2017).
 
-The book is built around one integrated dataset that students use throughout all twenty chapters. The Charles River Accounting Dataset is a process-to-ledger teaching database that follows a single fictional company through its complete business cycles. Charles River is a mid-size home furnishings company that designs and sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels, manufactures selected product lines in-house, and operates an interior design services practice that bills customers by the hour. The database contains 77 tables organized into ten groups covering order-to-cash, procure-to-pay, manufacturing, payroll and time, design services, accounting core, fixed assets and financing, master data, organizational planning, and demand planning. The dataset is provided in three formats: an SQLite database for SQL work, an Excel workbook for spreadsheet analysis, and a CSV package for flexible import into any tool including Power BI. Using a single company throughout the entire book means students learn one business deeply rather than multiple businesses superficially, and every chapter builds on the same data environment so that a customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built in a later chapter. The About the Dataset section that follows this preface provides full descriptions of each table group, the progressive introduction approach, and the distribution formats.
+The book is built around one integrated dataset that students use throughout all twenty chapters. The Charles River Accounting Dataset follows a single fictional mid-size home furnishings company through its complete business cycles, and the same data underlies every chapter regardless of which tool that chapter teaches. The About the Dataset section that follows this preface describes the company, the ten table groups, the business cycles, and the distribution formats in full detail.
 
 
 ## Why This Book
@@ -58,7 +58,7 @@ For a graduate course spanning fifteen weeks, the pace is faster and the emphasi
 
 ## How This Book Is Organized
 
-The book contains twenty chapters organized into five parts. Parts I through IV follow a deliberate progression. Part I (Chapters 1 through 3) builds the conceptual foundation without introducing any tools. Parts II, III, and IV each teach one tool in depth: Excel in Chapters 4 through 8, SQL in Chapters 9 through 12, and Power BI in Chapters 13 through 16. Part V (Chapters 17 through 20) integrates all three tools in applied projects that span financial reporting, cost accounting, forensic analytics, and emerging technologies. A comprehensive case closes each part, requiring students to combine material from all chapters in that part into a multi-component deliverable.
+The book contains twenty chapters organized into five parts that follow a deliberate progression. Part I (Chapters 1 through 3) builds the conceptual foundation without introducing any tools. Parts II, III, and IV each teach one tool in depth, with Excel covered in Chapters 4 through 8, SQL in Chapters 9 through 12, and Power BI in Chapters 13 through 16. Part V (Chapters 17 through 20) integrates all three tools in applied projects that span financial reporting, cost accounting, forensic analytics, and emerging technologies. A comprehensive case closes each part, requiring students to combine material from all chapters in that part into a multi-component deliverable.
 
 Six appendices provide reference material including a software installation guide, complete dataset documentation with Entity-Relationship diagrams, and quick reference guides for Excel functions, SQL syntax, and DAX functions. Appendix F maps every exercise in the book to the relevant competency areas in the AICPA, IMA, and IFAC frameworks, supporting instructors who need to align their course with accreditation requirements.
 
@@ -71,7 +71,7 @@ The profession's integration of analytics into its competency frameworks has acc
 
 ---
 
-# To the Student
+# To the Student {.unnumbered}
 
 You are beginning a book that will change how you work with accounting data. The accounting courses you have taken so far taught you to understand financial statements, apply standards, calculate ratios, and interpret results. Those skills remain essential. What this book adds is the ability to work directly with the data that produces those statements, ratios, and results. Instead of receiving a finished trial balance and analyzing it, you will learn to query a database, extract the general ledger entries, and build the trial balance yourself. Instead of reading a variance report, you will learn to calculate the variances from production data and present them in an interactive dashboard. Instead of reviewing a sample of transactions that someone else selected, you will learn to test the entire population and let the data reveal the anomalies.
 
@@ -82,7 +82,7 @@ This book assumes no prior experience with analytics or programming. If you have
 
 The book follows a consistent structure that will become familiar after the first few chapters. Each chapter opens with learning objectives that tell you what you will be able to do after completing the chapter. An opening scenario places you in a professional role and describes a task that motivates the material. The body of the chapter alternates between conceptual explanation and hands-on tutorials. Callout boxes provide practical tips, warnings, and connections to other parts of the book. Each chapter closes with a summary, key terms, review questions, and applied exercises.
 
-The applied exercises at the end of each chapter are organized into three sections by accounting perspective. Financial Accounting exercises focus on reporting and disclosure tasks. Managerial Accounting exercises focus on costing, budgeting, and performance measurement. Auditing exercises focus on testing, anomaly detection, and assurance procedures. You will complete exercises in all three perspectives regardless of which area of accounting interests you most. This breadth is intentional. Analytics skills transfer across roles, and understanding how the same technique serves different purposes will make you a more versatile professional.
+The applied exercises at the end of each chapter sit in three sections by accounting perspective, namely financial accounting, managerial accounting, and auditing. You will complete exercises in all three perspectives regardless of which area of accounting interests you most, because analytical techniques transfer across roles and understanding how the same technique serves different purposes will broaden your professional range.
 
 
 ## The Three Tools
@@ -100,9 +100,7 @@ In Part V of the book, you will use all three tools together. You will extract d
 
 ## The Dataset
 
-You will work with one dataset throughout this book: the Charles River Accounting Dataset. Charles River is a fictional mid-size home furnishings company that sells furniture, lighting, textiles, and accessories, manufactures selected product lines in-house, and operates an hourly design services practice. The database contains 77 tables organized into ten groups that cover the full range of business activity from customer orders and supplier payments through manufacturing, payroll, and general ledger posting. The dataset is provided as an SQLite database, an Excel workbook, and a CSV package, so you can use the same data in every tool the book covers.
-
-Using one company throughout the entire book is a deliberate design choice. Instead of learning three different businesses at a surface level, you will learn one business deeply. A sales order you analyze in an Excel chapter will appear in the general ledger you query in a SQL chapter and will surface again in a Power BI dashboard you build later. This continuity mirrors professional practice, where accountants work within one company's data for extended periods. The book introduces the table groups progressively, starting with the simplest tables and expanding as you build skill. The About the Dataset section provides full descriptions of each table group and the progressive introduction approach.
+You will work with one dataset throughout this book, the Charles River Accounting Dataset. Charles River is a fictional mid-size home furnishings company that sells goods, manufactures selected product lines, and provides hourly design services, generating the full range of accounting transactions you will analyze across the chapters. The dataset ships as an SQLite database, an Excel workbook, and a CSV package, so you can use the same data in every tool the book covers. The About the Dataset section that follows describes the company, the table groups, and the formats in full detail.
 
 
 ## How to Succeed
@@ -115,9 +113,9 @@ Finally, pay attention to the connections across chapters and tools. The "Connec
 
 ---
 
-# About the Dataset
+# About the Dataset {.unnumbered}
 
-This textbook is built around one integrated dataset: the Charles River Accounting Dataset. Rather than using multiple databases at different levels of complexity, this book uses a single company that students learn deeply over the course of twenty chapters. Every chapter builds on the same data environment, so a customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built later. This continuity reinforces learning and mirrors real professional practice, where accountants work within one company's data for extended periods.
+This textbook is built around one integrated dataset, the Charles River Accounting Dataset. Rather than using multiple databases at different levels of complexity, this book uses a single company that students learn deeply over the course of twenty chapters. Every chapter builds on the same data environment, so a customer order analyzed in an Excel chapter appears in the general ledger queried in a SQL chapter and surfaces in a Power BI dashboard built later. This continuity reinforces learning and mirrors real professional practice, where accountants work within one company's data for extended periods.
 
 
 ## The Company
@@ -129,9 +127,21 @@ This hybrid operating model is a deliberate design choice. A company that both b
 
 ## The Table Groups
 
-The Charles River database contains 77 tables organized into ten groups. The book introduces these groups progressively, starting with the simplest tables in the early chapters and expanding into more complex groups as students build skill.
+The Charles River database contains 77 tables organized into ten groups. The book introduces these groups progressively, starting with the simplest tables in the early chapters and expanding into more complex groups as students build skill. The table below summarizes the ten groups, and the paragraphs that follow describe each group in more detail.
 
-The Accounting Core group contains three tables: Account, JournalEntry, and GLEntry. These represent the chart of accounts, the finance-controlled journal headers, and the posted ledger detail. Every business cycle in the database ultimately flows into GLEntry, making it the single source of truth for the company's financial position. This group is the anchor for financial reporting, audit analytics, and period-close analysis.
+| Table Group | Number of Tables | Key Tables | Primary Accounting Use |
+|---|---|---|---|
+| Accounting Core | 3 | Account, JournalEntry, GLEntry | Financial reporting, audit analytics, period-close analysis |
+| Order-to-Cash (O2C) | 22 | Customer, SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, ServiceEngagement | Revenue analysis, receivables management, design services margin analysis |
+| Procure-to-Pay (P2P) | 9 | PurchaseOrder, PurchaseOrderLine, GoodsReceipt, PurchaseInvoice, DisbursementPayment | Purchasing analytics, three-way matching, vendor evaluation, duplicate payment detection |
+| Manufacturing | 14 | WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, WorkOrderClose | Standard cost versus actual cost analysis, production performance, material usage variance |
+| Payroll and Time | 14 | PayrollRegister, LaborTimeEntry, PayrollPayment, TimeClockEntry | Labor cost analysis, payroll compliance testing, workforce analytics |
+| Fixed Assets and Financing | 4 | FixedAsset, FixedAssetEvent, DebtAgreement, DebtScheduleLine | Depreciation analysis, asset lifecycle tracking, debt amortization |
+| Master Data | 3 | Item, Warehouse, Employee | Shared reference data for products, locations, and people across all groups |
+| Organizational Planning | 3 | CostCenter, Budget, BudgetLine | Departmental budgetary control, responsibility accounting, budget-versus-actual analysis |
+| Demand Planning and MRP | 5 | DemandForecast, InventoryPolicy, SupplyPlanRecommendation, MaterialRequirementPlan, RoughCutCapacityPlan | Demand forecasting, inventory optimization, production planning |
+
+The Accounting Core group contains three tables, namely Account, JournalEntry, and GLEntry. These represent the chart of accounts, the finance-controlled journal headers, and the posted ledger detail. Every business cycle in the database ultimately flows into GLEntry, making it the single source of truth for the company's financial position. This group is the anchor for financial reporting, audit analytics, and period-close analysis.
 
 The Order-to-Cash group contains 22 tables covering the full revenue cycle from customer order through cash collection, including sales orders, shipments, invoices, cash receipts, commercial pricing, design service engagements and billing, sales commissions, and a complete returns and credits chain through credit memos and customer refunds. This is the richest group in the database.
 
@@ -143,13 +153,18 @@ The Payroll and Time group contains 14 tables covering workforce management from
 
 The Fixed Assets and Financing group contains four tables covering the fixed asset subledger including acquisition, depreciation, and disposal, along with note-payable financing through debt agreements and amortization schedules.
 
-The Master Data group contains three shared reference tables: Item, Warehouse, and Employee. These are used across all other groups for product, location, and people information.
+The Master Data group contains three shared reference tables, namely Item, Warehouse, and Employee. These are used across all other groups for product, location, and people information.
 
-The Organizational Planning group contains three tables: CostCenter, Budget, and BudgetLine. These support budgetary control and responsibility accounting exercises.
+The Organizational Planning group contains three tables, namely CostCenter, Budget, and BudgetLine. These support budgetary control and responsibility accounting exercises.
 
 The Demand Planning and MRP group contains five tables covering demand forecasting, inventory policy, supply plan recommendations, material requirements planning, and rough-cut capacity planning.
 
 The Design Services tables are distributed within the Order-to-Cash group but represent a distinct business process. Service engagements, employee assignments, approved time entries, and billing lines give students a complete service revenue cycle alongside the goods revenue cycle.
+
+
+## The Business Cycles
+
+The table groups map to six business cycles that define how Charles River operates. The Order-to-Cash cycle traces customer demand from sales orders through shipments, invoicing, and cash receipts. The Design Services cycle, a branch within the O2C group, covers hourly consulting engagements that are staffed, approved, and billed monthly, creating a second revenue path alongside product sales. The Procure-to-Pay cycle covers replenishment from requisition through purchasing, goods receipt, and vendor payment. The Manufacturing cycle turns selected products into finished goods through planning, work orders, material issue, labor support, and production completion. The Payroll cycle processes employee time records into payroll registers, payments, and remittances. The Manual Journals and Close cycle handles accruals, reclassifications, and period-end adjustments through the JournalEntry table. Every one of these cycles ultimately flows into GLEntry, where the entire company's financial activity is recorded.
 
 
 ## How the Table Groups Connect
