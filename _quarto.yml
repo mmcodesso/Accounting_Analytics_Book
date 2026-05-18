@@ -10,6 +10,8 @@ book:
   chapters:
     - index.md
     - 00_preface.md
+    - 00_to_the_student.md
+    - 00_about_the_dataset.md
     - downloads.md
     - part: "Part I: Foundations of Accounting Analytics"
       chapters:
