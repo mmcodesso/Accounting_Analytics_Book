@@ -22,7 +22,6 @@ After completing this chapter, you will be able to:
 
 You have just started a position as a staff accountant at Charles River, a mid-size home furnishings company in the greater Boston area. During your first week, the controller asks you to investigate why gross margins on the Furniture product line declined in the most recent quarter. She tells you the data you need is spread across several tables in the company's database, including sales orders, product cost records, and the general ledger. Your accounting coursework prepared you to interpret financial statements, calculate ratios, and apply standards, but you have never pulled data directly from a database, cleaned it for analysis, or built an interactive report that the management team can explore on their own. You realize that answering the controller's question will require more than accounting knowledge. It will require the ability to extract, prepare, analyze, and communicate data. This chapter introduces the analytical mindset and the toolkit you will develop throughout this book to handle exactly this kind of challenge.
 
----
 
 ## The Changing Landscape of Accounting Work
 
@@ -90,14 +89,14 @@ The fourth driver is competitive pressure in the labor market. Graduates who can
 A survey of accounting professionals conducted by Kokina and Dagiliene (2017) found that respondents identified data analysis and technology skills as the area of greatest change in the competencies required of accountants. Respondents across audit, tax, and advisory roles reported that they spend more time working with data tools than they did five years earlier and expected that trend to continue.
 :::
 
-## Table 1.1: Examples of Analytics Applications by Accounting Role
+**Table 1.1: Examples of Analytics Applications by Accounting Role**
 
-| Role | Descriptive Example | Predictive Example |
-|---|---|---|
-| Financial Reporting | Comparative income statement showing revenue by item group for the past four quarters | Revenue forecast for the next fiscal quarter using trend extrapolation of historical Charles River sales data |
-| Managerial Accounting | Product profitability ranking by item group based on standard cost and list price from the Item table | Cost-volume-profit model projecting break-even points for the Furniture product line under three pricing scenarios |
-| External Audit | Stratification of Charles River sales invoices by aging bucket to evaluate the allowance for doubtful accounts | Regression-based expectation for monthly revenue used as a substantive analytical procedure |
-| Internal Audit | Frequency distribution of DisbursementPayment amounts to identify concentrations near approval thresholds | Risk scoring of journal entries from the Accounting Core based on multiple indicators to prioritize selections for testing |
+| Role | Descriptive Example | Predictive Example | Prescriptive Example |
+|---|---|---|---|
+| Financial Reporting | Comparative income statement showing revenue by item group for the past four quarters | Revenue forecast for the next fiscal quarter using trend extrapolation of historical Charles River sales data | Recommended adjustment to the allowance for doubtful accounts that balances collection risk against earnings volatility across alternative aging assumptions |
+| Managerial Accounting | Product profitability ranking by item group based on standard cost and list price from the Item table | Cost-volume-profit model projecting break-even points for the Furniture product line under three pricing scenarios | Product mix recommendation that maximizes total contribution margin across the four item groups subject to constraints on machine hours and raw material availability |
+| External Audit | Stratification of Charles River sales invoices by aging bucket to evaluate the allowance for doubtful accounts | Regression-based expectation for monthly revenue used as a substantive analytical procedure | Optimal allocation of substantive testing hours across audit areas that minimizes residual risk for a given engagement budget |
+| Internal Audit | Frequency distribution of DisbursementPayment amounts to identify concentrations near approval thresholds | Risk scoring of journal entries from the Accounting Core based on multiple indicators to prioritize selections for testing | Recommended threshold settings for continuous monitoring rules that maximize true positive detection of duplicate payments while limiting false positive review burden |
 
 ## The Accounting Analytics Workflow
 
