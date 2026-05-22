@@ -17,15 +17,16 @@ These files are automatically updated whenever the book is rebuilt.
 
 ## Datasets
 
-The datasets below are hosted on GitHub Releases to support large file sizes and fast global downloads.
+The dataset below is hosted on GitHub Releases to support large file sizes and fast global downloads.
+It supports the full book across Excel, SQL, and Power BI.
 
-### **Northwind**
-- [Northwind (SQLite)](https://github.com/mmcodesso/Accounting_Analytics/releases/download/v1.0-data/Northwind.sqlite)
-- [Northwind (Excel)](https://github.com/mmcodesso/Accounting_Analytics/releases/download/v1.0-data/Northwind.xlsx)
+### Charles River Accounting Dataset
 
-### **AdventureWorks**
-- [AdventureWorks (SQLite)](https://github.com/mmcodesso/Accounting_Analytics/releases/download/v1.0-data/AdventureWorks.sqlite)
-- [AdventureWorks (Excel)](https://github.com/mmcodesso/Accounting_Analytics/releases/download/v1.0-data/AdventureWorks.xlsx)
+- [Charles River Accounting Dataset (SQLite)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.sqlite)
+- [Charles River Accounting Dataset (Excel)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.xlsx)
+- [Charles River Accounting Dataset (CSV package)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver_csv.zip)
+
+All three formats contain the same Charles River data, so students can move between Excel, SQL, and Power BI without changing datasets.
 
 ---
 
