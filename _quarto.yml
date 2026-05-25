@@ -6,7 +6,8 @@ project:
 book:
   title: "Accounting Analytics"
   author: "Mauricio Codesso"
-  date: "3/30/2026"
+  cover-image: visuals/cover/cover.png
+  cover-image-alt: "Cover of Accounting Analytics: A Practical Approach"
   chapters:
     - index.md
     - 00_preface.md

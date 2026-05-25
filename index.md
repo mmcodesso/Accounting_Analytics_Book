@@ -11,6 +11,8 @@ sidebar: true
 
 # Welcome {.unnumbered}
 
+<!-- # Welcome {.unnumbered}
+
 ::: {.book-hero}
 ::: {.book-hero__title}
 Accounting Analytics
@@ -23,9 +25,9 @@ A Practical Approach
 ::: {.book-hero__oer}
 Open Educational Resource
 :::
-:::
+::: -->
 
-# Accounting Analytics: A Practical Approach
+# Accounting Analytics: A Practical Approach {.unnumbered}
 
 This is an open educational resource textbook that teaches accounting students to extract, prepare, analyze, and visualize financial and operational data using three tools widely adopted in professional practice. The book is designed for undergraduate and graduate accounting and business students with no prior analytics or programming experience.
 

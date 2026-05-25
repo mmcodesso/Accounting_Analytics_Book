@@ -1,0 +1,139 @@
+<mxfile host="app.diagrams.net" agent="textbook" version="24.0.0">
+  <diagram name="Fig 2.7 - GLEntry Debit Credit Sum" id="fig-02-07">
+    <mxGraphModel dx="1000" dy="650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="530" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;Figure 2.7: Charles River GLEntry Worksheet with SUM Formulas Comparing Total Debits and Credits&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="80" y="10" width="740" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:10px;&quot;&gt;&lt;i&gt;[Screenshot mockup — replace with actual Excel screenshot during production]&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="200" y="32" width="500" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="frame" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B0B0B0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="810" height="300" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="h_a" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;PostingDate&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="20" y="70" width="85" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_b" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;AccountID&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="105" y="70" width="70" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_c" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;Debit&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="175" y="70" width="90" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_d" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;Credit&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="265" y="70" width="90" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_e" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;SourceDocType&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="355" y="70" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_f" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;VoucherNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="455" y="70" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="h_g" value="&lt;font style=&quot;font-size:8px;&quot;&gt;&lt;b&gt;FiscalPeriod&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5D8DC;strokeColor=#B0B0B0;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="555" y="70" width="80" height="24" as="geometry"/>
+        </mxCell>
+
+        <!-- Data row 1 -->
+        <mxCell id="r1a" value="&lt;font style=&quot;font-size:8px;&quot;&gt;2024-01-02&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="20" y="94" width="85" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1b" value="&lt;font style=&quot;font-size:8px;&quot;&gt;1100&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="105" y="94" width="70" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1c" value="&lt;font style=&quot;font-size:8px;&quot;&gt;12,500.00&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="175" y="94" width="90" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1d" value="&lt;font style=&quot;font-size:8px;&quot;&gt;0.00&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="265" y="94" width="90" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1e" value="&lt;font style=&quot;font-size:8px;&quot;&gt;SalesInvoice&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="355" y="94" width="100" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1f" value="&lt;font style=&quot;font-size:8px;&quot;&gt;INV-001&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="455" y="94" width="100" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1g" value="&lt;font style=&quot;font-size:8px;&quot;&gt;1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="555" y="94" width="80" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- Data row 2 -->
+        <mxCell id="r2a" value="&lt;font style=&quot;font-size:8px;&quot;&gt;2024-01-02&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="20" y="116" width="85" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2b" value="&lt;font style=&quot;font-size:8px;&quot;&gt;4100&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="105" y="116" width="70" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2c" value="&lt;font style=&quot;font-size:8px;&quot;&gt;0.00&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="175" y="116" width="90" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2d" value="&lt;font style=&quot;font-size:8px;&quot;&gt;12,500.00&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="265" y="116" width="90" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2e" value="&lt;font style=&quot;font-size:8px;&quot;&gt;SalesInvoice&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="355" y="116" width="100" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2f" value="&lt;font style=&quot;font-size:8px;&quot;&gt;INV-001&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="455" y="116" width="100" height="22" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2g" value="&lt;font style=&quot;font-size:8px;&quot;&gt;1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="555" y="116" width="80" height="22" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ellipsis" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;i&gt;... (additional rows) ...&lt;/i&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="20" y="138" width="615" height="22" as="geometry"/>
+        </mxCell>
+
+        <!-- SUM row -->
+        <mxCell id="sum_label_a" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="20" y="175" width="85" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_label_b" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#1A5276&quot;&gt;&lt;b&gt;TOTALS&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="105" y="175" width="70" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_debit" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#1A5276&quot;&gt;&lt;b&gt;2,847,362.50&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;fontFamily=Helvetica;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="175" y="175" width="90" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_credit" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#1A5276&quot;&gt;&lt;b&gt;2,847,362.50&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;fontFamily=Helvetica;align=right;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="265" y="175" width="90" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_empty_e" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="355" y="175" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_empty_f" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="455" y="175" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum_empty_g" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#1A5276;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="555" y="175" width="80" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="diff_label" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#17A589&quot;&gt;&lt;b&gt;Difference (Debit - Credit)&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#17A589;strokeWidth=1.5;fontFamily=Helvetica;align=right;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="20" y="213" width="155" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="diff_value" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#17A589&quot;&gt;&lt;b&gt;0.00 &#x2713;&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#17A589;strokeWidth=1.5;fontFamily=Helvetica;align=center;" vertex="1" parent="1">
+          <mxGeometry x="175" y="213" width="180" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="callout1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;1&lt;/b&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="645" y="175" width="20" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="callout2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;2&lt;/b&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="365" y="218" width="20" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;(1)&lt;/b&gt; SUM formulas calculate total debits ($2,847,362.50) and total credits ($2,847,362.50) across all GLEntry rows. &lt;b&gt;(2)&lt;/b&gt; The difference of $0.00 confirms that the Charles River general ledger satisfies the fundamental accounting equation. A nonzero difference would indicate a serious consistency problem.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="20" y="375" width="790" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="prod_note" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;i&gt;Production: Capture from CharlesRiver.xlsx, GLEntry worksheet, at 1920&#x00D7;1080, default theme. Show columns through FiscalPeriod with SUM row visible at bottom. Adjust totals to match actual dataset values. Add blue callout markers per spec.&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="20" y="435" width="790" height="30" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

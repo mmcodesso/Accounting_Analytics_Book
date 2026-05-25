@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net" agent="textbook" version="24.0.0">
+  <diagram name="Fig 2.2 - Sources of Accounting Data" id="fig-02-02">
+    <mxGraphModel dx="1200" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Figure 2.2: Common Sources of Accounting Data&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="250" y="10" width="600" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Central hub: Accounting Analytics -->
+        <mxCell id="hub" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;Accounting&lt;br&gt;Analytics&lt;/b&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=2;fontFamily=Helvetica;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="280" width="160" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Source 1: General Ledger (top left) -->
+        <mxCell id="src1_box" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;General Ledger&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=12;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="80" y="60" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="src1_desc" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Central repository of all financial transactions. Every debit and credit entry that affects the financial statements.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#D5D8DC;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="80" y="96" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Source 2: Sub-Ledgers (top right) -->
+        <mxCell id="src2_box" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Sub-Ledgers&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=12;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="770" y="60" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="src2_desc" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Detailed records for specific account categories such as accounts receivable, accounts payable, and inventory.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#D5D8DC;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="770" y="96" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Source 3: Trial Balance (left middle) -->
+        <mxCell id="src3_box" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Trial Balance&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;strokeColor=#17A589;arcSize=12;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="30" y="310" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="src3_desc" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Summary listing of all account balances at a point in time. Starting point for financial statement preparation.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#D5D8DC;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="30" y="346" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Source 4: ERP System (right middle) -->
+        <mxCell id="src4_box" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;ERP System&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;strokeColor=#17A589;arcSize=12;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="820" y="310" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="src4_desc" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Integrated platform capturing financial, sales, purchasing, production, and HR data in a single database.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#D5D8DC;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="820" y="346" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Source 5: External Data (bottom center) -->
+        <mxCell id="src5_box" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;External Data Feeds&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;strokeColor=#F39C12;arcSize=12;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="420" y="540" width="200" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="src5_desc" value="&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Bank statements, market price feeds, credit ratings, tax rate tables, and industry benchmarking data from outside the organization.&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#D5D8DC;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="420" y="576" width="200" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Connector arrows from each source to hub -->
+        <mxCell id="conn1" style="rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.15;entryY=0.1;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="src1_desc" target="hub">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn2" style="rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=0.1;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="src2_desc" target="hub">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn3" style="rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=open;endFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="src3_desc" target="hub">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn4" style="rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="src4_desc" target="hub">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="conn5" style="rounded=1;orthogonalLoop=1;jettySize=auto;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="src5_box" target="hub">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -2,10 +2,6 @@
 title: "The Role of Analytics in Accounting"
 ---
 
-::: {.chapter-meta}
-[Conceptual Chapter]{.chapter-pill}
-:::
-
 ## Learning Objectives {.unnumbered}
 
 ::: {.learning-objectives}
@@ -165,7 +161,9 @@ The Charles River dataset is a fictional company created for educational purpose
 
 **Step 3.** Click on the SalesOrder worksheet. Examine the columns, which include SalesOrderID, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, and Status. Notice that CustomerID appears in both the Customer and SalesOrder worksheets. This column links the two tables together, a concept you will study in depth in Chapter 3 and use extensively when writing SQL joins in Chapters 10 and 11.
 
-*[Figure 1.7: Screenshot of the Charles River SalesOrder worksheet in Excel, showing column headers and the first several rows of data. Annotated callouts identify the SalesOrderID, CustomerID, OrderDate, and Status columns.]*
+
+![Screenshot of the Charles River SalesOrder worksheet in Excel.](visuals/png/fig-01-07-salesorder.png){#fig-01-01 fig-alt="Screenshot of the Charles River SalesOrder worksheet in Excel, showing column headers and the first several rows of data. Annotated callouts identify the SalesOrderID, CustomerID, OrderDate, and Status columns."}
+
 
 **Step 4.** Click on the Item worksheet. Examine the columns, which include ItemID, ItemName, ItemGroup, SupplyMode, StandardCost, and ListPrice. Notice the ItemGroup column, which classifies products into four categories: Furniture, Lighting, Textiles, and Accessories. Notice also the SupplyMode column, which indicates whether each item is Purchased (bought from a supplier) or Manufactured (produced in-house). These distinctions will be important for cost analysis and manufacturing exercises in later chapters.
 

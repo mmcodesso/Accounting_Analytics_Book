@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" agent="textbook" version="24.0.0">
+  <diagram name="Fig 2.1 - Spectrum of Data Structure" id="fig-02-01">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;Figure 2.1: The Spectrum of Data Structure&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="200" y="10" width="700" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="arrow_bg" value="" style="shape=mxgraph.arrows2.arrow;dx=40;dy=14;notch=0;rounded=0;fillColor=#D5D8DC;strokeColor=none;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="30" y="170" width="1040" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="label_more" value="&lt;b&gt;More Structure&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#5D6D7E;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="40" y="260" width="120" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="label_less" value="&lt;b&gt;Less Structure&lt;/b&gt;" style="text;html=1;align=right;verticalAlign=middle;fontSize=10;fontColor=#5D6D7E;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="940" y="260" width="120" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="zone1_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Structured Data&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=12;verticalAlign=middle;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="40" y="55" width="310" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone1_body" value="&lt;div style=&quot;text-align:left;line-height:1.5;&quot;&gt;&lt;font style=&quot;font-size:11px;&quot; color=&quot;#2C3E50&quot;&gt;Data organized into predefined rows and columns, with each column having a defined data type.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#D5D8DC;arcSize=8;verticalAlign=top;spacing=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="40" y="91" width="310" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone1_example" value="&lt;div style=&quot;text-align:left;line-height:1.4;&quot;&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Accounting example:&lt;/b&gt; The Charles River GLEntry table with columns for PostingDate, AccountID, Debit, Credit, SourceDocumentType, and FiscalPeriod. Each row is one posted ledger entry.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="40" y="166" width="310" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="zone2_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Semi-Structured Data&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;strokeColor=#17A589;arcSize=12;verticalAlign=middle;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="395" y="55" width="310" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone2_body" value="&lt;div style=&quot;text-align:left;line-height:1.5;&quot;&gt;&lt;font style=&quot;font-size:11px;&quot; color=&quot;#2C3E50&quot;&gt;Data with some organizational elements (tags, labels, hierarchy) but not in a strict row-and-column format.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#D5D8DC;arcSize=8;verticalAlign=top;spacing=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="395" y="91" width="310" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone2_example" value="&lt;div style=&quot;text-align:left;line-height:1.4;&quot;&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Accounting example:&lt;/b&gt; An XBRL financial filing with tagged data elements organized hierarchically, or a bank statement in PDF format containing embedded transaction tables.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="395" y="166" width="310" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="zone3_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Unstructured Data&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;strokeColor=#F39C12;arcSize=12;verticalAlign=middle;fontSize=13;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="750" y="55" width="310" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone3_body" value="&lt;div style=&quot;text-align:left;line-height:1.5;&quot;&gt;&lt;font style=&quot;font-size:11px;&quot; color=&quot;#2C3E50&quot;&gt;Data with no predefined tabular format. Information is stored as free-form text, images, or documents.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#D5D8DC;arcSize=8;verticalAlign=top;spacing=10;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="750" y="91" width="310" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="zone3_example" value="&lt;div style=&quot;text-align:left;line-height:1.4;&quot;&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Accounting example:&lt;/b&gt; The text of a lease agreement, narrative disclosures in an annual report, email correspondence between auditors and clients, or scanned invoice images.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1;arcSize=8;verticalAlign=middle;spacing=8;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="750" y="166" width="310" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=2;endArrow=open;endFill=0;" edge="1" parent="1" source="zone1_header" target="zone2_header">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=2;endArrow=open;endFill=0;" edge="1" parent="1" source="zone2_header" target="zone3_header">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tool_note" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:10px;&quot;&gt;&lt;i&gt;Excel, SQL, and Power BI are designed for structured data. The Charles River dataset is entirely structured across all ten table groups.&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="250" y="290" width="600" height="25" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

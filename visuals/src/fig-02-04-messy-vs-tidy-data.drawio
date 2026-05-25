@@ -1,0 +1,162 @@
+<mxfile host="app.diagrams.net" agent="textbook" version="24.0.0">
+  <diagram name="Fig 2.4 - Messy vs Tidy Data" id="fig-02-04">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="580" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Figure 2.4: Messy Versus Tidy Data&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="250" y="10" width="600" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== LEFT PANEL: MESSY (Wide Format) ===== -->
+        <mxCell id="messy_label" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:13px;&quot;&gt;&lt;b&gt;&#x2717; Messy (Wide Format)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="420" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- Messy table header -->
+        <mxCell id="m_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Department&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="120" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;January&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E74C3C;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="170" y="80" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;February&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E74C3C;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="270" y="80" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_th4" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;March&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E74C3C;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="370" y="80" width="100" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Messy Row 1 -->
+        <mxCell id="m_r1c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Sales&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="108" width="120" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r1c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$45,000&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="170" y="108" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r1c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$48,200&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="108" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r1c4" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$51,300&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="370" y="108" width="100" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- Messy Row 2 -->
+        <mxCell id="m_r2c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Marketing&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="134" width="120" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r2c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$22,000&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="170" y="134" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r2c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$23,500&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="134" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r2c4" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$21,800&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="370" y="134" width="100" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- Messy Row 3 -->
+        <mxCell id="m_r3c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Operations&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="160" width="120" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r3c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$67,500&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="170" y="160" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r3c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$69,100&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="160" width="100" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="m_r3c4" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$72,000&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="370" y="160" width="100" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- Messy annotation -->
+        <mxCell id="messy_anno" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Problem:&lt;/b&gt; &lt;/font&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;Month names are stored as column headers, not as data values. Budget Amount is spread across three columns instead of one. This layout prevents direct use in PivotTables, SQL GROUP BY queries, or Power BI data models.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="196" width="420" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== TRANSFORMATION ARROW ===== -->
+        <mxCell id="transform_arrow" value="" style="shape=mxgraph.arrows2.arrow;dx=30;dy=12;notch=0;rounded=0;fillColor=#17A589;strokeColor=none;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="225" y="255" width="70" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="transform_label" value="&lt;font color=&quot;#17A589&quot; style=&quot;font-size:11px;&quot;&gt;&lt;b&gt;Reshape to&lt;br&gt;tidy format&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="310" y="270" width="100" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== RIGHT/BOTTOM PANEL: TIDY (Long Format) ===== -->
+        <mxCell id="tidy_label" value="&lt;font color=&quot;#17A589&quot; style=&quot;font-size:13px;&quot;&gt;&lt;b&gt;&#x2713; Tidy (Long Format)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="420" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- Tidy table header -->
+        <mxCell id="t_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Department&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="370" width="120" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Month&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#17A589;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="170" y="370" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Budget Amount&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#17A589;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="270" y="370" width="120" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Tidy data rows (showing 6 of 9) -->
+        <mxCell id="t_r1c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Sales&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="398" width="120" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r1c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;January&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="170" y="398" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r1c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$45,000&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="398" width="120" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_r2c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Sales&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="422" width="120" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r2c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;February&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="170" y="422" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r2c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$48,200&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="422" width="120" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_r3c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Sales&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="446" width="120" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r3c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;March&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="170" y="446" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r3c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$51,300&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="446" width="120" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_r4c1" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Marketing&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="50" y="470" width="120" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r4c2" value="&lt;font style=&quot;font-size:10px;&quot;&gt;January&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
+          <mxGeometry x="170" y="470" width="100" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_r4c3" value="&lt;font style=&quot;font-size:10px;&quot;&gt;$22,000&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
+          <mxGeometry x="270" y="470" width="120" height="24" as="geometry"/>
+        </mxCell>
+
+        <!-- Ellipsis row -->
+        <mxCell id="t_ellipsis" value="&lt;font style=&quot;font-size:10px;&quot; color=&quot;#5D6D7E&quot;&gt;&lt;i&gt;... (9 rows total: 3 departments &#x00D7; 3 months)&lt;/i&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="50" y="494" width="340" height="24" as="geometry"/>
+        </mxCell>
+
+        <!-- Tidy principles annotation -->
+        <mxCell id="tidy_principle_box" value="&lt;div style=&quot;text-align:left;&quot;&gt;&lt;font color=&quot;#17A589&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Tidy data principles satisfied:&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;1. Each variable (Department, Month, Budget Amount) has its own column.&lt;br&gt;2. Each observation (one department in one month) has its own row.&lt;br&gt;3. This single table holds one type of observational unit (monthly budgets).&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#17A589;strokeWidth=1;arcSize=8;verticalAlign=middle;spacing=10;fontFamily=Helvetica;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="370" width="330" height="95" as="geometry"/>
+        </mxCell>
+
+        <!-- Why it matters annotation for messy side -->
+        <mxCell id="messy_principle_box" value="&lt;div style=&quot;text-align:left;&quot;&gt;&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Tidy data principles violated:&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;1. Month is stored in column headers, not in its own column.&lt;br&gt;2. Each row contains three observations (three months), not one.&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=1;arcSize=8;verticalAlign=middle;spacing=10;fontFamily=Helvetica;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="80" width="330" height="70" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
