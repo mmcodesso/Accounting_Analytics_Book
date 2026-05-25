@@ -6,7 +6,9 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{caption}
+\usepackage{graphicx}
 \usepackage[table]{xcolor}
+\usepackage{eso-pic}
 
 \definecolor{PrimaryBlue}{HTML}{1A5276}
 \definecolor{Teal}{HTML}{17A589}
@@ -28,3 +30,27 @@
 \captionsetup[table]{position=top, justification=raggedright, singlelinecheck=false}
 \setlength{\emergencystretch}{3em}
 \renewcommand{\arraystretch}{1.2}
+
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \IfFileExists{visuals/cover/cover.png}{%
+      \AddToShipoutPictureBG*{%
+        \AtPageLowerLeft{%
+          \includegraphics[width=\paperwidth,height=\paperheight]{visuals/cover/cover.png}%
+        }%
+      }%
+      \null
+    }{%
+      \centering
+      \vspace*{0.28\textheight}
+      {\Huge\sffamily\bfseries\color{PrimaryBlue}\@title\par}
+      \vspace{1.5rem}
+      {\Large\sffamily\@author\par}
+      \vfill
+    }%
+  \end{titlepage}
+  \clearpage
+}
+\makeatother

@@ -6,26 +6,8 @@ format:
   html:
     number-sections: false
 toc: false
-sidebar: true
+sidebar: true   
 ---
-
-# Welcome {.unnumbered}
-
-<!-- # Welcome {.unnumbered}
-
-::: {.book-hero}
-::: {.book-hero__title}
-Accounting Analytics
-:::
-
-::: {.book-hero__subtitle}
-A Practical Approach
-:::
-
-::: {.book-hero__oer}
-Open Educational Resource
-:::
-::: -->
 
 # Accounting Analytics: A Practical Approach {.unnumbered}
 

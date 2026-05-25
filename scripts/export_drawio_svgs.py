@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Export Draw.io source diagrams to SVG files for the Quarto book."""
+"""Export Draw.io source diagrams and the book cover for the Quarto book."""
 
 from __future__ import annotations
 
 import argparse
+import struct
 import os
 import re
 import shutil
@@ -16,7 +17,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SRC_DIR = REPO_ROOT / "visuals" / "src"
 DEFAULT_OUT_DIR = REPO_ROOT / "visuals" / "svg"
+DEFAULT_COVER_SOURCE = REPO_ROOT / "visuals" / "cover" / "accounting_analytics_cover.drawio"
+DEFAULT_COVER_OUTPUT = REPO_ROOT / "visuals" / "cover" / "cover.png"
 DEFAULT_PADDING = 0.5
+DEFAULT_COVER_WIDTH = 2550
+DEFAULT_COVER_HEIGHT = 3300
 
 
 class ExportError(RuntimeError):
@@ -61,6 +66,35 @@ def parse_args() -> argparse.Namespace:
         type=float,
         dest="padding",
         help="Deprecated alias for --padding.",
+    )
+    parser.add_argument(
+        "--cover-source",
+        type=Path,
+        default=DEFAULT_COVER_SOURCE,
+        help="Draw.io source file for the book cover.",
+    )
+    parser.add_argument(
+        "--cover-output",
+        type=Path,
+        default=DEFAULT_COVER_OUTPUT,
+        help="PNG output path for the book cover.",
+    )
+    parser.add_argument(
+        "--cover-width",
+        type=int,
+        default=DEFAULT_COVER_WIDTH,
+        help=f"Cover PNG width in pixels. Defaults to {DEFAULT_COVER_WIDTH}.",
+    )
+    parser.add_argument(
+        "--cover-height",
+        type=int,
+        default=DEFAULT_COVER_HEIGHT,
+        help=f"Cover PNG height in pixels. Defaults to {DEFAULT_COVER_HEIGHT}.",
+    )
+    parser.add_argument(
+        "--skip-cover",
+        action="store_true",
+        help="Do not export the book cover PNG.",
     )
     return parser.parse_args()
 
@@ -251,26 +285,100 @@ def export_svg(
     temp_output.replace(output)
 
 
+def read_png_dimensions(path: Path) -> tuple[int, int]:
+    with path.open("rb") as file:
+        header = file.read(24)
+
+    if len(header) < 24 or not header.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ExportError(f"Draw.io created an invalid PNG file: {path}")
+
+    return struct.unpack(">II", header[16:24])
+
+
+def export_cover_png(
+    drawio_bin: Path,
+    source: Path,
+    output: Path,
+    width: int,
+    height: int,
+) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_output = output.with_name(f".{output.stem}.tmp.png")
+    if temp_output.exists():
+        temp_output.unlink()
+
+    command = [
+        str(drawio_bin),
+        "-x",
+        "-f",
+        "png",
+        "--width",
+        str(width),
+        "--height",
+        str(height),
+        "-o",
+        str(temp_output),
+        str(source),
+    ]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        if temp_output.exists():
+            temp_output.unlink()
+        details = "\n".join(
+            part.strip()
+            for part in (result.stdout, result.stderr)
+            if part and part.strip()
+        )
+        if details:
+            details = f"\n{details}"
+        raise ExportError(f"Draw.io cover export failed for {source}.{details}")
+
+    if not temp_output.exists() or temp_output.stat().st_size == 0:
+        raise ExportError(f"Draw.io reported success but did not create a non-empty cover PNG: {temp_output}")
+
+    actual_width, actual_height = read_png_dimensions(temp_output)
+    if (actual_width, actual_height) != (width, height):
+        temp_output.unlink()
+        raise ExportError(
+            f"Cover export has dimensions {actual_width}x{actual_height}; "
+            f"expected {width}x{height}. Check the cover Draw.io page aspect ratio."
+        )
+
+    temp_output.replace(output)
+
+
 def run() -> int:
     args = parse_args()
     src_dir = args.src_dir.resolve()
     out_dir = args.out_dir.resolve()
+    cover_source = args.cover_source.resolve()
+    cover_output = args.cover_output.resolve()
     force_export = args.force or os.environ.get("GITHUB_ACTIONS") == "true"
 
     if args.padding < 0:
         raise ExportError(f"Padding must be greater than or equal to 0: {args.padding}")
+    if args.cover_width <= 0 or args.cover_height <= 0:
+        raise ExportError(
+            f"Cover dimensions must be positive: {args.cover_width}x{args.cover_height}"
+        )
 
     if not src_dir.is_dir():
         raise ExportError(f"Draw.io source directory does not exist: {src_dir}")
+    if not args.skip_cover and not cover_source.is_file():
+        raise ExportError(f"Cover Draw.io source file does not exist: {cover_source}")
 
     sources = sorted(src_dir.glob("*.drawio"))
     if not sources:
         print(f"No .drawio files found in {src_dir}")
-        return 0
 
     drawio_bin = find_drawio_executable(args.drawio_bin)
     print(f"Using Draw.io executable: {drawio_bin}")
     print(f"Using transparent SVG padding: {format_number(args.padding)}")
+    if not args.skip_cover:
+        print(
+            f"Using cover PNG size: {args.cover_width}x{args.cover_height} "
+            "(8.5x11 inches at 300 DPI)"
+        )
     if force_export and not args.force:
         print("GitHub Actions detected; exporting all diagrams because checkout timestamps are not reliable.")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -289,6 +397,28 @@ def run() -> int:
         export_svg(drawio_bin, source, output, args.padding)
         print(f"export {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
         exported += 1
+
+    if not args.skip_cover:
+        validate_single_page_drawio(cover_source)
+        if not force_export and is_output_current(cover_source, cover_output):
+            print(
+                f"skip   {cover_source.relative_to(REPO_ROOT)} -> "
+                f"{cover_output.relative_to(REPO_ROOT)}"
+            )
+            skipped += 1
+        else:
+            export_cover_png(
+                drawio_bin,
+                cover_source,
+                cover_output,
+                args.cover_width,
+                args.cover_height,
+            )
+            print(
+                f"export {cover_source.relative_to(REPO_ROOT)} -> "
+                f"{cover_output.relative_to(REPO_ROOT)}"
+            )
+            exported += 1
 
     print(f"Done: {exported} exported, {skipped} skipped.")
     return 0
