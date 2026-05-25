@@ -38,8 +38,20 @@ format:
     number-sections: true
   pdf:
     documentclass: scrreprt
+    papersize: letter
+    classoption:
+      - twoside
+      - open=right
+      - numbers=noendperiod
+    geometry:
+      - inner=0.75in
+      - outer=0.5in
+      - top=0.65in
+      - bottom=0.75in
     include-in-header: styles/book-pdf.tex
     colorlinks: true
+    number-sections: true
+    number-depth: 3
     fig-cap-location: bottom
     tbl-cap-location: top
   docx:

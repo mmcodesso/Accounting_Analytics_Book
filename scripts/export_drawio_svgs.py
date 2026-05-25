@@ -22,6 +22,13 @@ DEFAULT_COVER_OUTPUT = REPO_ROOT / "visuals" / "cover" / "cover.png"
 DEFAULT_PADDING = 0.5
 DEFAULT_COVER_WIDTH = 2550
 DEFAULT_COVER_HEIGHT = 3300
+DRAWIO_TEXT_WARNING_PATTERN = re.compile(
+    r"<switch>\s*"
+    r'<g\s+requiredFeatures="http://www\.w3\.org/TR/SVG11/feature#Extensibility"\s*/>\s*'
+    r'<a\b[^>]*(?:xlink:)?href="https://www\.drawio\.com/doc/faq/svg-export-text-problems"[^>]*>\s*'
+    r"<text\b[^>]*>\s*Text is not SVG - cannot display\s*</text>\s*"
+    r"</a>\s*</switch>\s*(?=</svg>)"
+)
 
 
 class ExportError(RuntimeError):
@@ -245,6 +252,13 @@ def add_svg_padding(path: Path, padding: float) -> None:
     )
 
 
+def remove_drawio_text_warning(path: Path) -> None:
+    text = path.read_text(encoding="utf-8")
+    cleaned, replacements = DRAWIO_TEXT_WARNING_PATTERN.subn("", text)
+    if replacements:
+        path.write_text(cleaned, encoding="utf-8")
+
+
 def export_svg(
     drawio_bin: Path,
     source: Path,
@@ -282,6 +296,7 @@ def export_svg(
         raise ExportError(f"Draw.io reported success but did not create a non-empty SVG: {temp_output}")
 
     add_svg_padding(temp_output, padding)
+    remove_drawio_text_warning(temp_output)
     temp_output.replace(output)
 
 

@@ -1,5 +1,4 @@
 ---
-number-sections: false
 format:
   html:
     number-sections: false

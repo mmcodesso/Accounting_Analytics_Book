@@ -340,6 +340,8 @@ The practical skills introduced in the two guided tutorials, inspecting the Char
 
 
 
+{{< pagebreak >}}
+
 ## Key Terms
 
 **Accuracy.** A data quality dimension indicating that recorded values correspond to the true values they are intended to represent. In accounting, accuracy problems include data entry errors, misclassifications, and incorrect calculations.
@@ -379,6 +381,8 @@ The practical skills introduced in the two guided tutorials, inspecting the Char
 **Unstructured data.** Data that lacks a predefined tabular format, such as the text of contracts, email correspondence, or scanned invoice images.
 
 
+
+{{< pagebreak >}}
 
 ## Multiple Choice Questions
 
@@ -489,6 +493,8 @@ D. Confirming that all customers in the Customer table have placed at least one 
 
 
 
+{{< pagebreak >}}
+
 ## Applied Exercises
 
 ### Financial Accounting Exercises
@@ -563,6 +569,8 @@ D. Confirming that all customers in the Customer table have placed at least one 
 **Deliverable.** A written memorandum documenting potential duplicate payments and the limitations of manual detection methods.
 
 
+
+{{< pagebreak >}}
 
 ## Further Reading
 

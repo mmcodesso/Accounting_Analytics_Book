@@ -2,9 +2,9 @@
 title: "The Role of Analytics in Accounting"
 ---
 
+::: {.learning-objectives}
 ## Learning Objectives {.unnumbered}
 
-::: {.learning-objectives}
 After completing this chapter, you will be able to:
 
 1. Explain how data analytics has changed the work accountants perform and the skills the profession demands.
@@ -212,6 +212,8 @@ This textbook teaches accounting analytics using three tools (Excel, SQL, and Po
 
 Every analytical project follows a consistent workflow. The accountant defines the question, accesses the data, prepares and cleans the data, analyzes it, visualizes the results, and communicates findings. This workflow provides the organizing thread for the entire book. The chapters are arranged so that students develop foundational skills in Parts I through IV and then apply them in integrated, multi-tool projects in Part V.
 
+{{< pagebreak >}}
+
 ## Key Terms
 
 **Accounting analytics.** The application of data extraction, preparation, analysis, and visualization techniques to financial and operational data for the purpose of supporting financial reporting, managerial decision-making, and audit assurance.
@@ -249,6 +251,8 @@ Every analytical project follows a consistent workflow. The accountant defines t
 **SQLite.** A lightweight relational database system that stores the entire database in a single file. This textbook uses SQLite because it requires no server installation and runs on any operating system.
 
 **Table group.** A named subset of related tables within the Charles River database that corresponds to a business process or functional area. The ten table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+
+{{< pagebreak >}}
 
 ## Multiple Choice Questions
 
@@ -356,6 +360,8 @@ A. Descriptive analytics
 B. Predictive analytics
 C. Prescriptive analytics
 D. The regression would not be considered analytics because it involves statistics
+
+{{< pagebreak >}}
 
 ## Applied Exercises
 
@@ -478,6 +484,8 @@ D. The regression would not be considered analytics because it involves statisti
 
 **Deliverable.** A written assessment of the journal entry data structure in the Charles River Accounting Core group, evaluating its suitability for audit testing of management override of controls.
 
+
+{{< pagebreak >}}
 
 ## Further Reading
 

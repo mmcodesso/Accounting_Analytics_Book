@@ -1,12 +1,11 @@
 ---
 title-block: false
 body-classes: welcome-page
-number-sections: false
 format:
   html:
     number-sections: false
-toc: false
-sidebar: true   
+    toc: false
+    sidebar: true
 ---
 
 # Accounting Analytics: A Practical Approach {.unnumbered}
