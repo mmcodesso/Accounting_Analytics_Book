@@ -3,7 +3,6 @@
 This page provides access to the latest version of the book and the datasets used throughout the chapters.
 As the project evolves, we will add versioned releases for major editions.
 
----
 
 ## Latest Book Version
 
@@ -13,7 +12,6 @@ These files are automatically updated whenever the book is rebuilt.
 - [Download EPUB (latest)](downloads/book-latest.epub)
 - [Download DOCX (latest)](downloads/book-latest.docx)
 
----
 
 ## Datasets
 
@@ -28,9 +26,8 @@ It supports the full book across Excel, SQL, and Power BI.
 
 All three formats contain the same Charles River data, so students can move between Excel, SQL, and Power BI without changing datasets.
 
----
 
-## Versioned Editions (coming soon)
+<!-- ## Versioned Editions (coming soon)
 
 In future major releases, we will archive:
 
@@ -38,4 +35,4 @@ In future major releases, we will archive:
 - Edition 2.0 (PDF, EPUB, DOCX)
 - Dataset versions (v1.0, v2.0, etc.)
 
-These will remain permanently accessible for citation and reproducibility.
+These will remain permanently accessible for citation and reproducibility. -->
