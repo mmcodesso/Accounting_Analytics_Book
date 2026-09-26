@@ -3,10 +3,10 @@ aliases:
   - /downloads.html
 ---
 
-# Downloads {.unnumbered}
+# Downloads {#sec-downloads .unnumbered}
 
-This page provides access to the latest version of the book and the datasets used throughout the chapters.
-As the project evolves, we will add versioned releases for major editions.
+This page provides access to the latest version of the book and the dataset used throughout its chapters.
+Versioned releases for major editions will be added as the project evolves.
 
 
 ## Latest Book Version
@@ -18,13 +18,10 @@ These files are automatically updated whenever the book is rebuilt.
 - [Download DOCX (latest)](/downloads/book-latest.docx)
 
 
-## Datasets
+## Charles River Accounting Dataset
 
-The dataset below is hosted on GitHub Releases to support large file sizes and fast global downloads.
-It supports the full book across Excel, SQL, and Power BI.
-
-### Charles River Accounting Dataset
-
+The Charles River Accounting Dataset supports every chapter of the book across Excel, SQL, and Power BI.
+The files are hosted on GitHub Releases to support large file sizes and fast global downloads.
 Visit the [Charles River Accounting Dataset website](https://charlesriver.accountinganalyticshub.com/)
 for documentation and additional information. All dataset changes and updates
 will be posted there. Direct downloads are available below.
