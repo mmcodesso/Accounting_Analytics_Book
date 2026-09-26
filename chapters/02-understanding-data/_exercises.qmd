@@ -1,0 +1,77 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 2.1 (Financial Accounting): Assessing Revenue Data Quality in the Charles River O2C Tables**
+
+**Table group:** O2C
+
+**Scenario.** You are a financial reporting analyst at Charles River preparing to analyze the company's revenue for the most recent fiscal year. Before building any reports, you need to verify that the underlying sales data is reliable enough to support accurate revenue figures.
+
+**Requirements.** (1) Open the CharlesRiver.xlsx workbook in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness). (2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved and note any values that appear problematic (such as zero or negative line amounts, missing item references, or pricing methods that seem inconsistent). (3) Examine whether every CustomerID in the SalesOrder table corresponds to a customer in the Customer table. Use COUNTIFS or XLOOKUP to test this relationship. Document any orphaned records where an order references a customer that does not exist. (4) Prepare a brief written data quality assessment memorandum (one page) that summarizes your findings and recommends whether the data is suitable for revenue reporting or whether specific problems must be resolved first.
+
+**Deliverable.** A one-page data quality assessment memorandum with specific findings organized by quality dimension.
+
+
+**Exercise 2.2 (Financial Accounting): Evaluating General Ledger Completeness at Charles River**
+
+**Table group:** Acct Core
+
+**Scenario.** You are a financial reporting analyst who has been asked to verify that the Charles River general ledger is complete before the team begins preparing the year-end financial statements. Your supervisor is concerned that some transactions may not have been posted.
+
+**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the GLEntry worksheet. Calculate the total debits and total credits across all entries. Determine whether the ledger is in balance. (2) Identify the date range covered by the general ledger entries. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within the fiscal year. Note any periods that appear to have an unusually low number of entries compared to other periods, which could indicate missing transactions. (3) Examine the SourceDocumentType column to understand what types of transactions are recorded. Determine whether the ledger includes entries from all expected source types (such as SalesInvoice, PurchaseInvoice, JournalEntry, PayrollRegister, and WorkOrderClose). If any expected source type is absent, document this as a potential completeness concern. (4) Write a brief assessment (one page) of the general ledger's completeness, suitable for review by the financial reporting manager.
+
+**Deliverable.** A one-page completeness assessment memorandum with quantitative evidence supporting each finding.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 2.3 (Managerial Accounting): Data Quality Assessment for Product Cost Analysis**
+
+**Table group:** Master Data and Manufacturing
+
+**Scenario.** You are a cost analyst at Charles River who has been asked to perform a product cost analysis. Before starting the analysis, you need to assess whether the data is clean enough to produce reliable cost figures.
+
+**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the Item worksheet from the Master Data group. Identify any items where the StandardCost field is zero, blank, or appears unreasonable. Assess whether these entries represent data quality problems or legitimate situations (such as items that are services rather than physical products, which may have a StandardCost of zero by design). (2) Compare the StandardCost and ListPrice columns. Identify any items where the ListPrice is less than the StandardCost, which would imply a negative margin. Determine whether these represent accuracy problems or deliberate pricing decisions. Note the SupplyMode column (Purchased versus Manufactured), which may explain cost differences. (3) Examine the WorkOrder worksheet from the Manufacturing group. Check for missing values in key fields such as PlannedQuantity, status, and date fields. (4) Write a brief assessment (one half to one page) of the data's suitability for product cost analysis, identifying any problems that would need to be resolved before proceeding.
+
+**Deliverable.** A written data quality assessment focused on cost analysis readiness, with specific item-level and work-order-level findings.
+
+
+**Exercise 2.4 (Managerial Accounting): Identifying Tidy Data Problems in Budget Reports**
+
+**Table group:** Org Planning
+
+**Scenario.** You are a management accountant at Charles River who needs to compare budgeted amounts to actual spending by cost center. The budget data is available in the Organizational Planning tables, but you suspect it may not be in a format suitable for analysis.
+
+**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Examine the structure. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row). If not, describe specifically which tidy data principle is violated and how the data would need to be restructured. (2) Examine the cost center references in the BudgetLine table and in the GLEntry table. The BudgetLine table references cost centers, and GLEntry includes a CostCenterID column. Assess whether the cost center identifiers are consistent between the two sources. Identify any inconsistencies that would prevent a straightforward comparison. (3) Document your findings in a brief memorandum (one half to one page) that recommends specific data preparation steps needed before a budget-versus-actual analysis can be performed.
+
+**Deliverable.** A written memorandum identifying structural and quality issues in the budget data and recommending preparation steps.
+
+
+### Auditing Exercises
+
+**Exercise 2.5 (Auditing): Data Quality Evaluation for Audit Planning**
+
+**Table group:** O2C, Acct Core, and P2P
+
+**Scenario.** You are a first-year auditor assigned to evaluate the data that will be used for analytics procedures during the upcoming Charles River audit. Your senior has asked you to perform a preliminary data quality assessment across three table groups to determine which data sources are reliable enough for audit testing.
+
+**Requirements.** (1) For the O2C table group, perform the following data quality checks: test for missing values in critical fields of the SalesOrder table (OrderDate, CustomerID, Status), test for records where Shipment.ShipmentDate precedes SalesOrder.OrderDate by matching on SalesOrderID, and check the Item table for items with zero or negative ListPrice values. Document the number of records affected by each problem. (2) For the Accounting Core group, perform the following checks: verify that total debits equal total credits in GLEntry, check for GLEntry records that reference an AccountID not found in the Account table, and examine the SourceDocumentType column for any unexpected or missing source types. (3) For the P2P group, examine the DisbursementPayment table and check for potential duplicate payments by sorting on SupplierID, Amount, and PaymentDate. Document any records that match on all three fields. (4) For each problem identified, classify it by quality dimension and assess its potential impact on audit procedures. A missing date, for example, would prevent the auditor from testing the transaction in the correct period. Prepare a one-page audit data quality assessment memorandum that your senior could use to decide which tables are suitable for audit analytics.
+
+**Deliverable.** A one-page audit data quality assessment memorandum organized by table group and quality dimension.
+
+
+**Exercise 2.6 (Auditing): Testing for Duplicate Payments**
+
+**Table group:** P2P
+
+**Scenario.** Your audit team has identified duplicate payments as a risk area for the current Charles River engagement. Before performing a full duplicate payment analysis (which you will learn in Chapter 12 using SQL), you have been asked to perform a preliminary manual check using Excel.
+
+**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the DisbursementPayment worksheet from the P2P table group. Identify the fields that would be relevant for detecting duplicate payments, such as SupplierID (as the payee identifier), Amount, and PaymentDate. (2) Sort the data by SupplierID and then by Amount to bring potential duplicates into adjacent rows. Scan for records where the same supplier received the same amount on the same date or within a narrow date range. Document any potential duplicates you identify. (3) Assess the reliability of your manual approach. Consider what limitations exist when searching for duplicates by visual inspection versus using automated techniques. Write two to three sentences explaining why a SQL-based approach (which you will learn in Chapter 12) would be more effective for this task. (4) Prepare a brief memorandum (one half page) documenting the potential duplicates identified and your assessment of the method's limitations.
+
+**Deliverable.** A written memorandum documenting potential duplicate payments and the limitations of manual detection methods.
+
+
+

@@ -1,0 +1,111 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A transaction amount of $15,000 is recorded in the general ledger as $1,500 due to a data entry error. This is an example of a problem with which data quality dimension?
+
+A.  Completeness
+B.  Timeliness
+C.  Accuracy
+D.  Consistency
+
+**2.** An auditor discovers that 21 records in the Charles River Shipment table have no value in the ShipmentDate field. This situation represents a problem with which data quality dimension?
+
+A.  Accuracy
+B.  Completeness
+C.  Consistency
+D.  Timeliness
+
+**3.** Charles River's Customer table records a client as "Beacon Hill Interiors" while the SalesInvoice records list the same client as "BEACON HILL INT." An analyst attempting to match invoices to customer records will encounter errors because of this difference. This is an example of a problem with which data quality dimension?
+
+A.  Accuracy
+B.  Completeness
+C.  Consistency
+D.  Timeliness
+
+**4.** Which of the following is an example of qualitative data in an accounting context?
+
+A.  The total amount of a sales invoice
+B.  The number of units of inventory on hand
+C.  The name of the cost center to which an expense is assigned
+D.  The gross profit margin expressed as a percentage
+
+**5.** According to the concept of tidy data, a budget spreadsheet with months as column headers (January, February, March) and departments as rows is considered "messy" because it violates which tidy data principle?
+
+A.  Each variable should occupy its own column
+B.  Each observation should occupy its own row
+C.  Each type of observational unit should form its own table
+D.  Both A and B
+
+**6.** An auditor is performing analytical procedures using general ledger data extracted from the client's ERP system on March 15 for a fiscal year ending December 31. The data includes all adjusting entries through March 10 but not the final three adjusting entries posted on March 12. This situation represents a concern about which data quality dimension?
+
+A.  Accuracy
+B.  Completeness
+C.  Consistency
+D.  Timeliness
+
+**7.** Which of the following best describes the relationship between structured and unstructured data in accounting practice?
+
+A.  Accountants work exclusively with structured data and never encounter unstructured data.
+B.  Most accounting analytical work uses structured data, but the proportion of unstructured data in accounting is growing.
+C.  Unstructured data has replaced structured data as the primary input for accounting analytics.
+D.  Structured and unstructured data require the same analytical tools and techniques.
+
+**8.** A management accountant discovers that the same product appears in the Item table under two different ItemID values because it was entered separately by two warehouse locations. This is an example of which data quality problem?
+
+A.  Missing value
+B.  Outlier
+C.  Duplicate record
+D.  Timeliness problem
+
+**9.** Which of the following sources of accounting data provides the most complete picture of an organization's financial transactions?
+
+A.  The accounts receivable sub-ledger
+B.  The general ledger
+C.  An external bank statement
+D.  A product inventory listing
+
+**10.** In the Charles River dataset, the GLEntry table includes a SourceDocumentType column. Which of the following best describes the purpose of this column?
+
+A.  It records the name of the employee who posted the entry.
+B.  It identifies the type of business event that generated the ledger entry, such as "SalesInvoice," "PurchaseInvoice," or "JournalEntry."
+C.  It stores the total amount of the transaction in a text format.
+D.  It indicates whether the entry has been approved by a supervisor.
+
+**11.** A dataset is organized so that each variable occupies its own column and each observation occupies its own row, but several records contain data entry errors in the amount field. This dataset is best described as:
+
+A.  Tidy and clean
+B.  Tidy but not clean
+C.  Clean but not tidy
+D.  Neither tidy nor clean
+
+**12.** A financial analyst creates a revenue summary using a SQL query that groups sales by customer name. The query returns 150 distinct customers, but the Charles River Customer table contains only 142 customer records. The most likely explanation for the discrepancy is:
+
+A.  The SQL query contains a syntax error.
+B.  Some customers made purchases but were never entered into the Customer table.
+C.  Inconsistent formatting of customer names caused the same customer to appear under multiple name variations.
+D.  The Customer table is more current than the sales data.
+
+**13.** An enterprise resource planning system is distinct from a standalone accounting package primarily because an ERP system:
+
+A.  Uses a relational database to store data
+B.  Integrates data from multiple functional areas such as sales, production, purchasing, and human resources into a single database
+C.  Produces financial statements automatically
+D.  Eliminates all data quality problems through built-in validation rules
+
+**14.** Which of the following best explains why data quality assessment should be performed before any analysis begins?
+
+A.  Software tools cannot process data that contains quality problems.
+B.  Data quality problems can cause analytical results to be unreliable or misleading, and identifying problems in advance allows the accountant to address them.
+C.  Professional standards prohibit accountants from using any data that contains missing values.
+D.  Data quality assessment is only required for auditing engagements and not for managerial accounting or financial reporting.
+
+**15.** An auditor examining the Charles River GLEntry table uses the SourceDocumentType column to separate entries generated by SalesInvoice from entries generated by JournalEntry. This separation is most useful for which audit procedure?
+
+A.  Calculating the total revenue for the period
+B.  Identifying manual journal entries that may indicate management override of controls, as distinct from entries generated automatically by business transactions
+C.  Verifying that the general ledger is in a tidy data format
+D.  Confirming that all customers in the Customer table have placed at least one order
+
+
+

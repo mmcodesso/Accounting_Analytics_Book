@@ -2,6 +2,8 @@
 format:
   html:
     number-sections: false
+aliases:
+  - /00_preface.html
 ---
 
 # Preface {.unnumbered}

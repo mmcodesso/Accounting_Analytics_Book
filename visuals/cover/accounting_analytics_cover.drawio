@@ -13,7 +13,7 @@
         <mxCell id="title-analytics" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#FFFFFF;fontSize=52;fontStyle=1;fontFamily=Helvetica;align=left;verticalAlign=middle;spacing=0;spacingLeft=0;" value="ANALYTICS" vertex="1">
           <mxGeometry height="76" width="610" x="66" y="162" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#E3A93B;fontSize=27;fontStyle=1;fontFamily=Helvetica;align=left;verticalAlign=middle;spacing=0;spacingLeft=0;" value="A PRACTICAL APPROACH" vertex="1">
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#E3A93B;fontSize=27;fontStyle=1;fontFamily=Helvetica;align=left;verticalAlign=middle;spacing=0;spacingLeft=0;" value="AN INTEGRATED APPROACH" vertex="1">
           <mxGeometry height="46" width="560" x="66" y="282" as="geometry" />
         </mxCell>
         <mxCell id="subtitle-rule" parent="1" style="shape=line;strokeColor=#E3A93B;strokeWidth=3;" value="" vertex="1">

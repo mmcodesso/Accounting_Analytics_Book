@@ -1,0 +1,42 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Accuracy.** A data quality dimension indicating that recorded values correspond to the true values they are intended to represent. In accounting, accuracy problems include data entry errors, misclassifications, and incorrect calculations.
+
+**Completeness.** A data quality dimension indicating that all expected records and field values are present in the dataset. Missing transactions, blank fields, and omitted time periods are examples of completeness problems.
+
+**Consistency.** A data quality dimension indicating that the same fact is represented in the same way wherever it appears in a dataset or across related datasets. Inconsistent customer names, account codes, or date formats are common consistency problems.
+
+**Data quality.** The degree to which a dataset is fit for its intended use, assessed across multiple dimensions including accuracy, completeness, consistency, and timeliness.
+
+**Duplicate record.** A record that appears more than once in a dataset, representing the same underlying transaction, entity, or event. Duplicate payments and duplicate customer entries are common examples in accounting data.
+
+**External data.** Data originating from outside the organization, such as bank statements, market price feeds, credit ratings, and industry benchmarks. External data introduces additional quality concerns because the accountant has less control over how it was collected and formatted.
+
+**General ledger.** The central repository of an organization's financial transactions, containing debit and credit entries organized by account. In the Charles River dataset, the general ledger is stored in the GLEntry table within the Accounting Core group.
+
+**Missing value.** A field within a record that is blank, null, or contains a placeholder rather than a substantive value. Missing values represent a completeness problem and can distort calculations if not handled properly.
+
+**Outlier.** A data value that falls far outside the expected range for its field. Outliers may represent legitimate unusual transactions or data entry errors and require investigation to determine the appropriate treatment.
+
+**Process-to-ledger traceability.** The ability to trace any general ledger entry back to the operational document that created it, using the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry. This traceability supports audit testing, variance investigation, and financial reporting verification.
+
+**Qualitative data.** Data consisting of categories, labels, or descriptions rather than numerical measurements. Account names, transaction descriptions, and vendor classifications are examples of qualitative data in accounting.
+
+**Quantitative data.** Data consisting of numerical values that represent measurements or counts and that can be subjected to arithmetic operations. Transaction amounts, unit quantities, and financial ratios are examples of quantitative data in accounting.
+
+**Semi-structured data.** Data that has some organizational elements but does not fit neatly into rows and columns. XBRL filings and PDF bank statements are examples relevant to accounting.
+
+**Structured data.** Data organized into a predefined format of rows and columns, where each column has a defined data type. The Charles River dataset contains structured data across all ten table groups.
+
+**Sub-ledger.** A detailed record for a specific category of accounts that feeds summary totals to the general ledger. The accounts receivable sub-ledger and accounts payable sub-ledger are common examples. In the Charles River dataset, the O2C and P2P table groups function as sub-ledgers.
+
+**Tidy data.** A dataset organized so that each variable occupies its own column, each observation occupies its own row, and each type of observational unit forms its own table. Tidy data aligns with the input requirements of analytical tools such as PivotTables, SQL, and Power BI.
+
+**Timeliness.** A data quality dimension indicating that the data reflects the current state of the business as of the relevant reporting date. Data that is not current enough for the intended analysis has a timeliness problem.
+
+**Unstructured data.** Data that lacks a predefined tabular format, such as the text of contracts, email correspondence, or scanned invoice images.
+
+
+

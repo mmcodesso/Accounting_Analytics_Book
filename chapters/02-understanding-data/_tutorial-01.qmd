@@ -1,0 +1,31 @@
+## Guided Tutorial 2.1: Inspecting Charles River O2C Data for Data Quality Problems
+
+**Context and objective.** In this tutorial, you will examine the Charles River O2C tables in Excel and identify specific data quality problems across several worksheets. The goal is to practice applying the four quality dimensions (accuracy, completeness, consistency, and timeliness) to a real dataset and to document what you find. This tutorial connects to the opening scenario by showing you how a data quality assessment works in practice.
+
+**Prerequisites.** You need Microsoft Excel installed on your computer and access to the CharlesRiver.xlsx file provided with this textbook.
+
+**Step-by-step instructions.**
+
+**Step 1.** Open CharlesRiver.xlsx in Excel and click on the SalesOrder worksheet. Scroll across the columns to familiarize yourself with the available fields. You should see columns including SalesOrderID, OrderNumber, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, FreightTerms, and Status. Scroll down to get a sense of the number of records.
+
+**Step 2.** Click on the Shipment worksheet. Examine the columns, which include ShipmentID, SalesOrderID, ShipmentDate, WarehouseID, FreightCost, BillableFreightAmount, and Status. Use the filter dropdown on the TrackingNumber column to look for blank cells. Count the number of shipment records that have no TrackingNumber value. These missing values represent a completeness problem: shipments that were created but for which no TrackingNumber was recorded. Record the count.
+
+
+![Screenshot of the Charles River Shipment worksheet in Excel.](/visuals/png/fig-02-05-screenshot-of-the-charles-river-shipment-worksheet.png){#fig-02-05 fig-alt="Screenshot of the Charles River Shipment worksheet in Excel with the TrackingNumber column filtered to show blank cells. An annotation highlights the missing values and identifies this as a completeness problem."}
+
+
+**Step 3.** Click on the Customer worksheet. Examine the Region column using the filter dropdown. Check for blank values. You will find that some customers have no value in the Region field. Consider whether this represents a true completeness problem (the data should exist but was not entered) or whether some customers were not assigned a region during setup. This distinction matters because the appropriate response differs. If the data should exist, it needs to be obtained. If the field was intentionally left blank, the gap is a known limitation rather than an error.
+
+**Step 4.** Still on the Customer worksheet, examine the CustomerName column. Look for potential consistency problems by scanning for variations in how customer names are formatted. Sort the column alphabetically to make near-duplicates easier to spot. Check whether any customer names appear to be the same company recorded under slightly different names (such as differences in punctuation, abbreviation, or legal suffix).
+
+**Step 5.** Return to the Shipment worksheet. Create a simple check for potential accuracy problems by examining the FreightCost column. Sort the FreightCost column from largest to smallest. Examine the highest values. Are any freight amounts unusually large relative to the others? Make a note of any values that appear to be outliers. In a real engagement, you would investigate these further to determine whether they are legitimate transactions or data entry errors.
+
+**Step 6.** Examine the relationship between the SalesOrder.OrderDate and the Shipment.ShipmentDate. Because these values are in two different worksheets, you will need to bring them together. In the Shipment worksheet, add a new column and use an XLOOKUP or VLOOKUP formula to retrieve the OrderDate from the SalesOrder worksheet by matching on SalesOrderID. Then create a helper formula that returns "Check" if ShipmentDate is earlier than OrderDate, and "OK" otherwise. Copy the formula down the column and filter for any "Check" results. A shipment that predates its order would indicate a potential accuracy problem in the date fields.
+
+*[Figure 2.6: Screenshot showing the Charles River Shipment worksheet with helper columns that retrieve the OrderDate from SalesOrder and flag records where ShipmentDate precedes OrderDate. The XLOOKUP formula is visible in the formula bar, and the annotation identifies this as an accuracy check.]*
+
+**Step 7.** Click on the Item worksheet. Examine the StandardCost and ListPrice columns. Sort by ListPrice from smallest to largest. Check whether any items have a ListPrice of zero, which could indicate a missing value recorded as zero rather than left blank. Also compare StandardCost to ListPrice and identify any items where the ListPrice is less than the StandardCost, which would imply a negative margin and warrants investigation.
+
+**Checkpoint.** At this point, you should have identified at least three specific data quality problems in the Charles River O2C tables: missing ShipmentDate values in the Shipment table (completeness), potential inconsistencies in customer names in the Customer table (consistency), and at least one finding worth investigating further in the date sequence or freight amounts (accuracy). You should have a written list of findings, noting the table, the column, the type of problem, and the number of affected records. This list is a simple version of the data quality assessment that auditors perform at the start of every analytics engagement.
+
+

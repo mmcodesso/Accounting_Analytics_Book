@@ -1,3 +1,8 @@
+---
+aliases:
+  - /downloads.html
+---
+
 # Downloads {.unnumbered}
 
 This page provides access to the latest version of the book and the datasets used throughout the chapters.
@@ -8,9 +13,9 @@ As the project evolves, we will add versioned releases for major editions.
 
 These files are automatically updated whenever the book is rebuilt.
 
-- [Download PDF (latest)](downloads/book-latest.pdf)
-- [Download EPUB (latest)](downloads/book-latest.epub)
-- [Download DOCX (latest)](downloads/book-latest.docx)
+- [Download PDF (latest)](/downloads/book-latest.pdf)
+- [Download EPUB (latest)](/downloads/book-latest.epub)
+- [Download DOCX (latest)](/downloads/book-latest.docx)
 
 
 ## Datasets

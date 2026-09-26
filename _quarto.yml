@@ -4,21 +4,22 @@ project:
     - python scripts/export_drawio_svgs.py
 
 book:
-  title: "Accounting Analytics"
+  title: "Accounting Analytics: An Integrated Approach"
+  output-file: "Accounting-Analytics"
   author: "Mauricio Codesso"
   cover-image: visuals/cover/cover.png
-  cover-image-alt: "Cover of Accounting Analytics: A Practical Approach"
+  cover-image-alt: "Cover of Accounting Analytics: An Integrated Approach"
   chapters:
-    - index.md
-    - 00_preface.md
-    - 00_to_the_student.md
-    - 00_about_the_dataset.md
-    - downloads.md
+    - index.qmd
+    - front-matter/preface.qmd
+    - front-matter/to-the-student.qmd
+    - front-matter/about-the-dataset.qmd
+    - front-matter/downloads.qmd
     - part: "Part I: Foundations of Accounting Analytics"
       chapters:
-        - 01_chapter.md
-        - 02_chapter.md
-        - 03_chapter.md
+        - chapters/01-role-of-analytics/chapter.qmd
+        - chapters/02-understanding-data/chapter.qmd
+        - chapters/03-accounting-data-environment/chapter.qmd
     - part: "Part II: Accounting Analytics with Excel"
     - part: "Part III: Accounting Analytics with SQL"
     - part: "Part IV: Data Visualization and Power BI"

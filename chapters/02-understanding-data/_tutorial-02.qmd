@@ -1,0 +1,29 @@
+## Guided Tutorial 2.2: Examining the Charles River Accounting Core for Completeness and Consistency
+
+**Context and objective.** In this tutorial, you will examine the Charles River Accounting Core tables to assess whether the general ledger entries and chart of accounts are complete and consistent. This is a more accounting-specific data quality assessment than the O2C tutorial, because it involves checking whether the accounting records themselves are internally coherent. The skills practiced here connect directly to the audit procedures you will learn in Chapter 8 and Chapter 12.
+
+**Prerequisites.** You need Microsoft Excel installed on your computer, access to the CharlesRiver.xlsx file, and completion of Tutorial 2.1.
+
+**Step-by-step instructions.**
+
+**Step 1.** Open CharlesRiver.xlsx in Excel (if not already open) and click on the Account worksheet. Examine the columns available. You should see fields including AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and ParentAccountID. This is the chart of accounts for Charles River, and it forms the backbone of the Accounting Core. The ParentAccountID column creates a hierarchical structure that organizes accounts into groups. Scroll through the list to get a sense of how many accounts exist and how they are organized.
+
+**Step 2.** Check the chart of accounts for completeness. Every major account type should be represented. Sort or filter the AccountType column and verify that the chart includes accounts classified as Asset, Liability, Equity, Revenue, and Expense. If any major category is missing, that is a completeness problem. Record your findings.
+
+**Step 3.** Click on the GLEntry worksheet. Examine the columns available. You should see fields including GLEntryID, PostingDate, AccountID, Debit, Credit, SourceDocumentType, SourceDocumentID, SourceLineID, VoucherType, VoucherNumber, FiscalYear, FiscalPeriod, and CostCenterID. Scroll down to get a sense of the volume of data.
+
+**Step 4.** Check the general ledger for a fundamental accounting consistency requirement: for every transaction, total debits should equal total credits. To test this at the aggregate level, use the SUM function to calculate the total of the Debit column and the total of the Credit column. The two totals should be equal, or very nearly so (small differences may arise from rounding). If there is a significant difference, that indicates a serious consistency problem in the ledger.
+
+*[Figure 2.7: Screenshot of the Charles River GLEntry worksheet with SUM formulas calculating total debits and total credits at the bottom of the respective columns. An annotation highlights the comparison and explains that equal totals confirm the basic debit-equals-credit consistency of the ledger.]*
+
+**Step 5.** Check for accounts referenced in the general ledger that do not exist in the chart of accounts. This is a consistency check between two related tables. To perform this check manually, use the COUNTIFS function. In a new column adjacent to the GLEntry data, enter a formula that counts how many times the AccountID value in the current GL row appears in the Account worksheet's AccountID column. If any GLEntry row returns a count of zero, that means the entry references an account that does not exist in the chart of accounts, which is a consistency problem. Scan for any zeros and record the affected entries.
+
+**Step 6.** Examine the PostingDate column in the GLEntry worksheet. Sort by posting date and check the date range. Note the earliest and latest dates. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within the fiscal year. If any fiscal period has an unusually low number of entries compared to other periods, that could indicate missing transactions. Also check whether any entries have dates that fall outside the expected fiscal year, which would be an accuracy concern.
+
+**Step 7.** Examine the Debit and Credit columns for missing or unusual values. Filter for rows where both the Debit and Credit fields are zero or blank. An entry with no debit and no credit amount serves no accounting purpose and may indicate a data entry error or a system artifact. Record the count of such entries if any exist.
+
+**Step 8.** Examine the SourceDocumentType column. Use a PivotTable or COUNTIFS formulas to count the number of GLEntry rows for each source document type. You should see entries from types such as "SalesInvoice," "PurchaseInvoice," "JournalEntry," "PayrollRegister," and "WorkOrderClose." If any expected source type is absent, that could indicate a completeness problem where an entire business cycle failed to post to the ledger. Record the distribution of entries by source document type.
+
+**Checkpoint.** At this point, you should have assessed the Charles River Accounting Core against three quality dimensions: completeness (all account types present in the chart of accounts, no gaps in fiscal periods, all expected source document types represented in GLEntry), consistency (debits equal credits in the aggregate, all GL account references exist in the chart of accounts), and accuracy (no entries outside the expected date range, no zero-amount entries without explanation). Your findings should be documented in a brief written summary that identifies each test performed, the result, and any issues discovered. This exercise previews the audit analytics work you will perform in Chapters 8 and 12, where you will use SQL to automate these same tests across the entire population.
+
+

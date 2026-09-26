@@ -1,0 +1,10 @@
+## Chapter Summary
+
+The accounting profession is undergoing a fundamental shift in the skills it demands from practitioners. The growth of transaction data, the evolution of audit methodology, and the expansion of the accountant's role from preparer to analyst have created strong demand for data analytics competencies. Professional bodies including the AICPA, IMA, and IFAC have responded by integrating analytics into their competency frameworks, signaling that these skills are essential rather than optional.
+
+Analytics in accounting takes three forms. Descriptive analytics summarizes historical data to explain what happened. Predictive analytics uses historical patterns to forecast future outcomes. Prescriptive analytics recommends actions by optimizing objectives subject to constraints. Most accounting analytics work is descriptive or predictive, and doing this work well requires both technical skill and professional judgment.
+
+This textbook teaches accounting analytics using three tools (Excel, SQL, and Power BI) applied to the Charles River Accounting Dataset, a single integrated database containing 77 tables organized in ten groups. The tools cover the full analytics workflow from data access through visualization and communication. The book introduces the table groups progressively, starting with the O2C and Accounting Core groups in the Excel chapters, expanding into P2P and Manufacturing in the SQL chapters, building cross-group models in Power BI, and integrating all groups in the applied chapters of Part V.
+
+Every analytical project follows a consistent workflow. The accountant defines the question, accesses the data, prepares and cleans the data, analyzes it, visualizes the results, and communicates findings. This workflow provides the organizing thread for the entire book. The chapters are arranged so that students develop foundational skills in Parts I through IV and then apply them in integrated, multi-tool projects in Part V.
+
