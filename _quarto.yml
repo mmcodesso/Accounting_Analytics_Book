@@ -15,15 +15,15 @@ book:
     - front-matter/to-the-student.qmd
     - front-matter/about-the-dataset.qmd
     - front-matter/downloads.qmd
-    - part: "Part I: Foundations of Accounting Analytics"
+    - part: "Foundations of Accounting Analytics"
       chapters:
         - chapters/01-role-of-analytics/chapter.qmd
         - chapters/02-understanding-data/chapter.qmd
         - chapters/03-accounting-data-environment/chapter.qmd
-    - part: "Part II: Accounting Analytics with Excel"
-    - part: "Part III: Accounting Analytics with SQL"
-    - part: "Part IV: Data Visualization and Power BI"
-    - part: "Part V: Integrated and Applied Topics"
+    - part: "Accounting Analytics with Excel"
+    - part: "Accounting Analytics with SQL"
+    - part: "Data Visualization and Power BI"
+    - part: "Integrated and Applied Topics"
 
 
 format:
