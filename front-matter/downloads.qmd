@@ -25,6 +25,10 @@ It supports the full book across Excel, SQL, and Power BI.
 
 ### Charles River Accounting Dataset
 
+Visit the [Charles River Accounting Dataset website](https://charlesriver.accountinganalyticshub.com/)
+for documentation and additional information. All dataset changes and updates
+will be posted there. Direct downloads are available below.
+
 - [Charles River Accounting Dataset (SQLite)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.sqlite)
 - [Charles River Accounting Dataset (Excel)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.xlsx)
 - [Charles River Accounting Dataset (CSV package)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver_csv.zip)

@@ -34,6 +34,10 @@ provides a common setting for learning across Excel, SQL, and Power BI. Instruct
 can use the material to support classroom discussion, guided practice, and
 independent assignments.
 
+Visit the [Charles River dataset website](https://charlesriver.accountinganalyticshub.com/)
+for documentation and additional information. All dataset changes and updates
+will be posted there.
+
 **The book is under development.** Chapters and supporting materials are being
 added and refined. Please review the available content when planning your course.
 
@@ -57,7 +61,7 @@ To propose direct edits, see the [contributor guide](CONTRIBUTING.md).
 
 If you use this book in your teaching or research, please cite it as:
 
-> Codesso, M. (2026). *Accounting Analytics: An Integrated Approach*. https://aa.accountinganalyticshub.com/
+> Codesso, M. (2026). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
 
 ## License and reuse
 

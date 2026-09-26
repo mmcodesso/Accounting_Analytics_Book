@@ -74,4 +74,4 @@ The book does not ask students to work with all 77 tables from the beginning. Ch
 
 The dataset is provided in three formats. The SQLite database is used for all SQL work in Chapters 9 through 12 and for data extraction in Part V. It requires no server installation, runs on any operating system, and works with DB Browser for SQLite, the free database tool used throughout the book. The Excel workbook is used for all spreadsheet work in Chapters 4 through 8. The CSV package provides maximum flexibility for import into any tool, including Power BI. All three formats contain identical data, so students work with the same underlying information regardless of which tool a given chapter uses.
 
-Complete documentation for every table in the database, including column names, data types, primary and foreign key relationships, cross-group bridge keys, and Entity-Relationship diagrams for each table group, appears in Appendix B.
+For dataset documentation and additional information, visit the [Charles River Accounting Dataset website](https://charlesriver.accountinganalyticshub.com/). All dataset changes and updates will be posted on that website.
