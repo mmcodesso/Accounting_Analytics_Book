@@ -33,3 +33,5 @@ __pycache__/
 **/*.quarto_ipynb
 *.bkp
 datasets/
+CLAUDE.md
+.gitignore

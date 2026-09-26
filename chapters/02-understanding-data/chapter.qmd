@@ -105,7 +105,7 @@ ERP systems are the dominant data source in large and mid-size organizations. Th
 
 Accountants also work with data that originates outside the organization. External data sources include bank statements used for cash reconciliation, market price feeds used for fair value measurements, credit rating data used for impairment assessments, tax rate tables used for compliance calculations, and industry benchmarking data used for comparative analysis. External data introduces additional quality concerns because the accountant has less control over how the data was collected, formatted, and maintained. When external data is combined with internal data for analysis, differences in formatting, time periods, or classification schemes can create inconsistencies that must be resolved before the analysis can proceed.
 
-::: {.callout-note .conection-dots icon=false}
+::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
 In Chapter 5, you will use Excel lookup functions and Power Query to merge data from different Charles River tables, such as combining SalesOrder data with Customer details from a separate worksheet. The challenges you encounter in that chapter, including mismatched identifiers and inconsistent formatting, are practical examples of the data quality issues discussed here. Understanding the sources of accounting data now will help you anticipate those challenges when you begin working with the tools.
 :::
@@ -150,7 +150,7 @@ Timeliness is a quality dimension that depends on context. Data that is perfectl
 | Timeliness | The data reflects the current state of the business as of the relevant reporting date. | An auditor performs a receivables aging analysis using GLEntry data extracted on March 1, but Charles River posted $200,000 in CashReceipt records on February 28 that are not reflected in the extract. The aging analysis overstates overdue balances. |
 
 ::: {.callout-warning .watch-out icon=false}
-## WATCH OUT 
+## Watch out
 A dataset can score well on one quality dimension while failing on another. The general ledger may be perfectly accurate (every amount matches the source document) and perfectly consistent (every account code follows the same format) but incomplete because transactions from a subsidiary were not yet consolidated. Evaluating data quality requires examining all four dimensions, not just the one that is easiest to check.
 :::
 
@@ -183,7 +183,7 @@ In audit analytics, outliers are often the transactions of greatest interest. Au
 
 
 ::: {.callout-tip .in-practice icon=false}
-## IN PRACTICE
+## In Practice
 In professional practice, data quality assessment is often the first task in any analytics engagement. Audit teams perform data quality checks before running analytical procedures to ensure that the results will be reliable. Management accountants validate the data behind cost reports before presenting them to executives. The AICPA's Guide to Audit Data Analytics recommends that auditors evaluate the completeness and accuracy of data obtained from client systems before using it in substantive procedures (AICPA, 2017). The data quality skills you develop in this chapter apply directly to that professional requirement.
 :::
 
@@ -203,7 +203,7 @@ Another common violation is storing observations in column headers rather than i
 
 
 ::: {.callout-warning .watch-out icon=false}
-## WATCH OUT
+## Watch out
 Students sometimes confuse "tidy" with "clean." A tidy dataset is one that follows the structural principles described above: each variable in its own column, each observation in its own row, each type of observational unit in its own table. A clean dataset is one that is free of quality problems such as missing values, duplicates, and inconsistencies. A dataset can be tidy but dirty (properly structured but containing errors) or clean but messy (free of errors but organized in a way that makes analysis difficult). Both structure and quality must be addressed before analysis can proceed.
 :::
 
@@ -212,7 +212,7 @@ The Charles River dataset is, for the most part, already tidy. It is stored as r
 
 
 ::: {.callout-note .connecting-dots icon=false}
-## CONNECTING THE DOTS
+## Connecting the Dots
 The tidy data principles described here are closely related to the concept of database normalization, which you will study in Chapter 3. Both tidy data and normalization seek to organize data so that each fact is stored once, in a single defined location, with no redundancy or ambiguity. Understanding tidy data now will make the transition to relational database concepts in the next chapter feel natural.
 :::
 
@@ -227,7 +227,7 @@ The ability to move between the general ledger and the operational documents tha
 
 
 ::: {.callout-note .connecting-dots icon=false}
-## CONNECTING THE DOTS
+## Connecting the Dots
 In Chapters 8 and 12, you will use SQL to query the SourceDocumentType column in GLEntry to isolate journal entries made by the accounting team from entries generated automatically by sales invoices, purchase invoices, and payroll. The traceability structure you learned here is the foundation for those audit analytics procedures.
 :::
 
