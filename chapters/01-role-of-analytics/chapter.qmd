@@ -88,9 +88,7 @@ In auditing, analytics is changing the nature of audit evidence. The ability to 
 
 Across all three areas, graduates who can combine accounting knowledge with data analysis skills are more attractive to employers than those with accounting knowledge alone. This is true from public accounting to industry to government. The ability to write a SQL query, build a PivotTable, or create an interactive dashboard distinguishes a candidate in a hiring process and opens career paths that were previously reserved for specialists in information systems or data science (Richins et al., 2017).
 
-Table 1.1 shows how each of the four types of analytics appears in financial accounting, managerial accounting, and auditing, using examples drawn from the Charles River data you will analyze in this book.
-
-**Table 1.1: Examples of Analytics Types by Accounting Perspective**
+@tbl-01-01 shows how each of the four types of analytics appears in financial accounting, managerial accounting, and auditing, using examples drawn from the Charles River data you will analyze in this book.
 
 | Type | Financial Accounting | Managerial Accounting | Auditing |
 |---|---|---|---|
@@ -98,6 +96,8 @@ Table 1.1 shows how each of the four types of analytics appears in financial acc
 | Diagnostic | Drill-down of a quarterly revenue shortfall by customer segment and item group to explain the change from the prior quarter | Decomposition of the decline in Furniture gross margin into price, volume, mix, and cost effects | Investigation of a spike in credit memos issued after year-end to determine whether revenue was recorded in the wrong period |
 | Predictive | Revenue forecast for the next fiscal quarter using trend extrapolation of historical Charles River sales data | Cost-volume-profit model projecting break-even points for the Furniture product line under three pricing scenarios | Regression-based expectation for monthly revenue used as a substantive analytical procedure |
 | Prescriptive | Recommended sequence of period-end close tasks that minimizes the days needed to close, given staff availability | Product mix recommendation that maximizes total contribution margin across the four product families, subject to constraints on machine hours and raw material availability | Allocation of substantive testing hours across audit areas that minimizes residual risk within a given engagement budget |
+
+: Examples of Analytics Types by Accounting Perspective {#tbl-01-01}
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
@@ -138,15 +138,15 @@ SQL is the standard language for retrieving and combining data stored in relatio
 
 Microsoft Power BI is a business intelligence platform for building data models, interactive reports, and dashboards. It connects to multiple data sources, relates tables to one another in a data model, and uses a formula language called DAX to define calculated measures. Power BI is strongest when results must be shared with an audience that wants to explore the data on its own, such as department managers filtering a dashboard to their own cost center.
 
-Table 1.2 summarizes how the three tools compare.
-
-**Table 1.2: Excel, SQL, and Power BI at a Glance**
+@tbl-01-02 summarizes how the three tools compare.
 
 | Tool | Strongest For | Typical Accounting Uses | Main Workflow Stages | Where in This Book |
 |---|---|---|---|---|
 | Microsoft Excel | Ad hoc analysis, modeling, and workpapers a reviewer can trace | Reconciliations, PivotTable summaries, forecasting models, audit workpapers | Prepare, analyze | Part II |
 | SQL | Large datasets that span related tables, and procedures that must be repeated | Extracting ledger detail, joining documents across a business cycle, population-level audit tests | Access, prepare, analyze | Part III |
 | Microsoft Power BI | Interactive reporting for audiences that explore the data themselves | Financial and operational dashboards, budget-versus-actual reports, audit monitoring | Analyze, visualize, communicate | Part IV |
+
+: Excel, SQL, and Power BI at a Glance {#tbl-01-02}
 
 @fig-01-03 maps each tool to the workflow stages introduced in the previous section. SQL handles most of the work in data access and preparation. Excel dominates preparation and analysis. Power BI takes the lead in visualization and presentation. All three tools contribute to the communication of results.
 
@@ -161,9 +161,7 @@ Part V of this book integrates all three tools using the full Charles River data
 
 This book is built around one integrated dataset that you will use in every chapter. The Charles River Accounting Dataset follows a single fictional mid-size home furnishings company in the greater Boston area that designs and sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels, manufactures selected product lines in-house, and operates an interior design services practice that bills customers by the hour. Working with one company throughout the book means you learn one business deeply rather than several superficially, and every chapter builds on the same data environment. The About the Dataset section in the front matter introduces the company and its business cycles in more detail.
 
-The database is organized into table groups, each covering one area of business activity, from customer orders and supplier payments through manufacturing, payroll, and general ledger posting. Table 1.3 summarizes the groups, the key tables in each, and their primary accounting uses. The book introduces these groups progressively, starting with the most accessible tables in the early Excel chapters and expanding into the more complex groups as your skills develop. @fig-01-04 shows how the groups connect through the general ledger, where the financial activity of every business cycle is ultimately posted. Complete documentation of every table and column is available on the dataset website.
-
-**Table 1.3: Charles River Table Groups**
+The database is organized into table groups, each covering one area of business activity, from customer orders and supplier payments through manufacturing, payroll, and general ledger posting. @tbl-01-03 summarizes the groups, the key tables in each, and their primary accounting uses. The book introduces these groups progressively, starting with the most accessible tables in the early Excel chapters and expanding into the more complex groups as your skills develop. @fig-01-04 shows how the groups connect through the general ledger, where the financial activity of every business cycle is ultimately posted. Complete documentation of every table and column is available on the dataset website.
 
 | Table Group | Key Tables | Primary Accounting Use |
 |---|---|---|
@@ -176,6 +174,8 @@ The database is organized into table groups, each covering one area of business 
 | Master Data | Item, Warehouse, Employee | Shared reference data for products, locations, and people across all groups |
 | Organizational Planning | CostCenter, Budget, BudgetLine | Departmental budgetary control, responsibility accounting, budget-versus-actual analysis |
 | Demand Planning and MRP | DemandForecast, InventoryPolicy, SupplyPlanRecommendation, MaterialRequirementPlan, RoughCutCapacityPlan | Demand forecasting, inventory planning, production planning |
+
+: Charles River Table Groups {#tbl-01-03}
 
 The design services practice does not have a table group of its own. Its tables, such as ServiceEngagement, ServiceTimeEntry, and ServiceBillingLine, sit within the Order-to-Cash group, giving you a service revenue cycle alongside the product revenue cycle.
 

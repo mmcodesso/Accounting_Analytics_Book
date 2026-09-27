@@ -6,9 +6,6 @@
         <mxCell id="1" parent="0"/>
 
         <!-- Title -->
-        <mxCell id="title" value="&lt;b&gt;Figure 2.2: Common Sources of Accounting Data&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="250" y="10" width="600" height="30" as="geometry"/>
-        </mxCell>
 
         <!-- Central hub: Accounting Analytics -->
         <mxCell id="hub" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;Accounting&lt;br&gt;Analytics&lt;/b&gt;&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=2;fontFamily=Helvetica;shadow=1;" vertex="1" parent="1">

@@ -6,7 +6,7 @@
 
 **Step-by-step instructions.**
 
-**Step 1.** Open the file CharlesRiver.xlsx in Excel. Notice that the workbook contains a large number of worksheets, each representing one table in the Charles River database and arranged by table group. Click through several worksheet tabs at the bottom of the screen and note the variety of table names, from Customer and SalesOrder through WorkOrder and PayrollRegister. Use Table 1.3 to match the worksheets you see to their table groups.
+**Step 1.** Open the file CharlesRiver.xlsx in Excel. Notice that the workbook contains a large number of worksheets, each representing one table in the Charles River database and arranged by table group. Click through several worksheet tabs at the bottom of the screen and note the variety of table names, from Customer and SalesOrder through WorkOrder and PayrollRegister. Use @tbl-01-03 to match the worksheets you see to their table groups.
 
 **Step 2.** Click on the Customer worksheet. Examine the column headers in row 1. You should see columns including CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms. Scroll down to get a sense of the number of records. Turn on filters for the worksheet (Data > Filter) and open the filter on the CustomerSegment column. You should see segments such as Wholesale, Small Business, Design Trade, Strategic, and Design Services, which classify customers by the way Charles River sells to them.
 

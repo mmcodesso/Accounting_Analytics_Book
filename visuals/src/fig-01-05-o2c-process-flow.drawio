@@ -1,76 +1,76 @@
-<mxfile>
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
   <diagram name="O2C Process Flow" id="fig0105v2">
-    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="500" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="842" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="500" math="0" shadow="0">
       <root>
-        <mxCell id="0"/>
-        <mxCell id="1" parent="0"/>
-
-        <mxCell id="cust" value="&lt;b&gt;Customer&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;places order&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="40" y="70" width="120" height="60" as="geometry"/>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cust" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;Customer&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;places order&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="70" as="geometry" />
         </mxCell>
-
-        <mxCell id="so" value="&lt;b&gt;SalesOrder&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;header: customer,&lt;br&gt;date, status&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="40" y="200" width="120" height="70" as="geometry"/>
+        <mxCell id="so" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;SalesOrder&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;header: customer,&lt;br&gt;date, status&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="40" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="sol" value="&lt;b&gt;SalesOrderLine&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;item, qty, price,&lt;br&gt;discount&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="220" y="200" width="130" height="70" as="geometry"/>
+        <mxCell id="sol" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;SalesOrderLine&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;item, qty, price,&lt;br&gt;discount&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="130" x="220" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="ship" value="&lt;b&gt;Shipment&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;ship date, carrier,&lt;br&gt;tracking&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="410" y="200" width="130" height="70" as="geometry"/>
+        <mxCell id="ship" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;Shipment&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;ship date, carrier,&lt;br&gt;tracking&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="130" x="410" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="si" value="&lt;b&gt;SalesInvoice&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;invoice date,&lt;br&gt;total amount, terms&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="600" y="200" width="140" height="70" as="geometry"/>
+        <mxCell id="si" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;SalesInvoice&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;invoice date,&lt;br&gt;total amount, terms&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="600" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="cr" value="&lt;b&gt;CashReceipt&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;receipt date,&lt;br&gt;amount, method&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="800" y="200" width="130" height="70" as="geometry"/>
+        <mxCell id="cr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;CashReceipt&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;receipt date,&lt;br&gt;amount, method&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="130" x="800" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="gle" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#FFFFFF'&gt;Accounting Core&lt;br&gt;debit/credit posting&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="1000" y="200" width="140" height="70" as="geometry"/>
+        <mxCell id="gle" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#FFFFFF&#39;&gt;Accounting Core&lt;br&gt;debit/credit posting&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="1000" y="200" as="geometry" />
         </mxCell>
-
-        <mxCell id="item" value="&lt;b&gt;Item&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;Master Data:&lt;br&gt;product info, cost&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" vertex="1" parent="1">
-          <mxGeometry x="220" y="70" width="130" height="60" as="geometry"/>
+        <mxCell id="item" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F39C12;strokeWidth=1.5;fontSize=11;fontFamily=Arial;verticalAlign=middle;" value="&lt;b&gt;Item&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;Master Data:&lt;br&gt;product info, cost&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="130" x="220" y="70" as="geometry" />
         </mxCell>
-
-        <mxCell id="cra" value="&lt;b&gt;CashReceipt&lt;br&gt;Application&lt;/b&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#5D6D7E'&gt;links receipt&lt;br&gt;to invoice&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1;fontSize=10;fontFamily=Arial;verticalAlign=middle;dashed=1;dashPattern=5 3;" vertex="1" parent="1">
-          <mxGeometry x="800" y="340" width="130" height="70" as="geometry"/>
+        <mxCell id="cra" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#17A589;strokeWidth=1;fontSize=10;fontFamily=Arial;verticalAlign=middle;dashed=1;dashPattern=5 3;" value="&lt;b&gt;CashReceipt&lt;br&gt;Application&lt;/b&gt;&lt;br&gt;&lt;font style=&#39;font-size:9px;color:#5D6D7E&#39;&gt;links receipt&lt;br&gt;to invoice&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="130" x="800" y="340" as="geometry" />
         </mxCell>
-
-        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" edge="1" source="cust" target="so" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" edge="1" source="so" target="sol" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" edge="1" source="sol" target="ship" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" edge="1" source="ship" target="si" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" edge="1" source="si" target="cr" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#1A5276;strokeWidth=2;endArrow=classic;" edge="1" source="si" target="gle" parent="1">
+        <mxCell id="e1" edge="1" parent="1" source="cust" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" target="so">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="so" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" target="sol">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="sol" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" target="ship">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="ship" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" target="si">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="si" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;endArrow=classic;" target="cr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="si" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#1A5276;strokeWidth=2;endArrow=classic;" target="gle">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="670" y="330"/>
-              <mxPoint x="980" y="330"/>
-              <mxPoint x="980" y="235"/>
+              <mxPoint x="670" y="150" />
+              <mxPoint x="980" y="150" />
+              <mxPoint x="980" y="235" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;endArrow=classic;" edge="1" source="item" target="sol" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-
-        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;endArrow=classic;" edge="1" source="cr" target="cra" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;endArrow=classic;" edge="1" source="cra" target="si" parent="1">
+        <mxCell id="e7" edge="1" parent="1" source="item" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;endArrow=classic;" target="sol">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="cr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;endArrow=classic;" target="cra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="cra" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1;endArrow=classic;" target="si">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="670" y="375"/>
+              <mxPoint x="670" y="375" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <mxCell id="e6_lbl" value="posts to ledger" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontSize=9;fontStyle=3;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="850" y="305" width="90" height="20" as="geometry"/>
+        <mxCell id="e6_lbl" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontSize=9;fontStyle=3;fontFamily=Arial;" value="posts to ledger" vertex="1">
+          <mxGeometry height="20" width="90" x="850" y="305" as="geometry" />
         </mxCell>
-
       </root>
     </mxGraphModel>
   </diagram>

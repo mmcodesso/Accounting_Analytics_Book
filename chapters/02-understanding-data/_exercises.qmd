@@ -4,74 +4,121 @@
 
 ### Financial Accounting Exercises
 
-**Exercise 2.1 (Financial Accounting): Assessing Revenue Data Quality in the Charles River O2C Tables**
+**Exercise 2.1: Assessing Revenue Data Quality in the Charles River O2C Tables**
 
-**Table group:** O2C
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
 **Scenario.** You are a financial reporting analyst at Charles River preparing to analyze the company's revenue for the most recent fiscal year. Before building any reports, you need to verify that the underlying sales data is reliable enough to support accurate revenue figures.
 
-**Requirements.** (1) Open the CharlesRiver.xlsx workbook in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness). (2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved and note any values that appear problematic (such as zero or negative line amounts, missing item references, or pricing methods that seem inconsistent). (3) Examine whether every CustomerID in the SalesOrder table corresponds to a customer in the Customer table. Use COUNTIFS or XLOOKUP to test this relationship. Document any orphaned records where an order references a customer that does not exist. (4) Prepare a brief written data quality assessment memorandum (one page) that summarizes your findings and recommends whether the data is suitable for revenue reporting or whether specific problems must be resolved first.
+**Requirements.**
+
+(1) Open the CharlesRiver.xlsx workbook in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness).
+
+(2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved, such as Quantity, UnitPrice, Discount, and LineTotal, and test whether LineTotal agrees with the other columns. Examine the PricingMethod column and identify the lines priced by approved override rather than by a price list, which deserve closer review.
+
+(3) Examine whether every CustomerID in the SalesOrder table corresponds to a customer in the Customer table. Use COUNTIFS or XLOOKUP to test this relationship. Document any orphaned records where an order references a customer that does not exist, and explain what a clean result tells you.
+
+(4) Prepare a brief written data quality assessment memorandum (one page) that summarizes your findings and recommends whether the data is suitable for revenue reporting or whether specific problems must be resolved first.
 
 **Deliverable.** A one-page data quality assessment memorandum with specific findings organized by quality dimension.
 
 
-**Exercise 2.2 (Financial Accounting): Evaluating General Ledger Completeness at Charles River**
+**Exercise 2.2: Evaluating General Ledger Completeness at Charles River**
 
-**Table group:** Acct Core
+**Table group:** Accounting Core
 
 **Scenario.** You are a financial reporting analyst who has been asked to verify that the Charles River general ledger is complete before the team begins preparing the year-end financial statements. Your supervisor is concerned that some transactions may not have been posted.
 
-**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the GLEntry worksheet. Calculate the total debits and total credits across all entries. Determine whether the ledger is in balance. (2) Identify the date range covered by the general ledger entries. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within the fiscal year. Note any periods that appear to have an unusually low number of entries compared to other periods, which could indicate missing transactions. (3) Examine the SourceDocumentType column to understand what types of transactions are recorded. Determine whether the ledger includes entries from all expected source types (such as SalesInvoice, PurchaseInvoice, JournalEntry, PayrollRegister, and WorkOrderClose). If any expected source type is absent, document this as a potential completeness concern. (4) Write a brief assessment (one page) of the general ledger's completeness, suitable for review by the financial reporting manager.
+**Requirements.**
+
+(1) Open the CharlesRiver.xlsx workbook and examine the GLEntry worksheet. Calculate the total debits and total credits across all entries. Determine whether the ledger is in balance.
+
+(2) Identify the date range covered by the general ledger entries. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within each fiscal year. Note any periods that have an unusually low number of entries compared to other periods, and explain whether each reflects missing transactions or the edges of the extract.
+
+(3) Examine the SourceDocumentType column to understand what types of transactions are recorded. Determine whether the ledger includes entries from all expected source types, such as SalesInvoice, Shipment, PurchaseInvoice, JournalEntry, PayrollPayment, and WorkOrderClose. If any expected source type is absent, document this as a potential completeness concern.
+
+(4) Write a brief assessment (one page) of the general ledger's completeness, suitable for review by the financial reporting manager.
 
 **Deliverable.** A one-page completeness assessment memorandum with quantitative evidence supporting each finding.
 
 
 ### Managerial Accounting Exercises
 
-**Exercise 2.3 (Managerial Accounting): Data Quality Assessment for Product Cost Analysis**
+**Exercise 2.3: Data Quality Assessment for Product Cost Analysis**
 
 **Table group:** Master Data and Manufacturing
 
 **Scenario.** You are a cost analyst at Charles River who has been asked to perform a product cost analysis. Before starting the analysis, you need to assess whether the data is clean enough to produce reliable cost figures.
 
-**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the Item worksheet from the Master Data group. Identify any items where the StandardCost field is zero, blank, or appears unreasonable. Assess whether these entries represent data quality problems or legitimate situations (such as items that are services rather than physical products, which may have a StandardCost of zero by design). (2) Compare the StandardCost and ListPrice columns. Identify any items where the ListPrice is less than the StandardCost, which would imply a negative margin. Determine whether these represent accuracy problems or deliberate pricing decisions. Note the SupplyMode column (Purchased versus Manufactured), which may explain cost differences. (3) Examine the WorkOrder worksheet from the Manufacturing group. Check for missing values in key fields such as PlannedQuantity, status, and date fields. (4) Write a brief assessment (one half to one page) of the data's suitability for product cost analysis, identifying any problems that would need to be resolved before proceeding.
+**Requirements.**
+
+(1) Open the CharlesRiver.xlsx workbook and examine the Item worksheet from the Master Data group. Identify any items where the StandardCost field is zero, blank, or appears unreasonable. Assess whether these entries represent data quality problems or legitimate situations, such as service items that have a StandardCost of zero by design.
+
+(2) Identify items with a blank ListPrice and use the ItemGroup column to determine whether each is an item Charles River sells. Then identify item names that appear more than once in the Item table and compare the ItemCode and StandardCost of each. Assess whether these are duplicate records or distinct items that share a name, and explain how shared names could distort a cost analysis that groups results by ItemName.
+
+(3) Examine the WorkOrder and WorkOrderOperation worksheets from the Manufacturing group. Every work order should have at least one routing operation. Use COUNTIFS to count the WorkOrderOperation rows for each WorkOrderID and identify any work orders with none. Explain why a work order without operations would make labor and overhead cost figures unreliable.
+
+(4) Write a brief assessment (one half to one page) of the data's suitability for product cost analysis, identifying any problems that would need to be resolved before proceeding.
 
 **Deliverable.** A written data quality assessment focused on cost analysis readiness, with specific item-level and work-order-level findings.
 
 
-**Exercise 2.4 (Managerial Accounting): Identifying Tidy Data Problems in Budget Reports**
+**Exercise 2.4: Evaluating Budget Data for Budget-Versus-Actual Analysis**
 
-**Table group:** Org Planning
+**Table group:** Organizational Planning, with GLEntry from the Accounting Core
 
-**Scenario.** You are a management accountant at Charles River who needs to compare budgeted amounts to actual spending by cost center. The budget data is available in the Organizational Planning tables, but you suspect it may not be in a format suitable for analysis.
+**Scenario.** You are a management accountant at Charles River who needs to compare budgeted amounts to actual spending by cost center. Before building the comparison, you need to understand how the budget data is structured and whether it can be matched to the general ledger.
 
-**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Examine the structure. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row). If not, describe specifically which tidy data principle is violated and how the data would need to be restructured. (2) Examine the cost center references in the BudgetLine table and in the GLEntry table. The BudgetLine table references cost centers, and GLEntry includes a CostCenterID column. Assess whether the cost center identifiers are consistent between the two sources. Identify any inconsistencies that would prevent a straightforward comparison. (3) Document your findings in a brief memorandum (one half to one page) that recommends specific data preparation steps needed before a budget-versus-actual analysis can be performed.
+**Requirements.**
 
-**Deliverable.** A written memorandum identifying structural and quality issues in the budget data and recommending preparation steps.
+(1) Open the CharlesRiver.xlsx workbook and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row), and describe what one row of each table represents.
+
+(2) Department managers often ask for budget reports with months across the top. Sketch the layout of such a report for one cost center. Explain which tidy data principles it would violate and why the tidy form stored in the workbook is better suited to a budget-versus-actual analysis.
+
+(3) Examine the CostCenterID column in BudgetLine and in GLEntry. Count the rows in each table where CostCenterID is blank. Assess how these rows would affect a comparison of budgeted and actual amounts by cost center, and recommend how they should be handled.
+
+(4) Document your findings in a brief memorandum (one half to one page) that recommends specific data preparation steps needed before a budget-versus-actual analysis can be performed.
+
+**Deliverable.** A written memorandum describing the structure of the budget data, the treatment of rows without a cost center, and the preparation steps needed before a budget-versus-actual analysis.
 
 
 ### Auditing Exercises
 
-**Exercise 2.5 (Auditing): Data Quality Evaluation for Audit Planning**
+**Exercise 2.5: Data Quality Evaluation for Audit Planning**
 
-**Table group:** O2C, Acct Core, and P2P
+**Table group:** Order-to-Cash, Master Data, Accounting Core, and Procure-to-Pay
 
-**Scenario.** You are a first-year auditor assigned to evaluate the data that will be used for analytics procedures during the upcoming Charles River audit. Your senior has asked you to perform a preliminary data quality assessment across three table groups to determine which data sources are reliable enough for audit testing.
+**Scenario.** You are a first-year auditor assigned to evaluate the data that will be used for analytics procedures during the upcoming Charles River audit. Your senior has asked you to perform a preliminary data quality assessment across several table groups to determine which data sources are reliable enough for audit testing.
 
-**Requirements.** (1) For the O2C table group, perform the following data quality checks: test for missing values in critical fields of the SalesOrder table (OrderDate, CustomerID, Status), test for records where Shipment.ShipmentDate precedes SalesOrder.OrderDate by matching on SalesOrderID, and check the Item table for items with zero or negative ListPrice values. Document the number of records affected by each problem. (2) For the Accounting Core group, perform the following checks: verify that total debits equal total credits in GLEntry, check for GLEntry records that reference an AccountID not found in the Account table, and examine the SourceDocumentType column for any unexpected or missing source types. (3) For the P2P group, examine the DisbursementPayment table and check for potential duplicate payments by sorting on SupplierID, Amount, and PaymentDate. Document any records that match on all three fields. (4) For each problem identified, classify it by quality dimension and assess its potential impact on audit procedures. A missing date, for example, would prevent the auditor from testing the transaction in the correct period. Prepare a one-page audit data quality assessment memorandum that your senior could use to decide which tables are suitable for audit analytics.
+**Requirements.**
+
+(1) For the Order-to-Cash group, test for missing values in critical fields of the SalesOrder table (OrderDate, CustomerID, Status), and test for sales invoices dated before the earliest shipment on the same sales order. Document the number of records affected by each problem.
+
+(2) For the Master Data group, check the Item table for blank ListPrice values and determine which of them are expected.
+
+(3) For the Accounting Core group, verify that total debits equal total credits in GLEntry, check for GLEntry records that reference an AccountID not found in the Account table, identify rows with neither a debit nor a credit amount, and examine the SourceDocumentType column for any unexpected or missing source types.
+
+(4) For the Procure-to-Pay group, examine the PurchaseInvoice table and check for supplier invoice numbers that appear more than once for the same supplier. Document any records that match.
+
+(5) For each problem identified, classify it by quality dimension and assess its potential impact on audit procedures. An invoice dated before its shipment, for example, would matter for testing revenue cutoff. Prepare a one-page audit data quality assessment memorandum that your senior could use to decide which tables are suitable for audit analytics.
 
 **Deliverable.** A one-page audit data quality assessment memorandum organized by table group and quality dimension.
 
 
-**Exercise 2.6 (Auditing): Testing for Duplicate Payments**
+**Exercise 2.6: Testing for Duplicate Payments**
 
-**Table group:** P2P
+**Table group:** Procure-to-Pay
 
-**Scenario.** Your audit team has identified duplicate payments as a risk area for the current Charles River engagement. Before performing a full duplicate payment analysis (which you will learn in Chapter 12 using SQL), you have been asked to perform a preliminary manual check using Excel.
+**Scenario.** Your audit team has identified duplicate payments as a risk area for the current Charles River engagement. Before performing a full duplicate payment analysis, which you will learn in the SQL chapters of Part III, you have been asked to perform a preliminary check using Excel.
 
-**Requirements.** (1) Open the CharlesRiver.xlsx workbook and examine the DisbursementPayment worksheet from the P2P table group. Identify the fields that would be relevant for detecting duplicate payments, such as SupplierID (as the payee identifier), Amount, and PaymentDate. (2) Sort the data by SupplierID and then by Amount to bring potential duplicates into adjacent rows. Scan for records where the same supplier received the same amount on the same date or within a narrow date range. Document any potential duplicates you identify. (3) Assess the reliability of your manual approach. Consider what limitations exist when searching for duplicates by visual inspection versus using automated techniques. Write two to three sentences explaining why a SQL-based approach (which you will learn in Chapter 12) would be more effective for this task. (4) Prepare a brief memorandum (one half page) documenting the potential duplicates identified and your assessment of the method's limitations.
+**Requirements.**
 
-**Deliverable.** A written memorandum documenting potential duplicate payments and the limitations of manual detection methods.
+(1) Open the CharlesRiver.xlsx workbook and examine the PurchaseInvoice and DisbursementPayment worksheets from the P2P table group. Identify the fields that would be relevant for detecting duplicate invoices and duplicate payments, such as SupplierID, InvoiceNumber, CheckNumber, Amount, and PaymentDate.
 
+(2) In the PurchaseInvoice worksheet, use COUNTIFS to count how many times each combination of SupplierID and InvoiceNumber appears, and filter for counts greater than one. In the DisbursementPayment worksheet, do the same for SupplierID and CheckNumber. Document any potential duplicates you identify, and note that payments made by ACH or wire transfer have no check number and cannot be tested this way.
 
+(3) Assess the reliability of your approach. Consider what duplicates your tests would miss, such as the same invoice entered with a slightly different number or paid by a method that has no check number. Write two to three sentences explaining why a SQL-based approach, which you will learn in Part III, would be more effective for this task.
 
+(4) Prepare a brief memorandum (one half page) documenting the potential duplicates identified and your assessment of the method's limitations.
+
+**Deliverable.** A written memorandum documenting potential duplicate invoices and payments and the limitations of the detection methods used.

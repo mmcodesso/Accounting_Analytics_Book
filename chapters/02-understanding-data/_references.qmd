@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## References
+
+American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*. AICPA.
+
+Fisher, I. E., Garnsey, M. R., & Hughes, M. E. (2016). Natural language processing in accounting, auditing and finance: A synthesis of the literature with a roadmap for future research. *Intelligent Systems in Accounting, Finance and Management*, *23*(3), 157–214.
+
+Grabski, S. V., Leech, S. A., & Schmidt, P. J. (2011). A review of ERP research: A future agenda for accounting information systems. *Journal of Information Systems*, *25*(1), 37–78.
+
+Redman, T. C. (2001). *Data quality: The field guide*. Digital Press.
+
+Wang, R. Y., & Strong, D. M. (1996). Beyond accuracy: What data quality means to data consumers. *Journal of Management Information Systems*, *12*(4), 5–33.
+
+Wickham, H. (2014). Tidy data. *Journal of Statistical Software*, *59*(10), 1–23.

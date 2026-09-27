@@ -5,9 +5,6 @@
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
 
-        <mxCell id="title" value="&lt;b&gt;Figure 2.1: The Spectrum of Data Structure&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="200" y="10" width="700" height="30" as="geometry"/>
-        </mxCell>
 
         <mxCell id="arrow_bg" value="" style="shape=mxgraph.arrows2.arrow;dx=40;dy=14;notch=0;rounded=0;fillColor=#D5D8DC;strokeColor=none;opacity=30;" vertex="1" parent="1">
           <mxGeometry x="30" y="170" width="1040" height="80" as="geometry"/>
@@ -57,7 +54,7 @@
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
-        <mxCell id="tool_note" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:10px;&quot;&gt;&lt;i&gt;Excel, SQL, and Power BI are designed for structured data. The Charles River dataset is entirely structured across all ten table groups.&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
+        <mxCell id="tool_note" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:10px;&quot;&gt;&lt;i&gt;Excel, SQL, and Power BI are designed for structured data. The Charles River dataset is entirely structured.&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
           <mxGeometry x="250" y="290" width="600" height="25" as="geometry"/>
         </mxCell>
 

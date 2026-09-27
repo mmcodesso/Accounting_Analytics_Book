@@ -12,7 +12,7 @@
 
 **Requirements.**
 
-(1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing (Table 1.3 lists the key tables in each group). For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold.
+(1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing (@tbl-01-03 lists the key tables in each group). For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold.
 
 (2) For each of the four financial reporting areas listed above, identify the specific tables and columns you would use. Write a brief explanation (two to three sentences) for each area.
 

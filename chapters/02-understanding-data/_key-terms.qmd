@@ -6,7 +6,7 @@
 
 **Completeness.** A data quality dimension indicating that all expected records and field values are present in the dataset. Missing transactions, blank fields, and omitted time periods are examples of completeness problems.
 
-**Consistency.** A data quality dimension indicating that the same fact is represented in the same way wherever it appears in a dataset or across related datasets. Inconsistent customer names, account codes, or date formats are common consistency problems.
+**Consistency.** A data quality dimension indicating that the same fact is represented in the same way wherever it appears in a dataset or across related datasets. Inconsistent customer names, account codes, or date formats, and fields within a record that contradict each other, are common consistency problems.
 
 **Data quality.** The degree to which a dataset is fit for its intended use, assessed across multiple dimensions including accuracy, completeness, consistency, and timeliness.
 
@@ -16,19 +16,25 @@
 
 **General ledger.** The central repository of an organization's financial transactions, containing debit and credit entries organized by account. In the Charles River dataset, the general ledger is stored in the GLEntry table within the Accounting Core group.
 
-**Missing value.** A field within a record that is blank, null, or contains a placeholder rather than a substantive value. Missing values represent a completeness problem and can distort calculations if not handled properly.
+**Messy data.** A dataset whose layout violates one or more tidy data principles, for example by storing values such as month names in column headers. Messy data is often easy for people to read but must be reshaped before analysis.
+
+**Missing value.** A field within a record that is blank, null, or contains a placeholder rather than a substantive value. Missing values represent a completeness problem when the data should exist, and they can distort calculations if not handled properly.
+
+**Orphaned record.** A record that refers to a related record that does not exist, such as a GLEntry row whose AccountID is not in the chart of accounts. Orphaned records are a failure of referential integrity.
 
 **Outlier.** A data value that falls far outside the expected range for its field. Outliers may represent legitimate unusual transactions or data entry errors and require investigation to determine the appropriate treatment.
-
-**Process-to-ledger traceability.** The ability to trace any general ledger entry back to the operational document that created it, using the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry. This traceability supports audit testing, variance investigation, and financial reporting verification.
 
 **Qualitative data.** Data consisting of categories, labels, or descriptions rather than numerical measurements. Account names, transaction descriptions, and vendor classifications are examples of qualitative data in accounting.
 
 **Quantitative data.** Data consisting of numerical values that represent measurements or counts and that can be subjected to arithmetic operations. Transaction amounts, unit quantities, and financial ratios are examples of quantitative data in accounting.
 
+**Referential integrity.** The requirement that every reference from one table to another points to a record that actually exists. In the Charles River database, for example, every AccountID in GLEntry should exist in the Account table.
+
 **Semi-structured data.** Data that has some organizational elements but does not fit neatly into rows and columns. XBRL filings and PDF bank statements are examples relevant to accounting.
 
-**Structured data.** Data organized into a predefined format of rows and columns, where each column has a defined data type. The Charles River dataset contains structured data across all ten table groups.
+**Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it, using the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry. This traceability supports audit testing, variance investigation, and reconciliation of sub-ledgers to the general ledger.
+
+**Structured data.** Data organized into a predefined format of rows and columns, where each column has a defined data type. The Charles River dataset contains structured data throughout.
 
 **Sub-ledger.** A detailed record for a specific category of accounts that feeds summary totals to the general ledger. The accounts receivable sub-ledger and accounts payable sub-ledger are common examples. In the Charles River dataset, the O2C and P2P table groups function as sub-ledgers.
 
@@ -36,7 +42,7 @@
 
 **Timeliness.** A data quality dimension indicating that the data reflects the current state of the business as of the relevant reporting date. Data that is not current enough for the intended analysis has a timeliness problem.
 
+**Trial balance.** A listing of all general ledger account balances at a specific point in time, used to verify that total debits equal total credits and as the starting point for preparing financial statements.
+
 **Unstructured data.** Data that lacks a predefined tabular format, such as the text of contracts, email correspondence, or scanned invoice images.
-
-
 

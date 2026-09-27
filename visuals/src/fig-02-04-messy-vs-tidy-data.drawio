@@ -6,9 +6,6 @@
         <mxCell id="1" parent="0"/>
 
         <!-- Title -->
-        <mxCell id="title" value="&lt;b&gt;Figure 2.4: Messy Versus Tidy Data&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontColor=#2C3E50;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="250" y="10" width="600" height="30" as="geometry"/>
-        </mxCell>
 
         <!-- ===== LEFT PANEL: MESSY (Wide Format) ===== -->
         <mxCell id="messy_label" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:13px;&quot;&gt;&lt;b&gt;&#x2717; Messy (Wide Format)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
@@ -77,7 +74,7 @@
         </mxCell>
 
         <!-- ===== TRANSFORMATION ARROW ===== -->
-        <mxCell id="transform_arrow" value="" style="shape=mxgraph.arrows2.arrow;dx=30;dy=12;notch=0;rounded=0;fillColor=#17A589;strokeColor=none;rotation=-90;" vertex="1" parent="1">
+        <mxCell id="transform_arrow" value="" style="shape=mxgraph.arrows2.arrow;dx=30;dy=12;notch=0;rounded=0;fillColor=#17A589;strokeColor=none;rotation=90;" vertex="1" parent="1">
           <mxGeometry x="225" y="255" width="70" height="90" as="geometry"/>
         </mxCell>
         <mxCell id="transform_label" value="&lt;font color=&quot;#17A589&quot; style=&quot;font-size:11px;&quot;&gt;&lt;b&gt;Reshape to&lt;br&gt;tidy format&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">

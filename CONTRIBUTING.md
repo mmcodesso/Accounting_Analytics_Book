@@ -119,6 +119,9 @@ Cite sources in APA 7 style, for example (Vasarhelyi et al., 2015) or
 Further Reading is a separate, annotated selection of five to eight sources.
 Refer to figures in the text with Quarto cross-references such as `@fig-01-03`
 rather than typing "Figure 1.3", so numbers stay correct when figures move.
+Caption tables with a line such as `: Title {#tbl-02-01}` directly after the
+table, and refer to them as `@tbl-02-01`. Quarto numbers them and keeps each
+caption with its table in the PDF.
 
 Use project-root paths for shared assets, for example
 `![Caption](/visuals/svg/figure.svg)`. Paths within an included file are resolved
