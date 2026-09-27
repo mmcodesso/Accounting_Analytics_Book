@@ -1,77 +1,31 @@
-<mxfile>
-  <diagram name="Tools Workflow Mapping" id="fig0103">
-    <mxGraphModel dx="1024" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="960" pageHeight="480" math="0" shadow="0">
+<mxfile host="Electron" version="29.6.6">
+  <diagram name="The Three Tools and Their Roles in the Analytics Workflow" id="fig-01-03-tools-workflow-mapping">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="860" pageHeight="364" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-
-        <!-- Stage header boxes (small, gray) -->
-        <mxCell id="h1" value="1. Define" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="110" height="36" as="geometry"/>
-        </mxCell>
-        <mxCell id="h2" value="2. Access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="180" y="40" width="110" height="36" as="geometry"/>
-        </mxCell>
-        <mxCell id="h3" value="3. Prepare" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="320" y="40" width="110" height="36" as="geometry"/>
-        </mxCell>
-        <mxCell id="h4" value="4. Analyze" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="460" y="40" width="110" height="36" as="geometry"/>
-        </mxCell>
-        <mxCell id="h5" value="5. Visualize" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="600" y="40" width="110" height="36" as="geometry"/>
-        </mxCell>
-        <mxCell id="h6" value="6. Communicate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5D8DC;fontColor=#2C3E50;strokeColor=#D5D8DC;fontSize=10;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="740" y="40" width="130" height="36" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrows between headers -->
-        <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h1" target="h2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="a23" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h2" target="h3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="a34" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h3" target="h4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="a45" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h4" target="h5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-        <mxCell id="a56" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h5" target="h6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
-
-        <!-- SQL bar spanning stages 2-3 -->
-        <mxCell id="sql" value="SQL (Part III)&#xa;Access and prepare data from databases" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
-          <mxGeometry x="180" y="120" width="250" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- SQL dashed extension to Communicate -->
-        <mxCell id="sql_ext" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1A5276;strokeWidth=1;dashed=1;dashPattern=5 3;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="740" y="120" width="130" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- Excel bar spanning stages 3-4 -->
-        <mxCell id="excel" value="Excel (Part II)&#xa;Prepare, analyze, and model data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
-          <mxGeometry x="320" y="210" width="250" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- Excel dashed extension to Communicate -->
-        <mxCell id="excel_ext" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#17A589;strokeWidth=1;dashed=1;dashPattern=5 3;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="740" y="210" width="130" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- Power BI bar spanning stages 4-5 -->
-        <mxCell id="pbi" value="Power BI (Part IV)&#xa;Analyze, visualize, and communicate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
-          <mxGeometry x="460" y="300" width="250" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- Power BI dashed extension to Communicate -->
-        <mxCell id="pbi_ext" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="740" y="300" width="130" height="55" as="geometry"/>
-        </mxCell>
-
-        <!-- "Communicate" labels in dashed boxes -->
-        <mxCell id="lbl1" value="Communicate" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="755" y="135" width="100" height="25" as="geometry"/>
-        </mxCell>
-        <mxCell id="lbl2" value="Communicate" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="755" y="225" width="100" height="25" as="geometry"/>
-        </mxCell>
-        <mxCell id="lbl3" value="Communicate" style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="755" y="315" width="100" height="25" as="geometry"/>
-        </mxCell>
+        <mxCell id="frame" value="" style="rounded=0;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="860" height="364" as="geometry"/></mxCell>
+        <mxCell id="c1" value="&lt;b&gt;1. Define&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="c2" value="&lt;b&gt;2. Access&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="147.2" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="c3" value="&lt;b&gt;3. Prepare&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="294.4" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="c4" value="&lt;b&gt;4. Analyze&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="441.6" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="c5" value="&lt;b&gt;5. Visualize&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="588.8" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="c6" value="&lt;b&gt;6. Communicate&lt;/b&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="736" y="0" width="124" height="40" as="geometry"/></mxCell>
+        <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c2" target="c3"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3" target="c4"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c12" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;SQL (Part III)&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Access and prepare data from databases&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="147.2" y="70" width="271.2" height="62" as="geometry"/></mxCell>
+        <mxCell id="c13" value="Communicate" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;dashed=1;dashPattern=6 3;" vertex="1" parent="1"><mxGeometry x="736" y="70" width="124" height="62" as="geometry"/></mxCell>
+        <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=none;startFill=0;endFill=0;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=6 3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c12" target="c13"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c15" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;Excel (Part II)&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Prepare, analyze, and model data&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#117A65;strokeColor=#117A65;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="294.4" y="152" width="271.2" height="62" as="geometry"/></mxCell>
+        <mxCell id="c16" value="Communicate" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#117A65;strokeWidth=1.5;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;dashed=1;dashPattern=6 3;" vertex="1" parent="1"><mxGeometry x="736" y="152" width="124" height="62" as="geometry"/></mxCell>
+        <mxCell id="e17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=none;startFill=0;endFill=0;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=6 3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c15" target="c16"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c18" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;Power BI (Part IV)&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2C3E50&quot;&gt;Analyze, visualize, and communicate&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F39C12;strokeColor=#F39C12;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="441.6" y="234" width="271.2" height="62" as="geometry"/></mxCell>
+        <mxCell id="c19" value="Communicate" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8A5D00;strokeWidth=1.5;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;dashed=1;dashPattern=6 3;" vertex="1" parent="1"><mxGeometry x="736" y="234" width="124" height="62" as="geometry"/></mxCell>
+        <mxCell id="e20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=none;startFill=0;endFill=0;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;dashed=1;dashPattern=6 3;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c18" target="c19"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c21" value="&lt;i&gt;Solid bars show the stages where each tool does most of its work. Dashed boxes show that every tool also helps communicate the results.&lt;/i&gt;" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=top;fontSize=13;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="322" width="860" height="40" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

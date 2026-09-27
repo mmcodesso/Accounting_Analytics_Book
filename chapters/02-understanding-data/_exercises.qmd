@@ -98,7 +98,7 @@
 
 (3) For the Accounting Core group, verify that total debits equal total credits in GLEntry, check for GLEntry records that reference an AccountID not found in the Account table, identify rows with neither a debit nor a credit amount, and examine the SourceDocumentType column for any unexpected or missing source types.
 
-(4) For the Procure-to-Pay group, examine the PurchaseInvoice table and check for supplier invoice numbers that appear more than once for the same supplier. Document any records that match.
+(4) For the Procure-to-Pay group, examine the PurchaseRequisition table and filter the ApprovedByEmployeeID column for blank cells. Look at the Status of those requisitions and document how many were converted to purchase orders even though no approver is recorded.
 
 (5) For each problem identified, classify it by quality dimension and assess its potential impact on audit procedures. An invoice dated before its shipment, for example, would matter for testing revenue cutoff. Prepare a one-page audit data quality assessment memorandum that your senior could use to decide which tables are suitable for audit analytics.
 

@@ -22,11 +22,9 @@
 
 **Enterprise resource planning (ERP) system.** An integrated software platform that organizations use to manage business processes across departments, including accounting, sales, purchasing, production, and human resources. The Charles River database is organized like the database behind an ERP system, with table groups that correspond to the functional modules found in commercial ERP platforms.
 
-**Entity-Relationship (ER) diagram.** A visual representation of the tables in a database and the relationships between them. ER diagrams show how tables are connected through primary and foreign keys.
+**Foreign key.** A column in one table that references the primary key of another table, creating a relationship between the two tables. For example, the CustomerID column in the Charles River SalesOrder table is a foreign key that references the Customer table.
 
-**Foreign key.** A column in a database table that references the primary key of another table, establishing a relationship between the two tables. For example, the CustomerID column in the Charles River SalesOrder table is a foreign key that references the CustomerID column in the Customer table.
-
-**General ledger.** The complete record of all financial transactions for an organization, organized by account. In the Charles River database, the general ledger is represented by the GLEntry table within the Accounting Core group.
+**General ledger.** The complete record of an organization's financial transactions, organized by account. In the Charles River database, the general ledger is the GLEntry table within the Accounting Core group.
 
 **Microsoft Excel.** A spreadsheet application developed by Microsoft that organizes data in rows and columns and supports calculations, PivotTables, lookup functions, Power Query, and optimization with Solver. Part II of this book teaches Excel for accounting analytics.
 
@@ -36,9 +34,9 @@
 
 **Prescriptive analytics.** The type of analytics that recommends actions by optimizing an objective subject to constraints. Examples in accounting include product mix optimization, tax strategy planning, and resource allocation modeling.
 
-**Primary key.** A column (or combination of columns) in a database table that uniquely identifies each row. For example, SalesOrderID is the primary key of the Charles River SalesOrder table.
+**Primary key.** A column, or combination of columns, that uniquely identifies each row in a table. For example, SalesOrderID is the primary key of the Charles River SalesOrder table.
 
-**Relational database.** A system for storing data in tables that are connected to one another through defined relationships. The Charles River dataset is provided as a relational database in SQLite format, as well as in Excel workbook and CSV formats.
+**Relational database.** A system that stores data in tables connected to one another through primary and foreign keys. The Charles River dataset is provided as a relational database in SQLite format, as well as in Excel workbook and CSV formats.
 
 **Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.
 
@@ -46,5 +44,5 @@
 
 **SQLite.** A lightweight relational database system that stores the entire database in a single file. This book uses SQLite because it requires no server installation and runs on any operating system.
 
-**Table group.** A named subset of related tables within the Charles River database that corresponds to a business process or functional area. The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+**Table group.** A named set of related tables within the Charles River database that corresponds to a business process or functional area. The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
 

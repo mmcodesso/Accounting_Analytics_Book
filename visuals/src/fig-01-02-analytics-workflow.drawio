@@ -1,91 +1,22 @@
-<mxfile>
-  <diagram name="Analytics Workflow" id="fig0102">
-    <mxGraphModel dx="1024" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="960" pageHeight="500" math="0" shadow="0">
+<mxfile host="Electron" version="29.6.6">
+  <diagram name="The Accounting Analytics Workflow" id="fig-01-02-analytics-workflow">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="860" pageHeight="280" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-
-        <!-- Row 1: Stages 1-3 (left to right) -->
-
-        <!-- Stage 1 -->
-        <mxCell id="10" value="1. Define the question" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="60" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="11" value="Translate the business need into&#xa;a specific analytical question" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="10">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrow 1-2 -->
-        <mxCell id="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;" edge="1" source="10" target="20" parent="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <!-- Stage 2 -->
-        <mxCell id="20" value="2. Access the data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="350" y="60" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="21" value="Identify sources, extract&#xa;relevant tables and columns" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="20">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrow 2-3 -->
-        <mxCell id="25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;" edge="1" source="20" target="30" parent="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <!-- Stage 3 -->
-        <mxCell id="30" value="3. Prepare and clean" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="660" y="60" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="31" value="Resolve missing values, duplicates,&#xa;inconsistent formatting" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="30">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrow 3 down to 4 -->
-        <mxCell id="35" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="30" target="40" parent="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <!-- Row 2: Stages 4-6 (right to left) -->
-
-        <!-- Stage 4 -->
-        <mxCell id="40" value="4. Analyze" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="660" y="210" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="41" value="Summarize, compare, model,&#xa;detect anomalies" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="40">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrow 4-5 -->
-        <mxCell id="45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="40" target="50" parent="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <!-- Stage 5 -->
-        <mxCell id="50" value="5. Visualize and present" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="350" y="210" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="51" value="Charts, dashboards, interactive&#xa;reports for stakeholders" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="50">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Arrow 5-6 -->
-        <mxCell id="55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#5D6D7E;strokeWidth=1.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="50" target="60" parent="1">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
-        <!-- Stage 6 -->
-        <mxCell id="60" value="6. Communicate findings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=12;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="210" width="230" height="65" as="geometry"/>
-        </mxCell>
-        <mxCell id="61" value="Memoranda, presentations,&#xa;and reports to decision makers" style="text;html=1;align=center;verticalAlign=middle;fontColor=#FFFFFF;fontSize=10;fontFamily=Arial;" vertex="1" parent="60">
-          <mxGeometry x="15" y="30" width="200" height="35" as="geometry"/>
-        </mxCell>
-
-        <!-- Chapter mapping note -->
-        <mxCell id="70" value="Part I introduces stages 1-2. Parts II and III develop stages 3-4. Part IV develops stage 5. Every chapter practices stage 6." style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="160" y="340" width="640" height="40" as="geometry"/>
-        </mxCell>
+        <mxCell id="frame" value="" style="rounded=0;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="860" height="280" as="geometry"/></mxCell>
+        <mxCell id="c1" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;1. Define the question&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Translate the business need into a specific analytical question&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="c2" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;2. Access the data&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Identify sources, extract relevant tables and columns&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="0" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="c3" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;3. Prepare and clean&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Resolve missing values, duplicates, inconsistent formatting&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="620" y="0" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="c4" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;4. Analyze&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Summarize, compare, model, detect anomalies&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#117A65;strokeColor=#117A65;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="620" y="150" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="c5" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;5. Visualize and present&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#FFFFFF&quot;&gt;Charts, dashboards, interactive reports for stakeholders&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#117A65;strokeColor=#117A65;strokeWidth=1;fontColor=#FFFFFF;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="150" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="c6" value="&lt;font style=&quot;font-size:14px&quot;&gt;&lt;b&gt;6. Communicate findings&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2C3E50&quot;&gt;Memoranda, presentations, and reports to decision makers&lt;/font&gt;" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F39C12;strokeColor=#F39C12;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="150" width="240" height="86" as="geometry"/></mxCell>
+        <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c2" target="c3"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3" target="c4"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="e11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=none;endArrow=blockThin;startFill=0;endFill=1;startSize=10;endSize=10;strokeColor=#5D6D7E;strokeWidth=1.5;fontSize=12;fontColor=#2C3E50;fontFamily=Helvetica;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell>
+        <mxCell id="c12" value="&lt;i&gt;Part I introduces stages 1-2. Parts II and III develop stages 3-4. Part IV develops stage 5. Every chapter practices stage 6.&lt;/i&gt;" style="text;html=1;whiteSpace=wrap;align=center;verticalAlign=top;fontSize=13;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="256" width="860" height="22" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

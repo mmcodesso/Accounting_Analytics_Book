@@ -65,23 +65,25 @@
 **Deliverable.** A one-page memorandum documenting the Charles River Manufacturing data and its suitability for cost analysis.
 
 
-**Exercise 3.4: Evaluating Cost Center and Budget Data in Charles River**
+**Exercise 3.4: Mapping the Keys Behind a Budget-Versus-Actual Report**
 
 **Table group:** Organizational Planning, with GLEntry from the Accounting Core
 
-**Scenario.** You are a management accountant at Charles River preparing to build a departmental performance report that compares budgeted expenses to actual expenses by cost center. Before starting the analysis, you need to understand how cost center data is structured in the database.
+**Scenario.** You are a management accountant at Charles River preparing to build a departmental performance report that compares budgeted expenses to actual expenses by cost center. Exercise 2.4 assessed the quality of the budget data. Before you build the report, you need to understand the keys and relationships that will connect budgets to actual spending.
 
 **Requirements.**
 
-(1) Open the Charles River workbook and examine the CostCenter worksheet. Identify the columns available and determine whether the cost centers form a hierarchy, using the ParentCostCenterID column.
+(1) Open the Charles River workbook and examine the CostCenter worksheet. Identify its primary key, and use the ParentCostCenterID column to determine whether the cost centers form a hierarchy. Explain what your finding means for a report that would roll departments up into divisions.
 
-(2) Examine the GLEntry worksheet and determine how general ledger entries are associated with cost centers. Identify the column that links GL entries to the CostCenter table, state the cardinality and optionality of the relationship, and count the entries that have no cost center.
+(2) Identify the foreign key that links GLEntry to CostCenter. Using crow's foot notation, state the cardinality and optionality at each end of the relationship, and explain what the optional end means for the report. Exercise 2.4 counted the ledger entries with no cost center, so use that count rather than recounting.
 
-(3) Examine the Budget and BudgetLine worksheets and determine how budgeted amounts are associated with cost centers and accounts. Identify the columns that connect budget records to cost centers and to the chart of accounts.
+(3) Examine the Budget and BudgetLine worksheets. Identify the foreign keys that connect each table to CostCenter and to Account, describe what one row of each table represents, and compare the accounts each table covers. Explain which table you would join to GLEntry for a comparison by cost center, account, and month, and why.
 
-(4) Assess whether the Charles River database provides sufficient data to compare budgeted versus actual spending for each cost center. Identify any gaps, such as missing cost center assignments on GL entries or budget records that do not correspond to accounts used in the general ledger. Write a brief assessment (one half to one page) documenting your findings.
+(4) Test whether every AccountID in the Budget table appears in GLEntry. Build a PivotTable of the distinct AccountID values in each worksheet and compare the two lists with XLOOKUP or COUNTIFS, as in Tutorial 2.2. Record any budgeted accounts with no ledger activity, and explain what a clean result tells you.
 
-**Deliverable.** A written assessment of the Charles River cost center data structure and its readiness for budget-versus-actual analysis.
+(5) Write a brief assessment (one half to one page) that documents the join path from the budget to the ledger, the relationships involved, and any gaps that would affect the report.
+
+**Deliverable.** A written assessment of the keys and relationships that connect Charles River budgets to actual spending by cost center.
 
 
 ### Auditing Exercises
@@ -98,7 +100,7 @@
 
 (2) For the purchasing cycle test, identify the table group and tables you would use. The test requires three-way matching by comparing the quantity and unit cost across PurchaseOrderLine, GoodsReceiptLine, and PurchaseInvoiceLine. Identify the foreign keys that link these three tables and note any gaps in the available data, such as a value that one of the three tables does not record.
 
-(3) For the journal entry analysis, identify the table group and tables you would use. The analysis requires access to every manually created journal entry, including the posting date, the amounts, the accounts debited and credited, and the employees who created and approved the entry. Identify which tables contain this information (JournalEntry and GLEntry), explain how the two are linked even though GLEntry has no JournalEntryID column, and identify the columns that would be useful for risk-based filtering (such as entries posted on weekends, entries with round-dollar amounts, or entries where the same employee both created and approved the entry).
+(3) For the journal entry analysis, identify the table group and tables you would use. The analysis requires access to every manually created journal entry, including the posting date, the amounts, the accounts debited and credited, and the employees who created and approved the entry. Identify which tables contain this information (JournalEntry and GLEntry) and explain how the two are linked even though GLEntry has no JournalEntryID column. For the risk-based filters, start from the columns you identified in Exercise 1.6 rather than listing them again, and note which of those columns sit in JournalEntry and which sit in GLEntry, because that determines which table each filter must read.
 
 (4) Prepare a data extraction plan (one to two pages) that documents your selections for all three procedures.
 

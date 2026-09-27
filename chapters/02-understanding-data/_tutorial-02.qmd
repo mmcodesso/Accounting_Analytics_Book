@@ -19,7 +19,8 @@
 <!-- Capture spec for Figure 2.7 (replace this placeholder with the screenshot when ready):
      CharlesRiver.xlsx > GLEntry worksheet. In cells to the right of the data, enter =SUM(D:D) for Debit, =SUM(E:E) for Credit, and their difference.
      Both totals should be 731,949,908.31 and the difference 0.00. Show the formula bar with the Debit SUM selected.
-     Match the style of Figure 2.5. Save as visuals/png/fig-02-07-glentry-debit-credit-sum.png and use
+     Match the style of Figure 2.5. Capture at 125-150% zoom and crop to at most 8 columns (hide the columns between Credit
+     and the totals) so the text prints at 7 pt or larger. Save as visuals/png/fig-02-07-glentry-debit-credit-sum.png and use
      ![Screenshot of the Charles River GLEntry worksheet with debit and credit totals.](/visuals/png/fig-02-07-glentry-debit-credit-sum.png){#fig-02-07 fig-alt="..."} -->
 
 **Step 5.** Check for accounts referenced in the general ledger that do not exist in the chart of accounts. This is a referential integrity test (@tbl-02-03). With hundreds of thousands of rows, adding a formula to every GLEntry row would be slow, so work with distinct values instead. Insert a PivotTable from the GLEntry worksheet and place AccountID in the Rows area. The PivotTable lists each AccountID that appears in the ledger exactly once. Next to the PivotTable, use XLOOKUP or COUNTIFS to check whether each listed AccountID exists in the Account worksheet's AccountID column. Any AccountID with no match is an orphaned reference. In the Charles River data, every AccountID should match. A clean result like this is still a finding worth recording, because it tells you that the ledger's account references can be relied on.

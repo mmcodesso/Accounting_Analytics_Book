@@ -27,7 +27,9 @@ jobs:
           tinytex: true
 
       - name: Install render dependencies
-        run: sudo apt-get update && sudo apt-get install --yes librsvg2-bin xvfb
+        # fonts-liberation is metric-compatible with Helvetica and Arial, so
+        # figure labels wrap the same way as in the local Draw.io exports.
+        run: sudo apt-get update && sudo apt-get install --yes librsvg2-bin xvfb fonts-liberation
 
       - name: Install Draw.io CLI
         run: |

@@ -1,242 +1,85 @@
-<mxfile host="app.diagrams.net" agent="textbook" version="24.0.0">
-  <diagram name="Fig 2.3 - Data Quality Problems" id="fig-02-03">
-    <mxGraphModel dx="1200" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="860" math="0" shadow="0">
+<mxfile host="Electron" version="29.6.6">
+  <diagram name="Common Data Quality Problems" id="fig-02-03-data-quality-problems">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="860" pageHeight="492" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-
-        <mxCell id="p1_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Missing Values&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=8;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="50" width="500" height="30" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_group" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;Charles River: Shipment table (O2C)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="82" width="340" height="16" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;ShipmentNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="100" width="105" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;ShipmentDate&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="135" y="100" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;TrackingNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="285" y="100" width="110" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_th4" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;FreightCost&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="215" y="100" width="70" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r1c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000028&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="124" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r1c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-15&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="124" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r1c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;TRK202400000028&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="285" y="124" width="110" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r1c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$189.01&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="215" y="124" width="70" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r2c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000029&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="146" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r2c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-16&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="146" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r2c3_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;(blank)&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="285" y="146" width="110" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r2c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$35.31&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="215" y="146" width="70" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r3c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000049&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="168" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r3c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-21&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="168" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r3c3_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;(blank)&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="285" y="168" width="110" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_r3c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$106.73&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="215" y="168" width="70" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_note" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Completeness problem:&lt;/b&gt; &lt;/font&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;TrackingNumber is blank, so there is no carrier record for these shipments.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="405" y="126" width="150" height="70" as="geometry"/>
-        </mxCell>
-        <mxCell id="p1_arrow" style="rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#E74C3C;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="p1_note" target="p1_r2c3_highlight">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Duplicate Records&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=8;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="50" width="500" height="30" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_group" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;Charles River: PurchaseInvoice table (P2P)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="82" width="340" height="16" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;SupplierID&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="100" width="65" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;InvoiceNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="635" y="100" width="120" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;InvoiceDate&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="755" y="100" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_th4" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;GrandTotal&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="835" y="100" width="75" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r1c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="570" y="124" width="65" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r1c2_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;V0002-2024-000182&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="635" y="124" width="120" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r1c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-02-29&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="755" y="124" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r1c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$4,152.60&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="835" y="124" width="75" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r2c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="570" y="146" width="65" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r2c2_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;V0002-2024-000182&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="635" y="146" width="120" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r2c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-03-04&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="755" y="146" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r2c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$3,454.20&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="835" y="146" width="75" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r3c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="570" y="168" width="65" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r3c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;V0002-2024-000204&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="635" y="168" width="120" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r3c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-03-17&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="755" y="168" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_r3c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$950.16&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="835" y="168" width="75" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p2_note" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Duplicate:&lt;/b&gt; &lt;/font&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;The same supplier invoice number is recorded twice, with different dates and amounts. This is a duplicate-payment risk that requires investigation.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="918" y="120" width="152" height="100" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Inconsistent Values&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=8;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="220" width="500" height="30" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_group" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;Charles River: Shipment table (O2C)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="252" width="340" height="16" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;ShipmentNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="270" width="105" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;ShipmentDate&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="135" y="270" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;Status&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="215" y="270" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_th4" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;DeliveryDate&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="295" y="270" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r1c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000001&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="294" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r1c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-03&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="294" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r1c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Delivered&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="215" y="294" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r1c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-08&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="295" y="294" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r2c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000004&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="316" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r2c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-06&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="316" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r2c3_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;In Transit&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="215" y="316" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r2c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-10&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="295" y="316" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r3c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000038&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="30" y="338" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r3c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-18&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="135" y="338" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r3c3_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;In Transit&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="215" y="338" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_r3c4" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2024-01-20&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="295" y="338" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p3_note" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Consistency problem:&lt;/b&gt; &lt;/font&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;These shipments are still marked In Transit, although their DeliveryDate passed years before the data was extracted.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="385" y="288" width="145" height="90" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_header" value="&lt;font color=&quot;#FFFFFF&quot;&gt;&lt;b&gt;Outliers&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;arcSize=8;verticalAlign=middle;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="220" width="500" height="30" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_group" value="&lt;font color=&quot;#5D6D7E&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;Charles River: Shipment table (O2C)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="252" width="340" height="16" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_th1" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;ShipmentNumber&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="570" y="270" width="105" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_th2" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;WarehouseID&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="675" y="270" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_th3" value="&lt;font color=&quot;#FFFFFF&quot; style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;FreightCost&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="755" y="270" width="80" height="24" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r1c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000001&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="570" y="294" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r1c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="675" y="294" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r1c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$98.03&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="755" y="294" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r2c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000002&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="570" y="316" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r2c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="675" y="316" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r2c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$152.57&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="755" y="316" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r3c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2024-000003&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="570" y="338" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r3c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="675" y="338" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r3c3" value="&lt;font style=&quot;font-size:9px;&quot;&gt;$248.92&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="755" y="338" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r4c1" value="&lt;font style=&quot;font-size:9px;&quot;&gt;SH-2026-008319&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;" vertex="1" parent="1">
-          <mxGeometry x="570" y="360" width="105" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r4c2" value="&lt;font style=&quot;font-size:9px;&quot;&gt;2&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;fontFamily=Helvetica;fontColor=#2C3E50;align=right;" vertex="1" parent="1">
-          <mxGeometry x="675" y="360" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_r4c3_highlight" value="&lt;font style=&quot;font-size:9px;&quot; color=&quot;#E74C3C&quot;&gt;&lt;b&gt;$873.95&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;strokeWidth=2;fontFamily=Helvetica;align=right;" vertex="1" parent="1">
-          <mxGeometry x="755" y="360" width="80" height="22" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_note" value="&lt;font color=&quot;#E74C3C&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;Outlier:&lt;/b&gt; &lt;/font&gt;&lt;font color=&quot;#2C3E50&quot; style=&quot;font-size:10px;&quot;&gt;A FreightCost of $873.95 is several times the average shipment (about $150). It may be a legitimate large or rush shipment, so investigate before treating it as an error.&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="845" y="288" width="225" height="100" as="geometry"/>
-        </mxCell>
-        <mxCell id="p4_arrow" style="rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#E74C3C;strokeWidth=1.5;endArrow=open;endFill=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="p4_note" target="p4_r4c3_highlight">
-          <mxGeometry relative="1" as="geometry"/>
-        </mxCell>
-
+        <mxCell id="frame" value="" style="rounded=0;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="860" height="492" as="geometry"/></mxCell>
+        <mxCell id="c1" value="&lt;b&gt;Missing Values&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=14;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="420" height="30" as="geometry"/></mxCell>
+        <mxCell id="c2" value="&lt;b&gt;Charles River: Shipment table (Order-to-Cash)&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="34" width="420" height="18" as="geometry"/></mxCell>
+        <mxCell id="c3" value="&lt;b&gt;ShipmentNumber&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="56" width="115" height="24" as="geometry"/></mxCell>
+        <mxCell id="c4" value="&lt;b&gt;ShipmentDate&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="115" y="56" width="90" height="24" as="geometry"/></mxCell>
+        <mxCell id="c5" value="&lt;b&gt;FreightCost&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="205" y="56" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c6" value="&lt;b&gt;TrackingNumber&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="285" y="56" width="135" height="24" as="geometry"/></mxCell>
+        <mxCell id="c7" value="SH-2024-000028" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="80" width="115" height="24" as="geometry"/></mxCell>
+        <mxCell id="c8" value="2024-01-15" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="115" y="80" width="90" height="24" as="geometry"/></mxCell>
+        <mxCell id="c9" value="$189.01" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="205" y="80" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c10" value="TRK202400000028" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="285" y="80" width="135" height="24" as="geometry"/></mxCell>
+        <mxCell id="c11" value="SH-2024-000029" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="104" width="115" height="24" as="geometry"/></mxCell>
+        <mxCell id="c12" value="2024-01-16" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="115" y="104" width="90" height="24" as="geometry"/></mxCell>
+        <mxCell id="c13" value="$35.31" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="205" y="104" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c14" value="&lt;b&gt;(blank)&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="285" y="104" width="135" height="24" as="geometry"/></mxCell>
+        <mxCell id="c15" value="SH-2024-000049" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="128" width="115" height="24" as="geometry"/></mxCell>
+        <mxCell id="c16" value="2024-01-21" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="115" y="128" width="90" height="24" as="geometry"/></mxCell>
+        <mxCell id="c17" value="$106.73" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="205" y="128" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c18" value="&lt;b&gt;(blank)&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="285" y="128" width="135" height="24" as="geometry"/></mxCell>
+        <mxCell id="c19" value="&lt;b&gt;&lt;font color=&quot;#B03A2E&quot;&gt;Completeness problem:&lt;/font&gt;&lt;/b&gt; TrackingNumber is blank, so there is no carrier record for these shipments." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#2C3E50;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="160" width="420" height="56" as="geometry"/></mxCell>
+        <mxCell id="c20" value="&lt;b&gt;Duplicate Records&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=14;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="0" width="420" height="30" as="geometry"/></mxCell>
+        <mxCell id="c21" value="&lt;b&gt;Charles River: PurchaseInvoice table (Procure-to-Pay)&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="440" y="34" width="420" height="18" as="geometry"/></mxCell>
+        <mxCell id="c22" value="&lt;b&gt;SupplierID&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="56" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c23" value="&lt;b&gt;InvoiceNumber&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="520" y="56" width="145" height="24" as="geometry"/></mxCell>
+        <mxCell id="c24" value="&lt;b&gt;InvoiceDate&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="665" y="56" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c25" value="&lt;b&gt;GrandTotal&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="760" y="56" width="100" height="24" as="geometry"/></mxCell>
+        <mxCell id="c26" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="80" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c27" value="&lt;b&gt;V0002-2024-000182&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="520" y="80" width="145" height="24" as="geometry"/></mxCell>
+        <mxCell id="c28" value="2024-02-29" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="665" y="80" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c29" value="$4,152.60" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="760" y="80" width="100" height="24" as="geometry"/></mxCell>
+        <mxCell id="c30" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="104" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c31" value="&lt;b&gt;V0002-2024-000182&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="520" y="104" width="145" height="24" as="geometry"/></mxCell>
+        <mxCell id="c32" value="2024-03-04" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="665" y="104" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c33" value="$3,454.20" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="760" y="104" width="100" height="24" as="geometry"/></mxCell>
+        <mxCell id="c34" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="128" width="80" height="24" as="geometry"/></mxCell>
+        <mxCell id="c35" value="V0002-2024-000204" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="520" y="128" width="145" height="24" as="geometry"/></mxCell>
+        <mxCell id="c36" value="2024-03-17" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="665" y="128" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c37" value="$950.16" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="760" y="128" width="100" height="24" as="geometry"/></mxCell>
+        <mxCell id="c38" value="&lt;b&gt;&lt;font color=&quot;#B03A2E&quot;&gt;Duplicate:&lt;/font&gt;&lt;/b&gt; The same supplier invoice number is recorded twice, with different dates and amounts. This is a duplicate-payment risk that requires investigation." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#2C3E50;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="440" y="160" width="420" height="56" as="geometry"/></mxCell>
+        <mxCell id="c39" value="&lt;b&gt;Inconsistent Values&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=14;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="250" width="420" height="30" as="geometry"/></mxCell>
+        <mxCell id="c40" value="&lt;b&gt;Charles River: Shipment table (Order-to-Cash)&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="284" width="420" height="18" as="geometry"/></mxCell>
+        <mxCell id="c41" value="&lt;b&gt;ShipmentNumber&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="306" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c42" value="&lt;b&gt;ShipmentDate&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="120" y="306" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c43" value="&lt;b&gt;Status&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="215" y="306" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c44" value="&lt;b&gt;DeliveryDate&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="306" width="110" height="24" as="geometry"/></mxCell>
+        <mxCell id="c45" value="SH-2024-000001" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="330" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c46" value="2024-01-03" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="120" y="330" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c47" value="Delivered" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="215" y="330" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c48" value="2024-01-08" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="330" width="110" height="24" as="geometry"/></mxCell>
+        <mxCell id="c49" value="SH-2024-000004" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="354" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c50" value="2024-01-06" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="120" y="354" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c51" value="&lt;b&gt;In Transit&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="215" y="354" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c52" value="2024-01-10" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="354" width="110" height="24" as="geometry"/></mxCell>
+        <mxCell id="c53" value="SH-2024-000038" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="0" y="378" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c54" value="2024-01-18" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="120" y="378" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c55" value="&lt;b&gt;In Transit&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="215" y="378" width="95" height="24" as="geometry"/></mxCell>
+        <mxCell id="c56" value="2024-01-20" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="310" y="378" width="110" height="24" as="geometry"/></mxCell>
+        <mxCell id="c57" value="&lt;b&gt;&lt;font color=&quot;#B03A2E&quot;&gt;Consistency problem:&lt;/font&gt;&lt;/b&gt; These shipments are still marked In Transit, although their DeliveryDate passed years before the data was extracted." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#2C3E50;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="0" y="410" width="420" height="56" as="geometry"/></mxCell>
+        <mxCell id="c58" value="&lt;b&gt;Outliers&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#1A5276;strokeColor=#1A5276;strokeWidth=1;fontColor=#FFFFFF;fontSize=14;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="250" width="420" height="30" as="geometry"/></mxCell>
+        <mxCell id="c59" value="&lt;b&gt;Charles River: Shipment table (Order-to-Cash)&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#5D6D7E;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="440" y="284" width="420" height="18" as="geometry"/></mxCell>
+        <mxCell id="c60" value="&lt;b&gt;ShipmentNumber&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="306" width="140" height="24" as="geometry"/></mxCell>
+        <mxCell id="c61" value="&lt;b&gt;WarehouseID&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="580" y="306" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c62" value="&lt;b&gt;FreightCost&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#5D6D7E;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#FFFFFF;fontSize=12;fontStyle=0;align=center;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="700" y="306" width="160" height="24" as="geometry"/></mxCell>
+        <mxCell id="c63" value="SH-2024-000001" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="330" width="140" height="24" as="geometry"/></mxCell>
+        <mxCell id="c64" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="580" y="330" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c65" value="$98.03" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="700" y="330" width="160" height="24" as="geometry"/></mxCell>
+        <mxCell id="c66" value="SH-2024-000002" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="354" width="140" height="24" as="geometry"/></mxCell>
+        <mxCell id="c67" value="1" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="580" y="354" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c68" value="$152.57" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="700" y="354" width="160" height="24" as="geometry"/></mxCell>
+        <mxCell id="c69" value="SH-2024-000003" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="378" width="140" height="24" as="geometry"/></mxCell>
+        <mxCell id="c70" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="580" y="378" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c71" value="$248.92" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="700" y="378" width="160" height="24" as="geometry"/></mxCell>
+        <mxCell id="c72" value="SH-2026-008319" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=left;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="440" y="402" width="140" height="24" as="geometry"/></mxCell>
+        <mxCell id="c73" value="2" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontColor=#2C3E50;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="580" y="402" width="120" height="24" as="geometry"/></mxCell>
+        <mxCell id="c74" value="&lt;b&gt;$873.95&lt;/b&gt;" style="rounded=0;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#B03A2E;strokeWidth=2;fontColor=#B03A2E;fontSize=13;fontStyle=0;align=right;verticalAlign=middle;fontFamily=Helvetica;spacingLeft=6;spacingRight=6;" vertex="1" parent="1"><mxGeometry x="700" y="402" width="160" height="24" as="geometry"/></mxCell>
+        <mxCell id="c75" value="&lt;b&gt;&lt;font color=&quot;#B03A2E&quot;&gt;Outlier:&lt;/font&gt;&lt;/b&gt; A FreightCost of $873.95 is several times the average shipment (about $150). It may be a legitimate large or rush shipment, so investigate before treating it as an error." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#2C3E50;fontStyle=0;fontFamily=Helvetica;spacing=2;fillColor=none;strokeColor=none;" vertex="1" parent="1"><mxGeometry x="440" y="434" width="420" height="56" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>

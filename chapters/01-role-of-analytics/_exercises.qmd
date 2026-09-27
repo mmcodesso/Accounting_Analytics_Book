@@ -31,7 +31,7 @@
 
 **Requirements.**
 
-(1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, CashReceiptApplication, and GLEntry. For each table, note the key columns that link it to the next table in the sequence.
+(1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, CashReceiptApplication, and GLEntry. For each table, identify the business event that creates a new row, such as a customer placing an order or the warehouse shipping goods. You do not need to trace the key columns that link the tables, because Chapter 3 teaches that skill.
 
 (2) Write a narrative description (one paragraph per table) explaining what each table records and how it connects to the next step in the revenue process.
 
@@ -63,23 +63,23 @@
 **Deliverable.** A written assessment that compares the cost analysis capabilities of the Manufacturing and Organizational Planning table groups, with specific references to tables and columns.
 
 
-**Exercise 1.4: Understanding Manufacturing Data Structures**
+**Exercise 1.4: Framing Production Questions with the Four Types of Analytics**
 
 **Table group:** Manufacturing and Master Data
 
-**Scenario.** You have been asked to prepare a brief overview of the production-related data available in the Charles River database for a new operations manager who will be using this data to evaluate production performance.
+**Scenario.** A new operations manager at Charles River wants to use the company's data to evaluate production performance but is not sure which questions to ask first. You have been asked to help the manager frame questions that analytics can answer.
 
 **Requirements.**
 
-(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing table group. Identify at least four tables that a production manager would find relevant.
+(1) Write one production-related question for each type of analytics: descriptive, diagnostic, predictive, and prescriptive. For example, a descriptive question might ask how many units of each product were completed last quarter.
 
-(2) For each table you identified, write one sentence describing what information it contains and how it might be used to evaluate production performance.
+(2) For each question, identify the table group that holds the data needed to answer it, using @tbl-01-03 as a starting point. Open the Charles River Excel workbook and name one or two worksheets that look relevant to each question.
 
-(3) Examine the Item table in the Master Data group and identify the columns that connect manufacturing tables to product information. Write two to three sentences explaining how these shared columns (such as ItemID) allow you to combine information across tables for a more complete analysis.
+(3) Explain in two to three sentences why the prescriptive question is the hardest of the four to answer, considering the data, the assumptions, and the judgment it requires.
 
-(4) Prepare a brief written overview (one half to one page) that the new manager could use as a reference when requesting reports.
+(4) Prepare a brief memorandum (one half to one page) that presents the four questions to the manager in order of analytical complexity and recommends which one to tackle first.
 
-**Deliverable.** A written overview of the production-related data in the Charles River Manufacturing table group, suitable for a non-technical manager audience.
+**Deliverable.** A memorandum presenting four production questions, one for each type of analytics, with the table groups and worksheets that would support each.
 
 
 ### Auditing Exercises

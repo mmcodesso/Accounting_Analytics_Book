@@ -1,6 +1,6 @@
 ## Guided Tutorial 3.2: Tracing a Sale from Sales Order to General Ledger
 
-**Context and objective.** In this tutorial, you will follow one real Charles River sale through the workbook, from the sales order to the general ledger and the cash receipt that paid for it. The goal is to practice using keys to move between tables and to see how the source-document trace connects operational data to the posted ledger. You will work with invoice SI-2025-007947, which billed a customer for two desks.
+**Context and objective.** In this tutorial, you will follow one real Charles River sale through the workbook, from the sales order to the general ledger and the cash receipt that paid for it. The goal is to practice using keys to move between tables and to see how the source-document trace connects operational data to the posted ledger. You will work with invoice SI-2025-007947, which billed a customer for two desks. Its revenue posting is the ledger row you saw in @fig-01-06, and this tutorial follows the rest of the sale.
 
 **Prerequisites.** You need Microsoft Excel installed on your computer and the CharlesRiver.xlsx file, together with the O2C ER diagram (@fig-03-07) and the Accounting Core ER diagram (@fig-03-09). Several worksheets are large, so use filters (Data > Filter) rather than scrolling to find the rows you need.
 

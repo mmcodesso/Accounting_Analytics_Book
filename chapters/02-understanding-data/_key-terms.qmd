@@ -14,7 +14,7 @@
 
 **External data.** Data originating from outside the organization, such as bank statements, market price feeds, credit ratings, and industry benchmarks. External data introduces additional quality concerns because the accountant has less control over how it was collected and formatted.
 
-**General ledger.** The central repository of an organization's financial transactions, containing debit and credit entries organized by account. In the Charles River dataset, the general ledger is stored in the GLEntry table within the Accounting Core group.
+**General ledger.** The complete record of an organization's financial transactions, organized by account. It holds the debit and credit entries that feed the financial statements, and in the Charles River dataset it is stored in the GLEntry table within the Accounting Core group.
 
 **Messy data.** A dataset whose layout violates one or more tidy data principles, for example by storing values such as month names in column headers. Messy data is often easy for people to read but must be reshaped before analysis.
 
@@ -28,11 +28,9 @@
 
 **Quantitative data.** Data consisting of numerical values that represent measurements or counts and that can be subjected to arithmetic operations. Transaction amounts, unit quantities, and financial ratios are examples of quantitative data in accounting.
 
-**Referential integrity.** The requirement that every reference from one table to another points to a record that actually exists. In the Charles River database, for example, every AccountID in GLEntry should exist in the Account table.
+**Referential integrity.** The requirement that every foreign key value corresponds to an existing primary key value in the referenced table. In the Charles River database, for example, every AccountID in GLEntry should exist in the Account table.
 
 **Semi-structured data.** Data that has some organizational elements but does not fit neatly into rows and columns. XBRL filings and PDF bank statements are examples relevant to accounting.
-
-**Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it, using the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry. This traceability supports audit testing, variance investigation, and reconciliation of sub-ledgers to the general ledger.
 
 **Structured data.** Data organized into a predefined format of rows and columns, where each column has a defined data type. The Charles River dataset contains structured data throughout.
 

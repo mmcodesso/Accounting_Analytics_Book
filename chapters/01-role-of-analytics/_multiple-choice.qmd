@@ -72,12 +72,12 @@ B.  A static Excel spreadsheet
 C.  The Excel Data Analysis ToolPak
 D.  Microsoft Power BI
 
-**11.** In the context of a relational database, a foreign key is best described as:
+**11.** An auditor selects a row in the Charles River GLEntry table and wants to find the business event that created it. Which columns make this possible?
 
-A.  A column that uniquely identifies each row in its own table
-B.  A column in one table that references the primary key of another table, establishing a relationship between them
-C.  A password or security credential used to access the database
-D.  A column that stores encrypted financial data for confidentiality purposes
+A.  AccountID and CostCenterID
+B.  SourceDocumentType, SourceDocumentID, and SourceLineID
+C.  FiscalYear and FiscalPeriod
+D.  Debit and Credit
 
 **12.** According to this chapter, which stage of the analytics workflow is often the most time-consuming?
 

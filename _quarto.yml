@@ -3,6 +3,9 @@ project:
   pre-render:
     - python scripts/export_drawio_svgs.py
 
+filters:
+  - filters/pdf-figures.lua
+
 book:
   title: "Accounting Analytics: An Integrated Approach"
   output-file: "Accounting-Analytics"

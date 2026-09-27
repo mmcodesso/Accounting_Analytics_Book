@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Export Draw.io source diagrams and the book cover for the Quarto book."""
+"""Export Draw.io source diagrams and the book cover for the Quarto book.
+
+Each visuals/src/*.drawio file is exported twice:
+
+- visuals/svg/<name>.svg, forced to the light theme on a white background, for
+  HTML, EPUB, and DOCX;
+- visuals/pdf/<name>.pdf, a cropped vector PDF that filters/pdf-figures.lua
+  substitutes for the SVG in the PDF build, so figure text stays vector text.
+"""
 
 from __future__ import annotations
 
@@ -17,6 +25,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SRC_DIR = REPO_ROOT / "visuals" / "src"
 DEFAULT_OUT_DIR = REPO_ROOT / "visuals" / "svg"
+DEFAULT_PDF_DIR = REPO_ROOT / "visuals" / "pdf"
 DEFAULT_COVER_SOURCE = REPO_ROOT / "visuals" / "cover" / "accounting_analytics_cover.drawio"
 DEFAULT_COVER_OUTPUT = REPO_ROOT / "visuals" / "cover" / "cover.png"
 DEFAULT_PADDING = 0.5
@@ -29,6 +38,9 @@ DRAWIO_TEXT_WARNING_PATTERN = re.compile(
     r"<text\b[^>]*>\s*Text is not SVG - cannot display\s*</text>\s*"
     r"</a>\s*</switch>\s*(?=</svg>)"
 )
+# light-dark(<light>, <dark>), where either value may itself be rgb(...).
+CSS_COLOR = r"(?:[^(),]|\([^()]*\))+"
+LIGHT_DARK_PATTERN = re.compile(rf"light-dark\(\s*({CSS_COLOR}?)\s*,\s*{CSS_COLOR}\)")
 
 
 class ExportError(RuntimeError):
@@ -50,6 +62,17 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_OUT_DIR,
         help="Directory where exported .svg files should be written.",
+    )
+    parser.add_argument(
+        "--pdf-dir",
+        type=Path,
+        default=DEFAULT_PDF_DIR,
+        help="Directory where exported vector .pdf files should be written.",
+    )
+    parser.add_argument(
+        "--skip-pdf",
+        action="store_true",
+        help="Do not export the vector PDF copies used by the PDF build.",
     )
     parser.add_argument(
         "--drawio-bin",
@@ -259,6 +282,54 @@ def remove_drawio_text_warning(path: Path) -> None:
         path.write_text(cleaned, encoding="utf-8")
 
 
+def add_white_background(path: Path) -> None:
+    """Paint the SVG white so dark reader themes do not show through transparent areas."""
+    text = path.read_text(encoding="utf-8")
+    svg_match = re.search(r"<svg\b[^>]*>", text)
+    view_box = re.search(r'viewBox="([^"]+)"', svg_match.group(0)) if svg_match else None
+    if not view_box:
+        return
+    min_x, min_y, width, height = (float(v) for v in view_box.group(1).replace(",", " ").split())
+    svg_tag = svg_match.group(0).replace(
+        "background: transparent; background-color: transparent;", "background-color: #FFFFFF;"
+    )
+    rect = (
+        f'<rect x="{format_number(min_x)}" y="{format_number(min_y)}" '
+        f'width="{format_number(width)}" height="{format_number(height)}" fill="#FFFFFF"/>'
+    )
+    path.write_text(
+        f"{text[: svg_match.start()]}{svg_tag}{rect}{text[svg_match.end():]}", encoding="utf-8"
+    )
+
+
+def force_light_colors(path: Path) -> None:
+    """Replace light-dark() with its light value for renderers that lack it."""
+    text = path.read_text(encoding="utf-8")
+    cleaned, replacements = LIGHT_DARK_PATTERN.subn(r"\1", text)
+    if replacements:
+        path.write_text(cleaned, encoding="utf-8")
+
+
+def run_drawio(command: list[str], source: Path, temp_output: Path, kind: str) -> None:
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        if temp_output.exists():
+            temp_output.unlink()
+        details = "\n".join(
+            part.strip()
+            for part in (result.stdout, result.stderr)
+            if part and part.strip()
+        )
+        if details:
+            details = f"\n{details}"
+        raise ExportError(f"Draw.io {kind} export failed for {source}.{details}")
+
+    if not temp_output.exists() or temp_output.stat().st_size == 0:
+        raise ExportError(
+            f"Draw.io reported success but did not create a non-empty {kind}: {temp_output}"
+        )
+
+
 def export_svg(
     drawio_bin: Path,
     source: Path,
@@ -275,28 +346,38 @@ def export_svg(
         "-x",
         "-f",
         "svg",
+        "--svg-theme",
+        "light",
         "-o",
         str(temp_output),
         str(source),
     ]
-    result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode != 0:
-        if temp_output.exists():
-            temp_output.unlink()
-        details = "\n".join(
-            part.strip()
-            for part in (result.stdout, result.stderr)
-            if part and part.strip()
-        )
-        if details:
-            details = f"\n{details}"
-        raise ExportError(f"Draw.io export failed for {source}.{details}")
-
-    if not temp_output.exists() or temp_output.stat().st_size == 0:
-        raise ExportError(f"Draw.io reported success but did not create a non-empty SVG: {temp_output}")
+    run_drawio(command, source, temp_output, "SVG")
 
     add_svg_padding(temp_output, padding)
     remove_drawio_text_warning(temp_output)
+    force_light_colors(temp_output)
+    add_white_background(temp_output)
+    temp_output.replace(output)
+
+
+def export_pdf(drawio_bin: Path, source: Path, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_output = output.with_name(f".{output.stem}.tmp.pdf")
+    if temp_output.exists():
+        temp_output.unlink()
+
+    command = [
+        str(drawio_bin),
+        "-x",
+        "-f",
+        "pdf",
+        "--crop",
+        "-o",
+        str(temp_output),
+        str(source),
+    ]
+    run_drawio(command, source, temp_output, "PDF")
     temp_output.replace(output)
 
 
@@ -366,6 +447,7 @@ def run() -> int:
     args = parse_args()
     src_dir = args.src_dir.resolve()
     out_dir = args.out_dir.resolve()
+    pdf_dir = args.pdf_dir.resolve()
     cover_source = args.cover_source.resolve()
     cover_output = args.cover_output.resolve()
     force_export = args.force or os.environ.get("GITHUB_ACTIONS") == "true"
@@ -402,16 +484,22 @@ def run() -> int:
     skipped = 0
     for source in sources:
         validate_single_page_drawio(source)
-        output = out_dir / f"{source.stem}.svg"
+        targets = [out_dir / f"{source.stem}.svg"]
+        if not args.skip_pdf:
+            targets.append(pdf_dir / f"{source.stem}.pdf")
 
-        if not force_export and is_output_current(source, output):
-            print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
-            skipped += 1
-            continue
+        for output in targets:
+            if not force_export and is_output_current(source, output):
+                print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
+                skipped += 1
+                continue
 
-        export_svg(drawio_bin, source, output, args.padding)
-        print(f"export {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
-        exported += 1
+            if output.suffix == ".svg":
+                export_svg(drawio_bin, source, output, args.padding)
+            else:
+                export_pdf(drawio_bin, source, output)
+            print(f"export {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
+            exported += 1
 
     if not args.skip_cover:
         validate_single_page_drawio(cover_source)

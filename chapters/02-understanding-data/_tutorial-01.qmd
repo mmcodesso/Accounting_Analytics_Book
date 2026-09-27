@@ -28,7 +28,8 @@
      CharlesRiver.xlsx > SalesInvoice worksheet. Column M "EarliestShipment": =MINIFS(Shipment!D:D,Shipment!C:C,E2), formatted as a date.
      Column N "DateCheck": =IF(M2=0,"No shipment",IF(C2<M2,"Check","OK")). Filter column N to "Check": 9 invoices remain,
      for example SI-2024-000001 (InvoiceDate 2024-01-01, earliest shipment 2024-01-03). Select M2 so the formula bar shows MINIFS.
-     Match the style of Figure 2.5 (red box around the flagged cells). Save as visuals/png/fig-02-06-salesinvoice-date-check.png and use
+     Match the style of Figure 2.5 (red box around the flagged cells). Capture at 125-150% zoom and crop to at most 8 columns
+     (for example A-C, E, and M-N, hiding D and F-L) so the text prints at 7 pt or larger. Save as visuals/png/fig-02-06-salesinvoice-date-check.png and use
      ![Screenshot of the Charles River SalesInvoice worksheet with date check helper columns.](/visuals/png/fig-02-06-salesinvoice-date-check.png){#fig-02-06 fig-alt="..."} -->
 
 **Step 7.** Click on the Item worksheet. Filter the ListPrice column to show blank cells, then look at the ItemGroup column for those rows. The blank list prices belong to items that Charles River does not sell at a list price, such as raw materials, packaging, capital equipment, and design services billed by the hour. These values are missing by design rather than by error. Compare this finding with the blank TrackingNumbers from Step 2, which represent information that should exist. Record both findings and the reasoning that distinguishes them.
