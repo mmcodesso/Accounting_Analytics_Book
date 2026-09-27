@@ -5,35 +5,35 @@
 **1.** Which of the following best describes the primary reason that analytics skills have become essential for accounting professionals?
 
 A.  Accounting standards now require the use of data visualization tools in all financial reports.
-B.  The volume and complexity of financial and operational data have grown beyond what traditional manual methods can effectively analyze.
-C.  Analytics skills have replaced the need for accountants to understand generally accepted accounting principles.
-D.  Employers prefer to hire data scientists rather than accountants for financial reporting roles.
+B.  Analytics skills have replaced the need for accountants to understand generally accepted accounting principles.
+C.  Employers prefer to hire data scientists rather than accountants for financial reporting roles.
+D.  The volume and complexity of financial and operational data have grown beyond what traditional manual methods can effectively analyze.
 
 **2.** A management accountant prepares a report showing total manufacturing costs by product line for the past four quarters and calculates the percentage change from quarter to quarter. This activity is best classified as which type of analytics?
 
-A.  Prescriptive analytics
-B.  Predictive analytics
-C.  Descriptive analytics
-D.  Diagnostic analytics
+A.  Descriptive analytics
+B.  Diagnostic analytics
+C.  Predictive analytics
+D.  Prescriptive analytics
 
-**3.** An auditor builds a regression model using monthly revenue data from the prior year to establish an expected range for current-year monthly revenue. The auditor then compares actual monthly revenue to the expected range and investigates months where the difference exceeds the threshold. This procedure involves which type of analytics?
+**3.** An auditor builds a regression model using monthly revenue data from the prior year to establish an expected range for current-year monthly revenue, against which actual results will later be compared. Building this expectation is an example of which type of analytics?
 
-A.  Descriptive analytics only
-B.  Predictive analytics
-C.  Prescriptive analytics
-D.  None of the above, because regression is a statistical technique rather than an analytics type
+A.  Descriptive analytics
+B.  Diagnostic analytics
+C.  Predictive analytics
+D.  Prescriptive analytics
 
 **4.** A cost accountant uses Excel's Solver tool to determine the combination of products that maximizes total contribution margin given constraints on machine hours and raw material availability. This activity is best classified as which type of analytics?
 
 A.  Descriptive analytics
-B.  Predictive analytics
-C.  Prescriptive analytics
-D.  Exploratory analytics
+B.  Diagnostic analytics
+C.  Predictive analytics
+D.  Prescriptive analytics
 
 **5.** Which of the following is the correct sequence of stages in the accounting analytics workflow as described in this chapter?
 
-A.  Access data, define the question, analyze, clean, visualize, communicate
-B.  Define the question, access data, clean and prepare data, analyze, visualize, communicate
+A.  Define the question, access data, clean and prepare data, analyze, visualize, communicate
+B.  Access data, define the question, analyze, clean, visualize, communicate
 C.  Analyze data, define the question, visualize, clean, communicate, access data
 D.  Define the question, visualize, access data, analyze, clean, communicate
 
@@ -44,33 +44,33 @@ B.  Master Data
 C.  Accounting Core
 D.  Organizational Planning
 
-**7.** Which tool covered in this textbook is most appropriate for extracting data directly from a relational database?
+**7.** Which tool covered in this book is most appropriate for extracting data directly from a relational database?
 
 A.  Microsoft Excel
 B.  SQL
 C.  Microsoft Power BI
 D.  The Data Analysis ToolPak
 
-**8.** The textbook introduces the Order-to-Cash and Accounting Core table groups before the Manufacturing and Payroll groups primarily because:
+**8.** The book introduces the Order-to-Cash and Accounting Core table groups before the Manufacturing and Payroll and Time groups primarily because:
 
-A.  Manufacturing and Payroll data is less important for accounting analysis than sales and ledger data.
-B.  The O2C and Accounting Core tables are the most accessible starting point for students who are new to analytics tools, and the book builds from simpler to more complex table groups.
-C.  Manufacturing and Payroll tables use a different database format that requires advanced SQL skills.
+A.  The O2C and Accounting Core tables are the most accessible starting point for students who are new to analytics tools, and the book builds from simpler to more complex table groups.
+B.  Manufacturing and payroll data is less important for accounting analysis than sales and ledger data.
+C.  Manufacturing and payroll tables use a different database format that requires advanced SQL skills.
 D.  Students must complete all O2C exercises before the Manufacturing tables become available in the dataset.
 
-**9.** Which professional organization's competency framework has been updated to include data analytics as a core skill for management accountants?
+**9.** Which professional organization made technology and analytics one of the core domains of its competency framework for management accountants?
 
 A.  The Financial Accounting Standards Board (FASB)
-B.  The Institute of Management Accountants (IMA)
-C.  The Securities and Exchange Commission (SEC)
+B.  The Securities and Exchange Commission (SEC)
+C.  The Institute of Management Accountants (IMA)
 D.  The International Accounting Standards Board (IASB)
 
 **10.** An accountant needs to create an interactive dashboard that allows multiple department managers to filter financial results to their own cost center and drill down into individual line items. Which tool is best suited for this purpose?
 
 A.  A SQL query
 B.  A static Excel spreadsheet
-C.  Microsoft Power BI
-D.  The Excel Data Analysis ToolPak
+C.  The Excel Data Analysis ToolPak
+D.  Microsoft Power BI
 
 **11.** In the context of a relational database, a foreign key is best described as:
 
@@ -79,31 +79,31 @@ B.  A column in one table that references the primary key of another table, esta
 C.  A password or security credential used to access the database
 D.  A column that stores encrypted financial data for confidentiality purposes
 
-**12.** According to this chapter, which stage of the analytics workflow is typically the most time-consuming?
+**12.** According to this chapter, which stage of the analytics workflow is often the most time-consuming?
 
-A.  Defining the question
-B.  Data preparation and cleaning
+A.  Data preparation and cleaning
+B.  Defining the question
 C.  Visualization
 D.  Communication of findings
 
 **13.** Which Charles River table group is most valuable for managerial accounting exercises involving production cost variance analysis?
 
 A.  Order-to-Cash
-B.  Manufacturing
-C.  Accounting Core
+B.  Accounting Core
+C.  Manufacturing
 D.  Master Data
 
-**14.** Which of the following best describes why this textbook uses a single dataset throughout all twenty chapters rather than multiple separate databases?
+**14.** Which of the following best describes why this book uses a single dataset in every chapter rather than multiple separate databases?
 
 A.  A single database requires less storage space on student computers than multiple databases.
 B.  Students learn one company's data deeply rather than multiple companies superficially, and a customer order analyzed in Excel appears in the general ledger queried in SQL and surfaces in a Power BI dashboard built later.
 C.  The Charles River database is the only dataset available in both Excel and SQLite formats.
-D.  Using a single dataset allows the textbook to avoid teaching SQL joins, which require multiple tables.
+D.  Using a single dataset allows the book to avoid teaching SQL joins, which require multiple tables.
 
-**15.** A financial analyst uses PivotTables to summarize total revenue by item group and fiscal quarter using the Charles River SalesOrderLine table. The analyst notices that revenue in the Furniture group declined sharply in the third quarter and investigates the underlying transactions to determine the cause. The summarization step is an example of descriptive analytics. What type of analytics would applying a regression model to forecast fourth-quarter Furniture revenue represent?
+**15.** A financial analyst uses a PivotTable to summarize invoiced revenue and gross margin by item group and fiscal quarter, using the Charles River SalesInvoiceLine and Item tables. The summary shows that the gross margin on Furniture declined in the most recent quarter. The analyst then breaks the decline down by product and customer segment and traces the largest changes to the underlying invoices to determine their cause. What type of analytics does this investigation represent?
 
 A.  Descriptive analytics
-B.  Predictive analytics
-C.  Prescriptive analytics
-D.  The regression would not be considered analytics because it involves statistics
+B.  Diagnostic analytics
+C.  Predictive analytics
+D.  Prescriptive analytics
 

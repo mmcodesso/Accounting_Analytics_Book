@@ -10,13 +10,13 @@
 
 **Scenario.** You are a financial reporting analyst at Charles River. Your supervisor has asked you to prepare a memorandum that maps the company's data environment to common financial reporting needs. The supervisor wants to understand which table groups and specific tables contain the data needed for revenue analysis, accounts receivable management, inventory valuation, and general ledger reporting.
 
-**Requirements.** 
+**Requirements.**
 
-(1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing. For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold. 
+(1) Open the Charles River Excel workbook and examine worksheets from at least four table groups: Order-to-Cash, Master Data, Accounting Core, and Manufacturing (Table 1.3 lists the key tables in each group). For each group, identify which tables contain data that relates to revenue recognition, accounts receivable, inventory, and cost of goods sold.
 
-(2) For each of the four financial reporting areas listed above, identify the specific tables and columns you would use. Write a brief explanation (two to three sentences) for each area. 
+(2) For each of the four financial reporting areas listed above, identify the specific tables and columns you would use. Write a brief explanation (two to three sentences) for each area.
 
-(3) Identify one financial reporting task that requires combining data from the O2C group with data from the Accounting Core group, and explain which tables you would need from each group and why. 
+(3) Identify one financial reporting task that requires combining data from the O2C group with data from the Accounting Core group, and explain which tables you would need from each group and why.
 
 (4) Prepare a one-page summary memorandum presenting your findings in a format suitable for your supervisor.
 
@@ -29,13 +29,13 @@
 
 **Scenario.** You are a staff accountant preparing for the quarterly close. Your manager has asked you to document the complete path that a revenue transaction follows through the Charles River database, from the initial customer order through cash collection and general ledger posting.
 
-**Requirements.** 
+**Requirements.**
 
-(1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, and GLEntry. For each table, note the key columns that link it to the next table in the sequence. 
+(1) Open the Charles River Excel workbook and examine the following worksheets in order: SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, CashReceiptApplication, and GLEntry. For each table, note the key columns that link it to the next table in the sequence.
 
-(2) Write a narrative description (one paragraph per table) explaining what each table records and how it connects to the next step in the revenue process. 
+(2) Write a narrative description (one paragraph per table) explaining what each table records and how it connects to the next step in the revenue process.
 
-(3) Identify the column in GLEntry that tells you the entry originated from a sales invoice rather than a journal entry or a payroll transaction. 
+(3) Identify the column in GLEntry that tells you the entry originated from a sales invoice rather than a journal entry or a payroll transaction.
 
 (4) Write a brief comparison (three to five sentences) explaining what information is available in the SalesInvoice table that is not available in the GLEntry table, and why an analyst might need to access both.
 
@@ -50,13 +50,13 @@
 
 **Scenario.** You are a management accountant at Charles River. Your controller has asked you to assess which table groups contain the information needed for a product cost analysis and a departmental budget review.
 
-**Requirements.** 
+**Requirements.**
 
-(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing group (such as WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, and WorkOrderClose). List the table names and the columns most relevant to understanding product costs. 
+(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing group (such as WorkOrder, BillOfMaterial, MaterialIssue, ProductionCompletion, and WorkOrderClose). List the table names and the columns most relevant to understanding product costs.
 
-(2) Examine worksheets from the Organizational Planning group (CostCenter, Budget, BudgetLine). List the table names and columns relevant to departmental budgeting. 
+(2) Examine worksheets from the Organizational Planning group (CostCenter, Budget, BudgetLine). List the table names and columns relevant to departmental budgeting.
 
-(3) Determine which group is better suited for product-level cost analysis (comparing standard cost to actual production cost) and which is better suited for departmental budget analysis (comparing budgeted amounts to actual spending by department). Explain your reasoning in three to five sentences. 
+(3) Determine which group is better suited for product-level cost analysis (comparing standard cost to actual production cost) and which is better suited for departmental budget analysis (comparing budgeted amounts to actual spending by department). Explain your reasoning in three to five sentences.
 
 (4) Identify one managerial accounting question that requires data from both the Manufacturing group and the Payroll group, and explain what tables from each group you would need.
 
@@ -69,13 +69,13 @@
 
 **Scenario.** You have been asked to prepare a brief overview of the production-related data available in the Charles River database for a new operations manager who will be using this data to evaluate production performance.
 
-**Requirements.** 
+**Requirements.**
 
-(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing table group. Identify at least four tables that a production manager would find relevant. 
+(1) Open the Charles River Excel workbook and examine worksheets from the Manufacturing table group. Identify at least four tables that a production manager would find relevant.
 
-(2) For each table you identified, write one sentence describing what information it contains and how it might be used to evaluate production performance. 
+(2) For each table you identified, write one sentence describing what information it contains and how it might be used to evaluate production performance.
 
-(3) Examine the Item table in the Master Data group and identify the columns that connect manufacturing tables to product information. Write two to three sentences explaining how these shared columns (such as ItemID) allow you to combine information across tables for a more complete analysis. 
+(3) Examine the Item table in the Master Data group and identify the columns that connect manufacturing tables to product information. Write two to three sentences explaining how these shared columns (such as ItemID) allow you to combine information across tables for a more complete analysis.
 
 (4) Prepare a brief written overview (one half to one page) that the new manager could use as a reference when requesting reports.
 
@@ -90,13 +90,13 @@
 
 **Scenario.** You are a first-year auditor who has been assigned to plan the data analytics procedures for the Charles River engagement. Your senior has asked you to assess what data is available for three common audit tests: aging of receivables, testing for duplicate payments, and journal entry testing for management override of controls.
 
-**Requirements.** 
+**Requirements.**
 
-(1) For each of the three audit tests listed above, identify which Charles River table group and specific tables contain the data needed to perform the test. For aging of receivables, look at the O2C group (SalesInvoice and CashReceipt). For duplicate payment detection, look at the P2P group (DisbursementPayment). For journal entry testing, look at the Accounting Core group (JournalEntry and GLEntry). Be specific about which columns you would use. 
+(1) For each of the three audit tests listed above, identify which Charles River table group and specific tables contain the data needed to perform the test. For aging of receivables, look at the O2C group (SalesInvoice, CashReceipt, and CashReceiptApplication, which matches each receipt to the invoices it pays). For duplicate payment detection, look at the P2P group (DisbursementPayment). For journal entry testing, look at the Accounting Core group (JournalEntry and GLEntry). Be specific about which columns you would use.
 
-(2) Explain how the SourceDocumentType column in GLEntry allows an auditor to distinguish between journal entries made by the accounting team and entries generated automatically by business transactions such as sales invoices or payroll. 
+(2) Explain how the SourceDocumentType column in GLEntry allows an auditor to distinguish between journal entries made by the accounting team and entries generated automatically by business transactions such as sales invoices or payroll.
 
-(3) Identify one audit test that would require combining data from the O2C group with data from the Accounting Core group, and explain why neither group alone would be sufficient. 
+(3) Identify one audit test that would require combining data from the O2C group with data from the Accounting Core group, and explain why neither group alone would be sufficient.
 
 (4) Write a planning memorandum (one page) that documents the data available for each test and identifies the specific tables and columns to be used.
 
@@ -109,11 +109,11 @@
 
 **Scenario.** You are preparing for journal entry testing as part of the Charles River audit engagement. Before writing any queries or performing any analysis, you need to understand the structure of the journal entry data in the company's system.
 
-**Requirements.** 
+**Requirements.**
 
-(1) Open the Charles River Excel workbook and examine the JournalEntry and GLEntry worksheets. Identify all columns available in each table. 
+(1) Open the Charles River Excel workbook and examine the JournalEntry and GLEntry worksheets. Identify all columns available in each table.
 
-(2) Determine which columns would be most useful for identifying journal entries that warrant audit attention. Consider columns related to the person who posted the entry, the date and time of posting, the amount, and any descriptions or references. Look for columns such as PostedByEmployeeID, PostingDate, Debit, Credit, and Description. 
+(2) Determine which columns would be most useful for identifying journal entries that warrant audit attention. Consider columns related to the person who posted the entry, the date and time of posting, the amount, and any descriptions or references. Look for columns such as CreatedByEmployeeID, ApprovedByEmployeeID, CreatedDate, PostingDate, EntryType, TotalAmount, and Description in JournalEntry, and Debit and Credit in GLEntry.
 
 (3) Write a brief assessment (three to five sentences) of whether the Charles River data provides sufficient information to test for three common fraud risk indicators: entries posted outside of normal business hours, entries with round-dollar amounts, and entries posted just below an approval threshold. For any indicator where the data may be insufficient, explain what additional information would be needed.
 

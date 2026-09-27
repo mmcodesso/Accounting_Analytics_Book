@@ -38,11 +38,12 @@ chapters/
     _multiple-choice.qmd
     _exercises.qmd
     _further-reading.qmd
+    _references.qmd
   02-understanding-data/
     chapter.qmd
     _tutorial-01.qmd
     _tutorial-02.qmd
-    ...same five supporting files
+    ...same supporting files (_references.qmd to be added)
   03-accounting-data-environment/
     chapter.qmd
 front-matter/
@@ -77,6 +78,7 @@ Open only the file relevant to the task, adding other files as needed for contex
 | Multiple-choice questions | `_multiple-choice.qmd` |
 | Financial accounting, managerial accounting, and auditing exercises | `_exercises.qmd` |
 | Further reading | `_further-reading.qmd` |
+| Full APA 7 list of every source cited in the chapter | `_references.qmd` |
 
 `chapter.qmd` includes each tutorial where it belongs in the narrative, using a
 standalone directive surrounded by blank lines:
@@ -86,7 +88,7 @@ standalone directive surrounded by blank lines:
 ```
 
 At the end, it includes the supporting files in this order: summary, key terms,
-multiple-choice questions, exercises, and further reading. Each companion file
+multiple-choice questions, exercises, further reading, and references. Each companion file
 owns its section heading and any preceding page break. The reader still sees one
 complete chapter.
 
@@ -111,6 +113,12 @@ D.  Fourth option
 Keep each question's A-D choices together as one list. This works across HTML,
 PDF, EPUB, and Word; a single space after `A.` is treated as ordinary paragraph
 text. See [Pandoc's lettered-list rules](https://pandoc.org/MANUAL.html#extension-fancy_lists).
+
+Cite sources in APA 7 style, for example (Vasarhelyi et al., 2015) or
+(Provost & Fawcett, 2013), and list every cited source in `_references.qmd`.
+Further Reading is a separate, annotated selection of five to eight sources.
+Refer to figures in the text with Quarto cross-references such as `@fig-01-03`
+rather than typing "Figure 1.3", so numbers stay correct when figures move.
 
 Use project-root paths for shared assets, for example
 `![Caption](/visuals/svg/figure.svg)`. Paths within an included file are resolved

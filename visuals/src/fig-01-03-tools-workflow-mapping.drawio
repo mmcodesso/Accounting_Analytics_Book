@@ -33,7 +33,7 @@
         <mxCell id="a56" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#B0B0B0;strokeWidth=1;" edge="1" source="h5" target="h6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
 
         <!-- SQL bar spanning stages 2-3 -->
-        <mxCell id="sql" value="SQL (Chapters 9-12)&#xa;Access and prepare data from databases" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
+        <mxCell id="sql" value="SQL (Part III)&#xa;Access and prepare data from databases" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
           <mxGeometry x="180" y="120" width="250" height="55" as="geometry"/>
         </mxCell>
 
@@ -43,7 +43,7 @@
         </mxCell>
 
         <!-- Excel bar spanning stages 3-4 -->
-        <mxCell id="excel" value="Excel (Chapters 4-8)&#xa;Prepare, analyze, and model data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
+        <mxCell id="excel" value="Excel (Part II)&#xa;Prepare, analyze, and model data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
           <mxGeometry x="320" y="210" width="250" height="55" as="geometry"/>
         </mxCell>
 
@@ -53,7 +53,7 @@
         </mxCell>
 
         <!-- Power BI bar spanning stages 4-5 -->
-        <mxCell id="pbi" value="Power BI (Chapters 13-16)&#xa;Analyze, visualize, and communicate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
+        <mxCell id="pbi" value="Power BI (Part IV)&#xa;Analyze, visualize, and communicate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=11;fontStyle=1;fontFamily=Arial;arcSize=15;" vertex="1" parent="1">
           <mxGeometry x="460" y="300" width="250" height="55" as="geometry"/>
         </mxCell>
 

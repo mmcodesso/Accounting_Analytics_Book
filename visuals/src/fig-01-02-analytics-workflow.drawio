@@ -83,7 +83,7 @@
         </mxCell>
 
         <!-- Chapter mapping note -->
-        <mxCell id="70" value="Chapters 2-3 address stages 1-2. Chapters 4-12 address stages 3-4. Chapters 13-16 address stage 5. All chapters practice stage 6." style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="70" value="Part I introduces stages 1-2. Parts II and III develop stages 3-4. Part IV develops stage 5. Every chapter practices stage 6." style="text;html=1;align=center;verticalAlign=middle;fontColor=#5D6D7E;fontSize=10;fontFamily=Arial;whiteSpace=wrap;" vertex="1" parent="1">
           <mxGeometry x="160" y="340" width="640" height="40" as="geometry"/>
         </mxCell>
       </root>

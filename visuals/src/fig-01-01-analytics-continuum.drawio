@@ -5,46 +5,58 @@
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A5276;fontColor=#FFFFFF;strokeColor=#1A5276;fontSize=13;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=8;" value="Descriptive Analytics" vertex="1">
-          <mxGeometry height="70" width="220" x="60" y="60" as="geometry" />
+          <mxGeometry height="70" width="190" x="40" y="60" as="geometry" />
         </mxCell>
         <mxCell id="11" parent="10" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#FFFFFF;fontSize=11;fontStyle=2;fontFamily=Arial;" value="&quot;What happened?&quot;" vertex="1">
-          <mxGeometry height="30" width="150" x="35" y="38" as="geometry" />
+          <mxGeometry height="30" width="150" x="20" y="38" as="geometry" />
         </mxCell>
-        <mxCell id="15" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=1.5;" target="20">
+        <mxCell id="15" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=1.5;" target="60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="60" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2874A6;fontColor=#FFFFFF;strokeColor=#2874A6;fontSize=13;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=8;" value="Diagnostic Analytics" vertex="1">
+          <mxGeometry height="70" width="190" x="270" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="61" parent="60" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#FFFFFF;fontSize=11;fontStyle=2;fontFamily=Arial;" value="&quot;Why did it happen?&quot;" vertex="1">
+          <mxGeometry height="30" width="150" x="20" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="65" edge="1" parent="1" source="60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=1.5;" target="20">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#17A589;fontColor=#FFFFFF;strokeColor=#17A589;fontSize=13;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=8;" value="Predictive Analytics" vertex="1">
-          <mxGeometry height="70" width="220" x="360" y="60" as="geometry" />
+          <mxGeometry height="70" width="190" x="500" y="60" as="geometry" />
         </mxCell>
         <mxCell id="21" parent="20" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#FFFFFF;fontSize=11;fontStyle=2;fontFamily=Arial;" value="&quot;What might happen?&quot;" vertex="1">
-          <mxGeometry height="30" width="170" x="25" y="38" as="geometry" />
+          <mxGeometry height="30" width="170" x="10" y="38" as="geometry" />
         </mxCell>
         <mxCell id="25" edge="1" parent="1" source="20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#5D6D7E;strokeWidth=1.5;" target="30">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="30" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F39C12;fontColor=#FFFFFF;strokeColor=#F39C12;fontSize=13;fontStyle=1;fontFamily=Arial;arcSize=20;verticalAlign=top;spacingTop=8;" value="Prescriptive Analytics" vertex="1">
-          <mxGeometry height="70" width="220" x="660" y="60" as="geometry" />
+          <mxGeometry height="70" width="190" x="730" y="60" as="geometry" />
         </mxCell>
         <mxCell id="31" parent="30" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#FFFFFF;fontSize=11;fontStyle=2;fontFamily=Arial;" value="&quot;What should we do?&quot;" vertex="1">
-          <mxGeometry height="30" width="170" x="25" y="38" as="geometry" />
+          <mxGeometry height="30" width="170" x="10" y="38" as="geometry" />
         </mxCell>
         <mxCell id="40" edge="1" parent="1" style="endArrow=classic;html=1;strokeColor=#5D6D7E;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="100" y="190" as="sourcePoint" />
-            <mxPoint x="840" y="190" as="targetPoint" />
+            <mxPoint x="80" y="190" as="sourcePoint" />
+            <mxPoint x="880" y="190" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="41" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#5D6D7E;fontSize=11;fontFamily=Arial;" value="Increasing analytical complexity" vertex="1">
-          <mxGeometry height="30" width="240" x="350" y="195" as="geometry" />
+          <mxGeometry height="30" width="240" x="360" y="195" as="geometry" />
         </mxCell>
         <mxCell id="50" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#5D6D7E;fontSize=10;fontStyle=2;fontFamily=Arial;" value="Revenue summary by quarter" vertex="1">
-          <mxGeometry height="30" width="190" x="75" y="240" as="geometry" />
+          <mxGeometry height="30" width="190" x="40" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="53" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#5D6D7E;fontSize=10;fontStyle=2;fontFamily=Arial;" value="Drill-down of a margin decline" vertex="1">
+          <mxGeometry height="30" width="190" x="270" y="240" as="geometry" />
         </mxCell>
         <mxCell id="51" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#5D6D7E;fontSize=10;fontStyle=2;fontFamily=Arial;" value="Regression forecast of sales" vertex="1">
-          <mxGeometry height="30" width="190" x="375" y="240" as="geometry" />
+          <mxGeometry height="30" width="190" x="500" y="240" as="geometry" />
         </mxCell>
         <mxCell id="52" parent="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontColor=#5D6D7E;fontSize=10;fontStyle=2;fontFamily=Arial;" value="Optimal product mix via Solver" vertex="1">
-          <mxGeometry height="30" width="200" x="670" y="240" as="geometry" />
+          <mxGeometry height="30" width="190" x="730" y="240" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

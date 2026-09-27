@@ -4,9 +4,13 @@
 
 **Accounting analytics.** The application of data extraction, preparation, analysis, and visualization techniques to financial and operational data for the purpose of supporting financial reporting, managerial decision-making, and audit assurance.
 
-**Analytics workflow.** The sequence of stages that an accounting analytics project follows, from defining the question through communicating findings. The six stages are question definition, data identification, data preparation, analysis, visualization, and communication.
+**Analytics workflow.** The sequence of stages that an accounting analytics project follows, from defining the question through communicating findings. The six stages are question definition, data identification and access, data preparation, analysis, visualization, and communication.
 
-**Business cycle.** A sequence of related business activities that form a complete process. Charles River's six business cycles (Order-to-Cash, Design Services, Procure-to-Pay, Manufacturing, Payroll, and Manual Journals and Close) each flow through multiple table groups and ultimately into the general ledger.
+**Big data.** Datasets that are too large or complex for traditional data processing methods, usually stored and processed on cloud data platforms. Accounting analytics draws on big data concepts but applies them to accounting data and questions.
+
+**Business cycle.** A sequence of related business activities that form a complete process. Charles River's business cycles, such as Order-to-Cash, Procure-to-Pay, Manufacturing, and Payroll, each generate records in one or more table groups, and their financial activity is ultimately posted to the general ledger.
+
+**Business intelligence.** The tools and infrastructure that organizations use to collect, store, and present data for operational and strategic decisions. Microsoft Power BI is an example of a business intelligence platform.
 
 **Chart of accounts.** A structured list of all accounts used by an organization to record financial transactions, organized by account type (assets, liabilities, equity, revenue, expenses). In the Charles River database, the chart of accounts is stored in the Account table within the Accounting Core group.
 
@@ -14,7 +18,9 @@
 
 **Descriptive analytics.** The type of analytics that summarizes and describes historical data to answer the question "what happened?" Examples in accounting include financial statement preparation, variance reports, and aging analyses.
 
-**Enterprise resource planning (ERP) system.** An integrated software platform that organizations use to manage business processes across departments, including accounting, sales, purchasing, production, and human resources. The Charles River database mirrors the structure of a production ERP system, with table groups that correspond to the functional modules found in commercial ERP platforms.
+**Diagnostic analytics.** The type of analytics that investigates the causes of a result to answer the question "why did it happen?" Examples in accounting include decomposing a margin decline into price, mix, and cost effects, drilling into an unexpected change in an account balance, and tracing exceptions back to their source transactions.
+
+**Enterprise resource planning (ERP) system.** An integrated software platform that organizations use to manage business processes across departments, including accounting, sales, purchasing, production, and human resources. The Charles River database is organized like the database behind an ERP system, with table groups that correspond to the functional modules found in commercial ERP platforms.
 
 **Entity-Relationship (ER) diagram.** A visual representation of the tables in a database and the relationships between them. ER diagrams show how tables are connected through primary and foreign keys.
 
@@ -22,7 +28,9 @@
 
 **General ledger.** The complete record of all financial transactions for an organization, organized by account. In the Charles River database, the general ledger is represented by the GLEntry table within the Accounting Core group.
 
-**Power BI.** A business intelligence platform developed by Microsoft that enables users to connect to data sources, build data models, and create interactive visualizations and dashboards.
+**Microsoft Excel.** A spreadsheet application developed by Microsoft that organizes data in rows and columns and supports calculations, PivotTables, lookup functions, Power Query, and optimization with Solver. Part II of this book teaches Excel for accounting analytics.
+
+**Microsoft Power BI.** A business intelligence platform developed by Microsoft that enables users to connect to data sources, build data models, and create interactive visualizations and dashboards. Part IV of this book teaches Power BI.
 
 **Predictive analytics.** The type of analytics that uses historical data to forecast future outcomes and estimate probabilities. Examples in accounting include revenue forecasting, regression-based analytical procedures, and credit risk assessment.
 
@@ -32,9 +40,11 @@
 
 **Relational database.** A system for storing data in tables that are connected to one another through defined relationships. The Charles River dataset is provided as a relational database in SQLite format, as well as in Excel workbook and CSV formats.
 
-**SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. Part III of this textbook teaches SQL using the Charles River SQLite database.
+**Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.
 
-**SQLite.** A lightweight relational database system that stores the entire database in a single file. This textbook uses SQLite because it requires no server installation and runs on any operating system.
+**SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. Part III of this book teaches SQL using the Charles River SQLite database.
 
-**Table group.** A named subset of related tables within the Charles River database that corresponds to a business process or functional area. The ten table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+**SQLite.** A lightweight relational database system that stores the entire database in a single file. This book uses SQLite because it requires no server installation and runs on any operating system.
+
+**Table group.** A named subset of related tables within the Charles River database that corresponds to a business process or functional area. The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
 

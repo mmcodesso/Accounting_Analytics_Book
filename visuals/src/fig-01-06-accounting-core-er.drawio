@@ -5,7 +5,7 @@
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
 
-        <mxCell id="acct" value="&lt;b&gt;Account&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK AccountID&lt;br&gt;AccountName&lt;br&gt;AccountType&lt;br&gt;FK ParentAccountID (self)&lt;br&gt;IsGroup&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+        <mxCell id="acct" value="&lt;b&gt;Account&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK AccountID&lt;br&gt;AccountNumber&lt;br&gt;AccountName&lt;br&gt;AccountType&lt;br&gt;NormalBalance&lt;br&gt;FK ParentAccountID (self)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
           <mxGeometry x="40" y="120" width="220" height="130" as="geometry"/>
         </mxCell>
 
@@ -21,15 +21,15 @@
           <mxGeometry x="-35" y="170" width="55" height="20" as="geometry"/>
         </mxCell>
 
-        <mxCell id="je" value="&lt;b&gt;JournalEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK JournalEntryID&lt;br&gt;PostingDate&lt;br&gt;EntryType&lt;br&gt;FK PostedByEmployeeID&lt;br&gt;FK ReversesJournalEntryID&lt;br&gt;Description&lt;br&gt;Status&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+        <mxCell id="je" value="&lt;b&gt;JournalEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK JournalEntryID&lt;br&gt;PostingDate&lt;br&gt;EntryType&lt;br&gt;Description&lt;br&gt;FK CreatedByEmployeeID&lt;br&gt;FK ApprovedByEmployeeID&lt;br&gt;FK ReversesJournalEntryID&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A5276;strokeWidth=1.5;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
           <mxGeometry x="400" y="80" width="240" height="170" as="geometry"/>
         </mxCell>
 
-        <mxCell id="gl" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK GLEntryID&lt;br&gt;PostingDate&lt;br&gt;FK AccountID&lt;br&gt;Debit&lt;br&gt;Credit&lt;br&gt;SourceDocumentType&lt;br&gt;SourceDocumentID&lt;br&gt;SourceLineID&lt;br&gt;FK CostCenterID&lt;br&gt;FK JournalEntryID (nullable)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F6F3;strokeColor=#1A5276;strokeWidth=2;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+        <mxCell id="gl" value="&lt;b&gt;GLEntry&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size:10px'&gt;PK GLEntryID&lt;br&gt;PostingDate&lt;br&gt;FK AccountID&lt;br&gt;Debit&lt;br&gt;Credit&lt;br&gt;SourceDocumentType&lt;br&gt;SourceDocumentID&lt;br&gt;SourceLineID&lt;br&gt;FK CostCenterID&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F6F3;strokeColor=#1A5276;strokeWidth=2;fontSize=11;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
           <mxGeometry x="400" y="320" width="240" height="230" as="geometry"/>
         </mxCell>
 
-        <mxCell id="src_docs" value="&lt;font style='font-size:10px;color:#5D6D7E'&gt;&lt;i&gt;Source documents from&lt;br&gt;other table groups:&lt;br&gt;&lt;br&gt;SalesInvoice (O2C)&lt;br&gt;PurchaseInvoice (P2P)&lt;br&gt;WorkOrderClose (Mfg)&lt;br&gt;PayrollRegister (Payroll)&lt;br&gt;FixedAssetEvent (FA)&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontSize=10;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=8;dashed=1;dashPattern=5 3;" vertex="1" parent="1">
+        <mxCell id="src_docs" value="&lt;font style='font-size:10px;color:#5D6D7E'&gt;&lt;i&gt;Source documents from&lt;br&gt;other table groups:&lt;br&gt;&lt;br&gt;SalesInvoice (O2C)&lt;br&gt;PurchaseInvoice (P2P)&lt;br&gt;WorkOrderClose (Mfg)&lt;br&gt;PayrollPayment (Payroll)&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#D5D8DC;strokeWidth=1;fontSize=10;fontFamily=Arial;align=left;spacingLeft=8;verticalAlign=top;spacingTop=8;dashed=1;dashPattern=5 3;" vertex="1" parent="1">
           <mxGeometry x="780" y="340" width="210" height="180" as="geometry"/>
         </mxCell>
 
@@ -50,7 +50,7 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="r2" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#5D6D7E;strokeWidth=1;" edge="1" source="je" target="gl" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="r2" value="SourceDocumentType = 'JournalEntry'&lt;br&gt;+ SourceDocumentID" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#5D6D7E;strokeWidth=1;dashed=1;dashPattern=5 3;fontColor=#5D6D7E;fontSize=9;fontStyle=2;fontFamily=Arial;labelBackgroundColor=#FFFFFF;" edge="1" source="je" target="gl" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
 
         <mxCell id="r3" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERmandOne;strokeColor=#F39C12;strokeWidth=1;dashed=1;dashPattern=5 3;" edge="1" source="cc" target="gl" parent="1">
           <mxGeometry relative="1" as="geometry"/>

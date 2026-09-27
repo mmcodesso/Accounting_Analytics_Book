@@ -71,9 +71,6 @@
           <mxGeometry x="850" y="305" width="90" height="20" as="geometry"/>
         </mxCell>
 
-        <mxCell id="title" value="&lt;b&gt;Figure 1.5: Simplified Order-to-Cash Process Flow&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontColor=#1A5276;fontSize=12;fontFamily=Arial;" vertex="1" parent="1">
-          <mxGeometry x="350" y="440" width="500" height="30" as="geometry"/>
-        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
