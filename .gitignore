@@ -35,3 +35,7 @@ __pycache__/
 datasets/
 CLAUDE.md
 .gitignore
+
+#Datasets
+datasets/
+.gitignore

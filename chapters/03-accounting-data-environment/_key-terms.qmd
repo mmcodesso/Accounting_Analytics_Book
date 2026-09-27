@@ -1,0 +1,52 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Cardinality.** The specification of how many rows on each side of a relationship can be associated with one another. The three types are one-to-one, one-to-many, and many-to-many. In accounting databases, one-to-many is the most common cardinality.
+
+**Column.** A single attribute within a database table, representing one piece of information recorded for every row. Examples include OrderDate, AccountName, and ListPrice.
+
+**Composite key.** A primary key made up of two or more columns that together uniquely identify each row. Every Charles River table uses a single-column surrogate key instead, but composite keys are common in other accounting systems.
+
+**Cross-group bridge key.** A column that appears in tables across different table groups within a database, enabling joins that span business functions. In the Charles River database, ItemID connects Master Data to O2C, P2P, and Manufacturing, and AccountID connects the Accounting Core to all groups that post to the general ledger.
+
+**Crow's foot notation.** A visual notation system used in Entity-Relationship diagrams to indicate cardinality and optionality. A bar represents "one," a three-pronged fork represents "many," and a circle represents "zero."
+
+**Data dictionary.** A reference document that describes each table and column in a database, including its meaning, data type, and relationships. Auditors often request a data dictionary along with an ER diagram when planning data extraction.
+
+**Data type.** The defined category of values that a column can hold, such as integer, decimal, text, date, or Boolean. Data types determine which operations can be performed on a column's values. The Charles River SQLite file stores dates as text in year-month-day form and Boolean flags as the integers 1 and 0.
+
+**Entity-Relationship (ER) diagram.** A visual representation of the tables in a database and the relationships between them, showing table names, column names, keys, and cardinality using standardized notation.
+
+**Foreign key.** A column in one table that references the primary key of another table, creating a defined relationship between the two tables. For example, CustomerID in the Charles River SalesOrder table is a foreign key referencing the Customer table. A foreign key may be declared as a constraint that the database enforces, or it may be a logical relationship that the data follows without enforcement, as in the Charles River database.
+
+**Header and line tables.** A design pattern in which one table records a document as a whole (the header) and a related table records its individual lines. Charles River examples include SalesOrder and SalesOrderLine, Shipment and ShipmentLine, and SalesInvoice and SalesInvoiceLine.
+
+**Junction table.** A table that resolves a many-to-many relationship between two other tables by converting it into two one-to-many relationships. The Charles River SalesOrderLine table is a junction table between SalesOrder and Item, and CashReceiptApplication is a junction table between CashReceipt and SalesInvoice.
+
+**Many-to-many relationship.** A relationship in which each row in either table can be associated with multiple rows in the other table. Relational databases represent many-to-many relationships through junction tables.
+
+**One-to-many relationship.** A relationship in which one row in the first table can be associated with many rows in the second table, but each row in the second table is associated with only one row in the first table. This is the most common relationship type in accounting databases.
+
+**Optionality.** The property of a relationship that specifies whether a row must participate in it. In crow's foot notation, a circle marks an optional relationship, such as a customer who has not yet placed a sales order.
+
+**Primary key.** A column or combination of columns that uniquely identifies each row in a table. No two rows can share the same primary key value, and the value cannot be blank.
+
+**Referential integrity.** The property of a database in which every foreign key value corresponds to an existing primary key value in the referenced table. Referential integrity prevents orphaned records that reference nonexistent related entries.
+
+**Relational database.** A data storage system that organizes information into tables connected by defined relationships through primary and foreign keys. The Charles River database is a relational database provided in SQLite format.
+
+**Row.** A single record within a database table, representing one instance of the entity or event the table describes. Each row in the Charles River SalesOrder table represents one customer order.
+
+**Self-referencing relationship.** A relationship in which a foreign key in a table references the primary key of the same table, creating a hierarchy within a single table. The Charles River Account table uses ParentAccountID to define the parent-child structure of the chart of accounts, and the Employee table uses ManagerID to link each employee to a manager.
+
+**Source-to-ledger traceability.** The ability to follow a general ledger entry back to the business document that created it. In the Charles River database, GLEntry uses SourceDocumentType, SourceDocumentID, and SourceLineID to identify the originating document in any business cycle, a logical link that points to a different table depending on SourceDocumentType.
+
+**Surrogate key.** A primary key with no business meaning that exists only to identify rows, usually a sequential integer. Every Charles River table uses a surrogate key, such as SalesOrderID or AccountID.
+
+**Table.** The fundamental storage unit in a relational database, organized into rows and columns. Each table stores information about one type of entity or event, such as customers, orders, or general ledger entries.
+
+**Table group.** A logical grouping of related tables within a database, organized by business function. The Charles River table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+
+**Unique constraint.** A rule that prevents two rows in a table from having the same value in a column. The Charles River database applies unique constraints to document numbers such as SalesInvoice.InvoiceNumber and JournalEntry.EntryNumber, in addition to its primary keys.
+

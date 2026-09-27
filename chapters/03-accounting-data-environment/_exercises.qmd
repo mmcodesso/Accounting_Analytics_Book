@@ -1,0 +1,124 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 3.1: Tracing a Purchase Transaction Through the Charles River Database**
+
+**Table group:** Procure-to-Pay and Accounting Core
+
+**Scenario.** You are a financial reporting analyst at Charles River preparing to verify that purchasing transactions recorded in the system are properly reflected in the general ledger. Tutorial 3.2 traced a sale. Your task is to apply the same technique to a purchase, from the supplier's invoice back to the goods received and forward to the payment and the ledger.
+
+**Requirements.**
+
+(1) Open the Charles River workbook in Excel and select one purchase invoice from the PurchaseInvoice worksheet that has a single line in the PurchaseInvoiceLine worksheet. Record its PurchaseInvoiceID, InvoiceNumber, SupplierID, and GrandTotal.
+
+(2) Follow the foreign keys on the invoice line. Use GoodsReceiptLineID to find the goods receipt line and its GoodsReceipt, and use POLineID to find the purchase order line and its PurchaseOrder. Look up the supplier in the Supplier worksheet. Write down each connecting key and the table it leads to. Note that a small number of invoice lines have no goods receipt line because they are linked to an accrual journal entry instead, so choose an invoice whose line has a GoodsReceiptLineID.
+
+(3) In the GLEntry worksheet, filter for the rows where SourceDocumentType is PurchaseInvoice and SourceDocumentID matches your invoice. Identify each account debited and credited, look it up in the Account worksheet, and verify that the debits equal the credits. Then find the ledger rows for the related goods receipt (SourceDocumentType GoodsReceipt). Explain why the purchase invoice debits Goods Received Not Invoiced rather than inventory.
+
+(4) Use the DisbursementPayment worksheet to find the payment or payments that settled the invoice, and trace their ledger rows. Prepare a brief written trace (one page) that documents the path of the transaction through the tables, identifying each table, the connecting keys, the accounts, and the amounts involved.
+
+**Deliverable.** A one-page written transaction trace documenting the path of a purchase transaction through the Charles River database.
+
+
+**Exercise 3.2: Mapping the Charles River O2C Group to the Revenue Cycle**
+
+**Table group:** Order-to-Cash, with the Item table from Master Data
+
+**Scenario.** You are a financial reporting analyst who has been asked to document how the Charles River database captures the revenue cycle. Your documentation will be used by the team as a reference when preparing revenue analyses in later chapters.
+
+**Requirements.**
+
+(1) Using the O2C ER diagram (@fig-03-07), identify all tables involved in recording a sale from the initial order through the line-item details to the shipment, invoice, and cash collection. List each table and describe its role in the revenue cycle in one to two sentences.
+
+(2) For each pair of connected tables in the revenue cycle path, identify the foreign key that creates the connection and state the cardinality and optionality of the relationship, reading both ends of each line.
+
+(3) Identify what revenue cycle information requires joining to the Accounting Core group. Consider whether the O2C tables alone record the general ledger postings, account classifications, or cost center assignments. For each gap you identify, explain which Accounting Core table and column would provide the missing information.
+
+(4) Prepare a brief written summary (one page) that could serve as a data dictionary excerpt for the revenue-related tables in Charles River.
+
+**Deliverable.** A one-page data dictionary excerpt covering the Charles River O2C revenue cycle tables, their relationships, and their connections to the Accounting Core.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 3.3: Mapping the Charles River Manufacturing Group**
+
+**Table group:** Manufacturing, with the Item table from Master Data
+
+**Scenario.** You are a cost analyst at Charles River. Your manager has asked you to document the database tables that support manufacturing cost analysis so that the team can plan a product costing project for the upcoming quarter.
+
+**Requirements.**
+
+(1) Using the Manufacturing ER diagram (@fig-03-08) and the Excel workbook, identify all tables that store production-related data. For each table, write one to two sentences describing what it contains and how it relates to manufacturing cost analysis.
+
+(2) Trace the path through the database that connects a finished product to its component materials. Start at the Item table and follow ParentItemID to BillOfMaterial, then BOMID to BillOfMaterialLine, and ComponentItemID back to the Item table for each component. Explain how a cost analyst would use this path to calculate the material cost of a product, and why the same Item table appears at both ends of the path.
+
+(3) Identify the table that records actual production activity (WorkOrder) and the tables that record completion (ProductionCompletion, ProductionCompletionLine) and cost close-out (WorkOrderClose). Examine their columns and determine what information is available for comparing planned production to actual production, including quantities and variance amounts.
+
+(4) Determine whether the Charles River database allows you to calculate the variance between standard cost and actual cost for a specific product. Identify which tables and columns would be involved.
+
+(5) Write a brief memorandum (one page) summarizing the production-related data available in the Charles River Manufacturing group and assessing its suitability for a product cost analysis project.
+
+**Deliverable.** A one-page memorandum documenting the Charles River Manufacturing data and its suitability for cost analysis.
+
+
+**Exercise 3.4: Evaluating Cost Center and Budget Data in Charles River**
+
+**Table group:** Organizational Planning, with GLEntry from the Accounting Core
+
+**Scenario.** You are a management accountant at Charles River preparing to build a departmental performance report that compares budgeted expenses to actual expenses by cost center. Before starting the analysis, you need to understand how cost center data is structured in the database.
+
+**Requirements.**
+
+(1) Open the Charles River workbook and examine the CostCenter worksheet. Identify the columns available and determine whether the cost centers form a hierarchy, using the ParentCostCenterID column.
+
+(2) Examine the GLEntry worksheet and determine how general ledger entries are associated with cost centers. Identify the column that links GL entries to the CostCenter table, state the cardinality and optionality of the relationship, and count the entries that have no cost center.
+
+(3) Examine the Budget and BudgetLine worksheets and determine how budgeted amounts are associated with cost centers and accounts. Identify the columns that connect budget records to cost centers and to the chart of accounts.
+
+(4) Assess whether the Charles River database provides sufficient data to compare budgeted versus actual spending for each cost center. Identify any gaps, such as missing cost center assignments on GL entries or budget records that do not correspond to accounts used in the general ledger. Write a brief assessment (one half to one page) documenting your findings.
+
+**Deliverable.** A written assessment of the Charles River cost center data structure and its readiness for budget-versus-actual analysis.
+
+
+### Auditing Exercises
+
+**Exercise 3.5: Planning a Data Extraction Strategy for the Charles River Audit**
+
+**Table group:** Order-to-Cash, Procure-to-Pay, and Accounting Core
+
+**Scenario.** You are an IT auditor responsible for planning the data extraction needed to support three audit procedures: a revenue completeness test, a purchasing cycle test including three-way matching, and a journal entry analysis for management override of controls. For each procedure, you need to identify which table group to use, which tables to extract, and which relationships you will need to traverse.
+
+**Requirements.**
+
+(1) For the revenue completeness test, identify the table group and tables you would use. Explain which table contains the population of revenue transactions and which related tables you would need to join to verify that each transaction includes a valid customer, a valid item, and an amount. State the keys that connect the tables. Explain how you would use the SourceDocumentType column in GLEntry to confirm that every sales invoice generated corresponding ledger entries.
+
+(2) For the purchasing cycle test, identify the table group and tables you would use. The test requires three-way matching by comparing the quantity and unit cost across PurchaseOrderLine, GoodsReceiptLine, and PurchaseInvoiceLine. Identify the foreign keys that link these three tables and note any gaps in the available data, such as a value that one of the three tables does not record.
+
+(3) For the journal entry analysis, identify the table group and tables you would use. The analysis requires access to every manually created journal entry, including the posting date, the amounts, the accounts debited and credited, and the employees who created and approved the entry. Identify which tables contain this information (JournalEntry and GLEntry), explain how the two are linked even though GLEntry has no JournalEntryID column, and identify the columns that would be useful for risk-based filtering (such as entries posted on weekends, entries with round-dollar amounts, or entries where the same employee both created and approved the entry).
+
+(4) Prepare a data extraction plan (one to two pages) that documents your selections for all three procedures.
+
+**Deliverable.** A one-to-two page data extraction plan for three audit procedures, identifying specific Charles River tables and relationships.
+
+
+**Exercise 3.6: Assessing Referential Integrity Across the Charles River Database**
+
+**Table group:** Order-to-Cash, Master Data, and Accounting Core
+
+**Scenario.** Your audit senior has asked you to perform a preliminary check on the referential integrity of the Charles River database. Because the database file does not declare foreign key constraints, nothing prevents a record from referencing a primary key value that does not exist, and testing is the only way to know whether the relationships hold. Referential integrity problems can indicate data migration errors, deletion of master records without updating related transactions, or system configuration problems. Any violations you find will be flagged for further investigation.
+
+**Requirements.**
+
+(1) Using the O2C and Accounting Core ER diagrams, identify at least six foreign key relationships to test. List each relationship by specifying the child table, the foreign key column, the parent table, and the primary key column. Include at least one cross-group relationship, such as SalesOrderLine.ItemID referencing Item.ItemID.
+
+(2) For each relationship, test whether every foreign key value in the child table exists as a primary key value in the parent table. For small tables, use XLOOKUP or COUNTIFS on each row. For the GLEntry table, which holds hundreds of thousands of rows, first build a PivotTable of the distinct AccountID values and test that short list against the Account table, as in Tutorial 2.2. Record the number of orphaned references, if any, for each relationship.
+
+(3) Pay particular attention to the relationships between SalesOrder and Customer, between SalesOrderLine and Item, and between GLEntry and Account. For any orphaned references you find, record the specific foreign key values that have no match and the number of records affected.
+
+(4) Prepare a brief memorandum (one page) documenting your referential integrity testing results. For each relationship tested, state whether integrity was maintained or violated. Explain what a clean result tells the audit team, and why that assurance comes from your tests rather than from the database itself.
+
+**Deliverable.** A one-page referential integrity testing memorandum documenting the results for all tested foreign key relationships in the Charles River database.

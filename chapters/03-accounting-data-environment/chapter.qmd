@@ -4,8 +4,293 @@ aliases:
   - /03_chapter.html
 ---
 
-::: {.chapter-meta}
-[Conceptual Chapter]{.chapter-pill}
+
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
+
+After completing this chapter, you will be able to:
+
+1. Explain the structure of a relational database, describe how tables, rows, columns, and data types organize accounting information, and describe how the Charles River database file stores that information.
+2. Distinguish between primary keys and foreign keys and explain how they establish relationships between tables in an accounting database.
+3. Read and interpret an Entity-Relationship diagram using crow's foot notation to identify tables, relationships, and cardinality.
+4. Map familiar accounting structures such as the chart of accounts, general ledger, and sub-ledgers to their representations as related tables in a database.
+5. Compare simple and complex table groups within the Charles River database and trace how cross-group bridge keys connect operational activity to the posted general ledger.
+6. Explain why the source-document columns in GLEntry act as a logical reference to many possible tables rather than a declared foreign key, and use them to trace a transaction across table groups.
 :::
 
----
+
+## Opening Scenario {.unnumbered}
+
+You are a newly hired staff accountant at Charles River, a mid-size home furnishings company that sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels. During your first week, your manager asks you to pull together a revenue analysis for the most recent quarter. She explains that all the data you need is stored in the company's database and hands you a printout of the database diagram. The diagram shows dozens of tables organized into groups with names like "Order-to-Cash," "Accounting Core," and "Manufacturing." Lines connect the tables in a web of relationships, and symbols at the endpoints of each line indicate how many rows on each side can be associated. You recognize some of the table names from your accounting courses, such as "Account," "GLEntry," and "SalesInvoice," but the overall structure and the connections between groups are unfamiliar. You realize that before you can run any queries or build any reports, you need to understand how the company's accounting data is organized within this database. This chapter provides that understanding. It introduces the relational database model, explains how accounting data is organized within it, and walks you through the Charles River database design that you will use throughout this book.
+
+
+
+## From Accounting Records to Database Tables
+
+In your introductory accounting courses, you learned to work with familiar structures such as the chart of accounts, the general journal, the general ledger, and various sub-ledgers. You recorded transactions as debits and credits, posted them to T-accounts, prepared trial balances, and produced financial statements. These structures have served the accounting profession for centuries, and they remain the conceptual foundation of financial record-keeping.
+
+What has changed is how organizations store and access these structures. In a manual system, the general journal is a physical book. In a spreadsheet-based system, it is a worksheet. In a modern organization like Charles River, it is a table in a relational database. The chart of accounts is another table. The accounts receivable sub-ledger is yet another table. These tables are connected to one another through defined relationships that mirror the connections you already understand from accounting. The CustomerID on a sales invoice connects that invoice to a specific customer record. The AccountID on a general ledger entry connects that entry to a specific account in the chart of accounts. These connections exist in manual systems as cross-references and posting notations. In a database, they are formalized as structural features that the database can enforce and that analytical tools can use.
+
+Understanding how accounting data is organized in a database is a prerequisite for everything that follows in this book. When you write SQL queries in Part III, you will need to know which tables contain the data you need and how those tables connect to one another. When you build data models in Power BI in Part IV, you will define relationships between tables that determine how your calculations and visualizations behave. Even in the Excel chapters of Part II, understanding the source structure helps you anticipate what the data will look like when you import it and what preparation steps will be necessary. The concepts in this chapter are not abstract. They are the practical foundation for every analytical task you will perform.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+The profession now treats database knowledge as part of an accountant's core preparation. The model curriculum that the AICPA and NASBA developed for aspiring CPAs expects newly licensed accountants to understand the attributes of data repositories and the capabilities of tools that extract and analyze data from them (AICPA & NASBA, 2021). Accounting educators have responded by building information systems and database competencies into courses across the curriculum (Sledgianowski et al., 2017). Auditors who can read a database diagram and identify the tables relevant to a procedure work more efficiently during fieldwork.
+:::
+
+
+## The Relational Database Model
+
+A relational database stores data in a collection of tables that are related to one another through shared values. The relational model was proposed by Edgar F. Codd in 1970 and has become the dominant approach to data storage in business information systems (Codd, 1970). Virtually every enterprise resource planning system, accounting software package, and transaction processing system in use today stores its data in a relational database. Understanding this model is therefore essential for any accountant who needs to access data directly rather than relying on pre-built reports.
+
+### Tables, Rows, and Columns
+
+The fundamental unit of a relational database is the table. A table stores information about one type of entity or event. In an accounting context, a table might store information about customers, products, sales orders, journal entries, or accounts. Each table has a name that identifies what it contains. The Charles River database, for example, has a table called Customer that stores information about every customer the company does business with, and a table called SalesOrder that records every sales order the company has received.
+
+A table is organized into rows and columns. Each row represents a single instance of the entity or event that the table describes. In the Customer table, each row represents one customer. In the SalesOrder table, each row represents one order. Each column represents a single attribute of that entity or event. In the Customer table, columns include CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms. In the SalesOrder table, columns include SalesOrderID, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, and Status. @fig-03-01 labels these parts on a sample of real Charles River customers.
+
+![Anatomy of a Database Table.](/visuals/svg/fig-03-01-anatomy-database-table.svg){#fig-03-01 fig-alt="The Charles River Customer table shown as a grid with five real customers and the columns CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms. Numbered markers identify the table name, one column (CustomerSegment), one row (customer 4, Edwards, Stanley and Rivera), the primary key column (CustomerID), and a single cell value (the Region of customer 12)."}
+
+If this structure looks familiar, it should. A database table is structurally identical to a well-organized spreadsheet or to the tidy data format described in Chapter 2. Each variable occupies its own column, and each observation occupies its own row. The difference is that a database defines this structure in advance. When a table is created, the database records the name of every column and, depending on the system, its data type and constraints. Every row has the same columns, which prevents the kind of structural drift that occurs in spreadsheets, where a user might insert a comment in a data column or merge cells in ways that break the tabular format.
+
+### Data Types
+
+Every column in a database table has a data type that specifies what kind of values the column is meant to hold. The most common data types in accounting databases include integers (whole numbers used for identifiers and counts), decimal or numeric values (numbers with fractional parts used for monetary amounts, prices, and quantities), text or character strings (used for names, descriptions, and codes), dates (used for transaction dates, due dates, and posting dates), and Boolean values (true or false values used for status flags such as whether a supplier has been approved).
+
+Data types matter for accounting analytics because they determine what operations are possible. You can calculate the sum of a column defined as a decimal but not the sum of a column defined as text. You can sort dates chronologically but only if the values are stored in a form that sorts correctly. Many of the data quality problems discussed in Chapter 2, such as a transaction amount stored as text because it includes a currency symbol, are essentially data type problems.
+
+How a particular database stores these types depends on the database system. The Charles River database is provided as a SQLite file, and SQLite uses only a few storage classes. Whole numbers are stored as INTEGER, numbers with fractional parts as REAL, and everything else as TEXT. SQLite has no separate date or Boolean type, so Charles River stores dates as text in the year-month-day format (such as 2025-03-05), which sorts in chronological order, and stores true or false flags as the integers 1 and 0. @tbl-03-01 summarizes the common data types and how the Charles River file stores each one. When you import the data into Excel or Power BI, those tools convert the stored values into their own date, number, and text types, so it is worth checking that each column arrives with the type you expect.
+
+| Data Type | Description | How Charles River Stores It | Charles River Example |
+|---|---|---|---|
+| INTEGER | Whole numbers without decimal places, used for identifiers, codes, and counts. | INTEGER | SalesOrderID in SalesOrder (for example, 1697). AccountNumber in Account (for example, 4010). |
+| DECIMAL / NUMERIC | Numbers with fractional parts, used for monetary amounts, prices, and quantities. | REAL (floating point) | StandardCost and ListPrice in Item (for example, 229.66 and 382.45). Debit and Credit in GLEntry. |
+| TEXT / VARCHAR | Character strings used for names, descriptions, codes, and classifications. | TEXT | CustomerName in Customer (for example, "Walters PLC"). OrderNumber in SalesOrder (for example, "SO-2024-001697"). |
+| DATE | Calendar dates, sometimes with a time, used for transaction, due, and posting dates. | TEXT in year-month-day form | InvoiceDate in SalesInvoice (for example, 2025-03-05). CreatedDate in GLEntry, which also includes the time. |
+| BOOLEAN | True or false values used for status flags. | INTEGER, with 1 for true and 0 for false | IsApproved in Supplier. IsActive in Customer and Item. |
+
+: Common Data Types and How the Charles River Database Stores Them {#tbl-03-01}
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A column that contains numbers is not necessarily a quantity. The Charles River Account table stores account numbers such as 1010 and 4010 as integers, so Excel, SQL, and Power BI will happily add them together or calculate their average. The result is meaningless, because account numbers are identifiers, not amounts. Other systems store codes like these as text precisely to prevent that kind of arithmetic and to preserve leading zeros, which a numeric type would drop from a code such as 0450. When you encounter a column of numbers in a database, consider whether the values represent quantities to be calculated or codes to be matched.
+:::
+
+
+## Keys and Relationships
+
+The power of a relational database comes not from individual tables but from the connections between them. In an accounting system, transactions do not exist in isolation. A sales order is placed by a customer, fulfilled from a warehouse, and contains items from the product catalog. A general ledger entry debits one account and credits another, and both accounts appear in the chart of accounts. These connections are represented in a database through keys.
+
+### Primary Keys
+
+A primary key is a column, or a combination of columns, that uniquely identifies each row in a table. No two rows in the same table can have the same primary key value, and the primary key cannot be blank. In the Charles River Customer table, the primary key is CustomerID. Every customer has a unique CustomerID, and no two customers share the same value. In the SalesOrder table, the primary key is SalesOrderID. Every order has a unique SalesOrderID that distinguishes it from every other order in the table. Every Charles River table uses a surrogate key of this kind: a single integer column that exists only to identify rows.
+
+Primary keys serve the same purpose in a database that unique identifiers serve in accounting. An invoice number uniquely identifies an invoice. A check number uniquely identifies a payment. An employee number uniquely identifies an employee. The database enforces primary key uniqueness automatically, meaning it will reject any attempt to insert a second row with an existing primary key value. The Charles River database also enforces uniqueness on many business document numbers through unique constraints, including OrderNumber in SalesOrder, InvoiceNumber in SalesInvoice, EntryNumber in JournalEntry, and AccountNumber in Account. These constraints are a form of data integrity control. Notice what is not constrained: the InvoiceNumber in the PurchaseInvoice table is the number printed on the supplier's invoice, and nothing prevents the same supplier invoice number from being recorded twice. That is exactly how the duplicate supplier invoice numbers you examined in Chapter 2 entered the data.
+
+### Foreign Keys
+
+A foreign key is a column in one table that references the primary key of another table. Foreign keys create the connections between tables that make a relational database relational. In the Charles River SalesOrder table, the column CustomerID is a foreign key that references the CustomerID primary key in the Customer table. This relationship means that every order is linked to a specific customer. If you know the CustomerID on an order, you can look up that customer's name, segment, region, and credit limit in the Customer table. @fig-03-02 shows this connection with real orders.
+
+![Primary Keys and Foreign Keys Illustrated.](/visuals/svg/fig-03-02-pk-fk-illustrated.svg){#fig-03-02 fig-alt="Two tables side by side. The SalesOrder table shows orders 59, 62, and 85 with their order numbers, order dates, and a highlighted CustomerID foreign key. The Customer table shows customers 1 (Walters PLC) and 4 (Edwards, Stanley and Rivera) with a highlighted CustomerID primary key. Arrows connect each order's CustomerID to the matching customer. A relationship line between the tables shows one customer to zero or many sales orders."}
+
+Foreign keys mirror the cross-references that exist in accounting records. When you post a journal entry to the general ledger, the account number on the entry refers to a specific account in the chart of accounts. That account number is functioning as a foreign key. When a sales invoice references a customer number, that customer number links the invoice to the customer master file. A foreign key does not always share the name of the primary key it references. In the BillOfMaterialLine table, for example, ComponentItemID is a foreign key that references ItemID in the Item table, and its name describes the role the item plays in the relationship.
+
+The relationship between a primary key and a foreign key establishes what database designers call referential integrity. This means that every foreign key value must correspond to an existing primary key value in the referenced table. If a customer is deleted from the Customer table while orders referencing that customer still exist in the SalesOrder table, the orders now reference a customer that does not exist, and any analysis that joins the two tables will produce incomplete results. A database can prevent this with foreign key constraints, which reject any insertion, update, or deletion that would leave an orphaned reference.
+
+It is important to distinguish the relationships a database is designed around from the constraints it actually enforces. The Charles River database, like many data extracts, data warehouses, and analytics datasets, declares its primary keys but does not declare its foreign keys. The relationships exist in the data, and the tests you performed in Chapter 2 found that every AccountID in GLEntry matches an account in the chart of accounts, but nothing in the file would stop an orphaned record from being added. These undeclared relationships are sometimes called logical foreign keys. They are why analysts test referential integrity rather than assume it, and they have a practical consequence: tools that read the file cannot discover the relationships on their own, so you will define them yourself when you build a Power BI data model.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+In the SQL chapters of Part III, you will write JOIN statements that use exactly these key relationships to combine data from multiple tables. A JOIN on SalesOrder.CustomerID = Customer.CustomerID retrieves the customer name for each order. Understanding keys now will make JOIN syntax intuitive rather than mysterious when you encounter it.
+:::
+
+
+## Relationships and Cardinality
+
+The relationship between two tables has a cardinality, meaning it specifies how many rows in one table can be associated with a single row in the other table. Three types of cardinality are common in accounting databases, and @fig-03-03 illustrates each one with Charles River tables.
+
+A one-to-many relationship means that one row in the first table can be associated with many rows in the second table, but each row in the second table is associated with only one row in the first table. This is the most common relationship type in accounting data. One customer can place many sales orders, but each sales order belongs to one customer. One account in the chart of accounts can have many general ledger entries, but each entry is posted to one account. One item in the product catalog can appear on many sales order lines, but each line references one item. In the Charles River database, the relationship between Customer and SalesOrder is one-to-many. Walters PLC, one of the company's strategic customers, has placed dozens of orders, and each of those orders carries the same CustomerID linking it back to that single customer record.
+
+A one-to-one relationship means that each row in the first table is associated with at most one row in the second table, and vice versa. One-to-one relationships are less common in accounting databases, and they usually arise when a later stage of a process is recorded in its own table. In the Charles River database, each work order is closed at most once, and the close is recorded in the WorkOrderClose table along with the manufacturing variances it posts. A work order that is still in production has no close record yet, so the relationship is more precisely one-to-zero-or-one. Similarly, each production completion in the ProductionCompletion table has exactly one line in the ProductionCompletionLine table.
+
+A many-to-many relationship means that each row in the first table can be associated with many rows in the second table, and each row in the second table can also be associated with many rows in the first table. In accounting, consider the relationship between sales orders and items. One sales order can contain many items, and one item can appear on many sales orders. Relational databases cannot directly represent a many-to-many relationship. Instead, they use a junction table (also called a bridge table or associative table) that sits between the two tables and converts the many-to-many relationship into two one-to-many relationships. In the Charles River database, the SalesOrderLine table serves this purpose. It sits between SalesOrder and Item, with each row representing one line on one order, and it has a foreign key to SalesOrder (SalesOrderID) and a foreign key to Item (ItemID). The CashReceiptApplication table plays the same role between cash receipts and sales invoices: one customer check can pay several invoices, and one invoice can be paid by several receipts.
+
+![The Three Types of Cardinality.](/visuals/svg/fig-03-03-three-cardinality-types.svg){#fig-03-03 fig-alt="Three panels. One-to-one: WorkOrder connects to WorkOrderClose with exactly one on the WorkOrder side and zero or one on the WorkOrderClose side. One-to-many: Customer connects to SalesOrder with exactly one on the Customer side and zero or many on the SalesOrder side. Many-to-many: SalesOrder and Item are connected through the SalesOrderLine junction table, with one or many lines per order and zero or many lines per item."}
+
+Cardinality has a companion property called optionality, which describes whether a row must participate in a relationship at all. Every sales order must belong to a customer, but a customer does not have to have placed an order: some Charles River customers have no orders yet. Every sales order has at least one line, but some items in the catalog have never been sold. Optionality matters for analysis because a relationship that allows zero matches will leave some rows out of a combined result unless you account for them, which is why a list of customers built by joining to their orders can silently omit the customers who have never ordered.
+
+Understanding cardinality is important for analytics because it affects the results you get when you combine tables. When you join a one-to-many relationship in SQL or in a Power BI data model, the many side of the relationship can multiply rows in your results. If you join the Customer table to the SalesOrder table and a customer has 15 orders, that customer's information will appear 15 times in the output, once for each order. This is correct and expected behavior, but if you are not aware of the cardinality, you might accidentally count the customer 15 times when calculating the number of customers. Many analytical errors in accounting result from misunderstanding the cardinality of a relationship, and the ER diagrams described in the next section help you avoid those errors by making cardinality visible.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+The most common mistake students make when working with related tables is double-counting. If you join the Customer table to SalesOrder to SalesOrderLine, a single customer with 5 orders and 20 line items across those orders will appear 20 times in the result set. Summing revenue at the line-item level is correct. Counting the customer at the line-item level overstates the customer count by a factor of 20. Always consider the cardinality of each join before performing aggregations.
+:::
+
+
+## Entity-Relationship Diagrams
+
+An Entity-Relationship diagram, commonly called an ER diagram, is a visual representation of the tables in a database and the relationships between them. ER diagrams are the maps that database designers, analysts, and auditors use to understand the structure of a data environment. Reading an ER diagram is a skill you will use repeatedly in this book and in professional practice.
+
+### How to Read an ER Diagram
+
+In the notation used throughout this book, each table appears as a rectangle. The rectangle has a header bar containing the table name and a body listing the column names. Primary key columns are marked with "PK" and foreign key columns are marked with "FK." Relationships between tables are shown as lines connecting the table that holds the primary key to the table that holds the foreign key. Tables from another table group are drawn with a gray header, and relationships that cross into another group are drawn in amber.
+
+The endpoints of each relationship line use crow's foot notation to indicate cardinality and optionality, as @fig-03-04 shows. A perpendicular bar means "one," and a three-pronged fork, which resembles a crow's foot, means "many." A circle means "zero," which marks the relationship as optional. Each endpoint combines two symbols. A pair of bars means exactly one, a circle with a bar means zero or one, a bar with a crow's foot means one or many, and a circle with a crow's foot means zero or many.
+
+![Reading Crow's Foot Notation.](/visuals/svg/fig-03-04-crows-foot-notation.svg){#fig-03-04 fig-alt="A reference table of the four crow's foot endpoint symbols. Exactly one (two bars): each SalesOrderLine belongs to exactly one SalesOrder. Zero or one (circle and bar): a WorkOrder has zero or one WorkOrderClose record. One or many (bar and crow's foot): a SalesOrder has one or more SalesOrderLines. Zero or many (circle and crow's foot): a Customer has zero or more SalesOrders. A note explains that each end of a line describes the table it touches."}
+
+Consider a concrete example. The Charles River ER diagram shows a line between the Customer table and the SalesOrder table. The Customer end of the line has two bars, meaning exactly one: every order belongs to exactly one customer. The SalesOrder end has a circle and a crow's foot, meaning zero or many: a customer can have many orders or none at all. Reading the relationship aloud, you would say "one customer can have zero or many sales orders, and each sales order belongs to exactly one customer." Looking at the columns, you can see that CustomerID is the primary key of the Customer table and a foreign key in the SalesOrder table. This tells you that the connection between the two tables is made through the CustomerID column, and that to retrieve a customer's name alongside their orders, you would match these two columns.
+
+ER diagrams serve the same purpose for a database that a chart of accounts serves for an accounting system. The chart of accounts tells you how the organization classifies its financial transactions. The ER diagram tells you how the database organizes its data. Just as you would consult the chart of accounts before preparing a journal entry, you should consult the ER diagram before writing a query or building a data model.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Auditors routinely request ER diagrams or data dictionaries from clients during the planning phase of an engagement. Understanding the client's database structure helps the audit team identify which tables contain the data needed for analytical procedures, which relationships need to be traversed to connect transactions to their supporting details, and where potential data integrity risks exist. The AICPA's Guide to Audit Data Analytics recommends that auditors document their understanding of the client's data structure before performing data extraction (AICPA, 2017).
+:::
+
+
+## The Accounting Data Model
+
+The relational concepts described so far apply to databases in any domain. What makes an accounting database distinctive is the specific set of entities it stores and the relationships between them. This section shows how the familiar structures of accounting map to tables and relationships in the Charles River database. Seeing these connections will help you move between accounting concepts and database structures without difficulty.
+
+### The Chart of Accounts as a Table
+
+The chart of accounts is the organizational backbone of any accounting system. It defines every account the organization uses to classify its financial transactions, typically organized into five major categories: assets, liabilities, equity, revenues, and expenses. In a database, the chart of accounts is stored as a table where each row represents one account. Columns typically include an account identifier, an account name, an account type classification, and a parent account reference that defines the hierarchical structure.
+
+In the Charles River database, the chart of accounts is stored in the Account table. Each row contains an AccountID, an AccountNumber, an AccountName, an AccountType (Asset, Liability, Equity, Revenue, or Expense), an AccountSubType for finer classification, a NormalBalance of debit or credit, and a ParentAccountID that places the account within the hierarchy. The ParentAccountID is a foreign key that points to another row in the same table, creating what database designers call a self-referencing relationship or recursive relationship. The Cash and Cash Equivalents account (1010), for example, has Assets (1000) as its parent. Deeper levels appear under Fixed Assets: Furniture and Fixtures (1110) sits under Fixed Assets (1100), which in turn sits under Assets. Summary accounts such as Assets and Fixed Assets are marked Header in the AccountSubType column, and no entries are posted to them. This hierarchical structure allows the database to represent the multi-level account groupings that appear on financial statements, as @fig-03-05 shows.
+
+![The Chart of Accounts as a Database Table.](/visuals/svg/fig-03-05-chart-of-accounts-table.svg){#fig-03-05 fig-alt="A portion of the real Charles River Account table with the columns AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and ParentAccountID, including 1000 Assets, 1010 Cash and Cash Equivalents, 1020 Accounts Receivable, 1100 Fixed Assets, 1110 Furniture and Fixtures, 4000 Revenue, 4010 Sales Revenue - Furniture, and 4080 Sales Revenue - Design Services. Highlighted cells show that the ParentAccountID of Furniture and Fixtures (11) is the AccountID of Fixed Assets. A tree on the right shows the resulting hierarchy."}
+
+### The General Ledger as a Related Table
+
+The general ledger records every financial transaction as a series of debit and credit entries. In a database, the general ledger is typically stored as a table where each row represents one side of a journal entry: a single debit or a single credit. Columns include the posting date, the account reference, the debit amount, the credit amount, the fiscal year and period, identifiers linking the entry to its source, and a cost center reference.
+
+The relationship between the general ledger table and the chart of accounts table is one-to-many. One account can appear in many general ledger entries, but each general ledger entry is posted to one account. Some accounts, such as the summary header accounts, have no entries at all, so more precisely the relationship is one-to-zero-or-many. The account reference in the general ledger table is a foreign key that points to the primary key of the chart of accounts table. This relationship is the database equivalent of posting a journal entry to a T-account. When you sum the debits and credits for a given account across all general ledger entries, you calculate that account's balance, which is precisely what a trial balance reports.
+
+In the Charles River database, the GLEntry table stores the general ledger, and it is by far the largest table in the database. Each row has an AccountID field that references the Account table, establishing the connection between individual entries and the chart of accounts. This relationship is what makes it possible to produce a trial balance from the database: you group the GLEntry rows by account and sum the Debit and Credit columns for each group.
+
+### Sub-Ledgers and the Source-Document Trace
+
+Sub-ledgers provide transaction-level detail for specific account categories. The accounts receivable sub-ledger, for example, records individual customer invoices and payments. The accounts payable sub-ledger records individual vendor invoices and payments. In a manual system, the sub-ledger detail rolls up to a control account in the general ledger, and the control account balance should equal the sum of all sub-ledger balances.
+
+In the Charles River database, the sub-ledgers are represented by the transactional cycle tables. The SalesInvoice, CashReceipt, and CashReceiptApplication tables in the O2C group function as the accounts receivable sub-ledger. The PurchaseInvoice and DisbursementPayment tables in the P2P group function as the accounts payable sub-ledger. In the Payroll and Time group, each row of the PayrollRegister table records one employee's pay for one pay period, and payroll reaches the ledger through summary postings and payment postings. Each of these business events generates entries in the GLEntry table.
+
+Chapter 2 introduced source-to-ledger traceability, the ability to follow any ledger entry back to the business document that created it through the SourceDocumentType, SourceDocumentID, and SourceLineID columns of GLEntry. From a database perspective, these columns are unusual. SourceDocumentType names the table the posting came from, such as SalesInvoice, PurchaseInvoice, PayrollPayment, or JournalEntry, and SourceDocumentID holds the primary key of a row in that table. Because the same SourceDocumentID column points to a different table depending on the value in SourceDocumentType, no single foreign key can describe the relationship. @fig-03-06 shows this pattern.
+
+![The Relationship Between the General Ledger and Sub-Ledgers.](/visuals/svg/fig-03-06-gl-subledger-relationship.svg){#fig-03-06 fig-alt="The Account table connects to the GLEntry table with a solid line: exactly one account to zero or many ledger entries. Dashed amber lines run from four source tables at the bottom (SalesInvoice from Order-to-Cash, PurchaseInvoice from Procure-to-Pay, PayrollPayment from Payroll and Time, and JournalEntry from the Accounting Core) to GLEntry, representing the source-document trace. A note explains that SourceDocumentType names the source table and SourceDocumentID holds the key of the row in that table, so the link is a logical one that analysts test."}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+In the audit analytics chapters of Parts II and III, you will use the SourceDocumentType column in GLEntry to isolate journal entries made by the accounting team from entries generated automatically by sales invoices, purchase invoices, and payroll. This source-document trace is one of the most important structures for audit analytics because it allows you to test whether the amounts reported in the financial statements are supported by underlying operational transactions.
+:::
+
+
+## Exploring the Charles River Schema by Table Group
+
+Now that you understand the components of a relational database, it is time to examine how the Charles River database is organized. The database is arranged into table groups, each covering a different business function, and the groups range from a handful of reference tables to large transactional cycles. Studying several groups together will show you how the same relational principles apply at different scales within a single company.
+
+### Table Groups as Organizational Units
+
+A table group is a logical grouping of related tables within a database, organized by business function. Table groups serve the same organizational purpose that departments serve in a company or that schemas serve in databases like Microsoft SQL Server: they cluster related activities together and make it easier to find what you need. In the Charles River database, the O2C (Order-to-Cash) group contains the tables related to customer orders, shipments, invoices, and collections. The Manufacturing group contains the tables related to bills of material, work orders, material usage, and production. The Accounting Core group contains the chart of accounts, journal entries, and general ledger.
+
+The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP. @tbl-01-03 in Chapter 1 lists the key tables in each. The size of each group reflects the complexity of the business process it covers. A reference function like Master Data needs only a few tables, while a transactional cycle like Order-to-Cash, which spans pricing, ordering, shipping, invoicing, commissions, returns, and cash collection, is the largest group in the database.
+
+### Simple Table Groups: Master Data
+
+The Master Data group is the simplest starting point for understanding the Charles River database. It contains three tables: Item, Warehouse, and Employee. Each table stores reference information about one type of entity that is shared across the rest of the database.
+
+The Item table stores product information, including ItemID, ItemName, ItemGroup, SupplyMode (Purchased or Manufactured), StandardCost, and ListPrice. Its ItemGroup column classifies items into the four product families the company sells (Furniture, Lighting, Textiles, and Accessories) and into groups for services, raw materials, packaging, and capital equipment. The Warehouse table stores location information for inventory storage. The Employee table stores personnel information used across sales, manufacturing, payroll, and accounting, and its ManagerID column is a self-referencing foreign key that points to each employee's manager in the same table.
+
+Master Data also carries accounting information. Each item records the accounts it posts to through InventoryAccountID, RevenueAccountID, and COGSAccountID, all of which reference the Account table. When Charles River sells a desk, the item's account mapping is what directs the revenue to Sales Revenue - Furniture and the cost to COGS - Furniture.
+
+What makes Master Data important is how it connects to everything else in the database. The ItemID column appears as a foreign key in tables across multiple groups: SalesOrderLine in the O2C group, PurchaseOrderLine in the P2P group, WorkOrder in the Manufacturing group, and many others. The EmployeeID column appears under role-specific names in SalesOrder (SalesRepEmployeeID), in JournalEntry (CreatedByEmployeeID and ApprovedByEmployeeID), in PayrollRegister, and in LaborTimeEntry. These shared columns are called cross-group bridge keys because they allow analysts to join data across different table groups. When you want to know which items a particular customer ordered, you join the O2C tables to the Item table through the ItemID bridge. When you want to know which employee approved a manual journal entry, you join the Accounting Core to the Employee table through EmployeeID. @tbl-03-02 compares Master Data with two larger groups.
+
+| Feature | Master Data | Order-to-Cash | Accounting Core |
+|---|---|---|---|
+| Key tables | Item, Warehouse, Employee | Customer, SalesOrder, SalesOrderLine, Shipment, ShipmentLine, SalesInvoice, SalesInvoiceLine, CashReceipt, CashReceiptApplication, and the pricing, service, commission, and returns tables | Account, JournalEntry, GLEntry |
+| Primary relationships | One-to-many from each master table outward to transactional tables in other groups. One self-reference (Employee.ManagerID) and links from Item to the Account table. | Long chains of one-to-many relationships following the revenue cycle, from Customer to SalesOrder to SalesOrderLine to ShipmentLine to SalesInvoiceLine. SalesOrderLine and CashReceiptApplication are junction tables. | Account to GLEntry (one to zero or many), with a self-reference in Account.ParentAccountID. GLEntry reaches source documents in every group through the source-document trace. |
+| Cross-group bridge keys | ItemID appears in O2C, P2P, and Manufacturing. EmployeeID appears in O2C, Payroll and Time, and the Accounting Core. | CustomerID stays within O2C. ItemID bridges to Master Data. Sales invoices, shipments, and cash receipts post to GLEntry through the source-document trace. | AccountID is referenced by GLEntry rows from every business cycle. CostCenterID bridges to Organizational Planning. |
+| Header-and-line pattern | Not applicable (reference tables). | SalesOrder and SalesOrderLine, Shipment and ShipmentLine, SalesInvoice and SalesInvoiceLine. CashReceiptApplication settles receipts against invoices. | None. JournalEntry and GLEntry are linked only through the source-document trace, not a stored foreign key. |
+| Accounting depth | No transactions, but each item carries its inventory, revenue, and COGS account mappings. | Records the full revenue cycle from order through cash collection. The debits and credits themselves are posted in GLEntry. | Contains the complete general ledger. Every balance on the financial statements can be derived from GLEntry joined to Account. |
+| Complexity profile | Small and relatively static. Referenced by every other group. | The largest group, with deep relationship chains and sub-paths for pricing, services, commissions, and returns. | Simple in structure but deep in scope. GLEntry is the largest table in the database and the integration point for all other groups. |
+
+: Comparison of Three Charles River Table Groups {#tbl-03-02}
+
+### Complex Transaction Groups: Order-to-Cash
+
+The Order-to-Cash group demonstrates how a single business cycle creates a long chain of related tables. The O2C group traces the full revenue cycle from the customer's initial order through shipment, invoicing, cash collection, and even returns and credits.
+
+The core O2C path follows a sequence of relationships. The Customer table stores customer master data. Each customer can place many sales orders, recorded in the SalesOrder table. Each sales order contains one or more line items, recorded in the SalesOrderLine table. Each sales order line references an item from the Item table (Master Data group) through the ItemID foreign key. When the order is fulfilled, one or more shipments are created in the Shipment table, with individual shipped lines in the ShipmentLine table. Each shipped line is then billed on a line of a sales invoice, recorded in SalesInvoice and SalesInvoiceLine. The customer eventually pays through a CashReceipt, and the CashReceiptApplication table records which specific invoices each receipt settles.
+
+At every step in this chain, the same relational principles apply. Each table has a primary key that uniquely identifies its rows, and foreign keys link each table to the next table in the sequence. Most steps are one-to-many: one customer has many orders, one order has many lines, one order has many shipments. One step is different. Each shipment line is billed on at most one invoice line, so the relationship between ShipmentLine and SalesInvoiceLine is one-to-zero-or-one, and invoice lines for design services have no shipment line at all because nothing was shipped. The SalesOrderLine table also functions as a junction table between SalesOrder and Item, resolving the many-to-many relationship between orders and products. @fig-03-07 shows the complete core path.
+
+![Entity-Relationship Diagram for the Charles River O2C Core Path.](/visuals/svg/fig-03-07-o2c-core-er.svg){#fig-03-07 fig-alt="An ER diagram of ten tables: Customer, SalesOrder, Shipment, SalesInvoice, and CashReceipt across the top, and Item (Master Data), SalesOrderLine, ShipmentLine, SalesInvoiceLine, and CashReceiptApplication across the bottom. Crow's foot lines show the relationships, including Customer to SalesOrder (one to zero or many), SalesOrder to SalesOrderLine (one to one or many), Item to SalesOrderLine in amber as a cross-group link, ShipmentLine to SalesInvoiceLine (zero or one on both ends), and CashReceipt and SalesInvoice to the CashReceiptApplication junction table."}
+
+Beyond the core path, the O2C group includes tables for commercial pricing (PriceList, PriceListLine, PromotionProgram, PriceOverrideApproval), design service engagements and billing (ServiceEngagement, ServiceTimeEntry, ServiceBillingLine), sales commissions (SalesCommissionRate, SalesCommissionAccrual), and a returns chain (SalesReturn, CreditMemo, CustomerRefund). You do not need to memorize these tables now. The important point is that a single business cycle in a real organization generates a substantial network of related tables, and the ability to read the ER diagram is what allows you to navigate that network.
+
+### The Manufacturing Group
+
+The Manufacturing group provides a second example of a complex transactional cycle. It covers bills of material, routings, work centers, work orders, material usage, labor support, and cost variance analysis. Production planning itself, including demand forecasts and material requirements planning, sits in the separate Demand Planning and MRP group.
+
+The production path begins with the BillOfMaterial and BillOfMaterialLine tables, which define the components required to manufacture each product. BillOfMaterial identifies the finished product through ParentItemID, and each BillOfMaterialLine identifies a component through ComponentItemID, so a single Item table plays two roles. When production begins, a WorkOrder is created for a specific item. The WorkOrder connects to WorkOrderOperation records that define the manufacturing steps, and MaterialIssue and MaterialIssueLine records track the components consumed during production. When production is complete, ProductionCompletion and ProductionCompletionLine records move finished goods into inventory at standard cost. Finally, the WorkOrderClose record resolves any difference between standard cost and actual cost, posting manufacturing variances to the general ledger. @fig-03-08 shows these tables and their relationships.
+
+![Focused Entity-Relationship Diagram for the Charles River Manufacturing Group.](/visuals/svg/fig-03-08-manufacturing-er-focused.svg){#fig-03-08 fig-alt="An ER diagram of the Manufacturing group: BillOfMaterial and BillOfMaterialLine linked to Item (Master Data) through ParentItemID and ComponentItemID, WorkOrder at the center linked to WorkOrderOperation, MaterialIssue and MaterialIssueLine, ProductionCompletion and ProductionCompletionLine, and WorkOrderClose. WorkOrder to WorkOrderClose is exactly one to zero or one, ProductionCompletion to ProductionCompletionLine is exactly one to exactly one, and links to Item are drawn in amber."}
+
+The Manufacturing group illustrates a pattern common in complex table groups: the distinction between planning and execution tables. The BillOfMaterial defines what should happen (the recipe). The WorkOrder and its related tables record what actually happened (the production run). This distinction is important for cost accounting because variances arise when actual performance differs from the plan.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Manufacturing companies typically have the most complex database structures among the organizations that accountants serve. Production data introduces tables for bills of material, work centers, routing steps, material issues, and production completions, all of which connect to the financial data through cost records and variance postings. Cost accountants and auditors working in manufacturing frequently need to traverse relationships that span multiple table groups to answer questions such as "What was the actual cost of producing this item, and how does it compare to the standard cost?" The Charles River Manufacturing group prepares you for exactly this type of analysis.
+:::
+
+### The Accounting Core as the Integration Hub
+
+The Accounting Core group contains only three tables, but it is the most important group in the database because every other group flows into it. The Account table stores the chart of accounts. The JournalEntry table stores the headers for manually created journal entries, including the posting date, the entry type, the employee who created the entry, and the employee who approved it. The GLEntry table stores every debit and credit that makes up the general ledger.
+
+What makes the Accounting Core special is its role as the integration hub. Each business cycle posts to GLEntry through several kinds of documents. The O2C group posts through sales invoices, shipments, cash receipts, and cash applications. The P2P group posts through goods receipts, purchase invoices, and disbursement payments. The Manufacturing group posts through material issues, production completions, and work order closes. The Payroll and Time group posts through payroll summaries, payroll payments, and liability remittances. And the JournalEntry table handles manual entries such as accruals, reclassifications, and period-end adjustments. The financial activity of every business cycle ultimately flows into GLEntry, making it the single source of truth for the organization's financial position. @fig-03-09 shows the Accounting Core and its connections.
+
+![Entity-Relationship Diagram for the Charles River Accounting Core and Source Document Connections.](/visuals/svg/fig-03-09-accounting-core-er.svg){#fig-03-09 fig-alt="An ER diagram of Account, GLEntry, and JournalEntry. Account has a self-reference for its parent account and connects to GLEntry with a solid line. JournalEntry has a self-reference for reversing entries, links to Employee (Master Data) through its created-by and approved-by columns, and connects to GLEntry through a dashed amber source-document trace. CostCenter (Organizational Planning) links to GLEntry. Dashed amber lines connect five source tables at the bottom (SalesInvoice, Shipment, PurchaseInvoice, MaterialIssue, and PayrollPayment) to GLEntry."}
+
+This design means that every balance reported on the financial statements can be verified by querying the GLEntry table. Revenue can be traced back to sales invoices. Cost of goods sold can be traced back to shipments and manufacturing close records. Payroll expense can be traced back to payroll postings. The source-document trace in GLEntry makes all of this possible without requiring the analyst to know in advance which business cycle generated a particular entry.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+The source-document trace in GLEntry uses the SourceDocumentType and SourceDocumentID columns to link entries to their originating documents. This is not a standard foreign key relationship because a foreign key can reference only one table, while a single SourceDocumentID column might reference a SalesInvoice, a PurchaseInvoice, or a JournalEntry depending on the SourceDocumentType value. The link therefore has to be tested rather than trusted. In the Charles River data, a small number of ledger rows typed as PayrollPayment point to payment records that do not exist, which is exactly the kind of exception such a test would reveal. In the SQL chapters of Part III, you will write queries that check whether every GLEntry with a given SourceDocumentType has a valid corresponding record in the expected source table.
+:::
+
+### Comparing Simple and Complex Table Groups
+
+Looking across the Master Data, O2C, Manufacturing, and Accounting Core groups together reveals how the relational model adapts to business functions of different sizes and complexities within a single company. Several patterns emerge from the comparison.
+
+The first pattern is that table group complexity increases with process complexity. Master Data stores relatively static reference information in a handful of tables. The O2C group, the largest in the database, captures a transactional cycle that spans pricing, ordering, shipping, invoicing, commissions, returns, and cash collection. The Manufacturing group covers the production process from bills of material through cost variance analysis. The number of tables reflects the number of distinct events and entities the business process involves.
+
+The second pattern is that the same relational principles apply at every scale. A foreign key in the Master Data group works exactly the same way as a foreign key in the O2C group. A one-to-many relationship between Customer and SalesOrder in the largest group follows the same rules as a one-to-many relationship between Account and GLEntry in one of the smallest. The SQL syntax, the Power BI modeling techniques, and the Excel lookup functions you will learn all operate on these same relational foundations regardless of group size.
+
+The third pattern is that cross-group bridge keys tie the entire database together. ItemID connects Master Data to O2C, P2P, and Manufacturing. AccountID connects the Accounting Core to every group that posts to the general ledger. EmployeeID connects Master Data to Payroll and Time, O2C (through sales representatives), and the Accounting Core (through the employees who create and approve journal entries). These bridge keys are what make it possible to ask questions that span multiple business functions, such as "What is the total cost of manufacturing a specific item, and how does it compare to the revenue that item generated?"
+
+
+{{< include _tutorial-01.qmd >}}
+
+
+{{< include _tutorial-02.qmd >}}
+
+
+## Looking Ahead
+
+This chapter has introduced the relational database model and shown you how accounting data is organized within it. You have learned how tables, rows, columns, and data types store information, how primary keys and foreign keys create relationships between tables, and how Entity-Relationship diagrams make these structures visible. You have seen the difference between the relationships a database is designed around and the constraints it enforces, examined the Charles River database design across multiple table groups, and traced how cross-group bridge keys and the source-document trace connect operational activity to the posted general ledger.
+
+The next chapter opens Part II, where you will begin working with data directly. It introduces Excel as an analytical tool and teaches you to organize accounting data in Excel Tables, apply sorting and filtering, and use conditional formatting to identify patterns. The relational concepts from this chapter will remain in the background as you work, because the data you import into Excel comes from the same tables and relationships you have just studied.
+
+
+
+{{< include _summary.qmd >}}
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

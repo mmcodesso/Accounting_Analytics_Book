@@ -1,0 +1,109 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** In a relational database, which of the following best describes the role of a primary key?
+
+A.  It uniquely identifies each row in a table and cannot be duplicated or left blank.
+B.  It stores the most important data value in the table.
+C.  It connects one table to another by referencing a column in a different table.
+D.  It defines the data type for all columns in the table.
+
+**2.** The CustomerID column appears in both the Charles River Customer table and the SalesOrder table. In the SalesOrder table, this column functions as a:
+
+A.  Primary key
+B.  Foreign key
+C.  Composite key
+D.  Data type
+
+**3.** An ER diagram shows a line between two tables. The line has a single bar on one end and a crow's foot on the other end. This notation represents which type of relationship?
+
+A.  One-to-one
+B.  One-to-many
+C.  Many-to-many
+D.  The notation does not indicate cardinality
+
+**4.** The Charles River SalesOrderLine table contains foreign keys to both SalesOrder and Item. This table exists because:
+
+A.  It stores the primary key of the SalesOrder table.
+B.  It is required for every database to have at least one table with two foreign keys.
+C.  It stores customer contact information for each order.
+D.  It resolves a many-to-many relationship between sales orders and items.
+
+**5.** A cost accountant wants to compare standard item costs to actual production costs and analyze manufacturing variances. Which Charles River table group is best suited for this analysis?
+
+A.  The O2C group, because it contains product pricing data in SalesOrderLine
+B.  The Accounting Core group, because it contains a complete general ledger
+C.  The Manufacturing group, because it contains WorkOrder, ProductionCompletion, and WorkOrderClose tables with standard cost and variance data
+D.  The Master Data group, because the Item table contains StandardCost and ListPrice
+
+**6.** In the Charles River database, the Account table contains a column called ParentAccountID that references another row in the same Account table. This is an example of a:
+
+A.  Foreign key referencing a different table
+B.  Cross-group bridge key
+C.  Self-referencing relationship
+D.  Many-to-many relationship
+
+**7.** An auditor wants to prepare a trial balance directly from the Charles River database. Which tables provide the necessary data?
+
+A.  Account and GLEntry from the Accounting Core group
+B.  SalesOrder and SalesOrderLine from the O2C group
+C.  WorkOrder and ProductionCompletion from the Manufacturing group
+D.  Item and Warehouse from the Master Data group
+
+**8.** The Charles River SQLite file declares a primary key for every table but declares no foreign key constraints. What does this mean for an analyst who plans to join SalesOrder to Customer?
+
+A.  The join will fail because the relationship is not declared in the file.
+B.  The database automatically prevents orphaned orders, so no testing is needed.
+C.  The relationship can still be used in the join, but the analyst should test that every CustomerID in SalesOrder matches a customer, because nothing in the file enforces it.
+D.  CustomerID must first be converted to text before the two tables can be joined.
+
+**9.** A relational database enforces referential integrity. This means that:
+
+A.  Every table must contain at least one foreign key.
+B.  Primary key values can be duplicated as long as the duplicates are in different tables.
+C.  Tables without relationships are automatically deleted from the database.
+D.  Every foreign key value must correspond to an existing primary key value in the referenced table.
+
+**10.** An analyst joins the Charles River Customer table to SalesOrder and then to SalesOrderLine. One customer has 10 orders, and those 10 orders contain a total of 45 line items. How many rows will this customer contribute to the joined result?
+
+A.  1 row
+B.  10 rows
+C.  45 rows
+D.  55 rows
+
+**11.** Which of the following accounting structures is represented in a database as a self-referencing table where child rows point to parent rows within the same table?
+
+A.  The chart of accounts hierarchy
+B.  The general ledger
+C.  The trial balance
+D.  The accounts receivable sub-ledger
+
+**12.** The Charles River GLEntry table uses SourceDocumentType and SourceDocumentID to link general ledger entries to their source documents. This design differs from a standard foreign key because:
+
+A.  It uses two columns instead of one.
+B.  It can reference a different table depending on the SourceDocumentType value, so no single foreign key constraint can describe it.
+C.  It stores the amount of the source document rather than its key.
+D.  It is only used for journal entries and not for other transaction types.
+
+**13.** Which of the following is the best definition of a relational database?
+
+A.  A data storage system that organizes information into tables connected through defined relationships using primary and foreign keys
+B.  A database that stores all data in a single large table
+C.  A spreadsheet with multiple worksheets
+D.  A database that requires SQL to access its data
+
+**14.** In a database that enforces data types, a column defined as INTEGER could store which of the following values?
+
+A.  "Accounts Receivable"
+B.  2024-03-15
+C.  99.73
+D.  4500
+
+**15.** The Charles River Master Data group has only a few tables, while the Order-to-Cash group is the largest table group in the database. Which of the following best explains this difference?
+
+A.  The O2C group is a newer part of the database and uses more modern design principles.
+B.  The O2C group captures a complex transactional cycle spanning pricing, ordering, shipping, invoicing, commissions, returns, and cash collection, each of which requires its own set of tables.
+C.  The Master Data group contains errors that should have been stored in additional tables.
+D.  The number of tables is arbitrary and has no relationship to the complexity of the business process.
+

@@ -43,9 +43,17 @@ chapters/
     chapter.qmd
     _tutorial-01.qmd
     _tutorial-02.qmd
-    ...same supporting files (_references.qmd to be added)
+    ...same supporting files
   03-accounting-data-environment/
     chapter.qmd
+    ...same supporting files as chapter 1
+    _tutorial-01.qmd
+    _tutorial-02.qmd
+    _summary.qmd
+    _key-terms.qmd
+    _multiple-choice.qmd
+    _exercises.qmd
+    _further-reading.qmd
 front-matter/
   preface.qmd
   to-the-student.qmd
@@ -63,7 +71,8 @@ address redirects to the moved page. Book download links use project-root paths
 (`/downloads/book-latest.pdf`, etc.) to match the publishing workflow.
 Visuals and styles remain in their shared directories. The downloads page links
 to the companion dataset's releases.
-Chapter 3 is a placeholder; add companion files when those sections are written.
+Chapter 3 follows the same split structure, with two tutorials and five supporting
+sections. Add `_references.qmd` when its separate reference list is written.
 
 ## Editing a chapter
 
@@ -122,6 +131,8 @@ rather than typing "Figure 1.3", so numbers stay correct when figures move.
 Caption tables with a line such as `: Title {#tbl-02-01}` directly after the
 table, and refer to them as `@tbl-02-01`. Quarto numbers them and keeps each
 caption with its table in the PDF.
+Place each table inline in `chapter.qmd`, right after the paragraph that
+introduces it; tables are not kept in separate files.
 
 Use project-root paths for shared assets, for example
 `![Caption](/visuals/svg/figure.svg)`. Paths within an included file are resolved
