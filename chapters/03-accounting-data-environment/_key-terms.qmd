@@ -8,7 +8,7 @@
 
 **Composite key.** A primary key made up of two or more columns that together uniquely identify each row. Every Charles River table uses a single-column surrogate key instead, but composite keys are common in other accounting systems.
 
-**Cross-group bridge key.** A column that appears in tables across different table groups within a database, enabling joins that span business functions. In the Charles River database, ItemID connects Master Data to O2C, P2P, and Manufacturing, and AccountID connects the Accounting Core to all groups that post to the general ledger.
+**Cross-group bridge key.** A column that appears in tables across different table groups within a database, enabling joins that span business functions. In the Charles River database, ItemID connects Master Data to O2C, P2P, Manufacturing, and the planning tables, and AccountID connects the Accounting Core to all groups that post to the general ledger.
 
 **Crow's foot notation.** A visual notation system used in Entity-Relationship diagrams to indicate cardinality and optionality. A bar represents "one," a three-pronged fork represents "many," and a circle represents "zero."
 
@@ -28,25 +28,27 @@
 
 **One-to-many relationship.** A relationship in which one row in the first table can be associated with many rows in the second table, but each row in the second table is associated with only one row in the first table. This is the most common relationship type in accounting databases.
 
+**One-to-one relationship.** A relationship in which each row in one table is associated with at most one row in the other table. In the Charles River database, a WorkOrder has zero or one WorkOrderClose record, because a work order is closed at most once.
+
 **Optionality.** The property of a relationship that specifies whether a row must participate in it. In crow's foot notation, a circle marks an optional relationship, such as a customer who has not yet placed a sales order.
 
 **Primary key.** A column, or combination of columns, that uniquely identifies each row in a table. No two rows can share the same primary key value, and the value cannot be blank.
 
 **Referential integrity.** The requirement that every foreign key value corresponds to an existing primary key value in the referenced table. A database can enforce it through declared foreign key constraints. The Charles River file declares none, so analysts test for orphaned records instead.
 
-**Relational database.** A system that stores data in tables connected to one another through primary and foreign keys. The Charles River database is a relational database provided in SQLite format.
+**Relational database.** A system that stores data in tables connected to one another through primary and foreign keys. The Charles River database is a relational database provided in SQLite format, and its relationships are logical rather than declared: the file defines its primary keys but not its foreign keys.
 
 **Row.** A single record within a database table, representing one instance of the entity or event the table describes. Each row in the Charles River SalesOrder table represents one customer order.
 
 **Self-referencing relationship.** A relationship in which a foreign key in a table references the primary key of the same table, creating a hierarchy within a single table. The Charles River Account table uses ParentAccountID to define the parent-child structure of the chart of accounts, and the Employee table uses ManagerID to link each employee to a manager.
 
-**Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it. In the Charles River database, GLEntry uses SourceDocumentType, SourceDocumentID, and SourceLineID to identify the originating document in any business cycle, a logical link that points to a different table depending on SourceDocumentType.
+**Source-to-ledger traceability.** The ability to trace a general ledger entry back to the business document that created it. In the Charles River database, GLEntry uses SourceDocumentType, SourceDocumentID, and SourceLineID to identify the originating document in any business cycle, a logical link that points to a different table depending on SourceDocumentType.
 
 **Surrogate key.** A primary key with no business meaning that exists only to identify rows, usually a sequential integer. Every Charles River table uses a surrogate key, such as SalesOrderID or AccountID.
 
 **Table.** The fundamental storage unit in a relational database, organized into rows and columns. Each table stores information about one type of entity or event, such as customers, orders, or general ledger entries.
 
-**Table group.** A named set of related tables within the Charles River database that corresponds to a business process or functional area. The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+**Table group.** A named set of related tables within the Charles River database that corresponds to a business process or functional area. The groups are a documentation convention: the SQLite file itself does not record which group a table belongs to, so @tbl-01-03 is the reference for group membership.
 
-**Unique constraint.** A rule that prevents two rows in a table from having the same value in a column. The Charles River database applies unique constraints to document numbers such as SalesInvoice.InvoiceNumber and JournalEntry.EntryNumber, in addition to its primary keys.
+**Unique constraint.** A rule that prevents two rows in a table from having the same value in a column. The Charles River database enforces unique constraints on document numbers such as SalesInvoice.InvoiceNumber and JournalEntry.EntryNumber through unique indexes, in addition to its primary keys.
 

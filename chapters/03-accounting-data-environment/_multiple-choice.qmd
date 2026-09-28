@@ -34,7 +34,7 @@ D.  It resolves a many-to-many relationship between sales orders and items.
 
 A.  The O2C group, because it contains product pricing data in SalesOrderLine
 B.  The Accounting Core group, because it contains a complete general ledger
-C.  The Manufacturing group, because it contains WorkOrder, ProductionCompletion, and WorkOrderClose tables with standard cost and variance data
+C.  The Manufacturing group, because it contains WorkOrder, ProductionCompletionLine, and WorkOrderClose tables with standard cost and variance data
 D.  The Master Data group, because the Item table contains StandardCost and ListPrice
 
 **6.** In the Charles River database, the Account table contains a column called ParentAccountID that references another row in the same Account table. This is an example of a:

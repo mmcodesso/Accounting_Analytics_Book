@@ -512,7 +512,8 @@ def fig_03_10() -> Diagram:
     d.text(f"<b>Tracing one sale.</b> Steps 1 to 4 follow invoice {inv[1]} back through the "
            "Order-to-Cash tables. Step 5 uses the source-document trace to find its ledger "
            "postings, and step 6 classifies the revenue posting. A and B show the other postings "
-           "the same sale creates.", RX, 0, RW, 110)
+           "the same sale creates. The cards show account numbers, which you find by looking up "
+           "each posting's AccountID in the Account table.", RX, 0, RW, 150)
     return d
 
 

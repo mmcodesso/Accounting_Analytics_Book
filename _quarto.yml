@@ -4,6 +4,7 @@ project:
     - python scripts/export_drawio_svgs.py
 
 filters:
+  - filters/strip-comments.lua
   - filters/pdf-figures.lua
 
 book:
@@ -23,6 +24,7 @@ book:
         - chapters/01-role-of-analytics/chapter.qmd
         - chapters/02-understanding-data/chapter.qmd
         - chapters/03-accounting-data-environment/chapter.qmd
+        - cases/part-1-case.qmd
     - part: "Accounting Analytics with Excel"
     - part: "Accounting Analytics with SQL"
     - part: "Data Visualization and Power BI"

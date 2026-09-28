@@ -127,7 +127,7 @@ def fig_01_04() -> Diagram:
                   "", GRAY_TINT, dashed=True, body_h=60)
             y += 88 + 12
     right = [
-        ("Fixed Assets and Financing", "FixedAsset, DebtAgreement, ...", "Posts through journal entries", TEAL),
+        ("Fixed Assets and Financing", "FixedAsset, DebtAgreement, ...", "Posts through purchase invoices and journal entries", TEAL),
         ("Master Data", "Item, Warehouse, Employee", "Shared keys: ItemID, EmployeeID", GRAY_TINT),
         ("Organizational Planning", "CostCenter, Budget, BudgetLine", "Shared keys: CostCenterID, AccountID", GRAY_TINT),
         ("Demand Planning and MRP", "DemandForecast, InventoryPolicy, ...", "Shared key: ItemID", GRAY_TINT),

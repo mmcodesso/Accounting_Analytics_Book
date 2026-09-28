@@ -34,7 +34,7 @@
 
 **Structured data.** Data organized into a predefined format of rows and columns, where each column has a defined data type. The Charles River dataset contains structured data throughout.
 
-**Sub-ledger.** A detailed record for a specific category of accounts that feeds summary totals to the general ledger. The accounts receivable sub-ledger and accounts payable sub-ledger are common examples. In the Charles River dataset, the O2C and P2P table groups function as sub-ledgers.
+**Sub-ledger.** A detailed record for a specific category of accounts that feeds summary totals to the general ledger. The accounts receivable sub-ledger and accounts payable sub-ledger are common examples. In the Charles River dataset, tables such as SalesInvoice and CashReceiptApplication (accounts receivable) and PurchaseInvoice and DisbursementPayment (accounts payable) function as sub-ledgers.
 
 **Tidy data.** A dataset organized so that each variable occupies its own column, each observation occupies its own row, and each type of observational unit forms its own table. Tidy data aligns with the input requirements of analytical tools such as PivotTables, SQL, and Power BI.
 

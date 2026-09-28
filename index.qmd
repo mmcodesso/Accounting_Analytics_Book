@@ -17,9 +17,9 @@ The book is designed for undergraduate and graduate accounting and business stud
 
 ## What This Book Covers {.unnumbered}
 
-The chapters of the book are organized into five parts. Part I establishes the conceptual foundations of accounting analytics, including data types, data quality, and the relational database model. Part II teaches data preparation, descriptive analytics, statistical modeling, and audit testing in Microsoft Excel. Part III introduces SQL for querying relational databases, joining tables, performing aggregations, and conducting population-level audit analytics. Part IV covers data visualization principles and interactive dashboard design in Microsoft Power BI. Part V integrates all three tools in applied projects spanning financial reporting analytics, cost and management accounting, forensic accounting, and emerging technologies.
+The chapters of the book are organized into five parts. Part I establishes the conceptual foundations of accounting analytics, including data types, data quality, and the relational database model, and closes with a case that prepares the company's data for analysis. Part II teaches data preparation, descriptive analytics, statistical modeling, and audit testing in Microsoft Excel. Part III introduces SQL for querying relational databases, joining tables, performing aggregations, and conducting population-level audit analytics. Part IV covers data visualization principles and interactive dashboard design in Microsoft Power BI. Part V integrates all three tools in applied projects spanning financial reporting analytics, cost and management accounting, forensic accounting, and emerging technologies.
 
-The book is under development. Chapters are published as they are completed, and the Downloads page always provides the latest version of the book.
+The book is under development. Chapters are published as they are completed, and the [Downloads](#sec-downloads) page always provides the latest version of the book.
 
 
 ## Where to Start {.unnumbered}

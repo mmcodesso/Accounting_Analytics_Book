@@ -38,11 +38,11 @@
 
 **Relational database.** A system that stores data in tables connected to one another through primary and foreign keys. The Charles River dataset is provided as a relational database in SQLite format, as well as in Excel workbook and CSV formats.
 
-**Source-to-ledger traceability.** The ability to trace any general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.
+**Source-to-ledger traceability.** The ability to trace a general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.
 
 **SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. Part III of this book teaches SQL using the Charles River SQLite database.
 
 **SQLite.** A lightweight relational database system that stores the entire database in a single file. This book uses SQLite because it requires no server installation and runs on any operating system.
 
-**Table group.** A named set of related tables within the Charles River database that corresponds to a business process or functional area. The table groups are Accounting Core, Order-to-Cash, Procure-to-Pay, Manufacturing, Payroll and Time, Fixed Assets and Financing, Master Data, Organizational Planning, and Demand Planning and MRP.
+**Table group.** A named set of related tables within the Charles River database that corresponds to a business process or functional area. Examples include Order-to-Cash, Procure-to-Pay, and the Accounting Core, and @tbl-01-03 lists every group with its key tables.
 

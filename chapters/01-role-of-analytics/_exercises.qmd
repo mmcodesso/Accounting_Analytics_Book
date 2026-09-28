@@ -46,7 +46,7 @@
 
 **Exercise 1.3: Evaluating Table Groups for Cost Analysis**
 
-**Table group:** Manufacturing, Organizational Planning, and Payroll
+**Table group:** Manufacturing, Organizational Planning, and Payroll and Time
 
 **Scenario.** You are a management accountant at Charles River. Your controller has asked you to assess which table groups contain the information needed for a product cost analysis and a departmental budget review.
 
@@ -58,7 +58,7 @@
 
 (3) Determine which group is better suited for product-level cost analysis (comparing standard cost to actual production cost) and which is better suited for departmental budget analysis (comparing budgeted amounts to actual spending by department). Explain your reasoning in three to five sentences.
 
-(4) Identify one managerial accounting question that requires data from both the Manufacturing group and the Payroll group, and explain what tables from each group you would need.
+(4) Identify one managerial accounting question that requires data from both the Manufacturing group and the Payroll and Time group, and explain what tables from each group you would need.
 
 **Deliverable.** A written assessment that compares the cost analysis capabilities of the Manufacturing and Organizational Planning table groups, with specific references to tables and columns.
 

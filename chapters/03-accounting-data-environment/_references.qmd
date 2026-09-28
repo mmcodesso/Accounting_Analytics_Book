@@ -2,9 +2,9 @@
 
 ## References
 
-American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*. AICPA.
+American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*.
 
-American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*. AICPA & NASBA.
+American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*.
 
 Codd, E. F. (1970). A relational model of data for large shared data banks. *Communications of the ACM*, *13*(6), 377–387.
 

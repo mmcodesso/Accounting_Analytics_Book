@@ -142,7 +142,7 @@ def fig_02_03() -> Diagram:
     return d
 
 
-def fig_02_04() -> Diagram:
+def fig_02_06() -> Diagram:
     d = Diagram("Messy Versus Tidy Data")
     budgets = q(
         "SELECT cc.CostCenterName, b.Month, b.BudgetAmount FROM Budget b "
@@ -210,6 +210,6 @@ FIGURES = {
     "fig-02-01-spectrum-data-structure": fig_02_01,
     "fig-02-02-sources-accounting-data": fig_02_02,
     "fig-02-03-data-quality-problems": fig_02_03,
-    "fig-02-04-messy-vs-tidy-data": fig_02_04,
+    "fig-02-06-messy-vs-tidy-data": fig_02_06,
 }
 

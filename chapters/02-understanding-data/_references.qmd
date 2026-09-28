@@ -2,7 +2,7 @@
 
 ## References
 
-American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*. AICPA.
+American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*.
 
 Fisher, I. E., Garnsey, M. R., & Hughes, M. E. (2016). Natural language processing in accounting, auditing and finance: A synthesis of the literature with a roadmap for future research. *Intelligent Systems in Accounting, Finance and Management*, *23*(3), 157–214.
 

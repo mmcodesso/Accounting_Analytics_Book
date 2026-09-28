@@ -49,6 +49,8 @@ chapters/
     _tutorial-01.qmd
     _tutorial-02.qmd
     ...same supporting files
+cases/
+  part-1-case.qmd
 front-matter/
   preface.qmd
   to-the-student.qmd
@@ -56,6 +58,8 @@ front-matter/
   downloads.qmd
 index.qmd
 ```
+
+Each Part closes with a comprehensive case in `cases/part-N-case.qmd`, registered in `_quarto.yml` after the Part's last chapter. Its requirements build on every chapter in the Part, and the expected answers for instructors sit in hidden comments after each requirement.
 
 Edit the homepage content and metadata directly in the root `index.qmd`, and
 edit the downloads page in `front-matter/downloads.qmd`. The root `index.qmd` is
@@ -82,8 +86,8 @@ Open only the file relevant to the task, adding other files as needed for contex
 | Further reading | `_further-reading.qmd` |
 | Full APA 7 list of every source cited in the chapter | `_references.qmd` |
 
-`chapter.qmd` includes each tutorial where it belongs in the narrative, using a
-standalone directive surrounded by blank lines:
+`chapter.qmd` includes each tutorial right after the section it practices, at the
+end of a `##` section, using a standalone directive surrounded by blank lines:
 
 ```markdown
 {{< include _tutorial-01.qmd >}}

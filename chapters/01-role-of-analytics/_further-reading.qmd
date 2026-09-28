@@ -4,7 +4,7 @@
 
 Appelbaum, D., Kogan, A., & Vasarhelyi, M. A. (2017). Big data and analytics in the modern audit engagement: Research needs. *Auditing: A Journal of Practice & Theory*, *36*(4), 1–27. This paper outlines a research agenda for data analytics in auditing and provides a framework for understanding how the analytical techniques taught in this book relate to the evolving audit process. The paper's discussion of population-based testing versus sampling is particularly relevant to the arguments presented in this chapter.
 
-Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500. This article provides an accessible overview of how audit practice is changing due to data analytics and identifies specific opportunities for auditors who develop analytical skills. It is useful reading for students interested in the audit perspective.
+Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500. This article provides an accessible overview of how audit practice is changing due to data analytics and identifies specific opportunities for auditors who develop analytical skills. It is useful reading if you are interested in the audit perspective.
 
 International Accounting Education Standards Board. (2019). *Revisions to IES 2, 3, 4, and 8*. International Federation of Accountants. These revisions to the International Education Standards add information and communications technology learning outcomes to the education of aspiring and practicing professional accountants. They show that technology and analytics competencies are recognized by international standard setters as part of the core preparation of every accountant.
 

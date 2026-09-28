@@ -12,7 +12,7 @@
 
 **Requirements.**
 
-(1) Open the Charles River workbook in Excel and select one purchase invoice from the PurchaseInvoice worksheet that has a single line in the PurchaseInvoiceLine worksheet. Record its PurchaseInvoiceID, InvoiceNumber, SupplierID, and GrandTotal.
+(1) Open the Charles River workbook in Excel and select one purchase invoice from the PurchaseInvoice worksheet whose Status is Paid and that has a single line in the PurchaseInvoiceLine worksheet. Record its PurchaseInvoiceID, InvoiceNumber, SupplierID, and GrandTotal.
 
 (2) Follow the foreign keys on the invoice line. Use GoodsReceiptLineID to find the goods receipt line and its GoodsReceipt, and use POLineID to find the purchase order line and its PurchaseOrder. Look up the supplier in the Supplier worksheet. Write down each connecting key and the table it leads to. Note that a small number of invoice lines have no goods receipt line because they are linked to an accrual journal entry instead, so choose an invoice whose line has a GoodsReceiptLineID.
 
@@ -35,7 +35,7 @@
 
 (2) For each pair of connected tables in the revenue cycle path, identify the foreign key that creates the connection and state the cardinality and optionality of the relationship, reading both ends of each line.
 
-(3) Identify what revenue cycle information requires joining to the Accounting Core group. Consider whether the O2C tables alone record the general ledger postings, account classifications, or cost center assignments. For each gap you identify, explain which Accounting Core table and column would provide the missing information.
+(3) Identify what revenue cycle information requires joining to the Accounting Core group. Consider whether the O2C tables alone record the general ledger postings and the account classifications, and note which O2C table already carries a cost center. For each gap you identify, explain which Accounting Core table and column would provide the missing information.
 
 (4) Prepare a brief written summary (one page) that could serve as a data dictionary excerpt for the revenue-related tables in Charles River.
 

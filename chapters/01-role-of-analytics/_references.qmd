@@ -2,7 +2,7 @@
 
 ## References
 
-American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*. AICPA & NASBA.
+American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*.
 
 Appelbaum, D., Kogan, A., & Vasarhelyi, M. A. (2017). Big data and analytics in the modern audit engagement: Research needs. *Auditing: A Journal of Practice & Theory*, *36*(4), 1–27.
 
@@ -10,7 +10,7 @@ Cokins, G. (2013). Top 7 trends in management accounting. *Strategic Finance*, *
 
 Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500.
 
-Institute of Management Accountants. (2019). *IMA management accounting competency framework*. IMA.
+Institute of Management Accountants. (2019). *IMA management accounting competency framework*.
 
 Institute of Management Accountants & Robert Half. (2016). *Building a team to capitalize on the promise of big data*. IMA.
 
@@ -20,7 +20,7 @@ Kokina, J., & Davenport, T. H. (2017). The emergence of artificial intelligence:
 
 Provost, F., & Fawcett, T. (2013). Data science and its relationship to big data and data-driven decision making. *Big Data*, *1*(1), 51–59.
 
-Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). PCAOB.
+Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007).
 
 Richins, G., Stapleton, A., Stratopoulos, T. C., & Wong, C. (2017). Big data analytics: Opportunity or threat for the accounting profession? *Journal of Information Systems*, *31*(3), 63–79.
 

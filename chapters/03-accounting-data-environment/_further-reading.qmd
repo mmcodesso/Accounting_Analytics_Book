@@ -2,7 +2,7 @@
 
 ## Further Reading
 
-American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*. AICPA. This professional guidance document includes recommendations for auditors on understanding client data structures before performing data analytics procedures. The guide's discussion of data extraction planning and relationship mapping aligns with the ER diagram reading skills taught in this chapter.
+American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*. This professional guidance document includes recommendations for auditors on understanding client data structures before performing data analytics procedures. The guide's discussion of data extraction planning and relationship mapping aligns with the ER diagram reading skills taught in this chapter.
 
 Codd, E. F. (1970). A relational model of data for large shared data banks. *Communications of the ACM*, *13*(6), 377–387. This paper introduced the relational database model that underlies virtually every modern business information system. Although the paper is technical, the core ideas of organizing data into tables with defined relationships are accessible, and understanding their origin helps explain why relational databases work the way they do. This is one of the most influential papers in the history of computing.
 
