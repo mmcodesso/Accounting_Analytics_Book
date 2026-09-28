@@ -35,7 +35,7 @@ Understanding how accounting data is organized in a database is a prerequisite f
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-The profession now treats database knowledge as part of an accountant's core preparation. The model curriculum that the American Institute of Certified Public Accountants (AICPA) and the National Association of State Boards of Accountancy (NASBA) developed for aspiring CPAs expects newly licensed accountants to understand the attributes of data repositories and the capabilities of tools that extract and analyze data from them (AICPA & NASBA, 2021). Accounting educators have responded by building information systems and database competencies into courses across the curriculum (Sledgianowski et al., 2017). Auditors who can read a database diagram and identify the tables relevant to a procedure work more efficiently during fieldwork.
+The profession now treats database knowledge as part of an accountant's core preparation. The model curriculum that the American Institute of Certified Public Accountants (AICPA) and the National Association of State Boards of Accountancy (NASBA) developed for aspiring CPAs expects newly licensed accountants to understand the attributes of data repositories and the capabilities of tools that extract and analyze data from them (AICPA & NASBA, 2021). Accounting departments have responded by building technology and data analytics skills into their curricula, although the courses and methods vary from program to program (Andiola et al., 2020). Auditors who can read a database diagram and identify the tables relevant to a procedure work more efficiently during fieldwork.
 :::
 
 
@@ -145,7 +145,7 @@ ER diagrams serve the same purpose for a database that a chart of accounts serve
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Auditors routinely request ER diagrams or data dictionaries from clients during the planning phase of an engagement. Understanding the client's database structure helps the audit team identify which tables contain the data needed for analytical procedures, which relationships need to be traversed to connect transactions to their supporting details, and where potential data integrity risks exist. The AICPA's *Guide to Audit Data Analytics* recommends that auditors document their understanding of the client's data structure before performing data extraction (AICPA, 2017).
+Auditors routinely request ER diagrams or data dictionaries from clients during the planning phase of an engagement. Understanding the client's database structure helps the audit team identify which tables contain the data needed for analytical procedures, which relationships need to be traversed to connect transactions to their supporting details, and where potential data integrity risks exist. The AICPA's auditing standards require auditors to understand the client's information system, including its data, how information flows from the initiation of a transaction to the general ledger and the financial statements, and the IT environment that supports it (AICPA, 2021).
 :::
 
 

@@ -2,26 +2,36 @@
 
 ## References
 
-American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*.
+American Institute of Certified Public Accountants & Chartered Institute of Management Accountants. (2025). *Future-ready finance: Technology, productivity, and skills survey report*. <https://www.aicpa-cima.com/resources/download/future-ready-finance-technology-productivity-and-skills-survey-report>
 
-Appelbaum, D., Kogan, A., & Vasarhelyi, M. A. (2017). Big data and analytics in the modern audit engagement: Research needs. *Auditing: A Journal of Practice & Theory*, *36*(4), 1–27.
+American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*. <https://www.thiswaytocpa.com/collectedmedia/files/cpa-evolution-model-curriculum-update.pdf>
 
-Cokins, G. (2013). Top 7 trends in management accounting. *Strategic Finance*, *95*(6), 21–29.
+Appelbaum, D., Kogan, A., Vasarhelyi, M., & Yan, Z. (2017). Impact of business analytics and enterprise systems on managerial accounting. *International Journal of Accounting Information Systems*, *25*, 29–44. <https://doi.org/10.1016/j.accinf.2017.03.003>
 
-Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500.
+Askary, S., & Askarany, D. (2024). Analytical skills for accounting students in a data-driven job market: Australian evidence. *Accounting Research Journal*, *37*(6), 635–654. <https://doi.org/10.1108/ARJ-05-2024-0184>
 
-Institute of Management Accountants. (2019). *IMA management accounting competency framework*.
+Barr-Pulliam, D., Brown-Liburd, H. L., & Munoko, I. (2022). The effects of person-specific, task, and environmental factors on digital transformation and innovation in auditing: A review of the literature. *Journal of International Financial Management & Accounting*, *33*(2), 337–374. <https://doi.org/10.1111/jifm.12148>
 
-Institute of Management Accountants & Robert Half. (2016). *Building a team to capitalize on the promise of big data*. IMA.
+Bedford, D. S., Derichs, D., Hoozée, S., Malmi, T., Messner, M., Sinha, V. K., Van der Kolk, B., & Verbeeten, F. (2025). Digitalization of the finance function: Automation, analytics, and finance function effectiveness. *Management Accounting Research*, *67*, Article 100942. <https://doi.org/10.1016/j.mar.2025.100942>
 
-International Accounting Education Standards Board. (2019). *Revisions to IES 2, 3, 4, and 8*. International Federation of Accountants.
+Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500. <https://doi.org/10.1016/j.bushor.2015.05.002>
 
-Kokina, J., & Davenport, T. H. (2017). The emergence of artificial intelligence: How automation is changing auditing. *Journal of Emerging Technologies in Accounting*, *14*(1), 115–122.
+Elo, T., Kimpimäki, J.-P., Puumalainen, K., Sjögrén, H., & Pätäri, S. (2026). Mapping the skill landscape: Insights from accounting job advertisements. *Accounting Education*, *35*(5), 595–636. <https://doi.org/10.1080/09639284.2025.2488979>
 
-Provost, F., & Fawcett, T. (2013). Data science and its relationship to big data and data-driven decision making. *Big Data*, *1*(1), 51–59.
+Institute of Management Accountants. (2025). *IMA competency framework*. <https://www.imanet.org/career-resources/competency-framework>
 
-Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007).
+International Accounting Education Standards Board. (2019). *Revisions to IES 2, 3, 4 and 8*. International Federation of Accountants. <https://www.ifac.org/education/publications/revisions-ies-2-3-4-and-8>
 
-Richins, G., Stapleton, A., Stratopoulos, T. C., & Wong, C. (2017). Big data analytics: Opportunity or threat for the accounting profession? *Journal of Information Systems*, *31*(3), 63–79.
+Kokina, J., Blanchette, S., Davenport, T. H., & Pachamanova, D. (2025). Challenges and opportunities for artificial intelligence in auditing: Evidence from the field. *International Journal of Accounting Information Systems*, *56*, Article 100734. <https://doi.org/10.1016/j.accinf.2025.100734>
 
-Vasarhelyi, M. A., Kogan, A., & Tuttle, B. M. (2015). Big data in accounting: An overview. *Accounting Horizons*, *29*(2), 381–396.
+Law, K. K. F., & Shen, M. (2025). How does artificial intelligence shape audit firms? *Management Science*, *71*(5), 3641–3666. <https://doi.org/10.1287/mnsc.2022.04040>
+
+Provost, F., & Fawcett, T. (2013). Data science and its relationship to big data and data-driven decision making. *Big Data*, *1*(1), 51–59. <https://doi.org/10.1089/big.2013.1508>
+
+Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>
+
+Richins, G., Stapleton, A., Stratopoulos, T. C., & Wong, C. (2017). Big data analytics: Opportunity or threat for the accounting profession? *Journal of Information Systems*, *31*(3), 63–79. <https://doi.org/10.2308/isys-51805>
+
+Suarta, I. M., Suwintana, I. K., Sudiadnyani, I. G. A. O., & Sintadevi, N. P. R. (2024). Employability and digital technology: What skills employers want from accounting workers? *Accounting Education*, *33*(3), 274–295. <https://doi.org/10.1080/09639284.2023.2196665>
+
+Vasarhelyi, M. A., Kogan, A., & Tuttle, B. M. (2015). Big data in accounting: An overview. *Accounting Horizons*, *29*(2), 381–396. <https://doi.org/10.2308/acch-51071>

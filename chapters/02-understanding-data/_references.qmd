@@ -2,14 +2,22 @@
 
 ## References
 
-American Institute of Certified Public Accountants. (2017). *Guide to audit data analytics*.
+American Institute of Certified Public Accountants. (2020). *Audit evidence* (Statement on Auditing Standards No. 142). <https://www.aicpa-cima.com/resources/download/aicpa-statement-on-auditing-standards-no-142>
 
-Fisher, I. E., Garnsey, M. R., & Hughes, M. E. (2016). Natural language processing in accounting, auditing and finance: A synthesis of the literature with a roadmap for future research. *Intelligent Systems in Accounting, Finance and Management*, *23*(3), 157–214.
+American Institute of Certified Public Accountants. (2026). *Guide to audit data analytics*. <https://www.aicpa-cima.com/cpe-learning/publication/guide-to-audit-data-analytics>
 
-Grabski, S. V., Leech, S. A., & Schmidt, P. J. (2011). A review of ERP research: A future agenda for accounting information systems. *Journal of Information Systems*, *25*(1), 37–78.
+Azeroual, O., & Jha, M. (2021). Without data quality, there is no data migration. *Big Data and Cognitive Computing*, *5*(2), Article 24. <https://doi.org/10.3390/bdcc5020024>
 
-Redman, T. C. (2001). *Data quality: The field guide*. Digital Press.
+Bochkay, K., Brown, S. V., Leone, A. J., & Tucker, J. W. (2023). Textual analysis in accounting: What's next? *Contemporary Accounting Research*, *40*(2), 765–805. <https://doi.org/10.1111/1911-3846.12825>
 
-Wang, R. Y., & Strong, D. M. (1996). Beyond accuracy: What data quality means to data consumers. *Journal of Management Information Systems*, *12*(4), 5–33.
+Cai, L., & Zhu, Y. (2015). The challenges of data quality and data quality assessment in the big data era. *Data Science Journal*, *14*, Article 2. <https://doi.org/10.5334/dsj-2015-002>
 
-Wickham, H. (2014). Tidy data. *Journal of Statistical Software*, *59*(10), 1–23.
+Cao, L., & Zhu, H. (2013). Normal accidents: Data quality problems in ERP-enabled manufacturing. *Journal of Data and Information Quality*, *4*(3), 1–26. <https://doi.org/10.1145/2458517.2458519>
+
+Jans, M., Alles, M. G., & Vasarhelyi, M. A. (2014). A field study on the use of process mining of event logs as an analytical procedure in auditing. *The Accounting Review*, *89*(5), 1751–1773. <https://doi.org/10.2308/accr-50807>
+
+Wang, R. Y., & Strong, D. M. (1996). Beyond accuracy: What data quality means to data consumers. *Journal of Management Information Systems*, *12*(4), 5–33. <https://doi.org/10.1080/07421222.1996.11518099>
+
+Wickham, H. (2014). Tidy data. *Journal of Statistical Software*, *59*(10), 1–23. <https://doi.org/10.18637/jss.v059.i10>
+
+Yan, Z., & Moffitt, K. C. (2019). Contract analytics in auditing. *Accounting Horizons*, *33*(3), 111–126. <https://doi.org/10.2308/acch-52457>
