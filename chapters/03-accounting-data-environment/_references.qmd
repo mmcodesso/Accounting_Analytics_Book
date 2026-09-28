@@ -9,3 +9,5 @@ American Institute of Certified Public Accountants & National Association of Sta
 Andiola, L. M., Masters, E., & Norman, C. (2020). Integrating technology and data analytic skills into the accounting curriculum: Accounting department leaders' experiences and insights. *Journal of Accounting Education*, *50*, Article 100655. <https://doi.org/10.1016/j.jaccedu.2020.100655>
 
 Codd, E. F. (1970). A relational model of data for large shared data banks. *Communications of the ACM*, *13*(6), 377–387. <https://doi.org/10.1145/362384.362685>
+
+Daff, L. (2021). Employers' perspectives of accounting graduates and their world of work: Software use and ICT competencies. *Accounting Education*, *30*(5), 495–524. <https://doi.org/10.1080/09639284.2021.1935282>

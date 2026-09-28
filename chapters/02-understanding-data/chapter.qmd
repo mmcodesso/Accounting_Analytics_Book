@@ -202,7 +202,7 @@ Detecting these problems requires systematic tests rather than casual inspection
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-In professional practice, data quality assessment is often the first task in any analytics engagement. Audit teams perform data quality checks before running analytical procedures to ensure that the results will be reliable. Management accountants validate the data behind cost reports before presenting them to executives. The AICPA's *Guide to Audit Data Analytics* includes practical considerations for assessing the reliability of the data that an audit data analytic uses (AICPA, 2026). The data quality skills you develop in this chapter apply directly to that professional requirement.
+In professional practice, data quality assessment is often the first task in any analytics engagement. Audit teams perform data quality checks before running analytical procedures to ensure that the results will be reliable. Management accountants validate the data behind cost reports before presenting them to executives. Practitioners value these skills highly: in a survey of accounting professionals, public accountants and those working in industry valued skills in data management, data cleansing, and correcting inaccurate or incomplete data more than accounting educators did (Holmes & Douglass, 2022). The AICPA's *Guide to Audit Data Analytics* includes practical considerations for assessing the reliability of the data that an audit data analytic uses (AICPA, 2026). The data quality skills you develop in this chapter apply directly to that professional requirement.
 :::
 
 {{< include _tutorial-01.qmd >}}

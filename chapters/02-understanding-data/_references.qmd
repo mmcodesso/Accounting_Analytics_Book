@@ -14,6 +14,8 @@ Cai, L., & Zhu, Y. (2015). The challenges of data quality and data quality asses
 
 Cao, L., & Zhu, H. (2013). Normal accidents: Data quality problems in ERP-enabled manufacturing. *Journal of Data and Information Quality*, *4*(3), 1–26. <https://doi.org/10.1145/2458517.2458519>
 
+Holmes, A. F., & Douglass, A. (2022). Artificial intelligence: Reshaping the accounting profession and the disruption to accounting education. *Journal of Emerging Technologies in Accounting*, *19*(1), 53–68. <https://doi.org/10.2308/JETA-2020-054>
+
 Jans, M., Alles, M. G., & Vasarhelyi, M. A. (2014). A field study on the use of process mining of event logs as an analytical procedure in auditing. *The Accounting Review*, *89*(5), 1751–1773. <https://doi.org/10.2308/accr-50807>
 
 Wang, R. Y., & Strong, D. M. (1996). Beyond accuracy: What data quality means to data consumers. *Journal of Management Information Systems*, *12*(4), 5–33. <https://doi.org/10.1080/07421222.1996.11518099>

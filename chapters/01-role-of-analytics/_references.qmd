@@ -14,9 +14,17 @@ Barr-Pulliam, D., Brown-Liburd, H. L., & Munoko, I. (2022). The effects of perso
 
 Bedford, D. S., Derichs, D., Hoozée, S., Malmi, T., Messner, M., Sinha, V. K., Van der Kolk, B., & Verbeeten, F. (2025). Digitalization of the finance function: Automation, analytics, and finance function effectiveness. *Management Accounting Research*, *67*, Article 100942. <https://doi.org/10.1016/j.mar.2025.100942>
 
+Brink, W. D., & Stoel, M. D. (2019). Analytics knowledge, skills, and abilities for accounting graduates. In T. G. Calderon (Ed.), *Advances in accounting education: Teaching and curriculum innovations* (Vol. 22, pp. 23–43). Emerald Publishing. <https://doi.org/10.1108/S1085-462220190000022002>
+
+Choi, J. H., & Xie, C. L. (2026). Human + AI in accounting: Early evidence from the field. *Journal of Accounting Research*, *64*(3), 1333–1373. <https://doi.org/10.1111/1475-679x.70052>
+
 Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500. <https://doi.org/10.1016/j.bushor.2015.05.002>
 
 Elo, T., Kimpimäki, J.-P., Puumalainen, K., Sjögrén, H., & Pätäri, S. (2026). Mapping the skill landscape: Insights from accounting job advertisements. *Accounting Education*, *35*(5), 595–636. <https://doi.org/10.1080/09639284.2025.2488979>
+
+Franke, F., & Hiebl, M. R. W. (2023). Big data and decision quality: The role of management accountants' data analytics skills. *International Journal of Accounting & Information Management*, *31*(1), 93–127. <https://doi.org/10.1108/IJAIM-12-2021-0246>
+
+Hirsch, B., Seubert, A., & Sohn, M. (2015). Visualisation of data in management accounting reports: How supplementary graphs improve every-day management judgments. *Journal of Applied Accounting Research*, *16*(2), 221–239. <https://doi.org/10.1108/JAAR-08-2012-0059>
 
 Institute of Management Accountants. (2025). *IMA competency framework*. <https://www.imanet.org/career-resources/competency-framework>
 
@@ -26,12 +34,18 @@ Kokina, J., Blanchette, S., Davenport, T. H., & Pachamanova, D. (2025). Challeng
 
 Law, K. K. F., & Shen, M. (2025). How does artificial intelligence shape audit firms? *Management Science*, *71*(5), 3641–3666. <https://doi.org/10.1287/mnsc.2022.04040>
 
+Liew, A., Boxall, P., & Setiawan, D. (2022). The transformation to data analytics in Big-Four financial audit: What, why and how? *Pacific Accounting Review*, *34*(4), 569–584. <https://doi.org/10.1108/PAR-06-2021-0105>
+
 Provost, F., & Fawcett, T. (2013). Data science and its relationship to big data and data-driven decision making. *Big Data*, *1*(1), 51–59. <https://doi.org/10.1089/big.2013.1508>
 
 Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>
 
 Richins, G., Stapleton, A., Stratopoulos, T. C., & Wong, C. (2017). Big data analytics: Opportunity or threat for the accounting profession? *Journal of Information Systems*, *31*(3), 63–79. <https://doi.org/10.2308/isys-51805>
 
+Spraakman, G., Sanchez-Rodriguez, C., & Tuck-Riggs, C. A. (2021). Data analytics by management accountants. *Qualitative Research in Accounting & Management*, *18*(1), 127–147. <https://doi.org/10.1108/QRAM-11-2019-0122>
+
 Suarta, I. M., Suwintana, I. K., Sudiadnyani, I. G. A. O., & Sintadevi, N. P. R. (2024). Employability and digital technology: What skills employers want from accounting workers? *Accounting Education*, *33*(3), 274–295. <https://doi.org/10.1080/09639284.2023.2196665>
 
 Vasarhelyi, M. A., Kogan, A., & Tuttle, B. M. (2015). Big data in accounting: An overview. *Accounting Horizons*, *29*(2), 381–396. <https://doi.org/10.2308/acch-51071>
+
+Vitali, S., & Giuliani, M. (2024). Emerging digital technologies and auditing firms: Opportunities and challenges. *International Journal of Accounting Information Systems*, *53*, Article 100676. <https://doi.org/10.1016/j.accinf.2024.100676>
