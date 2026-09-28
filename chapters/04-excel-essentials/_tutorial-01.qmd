@@ -1,0 +1,103 @@
+## Guided Tutorial 4.1: Building the Furniture Analysis Workbook with Power Query
+
+**Context and objective.** In this tutorial, you will create the workbook in which you will analyze the controller's question. Instead of working in CharlesRiver.xlsx, you will start a new workbook and use Power Query to import the four Tables the analysis needs: the sales invoices, the invoice lines, the items Charles River sells, and the promotion programs. You will filter and trim the data before loading it, add two calculated columns with structured references, and build control totals that prove the imported data is complete. The master workbook is never changed, and the new workbook can be refreshed whenever the data is updated.
+
+**Prerequisites.** You need the desktop version of Microsoft Excel with Power Query (see the Watch out box earlier in this chapter) and the CharlesRiver.xlsx file provided with this textbook. You do not need to open CharlesRiver.xlsx, because Power Query reads it directly.
+
+**Step-by-step instructions.**
+
+**Step 1. Create the analysis workbook.** Open Excel and create a blank workbook. Save it as `Charles River Furniture Analysis.xlsx`, in the same folder as CharlesRiver.xlsx.
+
+**Step 2. Connect to CharlesRiver.xlsx and choose the Tables.** Power Query can read the workbook without opening it.
+
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and click **Import**.
+b. After a moment, the **Navigator** window lists everything the workbook contains. Each worksheet appears with a worksheet icon under its own name, such as SalesInvoiceLine, and each Excel Table appears with a table icon under its Table name, such as T17_SalesInvoiceLine.
+c. Select the **Select multiple items** check box, and then select four Tables: **T16_SalesInvoice**, **T17_SalesInvoiceLine**, **T44_Item**, and **T7_PromotionProgram**.
+d. Click one of them to see a preview of its data.
+e. Click **Transform Data**, not **Load**, so that you can shape the data before it reaches your workbook.
+
+@fig-04-02 shows the Navigator with the four Tables selected.
+
+![The Power Query Navigator for CharlesRiver.xlsx.](/visuals/svg/fig-04-02-power-query-navigator.svg){#fig-04-02 fig-alt="A mock of the Power Query Navigator for CharlesRiver.xlsx. The Select multiple items check box is checked. The list shows worksheets, such as SalesInvoiceLine, with a worksheet icon, and below them four checked Excel Tables with a table icon: T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram. T17_SalesInvoiceLine is selected, and the preview pane shows its first rows. The check box and the Transform Data button are outlined."}
+
+**Step 3. Rename the queries.** The Power Query Editor opens, with the four queries listed in the **Queries** pane on the left. Each query is named after its Table, such as T17_SalesInvoiceLine. Because the query name becomes the name of the Table that Power Query loads into your workbook, rename the queries now. Double-click each name in the **Queries** pane and type `SalesInvoice`, `SalesInvoiceLine`, `Item`, and `PromotionProgram`, respectively.
+
+**Step 4. Keep only the items Charles River sells.** The Item Table holds every item Charles River buys or sells, but the analysis needs only the items it sells. As you found in Tutorial 2.1, the items with a blank ListPrice are ones Charles River buys, such as raw materials, packaging, capital equipment, and operating services.
+
+a. Select the **Item** query.
+b. Click the filter button on the ListPrice column header.
+c. Clear the check box for the blank value, which Power Query shows as **(null)**, and click **OK**.
+
+**Step 5. Keep only the columns the analysis needs.** The analysis uses fewer than half of the Item Table's columns.
+
+a. With the **Item** query still selected, choose **Home > Choose Columns**.
+b. Clear **Select All Columns**, and select only ItemID, ItemCode, ItemName, ItemGroup, ItemType, StandardCost, ListPrice, UnitOfMeasure, SupplyMode, CollectionName, and LifecycleStatus.
+c. Click **OK**.
+d. Look at the **Applied Steps** list on the right.
+
+The **Applied Steps** list now ends with one step for the filter and one for the columns you kept, and you can click any step to see the data as it was at that point. The status bar at the bottom of the editor shows how many columns and rows remain, as in @fig-04-03.
+
+![The Item Query in the Power Query Editor.](/visuals/svg/fig-04-03-power-query-editor-item.svg){#fig-04-03 fig-alt="A mock of the Power Query Editor. The Queries pane lists SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram, with Item selected. The preview shows the first items that have a list price, with the columns ItemID, ItemName, ItemGroup, and ListPrice, and the filtered ListPrice column is outlined. The Applied Steps list reads Source, Navigation, Changed Type, Filtered Rows, and Removed Other Columns, with the last two outlined, and the status bar shows how many columns and rows remain."}
+
+**Step 6. Check the data types.** The icon at the left of each column header shows the column's data type.
+
+a. Select the **SalesInvoice** query and look at the icon on the InvoiceDate column header.
+b. If the column shows a time as well as a date, such as 12:00:00 AM, click the icon and choose **Date**.
+c. Do the same for DueDate and PaymentDate.
+d. Select the **SalesInvoiceLine** query and confirm that Quantity, BaseListPrice, UnitPrice, Discount, and LineTotal have a decimal number type.
+
+Keep every row of both queries, because the analysis will compare several periods.
+
+**Step 7. Load the queries into the workbook.**
+
+a. Choose **Home > Close & Load**. Power Query loads each query into a new worksheet as an Excel Table.
+b. Open the **Queries & Connections** pane, which shows each query with the number of rows it loaded.
+c. Rename each new worksheet after the Table it holds: `SalesInvoice`, `SalesInvoiceLine`, `Item`, and `PromotionProgram`.
+
+The invoice lines outnumber the invoices, because many invoices have more than one line, and the Item Table holds only a few hundred rows.
+
+**Step 8. Check the Table name.** Click any cell in the SalesInvoiceLine Table and look at the **Table Design** tab. The **Table Name** box shows SalesInvoiceLine, the name you gave the query. The Table already has filter buttons and banded rows, just like the worksheets in CharlesRiver.xlsx.
+
+**Step 9. Add two calculated columns.** ListAmount is what each line would have been billed at the item's list price, and DiscountAmount is the promotional discount taken on the line.
+
+a. Click the first empty cell to the right of the last header, PricingMethod, type `ListAmount`, and press Enter. The Table expands to include the new column.
+b. In the first data row of ListAmount, type `=ROUND(` and click the Quantity cell in the same row, type an asterisk, click the BaseListPrice cell, and finish the formula so that it reads `=ROUND([@Quantity]*[@BaseListPrice],2)`.
+c. Press Enter. Excel fills the formula down the entire column.
+d. Repeat the process for a second column, `DiscountAmount`, with this formula:
+
+   ```
+   =ROUND([@Quantity]*[@UnitPrice]*[@Discount],2)
+   ```
+
+Discount holds a rate, such as 0.10 for 10 percent, and it is zero on lines without a promotion, so DiscountAmount is zero on those lines too. @fig-04-04 shows the Table with both calculated columns.
+
+![The SalesInvoiceLine Table with Its Calculated Columns.](/visuals/svg/fig-04-04-salesinvoiceline-table.svg){#fig-04-04 fig-alt="A mock of the SalesInvoiceLine Table after Tutorial 4.1, with columns B through F and L through O hidden. The Table Name box on the Table Design tab reads SalesInvoiceLine, and the formula bar shows =ROUND([@Quantity]*[@BaseListPrice],2) for the selected ListAmount cell. Of five consecutive invoice lines, two carry a promotional discount of 0.1 and have a DiscountAmount greater than zero, and the other three have a DiscountAmount of zero. The ListAmount and DiscountAmount calculated columns are outlined."}
+
+**Step 10. Build control totals that prove the import is complete.**
+
+a. Insert a new worksheet and name it `Analysis`.
+b. In cell A1, type `Control totals`.
+c. In A3 through A8, type the labels `Invoice lines`, `Invoices`, `Line total`, `Invoice subtotal`, `Difference`, and `Discount taken`.
+d. In B3 through B8, enter these formulas:
+   - B3: `=COUNTA(SalesInvoiceLine[SalesInvoiceLineID])`
+   - B4: `=COUNTA(SalesInvoice[SalesInvoiceID])`
+   - B5: `=SUM(SalesInvoiceLine[LineTotal])`
+   - B6: `=SUM(SalesInvoice[SubTotal])`
+   - B7: `=ROUND(B5-B6,2)`
+   - B8: `=SUM(SalesInvoiceLine[DiscountAmount])`
+e. Add one more row: type `List amount` in A9 and enter `=SUM(SalesInvoiceLine[ListAmount])` in B9.
+f. Format the amounts with a thousands separator and two decimals.
+
+The SubTotal on each invoice is the sum of its lines, so the two totals in B5 and B6 come from different Tables but should agree to the cent, and B7 should show zero. The ROUND in B7 removes the tiny differences, far smaller than a cent, that computers produce when they add long columns of decimal numbers. Compare the list amount in B9 with the line total in B5.
+
+**Step 11. Test the refresh.** Choose **Data > Refresh All**. Power Query reads CharlesRiver.xlsx again and repeats every step. When it finishes, confirm that the row counts in the **Queries & Connections** pane and your control totals are unchanged, and that the ListAmount and DiscountAmount columns are still filled. Save the workbook.
+
+
+**Checkpoint.** Your workbook should now contain four data worksheets, each holding a Table named after its query, and an Analysis worksheet. Check that:
+
+- the Item Table holds only the items Charles River sells;
+- the line total and the invoice subtotal agree exactly, and the difference is zero;
+- the list amount is well above the line total;
+- the discount taken is a small fraction of the line total, but not zero.
+
+The zero difference tells you that every invoice line was imported and that the lines add up to the invoices they belong to. The list amount is above the line total because most lines are billed at price-list prices below the item's list price and some also carry a promotional discount. The discount is not zero because some lines were billed under a promotion, and Tutorial 4.3 finds out which ones.

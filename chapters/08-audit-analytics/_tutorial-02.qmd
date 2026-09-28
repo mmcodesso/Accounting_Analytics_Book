@@ -1,0 +1,56 @@
+### Tutorial 8.2: Benford's Law Analysis on Charles River Supplier Payments
+
+**Context and objective.** You will perform a first-digit analysis on the supplier payment amounts in the DisbursementPayment table and compare the observed digit frequencies to the expected Benford's Law distribution. This test is a standard audit procedure used to screen for unusual patterns in payment data, and it runs on the same population you profiled in Tutorial 8.1.
+
+**Prerequisites.** Open the Charles River Excel workbook and navigate to the DisbursementPayment worksheet. You will use the Amount column.
+
+**Step-by-step instructions.**
+
+1. Create a new worksheet called "Benfords" in your workbook. Copy the Amount column from the DisbursementPayment worksheet, or reference it from the source sheet. Exclude any zero or negative amounts from the analysis, because Benford's Law applies only to positive values. You can filter these out manually or use a helper column with an IF formula that returns the amount only when it is greater than zero.
+
+2. Create a column called "LeadingDigit" next to the payment amounts. Use the formula =VALUE(LEFT(TEXT([@Amount], "0"), 1)) to extract the first digit. The TEXT function converts the amount to a string without scientific notation, the LEFT function extracts the first character, and the VALUE function converts it back to a number. This formula handles amounts of any magnitude correctly.
+
+3. In a separate area of the worksheet, create a reference table for the expected Benford's distribution. In column A, enter the digits 1 through 9. In column B, enter the expected proportions 0.301, 0.176, 0.125, 0.097, 0.079, 0.067, 0.058, 0.051, and 0.046.
+
+4. In column C of the reference table, use COUNTIF to calculate the actual count of each leading digit in the payment data. The formula is =COUNTIF(LeadingDigitColumn, A2), where A2 contains the digit being counted.
+
+5. In column D, calculate the actual proportion for each digit by dividing the count by the total number of payments analyzed. Format these cells as percentages with one decimal place.
+
+6. In column E, calculate the difference between the actual proportion and the expected proportion for each digit. This difference column reveals which digits appear more or less frequently than expected.
+
+7. Create a clustered bar chart that displays the expected proportion and the actual proportion for each digit side by side. This visual comparison is the standard way to present Benford's Law results. Format the chart with clear labels and a legend that distinguishes the expected bars from the actual bars.
+
+8. To assess whether the deviations are statistically significant, calculate the Z-statistic for each digit using the formula Z = (ActualProportion - ExpectedProportion) / SQRT(ExpectedProportion * (1 - ExpectedProportion) / N), where N is the total number of payments analyzed. A Z-statistic with an absolute value greater than 1.96 indicates a statistically significant deviation at the 95 percent confidence level. Add this calculation as column F in your reference table.
+
+*[Figure 8.4: Screenshot of the LeadingDigit formula in Excel, showing the TEXT, LEFT, and VALUE functions applied to a Charles River DisbursementPayment amount. The formula bar and the resulting digit are visible.]*
+
+*[Figure 8.5: Completed Benford's Law comparison table showing digits 1 through 9, expected proportions, actual proportions, differences, and Z-statistics for the Charles River supplier payments. Statistically significant deviations are highlighted with conditional formatting.]*
+
+<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
+
+*Caption (placed below figure): Figure 8.5: Completed Benford's Law comparison table for Charles River supplier payment amounts (DisbursementPayment) showing expected proportions, actual proportions, differences, and Z-statistics for each leading digit. Digits where the absolute Z-statistic exceeds 1.96 (indicated by an asterisk) represent statistically significant deviations at the 95 percent confidence level.*
+
+| Leading Digit | Expected Proportion | Actual Count | Actual Proportion | Difference | Z-Statistic | Significant? |
+|---:|---:|---:|---:|---:|---:|---|
+| 1 | 30.10% | 296 | 27.38% | −2.72% | −1.95 | No |
+| 2 | 17.61% | 178 | 16.47% | −1.14% | −0.97 | No |
+| 3 | 12.49% | 147 | 13.60% | +1.11% | 1.10 | No |
+| 4 | 9.69% | 101 | 9.34% | −0.35% | −0.39 | No |
+| 5 | 7.92% | 124 | 11.47% | +3.55% | 4.31 | **Yes*** |
+| 6 | 6.69% | 68 | 6.29% | −0.40% | −0.52 | No |
+| 7 | 5.80% | 59 | 5.46% | −0.34% | −0.47 | No |
+| 8 | 5.12% | 56 | 5.18% | +0.06% | 0.09 | No |
+| 9 | 4.58% | 52 | 4.81% | +0.23% | 0.36 | No |
+| **Total** | **100.00%** | **1,081** | **100.00%** | | | |
+
+*Note: Values are illustrative. The significant deviation for digit 5 would prompt the auditor to investigate supplier payments in the $5,000 to $5,999 and $50,000 to $59,999 ranges to determine whether there is a legitimate business explanation, such as a recurring service contract at that price point, or whether the concentration warrants expanded testing.*
+
+*[Figure 8.6: Clustered bar chart comparing expected Benford's distribution to actual leading digit frequencies in Charles River DisbursementPayment amounts. Digits with statistically significant deviations are annotated.]*
+
+**Checkpoint.** Your comparison table should have nine rows, one per digit, with expected proportions, actual proportions, differences, and Z-statistics. The bar chart should make it easy to see where the actual distribution deviates from the expected pattern. If any digit shows a Z-statistic with an absolute value greater than 1.96, it should be highlighted as a potential anomaly requiring follow-up.
+
+> **[IN PRACTICE]**
+> Many audit firms include Benford's Law analysis as a standard procedure in their audit programs for accounts payable, journal entries, and expense reimbursements. The analysis is performed early in the engagement as part of risk assessment. Significant deviations do not necessarily indicate fraud, but they focus the auditor's attention on specific dollar ranges where additional testing is warranted. Nigrini (2012) provides decision frameworks for interpreting Benford's results in audit contexts and recommends follow-up procedures for each type of deviation.
+
+> **[CONNECTING THE DOTS]**
+> In Chapter 12, you will perform this same Benford's Law analysis using SQL, which allows you to query the DisbursementPayment table directly from the Charles River database without exporting to Excel. The SQL approach is faster for large populations and can be saved as a reusable query. In Chapter 19, the analysis is extended to second-digit and first-two-digit testing, which provides a more granular view of the digit distribution and is used in forensic accounting investigations.

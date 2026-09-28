@@ -105,6 +105,7 @@ class Diagram:
     def __init__(self, name: str):
         self.name = name
         self.cells: list[str] = []
+        self.front: list[str] = []  # drawn after every other cell, such as emphasis outlines
         self.count = 0
         self.bottom = 0.0
         self.right = 0.0
@@ -122,10 +123,10 @@ class Diagram:
             raise ValueError(f"{self.name}: content at ({x}, {y}) lies outside the frame")
 
     def vertex(self, value: str, style: str, x: float, y: float, w: float, h: float,
-               cid: str | None = None) -> str:
+               cid: str | None = None, front: bool = False) -> str:
         cid = cid or self._id()
         self._track(x, y, w, h)
-        self.cells.append(
+        (self.front if front else self.cells).append(
             f'<mxCell id="{cid}" value="{html.escape(value, quote=True)}" style="{style}" '
             f'vertex="1" parent="1"><mxGeometry x="{x:g}" y="{y:g}" width="{w:g}" '
             f'height="{h:g}" as="geometry"/></mxCell>'
@@ -158,10 +159,13 @@ class Diagram:
         """An invisible point for drawing free-standing line samples."""
         return self.vertex("", "text;html=1;strokeColor=none;fillColor=none;", x, y, 1, 1)
 
-    def outline(self, x: float, y: float, w: float, h: float, color: str, width: float = 3) -> str:
+    def outline(self, x: float, y: float, w: float, h: float, color: str, width: float = 3,
+                front: bool = False) -> str:
+        """An unfilled rectangle. front=True draws it above every other cell, so cells
+        created later can never cover part of it."""
         return self.vertex(
             "", f"rounded=0;html=1;fillColor=none;strokeColor={color};strokeWidth={width:g};",
-            x, y, w, h,
+            x, y, w, h, front=front,
         )
 
     def marker(self, label: str, x: float, y: float, fill: str = BLUE, color: str = WHITE,
@@ -302,7 +306,7 @@ class Diagram:
             f'vertex="1" parent="1"><mxGeometry x="0" y="0" width="{FRAME_WIDTH}" '
             f'height="{height}" as="geometry"/></mxCell>'
         )
-        body = "\n        ".join([frame, *self.cells])
+        body = "\n        ".join([frame, *self.cells, *self.front])
         xml = (
             '<mxfile host="Electron" version="29.6.6">\n'
             f'  <diagram name="{html.escape(self.name, quote=True)}" id="{path.stem}">\n'

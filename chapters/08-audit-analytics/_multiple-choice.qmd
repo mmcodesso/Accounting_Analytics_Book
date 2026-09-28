@@ -1,0 +1,197 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** What is the primary purpose of stratifying a transaction population before selecting an audit sample?
+
+A) To reduce the total number of items that need to be tested
+
+B) To identify the distribution of dollar values across size categories so that testing effort can be directed toward the highest-risk items
+
+C) To ensure that every item in the population has an equal chance of being selected
+
+D) To calculate the total dollar value of the population for materiality purposes
+
+**Answer: B**
+
+
+**2.** According to Benford's Law, which leading digit is expected to appear most frequently in a naturally occurring dataset?
+
+A) 5
+
+B) 9
+
+C) 1
+
+D) 3
+
+**Answer: C**
+
+
+**3.** An auditor performs a Benford's Law analysis on the Charles River DisbursementPayment amounts and finds that the digit 8 appears as the leading digit 12 percent of the time, compared to the expected frequency of 5.1 percent. What is the most appropriate next step?
+
+A) Conclude that fraud has occurred and report the finding to management
+
+B) Remove all payments with a leading digit of 8 from the population
+
+C) Investigate the payments with leading digit 8 to determine whether there is a legitimate explanation for the excess frequency
+
+D) Repeat the analysis using second-digit frequencies to confirm the result
+
+**Answer: C**
+
+
+**4.** Which Excel formula correctly extracts the leading digit from a payment amount stored in cell B2?
+
+A) =LEFT(B2, 1)
+
+B) =VALUE(LEFT(TEXT(B2, "0"), 1))
+
+C) =MID(B2, 1, 1)
+
+D) =INT(B2/10)
+
+**Answer: B**
+
+
+**5.** In an aging analysis of Charles River sales invoices, the reference date should be set to which of the following?
+
+A) The current date, regardless of the reporting period
+
+B) The date the data was extracted from the system
+
+C) The end date of the reporting period being analyzed
+
+D) The earliest invoice date in the dataset
+
+**Answer: C**
+
+
+**6.** A duplicate detection test on the DisbursementPayment table uses COUNTIFS to count records that share the same SupplierID, Amount, and PaymentDate. A record returns a count of 3. What does this result mean?
+
+A) The record is a triplicate payment that should be immediately reversed
+
+B) There are three records in the dataset that share the same supplier, amount, and date, which warrants investigation
+
+C) The COUNTIFS formula contains an error because duplicates should return a count of 2
+
+D) The supplier was paid three times for three different invoices
+
+**Answer: B**
+
+
+**7.** An auditor uses the WEEKDAY function to test whether journal entries were posted on weekends. The formula =WEEKDAY(B2, 2) returns a value of 6. What day of the week does this represent?
+
+A) Friday
+
+B) Saturday
+
+C) Sunday
+
+D) Monday
+
+**Answer: B**
+
+
+**8.** Which of the following Charles River populations would be LEAST appropriate for a Benford's Law analysis?
+
+A) DisbursementPayment amounts ranging from a few dollars to several hundred thousand dollars
+
+B) A set of employee identification numbers assigned sequentially
+
+C) GLEntry debit amounts ranging from small to very large values
+
+D) SalesInvoice merchandise totals ranging across several orders of magnitude
+
+**Answer: B**
+
+
+**9.** What is the purpose of a gap analysis performed on the Charles River sales invoice numbers?
+
+A) To test whether the average invoice amount is consistent with prior periods
+
+B) To test the completeness of recorded transactions by identifying missing numbers in the sequence
+
+C) To identify invoices that exceed a materiality threshold
+
+D) To calculate the difference between budgeted and actual amounts
+
+**Answer: B**
+
+
+**10.** A journal entry risk score is calculated by summing three binary flags, weekend posting, round dollar amount, and amount just below the approval threshold, each scored 0 or 1. An entry receives a risk score of 3. What does this indicate?
+
+A) The entry is confirmed to be fraudulent
+
+B) The entry exhibits all three characteristics associated with control override and should receive priority investigation
+
+C) The entry should be removed from the dataset before further testing
+
+D) The entry represents three separate journal entries that have been combined
+
+**Answer: B**
+
+
+**11.** Which professional standard specifically requires auditors to test journal entries as part of their response to the risk of management override of controls?
+
+A) AU-C Section 520, Analytical Procedures
+
+B) AS 2401 and ISA 240, which address the auditor's responsibility related to fraud
+
+C) ASC 326, Financial Instruments: Credit Losses
+
+D) ISA 530, Audit Sampling
+
+**Answer: B**
+
+
+**12.** In a Benford's Law analysis, the Z-statistic for digit 5 is calculated as 2.45. What does this indicate?
+
+A) The digit 5 appears exactly as expected
+
+B) The deviation between the observed and expected frequency of digit 5 is statistically significant at the 95 percent confidence level
+
+C) The analysis is invalid because the Z-statistic exceeds the expected proportion
+
+D) The dataset does not follow Benford's Law for any digit
+
+**Answer: B**
+
+
+**13.** An auditor is documenting an Excel-based Benford's Law analysis in the audit workpapers. Which of the following elements should be included?
+
+A) Only the bar chart comparing actual and expected frequencies
+
+B) The test objective, the data source, the digit frequency comparison table, the Z-statistics, and a conclusion stating whether the results require follow-up
+
+C) A printout of the Excel formulas used
+
+D) Only the conclusion paragraph
+
+**Answer: B**
+
+
+**14.** A stratification of the Charles River DisbursementPayment population shows that 5 percent of payments account for 72 percent of the total dollar value. What is the most likely audit implication?
+
+A) The remaining 95 percent of payments can be excluded from testing
+
+B) The audit sample should focus disproportionately on the high-value stratum because it represents the majority of the dollar risk
+
+C) The population contains fraudulent transactions
+
+D) The stratification boundaries need to be adjusted to produce a more even distribution
+
+**Answer: B**
+
+
+**15.** What is the primary reason audit analytics workpapers should include the source of the data, the date of extraction, and the number of records?
+
+A) To demonstrate that the auditor spent sufficient time on the analysis
+
+B) To enable a reviewer to verify the completeness and integrity of the data used in the analysis
+
+C) To comply with data privacy regulations
+
+D) To calculate the audit fee
+
+**Answer: B**

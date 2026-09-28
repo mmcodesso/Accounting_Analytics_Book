@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild the Part I figure sources in visuals/src/ from code and the dataset.
+"""Rebuild the generated figure sources in visuals/src/ from code and the dataset.
 
 Usage:
     python scripts/figures/build.py                    # every figure
@@ -22,10 +22,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ch01  # noqa: E402
 import ch02  # noqa: E402
 import ch03  # noqa: E402
+import ch04  # noqa: E402
 from data import REPO_ROOT  # noqa: E402
 
 SRC_DIR = REPO_ROOT / "visuals" / "src"
-CHAPTERS = {1: ch01.FIGURES, 2: ch02.FIGURES, 3: ch03.FIGURES}
+CHAPTERS = {1: ch01.FIGURES, 2: ch02.FIGURES, 3: ch03.FIGURES, 4: ch04.FIGURES}
 
 
 def main() -> int:

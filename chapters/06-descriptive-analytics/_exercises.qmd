@@ -1,0 +1,74 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 6.1 (Financial Accounting): Revenue Summarization and Period-over-Period Comparison**
+
+**Table group:** O2C (SalesInvoice, SalesInvoiceLine, Item, Customer)
+
+**Scenario.** You are a financial reporting analyst at Charles River preparing materials for the quarterly earnings review. The CFO wants a revenue summary broken down by item group and fiscal quarter, along with an analysis of which item groups grew or declined relative to the prior quarter.
+
+**Requirements.** (1) Using the merged InvoiceLines dataset you prepared in Chapter 5, or by merging SalesInvoiceLine with Item, Customer, and SalesInvoice now using XLOOKUP or Power Query, build a PivotTable that shows item groups as rows, fiscal quarters as columns, and total LineTotal as the aggregated value. Format the values as currency. (2) Use the Show Values As feature to display the percentage change from the prior quarter for each item group. Identify which item group showed the largest quarter-over-quarter increase and which showed the largest decline. (3) Add a second PivotTable on a separate worksheet that summarizes revenue by customer segment (Wholesale and Direct) and item group, then use Show Values As % of Column Total to show each segment's share of revenue within each item group. Identify which segment dominates each item group. (4) On an Analysis worksheet, write a three-to-five-sentence interpretive summary that identifies the two most notable findings from your analysis and explains their potential implications for financial reporting. Reference specific numbers from your PivotTables.
+
+**Deliverable.** An Excel workbook with two PivotTables (one showing quarter-over-quarter growth rates, one showing segment revenue share) and a written interpretive summary on the Analysis worksheet.
+
+
+**Exercise 6.2 (Financial Accounting): Disaggregated Revenue Analysis by Customer Segment**
+
+**Table group:** O2C (SalesInvoice, SalesInvoiceLine, Customer, Item)
+
+**Scenario.** You are a financial reporting analyst at Charles River preparing the disaggregated revenue analysis that supports the revenue disclosure in the notes to the financial statements. The disclosure requires the company to report revenue by major customer channel and by product category.
+
+**Requirements.** (1) Create a merged dataset that includes customer segment, region, item group, and LineTotal. Build a PivotTable that shows customer segment as rows and item group as columns, with total LineTotal as the aggregated value. (2) Use Show Values As % of Grand Total to determine which segment and item group combination generates the largest share of the company's total revenue. (3) Create a second PivotTable that groups revenue by customer segment and region, then by year. Calculate the year-over-year percentage change using Show Values As % Difference From (previous). Identify any segment or region that showed a revenue decline in the most recent year. (4) Write a one-paragraph disclosure-style narrative that summarizes the disaggregation of revenue by channel and product category, suitable for inclusion in the notes to the financial statements. Reference your PivotTable data to support each statement.
+
+**Deliverable.** An Excel workbook with two PivotTables, calculated percentages, and a disclosure narrative.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 6.3 (Managerial Accounting): Product Line Profitability Analysis**
+
+**Table group:** O2C (SalesInvoiceLine) and Master Data (Item)
+
+**Scenario.** You are a cost analyst at Charles River. The VP of Operations has asked you to analyze the profitability of each item group by comparing the standard cost to the list price and to the actual billed amounts observed in the sales data.
+
+**Requirements.** (1) Build a summary table or PivotTable that shows each item group with its average StandardCost, average ListPrice (both from the Item table), and average billed unit revenue derived from the sales data (LineTotal divided by QuantityShipped). Calculate the average markup percentage, which is list price minus standard cost, divided by standard cost, and the average realized margin percentage, which is billed unit revenue minus standard cost, divided by billed unit revenue. (2) Use COUNTIFS or a PivotTable to count the number of distinct items and the total units shipped (QuantityShipped) within each item group. (3) Identify the item group with the highest realized margin and the one with the lowest. (4) On an Analysis worksheet, write three to five sentences interpreting your findings. Address whether the item group with the highest margin is also the one with the highest sales volume, and discuss what this pattern might suggest about the company's pricing strategy.
+
+**Deliverable.** An Excel workbook with profitability summary data by item group, margin calculations, and a written interpretation.
+
+
+**Exercise 6.4 (Managerial Accounting): Production Performance Summary Using Work Order Data**
+
+**Table group:** Manufacturing (WorkOrder, ProductionCompletion, ProductionCompletionLine, WorkOrderClose) and Master Data (Item)
+
+**Scenario.** You are a production analyst at Charles River. The plant manager wants a summary of manufacturing performance by item group, including total planned production volume, completed volume, completion rate, and the manufacturing variance recognized at close.
+
+**Requirements.** (1) Build a PivotTable that shows item groups as rows and summarizes the total planned quantity from the WorkOrder table and the total completed quantity from ProductionCompletionLine. Create a calculated field or formula column for completion rate, calculated as completed quantity divided by planned quantity. (2) Group the work order dates by quarter and analyze whether completion rates changed over time for the item groups with the lowest overall completion rates. (3) Using the WorkOrderClose table, build a second PivotTable that summarizes the total manufacturing variance amount by item group and identifies which item group carries the largest variance relative to its production volume. (4) On an Analysis worksheet, write a three-to-five-sentence memorandum for the plant manager summarizing the key findings and recommending which item groups should receive the most attention based on completion rates and variance amounts.
+
+**Deliverable.** An Excel workbook with production performance PivotTables, completion rate and variance calculations, and a management memorandum.
+
+
+### Auditing Exercises
+
+**Exercise 6.5 (Auditing): Transaction Stratification for Audit Planning**
+
+**Table group:** O2C (SalesInvoice, SalesInvoiceLine)
+
+**Scenario.** You are an audit associate assigned to plan the substantive testing of Charles River's revenue transactions. Your senior has asked you to stratify the sales invoice lines by billed amount to understand the distribution of the transaction population and to determine an appropriate approach for selecting items to test.
+
+**Requirements.** (1) Build a stratification table with at least five strata of your own design, based on your examination of the LineTotal distribution. Use COUNTIFS and SUMIFS to determine the line count and dollar value within each stratum. Calculate the percentage of total count and percentage of total revenue for each stratum, as well as the cumulative percentage of revenue. (2) Determine the threshold above which individual items should be selected for testing. A common approach is to identify the stratum boundary above which a small number of lines account for a large share, such as 50 percent or more, of total revenue. State your recommended threshold and justify it based on the stratification data. (3) Calculate summary statistics (AVERAGE, MEDIAN, STDEV.S, MIN, MAX) for the LineTotal of the full population and for each stratum separately. Discuss how the statistics differ across strata. (4) On an Analysis worksheet, write a one-page memorandum to your audit senior summarizing the population characteristics, your recommended stratification approach, and the rationale for your testing thresholds. This memorandum should be suitable for inclusion in the audit workpapers.
+
+**Deliverable.** An Excel workbook with a stratification table, summary statistics by stratum, and a one-page audit planning memorandum.
+
+
+**Exercise 6.6 (Auditing): Descriptive Profiling of Transaction Patterns for Anomaly Identification**
+
+**Table group:** O2C (SalesInvoice, SalesInvoiceLine, SalesOrderLine, Customer, Item)
+
+**Scenario.** Your audit team is performing analytical procedures on Charles River's revenue data. Before running specific anomaly detection tests, which you will learn in Chapter 8, your senior has asked you to build a descriptive profile of the transaction data to establish expectations about what normal looks like for this company.
+
+**Requirements.** (1) Build a PivotTable that shows the count of invoice lines, total revenue (LineTotal), and average revenue per line for each item group. Identify any item group where the average revenue per line is much higher or lower than the overall average. (2) Create a second PivotTable that shows the count of invoices by customer, sorted from highest to lowest. Identify the top five customers by invoice count and the top five by total revenue. Note whether the same customers appear on both lists, and calculate what share of total revenue the top five customers represent, which speaks to customer concentration. (3) Using the PricingMethod column on the SalesInvoiceLine or SalesOrderLine table, use COUNTIFS to determine how many lines used standard price-list pricing, promotion pricing, and approved override pricing. Calculate the percentage of non-standard pricing for each item group. Identify any item group where non-standard pricing is notably more frequent than the overall rate. (4) On an Analysis worksheet, write a descriptive profile of the transaction population in three to five paragraphs. This profile should describe the overall volume, revenue distribution, customer concentration, and pricing-method patterns, noting any observations that might warrant further investigation during the audit. This profile serves as the baseline against which anomaly detection tests in Chapter 8 will be compared.
+
+**Deliverable.** An Excel workbook with PivotTables for item group analysis and customer analysis, pricing-method frequency calculations, and a written descriptive profile suitable for audit workpapers.

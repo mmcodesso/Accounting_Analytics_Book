@@ -1,0 +1,74 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 5.1 (Financial Accounting): Building a Receivables Schedule from Charles River Invoice Data**
+
+**Table group:** O2C (SalesInvoice, Customer, CashReceiptApplication)
+
+**Scenario.** You are a financial reporting analyst preparing an accounts receivable analysis for Charles River. The analysis requires combining sales invoice data with customer details to produce a schedule grouped by customer and by aging period. The invoice data lives in the SalesInvoice table, the customer details live in the Customer table, and the settlement detail lives in the CashReceiptApplication table.
+
+**Requirements.** (1) Use XLOOKUP or INDEX/MATCH to merge customer information, which is CustomerName, CustomerSegment, and Region, into the SalesInvoice Table by matching on CustomerID. Verify the merge by spot-checking at least five records and document any invoices that fail to match a customer record. (2) Add a calculated column that uses date functions to assign each invoice to its fiscal quarter from the InvoiceDate, assuming a calendar fiscal year. Add a second calculated column that computes the number of days outstanding as the difference between a named reference date and the InvoiceDate, and classify each invoice into aging buckets of 0 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days using a nested IF formula based on the DueDate where appropriate. (3) Apply TRIM to the CustomerName column to remove any extra spaces that would cause grouping inconsistencies in the receivables schedule, and document how many records were affected. (4) Create a summary section on an Analysis worksheet that shows the total number of invoices and the total invoice amount by aging bucket using SUMIFS and COUNTIFS with structured references.
+
+**Deliverable.** An Excel workbook with merged and cleaned invoice data, fiscal quarter and aging classifications, and a summary receivables schedule on the Analysis worksheet.
+
+
+**Exercise 5.2 (Financial Accounting): Standardizing Revenue Data for Period Reporting**
+
+**Table group:** O2C (SalesInvoiceLine, SalesInvoice, Item)
+
+**Scenario.** The financial reporting team needs a revenue dataset that includes the invoice date, the item name, the item group, and the billed line amount for every invoice line, organized by fiscal quarter. The data currently resides in three separate tables.
+
+**Requirements.** (1) Use lookup functions to create a merged dataset on the SalesInvoiceLine Table that includes InvoiceDate from SalesInvoice and ItemName and ItemGroup from Item. Match SalesInvoiceLine to SalesInvoice on SalesInvoiceID and to Item on ItemID. (2) Use YEAR and the fiscal quarter formula to create FiscalYear and FiscalQuarter columns for every line from the InvoiceDate. (3) Examine the ItemName column for trailing spaces or inconsistent formatting, apply TRIM, and document the number of records cleaned. (4) On an Analysis worksheet, calculate total billed revenue by fiscal quarter using SUMIFS on the LineTotal column, and calculate the percentage of total annual revenue represented by each quarter. Write three to five sentences interpreting whether revenue is distributed evenly across quarters or concentrated in specific periods, and whether any item group drives the pattern.
+
+**Deliverable.** An Excel workbook with a fully merged and cleaned revenue dataset, fiscal period columns, and a quarterly revenue summary with written interpretation.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 5.3 (Managerial Accounting): Product Margin Data Preparation**
+
+**Table group:** O2C (SalesOrderLine, Customer) and Master Data (Item)
+
+**Scenario.** You are a cost analyst preparing data for a product margin analysis. The analysis requires combining item cost and price data, which are StandardCost and ListPrice, with SalesOrderLine quantities to calculate unit and total margins by item. Before the analysis can proceed, the data must be merged, validated, and prepared.
+
+**Requirements.** (1) Convert the SalesOrderLine, Item, and Customer worksheets into named Excel Tables. Use XLOOKUP to add StandardCost and ListPrice from the Item Table to each row of the SalesOrderLine Table by matching on ItemID. (2) Add a calculated column called UnitMargin that computes the difference between ListPrice and StandardCost for each line. Add a second column called TotalMargin that multiplies UnitMargin by the ordered quantity on the line. (3) Use the MarginCheck approach from Tutorial 5.2 to flag any lines where UnitMargin is negative, count the number of negative-margin lines, and calculate their total margin impact. (4) Use Power Query to create a separate, repeatable version of this merged dataset. Import SalesOrderLine, merge it with the Item Table on ItemID and with the Customer Table on the CustomerID retrieved through SalesOrder, select only the columns needed for margin analysis, and load the result as a new worksheet. Document the Applied Steps on a Documentation worksheet. (5) Write a brief assessment of whether the data is ready for a product margin analysis, noting any issues that would need to be resolved.
+
+**Deliverable.** An Excel workbook with both a formula-based merged dataset and a Power Query-based merged dataset, margin calculations, and a written data readiness assessment.
+
+
+**Exercise 5.4 (Managerial Accounting): Cleaning and Combining Item Master Data**
+
+**Table group:** Master Data (Item) and O2C (SalesOrderLine)
+
+**Scenario.** The operations team has requested a clean item profitability summary that combines a standardized item master with ordered quantities so that margin can be compared across item groups. The information is currently split between the Item table and the SalesOrderLine table.
+
+**Requirements.** (1) Apply TRIM to the ItemName column and PROPER to standardize its capitalization, and apply UPPER with TRIM to the ItemGroup column to produce a standardized ItemGroupStd column. Document any item names where PROPER produces an incorrect result that requires a manual correction. (2) Use XLOOKUP to add the standardized ItemName and ItemGroupStd to each row of the SalesOrderLine Table by matching on ItemID, and add a calculated TotalMargin column from the item UnitMargin and the ordered quantity. (3) Build a Power Query workflow that imports SalesOrderLine, merges the Item Table on ItemID, groups the result by ItemGroup, and produces a summary of total ordered quantity and total margin by item group. Load the result as a new worksheet. (4) Compare your formula-based result with your Power Query result to verify consistency, and write two to three sentences identifying which item group contributes the most margin.
+
+**Deliverable.** An Excel workbook with a standardized item master, a merged margin dataset created through formulas, and a Power Query summary of margin by item group.
+
+
+### Auditing Exercises
+
+**Exercise 5.5 (Auditing): Standardizing Supplier Names for Duplicate Detection**
+
+**Table group:** P2P (Supplier)
+
+**Scenario.** Your audit team suspects that the Charles River supplier master file may contain duplicate suppliers entered under slightly different names. Before running a formal duplicate detection test, you need to standardize the supplier names so that near-duplicates can be identified.
+
+**Requirements.** (1) Open the Supplier Table and examine the SupplierName column. Apply TRIM to remove extra spaces, apply UPPER to standardize capitalization, and apply SUBSTITUTE to remove common variations such as periods in abbreviations by replacing "." with nothing, and to standardize "Inc." and "Incorporated" to a single form and "Ltd." and "Limited" to a single form. Chain these functions into a new column called StdSupplierName. (2) Sort the StdSupplierName column alphabetically and scan for near-duplicates, which are suppliers with very similar names that may represent the same entity. Document any potential duplicates you identify, including the original names and the standardized names. (3) Use COUNTIFS on the StdSupplierName column to count how many suppliers share the same standardized name, where any count greater than 1 indicates a potential duplicate, and record the results. Consider also whether suppliers with the same standardized name share the same SupplierCategory or SupplierRiskRating, which would strengthen the case that they are truly the same vendor. (4) Write a brief memorandum of one half to one page documenting your standardization approach, the potential duplicates identified, and a recommendation for whether these findings warrant further investigation. Note that this manual approach has limits and that Chapter 12 will introduce SQL-based duplicate detection that can handle larger datasets and more complex matching criteria.
+
+**Deliverable.** An Excel workbook with standardized supplier names, flagged potential duplicates, and a written audit memorandum.
+
+
+**Exercise 5.6 (Auditing): Documenting a Repeatable P2P Data Preparation Process**
+
+**Table group:** P2P (PurchaseOrder, PurchaseOrderLine, Supplier)
+
+**Scenario.** Your audit team needs to perform recurring analytical procedures on Charles River purchasing data. The same data preparation steps, which are merging purchase order headers with their lines and adding supplier context, must be performed each period when updated data is received. Your senior has asked you to build a Power Query workflow that automates this preparation so that future periods require only a data refresh rather than manual rebuilding.
+
+**Requirements.** (1) Build a Power Query workflow that imports the PurchaseOrderLine Table and merges it with the PurchaseOrder Table on PurchaseOrderID to add the OrderDate, the ExpectedDeliveryDate, and the SupplierID to each line. Document each step by reviewing the Applied Steps panel and recording the step names and their purposes on a Documentation worksheet. (2) Merge the result with the Supplier Table on SupplierID to add SupplierName, PaymentTerms, and SupplierCategory, and add a custom column that computes an extended ordered cost from the line Quantity and UnitCost. (3) Load the query result as a new worksheet and verify the result by spot-checking at least five records against the source tables. (4) Test the repeatability of the workflow by adding a row to the source PurchaseOrderLine Table and refreshing the query, then confirm that the refreshed result includes the new line. (5) Write a process documentation memorandum of one page that describes the Power Query workflow, lists the Applied Steps, and explains how the team should refresh the data each period. This memorandum should be suitable for inclusion in the audit workpapers as documentation of the data preparation procedure.
+
+**Deliverable.** An Excel workbook with a Power Query workflow that merges PurchaseOrderLine, PurchaseOrder, and Supplier, a verified output worksheet, and a one-page process documentation memorandum suitable for audit workpaper inclusion.

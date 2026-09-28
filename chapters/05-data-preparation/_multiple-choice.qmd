@@ -1,0 +1,108 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A staff accountant imports customer data from two different systems. In one system the customer name is "Beacon Hill Interiors" and in the other it is "  Beacon Hill Interiors  " with extra leading and trailing spaces. Which function resolves this difference for matching purposes?
+
+A. SUBSTITUTE
+B. TRIM
+C. PROPER
+D. LEN
+
+**2.** An analyst needs to extract the fiscal year from a SalesOrder OrderDate value stored in cell A2. Which formula achieves this?
+
+A. =DATE(A2)
+B. =YEAR(A2)
+C. =LEFT(A2, 4)
+D. =FISCAL(A2)
+
+**3.** Charles River uses a fiscal year that begins on July 1. An analyst needs to assign the order date October 15 to the correct fiscal quarter. October is the fourth month of this fiscal year. Which fiscal quarter does this order belong to?
+
+A. Q1
+B. Q2
+C. Q3
+D. Q4
+
+**4.** An auditor uses the formula =XLOOKUP([@SupplierID], Supplier[SupplierID], Supplier[SupplierName], "NOT FOUND") to retrieve supplier names. For three records the formula returns "NOT FOUND". What does this result indicate?
+
+A. The XLOOKUP formula contains a syntax error.
+B. The three records contain SupplierID values that do not exist in the Supplier Table, which indicates a referential integrity problem.
+C. The Supplier Table is not formatted as an Excel Table.
+D. XLOOKUP cannot match numeric values.
+
+**5.** Which of the following best describes the advantage of XLOOKUP over VLOOKUP?
+
+A. XLOOKUP is faster than VLOOKUP for large datasets.
+B. XLOOKUP can search any column and specifies the return column independently, while VLOOKUP can only search the leftmost column and requires a column index number.
+C. XLOOKUP automatically removes duplicate values from the lookup table.
+D. XLOOKUP works in older versions of Excel where VLOOKUP does not.
+
+**6.** A management accountant uses COUNTIFS to identify potential duplicate payments in the Charles River DisbursementPayment table. The formula =COUNTIFS(DisbursementPayment[SupplierID], [@SupplierID], DisbursementPayment[Amount], [@Amount], DisbursementPayment[PaymentDate], [@PaymentDate]) returns a value of 3 for a specific row. What does this result mean?
+
+A. The payment was made to three different suppliers.
+B. There are three rows in the DisbursementPayment Table that match on supplier, amount, and date, which suggests potential duplicate payments that require investigation.
+C. The formula contains an error because COUNTIFS cannot compare three columns simultaneously.
+D. The payment amount was three dollars.
+
+**7.** Which of the following is the primary advantage of using Power Query for data preparation instead of formulas?
+
+A. Power Query formulas run faster than worksheet formulas.
+B. Power Query records every transformation step in an ordered list that can be reviewed, edited, and refreshed when source data changes, which creates a documented and repeatable process.
+C. Power Query can handle datasets that are too large for Excel.
+D. Power Query eliminates the need to understand data quality concepts.
+
+**8.** An analyst applies the formula =TRIM(CLEAN(A2)) to a cell containing imported text data. What does this combined formula accomplish?
+
+A. It converts the text to uppercase and removes spaces.
+B. It removes non-printable characters with CLEAN and then removes extra spaces with TRIM, which addresses two common text quality problems in a single formula.
+C. It deletes the contents of cell A2.
+D. It highlights the cell if it contains errors.
+
+**9.** A financial analyst uses the formula =IF(ISBLANK([@Region]), "Not Specified", [@Region]) when preparing Charles River customer data for a geographic analysis. Why is this formula preferable to leaving the blank values as is?
+
+A. The formula converts text to dates.
+B. Blank values would cause Excel to crash during PivotTable creation.
+C. Replacing blanks with a label ensures that customers without a region value are included in grouped analyses rather than silently excluded, and it makes the handling of missing data explicit.
+D. The formula is required by GAAP for revenue recognition purposes.
+
+**10.** An analyst creates a Power Query merge between the SalesOrder query and the Customer query using CustomerID as the key column and selects Left Outer as the join type. Which result does this produce?
+
+A. Only orders with matching customers are included.
+B. All orders are included. Orders with a matching customer show the customer information, and orders without a matching customer show null values in the customer columns.
+C. All customers are included whether or not they have orders.
+D. Only customers without orders are included.
+
+**11.** A Charles River account number is stored as the text value "4050". An analyst needs to extract the leading digit that identifies the account class. Which formula accomplishes this?
+
+A. =RIGHT(A2, 1)
+B. =LEFT(A2, 1)
+C. =MID(A2, 2, 1)
+D. =VALUE(A2)
+
+**12.** After performing all data cleaning using formulas in helper columns, an analyst needs to replace the original data with the cleaned values. Which of the following is the correct approach?
+
+A. Delete the original column. The helper column formulas will continue to work.
+B. Copy the helper column, paste it as values over the original column, and then delete the helper column.
+C. Use Find and Replace to update the original column.
+D. The helper column and original column should both be kept permanently.
+
+**13.** A cost analyst discovers that 18 items in the Charles River Item table have a StandardCost value of zero. Which of the following is the most appropriate response?
+
+A. Delete all 18 items from the dataset.
+B. Replace all zero values with the average cost of other items.
+C. Investigate whether the zero values represent discontinued items, data entry errors, or items that have not yet been costed, and document the findings before deciding how to treat each case.
+D. Ignore the zero values because they will not affect the analysis.
+
+**14.** The DATEDIF function is used to calculate the difference between two dates. If cell A2 contains a SalesOrder OrderDate of January 15 and cell B2 contains a ShipmentDate of April 10 of the same year, what does the formula =DATEDIF(A2, B2, "M") return?
+
+A. 86, the number of days
+B. 2, the number of complete months
+C. 3, the number of months including partial months
+D. An error, because DATEDIF does not accept the "M" parameter
+
+**15.** An internal auditor is documenting the data preparation steps performed on Charles River general ledger data. Which approach best meets professional documentation standards?
+
+A. Writing a memo that describes the cleaning steps in general terms
+B. Using Power Query, which automatically records each transformation step and creates a reviewable log of the entire preparation process
+C. Taking screenshots of the original and cleaned data
+D. Keeping the formula cells visible in the workbook without additional documentation

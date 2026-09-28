@@ -20,6 +20,7 @@ $font-family-base: $font-family-serif;
 $headings-font-family: $font-family-sans-serif;
 $line-height-base: 1.72;
 $border-radius: 0.75rem;
+$code-color: $ink;
 
 /*-- scss:rules --*/
 
@@ -223,6 +224,37 @@ hr {
 
 .callout .callout-body-container > :last-child {
   margin-bottom: 0;
+}
+
+/* Formulas and text to type: one look whether inline or on their own line.
+   Quarto's defaults color inline code purple and code blocks black, which made
+   the same kind of formula look like two different things. */
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode),
+pre:not(.sourceCode),
+pre:not(.sourceCode) code {
+  color: var(--aa-ink);
+  background-color: var(--aa-soft);
+}
+
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode) {
+  border: 1px solid var(--aa-border);
+  border-radius: 0.3rem;
+  padding: 0.05em 0.3em;
+}
+
+pre:not(.sourceCode) {
+  border: 1px solid var(--aa-border);
+  border-radius: 0.3rem;
+  padding: 0.45rem 0.75rem;
+}
+
+pre:not(.sourceCode) code {
+  border: 0;
+  padding: 0;
 }
 
 .callout .callout-body-container p,

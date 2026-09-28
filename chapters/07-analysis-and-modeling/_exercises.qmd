@@ -1,0 +1,74 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 7.1 (Financial Accounting): Revenue Trend Analysis and Forecasting**
+
+**Table group:** Order-to-Cash (SalesInvoice, SalesInvoiceLine, Item)
+
+**Scenario.** You are a financial reporting analyst at Charles River. The controller has asked you to prepare a revenue trend analysis to support the company's quarterly financial reporting. The board of directors wants to see historical revenue trends and a short-term projection for the next two quarters, along with a statement of the assumptions and confidence level supporting the forecast. This analysis will be included as supplementary information accompanying the quarterly financial statements.
+
+**Requirements.** (1) Aggregate Charles River sales invoice line data into quarterly revenue totals (rather than monthly) and create a table showing revenue by quarter for the entire period covered by the dataset. Calculate the quarter-over-quarter growth rate for each period. (2) Run a regression analysis using the Data Analysis ToolPak with quarter number as the independent variable and quarterly revenue as the dependent variable. Report the R Square, the regression equation, the p-value for the slope, and the standard error. (3) Use the regression model to forecast revenue for the next two quarters beyond the historical data. Calculate a simple confidence range by adding and subtracting one standard error from each predicted value. Present the forecast in a table with columns for quarter, predicted revenue, lower bound, and upper bound. (4) Create a chart that shows the historical quarterly revenue as data points, the regression trendline, and the forecast with the confidence range displayed as a shaded band or error bars. (5) On a separate worksheet labeled "Assumptions and Limitations," document the assumptions underlying the forecast using the four-column format presented in this chapter (Assumption, Value Used, Basis, Sensitivity). Include at least four assumptions.
+
+**Deliverable.** An Excel workbook with quarterly revenue data, regression output, a forecast table with confidence range, a trend chart, and a written assumptions documentation worksheet.
+
+
+**Exercise 7.2 (Financial Accounting): Correlation Analysis for Analytical Procedures**
+
+**Table group:** Order-to-Cash (SalesInvoice, SalesInvoiceLine, Customer)
+
+**Scenario.** You are an audit senior preparing substantive analytical procedures for the Charles River revenue audit. You want to identify independent variables that are highly correlated with monthly revenue so that you can build a regression-based expectation. Strong correlations with variables that are not direct components of revenue provide stronger audit evidence than simple trend analysis.
+
+**Requirements.** (1) Aggregate Charles River data into monthly summaries that include total revenue, invoice count, distinct customer count, and average invoice-line amount. (2) Use the Data Analysis ToolPak Correlation tool to produce a correlation matrix for these four variables. Identify which pairs of variables have the strongest correlation and which have the weakest. (3) Select the independent variable with the highest correlation to total revenue and run a regression analysis with total revenue as the dependent variable. Report and interpret the R Square, slope, p-value, and residuals. (4) On a separate worksheet, write a brief memorandum (three to four paragraphs) explaining which variable you selected as the predictor, why the correlation supports its use, how you would use the regression model to set an expectation for total revenue in a test month, and what threshold you would use to determine whether a difference between the predicted and actual values warrants investigation. Reference AU-C Section 520 or ISA 520 as the relevant standard.
+
+**Deliverable.** An Excel workbook with monthly aggregated data, a correlation matrix, regression output, and an analytical procedures memorandum.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 7.3 (Managerial Accounting): Multi-Group CVP Analysis**
+
+**Table group:** Master Data (Item) and Manufacturing (ProductionCompletion, ProductionCompletionLine)
+
+**Scenario.** You are a cost analyst at Charles River. The finance director has asked you to prepare a CVP analysis covering three product lines: Furniture, Lighting, and Textiles. The analysis should determine the break-even point for each product line and evaluate how changes in material costs would affect profitability. The finance director wants to see a scenario comparison and a sensitivity analysis before the next planning meeting.
+
+**Requirements.** (1) From the Item table, select one representative manufactured item from each of the three item groups (Furniture, Lighting, and Textiles). Record each item's ListPrice and StandardCost. Calculate the contribution margin per unit and contribution margin ratio for each. (2) Build a separate CVP model for each product line using the worksheet structure from Tutorial 7.2. Assume fixed costs of $245,000 for the Furniture item, $160,000 for the Lighting item, and $120,000 for the Textiles item. Calculate the break-even volume and break-even revenue for each. (3) Use Scenario Manager to define three scenarios for each product line: Base Case (current costs), a Material Cost Increase scenario (variable cost increases by 15%), and a Material Cost Decrease scenario (variable cost decreases by 10%). Generate a Scenario Summary comparing break-even volumes and profit at a reference volume of 400 units across all three scenarios for each product line. (4) Create a two-variable data table for the Furniture item that shows profit at varying combinations of selling price (a range of your choice in $100 increments) and volume (100 to 600 in 100 increments). Apply conditional formatting to highlight loss cells in red and profit cells in green.
+
+**Deliverable.** An Excel workbook with three CVP model worksheets (one per product line), Scenario Summary worksheets, a two-variable data table for the Furniture item, and a one-page summary memo comparing the three product lines.
+
+
+**Exercise 7.4 (Managerial Accounting): Production Optimization with Solver**
+
+**Table group:** Master Data (Item) and Manufacturing (WorkOrder, BillOfMaterial, WorkOrderOperationSchedule)
+
+**Scenario.** You are a production planner at Charles River. The plant manager has asked you to determine the optimal production plan for the upcoming quarter. The plant has limited work center hours and limited warehouse space, and the goal is to maximize total contribution margin across five manufactured items. Additionally, the sales team has specified minimum production quantities for two items to meet customer commitments.
+
+**Requirements.** (1) Select five manufactured items from the Item table (SupplyMode of "Manufactured") that represent different products across the Furniture, Lighting, and Textiles groups. Record each item's ListPrice and StandardCost. Estimate work center hours and storage requirements per unit (you may use reasonable estimates or derive hours from the WorkOrderOperationSchedule data if available). (2) Set up a Solver model with the five production quantities as decision variables, total contribution margin as the objective to maximize, and at least four constraints: maximum work center hours (5,000), maximum storage space (12,000 square feet), non-negativity on all quantities, and minimum production of at least 50 units each for two specified items. Require all quantities to be integers. (3) Run Solver and document the optimal solution. Generate the Sensitivity Report and explain the shadow prices for the binding constraints. Identify which constraint is most valuable to relax, meaning which additional resource would increase profit the most. (4) Re-run Solver with the work center hours constraint relaxed by 500 hours and compare the new optimal solution to the original. Calculate the incremental profit from the additional capacity and compare it to the shadow price from the first solution.
+
+**Deliverable.** An Excel workbook with the Solver model worksheet, the original and revised optimal solutions, Sensitivity Reports, and a one-page memorandum explaining the production recommendation to the plant manager.
+
+
+### Auditing Exercises
+
+**Exercise 7.5 (Auditing): Regression-Based Substantive Analytical Procedures**
+
+**Table group:** Order-to-Cash (SalesInvoice, SalesInvoiceLine)
+
+**Scenario.** You are an audit associate performing substantive analytical procedures on Charles River monthly revenue. Your audit senior has asked you to build a regression model that establishes an independent expectation for each month's revenue. You will then compare the predicted values to the actual values and identify any months where the difference exceeds a tolerable threshold, as those months would require further investigation.
+
+**Requirements.** (1) Aggregate Charles River sales invoice line data into monthly revenue totals. Assign each month a sequential number starting at 1. Create a scatter chart showing revenue versus month number. (2) Run a regression using the Data Analysis ToolPak with month number as the independent variable and monthly revenue as the dependent variable. Report the regression equation, R Square, standard error, and the p-value for the slope. (3) Calculate the predicted revenue for each historical month using the regression equation. Calculate the residual (actual minus predicted) for each month. Identify any months where the absolute value of the residual exceeds 1.5 times the standard error of the regression. Flag these months as items requiring investigation. (4) For each flagged month, investigate the underlying data. Examine whether the unusual revenue was driven by an increase in invoice count, an increase in average invoice-line amount, concentration in a particular item group, or a single large customer order. Write one paragraph per flagged month describing your findings. (5) On a separate worksheet, prepare a working paper documenting the analytical procedure. Include the expectation (the regression model), the threshold for investigation (1.5 times the standard error), the results of the comparison, and your conclusion for each flagged item. Structure the working paper so that it could be included in an audit file.
+
+**Deliverable.** An Excel workbook with monthly data, regression output, a residual analysis table with flagged months, investigation notes, and a formatted audit working paper.
+
+
+**Exercise 7.6 (Auditing): Cost Behavior Analysis and Reasonableness Testing**
+
+**Table group:** Manufacturing (ProductionCompletion, ProductionCompletionLine, WorkOrderClose) and Master Data (Item)
+
+**Scenario.** You are an internal auditor at Charles River reviewing the reasonableness of manufacturing costs. Management has represented that direct manufacturing costs are primarily variable, increasing proportionally with production volume. Your task is to test this assertion by analyzing the relationship between production volume and manufacturing cost using regression analysis.
+
+**Requirements.** (1) From the Manufacturing group, extract production completion data. For each completion, use ProductionCompletionLine.QuantityCompleted as the unit count and ProductionCompletionLine.ExtendedStandardTotalCost as the standard cost of the completed goods. Bring in the manufacturing variance for each closed work order from WorkOrderClose.TotalVarianceAmount. Aggregate the data by month to create a table of monthly production volume (total units completed) and monthly total manufacturing cost (the sum of ExtendedStandardTotalCost plus the variance closed that month). (2) Calculate the correlation between monthly production volume and monthly total manufacturing cost. Evaluate whether the correlation is consistent with management's assertion that costs are primarily variable. (3) Run a regression with monthly total manufacturing cost as the dependent variable and monthly production volume as the independent variable. Interpret the intercept as the estimated fixed or unexplained cost component and the slope as the estimated variable cost per unit. Evaluate whether the intercept is economically significant relative to total costs. (4) Calculate the residuals and identify any months where actual costs deviate substantially from the regression prediction. For each outlier month, consider possible explanations: changes in product mix, unusually large manufacturing variances at close, startup costs for new production runs, or data recording issues. (5) Write a memorandum to the internal audit director (two to three paragraphs) summarizing your conclusion about whether management's assertion is supported by the data, noting any qualifications or areas requiring further investigation.
+
+**Deliverable.** An Excel workbook with aggregated monthly production and cost data, correlation and regression analysis, residual analysis, and an internal audit memorandum.

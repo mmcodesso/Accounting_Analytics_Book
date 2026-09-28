@@ -1,0 +1,260 @@
+---
+title: "Excel Essentials for Accounting Analytics"
+---
+
+
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
+
+After completing this chapter, you will be able to:
+
+1. Explain why the structure of a workbook is a control over the accuracy of an analysis, drawing on research into spreadsheet errors.
+2. Build an analysis workbook by importing Excel Tables with Power Query, and use structured references and calculated columns in formulas that are easier to read and maintain than cell addresses.
+3. Distinguish between relative, absolute, and mixed cell references, apply each correctly, and use named cells to hold the parameters of an analysis.
+4. Apply multi-level sorts, filters, slicers, and the SUBTOTAL function to explore transaction-level data and summarize only the records in view.
+5. Use conditional formatting to surface patterns and exceptions, and data validation to protect the cells that drive an analysis.
+6. Organize and document an analytical workbook so that a reviewer can follow every number back to its source.
+:::
+
+
+## Opening Scenario {.unnumbered}
+
+You are the staff accountant from Part I, and the controller has read your data readiness memo. She agrees with your conclusions: gross margin on the Furniture product line fell from the third quarter of the 2026 fiscal year to the fourth, the sales and ledger data reconcile to the cent, and the analysis must exclude the year-end closing entry. Now she wants the diagnostic answer, and before you begin she has one request. The analysis will be reviewed by the finance team and possibly by the auditors, so she wants it built in a workbook that anyone on the team can refresh, that never alters the company's data, and that a reviewer can follow from any number back to its source. "Build it as if you were going to hand it to someone else," she says, "because you are." You have worked in the CharlesRiver.xlsx workbook throughout Part I, filtering worksheets and writing test formulas, but those were one-off checks. An analysis that the controller will act on needs a sturdier foundation. This chapter teaches you how to build it: how to bring the data you need into a workbook of your own, how to write formulas that stay correct as the data changes, how to make patterns and exceptions visible, and how to document the work so that it can be reviewed.
+
+
+
+## Why Workbook Structure Matters
+
+The first three chapters of this book used Excel to explore and test the Charles River data. You filtered the Shipment worksheet for blank tracking numbers, wrote MINIFS formulas to compare invoice and shipment dates, built PivotTables of the general ledger, and traced a sale from its order to its ledger postings. Each of those tasks answered a single question and could be repeated from scratch if needed. An analysis that supports a management decision or an audit conclusion is different. It is built once, extended many times, handed to reviewers, and refreshed when new data arrives, and every one of those steps is an opportunity for an error to enter.
+
+Research on spreadsheet errors shows why this matters. In an early synthesis of the evidence, Panko (1998) concluded that errors occur in a few percent of all spreadsheet cells, which means that for a large spreadsheet the question is not whether an error exists but how many there are. He also reported that, according to surveys of spreadsheet developers, spreadsheet creation is informal and few organizations have comprehensive policies for it. Later field audits refined these estimates. When Powell et al. (2009a) applied a structured auditing protocol to 50 operational spreadsheets, they found errors in 0.9 to 1.8 percent of formula cells, depending on how an error was defined, and the error rate differed widely from one spreadsheet to another. In a companion study, Powell et al. (2009b) asked the developers of 25 operational spreadsheets to confirm the potential errors that the auditors had found. Many of the confirmed errors had no effect on the results, but the largest was worth $100 million. Executives report the same pattern. In interviews with 45 managers and analysts, Caulkins et al. (2007) found that almost all considered spreadsheet errors common, that most could describe errors that had led to losses or poor decisions, and that quality control was in most cases informal.
+
+For accountants, these findings carry professional weight. Excel remains the tool in which much accounting analysis is done. A survey of small and medium-sized entities by Church et al. (2021) found that they continue to perform their leading accounting tasks in Excel spreadsheets. A spreadsheet that supports a cost analysis, a disclosure, or an audit procedure must be accurate, and it must also be reviewable, because a reviewer who cannot follow the logic cannot detect the errors in it. Research has not yet established which design practices prevent which errors. In a critical review of the literature, Powell et al. (2008) observed that relatively little is known about what types of errors occur, how they are created, and how they can be avoided. There is evidence, however, that a structured design approach helps. In two field experiments, Janvrin and Morrison (2000) found that participants who followed a structured design approach made significantly fewer errors in the links between different parts of a workbook.
+
+The practices in this chapter should be read in that light. Excel Tables, structured references, named parameters, validation rules, and documentation do not guarantee a correct analysis, and they do not replace careful review. What they do is remove common opportunities for error, such as a formula that stops one row short of the data, and make the remaining logic visible to the person who checks it. They are controls in the accounting sense of the word: procedures that reduce the risk of a misstatement and leave evidence that the work was done properly.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+The field audits by Powell et al. (2009b) found that errors were not spread evenly. Nine of the 25 spreadsheets they examined contained no errors at all, and many of the confirmed errors had no effect on the results, yet the largest confirmed error was worth $100 million. The practical lesson for a reviewer is that a spreadsheet's appearance says little about its accuracy. The workbooks that can be reviewed efficiently are the ones whose structure lets the reviewer see where each number comes from.
+:::
+
+
+## Excel Tables and Structured References
+
+An Excel Table is a range of data that Excel manages as a single named object. When data is stored in a Table, Excel knows where the data begins and ends, which row holds the column headers, and what each column is called. It adds filter buttons to the header row, applies banded formatting, and extends the Table automatically when you add rows or columns. Most importantly for analysis, it lets formulas refer to the data by name rather than by cell address.
+
+You have already worked with Excel Tables, even if you did not know it. Every worksheet in CharlesRiver.xlsx stores its data as a Table, which is why the worksheets you filtered in Part I had banded rows and filter buttons in the header row. Each Table has a name made of a number and the name of the database table it holds, such as T17_SalesInvoiceLine or T44_Item. You can see the name by clicking any cell in the data and looking at the Table Name box at the left end of the Table Design tab (the Table tab in Excel for Mac). Because the filter buttons are already part of each Table, you do not need to turn them on. In fact, the Data > Filter command toggles them, so clicking it on one of these worksheets turns the filter buttons off.
+
+### Tables Compared with Plain Ranges
+
+To see why Tables matter, consider the alternative. A plain range is simply a block of cells. Excel does not know that the block is a dataset, so a formula that totals it must name the exact cells, such as `=SUM(K2:K27934)`. If new rows are added below the block, the formula does not include them, and nothing warns you that the total is now incomplete. A range error of this kind produces a number that looks reasonable, which is exactly what makes it dangerous. @tbl-04-01 summarizes the practical differences.
+
+| Feature | Plain range | Excel Table |
+|---|---|---|
+| Boundaries | Formulas name fixed cells, such as K2:K27934, that must be extended by hand when rows are added | The Table knows its own extent, and new rows typed directly below it become part of it |
+| Formula references | Cell addresses, such as `=SUM(K2:K27934)` | Structured references, such as `=SUM(SalesInvoiceLine[LineTotal])` |
+| Column formulas | Copied down by hand, and easy to leave incomplete | A formula entered in a column fills every row automatically as a calculated column |
+| Filter buttons and banding | Added separately | Built into the header row |
+| Slicers | Not available | Available from the Table Design tab |
+| Charts and PivotTables | Their source ranges must be extended by hand | They follow the Table as it grows, although a PivotTable still needs to be refreshed |
+| Name | None, unless you define one | Every Table has a name, which appears in the Name Manager and in formulas |
+
+: Excel Tables compared with plain data ranges {#tbl-04-01}
+
+When data arrives as a plain range, for example in a file exported from another system, you can convert it into a Table in one step. Click any cell in the data and press Ctrl+T (Cmd+T on a Mac). Excel shows the range it has detected and asks whether the first row contains headers. Confirm, and then give the Table a descriptive name in the Table Name box, because a default name such as Table1 tells a reviewer nothing. In this chapter you will create Tables a different way, by loading them with Power Query, which names each Table for you.
+
+### Structured References
+
+A structured reference refers to Table data by the Table's name and the column's name instead of by cell address. The formula `=SUM(SalesInvoiceLine[LineTotal])` totals the LineTotal column of the Table named SalesInvoiceLine, however many rows the Table holds. Inside a Table, the reference [@LineTotal] means the LineTotal value in the current row, so a formula such as `=[@Quantity]*[@BaseListPrice]` multiplies two columns of the same row. You rarely need to type these references. When you click a Table cell or select a Table column while writing a formula, Excel inserts the structured reference for you.
+
+Structured references make formulas self-documenting. A reviewer who reads `=AVERAGE(SalesInvoiceLine[LineTotal])` knows immediately what is being averaged, whereas `=AVERAGE(K2:K27934)` sends the reviewer to column K to find out, and then to the bottom of the data to confirm that row 27934 really is the last row. @fig-04-01 shows the same data as a plain range and as a Table, using invoice lines that include the sale you traced in Tutorial 3.2.
+
+![A Plain Range Compared with an Excel Table.](/visuals/svg/fig-04-01-range-vs-table.svg){#fig-04-01 fig-alt="Two views of the same worksheet cells, columns A, G, H, K, and P of rows 1 and 10645 to 10648, which hold four Charles River invoice lines, including line 10645 for the Alder Desk sold on invoice SI-2025-007947. In the top view the cells are a plain range: row 1 holds ordinary text, the ListAmount column in column P holds a formula typed in P2 and copied down by hand, so that cell P10646 contains =ROUND(G10646*H10646,2), and the total uses =SUM(K2:K27934), which must be edited when rows are added. In the bottom view the same cells are the SalesInvoiceLine Excel Table: it has a name, a header row with filter buttons, banded rows, a calculated ListAmount column with the single formula =ROUND([@Quantity]*[@BaseListPrice],2), and a total that uses the structured reference =SUM(SalesInvoiceLine[LineTotal])."}
+
+### Calculated Columns
+
+When you type a formula into an empty column of a Table, Excel copies it to every row of that column, creating a calculated column. If rows are added later, the formula extends to them as well. Calculated columns are the natural place for row-level measures such as an extended amount or a discount, because every row is guaranteed to use the same formula. In a plain range, the same column takes a formula typed in the first row and copied down by hand. Every row then holds its own copy, and rows added later get no formula at all, as the top half of @fig-04-01 shows. If you ever need a different formula in a single row, Excel marks the inconsistency with a small triangle in the corner of the cell, which is a useful warning when you review someone else's workbook.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A Table grows when you type next to it. A value or formula typed in the row directly below a Table becomes a new row of the Table, and one typed in the column directly to its right becomes a new column. That behavior is convenient when you mean to extend the data, but a summary formula typed beside a Table ends up inside it, where it may be copied to thousands of rows or refer to itself. Keep summaries, parameters, and notes on separate worksheets, and leave the data worksheets for the Tables alone.
+:::
+
+
+## Bringing Data into the Workbook with Power Query
+
+The simplest way to start an analysis is to open the company workbook and work in it, which is what you did in Part I. For a lasting analysis that approach has three drawbacks. Every change you make alters the company's data, the workbook you are working in is far larger than the analysis needs, and the steps you took to select and prepare the data are not recorded anywhere. Copying the data into a new workbook removes the first problem but not the others, and it adds a new one: the copy no longer updates when the source does.
+
+Power Query, which appears in Excel under Data > Get Data, addresses all of these. Power Query is Excel's tool for connecting to data, shaping it, and loading the result into a workbook. You point it at a source, such as another Excel workbook, a text file, or a database, and choose the data you want. In the Power Query Editor you can then remove columns you do not need, filter out rows, and correct data types, and each action is recorded as a step in the Applied Steps list. When you close the editor, Power Query loads the result into your workbook as an Excel Table. The source is never changed. When the source is updated, Data > Refresh All reads it again and repeats every recorded step, so the Tables in your workbook stay current without any manual copying.
+
+When the source is an Excel workbook, the Power Query Navigator lists everything the workbook contains, each worksheet and each Table, with a different icon for each kind. For CharlesRiver.xlsx, choosing the Table objects, such as T17_SalesInvoiceLine, is the better choice, because a Table already defines its header row and its extent. Once the data has been loaded, the list of applied steps becomes a record of how the data was prepared, which is exactly the kind of evidence a reviewer looks for.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Power Query is built into Excel for Windows, including Microsoft 365 and Excel 2021 or later. On a Mac, the Power Query Editor requires Excel for Microsoft 365, and some commands are arranged differently from the Windows version described in the tutorials. The tutorials also need the desktop version of Excel, because the Charles River workbook is too large for Excel for the web.
+:::
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+In Chapter 2 you learned that a reliable analysis depends on being able to trace every number back to its source. Power Query supports that traceability inside Excel. The query records which workbook and which Table each result came from, and its applied steps record every filter and change made on the way. You will use Power Query again later in Part II, when the analysis requires data from several tables to be prepared and combined.
+:::
+
+
+{{< include _tutorial-01.qmd >}}
+
+
+## Cell References and Named Cells
+
+Structured references handle most formulas that work inside a Table. Many analyses, however, also need formulas outside a Table: summary grids, percentages of a total, and calculations that depend on a parameter such as a threshold or a date. For these, you need to understand how Excel's cell references behave when a formula is copied.
+
+### Relative, Absolute, and Mixed References
+
+A relative reference, such as A2, adjusts when the formula is copied. Copy a formula that refers to A2 one row down and the reference becomes A3; copy it one column to the right and it becomes B2. Relative references are what you want when each row or column of a calculation should use its own data.
+
+An absolute reference, such as $A$2, does not change when the formula is copied, because the dollar signs lock both the column and the row. Absolute references are what you want when every copy of a formula must point to the same cell, such as a total used as the denominator of a percentage, or a single threshold used by every row of a test.
+
+A mixed reference locks only one part. The reference $A2 locks the column but lets the row adjust, and A$2 locks the row but lets the column adjust. Mixed references make it possible to fill a two-way grid with a single formula: the row labels sit in a locked column, the column headers sit in a locked row, and each cell of the grid combines its own row label with its own column header. When you are editing a formula, pressing F4 (Cmd+T on a Mac) cycles the selected reference through the four forms. @tbl-04-02 summarizes the reference types, and @fig-04-05 shows how each behaves when a formula is copied.
+
+| Reference type | Example | When the formula is copied | Typical use |
+|---|---|---|---|
+| Relative | A2 | Row and column both adjust | Row-by-row calculations, such as an extended amount on each line |
+| Absolute | $A$2 | Neither the row nor the column changes | A single cell used by every copy, such as a grand total or a threshold |
+| Mixed, column locked | $A2 | The column stays A and the row adjusts | Row labels of a two-way grid whose formula is copied across columns |
+| Mixed, row locked | A$2 | The row stays 2 and the column adjusts | Column headers of a two-way grid whose formula is copied down rows |
+| Structured | SalesInvoiceLine[LineTotal] | Unchanged when copied and pasted, but column names shift when the formula is filled across | Formulas that use Table data |
+
+: Cell reference types in Excel {#tbl-04-02}
+
+![How Cell References Behave When a Formula Is Copied.](/visuals/svg/fig-04-05-cell-reference-types.svg){#fig-04-05 fig-alt="Three panels. The relative panel shows =B2*C2 in D2 becoming =B3*C3 when copied down one row. The absolute panel shows =B2/$B$6 becoming =B3/$B$6, so every row divides by the same total in B6. The mixed panel shows a two-way grid in which =$A3*(1-B$2) becomes =$A3*(1-C$2) when copied one column to the right and =$A4*(1-B$2) when copied one row down, because the column of the row labels and the row of the column headers are locked."}
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Structured references behave differently from cell references when you drag a formula with the fill handle. Filling down leaves them unchanged, but filling across shifts each column name to the next column of the Table, as if the formula were a series. A COUNTIFS formula that refers to SalesInvoiceLine[PricingMethod], filled one column to the right, can end up referring to a different column without any error message. To reproduce a formula across a grid, copy it and paste it instead, which leaves structured references unchanged, or lock the column by writing it as `SalesInvoiceLine[[PricingMethod]:[PricingMethod]]`. After copying any formula, click a cell in the middle of the result and read the formula bar to confirm that every reference points where you intend.
+:::
+
+### Named Cells
+
+A named cell gives a cell a descriptive name that formulas can use instead of its address. Select the cell, click the Name Box at the left end of the formula bar, type a name such as LargeLineThreshold, and press Enter. From then on, a formula can refer to it by name, as in `=COUNTIFS(SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)`. A named cell behaves like an absolute reference, so it never shifts when the formula is copied, and the formula states its own logic: it counts the lines above the large-line threshold. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed.
+
+Named cells are the natural home for the parameters of an analysis, such as the percentile that defines a large transaction, the start and end dates of the period under review, or a materiality amount. Placing every parameter on one worksheet, each with a name and a short description, makes the assumptions of the analysis easy to find and easy to change. When a parameter changes, every formula that uses it updates, and a reviewer can see in one place which values drove the results. The Name Manager, on the Formulas tab, lists every name in the workbook with its value and the cell it refers to. It also lists every Table, because a Table name is a name too.
+
+
+{{< include _tutorial-02.qmd >}}
+
+
+## Sorting, Filtering, and Slicers
+
+Sorting and filtering are the most basic tools for exploring transaction data, and you used both throughout Part I. This section adds the techniques that make them more useful for analysis: sorting on more than one column, filtering on conditions rather than individual values, summarizing only the rows in view, and filtering with slicers.
+
+### Sorting on More Than One Column
+
+The sort commands on a column's filter button sort the Table by that column. Their labels depend on the type of data, for example Sort Smallest to Largest for numbers, Sort Oldest to Newest for dates, and Sort A to Z for text. To sort on several columns at once, use Data > Sort, which lets you add levels. For example, you can sort the SalesInvoiceLine Table first by PromotionID and then, within each promotion, by LineTotal from largest to smallest. Excel applies the levels in order, so the first level decides the overall order and each later level only breaks ties within it. Sorting a Table rearranges its rows but never separates the values of a row from one another, because Excel moves each row as a whole.
+
+### Filtering on Conditions
+
+A column's filter button offers more than a list of values to check. Number filters select values greater than, less than, or between amounts you specify, or the top items by count or percentage. Text filters select values that begin with, end with, or contain given characters. Date filters select values before, after, or between dates, and they also offer relative choices such as This Quarter and Last Year. Filters on different columns combine, so a Table filtered on two columns shows only the rows that meet both conditions. The status bar at the bottom of the window reports how many records are in view, as it did in Tutorial 2.1.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Relative date filters such as This Quarter, Last Year, and Year to Date are measured from today's date, not from the dates in the data. A historical extract such as the Charles River data ends on a fixed date, so these filters return the wrong period or nothing at all. Filter historical data with explicit dates instead, for example Between 2026-10-01 and 2026-12-31 for the fourth quarter of fiscal 2026.
+:::
+
+### Summarizing Only the Visible Rows
+
+A filter hides rows, but it does not change what most formulas calculate. The formula `=SUM(SalesInvoiceLine[LineTotal])` returns the total of every row in the Table, including the rows the filter has hidden. To summarize only the rows in view, use the SUBTOTAL function, whose first argument chooses the calculation: `=SUBTOTAL(109,SalesInvoiceLine[LineTotal])` sums the visible rows, and `=SUBTOTAL(103,SalesInvoiceLine[SalesInvoiceLineID])` counts them. Rows removed by a filter are always excluded. The function numbers in the 100s also exclude rows that you have hidden manually, while the corresponding numbers below 100, such as 9 for a sum, include them. Placing a SUM next to a SUBTOTAL is a quick way to show both the total population and the part of it currently in view.
+
+### Slicers
+
+A slicer is a panel of buttons, one for each value in a column, that filters a Table when you click a button. To add one, click any cell in the Table, choose Insert Slicer on the Table Design tab, and select the columns you want. Clicking a button filters the Table to that value, and you can select several buttons at once with the Multi-Select button at the top of the slicer or by holding Ctrl as you click. The Clear Filter button at the top of the slicer removes its filter. Slicers show at a glance which filter is active, which makes them well suited to comparing categories one at a time, such as the promotions or pricing methods on the invoice lines.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Slicers also filter PivotTables, which you will build later in Part II, and they reappear in the Power BI reports of Part IV, where they filter every visual on a report page. The skill is the same in all three places: isolating one part of the data to answer a focused question, while keeping track of the filter that produced the answer.
+:::
+
+
+## Conditional Formatting
+
+Conditional formatting changes the appearance of cells that meet a rule you define. It does not change the data. What it does is direct your attention, so that instead of reading thousands of rows you can see at once where the large amounts, the exceptions, or the unusual combinations are. @tbl-04-03 summarizes the main rule types, all of which are on the Home tab under Conditional Formatting.
+
+| Rule type | What it does | Accounting example |
+|---|---|---|
+| Highlight Cells Rules | Formats cells greater than, less than, between, or equal to a value, or containing given text | Highlight invoice lines above a review threshold |
+| Top/Bottom Rules | Formats the highest or lowest items by count or percentage, or values above or below the average | Highlight the top 10 percent of line amounts |
+| Data Bars | Fills each cell with a bar whose length reflects its value | Compare discount dollars across promotions in a summary grid |
+| Color Scales | Shades cells along a color gradient from low to high | Show the spread of margins across items |
+| Icon Sets | Places an icon in each cell according to thresholds | Mark variances as favorable, neutral, or unfavorable |
+| Formula-based rules | Formats cells for which a formula you write returns TRUE | Highlight every row of the invoice lines that carries a promotional discount |
+
+: Types of conditional formatting rules {#tbl-04-03}
+
+The formula-based rule, reached through New Rule and "Use a formula to determine which cells to format," is the most flexible. It lets you format a whole row based on the value in one of its columns. If you select the data rows of a Table and enter the rule `=$J2>0`, Excel evaluates the formula for every selected cell, adjusting the row for each one, while the dollar sign keeps the column fixed on column J. Every cell in a row whose column J value is greater than zero is formatted, so the entire row stands out. Formulas in conditional formatting rules use cell references rather than structured references, so check the column letter of the field you want before writing the rule.
+
+You can apply several rules to the same cells, and Excel applies them all. When two rules would set the same property, such as the fill color, the rule higher in the list wins. The Manage Rules dialog shows the list, lets you change the order, and offers a Stop If True option that prevents lower rules from applying to a cell that meets the current one. A new rule is added at the top of the list, so the most recently created rule takes priority unless you reorder the rules.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Color alone is a weak way to communicate a finding. Readers who are color-blind may not see the difference, a printed copy may lose it, and a highlighted cell cannot be counted or totaled. Use conditional formatting to find the exceptions, and then record them in a form that survives: a flag column, a COUNTIFS total on a summary sheet, or a filtered list. Excel's Filter by Color command, on the filter button of a formatted column, is a quick way to go from the highlighted cells to such a list.
+:::
+
+
+## Data Validation
+
+Data validation controls what can be entered in a cell. In an analytical workbook its main use is to protect the parameter cells that drive the analysis, because a mistyped parameter flows silently into every formula that depends on it. To add a rule, select the cell and choose Data > Data Validation. The Settings tab offers several types of criteria: a List of allowed values, which creates a drop-down menu in the cell; Whole Number and Decimal, optionally within a minimum and maximum; Date and Time within a range; Text Length; and Custom, which accepts any entry for which a formula you write returns TRUE.
+
+The dialog has two more tabs. The Input Message tab lets you write a note that appears whenever the cell is selected, which is a convenient place to explain what the parameter means and what values are sensible. The Error Alert tab decides what happens when someone enters an invalid value. The Stop style refuses the entry. The Warning and Information styles only caution the user, who can accept the invalid value anyway. For a parameter cell, Stop is usually the right choice.
+
+Validation has limits worth knowing. It checks values that are typed into a cell, but pasting over a validated cell replaces both the value and the validation rule, and a formula result is never checked. Adding a rule does not check the values already in the cells, although the Circle Invalid Data command on the Data Validation menu marks any existing values that break a rule. Validation is therefore a guard against typing mistakes, not a complete control, and it works best alongside the review of parameters that a documentation worksheet makes possible.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Audit and finance workbooks often gather their parameters on a single worksheet, with each parameter named, validated, and described: the period under review, the materiality amount, a sampling threshold, or an exchange rate. A reviewer can then see every assumption that drove the results in one place and confirm that each is appropriate, instead of hunting for numbers typed into formulas across the workbook. When a parameter changes, the change is made once, in a cell that refuses implausible values.
+:::
+
+
+## Organizing and Documenting the Workbook
+
+A well-organized workbook is easier to build, easier to review, and less likely to contain errors. The organizing principle is separation. The data, the parameters, the calculations, and the explanation of the work each belong in their own place, so that a reviewer can check each one on its own and follow a number from one to the next.
+
+### Layers of an Analysis Workbook
+
+An analysis workbook built with Power Query naturally falls into four layers, which @fig-04-07 shows. The data worksheets hold the Tables that the queries load, and nothing else, so that a refresh can replace their contents safely. The parameters worksheet holds the named, validated inputs of the analysis. The analysis worksheets hold the formulas that summarize the data, using structured references to the Tables and names for the parameters. The documentation worksheet, placed first in the workbook, explains the rest. If you need a formatted output for a report, it goes on its own worksheet as well, drawing its figures from the analysis worksheets rather than recalculating them.
+
+![Layers of an Analysis Workbook.](/visuals/svg/fig-04-07-analysis-workbook-layout.svg){#fig-04-07 fig-alt="A diagram of the four layers of an analysis workbook. On the left, the CharlesRiver.xlsx workbook is the source and is never edited. Power Query reads selected Tables from it, applies recorded steps, and loads the results into data worksheets in the analysis workbook: SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram. Refresh All repeats the queries. A parameters worksheet holds named, validated inputs such as ThresholdPercentile and LargeLineThreshold. An analysis worksheet holds formulas that use structured references to the Tables and the named parameters. A documentation worksheet, first in the workbook, records the purpose, source, queries, parameters, preparer, reviewer, and open questions."}
+
+This separation is the spreadsheet equivalent of an audit trail. If a reviewer questions a number on the analysis worksheet, the formula names the Table and the parameter it uses, the query names the source Table and every step applied to it, and the source is the company's own data. Each link can be checked. It is the same idea as the source-to-ledger traceability you studied in Chapters 2 and 3, applied to your own work.
+
+### Documentation
+
+Every analytical workbook should begin with a documentation worksheet that tells a reviewer what the workbook is and how it was built. It should state the purpose of the analysis and the question it addresses; the source of the data, including the file, the Tables used, and the filters applied in each query; the date the data was last refreshed; the parameters and what each one controls; the name of the preparer and, once reviewed, of the reviewer; a list of the worksheets and what each contains; and any open questions or limitations. A short note on formatting conventions helps too. A common convention uses blue font for input cells that a user may change and black font for formulas. Whatever convention you choose, apply it consistently and state it on the documentation worksheet.
+
+Within the analysis worksheets, cell notes can explain a formula that is not self-evident or record a decision made during the analysis. The goal of all of this is the one that auditing standards set for audit documentation. For audits of public companies, the Public Company Accounting Oversight Board (PCAOB, 2004) requires audit documentation to contain enough information to enable an experienced auditor with no previous connection to the engagement to understand the work performed, the evidence obtained, and the conclusions reached, and to identify who performed and who reviewed the work. An analysis workbook documented to that standard can be reviewed, refreshed, and extended by someone other than the person who built it.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+The documentation worksheet you build in this chapter is the one you will extend throughout Part II, as the analysis workbook grows. When you reach the audit analytics work at the end of Part II, you will find that the same practices underlie an audit workpaper, where recording the source, the parameters, the steps, the preparer, and the reviewer is a professional requirement rather than good practice.
+:::
+
+
+{{< include _tutorial-03.qmd >}}
+
+
+## Looking Ahead
+
+This chapter has built the foundation for the Excel work that follows. You have seen why the structure of a workbook acts as a control over the accuracy of an analysis. You have used Power Query to bring selected Charles River Tables into a workbook of your own without altering the company's data, and you have written structured references and calculated columns that stay correct as the data changes. You have used relative, absolute, and mixed references and named parameter cells to build a summary grid, explored the invoice lines with sorting, filters, slicers, and SUBTOTAL, made exceptions visible with conditional formatting, protected a parameter with data validation, and documented the workbook so that a reviewer can follow it.
+
+The workbook has also produced the first clue to the controller's question. More invoice lines carry the Furniture Seasonal Promotion than any other promotion, and its effective dates, September and October 2026, straddle the end of the third quarter and the start of the fourth, the two quarters whose margins the controller wants explained. A clue is not an answer, however. The invoice lines carry neither an invoice date nor an item group, so the workbook cannot yet say how many of those lines fell in each quarter, or how much the promotion lowered Furniture prices compared with the other causes a margin can have. Answering those questions requires combining the invoice lines with the invoices, the items, and the customers into a single analytical table. The next chapters of Part II do that work: preparing and combining the data, summarizing it, and then measuring the effects that explain the change in margin.
+
+
+
+{{< include _summary.qmd >}}
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

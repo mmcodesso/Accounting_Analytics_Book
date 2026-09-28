@@ -6,27 +6,59 @@
 
 **Step-by-step instructions.**
 
-**Step 1.** Open CharlesRiver.xlsx in Excel (if not already open) and click on the Account worksheet. Examine the columns available. You should see fields including AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and ParentAccountID. This is the chart of accounts for Charles River, and it forms the backbone of the Accounting Core. The ParentAccountID column creates a hierarchical structure that organizes accounts into groups. Scroll through the list to get a sense of how many accounts exist and how they are organized.
+**Step 1. Get to know the chart of accounts.**
 
-**Step 2.** Check the chart of accounts for completeness. Every major account type should be represented. Sort or filter the AccountType column and verify that the chart includes accounts classified as Asset, Liability, Equity, Revenue, and Expense. If any major category is missing, that is a completeness problem. Record your findings.
+a. Open CharlesRiver.xlsx in Excel (if not already open) and click the **Account** worksheet tab.
+b. Examine the columns available. You should see fields including AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and ParentAccountID.
+c. Scroll through the list to get a sense of how many accounts exist and how they are organized.
 
-**Step 3.** Click on the GLEntry worksheet. Examine the columns available. You should see fields including GLEntryID, PostingDate, AccountID, Debit, Credit, VoucherType, VoucherNumber, SourceDocumentType, SourceDocumentID, SourceLineID, CostCenterID, FiscalYear, and FiscalPeriod. Scroll down to get a sense of the volume of data. The GLEntry worksheet holds hundreds of thousands of rows, close to the maximum that a single Excel worksheet can contain.
+This is the chart of accounts for Charles River, and it forms the backbone of the Accounting Core. The ParentAccountID column creates a hierarchical structure that organizes accounts into groups.
 
-**Step 4.** Check the general ledger for a fundamental accounting consistency requirement: for every transaction, total debits should equal total credits. To test this at the aggregate level, press Ctrl+Down Arrow to jump to the last row of the data, leave one blank row, and type Total in column C. In column D of that row, type `=SUM(`, click the first Debit value in cell D2, press Ctrl+Shift+Down Arrow to select every Debit value, and close the parenthesis. Enter the same kind of formula for the Credit column in column E. In the row below, type Difference in column C and enter a formula in column D that subtracts the credit total from the debit total. The two totals should be equal, or very nearly so (small differences may arise from rounding), as they are in @fig-02-07. If there is a significant difference, that indicates a serious consistency problem in the ledger.
+**Step 2. Check the chart of accounts for completeness.** Every major account type should be represented. Sort or filter the AccountType column and verify that the chart includes accounts classified as Asset, Liability, Equity, Revenue, and Expense. If any major category is missing, that is a completeness problem. Record your findings.
 
-![Screenshot of the Charles River GLEntry worksheet with debit and credit totals.](/visuals/png/fig-02-07-glentry-debit-credit-sum.png){#fig-02-07 fig-alt="Screenshot of the bottom of the Charles River GLEntry worksheet in Excel, showing the last ledger rows, year-end journal entries dated 2026-12-31. Below the data, a Total row shows the sum of the Debit column and the sum of the Credit column, both $731,949,908.31, and a Difference row shows $0.00. A red box highlights the totals and the difference."}
+**Step 3. Get to know the general ledger.** Click the **GLEntry** worksheet tab and examine the columns available. You should see fields including GLEntryID, PostingDate, AccountID, Debit, Credit, VoucherType, VoucherNumber, SourceDocumentType, SourceDocumentID, SourceLineID, CostCenterID, FiscalYear, and FiscalPeriod. Scroll down to get a sense of the volume of data. The GLEntry worksheet holds hundreds of thousands of rows, close to the maximum that a single Excel worksheet can contain.
 
-**Step 5.** Check for accounts referenced in the general ledger that do not exist in the chart of accounts. This is a referential integrity test (@tbl-02-03). With hundreds of thousands of rows, adding a formula to every GLEntry row would be slow, so work with distinct values instead. Insert a PivotTable from the GLEntry worksheet and place AccountID in the Rows area. The PivotTable lists each AccountID that appears in the ledger exactly once. Next to the PivotTable, use XLOOKUP or COUNTIFS to check whether each listed AccountID exists in the Account worksheet's AccountID column. Any AccountID with no match is an orphaned reference. In the Charles River data, every AccountID should match. A clean result like this is still a finding worth recording, because it tells you that the ledger's account references can be relied on.
+**Step 4. Check that total debits equal total credits.** For every transaction, total debits should equal total credits, a fundamental accounting consistency requirement. To test it at the aggregate level:
+
+a. Press Ctrl+Down Arrow to jump to the last row of the data, leave one blank row, and type `Total` in column C.
+b. In column D of that row, type `=SUM(`, click the first Debit value in cell D2, press Ctrl+Shift+Down Arrow to select every Debit value, and close the parenthesis.
+c. Enter the same kind of formula for the Credit column in column E.
+d. In the row below, type `Difference` in column C and enter a formula in column D that subtracts the credit total from the debit total.
+
+The two totals should be equal, or very nearly so (small differences may arise from rounding), as they are in @fig-02-07. If there is a significant difference, that indicates a serious consistency problem in the ledger.
+
+![Debit and Credit Totals at the Bottom of the GLEntry Worksheet.](/visuals/svg/fig-02-07-glentry-debit-credit-sum.svg){#fig-02-07 fig-alt="A mock of the bottom of the Charles River GLEntry worksheet in Excel, showing the last ledger rows, year-end journal entries dated 2026-12-31. After one blank row, a Total row shows the sum of the Debit column and the sum of the Credit column, which are equal, and a Difference row shows $0.00. The formula bar shows the difference formula, and the totals and the difference are outlined."}
+
+**Step 5. Check that every ledger account exists in the chart of accounts.** This is a referential integrity test (@tbl-02-03). With hundreds of thousands of rows, adding a formula to every GLEntry row would be slow, so work with distinct values instead.
+
+a. Insert a PivotTable from the GLEntry worksheet and place AccountID in the **Rows** area. The PivotTable lists each AccountID that appears in the ledger exactly once.
+b. Next to the PivotTable, use XLOOKUP or COUNTIFS to check whether each listed AccountID exists in the Account worksheet's AccountID column.
+c. Record the result.
+
+Any AccountID with no match is an orphaned reference. In the Charles River data, every AccountID should match. A clean result like this is still a finding worth recording, because it tells you that the ledger's account references can be relied on.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
 A single Excel worksheet can hold just over one million rows, and the Charles River GLEntry table already fills most of that space. Formulas copied down every row of a table this size can make Excel slow or unresponsive. Summarizing first, as the PivotTable in Step 5 does, keeps the workbook responsive. When a dataset outgrows Excel altogether, SQL becomes the better tool, which is one reason Part III teaches it.
 :::
 
-**Step 6.** Examine the PostingDate column. Sort by posting date and note the earliest and latest dates. Then build a PivotTable with FiscalYear and FiscalPeriod in the Rows area and a count of GLEntryID in the Values area. Most periods contain a similar volume of entries, but the first period and the final periods contain far fewer. Before treating a low-volume period as a sign of missing transactions, check whether it sits at the edge of the extract. The data begins when the company's records begin, and it ends early in a new fiscal year in which only some kinds of activity have been recorded. Filter to the latest fiscal year and look at the SourceDocumentType of its entries: you will find only supplier payments, which settle invoices from the prior year. Record what you find and whether these entries belong in an analysis of the fiscal years under review, which is a timeliness and cutoff question.
+**Step 6. Check the periods the ledger covers.**
 
-**Step 7.** Examine the Debit and Credit columns for missing or unusual values. Filter for rows where both the Debit and Credit fields are zero. You will find a small number of such rows, all from the same source document type. An entry with no debit and no credit amount serves no accounting purpose. It may be a system artifact or a data entry error, and either way it should be investigated and explained. Record the count and the source document type.
+a. Sort by the PostingDate column and note the earliest and latest dates.
+b. Build a PivotTable with FiscalYear and FiscalPeriod in the **Rows** area and a count of GLEntryID in the **Values** area.
+c. Filter to the latest fiscal year and look at the SourceDocumentType of its entries.
+d. Record what you find and whether these entries belong in an analysis of the fiscal years under review, which is a timeliness and cutoff question.
 
-**Step 8.** Examine the SourceDocumentType column. Use a PivotTable to count the number of GLEntry rows for each source document type. You should see types such as "SalesInvoice," "Shipment," "PurchaseInvoice," "GoodsReceipt," "MaterialIssue," "PayrollPayment," "JournalEntry," and "WorkOrderClose." If an expected source type were absent, that would indicate a completeness problem, in which an entire business cycle failed to post to the ledger. Record the distribution of entries by source document type.
+Most periods contain a similar volume of entries, but the first period and the final periods contain far fewer. Before treating a low-volume period as a sign of missing transactions, check whether it sits at the edge of the extract. The data begins when the company's records begin, and it ends early in a new fiscal year in which only some kinds of activity have been recorded. In the latest fiscal year you will find only supplier payments, which settle invoices from the prior year.
 
-**Checkpoint.** At this point, you should have assessed the Charles River Accounting Core against the quality dimensions in @tbl-02-03. For completeness, you checked that all account types are present in the chart of accounts, that every period has entries (and why some periods are small), and that every expected source document type appears in GLEntry. For consistency, you confirmed that debits equal credits in the aggregate and that every GL account reference exists in the chart of accounts. For accuracy and timeliness, you identified the zero-amount rows and the entries dated beyond the fiscal years under review. Your findings should be documented in a brief written summary that identifies each test performed, the result, and any issues discovered, including the tests that found no problems. This exercise previews the audit analytics work in Parts II and III, where you will use Excel and then SQL to automate these same tests across the entire population.
+**Step 7. Look for entries with no amount.** Examine the Debit and Credit columns for missing or unusual values. Filter for rows where both the Debit and Credit fields are zero, and record the count and the source document type. You will find a small number of such rows, all from the same source document type. An entry with no debit and no credit amount serves no accounting purpose. It may be a system artifact or a data entry error, and either way it should be investigated and explained.
+
+**Step 8. Check that every business cycle posts to the ledger.** Use a PivotTable to count the number of GLEntry rows for each value of the SourceDocumentType column, and record the distribution. You should see types such as "SalesInvoice," "Shipment," "PurchaseInvoice," "GoodsReceipt," "MaterialIssue," "PayrollPayment," "JournalEntry," and "WorkOrderClose." If an expected source type were absent, that would indicate a completeness problem, in which an entire business cycle failed to post to the ledger.
+
+**Checkpoint.** At this point, you should have assessed the Charles River Accounting Core against the quality dimensions in @tbl-02-03:
+
+- **Completeness:** all account types are present in the chart of accounts, every period has entries (and you know why some periods are small), and every expected source document type appears in GLEntry.
+- **Consistency:** debits equal credits in the aggregate, and every GL account reference exists in the chart of accounts.
+- **Accuracy and timeliness:** you identified the zero-amount rows and the entries dated beyond the fiscal years under review.
+
+Your findings should be documented in a brief written summary that identifies each test performed, the result, and any issues discovered, including the tests that found no problems. This exercise previews the audit analytics work in Parts II and III, where you will use Excel and then SQL to automate these same tests across the entire population.

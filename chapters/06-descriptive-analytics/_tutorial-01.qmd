@@ -1,0 +1,26 @@
+### Tutorial 6.1: Building a Statistical Profile of Charles River Invoice Line Data
+
+**Context and objective.** You will calculate a set of summary statistics for the Charles River invoice line data to build a profile of billed line characteristics. This profile tells you the typical billed amount, the typical shipped quantity, and how much variation exists in both measures. These statistics provide context for the more detailed analyses you will perform later in the chapter.
+
+**Prerequisites.** Open the merged invoice line dataset you prepared in Chapter 5, which combines SalesInvoiceLine with Item, Customer, and SalesInvoice into a single Excel Table named InvoiceLines, with columns including LineTotal, QuantityShipped, ItemGroup, CustomerSegment, InvoiceDate, and FiscalQuarter.
+
+**Step 1.** Create a new worksheet and name it "SummaryStats." In cell A1, type "Statistical Profile of Invoice Lines" as a descriptive title. In cell A3, type "Measure" as a column header. In cell B3, type "LineTotal" and in cell C3, type "QuantityShipped."
+
+**Step 2.** In cells A4 through A10, enter the following labels, one per row. Average, Median, Standard Deviation, Minimum, Maximum, Count, and Count Blank.
+
+**Step 3.** In cell B4, enter the formula =AVERAGE(InvoiceLines[LineTotal]). This calculates the average billed amount across all invoice lines. Your result should be approximately $793.
+
+**Step 4.** In cell B5, enter =MEDIAN(InvoiceLines[LineTotal]). Your result should be approximately $512. Notice that the median is lower than the average, which tells you that the line amount distribution is skewed to the right by some higher-value lines.
+
+**Step 5.** In cell B6, enter =STDEV.S(InvoiceLines[LineTotal]). This returns approximately $864, which is larger than the mean itself. This large standard deviation confirms that line amounts vary widely, from small accessory lines to large furniture orders.
+
+**Step 6.** In cells B7 and B8, enter =MIN(InvoiceLines[LineTotal]) and =MAX(InvoiceLines[LineTotal]). The minimum should be near $18 and the maximum near $11,480, confirming the wide range suggested by the standard deviation.
+
+**Step 7.** In cell B9, enter =COUNT(InvoiceLines[LineTotal]) to count the number of lines with a numeric amount. In cell B10, enter =COUNTBLANK(InvoiceLines[LineTotal]) to check for missing values. The count should be approximately 4,200 and the blank count should be 0.
+
+**Step 8.** Repeat steps 3 through 7 in column C for the QuantityShipped field. Your results should show an average quantity near 15, a median near 10, a standard deviation near 14, a minimum of 1, and a maximum near 96.
+
+**Checkpoint.** Your SummaryStats worksheet should now contain a table with seven statistical measures calculated for both LineTotal and QuantityShipped. The fact that the average line amount exceeds the median by roughly $280 tells you the distribution is right-skewed. The standard deviation of the QuantityShipped field being nearly as large as its mean indicates substantial variability in line sizes. These observations will inform the PivotTable analyses you build later in this chapter.
+
+> **[WATCH OUT]**
+> When using statistical functions with Excel Tables, reference the table column using structured references such as InvoiceLines[LineTotal] rather than a cell range such as F2:F4201. Structured references adjust automatically if rows are added to or removed from the Table, while cell references do not. Chapter 4 explained this distinction in detail. In summarization work, where you may return to the same workbook with updated data in a future quarter, using structured references prevents your summary statistics from becoming stale.

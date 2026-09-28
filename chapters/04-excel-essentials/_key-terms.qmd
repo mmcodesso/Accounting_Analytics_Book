@@ -1,0 +1,33 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Absolute reference.** A cell reference in which both the column and the row are locked with dollar signs, such as $A$2, so that the reference does not change when the formula is copied. Absolute references are used when every copy of a formula must refer to the same cell, such as a grand total used as a denominator.
+
+**Applied steps.** The list in the Power Query Editor that records each action taken on a query, such as filtering rows, removing columns, or changing a data type. Power Query repeats the steps in order every time the query is refreshed, and the list documents how the data was prepared.
+
+**Calculated column.** A column of an Excel Table whose formula Excel applies to every row automatically, including rows added later. Calculated columns are the natural place for row-level measures, such as the list amount or the discount on each invoice line.
+
+**Conditional formatting.** An Excel feature that changes the appearance of cells that meet a rule, such as values above a threshold, the top items in a range, or rows for which a formula returns TRUE. It directs attention to patterns and exceptions without changing the data.
+
+**Data validation.** An Excel feature that restricts what can be typed into a cell, such as a list of allowed values or a number within a range, and that can display an input message and refuse invalid entries. In analytical workbooks it protects the parameter cells that drive the results.
+
+**Documentation worksheet.** A worksheet, usually the first in a workbook, that records the purpose of the analysis, the data sources and query steps, the parameters, the worksheets and their contents, the preparer and reviewer, and any open questions, so that someone else can understand and review the work.
+
+**Excel Table.** A range of data that Excel manages as a single named object, with a header row, filter buttons, banded formatting, automatic expansion, and support for structured references. An Excel Table is a feature of the spreadsheet, distinct from a table in a relational database, although each worksheet of CharlesRiver.xlsx stores one database table as an Excel Table.
+
+**Mixed reference.** A cell reference that locks either the column or the row but not both, such as $A2 or A$2. Mixed references let a single formula fill a two-way grid, with the row labels in a locked column and the column headers in a locked row.
+
+**Named range.** A descriptive name assigned to a cell or range, such as LargeLineThreshold, that formulas can use in place of the cell address. A name always refers to the same cells, so it behaves like an absolute reference while making the formula easier to read. The Name Manager lists every name in a workbook.
+
+**Parameter cell.** A cell that holds an input to an analysis, such as a threshold, a percentile, or the start date of a review period, so that the value is stated once and used by every formula that needs it. Parameter cells are usually named, validated, and gathered on one worksheet.
+
+**Power Query.** Excel's tool for connecting to data, shaping it, and loading it into a workbook, found under Data > Get Data. It records each transformation as an applied step, loads results as Excel Tables without altering the source, and repeats the steps when the data is refreshed.
+
+**Relative reference.** A cell reference, such as A2, that adjusts when the formula is copied, so that each copy refers to the cell in the same relative position. Relative references are the default in Excel and suit calculations in which each row uses its own data.
+
+**Slicer.** A panel of buttons, one for each value in a column, that filters an Excel Table or a PivotTable when a button is clicked. Slicers make it easy to compare categories one at a time and show which filter is active.
+
+**Structured reference.** A reference that uses a Table's name and a column's name instead of cell addresses, such as SalesInvoiceLine[LineTotal] for a whole column or [@LineTotal] for the current row. Structured references adjust automatically as the Table grows and make formulas self-documenting.
+
+**SUBTOTAL function.** An Excel function that calculates a sum, count, average, or other summary of only the rows that are visible, excluding the rows hidden by a filter. Function numbers from 101 to 111, such as 109 for a sum, also exclude rows hidden manually.

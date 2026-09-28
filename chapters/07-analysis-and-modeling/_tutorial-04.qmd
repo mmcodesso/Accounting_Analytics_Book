@@ -1,0 +1,32 @@
+### Tutorial 7.4: Finding the Optimal Product Mix with Solver
+
+**Context and objective.** Charles River manufactures several furniture items in-house and faces constraints on work center hours and warehouse space. You will use Solver to determine the production quantities for three manufactured items that maximize total contribution margin, subject to production time and storage constraints. This exercise simulates the kind of production planning analysis that a cost analyst or operations analyst would perform.
+
+**Prerequisites.** Enable the Solver add-in (see instructions above). Create a new worksheet named "ProductMix."
+
+**Step 1.** Set up the product data. In cell A1, type "Optimal Product Mix Analysis" as a title. In cells A3 through A5, enter the names of three manufactured Charles River furniture items: "Beacon Dining Table," "Harbor Bookcase," and "Charles Sideboard." These items represent different products in the Furniture group with different prices, costs, and production requirements.
+
+**Step 2.** Enter the product parameters. In row 2 (above the item names), create column headers: in cell B2, type "List Price," in cell C2, type "Standard Cost," in cell D2, type "Contribution Margin," in cell E2, type "Production Hours," in cell F2, type "Storage (sq ft)," and in cell G2, type "Quantity to Produce." Using the Item table as your reference, enter the ListPrice and StandardCost for each item. For the Beacon Dining Table, enter ListPrice = 1850 and StandardCost = 1040. For the Harbor Bookcase, enter ListPrice = 1280 and StandardCost = 720. For the Charles Sideboard, enter ListPrice = 2150 and StandardCost = 1290. In column D, enter the formula =B3-C3 for each row to calculate the contribution margin per unit.
+
+**Step 3.** Enter the production requirement estimates. These values represent the work center hours and warehouse storage space required per unit. For the Beacon Dining Table, enter Production Hours = 6.0 and Storage = 18 square feet. For the Harbor Bookcase, enter Production Hours = 4.5 and Storage = 14. For the Charles Sideboard, enter Production Hours = 7.5 and Storage = 22. These are simplified estimates for the exercise; in practice, you could derive production hours from the WorkOrderOperationSchedule table in the Manufacturing group.
+
+**Step 4.** In column G (Quantity to Produce), enter initial values of 0 for all three items. These are the decision variables that Solver will adjust.
+
+**Step 5.** Set up the constraint totals. In cell A7, type "Total Contribution Margin" and in cell B7, enter the formula =SUMPRODUCT(D3:D5, G3:G5). This multiplies each item's contribution margin by its production quantity and sums the results. In cell A8, type "Total Production Hours" and in cell B8, enter =SUMPRODUCT(E3:E5, G3:G5). In cell A9, type "Total Storage (sq ft)" and in cell B9, enter =SUMPRODUCT(F3:F5, G3:G5).
+
+**Step 6.** Enter the constraints. In cell C8, type "Available:" and in cell D8, enter 4000 (the total work center hours available in the quarter). In cell C9, type "Available:" and in cell D9, enter 10000 (the total warehouse storage space in square feet).
+
+**Step 7.** Open Solver from the Data tab. Set the Objective to cell B7 (Total Contribution Margin). Select "Max" to maximize it. Set the Variable Cells to G3:G5 (the production quantities). Click "Add" to add constraints. First constraint: B8 <= D8 (total production hours must not exceed available hours). Second constraint: B9 <= D9 (total storage must not exceed available space). Third constraint: G3:G5 >= 0 (no negative production). Fourth constraint: G3:G5 = integer (you cannot produce a fraction of a furniture unit).
+
+*[Figure 7.12: The Solver Parameters dialog box with the Objective set to Total Contribution Margin (Max), Variable Cells set to the production quantity cells, and four constraints listed: production hours limit, storage limit, non-negativity, and integer constraint. Annotations label each section.]*
+
+**Step 8.** In the Solving Method dropdown, select "Simplex LP" (since this is a linear optimization problem with linear constraints). Click Solve. Solver will calculate the optimal quantities and display a dialog reporting whether it found an optimal solution.
+
+**Step 9.** If Solver finds a solution, select "Keep Solver Solution" and check "Sensitivity" under Reports before clicking OK. The sensitivity report provides information about how much the objective function value would change if constraints were relaxed, which is useful for understanding which constraints are most binding.
+
+**Step 10.** Examine the results. Solver should have populated the Quantity to Produce cells with the optimal values. Check that the Total Production Hours and Total Storage do not exceed their limits. Examine which items Solver chose to produce in the greatest quantity and consider whether the result makes sense given the contribution margins and resource requirements.
+
+**Checkpoint.** Your ProductMix worksheet should show the optimal production quantities for all three items, with the total contribution margin maximized subject to the production hours and storage constraints. The production hours and storage totals should be at or below their limits. The Sensitivity Report worksheet should show the shadow prices for each constraint, indicating the value of one additional unit of the constrained resource.
+
+> **[CONNECTING THE DOTS]**
+> In Chapter 18, you will revisit product mix and profitability analysis using all three tools. SQL queries will extract the cost and pricing data from the Charles River database, Excel models will perform the CVP and optimization analysis, and Power BI dashboards will present the results to management. The Solver model you built in this tutorial is the analytical core of that integrated workflow.

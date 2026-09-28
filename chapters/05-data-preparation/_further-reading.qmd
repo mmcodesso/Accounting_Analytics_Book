@@ -1,0 +1,19 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Dasu, T., and Johnson, T. (2003). *Exploratory data mining and data cleaning.* Wiley. This book provides a comprehensive treatment of data quality assessment and data cleaning techniques. Although it addresses data cleaning broadly rather than in an accounting-specific context, its discussion of the proportion of project time consumed by data preparation and its taxonomy of data quality problems are directly relevant to the practical challenges addressed in this chapter.
+
+Hernandez, M. J. (2013). *Database design for mere mortals: A hands-on guide to relational database design* (3rd ed.). Addison-Wesley. This book explains relational database design in accessible terms, including how tables relate through keys and how data should be organized across multiple tables. Understanding these design principles helps explain why the Charles River data arrives in separate tables, such as SalesOrder, Customer, and Item, that must be merged using the lookup and Power Query techniques taught in this chapter.
+
+Huang, F., and Vasarhelyi, M. A. (2019). Applying robotic process automation (RPA) in auditing: A framework. *International Journal of Accounting Information Systems*, 35, 100433. This paper discusses how repetitive data preparation tasks in auditing can be automated. Power Query's repeatable transformation workflows represent a step toward the process automation described in this paper, and the documentation capabilities of Power Query align with the audit evidence requirements the authors discuss.
+
+Rahm, E., and Do, H. H. (2000). Data cleaning: Problems and current approaches. *IEEE Data Engineering Bulletin*, 23(4), 3-13. This paper provides a foundational overview of data cleaning problems, including duplicate detection, inconsistent formatting, and missing values. The taxonomy of cleaning challenges described in this paper maps directly to the problems students encounter when working with the Charles River data and the solutions taught in this chapter.
+
+AICPA (American Institute of Certified Public Accountants). (2017). *Guide to audit data analytics.* AICPA. This professional guidance document recommends that auditors document all data preparation steps performed before analytical procedures and evaluate the reliability of data obtained from client systems. The Power Query documentation techniques taught in this chapter directly support these professional requirements.
+
+Panko, R. R. (2008). What we know about spreadsheet errors. *Journal of Organizational and End User Computing*, 10(2), 15-21. This paper's findings on spreadsheet error rates are relevant to data preparation because formula-based cleaning introduces opportunities for error at every step. Power Query's structured, visible transformation process reduces these risks by eliminating scattered formulas and creating a reviewable transformation log.
+
+Powell, S. G., Baker, K. R., and Lawson, B. (2008). A critical review of the literature on spreadsheet errors. *Decision Support Systems*, 46(1), 128-138. This review examines the causes and consequences of spreadsheet errors in organizational settings. The paper supports the argument that documented, repeatable data preparation processes, such as those built in Power Query, are preferable to ad hoc formula-based approaches for reducing error risk in accounting analyses.
+
+Wickham, H. (2014). Tidy data. *Journal of Statistical Software*, 59(10), 1-23. This paper formalized the concept of tidy data introduced in Chapter 2. The data preparation techniques in this chapter, particularly the use of Power Query to reshape, merge, and clean data into a tidy format with each variable in its own column and each observation in its own row, are practical applications of the principles described in this paper.

@@ -1,0 +1,45 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**AVERAGE function.** An Excel function that calculates the arithmetic mean of a set of numeric values. In accounting analytics, AVERAGE helps determine typical transaction sizes, average account balances, and mean period-over-period changes.
+
+**AVERAGEIFS function.** An Excel function that calculates the arithmetic mean of values that meet one or more specified criteria. It combines the averaging capability of AVERAGE with the filtering logic of SUMIFS, enabling calculations such as the average line amount for a specific customer segment or item group.
+
+**Calculated field.** A user-defined field within a PivotTable that performs a calculation using other fields in the source data. Calculated fields derive measures such as unit revenue, profit margins, and markup percentages directly within the PivotTable, and they update automatically when the PivotTable refreshes.
+
+**Completion rate.** A production measure that compares the quantity completed (from ProductionCompletion) to the quantity planned (from WorkOrder), expressed as a percentage. A completion rate below 100 percent indicates that planned production was not fully achieved.
+
+**Conditional aggregation.** The process of calculating totals, counts, or averages for a subset of data that meets specified criteria. In Excel, conditional aggregation is performed using the SUMIFS, COUNTIFS, and AVERAGEIFS family of functions.
+
+**COUNTIFS function.** An Excel function that counts the number of rows in a dataset that meet one or more specified criteria. In accounting, COUNTIFS helps determine transaction counts by period, segment, or threshold, such as the number of invoice lines above a materiality limit.
+
+**Cross-tabulation.** A summarization technique that displays a measure such as revenue or count broken down by two or more dimensions at once, such as item group and customer segment. PivotTables are the primary tool for cross-tabulation in Excel.
+
+**Customer segment.** A classification in the Customer table (CustomerSegment) that distinguishes Wholesale from Direct customers at Charles River. Summarizing by customer segment supports disaggregated revenue analysis.
+
+**Date grouping.** A PivotTable feature that groups date values into periods such as days, months, quarters, or years. Date grouping enables time-based summarization without requiring the analyst to add period columns to the source data.
+
+**Descriptive analytics.** The category of analytics that answers the question "what happened?" by summarizing historical data into totals, averages, counts, distributions, and comparisons. Descriptive analytics is the most common form of analytics in accounting practice.
+
+**Item group.** A classification in the Item table (ItemGroup) that organizes Charles River products into Furniture, Lighting, Textiles, and Accessories. Item group is a common dimension for revenue and production summaries.
+
+**LineTotal.** The extended billed amount on a single sales invoice line in the SalesInvoiceLine table. LineTotal is the authoritative line-level revenue figure used throughout this chapter for sales summarization.
+
+**Measures of central tendency.** Statistical measures that describe the center of a data distribution, including the mean (AVERAGE) and the median (MEDIAN). In accounting data, differences between the mean and median indicate that the distribution is skewed by extreme values.
+
+**Measures of dispersion.** Statistical measures that describe how spread out values are in a dataset, including the standard deviation (STDEV.S), the range (MAX minus MIN), and the minimum and maximum values. Dispersion measures indicate variability in account balances, transaction amounts, or production metrics.
+
+**MEDIAN function.** An Excel function that returns the middle value of a set of numeric values when arranged in order. Unlike the mean, the median is not influenced by extreme values, making it a more robust measure of central tendency for skewed accounting distributions.
+
+**PivotTable.** An interactive Excel feature that summarizes data from a source table by organizing it into a flexible grid of row labels, column labels, and aggregated values. PivotTables automate multidimensional summarization and support grouping, filtering, and multiple calculation types.
+
+**Show Values As.** A PivotTable feature that transforms the displayed values from raw aggregates into derived calculations such as percentages of row or column totals, differences from a base value, or running totals. This feature enables comparative and trend analysis within a PivotTable without modifying the source data.
+
+**STDEV.S function.** An Excel function that calculates the sample standard deviation of a set of numeric values. A larger standard deviation indicates greater variability in the data. In accounting, standard deviation helps assess the predictability of revenue streams, expense patterns, and production metrics.
+
+**Stratification.** The process of dividing a dataset into groups (strata) based on ranges of a numeric variable and examining the count and monetary value within each group. Auditors use stratification to understand the distribution of a transaction population and to design sampling plans that focus testing on the most significant items.
+
+**SUMIFS function.** An Excel function that calculates the sum of values in a range that meet one or more specified criteria. SUMIFS is the most commonly used conditional aggregation function in accounting analytics, supporting calculations such as total revenue by item group, total expenses by department, and total payments by supplier.
+
+**Work order close variance.** The manufacturing variance recognized when a work order is closed, recorded in the WorkOrderClose table and posted to the manufacturing variance account. It represents the difference between accumulated production costs and standard cost absorbed into finished goods.

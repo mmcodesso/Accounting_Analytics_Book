@@ -1,0 +1,23 @@
+## Guided Tutorial 5.2: Cleaning Charles River Item Data with Text Functions
+
+**Context and objective.** In this tutorial, you will clean the Charles River Item table using text functions. The Item table contains item names, item groups, and cost and price information that need standardization before they can support a cost analysis. You will use TRIM, UPPER, ISBLANK, and IF to resolve formatting inconsistencies and to flag items whose cost and price data would distort a profitability analysis.
+
+**Prerequisites.** You need the Charles River Excel workbook open with the Item worksheet converted to a named Excel Table called Item. If you have not yet converted it, do so now following the steps from Chapter 4.
+
+**Step-by-step instructions.**
+
+**Step 1.** Click on the Item worksheet. Examine the ItemName column. Scroll through the item names and note any inconsistencies in spacing or formatting. Some names may carry extra spaces between words, and the formatting may not be consistent across all entries.
+
+**Step 2.** In the first empty column to the right of the Table, type "CleanName" as the header. In the first data row, enter the formula =TRIM([@ItemName]) and press Enter. This removes any leading, trailing, or extra interior spaces from each item name. Scroll through the results and compare them to the original ItemName column to verify the cleaning effect.
+
+**Step 3.** Examine the ItemGroup column, which classifies each item as Furniture, Lighting, Textiles, or Accessories. In the next empty column, type "ItemGroupStd" as the header. Enter the formula =UPPER(TRIM([@ItemGroup])). This formula trims stray spaces and converts the group label to uppercase so that grouping and matching operations treat values consistently regardless of how the original data was capitalized.
+
+*[Figure 5.10: Screenshot of the Charles River Item Table with new columns added, including CleanName using TRIM, ItemGroupStd using UPPER and TRIM, MarginCheck using a nested IF, and UnitMargin. Annotations identify each formula and the problem it resolves.]*
+
+**Step 4.** Examine the StandardCost and ListPrice columns. Use conditional formatting to highlight any rows where StandardCost is zero. In the next empty column, type "MarginCheck" as the header. Enter the formula =IF([@StandardCost]=0, "No Cost Data", IF([@ListPrice]<[@StandardCost], "Negative Margin", "OK")). This formula flags items with missing cost data and items whose list price is below the standard cost, both of which would distort a profitability analysis.
+
+**Step 5.** Add a column with the header "UnitMargin" and the formula =[@ListPrice]-[@StandardCost]. This computes the gross margin per unit for each item from the list price and the standard cost that the Item table records. You will build on this column in the managerial accounting exercises.
+
+**Step 6.** Filter the MarginCheck column to show only the "No Cost Data" and "Negative Margin" entries. Count the number of records in each category. These are the items you would need to investigate or exclude before performing a reliable cost analysis. Because the Item table also records a SupplyMode of Purchased or Manufactured for each item, note whether the flagged items concentrate among purchased items or manufactured items, since the explanation for a missing standard cost often differs between the two.
+
+**Checkpoint.** Your Item Table should now include four new columns, which are CleanName, ItemGroupStd, MarginCheck, and UnitMargin. The CleanName column should contain trimmed item names. The ItemGroupStd column should contain standardized uppercase group labels. The MarginCheck column should flag items with missing or problematic cost data. The UnitMargin column should compute a per-unit margin for every item. If all four columns produce values rather than errors for every row, your text function cleaning is complete.

@@ -1,0 +1,50 @@
+### Tutorial 8.3: Aging Analysis on Charles River Sales Invoices
+
+**Context and objective.** You will build an aging analysis of Charles River customer invoices that classifies each outstanding balance by how many days it is past due. This analysis supports the estimation of the allowance for doubtful accounts and identifies the balances that carry the highest collection risk.
+
+**Prerequisites.** Open the Charles River Excel workbook and navigate to the SalesInvoice worksheet in the Order-to-Cash group. You will use the InvoiceDate and DueDate columns, and you will draw the invoice value from the SalesInvoiceLine worksheet.
+
+**Step-by-step instructions.**
+
+1. Create a new worksheet called "AgingAnalysis." Copy the SalesInvoiceID, CustomerID, InvoiceDate, DueDate, and FreightAmount columns from the SalesInvoice worksheet.
+
+2. Calculate the merchandise total for each invoice. Because the SalesInvoice header does not store an invoice total, use SUMIFS to sum the LineTotal column from the SalesInvoiceLine worksheet for each SalesInvoiceID. Add the FreightAmount to produce the full invoice value. Place the result in a column called InvoiceTotal. This mirrors the summing step you learned when working with line-level data in earlier chapters.
+
+3. Determine a reference date for the aging analysis. Use the last day of the fiscal quarter under review as the reference date. Enter this date in a named cell, for example name it "ReportDate," so that you can change it easily when performing the analysis for a different period.
+
+4. Create a column called "DaysPastDue" that calculates the number of days between the DueDate and the ReportDate. The formula is =ReportDate - [@DueDate]. This returns the number of days as an integer. A negative or zero result means the invoice is not yet past due. If the result shows as a date rather than a number, format the cell as a number.
+
+5. Create a column called "AgingCategory" that classifies each invoice into one of five bands. Use a nested IF formula: =IF([@DaysPastDue]<=0, "Current", IF([@DaysPastDue]<=30, "1-30 Days", IF([@DaysPastDue]<=60, "31-60 Days", IF([@DaysPastDue]<=90, "61-90 Days", "Over 90 Days")))). This formula evaluates the days past due and assigns the appropriate label.
+
+6. Build a summary table using COUNTIFS and SUMIFS that shows, for each aging category, the number of invoices and the total InvoiceTotal value. Alternatively, create a PivotTable with AgingCategory as the row field, Count of SalesInvoiceID as one value, and Sum of InvoiceTotal as another value.
+
+7. Calculate the percentage of total value in each aging category. Add a column that divides each category's total by the grand total.
+
+8. Format the summary as a professional aging schedule with clear labels, dollar formatting, and percentage formatting. Add conditional formatting that applies increasingly intense shading to older aging categories, providing a visual signal that older balances carry higher risk.
+
+*[Figure 8.7: The nested IF formula for the AgingCategory column applied to Charles River sales invoices, shown in the formula bar with the corresponding aging categories visible in the column below. The DaysPastDue column is derived from the invoice DueDate.]*
+
+*[Figure 8.8: Completed aging schedule summary table for Charles River sales invoices, showing five aging categories with count, total value, and percent of total. Conditional formatting applies progressively darker shading to older categories.]*
+
+<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
+
+*Caption (placed below figure): Figure 8.8: Completed aging schedule summary for Charles River sales invoices (SalesInvoice) classified by days past due from the reporting date. Days past due are measured from each invoice DueDate. Progressively darker shading on older categories provides a visual signal that older balances carry higher collection risk. In a healthy receivables portfolio, the Current category holds the largest share of value, with progressively smaller amounts in the older bands.*
+
+| Aging Category | Count | Total Value | % of Count | % of Value |
+|---|---:|---:|---:|---:|
+| Current (Not Yet Due) | 384 | $1,642,300 | 52.0% | 58.7% |
+| 1-30 Days | 198 | $642,180 | 26.8% | 23.0% |
+| 31-60 Days | 92 | $312,540 | 12.5% | 11.2% |
+| 61-90 Days | 41 | $128,610 | 5.6% | 4.6% |
+| **Over 90 Days** | **23** | **$69,420** | **3.1%** | **2.5%** |
+| **Total** | **738** | **$2,795,050** | **100.0%** | **100.0%** |
+
+*Note: Values are illustrative and represent open (unpaid) invoices as of the reporting date. The Current category holds the majority of value because most invoices are paid within terms, while the small over-90-days balance is the population the auditor would target for collectibility assessment and the controller would weight most heavily when estimating the allowance.*
+
+**Checkpoint.** Your aging schedule should classify every outstanding invoice into one of the five aging bands. The count column should sum to the total number of unpaid invoices in the population, and the percentage column should sum to 100 percent. In a healthy receivables portfolio, the Current category should hold the largest share of value, with progressively smaller amounts in the older bands.
+
+> **[WATCH OUT]**
+> When building an aging analysis, be careful about the choice of reference date and the date you age from. Using the current date rather than the reporting period end date will produce different results, and the aging schedule should always be tied to a specific reporting date for consistency and auditability. Confirm as well that the date column you are using represents the event you intend to measure. For receivables aging, the relevant date is the invoice due date or the invoice date, not the order date. Charles River provides the DueDate column on SalesInvoice for exactly this purpose, so you can age by days past due rather than relying on a proxy.
+
+> **[IN PRACTICE]**
+> Under ASC 326, companies must estimate expected credit losses over the lifetime of their receivables. Many companies use historical aging schedules as the basis for these estimates, applying loss rates to each aging band and summing the results to determine the total allowance. Auditors evaluate these estimates by independently constructing or recalculating the aging schedule and comparing the loss rates to historical experience and forward-looking economic conditions.

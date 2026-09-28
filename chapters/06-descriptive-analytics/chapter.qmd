@@ -1,0 +1,253 @@
+---
+title: "Descriptive Analytics and Summarization in Excel"
+---
+
+<!-- DRAFT: not yet revised. Migrated from drafts/06 unchanged except for the file layout; not registered in _quarto.yml. -->
+**Tools:** Microsoft Excel
+**Table Groups:** Order-to-Cash (O2C) | Manufacturing (Mfg)
+
+---
+
+## Learning Objectives
+
+After completing this chapter, you will be able to:
+
+1. Apply statistical functions including AVERAGE, MEDIAN, STDEV, COUNT, and MIN/MAX to describe accounting datasets and interpret the results in a professional context.
+2. Use conditional aggregation functions including SUMIFS, COUNTIFS, and AVERAGEIFS to calculate totals and averages that meet specific criteria defined by account, period, or category.
+3. Build and format PivotTables that summarize accounting data across multiple dimensions such as item group, customer segment, and time period.
+4. Create calculated fields within PivotTables to derive measures such as profit margins and growth rates that do not exist in the source data.
+5. Apply date grouping in PivotTables to summarize transaction data by month, quarter, and year without modifying the underlying dataset.
+6. Evaluate summarized results to identify patterns, trends, and anomalies that warrant further investigation from financial accounting, managerial accounting, and auditing perspectives.
+
+---
+
+## Opening Scenario
+
+You are a financial analyst at Charles River, a furniture and home furnishings manufacturer that sells through both wholesale and direct channels. The quarterly management meeting is next week, and the CFO has asked you to prepare a performance summary covering the company's billed sales for the most recent fiscal year. She wants to know which item groups generated the most revenue, how revenue changed from quarter to quarter, how the Wholesale and Direct customer segments compare, and whether any item group shows an unusual pattern that might point to a pricing problem or a shift in demand. The data you need is already in clean, merged form because a colleague completed the data preparation work described in the previous chapter, joining the SalesInvoiceLine records to the Item and Customer tables and assigning each invoice to its fiscal quarter. Your task now is to summarize that data into the tables, statistics, and cross-tabulations that will support the management team's discussion. You must move from a dataset of several thousand individual invoice lines to a concise set of summaries that answer specific business questions. This chapter teaches you the Excel functions and features that make that summarization work efficient and reliable.
+
+---
+
+## The Role of Descriptive Analytics in Accounting
+
+Chapter 1 introduced three categories of analytics and described descriptive analytics as the foundation on which the others build. Descriptive analytics answers the question "what happened?" by summarizing historical data into totals, averages, counts, distributions, and comparisons. In accounting, descriptive analytics is not a preliminary step performed before the real analysis begins. It is the core of much of what accountants produce. Comparative income statements, variance reports, aging schedules, budget-to-actual summaries, and key performance indicator dashboards are all forms of descriptive analytics. The tools and techniques in this chapter produce these outputs directly.
+
+The importance of summarization in accounting work is well established in both practice and research. Vasarhelyi and Halper (1991) argued that continuous monitoring of business transactions requires accountants to develop systematic approaches to aggregating and comparing data across periods, accounts, and organizational units. Their early vision of continuous auditing depended on the ability to summarize large volumes of transactional data into meaningful indicators. More recently, the American Institute of Certified Public Accountants (AICPA, 2017) included data summarization and stratification as core analytical procedures in its Guide to Audit Data Analytics, noting that summarized data helps auditors identify areas of elevated risk before selecting detailed samples. For management accountants, the Institute of Management Accountants (IMA, 2019) identified the ability to analyze and interpret data as a core competency, with descriptive summarization serving as the starting point for performance evaluation and planning.
+
+This chapter covers three categories of summarization tools in Excel. Statistical functions provide single-number summaries of a column or range, such as the average billed amount per invoice line, the standard deviation of monthly revenue, or the count of transactions that meet a specific condition. PivotTables provide multidimensional summarization, allowing you to break down totals by two or more dimensions at once, such as revenue by item group and quarter, or invoice counts by customer segment and region. Conditional aggregation functions such as SUMIFS and COUNTIFS allow you to calculate totals and counts that meet criteria you define, without rearranging the underlying data.
+
+These three categories of tools complement one another rather than compete. Statistical functions answer questions about a single variable at a time. PivotTables answer questions that involve two or more dimensions. Conditional aggregation functions answer questions that require specific filtering criteria applied within a formula. By the end of this chapter, you will know which tool to reach for depending on the question you need to answer.
+
+## Statistical Functions for Accounting Data
+
+Excel provides a set of statistical functions that calculate summary measures from a column or range of values. These functions reduce a column containing hundreds or thousands of individual values into a single number that describes the column as a whole. The functions most relevant to accounting work include SUM, AVERAGE, MEDIAN, STDEV, COUNT, COUNTA, MIN, and MAX. Each answers a different question about the data, and using them in combination provides a profile of a dataset that is far more informative than any single measure alone.
+
+### Measures of Central Tendency
+
+The AVERAGE function calculates the arithmetic mean of a set of values. The syntax is =AVERAGE(range), where range refers to the cells containing the values. For the Charles River invoice line data, =AVERAGE(InvoiceLines[LineTotal]) returns the average billed amount across all sales invoice lines. The average is the most commonly reported summary measure in accounting, but it can mislead when the data contains extreme values. A small number of very large invoice lines can pull the average upward, giving an inflated impression of the typical line size. This limitation matters in accounting contexts where distributions are frequently skewed by a few high-value transactions.
+
+The MEDIAN function addresses this limitation by returning the middle value when the data is sorted from smallest to largest. If the dataset contains an odd number of values, the median is the single middle value. If the dataset contains an even number of values, the median is the average of the two middle values. The syntax is =MEDIAN(range). The median is not affected by extreme values because it depends only on position, not magnitude. When the average and the median of a dataset differ substantially, that difference signals that the distribution is skewed, which is useful information for both financial analysis and auditing. An auditor examining invoice amounts, for example, can compare the average line amount to the median line amount as a quick check for whether a small number of large transactions are influencing the summary statistics.
+
+> **[IN PRACTICE]**
+> Auditors frequently compare the mean and median of an account balance population as part of preliminary analytical procedures. A large gap between the two values indicates a skewed distribution, which can affect the auditor's approach to sampling and risk assessment. The AICPA's Guide to Audit Data Analytics (2017) recommends that auditors examine the shape of the data distribution before setting expectations for substantive analytical procedures.
+
+### Measures of Dispersion
+
+The STDEV.S function calculates the sample standard deviation, which measures how spread out the values in a dataset are around their mean. The syntax is =STDEV.S(range). A small standard deviation indicates that most values lie close to the average, while a large standard deviation indicates that values vary widely. In accounting, the standard deviation helps you assess variability in revenue streams, expense accounts, and production metrics. A cost center with a monthly expense average of $50,000 and a standard deviation of $2,000 exhibits much more predictable spending than one with the same average but a standard deviation of $15,000. The latter would require more scrutiny during budget variance analysis because its spending fluctuates significantly from month to month.
+
+Excel also provides STDEV.P for calculating the population standard deviation, which uses a slightly different formula that divides by N rather than N minus 1. In most accounting applications, you will use STDEV.S because you are working with a sample of transactions from a period rather than the entire population of all transactions that will ever occur. The practical difference between the two functions is small when the dataset is large, but using the correct version reflects good analytical practice.
+
+The MIN and MAX functions return the smallest and largest values in a range. While simple, these functions prove useful in accounting contexts. The maximum value in a column of invoice line amounts tells you the largest single billed line in the period, which may warrant individual review. The minimum value might reveal zero-value or negative-value transactions that indicate credits, reversals, or data entry errors. The range, calculated as =MAX(range)-MIN(range), describes the full spread of values from smallest to largest.
+
+### Counting Functions
+
+The COUNT function counts the number of cells in a range that contain numeric values. The syntax is =COUNT(range). For a column of transaction amounts, COUNT tells you how many transactions are in the dataset. The COUNTA function is similar but counts all non-empty cells regardless of whether they contain numbers or text. The difference matters when you work with columns that may contain text entries such as "N/A" or "Pending" in place of numeric values. COUNT would skip those cells while COUNTA would include them.
+
+The COUNTBLANK function counts empty cells in a range, which helps you identify missing data. If you are examining a column of shipment dates and COUNTBLANK returns a value greater than zero, you know that some lines have not been shipped or that the shipment date was not recorded. Chapter 5 introduced techniques for handling missing data during preparation. At the summarization stage, counting blanks serves as a quality check to confirm that the preparation was complete.
+
+*[Figure 6.1: A summary statistics panel showing AVERAGE, MEDIAN, STDEV.S, MIN, MAX, COUNT, and COUNTBLANK applied to the Charles River invoice line LineTotal and QuantityShipped columns. The panel is organized as a small table with function names in the first column, LineTotal results in the second column, and QuantityShipped results in the third column.]*
+
+<!-- DRAFT: tabular content moved from drafts/06/table-06-01-summary-statistics-panel.md; values not yet verified -->
+
+*Figure 6.1: Summary statistics for the Charles River invoice line LineTotal and QuantityShipped columns. The comparison between the average and median for LineTotal reveals a right-skewed distribution, indicating that a relatively small number of high-value lines pull the average above the midpoint. The standard deviation of QuantityShipped is nearly as large as its mean, confirming substantial variability in line sizes.*
+
+| Measure            |  LineTotal | QuantityShipped |
+|--------------------|-----------:|----------------:|
+| Average            |    $793.40 |           14.60 |
+| Median             |    $512.00 |           10.00 |
+| Standard Deviation |    $864.20 |           13.90 |
+| Minimum            |     $18.00 |               1 |
+| Maximum            | $11,480.00 |              96 |
+| Count              |      4,200 |           4,200 |
+| Count Blank        |          0 |               0 |
+
+*Note: Values are approximate and must be verified against the Charles River dataset file. LineTotal is the extended billed amount on each SalesInvoiceLine. QuantityShipped is sourced from ShipmentLine through the ShipmentLineID link and carried onto the merged invoice line dataset.*
+
+{{< include _tutorial-01.qmd >}}
+
+## Conditional Aggregation with SUMIFS, COUNTIFS, and AVERAGEIFS
+
+Statistical functions operate on an entire column or range without distinction. The AVERAGE function, for example, calculates the mean of every value in the range you specify. In accounting work, however, you frequently need to calculate totals, counts, or averages that apply only to a subset of the data defined by one or more conditions. You might need the total revenue for a specific item group, the count of invoice lines billed to a particular customer segment, or the average line amount for a specific fiscal quarter. Conditional aggregation functions allow you to specify these criteria within the formula itself, without filtering or rearranging the underlying data.
+
+### The SUMIFS Function
+
+The SUMIFS function calculates the sum of values in a range that meet one or more criteria. The syntax is =SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2, ...). The sum_range is the column containing the values you want to add. Each criteria_range and criteria pair specifies a condition that must be met for a value to be included in the sum. All criteria must be satisfied at once for a value to contribute to the result.
+
+For example, suppose you want to calculate the total revenue from the Furniture item group. If your merged dataset has a column called ItemGroup and a column called LineTotal, the formula would be =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], "Furniture"). This formula examines every row in the dataset and adds the LineTotal value only for rows where the ItemGroup equals "Furniture."
+
+You can add additional criteria to narrow the calculation further. To calculate total Furniture revenue for a specific fiscal quarter, you would add a second criteria pair referencing the FiscalQuarter column. The formula =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], "Furniture", InvoiceLines[FiscalQuarter], "Q3") returns the total revenue for Furniture in the third fiscal quarter only.
+
+### The COUNTIFS Function
+
+The COUNTIFS function counts the number of rows that meet one or more criteria. Its syntax is =COUNTIFS(criteria_range1, criteria1, criteria_range2, criteria2, ...). Unlike SUMIFS, there is no sum_range because the function counts rows rather than adding values. COUNTIFS helps you determine the number of transactions that meet specific conditions, such as the number of invoice lines above a certain amount, the number of lines billed to a particular customer segment, or the number of journal entries posted during a specific period.
+
+For example, =COUNTIFS(InvoiceLines[LineTotal], ">"&10000) counts the number of invoice lines with a billed amount exceeding $10,000. The ampersand joins the comparison operator ">" with the threshold value. This syntax can confuse students at first, but it follows a consistent pattern. The comparison operator is always enclosed in quotation marks, and numeric values are joined to it using the ampersand.
+
+### The AVERAGEIFS Function
+
+The AVERAGEIFS function calculates the average of values that meet one or more criteria. Its syntax mirrors SUMIFS, =AVERAGEIFS(average_range, criteria_range1, criteria1, criteria_range2, criteria2, ...). This function helps when you need the average value for a specific subset of your data, such as the average line amount for the Wholesale segment or the average billed amount for items in a particular item group.
+
+> **[CONNECTING THE DOTS]**
+> In Chapter 10, you will learn to write SQL queries that perform the same conditional aggregation using the WHERE clause and GROUP BY statement, joining SalesInvoice to SalesInvoiceLine to Item to summarize revenue by item group directly from the database. The SQL approach is more efficient for large datasets because the database engine performs the calculation, but the logic is identical. Understanding SUMIFS and COUNTIFS in Excel prepares you to think in terms of filter first and aggregate second, which is exactly what SQL does.
+
+{{< include _tutorial-02.qmd >}}
+
+## PivotTables for Multidimensional Summarization
+
+The SUMIFS approach you used in Tutorial 6.2 produces a clean, readable summary table, but it requires you to type item group names manually, set up the layout in advance, and write a formula for every cell. For a table with 4 item groups and 4 quarters, that means 16 individual SUMIFS formulas plus row and column totals. If the data contained 50 item subcategories or 12 months, the formula approach would become unwieldy. PivotTables solve this problem by automating the layout, aggregation, and formatting of multidimensional summaries. They are the single most important summarization tool in Excel for accounting work.
+
+A PivotTable is an interactive summary table that Excel builds from a source dataset. You specify which fields to use as row labels, which to use as column labels, and which to aggregate as values. Excel then creates the summary table automatically, calculating the appropriate totals for every combination of row and column labels. If the source data changes, you can refresh the PivotTable with a single click and the summary updates to reflect the new data. This combination of speed, flexibility, and automatic aggregation makes PivotTables central to financial reporting, management accounting, and audit analytics.
+
+Research on technology adoption in accounting supports the practical importance of PivotTables. Bradbard, Alvis, and Morris (2014) surveyed management accountants and found that data summarization and analysis were among the most frequent uses of spreadsheets in practice, but that many accountants had limited exposure to PivotTables during their education. Sledgianowski, Gomaa, and Tan (2017) argued that teaching data analytics tools such as PivotTables within accounting courses improves students' ability to extract meaningful information from transactional data, a skill that traditional accounting curricula often underdevelop. The guided tutorials in this section address that gap by teaching PivotTables through accounting applications rather than in the abstract.
+
+### Creating a PivotTable
+
+To create a PivotTable, click any cell within the source data table and navigate to the Insert tab on the Ribbon. Click PivotTable. Excel will display a dialog box asking you to confirm the source data range and to choose where to place the PivotTable. If your source data is an Excel Table, Excel will display the Table name in the range field, which is preferable to a cell range because it includes all rows automatically. Choose New Worksheet as the location so the PivotTable does not overwrite your source data or other analyses.
+
+After you click OK, Excel creates a blank PivotTable shell on a new worksheet and opens the PivotTable Fields pane on the right side of the screen. This pane lists every column in your source data as a field that you can drag into one of four areas, Rows, Columns, Values, and Filters. The Rows area defines the row labels of your summary. The Columns area defines the column labels. The Values area specifies which field to aggregate and how, such as sum, count, or average. The Filters area allows you to restrict the entire PivotTable to a subset of the data without removing any rows from the source.
+
+*[Figure 6.3: The PivotTable Fields pane in Excel, showing a list of available fields on the top and the four drop zones (Filters, Columns, Rows, Values) on the bottom. An annotation explains that dragging fields into these zones determines the structure of the summary table.]*
+
+### Choosing Aggregation Methods
+
+When you drag a numeric field into the Values area, Excel defaults to Sum as the aggregation method. This is appropriate when you want the total of the field, such as total revenue or total quantity. To change the aggregation method, click the dropdown arrow next to the field name in the Values area and select Value Field Settings. This opens a dialog where you can choose from Sum, Count, Average, Max, Min, StdDev, and other functions. For accounting work, Sum and Count are the most common, but Average is useful for per-unit or per-transaction analyses, and Count is essential for determining the number of transactions in each category.
+
+A subtle but important point is that when you drag a text field into the Values area, Excel defaults to Count rather than Sum because text values cannot be summed. This behavior is useful when you want to count transactions by category or period, but it can produce confusing results if you place a text field in the Values area when you intended it for the Rows or Columns area.
+
+> **[IN PRACTICE]**
+> Financial controllers frequently use PivotTables to prepare comparative revenue and expense summaries during the monthly close process. A PivotTable connected to the general ledger detail in the GLEntry table can produce a full income statement summary grouped by account category and reporting period in seconds, replacing what would otherwise require hours of manual subtotaling and formatting.
+
+{{< include _tutorial-03.qmd >}}
+
+### Grouping by Date in PivotTables
+
+One of the most powerful features of PivotTables for accounting work is automatic date grouping. When you place a date field in the Rows or Columns area, Excel can group the individual dates into months, quarters, years, or combinations of these. This means you can summarize transactional data by time period without adding separate period columns to your source data, as the FiscalQuarter column you created in Chapter 5 required.
+
+To group dates, right-click any date cell in the PivotTable and select Group. The Grouping dialog offers options including Seconds, Minutes, Hours, Days, Months, Quarters, and Years. You can select multiple options. For example, selecting both Quarters and Years produces a hierarchy where each year contains four quarters. This proves particularly useful when your data spans multiple years and you want to compare the same quarter across years.
+
+Date grouping in PivotTables is nondestructive. It does not modify the source data and you can change it at any time by right-clicking and regrouping. If you initially group by quarter and later decide you need monthly detail, you can change the grouping without rebuilding the PivotTable.
+
+> **[WATCH OUT]**
+> PivotTable date grouping requires that every value in the date column is a valid date. If even one cell contains a text value, a blank, or an error, Excel will refuse to group the dates and will display each individual date as a separate row instead. If you encounter this problem, return to your source data and check the date column for non-date entries. The ISNUMBER function can help. =ISNUMBER(A2) returns TRUE if the value is a number (dates are stored as numbers in Excel) and FALSE if it is text or blank. Fixing any non-date values will allow grouping to work.
+
+### Calculated Fields in PivotTables
+
+A calculated field is a new field you define within the PivotTable that performs a calculation using other fields in the source data. Calculated fields help when you need a derived measure, such as a profit margin or a unit price, that does not exist as a column in the source table. The calculation is performed within the PivotTable's aggregation engine, which means it respects the grouping structure of the PivotTable automatically. A calculated field for unit price, for example, will produce the correct value for each item group and each quarter without requiring separate formulas for each cell.
+
+To create a calculated field, click anywhere in the PivotTable, go to the PivotTable Analyze tab on the Ribbon, click Fields, Items and Sets, and select Calculated Field. In the dialog that appears, give the field a name and enter the formula using the field names from your source data. For example, if your source data contains LineTotal and QuantityShipped fields, you could create a calculated field called UnitRevenue with the formula = LineTotal / QuantityShipped.
+
+A practical caution applies to calculated fields. They operate on aggregated values, not on individual rows. If you define a field as = LineTotal / QuantityShipped, the PivotTable will divide the sum of LineTotal by the sum of QuantityShipped for each cell, which gives you the weighted average revenue per unit rather than the simple average of per-unit revenues. For many accounting applications, the weighted average is the more appropriate measure, but you should understand the distinction to avoid misinterpreting the results.
+
+> **[IN PRACTICE]**
+> Management accountants use PivotTable calculated fields to derive contribution margins, markup percentages, and cost ratios directly within summary reports. Because the calculated field updates automatically when the PivotTable refreshes, these derived measures stay current without manual recalculation. This proves valuable during budget review cycles when source data is updated frequently.
+
+### Cross-Tabulation and Comparative Analysis
+
+PivotTables are natural tools for cross-tabulation, which is the process of summarizing data along two or more dimensions at once. In accounting, cross-tabulation supports comparative analysis, where you examine how a measure varies across categories, periods, segments, or other dimensions. A revenue cross-tabulation by item group and customer segment, for example, reveals not just which groups generate the most revenue but where that revenue comes from across the wholesale and direct channels. This information supports decisions about channel focus, pricing strategy, and resource allocation.
+
+To build a cross-tabulation in a PivotTable, you place one dimension in the Rows area and another in the Columns area. You can place additional dimensions in either area to create a nested structure. For example, placing CustomerSegment and Region in the Rows area creates a hierarchy where each segment expands to show its regions. Placing ItemGroup in the Columns area then shows revenue for each region within each segment across each item group. This level of detail can become overwhelming, so careful judgment about which dimensions to include is an important part of effective PivotTable design.
+
+The Show Values As feature extends cross-tabulation by allowing you to display values not just as raw totals but as percentages of row totals, percentages of column totals, or differences from a base value. To access this feature, right-click a value in the PivotTable, select Show Values As, and choose from the available options. For accounting work, % of Row Total shows each quarter's contribution to the item group's annual revenue, while % of Column Total shows each item group's share of quarterly revenue. % Difference From calculates the percentage change from a prior period, which is the basis for period-over-period growth analysis.
+
+*[Figure 6.5: A PivotTable showing revenue by item group and fiscal quarter, with the "Show Values As" menu open. The menu displays options including "% of Grand Total," "% of Row Total," "% of Column Total," and "% Difference From." An annotation explains that "% of Row Total" shows each quarter's contribution to the item group's annual total.]*
+
+{{< include _tutorial-04.qmd >}}
+
+## Applying Descriptive Analytics Across the Charles River Data
+
+The invoice line data gives you a strong starting point for summarization because it is transaction-level and ties directly to recognized revenue. The Charles River database, however, contains far more than sales data, and the same summarization tools apply across every table group. Two extensions illustrate the range.
+
+The first extension adds dimensions within the Order-to-Cash group. Beyond item group and quarter, the Customer table carries a CustomerSegment column with values of Wholesale and Direct, and a Region column that records the geographic market. Summarizing revenue by customer segment supports the disaggregated revenue analysis that accounting standards encourage, because investors often want to understand how much revenue comes from each channel. Adding region as a second dimension shows where each channel is concentrated. These analyses use the same PivotTable techniques you have already learned, with CustomerSegment and Region taking the place of the time dimension.
+
+The second extension moves into the Manufacturing group. For a cost accountant at Charles River, descriptive analytics might involve summarizing production activity by item group to understand volume and efficiency. The WorkOrder table records the planned production quantity and the release and due dates for each production order. The ProductionCompletion and ProductionCompletionLine tables record the quantity completed and the standard finished-goods cost. The WorkOrderClose table records the manufacturing variance recognized when each order is closed. By summarizing these tables with PivotTables, a cost accountant can calculate a completion rate, which compares the completed quantity to the planned quantity, and can identify the item groups with the largest variance amounts at close. These questions parallel the revenue analyses you performed earlier, but they draw on production data rather than sales data.
+
+The increase in available dimensions means you must make more deliberate choices about which dimensions to include in your summaries and how much detail to present. A summary that breaks revenue down by item group, customer segment, region, and quarter at once would produce a table too dense to interpret. Effective summarization selects the two or three dimensions that answer the specific question at hand.
+
+> **[CONNECTING THE DOTS]**
+> In Chapter 10, you will learn SQL joins that combine Charles River tables directly in the database, producing a merged dataset without the lookup formulas you used in Chapter 5. In Chapter 15, you will model Charles River data in Power BI using a star schema, including a production model built from the WorkOrder, ProductionCompletion, and Item tables. Each tool provides a different approach to the same fundamental task of combining and summarizing multidimensional data. The PivotTable approach you learn here is the most accessible starting point because it requires no code and provides immediate visual feedback.
+
+{{< include _tutorial-05.qmd >}}
+
+## Stratification and Distribution Analysis
+
+Stratification is a specific application of descriptive analytics in which you divide a dataset into groups, or strata, based on ranges of a numeric variable and then examine the characteristics of each group. In auditing, stratification helps you understand the distribution of transaction values, account balances, or other monetary amounts. The AICPA's Guide to Audit Data Analytics (2017) identifies stratification as one of the foundational analytical procedures because it helps auditors identify where risk is concentrated within a population. For example, stratifying sales invoice amounts by size reveals whether a few large invoices dominate the population or whether the population is made up of many small invoices of similar size. This information directly affects the audit approach, including sample sizes, materiality assessments, and the selection of items for detailed testing.
+
+In financial accounting, stratification supports revenue analysis by showing how sales are distributed across invoice size ranges. A company where most revenue comes from a small number of large invoices has a different risk profile than one where revenue is spread across many invoices of similar size. In management accounting, stratifying production orders or purchase orders by size helps identify spending and activity patterns that may warrant renegotiation, consolidation, or additional oversight.
+
+### Building Stratification with COUNTIFS and SUMIFS
+
+You can stratify a dataset using the COUNTIFS and SUMIFS functions you learned earlier in this chapter. The approach involves defining a set of value ranges (strata) and then counting the number of transactions and summing the dollar values within each stratum.
+
+For example, to stratify Charles River invoice lines by billed amount, you might define five strata, $0 to $250, $250 to $750, $750 to $1,500, $1,500 to $5,000, and above $5,000. For each stratum, you would use COUNTIFS to count the number of lines and SUMIFS to calculate the total revenue. The formulas use paired criteria to define the range. For the $250 to $750 stratum, the count formula would be =COUNTIFS(InvoiceLines[LineTotal], ">="&250, InvoiceLines[LineTotal], "<"&750), and the sum formula would follow the same pattern using SUMIFS.
+
+Organizing the results into a stratification table with columns for the stratum range, the count of transactions, the percentage of total count, the total dollar value, and the percentage of total value produces a concise profile of the transaction population. This table allows an auditor or analyst to see at a glance how transactions are distributed and where the monetary value is concentrated.
+
+*[Figure 6.7: A stratification table for Charles River invoice lines by billed amount. The table has five rows for the defined strata, with columns for Amount Range, Line Count, % of Count, Total Revenue, and % of Revenue. A "Cumulative % of Revenue" column on the right shows that the upper strata account for a disproportionate share of total revenue.]*
+
+<!-- DRAFT: tabular content moved from drafts/06/table-06-07-stratification.md; values not yet verified -->
+
+*Figure 6.7: A stratification table classifying Charles River invoice lines into five value ranges by LineTotal. The table reveals that the lowest stratum ($0 to $250) contains 36 percent of all lines but only 6 percent of total revenue, while the two highest strata together contain 12 percent of the lines and account for 50 percent of total revenue. The cumulative percentage column shows how revenue accumulates across strata from smallest to largest. This analysis supports audit planning by identifying where monetary value is concentrated within the transaction population.*
+
+| Amount Range     | Line Count | % of Total Count | Revenue Total | % of Total Revenue | Cumulative % Revenue |
+|------------------|-----------:|-----------------:|--------------:|-------------------:|---------------------:|
+| $0 – $250        |      1,512 |           36.0%  |     $198,420  |             6.0%   |                6.0%  |
+| $250 – $750      |      1,386 |           33.0%  |     $642,180  |            19.3%   |               25.3%  |
+| $750 – $1,500    |        798 |           19.0%  |     $826,540  |            24.8%   |               50.1%  |
+| $1,500 – $5,000  |        462 |           11.0%  |   $1,284,360  |            38.5%   |               88.6%  |
+| $5,000+          |         42 |            1.0%  |     $380,800  |            11.4%   |              100.0%  |
+| **Total**        |  **4,200** |       **100.0%** | **$3,332,300**|        **100.0%**  |                      |
+
+*Note: Values are approximate and must be verified against the Charles River dataset. The stratification demonstrates the typical accounting data pattern where a small number of high-value transactions accounts for a disproportionate share of total monetary value. The $1,500 to $5,000 stratum alone contains 11 percent of lines but represents 38.5 percent of total revenue, making it the single most consequential stratum for audit testing purposes.*
+
+{{< include _tutorial-06.qmd >}}
+
+## Interpreting and Communicating Descriptive Results
+
+Producing summary tables and statistics is only half of descriptive analytics. The other half is interpreting the results and communicating them to the people who will use them for decision-making. A PivotTable that shows revenue by item group and quarter is a data product. A paragraph that explains that the Lighting group showed a meaningful decline in the third quarter that warrants investigation because it departs from the pattern observed in prior quarters is an analytical finding. The transition from data product to analytical finding is where professional judgment enters the process.
+
+Effective interpretation requires the analyst to look for patterns, departures from expectations, and relationships between variables. Patterns include consistent growth across periods, stable proportions across categories, and predictable seasonal fluctuations. Departures from expectations include sudden changes in trend, categories that behave differently from their peers, and individual values that fall outside the normal range. Relationships include connections between variables, such as whether item groups with higher average line amounts also show higher variability in shipped quantities.
+
+Peecher, Schwartz, and Solomon (2007) argued that the effectiveness of analytical procedures in auditing depends not just on the calculations performed but on the quality of the auditor's expectations and the rigor of the investigation when results deviate from those expectations. The same principle applies to management reporting and financial analysis. A PivotTable that shows a revenue decline is useful only if someone examines it, compares it to an expectation, and investigates the cause of the deviation. The techniques in this chapter produce the data that supports that process, but the professional judgment that interprets the data is what gives the analysis its value.
+
+Communication is the final step. Summary tables should be formatted for readability, with clear headers, appropriate number formats, and visual cues such as conditional formatting to draw attention to the most important values. Written interpretations should be concise and specific, identifying the key finding, the supporting evidence, and the recommended action or further investigation. The exercises at the end of this chapter ask you to produce both the data summaries and the written interpretations because both skills are essential in professional practice.
+
+> **[CONNECTING THE DOTS]**
+> In Chapter 13, you will learn the principles of effective data visualization, and in Chapters 14 through 16, you will build interactive dashboards in Power BI that present descriptive analytics results in visual form using the Charles River data. The PivotTable summaries you create in this chapter provide the analytical foundation for those visualizations. Understanding the numbers behind the charts is essential for creating visualizations that are accurate and informative rather than misleading.
+
+## Looking Ahead
+
+This chapter has taught you to summarize and describe accounting data using three categories of Excel tools. Statistical functions provide single-number summaries of individual variables. Conditional aggregation functions calculate totals, counts, and averages for subsets of data defined by criteria. PivotTables automate multidimensional summarization with flexible grouping, calculated fields, and multiple display options. Together, these tools allow you to transform a dataset of individual transactions into the summary reports, cross-tabulations, and stratification tables that drive financial reporting, management decision-making, and audit planning.
+
+In the next chapter, you will move beyond description into analysis and modeling. Chapter 7 introduces regression analysis, trend forecasting, scenario analysis, and optimization, all within Excel and all grounded in the Charles River data. Where this chapter answered the question "what happened?", Chapter 7 will help you answer "what might happen?" and "what should we do?" The summarized data and PivotTable outputs you created in this chapter will serve as inputs for the models and forecasts you build next.
+
+---
+
+
+{{< include _summary.qmd >}}
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _further-reading.qmd >}}

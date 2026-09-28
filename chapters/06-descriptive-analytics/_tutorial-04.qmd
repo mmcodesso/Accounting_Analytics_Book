@@ -1,0 +1,19 @@
+### Tutorial 6.4: Analyzing Revenue Trends and Item Group Composition
+
+**Context and objective.** You will extend the PivotTable from Tutorial 6.3 by adding percentage calculations and identifying which item groups grew or declined across quarters. This analysis moves beyond raw totals into the interpretive work that makes descriptive analytics useful for decision-making.
+
+**Prerequisites.** Complete Tutorial 6.3. Your PivotTable should show revenue by item group and quarter with grand totals.
+
+**Step 1.** Click on the PivotTable you built in Tutorial 6.3 to activate it. The PivotTable Analyze and Design tabs should appear on the Ribbon.
+
+**Step 2.** To see each quarter's share of the item group's annual revenue, right-click any revenue value in the PivotTable. Select Show Values As and then % of Row Total. The values will change from dollar amounts to percentages. Each row will now show how the item group's revenue was distributed across the four quarters. If an item group shows 31% in Q4 and only 23% in Q1, that indicates a year-end concentration.
+
+**Step 3.** Examine the percentages for each item group. Note any group where one quarter contributes a disproportionate share of annual revenue. This pattern is relevant for financial reporting because it affects revenue recognition timing and for budgeting because it affects cash flow projections.
+
+**Step 4.** Switch back to the dollar view by right-clicking any value, selecting Show Values As, and choosing No Calculation. Then right-click again, select Show Values As, and choose % Difference From. In the dialog that appears, select FiscalQuarter as the Base Field and (previous) as the Base Item. This transforms each cell into the percentage change from the prior quarter. Q1 will show no value because there is no prior quarter, Q2 will show the percentage change from Q1, and so on.
+
+**Step 5.** Examine the growth rates. An item group with positive growth in every quarter is on a consistent upward trajectory. A group with a sharp decline in one quarter warrants investigation. Note these observations on a separate worksheet labeled "Analysis Notes" because you will reference them in the exercises at the end of this chapter.
+
+**Step 6.** Return the PivotTable to its original dollar-value display. The purpose of this tutorial was to demonstrate that a single PivotTable can answer multiple analytical questions by changing how values are displayed, without modifying the source data or rebuilding the table.
+
+**Checkpoint.** You should have observed the percentage distribution and quarter-over-quarter growth rates for each item group. Your Analysis Notes worksheet should contain at least two observations about patterns in the data, such as which item group has the most even distribution across quarters and which shows the largest quarter-over-quarter change. These observations demonstrate the interpretive component of descriptive analytics, which is where the accounting judgment lies.

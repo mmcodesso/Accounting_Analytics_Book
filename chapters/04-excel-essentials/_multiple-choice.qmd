@@ -1,0 +1,108 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A staff accountant stores a dataset of invoice lines as an Excel Table instead of a plain range. Which of the following is a direct benefit of the Table?
+
+A.  The Table prevents other users from changing any of the values it contains.
+B.  Formulas can refer to the data by Table and column name, and they include rows added to the Table later.
+C.  The Table automatically creates a PivotTable summary of every numeric column.
+D.  The Table checks each value against the source database and flags values that differ.
+
+**2.** An analyst filters the SalesInvoiceLine Table to show only the lines of one promotion and then enters `=SUM(SalesInvoiceLine[LineTotal])` on another worksheet. The result equals the total of all invoice lines, not just the lines in view. What should the analyst use instead?
+
+A.  `=SUM(SalesInvoiceLine[@LineTotal])`
+B.  `=SUMIFS(SalesInvoiceLine[LineTotal],SalesInvoiceLine[LineTotal],">0")`
+C.  `=COUNTIFS(SalesInvoiceLine[LineTotal],">0")`
+D.  `=SUBTOTAL(109,SalesInvoiceLine[LineTotal])`
+
+**3.** Inside the SalesInvoiceLine Table, a calculated column uses the formula `=ROUND([@Quantity]*[@BaseListPrice],2)`. What does [@Quantity] refer to?
+
+A.  The Quantity value in the same row as the formula
+B.  The entire Quantity column of the Table
+C.  The first value in the Quantity column
+D.  The Quantity column of whichever Table is selected when the workbook recalculates
+
+**4.** A formula in cell D2 reads `=C2/$C$500`, where C500 holds the total of column C. The formula is copied down to D3 through D499. Which type of reference is $C$500?
+
+A.  Relative reference
+B.  Mixed reference with the column locked
+C.  Absolute reference
+D.  Structured reference
+
+**5.** A summary grid lists pricing methods in column A and discount rates in row 15. The formula in B16 is `=COUNTIFS(SalesInvoiceLine[PricingMethod],$A16,SalesInvoiceLine[Discount],B$15)`, and it is copied and pasted into C16. What does the copy in C16 refer to?
+
+A.  $A16 and C$15
+B.  $A16 and B$15
+C.  $B16 and C$15
+D.  $A17 and B$16
+
+**6.** An analysis workbook imports the SalesInvoiceLine Table from CharlesRiver.xlsx with Power Query, after filtering and removing columns in the Power Query Editor. When a colleague later chooses Data > Refresh All, what happens?
+
+A.  Power Query writes the filtered data back to CharlesRiver.xlsx so that the two workbooks match.
+B.  Power Query reloads the data without the filters, which must then be applied again by hand.
+C.  Power Query reads CharlesRiver.xlsx again and repeats every applied step, leaving the source file unchanged.
+D.  Power Query deletes the Table from the analysis workbook and asks the colleague to choose the data again.
+
+**7.** In the Power Query Navigator, CharlesRiver.xlsx lists both a worksheet named SalesInvoiceLine and a Table named T17_SalesInvoiceLine. Why is the Table usually the better choice to import?
+
+A.  Only Tables can be refreshed; worksheets can be imported only once.
+B.  The Table already defines the header row and the extent of the data.
+C.  The Table contains more rows than the worksheet that holds it.
+D.  Importing a worksheet changes the formatting of the source workbook.
+
+**8.** An auditor opens the Charles River shipment data, which ends on December 31, 2026, and applies the date filter This Quarter to the ShipmentDate column. The filter shows no rows, or rows from the wrong period. What is the most likely explanation?
+
+A.  Date filters work only on columns formatted as text.
+B.  The ShipmentDate column contains no dates in the fourth quarter.
+C.  Filters cannot be combined with the banded formatting of an Excel Table.
+D.  This Quarter is measured from today's date, not from the dates in the data.
+
+**9.** A slicer on the PromotionID column is connected to the SalesInvoiceLine Table. An analyst clicks the button for promotion 8. What happens?
+
+A.  The Table is filtered to the rows for promotion 8, and the other rows are hidden but not deleted.
+B.  The rows for every other promotion are deleted from the Table until the workbook is refreshed.
+C.  A new worksheet is created that holds a copy of the rows for promotion 8.
+D.  The rows for promotion 8 are highlighted, and every row remains visible.
+
+**10.** An analyst selects the data rows of a Table, with cell A2 active, and creates the conditional formatting rule `=$J2>0`, where column J holds the Discount. Why does the reference include a dollar sign before J but not before 2?
+
+A.  The dollar sign converts the rule into a structured reference to the Discount column.
+B.  Conditional formatting rules require every reference to be absolute.
+C.  Each cell in a row is tested against that row's value in column J, so the column stays fixed while the row adjusts.
+D.  The dollar sign limits the rule to the cells in column J.
+
+**11.** A worksheet has two conditional formatting rules on the same cells. The first rule, created earlier, fills values above 1,000 with green. The second rule, created later, fills values above 5,000 with red. Neither rule uses Stop If True, and the order has not been changed. What fill does a cell containing 6,200 display?
+
+A.  Green, because the rule created first is evaluated first
+B.  Red, because a new rule is added at the top of the list and takes priority when both rules set the fill
+C.  Both colors, split across the cell
+D.  No fill, because the two rules conflict and cancel each other
+
+**12.** A parameter cell has a data validation rule that allows decimals between 0.5 and 0.99. A user types 1.5, Excel displays an alert, and the user clicks Yes to continue, after which the cell holds 1.5. What explains this result?
+
+A.  Data validation does not apply to decimal values.
+B.  The rule was entered with the minimum and maximum reversed.
+C.  Data validation checks only values pasted into the cell, not values typed.
+D.  The rule's Error Alert style was set to Warning, which lets the user accept an invalid entry.
+
+**13.** An analyst types a summary formula in the empty column immediately to the right of an Excel Table. What is the most likely result, and what is the better practice?
+
+A.  The Table expands to include the column, and the formula may be copied to every row; summaries belong on a separate worksheet.
+B.  Excel refuses the entry, because cells next to a Table are locked; summaries must be entered in a new workbook.
+C.  The formula is ignored until the Table is refreshed; summaries should be entered only after a refresh.
+D.  The formula is converted into a PivotTable; summaries are best created as PivotTables in any case.
+
+**14.** Which of the following best explains why an analysis workbook should begin with a documentation worksheet?
+
+A.  Excel requires a documentation worksheet in any workbook that contains Power Query queries.
+B.  A documentation worksheet makes the workbook's formulas calculate faster.
+C.  It records the purpose, sources, steps, parameters, preparer, and reviewer, so that someone with no previous connection to the work can understand and review it.
+D.  Accounting standards require every spreadsheet used by a company to begin with a documentation worksheet.
+
+**15.** An analyst defines a large-line threshold with `=PERCENTILE.INC(SalesInvoiceLine[LineTotal],ThresholdPercentile)` in a cell named LargeLineThreshold, instead of typing an amount such as 5,000. What is the main advantage of this approach?
+
+A.  PERCENTILE.INC guarantees that every large line is an error.
+B.  The threshold is derived from the data and stated in one named place, so it updates with the data and every formula that uses it shows its logic.
+C.  A named cell cannot be changed, so the threshold is protected without data validation.
+D.  The formula makes the threshold identical from one year to the next.

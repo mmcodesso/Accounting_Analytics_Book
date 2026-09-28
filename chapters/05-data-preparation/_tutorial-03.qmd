@@ -1,0 +1,33 @@
+## Guided Tutorial 5.3: Building a Repeatable Data Preparation Workflow in Power Query
+
+**Context and objective.** In this tutorial, you will use Power Query to import the Charles River SalesOrder and Customer tables, clean the data, merge the two tables on CustomerID, and load the result as a new worksheet. The goal is to create a documented, repeatable data preparation workflow that you can refresh whenever the source data is updated.
+
+**Prerequisites.** You need the Charles River Excel workbook open with the SalesOrder and Customer worksheets available as named Excel Tables.
+
+**Step-by-step instructions.**
+
+**Step 1.** Click on the SalesOrder Table. Go to the Data tab and click From Table/Range in the Get and Transform Data group. The Power Query Editor opens with a preview of the SalesOrder data.
+
+**Step 2.** In the Power Query Editor, locate the Applied Steps panel on the right side. You should see initial steps such as Source and Changed Type that Power Query applied automatically. Click on each step to observe how the data changes.
+
+**Step 3.** Remove columns that are not needed for this analysis. Click the Choose Columns button on the Home tab. Keep SalesOrderID, OrderNumber, CustomerID, and OrderDate, and uncheck RequestedDeliveryDate, FreightTerms, and Status. Click OK. A new step called Removed Other Columns appears in the Applied Steps panel.
+
+**Step 4.** Confirm the date type on the OrderDate column. Click on the OrderDate column header and verify that the data type icon shows a date type. If the column includes a time component you do not need, use the Date Only transformation on the Transform tab.
+
+**Step 5.** Add a custom column for the fiscal quarter. Go to the Add Column tab and click Custom Column. Name the column FiscalQuarter and enter the formula =Number.RoundUp(Date.Month([OrderDate]) / 3). Click OK. A new column appears with the fiscal quarter number for each order, and a new step is recorded in the Applied Steps panel.
+
+*[Figure 5.11: The Power Query Editor showing the Custom Column dialog for creating the FiscalQuarter column from the Charles River SalesOrder data. The formula is visible in the formula field. The Applied Steps panel on the right shows the sequence of transformations performed so far, including Source, Changed Type, Removed Other Columns, and the new Added Custom step.]*
+
+**Step 6.** Now merge the Customer table. On the Home tab, click Merge Queries. In the merge dialog, the current query, SalesOrder, is shown on top. Select CustomerID as the key column by clicking on it. In the lower section, select the Customer query from the dropdown and select CustomerID in the Customer table. Set the join kind to Left Outer, which keeps all rows from the first table and the matching rows from the second. Click OK. A new column called Customer appears in the table, containing expandable table objects.
+
+**Step 7.** Click the expand icon, a double-arrow icon, on the Customer column header. A dialog lists all columns from the Customer table. Select only CustomerName, CustomerSegment, and Region. Uncheck the option that adds the original column name as a prefix to keep the column names clean. Click OK. The CustomerName, CustomerSegment, and Region columns now appear in the query result, populated with the matching customer information for each order.
+
+*[Figure 5.12: The expanded result in Power Query showing the Charles River SalesOrder data merged with CustomerName, CustomerSegment, and Region from the Customer table. The Applied Steps panel shows the complete sequence of steps, including the merge and the expansion. An annotation highlights that every step is documented and can be reviewed or modified.]*
+
+**Step 8.** Review the Applied Steps panel. You should see a sequence that includes the source connection, the type change, the column removal, the custom FiscalQuarter column, the merge operation, and the column expansion. Click on each step in sequence to see the data at each point in the transformation. This step-by-step visibility is the key advantage of Power Query over formula-based cleaning.
+
+**Step 9.** Click Close and Load on the Home tab. Power Query creates a new worksheet in your workbook containing the cleaned and merged data, and the worksheet name matches the query name. The data loads as an Excel Table that is connected to the Power Query transformation. To update it when source data changes, right-click the Table and select Refresh.
+
+**Step 10.** Open a Documentation worksheet and record the Power Query transformation you created. Note the query name, the source tables used, the transformation steps applied, and the output worksheet name.
+
+**Checkpoint.** Your workbook should now contain a new worksheet with a merged and cleaned dataset that includes SalesOrderID, OrderNumber, CustomerID, OrderDate, FiscalQuarter, CustomerName, CustomerSegment, and Region. The Applied Steps panel in Power Query should contain six to eight named steps that document the entire transformation. If you right-click the output Table and click Refresh, the query should re-execute without errors, which demonstrates its repeatability. This workflow can serve as a template for any future data preparation task where you need to combine and clean multiple Charles River tables.

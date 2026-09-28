@@ -1,0 +1,101 @@
+## Guided Tutorial 4.3: Surfacing Promotions and Documenting the Workbook
+
+**Context and objective.** In this tutorial, you will use the techniques from the last four sections to finish the analysis workbook. You will protect the threshold parameter with data validation, highlight the invoice lines that carry a promotional discount, sort and slice the lines to compare the promotions, and use SUBTOTAL to measure the lines in view. You will then look up the promotion that stands out and record what you found, and what remains open, on a documentation worksheet.
+
+**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorials 4.1 and 4.2.
+
+**Step-by-step instructions.**
+
+**Step 1. Protect the threshold parameter with data validation.**
+
+a. On the **Parameters** worksheet, select B3, the ThresholdPercentile cell, and choose **Data > Data Validation**.
+b. On the **Settings** tab, allow **Decimal** between a minimum of `0.5` and a maximum of `0.99`.
+c. On the **Input Message** tab, type the title `Threshold percentile` and the message `Enter a share between 0.5 and 0.99, such as 0.9 for the top 10 percent of lines.`
+d. On the **Error Alert** tab, choose the **Stop** style and type a short explanation. Click **OK**.
+e. Test the rule by typing `1.5` in B3. Excel should refuse the entry. Press Escape or click **Cancel** so that 0.9 remains.
+
+**Step 2. Highlight every line with a promotional discount.** A formula rule can shade an entire row based on the value in one of its columns.
+
+a. Go to the **SalesInvoiceLine** worksheet.
+b. Click cell A2, the first data cell of the Table, and press Ctrl+A, which selects the Table's data rows without the header while A2 stays the active cell.
+c. Choose **Home > Conditional Formatting > New Rule**, select **Use a formula to determine which cells to format**, and enter `=$J2>0`. Column J holds Discount; if your Discount column has a different letter, use that letter instead.
+d. Click **Format**, choose a light fill color on the **Fill** tab, and click **OK** twice.
+e. Scroll through the Table.
+
+Excel reads the formula as written for the active cell in row 2 and adjusts the row for every other selected cell, which is why A2 must be the active cell. Every row whose discount is greater than zero is now shaded across the whole Table, and the shaded rows are scattered among many unshaded ones.
+
+**Step 3. Sort the lines so that the promotion lines come together.**
+
+a. Choose **Data > Sort**.
+b. For the first level, sort by PromotionID from **Smallest to Largest**.
+c. Click **Add Level**, and sort the second level by DiscountAmount from **Largest to Smallest**. Click **OK**.
+
+The shaded rows now sit at the top of the Table, grouped by promotion, with the largest discount first within each group. The lines without a promotion have a blank PromotionID, and blank cells always sort to the bottom.
+
+**Step 4. Add a slicer.**
+
+a. With a cell in the Table selected, choose **Table Design > Insert Slicer**, select **PromotionID**, and click **OK**.
+b. Move the slicer beside the Table. It shows one button for each promotion number and one for the blank value.
+c. Click the button for promotion 1, and read the status bar at the bottom of the window, which reports how many of the Table's records are in view.
+d. Click each of the other promotion buttons in turn and compare the counts.
+
+**Step 5. Measure the lines in view.**
+
+a. On the **Analysis** worksheet, type `Lines in view` in A28 and enter this formula in B28:
+
+   ```
+   =SUBTOTAL(103,SalesInvoiceLine[SalesInvoiceLineID])
+   ```
+
+b. Type `Discount in view` in A29 and enter `=SUBTOTAL(109,SalesInvoiceLine[DiscountAmount])` in B29.
+c. Type `Discount, all lines` in A30 and enter `=SUM(SalesInvoiceLine[DiscountAmount])` in B30.
+d. Return to the slicer and click each promotion button again, noting the two SUBTOTAL results each time.
+
+B30 never changes, because SUM includes the hidden rows, while B28 and B29 follow the slicer. One promotion stands out on both measures: promotion 8 has more lines than any other and far more discount dollars. @fig-04-08 shows the Table with promotion 8 selected.
+
+![The Invoice Lines Filtered to Promotion 8 with a Slicer.](/visuals/svg/fig-04-08-promotion-slicer.svg){#fig-04-08 fig-alt="A mock of the SalesInvoiceLine Table filtered by a PromotionID slicer on which button 8 is selected and outlined. The visible rows are sorted by DiscountAmount from largest to smallest, every row is shaded by the conditional formatting rule, and the row numbers are blue because the Table is filtered. The status bar, outlined, reports how many of the Table's records are in view."}
+
+**Step 6. Find out what promotion 8 is.**
+
+a. Go to the **PromotionProgram** worksheet and locate the row whose PromotionID is 8.
+b. Read its PromotionCode, PromotionName, ScopeType, ItemGroup, DiscountPct, EffectiveStartDate, and EffectiveEndDate.
+c. Compare its DiscountPct with the Discount on the promotion 8 lines in the SalesInvoiceLine Table; they should agree.
+d. Return to the slicer and click its **Clear Filter** button so that every line is in view again.
+
+Promotion 8 is PROMO-2026-008, the Furniture Seasonal Promotion. It applied a 10 percent discount to the entire Furniture item group, and it was effective from September 1 to October 31, 2026.
+
+**Step 7. Create the documentation worksheet.**
+
+a. Insert a new worksheet, name it `Documentation`, and drag its tab to the far left so that it is the first worksheet in the workbook.
+b. In column A, type the labels below, and in column B, enter the information for your workbook:
+   - **Purpose:** Diagnose the decline in Furniture gross margin from the third to the fourth quarter of fiscal 2026, as requested by the controller.
+   - **Source:** CharlesRiver.xlsx and its folder location; Tables T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram, imported with Power Query.
+   - **Query steps:** Item keeps only items with a list price and eleven columns; SalesInvoice has its date columns set to the Date type; the other queries keep every row and column.
+   - **Last refreshed:** the date of your last Refresh All.
+   - **Parameters:** ThresholdPercentile (Parameters!B3, an input validated between 0.5 and 0.99) and LargeLineThreshold (Parameters!B4, a formula).
+   - **Calculated columns:** ListAmount and DiscountAmount on the SalesInvoiceLine Table, with their formulas.
+   - **Worksheets:** each worksheet in the workbook and what it contains.
+   - **Conventions:** blue font marks input cells; black font marks formulas.
+   - **Prepared by** and **Date prepared:** your name and today's date. **Reviewed by** and **Date reviewed:** left blank for the reviewer.
+   - **Open questions:** Promotion 8, the Furniture Seasonal Promotion (10 percent, September 1 to October 31, 2026), has the most promotion lines and the most discount dollars. Its dates straddle the two quarters under review. Its effect on Furniture prices in each quarter cannot yet be measured, because the invoice lines carry no invoice date or item group.
+c. Format column A in bold and widen column B so that the text is readable.
+d. Open **Formulas > Name Manager** and confirm that it lists your two named cells alongside the four Tables.
+
+@fig-04-09 shows a completed example.
+
+![The Documentation Worksheet of the Analysis Workbook.](/visuals/svg/fig-04-09-documentation-sheet.svg){#fig-04-09 fig-alt="A mock of the Documentation worksheet, the first of the worksheet tabs. Column A holds the labels Purpose, Source, Query steps, Last refreshed, Parameters, Calculated columns, Worksheets, Conventions, Prepared by, Reviewed by, and Open questions, and column B holds the entries. The open question, outlined, notes that promotion 8, the Furniture Seasonal Promotion, has the most promotion lines and the most discount dollars, and that its effect in each quarter cannot yet be measured."}
+
+**Step 8. Put the workbook in order and refresh it.**
+
+a. Arrange the worksheet tabs in the order of the layers in @fig-04-07: Documentation first, then the four data worksheets, then Parameters and Analysis.
+b. Choose **Data > Refresh All** one more time, and check that the calculated columns and the highlighting are still in place.
+c. Update the Last refreshed date on the Documentation worksheet, and save the workbook.
+
+**Checkpoint.** Your workbook should now open on a Documentation worksheet that explains it. Check that:
+
+- every number on the Analysis worksheet traces to a named Table or a named parameter;
+- an out-of-range threshold percentile is refused;
+- the promotion lines are shaded;
+- the slicer shows that promotion 8, the Furniture Seasonal Promotion, has both the most lines and the most discount dollars of any promotion.
+
+You have not yet shown that this promotion explains the fall in the Furniture margin, and the open question on your Documentation worksheet says why: to measure its effect in each quarter, the invoice lines must first be combined with the invoice dates and item groups that live in other Tables.

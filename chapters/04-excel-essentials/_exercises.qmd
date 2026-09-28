@@ -1,0 +1,190 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 4.1: A Billing Schedule by Fiscal Year**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** You are a financial reporting analyst at Charles River. The controller wants a schedule of amounts billed to customers in each fiscal year, built so that it can be refreshed and reviewed. The schedule must tie to the invoice detail and state clearly what it does and does not include.
+
+**Requirements.**
+
+(1) In the analysis workbook from Tutorial 4.1, or in a new workbook, use Power Query to load the SalesInvoice Table from CharlesRiver.xlsx, with its date columns set to the Date type.
+
+(2) On a Parameters worksheet, create two named cells, PeriodStart and PeriodEnd, and apply data validation that allows only dates from January 1, 2024, to December 31, 2026. Enter the first and last days of fiscal 2026. Remember that Charles River's fiscal year is the calendar year.
+
+(3) On an Analysis worksheet, use COUNTIFS and SUMIFS with the named cells to calculate, for the period, the number of invoices and the totals of SubTotal, FreightAmount, TaxAmount, and GrandTotal. Confirm that SubTotal plus FreightAmount plus TaxAmount equals GrandTotal.
+
+(4) Build a grid with the fiscal years 2024, 2025, and 2026 in a column and the four amounts across a row. Fill it with one SUMIFS formula that uses mixed references, calculating each year's start and end dates with the DATE function. Add a total row and show that it equals the totals of the entire SalesInvoice Table.
+
+(5) Write two or three sentences explaining why this schedule is not a revenue figure for the financial statements. Consider, for example, the CreditMemo worksheet in CharlesRiver.xlsx, sales tax, and freight.
+
+**Deliverable.** A refreshable billing schedule by fiscal year that ties to the invoice detail, with validated period parameters and a short note on its limitations.
+
+<!-- Instructor notes, Exercise 4.1: invoices by fiscal year 2024 / 2025 / 2026: 6,735 / 7,008 / 7,171 (20,914 in all).
+     SubTotal 27,313,723.48 / 29,376,702.28 / 29,756,420.08 (86,446,845.84); FreightAmount 192,134.79 / 214,544.33 / 214,588.22;
+     TaxAmount 1,787,880.84 / 1,923,431.50 / 1,948,116.12; GrandTotal 29,293,739.11 / 31,514,678.11 / 31,919,124.42.
+     SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted (158 / 232 / 222 credit memos,
+     SubTotal 145,655.35 / 201,104.38 / 242,764.56), sales tax is a liability collected for the government rather than revenue, and freight
+     billed is recorded in its own revenue account (4050). Grid formula, for example
+     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[InvoiceDate],">="&DATE($A5,1,1),SalesInvoice[InvoiceDate],"<="&DATE($A5,12,31)),
+     pasted (not filled) across, with the sum column changed per measure or locked with [[Col]:[Col]]. -->
+
+
+**Exercise 4.2: Reviewing Promotional Discounts**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** The sales director has asked the finance team for a summary of the promotion programs Charles River ran and the discounts they gave away. You are asked to prepare it from the analysis workbook and to check that each promotion was applied at its approved rate.
+
+**Requirements.**
+
+(1) Using the SalesInvoiceLine and PromotionProgram Tables from Tutorial 4.1, including the DiscountAmount calculated column, build a summary on an Analysis worksheet with one row for each PromotionID in the PromotionProgram Table. For each promotion, show the PromotionCode and PromotionName, the number of invoice lines, the total LineTotal, and the total DiscountAmount.
+
+(2) Add a column that shows each promotion's share of all discount dollars, using an absolute reference to the grand total. Apply data bars to the discount column of the summary.
+
+(3) For each promotion, use COUNTIFS to count the invoice lines whose Discount differs from the promotion's DiscountPct. Report whether any promotion was applied at a rate other than its approved rate.
+
+(4) Identify the promotion with the largest share of the discount dollars, and describe its scope, its rate, and its effective dates from the PromotionProgram Table.
+
+(5) Write a brief memo (one half page) summarizing the promotions, the consistency test, and what the analysis cannot yet show about when each discounted line was billed.
+
+**Deliverable.** A promotion summary with shares of the discount dollars, a rate consistency test, and a half-page memo.
+
+<!-- Instructor notes, Exercise 4.2: lines / LineTotal / DiscountAmount by promotion (DiscountAmount = ROUND(Quantity*UnitPrice*Discount,2);
+     Excel rounding may move totals by a few cents): 1 Alder Collection 80 / 323,434.84 / 28,124.79; 2 Accessories Seasonal 431 / 337,900.23 /
+     37,544.57; 3 Strategic Customer 149 / 494,666.68 / 67,454.54; 4 Brookside Collection 74 / 374,091.50 / 32,529.70; 5 Textiles Seasonal
+     228 / 468,808.77 / 52,089.91; 6 Wholesale Customer 414 / 1,106,747.14 / 150,920.03; 7 Harbor Collection 68 / 350,503.51 / 30,478.53;
+     8 Furniture Seasonal 576 / 2,664,482.15 / 296,053.57; 9 Design Trade Customer 88 / 205,755.54 / 28,057.65; all 2,108 lines /
+     723,253.29. Promotion 8 holds about 41 percent of the discount dollars. The consistency test finds no differences: every promotion
+     line carries its promotion's DiscountPct, and no line has a discount without a PromotionID. Students may notice that promotions 4 and 7
+     have an EffectiveEndDate earlier than their EffectiveStartDate and promotion 1 is effective for a single day; testing billing dates
+     against the effective dates needs the invoice dates, which a later chapter brings onto the lines. -->
+
+
+### Managerial Accounting Exercises
+
+**Exercise 4.3: List-Price Margins by Product Group**
+
+**Table group:** Master Data (Item)
+
+**Scenario.** You are a management accountant preparing a product overview for the operations team. The team wants to know which product groups carry the highest list-price margins and which items fall below a margin target.
+
+**Requirements.**
+
+(1) Using the Item Table from Tutorial 4.1, add two calculated columns: UnitMargin, equal to ListPrice minus StandardCost, and MarginPct, equal to UnitMargin divided by ListPrice.
+
+(2) Filter the Table to the items whose ItemType is Finished Good, which excludes the design services. Explain why the design services would distort a margin comparison.
+
+(3) Sort the Table by ItemGroup from A to Z and then by MarginPct from largest to smallest. Apply a color scale to the MarginPct column.
+
+(4) Create a named parameter cell, MarginTarget, set to 0.45 and validated to allow decimals between 0 and 1. Add a formula-based conditional formatting rule that highlights the items whose MarginPct is below MarginTarget, and use COUNTIFS to count them.
+
+(5) Create a parameter cell with a List validation rule that offers the four product groups Accessories, Furniture, Lighting, and Textiles. Use AVERAGEIFS to calculate the average UnitMargin and MarginPct of the finished goods in the selected group, and record the results for each group.
+
+(6) Write three to four sentences interpreting the results. Explain why a margin at list price is not the margin Charles River actually earns.
+
+**Deliverable.** An Item analysis with margin columns, a validated margin target, highlighted exceptions, a group selector driving AVERAGEIFS results, and a short interpretation.
+
+<!-- Instructor notes, Exercise 4.3: 219 finished goods. The four design services have a StandardCost of 0, so their MarginPct is 100 percent.
+     Average UnitMargin / average MarginPct: Accessories 76.47 / 56.2%; Furniture 385.62 / 49.3%; Lighting 162.03 / 51.8%; Textiles 141.65 /
+     53.5%. MarginPct ranges from 39.6% to 63.9%, so no item is below 30 percent; 27 items are below 0.45 (Furniture 20, Lighting 6,
+     Textiles 1, Accessories 0). Furniture earns the most per unit but the lowest percentage. List-price margin overstates realized margin,
+     because most sales are billed at price-list prices below list, some carry promotional discounts, and StandardCost is a standard,
+     not an actual cost. -->
+
+
+**Exercise 4.4: Freight Billed Versus Freight Incurred**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** The logistics manager has asked whether the freight Charles River bills to customers covers what it pays its carriers. The answer will inform a discussion about freight terms.
+
+**Requirements.**
+
+(1) Use Power Query to load the Shipment and SalesOrder Tables from CharlesRiver.xlsx into your workbook.
+
+(2) On the Shipment Table, add a calculated column FreightTerms that brings in the FreightTerms of each shipment's sales order with XLOOKUP, using SalesOrderID, as you did with lookups in Part I. Add a second calculated column, FreightMargin, equal to BillableFreightAmount minus FreightCost.
+
+(3) Apply a formula-based conditional formatting rule that highlights the shipments with a negative FreightMargin, and use COUNTIFS and SUMIFS to count and total them.
+
+(4) Build a small grid with the FreightTerms values as rows and, as columns, the number of shipments, the total FreightCost, the total BillableFreightAmount, and the total FreightMargin. Fill it with formulas that use mixed references.
+
+(5) Add a slicer on FreightTerms and use it, together with SUBTOTAL, to compare the average FreightCost under each term.
+
+(6) Write a brief interpretation (four to five sentences) of what the grid shows. Distinguish the freight Charles River absorbs by design from any shortfall on the freight it intends to recover.
+
+**Deliverable.** A freight analysis with calculated columns, highlighted shortfalls, a summary grid by freight terms, and a short interpretation.
+
+<!-- Instructor notes, Exercise 4.4: 9,707 shipments. FreightTerms values are Prepaid (5,024 shipments) and Prepaid and Add (4,683).
+     Every Prepaid shipment has BillableFreightAmount 0, so all are negative by design: FreightMargin -849,739.09 (average FreightCost 169.14).
+     Prepaid and Add shipments bill freight: 2,070 above cost, 2,608 below, 5 equal; FreightMargin -6,391.63 (average FreightCost 134.03;
+     billed freight averages about 96 percent of cost). Total FreightMargin -856,130.72; 7,632 negative shipments. FreightCost ranges from
+     23.24 to 873.95. The finding: freight is absorbed by design on Prepaid orders, and freight billed under Prepaid and Add recovers most but
+     not all of the carrier cost. -->
+
+
+### Auditing Exercises
+
+**Exercise 4.5: A Refreshable Shipment Exception Report**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** You are a first-year auditor. In Tutorial 2.1 you found shipments with no tracking number and shipments still marked In Transit after their delivery date had passed. Your senior asks you to turn those one-time filters into an exception report that the team can refresh when the next extract arrives.
+
+**Requirements.**
+
+(1) Use Power Query to load the Shipment Table from CharlesRiver.xlsx into a new workbook, with ShipmentDate and DeliveryDate set to the Date type.
+
+(2) On a Parameters worksheet, create a named cell ReviewDate, validated to accept only dates, and set it to the last day of the extract, December 31, 2026. Explain in a note beside the cell why the report uses a fixed review date rather than the TODAY function.
+
+(3) Add two formula-based conditional formatting rules to the Shipment Table: one that highlights rows with a blank TrackingNumber, and a second, in a different color, that highlights rows whose Status is In Transit and whose DeliveryDate is before ReviewDate. Remember that conditional formatting formulas use cell references, and that a formula rule can refer to a named cell.
+
+(4) On an Analysis worksheet, use COUNTIFS to count the shipments in each exception category, the blank tracking numbers by Status, and the shipments in both categories.
+
+(5) Add a slicer on Status and confirm your counts with SUBTOTAL. Then change ReviewDate to December 1, 2026, and explain how the second count changes.
+
+(6) Prepare a brief memo for your senior (one half page) describing each exception, its likely cause, and the evidence you would request.
+
+**Deliverable.** A refreshable exception report with a validated review date, highlighted exceptions, counts by category, and a half-page memo.
+
+<!-- Instructor notes, Exercise 4.5: 9,707 shipments. Blank TrackingNumber: 392 (368 Delivered, 24 In Transit). In Transit: 740 shipments
+     from every year of the data (2024: 234, 2025: 254, 2026: 252). With ReviewDate 2026-12-31, 739 In Transit shipments have a DeliveryDate
+     before the review date (the other is due on the review date itself); with ReviewDate 2026-12-01 the count is 722. All 24 In Transit
+     shipments with a blank tracking number are in both categories. No ShipmentDate or DeliveryDate is blank. The Status conflict is a
+     consistency and timeliness problem (Chapter 2); the blank tracking numbers are a completeness problem. -->
+
+
+**Exercise 4.6: Reviewing Price Override Approvals**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** Charles River lets its sales team request a price below the price list for a customer, and a manager must approve each request before the price is used. Your audit team wants a preliminary review of the approval records to see whether the control operated as designed.
+
+**Requirements.**
+
+(1) Use Power Query to load the PriceOverrideApproval Table (T8_PriceOverrideApproval) from CharlesRiver.xlsx. Set RequestDate and ApprovedDate to the Date type.
+
+(2) Add a calculated column, DiscountFromReference, equal to one minus ApprovedUnitPrice divided by ReferenceUnitPrice, formatted as a percentage.
+
+(3) Apply formula-based conditional formatting rules that highlight, in different colors, requests with a blank ApprovedByEmployeeID and requests whose RequestedByEmployeeID equals the ApprovedByEmployeeID. Use COUNTIFS to count each group, and use a slicer on Status to see how the groups relate to it.
+
+(4) Build a small grid with the requesting employees as rows and, as columns, the number of requests, the number approved by someone other than the requester, and the number approved by the requester. Look up the requesters' names and job titles in the Employee worksheet of CharlesRiver.xlsx.
+
+(5) Sort the Table by DiscountFromReference from largest to smallest, and describe the range of discounts approved.
+
+(6) Prepare a brief memo (one half page) that describes each exception, explains why it matters for the design of the pricing control, and lists the follow-up procedures you would propose, including how you would find out whether the pending requests were used on sales.
+
+**Deliverable.** A reviewed approval Table with highlighted exceptions, a grid of requests by requester, and a half-page memo on the pricing control.
+
+<!-- Instructor notes, Exercise 4.6: 412 requests; 409 Approved, 3 Pending. All 409 approvals were made by EmployeeID 6 (Carrie Schultz,
+     Sales Manager). Requests by requester: EmployeeID 6 109, 82 44, 84 76, 107 80, 108 31, 120 72. The Sales Manager approved 106 of her
+     own 109 requests; her other 3 requests are the 3 Pending ones (IDs 2, 165, and 294), which have no approver or approval date. These
+     three are the AnomalyLog's missing_price_override_approval items. DiscountFromReference ranges from about 5.7% to 10.6%. Follow-up
+     for the pending requests: their SalesOrderLineIDs (147, 8038, 15033) were invoiced at the pending ApprovedUnitPrice under a price-list
+     PricingMethod (AnomalyLog sale_below_price_floor_without_approval), which students can find by filtering SalesInvoiceLine on
+     SalesOrderLineID; the full test is part of the audit analytics later in Part II. The self-approval pattern is a design issue:
+     the only approver is also a requester. -->

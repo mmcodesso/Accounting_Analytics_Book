@@ -1,0 +1,19 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Horngren, C. T., Datar, S. M., and Rajan, M. V. (2021). *Cost accounting: A managerial emphasis* (17th ed.). Pearson. This textbook provides the authoritative treatment of cost-volume-profit analysis, including its assumptions, extensions to multiple products, and applications in planning and control. The CVP framework used in this chapter follows the approach developed across successive editions of this text.
+
+Appelbaum, D., Kogan, A., Vasarhelyi, M. A., and Yan, Z. (2017). Impact of business analytics and enterprise systems on managerial accounting. *International Journal of Accounting Information Systems*, 25, 29-44. This paper examines how business analytics tools are changing the work of management accountants, including the increasing use of predictive models and scenario analysis for planning and decision support. The paper supports the chapter's emphasis on modeling as a core competency for accounting professionals.
+
+AICPA (American Institute of Certified Public Accountants). (2017). *Guide to audit data analytics.* AICPA. This professional guidance document describes how auditors can use data analytics, including regression analysis, to develop expectations for substantive analytical procedures. The sections on regression-based analytics are directly relevant to the forecasting and expectation-setting techniques taught in this chapter.
+
+Eilifsen, A., Knechel, W. R., and Wallage, P. (2001). Application of the business risk audit model: A field study. *Accounting Horizons*, 15(3), 193-207. This paper examines the use of analytical procedures in practice, including the application of regression and trend analysis to set audit expectations. The findings support the chapter's approach of using statistical models to strengthen the precision of analytical procedures.
+
+IMA (Institute of Management Accountants). (2019). *IMA Management Accounting Competency Framework.* IMA. This framework identifies planning, budgeting, and forecasting as core competencies for management accountants. The scenario analysis, sensitivity testing, and optimization techniques taught in this chapter directly support the competencies the framework describes.
+
+Trinkle, B. S., and Baldwin, A. A. (2016). Research methodologies and design in accounting analytics. In *Routledge companion to accounting information systems* (pp. 234-247). Routledge. This chapter discusses research methods commonly used in accounting analytics, including regression analysis and correlation. It provides context for understanding the statistical tools taught in this chapter as part of a broader analytical methodology used in both academic research and practice.
+
+Wheeler, P. R. (2015). The role of analytical procedures: Has Benford analysis improved the audit process? In *Proceedings of the American Accounting Association Annual Meeting.* This paper examines the effectiveness of various analytical procedures used in auditing, including regression-based expectations. The discussion of how auditors set thresholds for investigation is relevant to the audit exercises in this chapter.
+
+Blocher, E. J., Stout, D. E., Juras, P. E., and Smith, S. (2019). *Cost management: A strategic emphasis* (8th ed.). McGraw-Hill. This textbook covers cost estimation techniques including the high-low method and regression analysis applied to separating fixed and variable costs. The cost behavior analysis approach used in the auditing exercises of this chapter draws on the framework presented in this text.

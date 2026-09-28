@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from data import one
+import excel as xl
+from data import one, q, require_columns
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CROSS_WIDTH, GRAY, GRAY_TINT, HEAD, HIGHLIGHT,
                     INK, RULE, ROW_H, SMALL, TEAL, WHITE, Diagram, esc, money)
 
@@ -306,6 +307,30 @@ def fig_01_08() -> Diagram:
     return d
 
 
+def fig_01_07() -> Diagram:
+    d = Diagram("The Charles River SalesOrder Worksheet")
+    cols = ["SalesOrderID", "OrderNumber", "OrderDate", "CustomerID", "RequestedDeliveryDate",
+            "Status", "SalesRepEmployeeID"]
+    require_columns("SalesOrder", cols)
+    table_cols = [r[1] for r in q("PRAGMA table_info(SalesOrder)")]
+    assert table_cols[:len(cols)] == cols, table_cols
+    first, last, count = one("SELECT MIN(SalesOrderID), MAX(SalesOrderID), COUNT(*) FROM SalesOrder")
+    assert (first, last) == (1, count), "row numbers assume IDs 1..n in worksheet order"
+    orphans = one("SELECT COUNT(*) FROM SalesOrder o WHERE NOT EXISTS "
+                  "(SELECT 1 FROM Customer c WHERE c.CustomerID = o.CustomerID)")[0]
+    assert orphans == 0, orphans
+    rows = q(f"SELECT {', '.join(cols)} FROM SalesOrder ORDER BY SalesOrderID LIMIT 14")
+
+    widths = [40, 100, 130, 92, 92, 164, 70, 150]
+    body = [(str(r[0] + 1), [str(v) for v in r]) for r in rows]
+    geo = xl.table_view(d, 0, 0, list("ABCDEFG"), widths, cols, body)
+    xl.emphasis(d, *xl.column_box(geo, 3, len(body) + 1))
+    bottom = 22 + ROW_H * (len(body) + 1)
+    xl.sheet_tabs(d, 0, bottom + 6, xl.tabs_around("SalesOrder", 4, 3), "SalesOrder")
+    d.text("<i>Outlined: CustomerID, the column that links each order to the customer who placed "
+           "it.</i>", 0, bottom + 38, 860, 20, size=SMALL, color=GRAY)
+    return d
+
 FIGURES = {
     "fig-01-01-analytics-continuum": fig_01_01,
     "fig-01-02-analytics-workflow": fig_01_02,
@@ -313,6 +338,7 @@ FIGURES = {
     "fig-01-04-charles-river-architecture": fig_01_04,
     "fig-01-05-o2c-process-flow": fig_01_05,
     "fig-01-06-ledger-posting-trace": fig_01_06,
+    "fig-01-07-salesorder-worksheet": fig_01_07,
     "fig-01-08-book-organization-map": fig_01_08,
 }
 

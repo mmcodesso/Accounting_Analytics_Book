@@ -1,0 +1,41 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Contribution margin.** The difference between the selling price per unit and the variable cost per unit. The contribution margin represents the amount each unit contributes toward covering fixed costs and generating profit.
+
+**Contribution margin ratio.** The contribution margin per unit divided by the selling price per unit, expressed as a percentage. This ratio indicates what proportion of each revenue dollar is available to cover fixed costs and contribute to profit.
+
+**Correlation coefficient.** A statistical measure, ranging from negative one to positive one, that quantifies the strength and direction of the linear relationship between two variables. In accounting, it is used to assess whether two variables are related before building a regression model.
+
+**Cost-volume-profit analysis.** A modeling technique that expresses profit as a function of selling price, variable cost, fixed costs, and sales volume. CVP analysis is used in managerial accounting for break-even analysis, pricing decisions, and production planning.
+
+**Data Analysis ToolPak.** An Excel add-in that provides statistical analysis tools including regression, correlation, descriptive statistics, and hypothesis testing. The ToolPak must be enabled through the File, Options, Add-ins menu before first use.
+
+**Data table.** An Excel what-if analysis tool that calculates the results of a formula across a range of input values. A one-variable data table varies one input, and a two-variable data table varies two inputs simultaneously.
+
+**Dependent variable.** The variable being predicted or explained in a regression model. In accounting, this is typically the account balance, revenue amount, or cost total that the analyst wants to forecast or estimate.
+
+**FORECAST.LINEAR.** An Excel function that returns a single predicted value based on a linear regression of known data points. It provides a quick forecast without the full diagnostic output of the Data Analysis ToolPak.
+
+**Goal Seek.** An Excel tool that finds the value of a single input cell that makes a formula cell equal to a specified target value. Goal Seek works backward from a desired result to determine the required input.
+
+**Independent variable.** The variable used to predict or explain the dependent variable in a regression model. In accounting, this is typically a driver such as time period, volume, or an economic indicator.
+
+**Intercept.** The constant term in a regression equation, representing the predicted value of the dependent variable when the independent variable equals zero. In cost estimation, the intercept represents the estimated fixed cost component.
+
+**R Square.** A statistic that measures the proportion of variation in the dependent variable that is explained by the regression model. An R Square of 0.80 means that 80% of the variation is explained and 20% is unexplained.
+
+**Regression analysis.** A statistical technique that models the relationship between a dependent variable and one or more independent variables by fitting an equation to observed data. In accounting, regression supports cost estimation, revenue forecasting, and audit analytical procedures.
+
+**Scenario Manager.** An Excel tool that allows users to define and compare named sets of input values (scenarios) and generate a summary report showing the model's outputs under each scenario.
+
+**Sensitivity analysis.** The practice of systematically testing how a model's outputs change when key assumptions change. Sensitivity analysis reveals which assumptions have the greatest impact on the model's conclusions.
+
+**Slope.** The coefficient in a regression equation that indicates how much the dependent variable changes for each one-unit increase in the independent variable. A positive slope indicates a positive relationship and a negative slope indicates a negative relationship.
+
+**Solver.** An Excel add-in that finds the optimal value of a target cell by adjusting one or more variable cells, subject to constraints. Solver can maximize, minimize, or target a specific value and is used for optimization problems such as product mix and resource allocation.
+
+**TREND function.** An Excel function that returns an array of predicted values based on a linear regression of known data points. Unlike FORECAST.LINEAR, TREND can return predictions for multiple new values at once.
+
+**Trendline.** A line added to an Excel chart that represents the best fit through the data points. Trendlines can be linear, exponential, logarithmic, or polynomial, and can be extended beyond the data to project future values.

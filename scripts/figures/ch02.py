@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from data import one, q
+import excel as xl
+from data import one, q, require_columns
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, HEAD,
                     HIGHLIGHT, INK, RULE, ROW_H, SMALL, TEAL, TEAL_TINT, WHITE, Diagram, esc,
                     money)
@@ -206,10 +207,106 @@ def fig_02_06() -> Diagram:
     return d
 
 
+def fig_02_04() -> Diagram:
+    d = Diagram("The Shipment Worksheet Filtered to Blank Tracking Numbers")
+    cols = ["ShipmentID", "ShipmentNumber", "SalesOrderID", "ShipmentDate", "WarehouseID",
+            "ShippedBy", "TrackingNumber", "Status"]
+    require_columns("Shipment", cols)
+    table_cols = [r[1] for r in q("PRAGMA table_info(Shipment)")]
+    assert table_cols[:len(cols)] == cols, table_cols
+    first, last, total = one("SELECT MIN(ShipmentID), MAX(ShipmentID), COUNT(*) FROM Shipment")
+    assert (first, last) == (1, total), "row numbers assume IDs 1..n in worksheet order"
+    blank = "(TrackingNumber IS NULL OR TrackingNumber = '')"
+    count = one(f"SELECT COUNT(*) FROM Shipment WHERE {blank}")[0]
+    assert count > 0
+    rows = q(f"SELECT {', '.join(cols)} FROM Shipment WHERE {blank} ORDER BY ShipmentID LIMIT 14")
+
+    widths = [44, 84, 118, 96, 100, 94, 126, 120, 76]
+    body = [(str(r[0] + 1), [str(v) if v is not None else "" for v in r]) for r in rows]
+    geo = xl.table_view(d, 0, 0, list("ABCDEFGH"), widths, cols, body, number_color=BLUE)
+    xl.emphasis(d, *xl.column_box(geo, 6, len(body) + 1))
+    bottom = 22 + ROW_H * (len(body) + 1)
+    xl.sheet_tabs(d, 0, bottom + 6, xl.tabs_around("Shipment", 3, 2), "Shipment")
+    xl.status_bar(d, 0, bottom + 34, 860, f"{count} of {total} records found")
+    xl.emphasis(d, 2, bottom + 34, 220, 24)
+    d.text(f"<i>The first {len(rows)} of the shipments in view are shown. Outlined: the empty "
+           "TrackingNumber column and the count in the status bar. Blue row numbers mark a "
+           "filtered Table.</i>", 0, bottom + 66, 860, 40, size=SMALL, color=GRAY)
+    return d
+
+
+def fig_02_05() -> Diagram:
+    d = Diagram("The SalesInvoice Worksheet with Date Check Helper Columns")
+    require_columns("SalesInvoice", ["SalesInvoiceID", "InvoiceNumber", "InvoiceDate",
+                                     "SalesOrderID"])
+    require_columns("Shipment", ["SalesOrderID", "ShipmentDate"])
+    first, last, total = one("SELECT MIN(SalesInvoiceID), MAX(SalesInvoiceID), COUNT(*) "
+                             "FROM SalesInvoice")
+    assert (first, last) == (1, total), "row numbers assume IDs 1..n in worksheet order"
+    rows = q("SELECT si.SalesInvoiceID, si.InvoiceNumber, si.InvoiceDate, si.SalesOrderID, "
+             "m.first_ship FROM SalesInvoice si JOIN (SELECT SalesOrderID, MIN(ShipmentDate) "
+             "AS first_ship FROM Shipment GROUP BY SalesOrderID) m USING (SalesOrderID) "
+             "WHERE si.InvoiceDate < m.first_ship ORDER BY si.SalesInvoiceID")
+    assert 0 < len(rows) <= 15, len(rows)
+
+    xl.formula_bar(d, 0, 0, 860, "M2", "=MINIFS(Shipment!D:D, Shipment!C:C, E2)")
+    headers = ["SalesInvoiceID", "InvoiceNumber", "InvoiceDate", "SalesOrderID", "Min Date",
+               "Check"]
+    widths = [56, 124, 140, 110, 110, 110, 90]
+    body = [(str(r[0] + 1), [str(r[0]), r[1], r[2], str(r[3]), r[4], "Check"]) for r in rows]
+    geo = xl.table_view(d, 0, 40, list("ABCEMN"), widths, headers, body, number_color=BLUE)
+    xl.emphasis(d, *xl.column_box(geo, 5, len(body) + 1))
+    bottom = 40 + 22 + ROW_H * (len(body) + 1)
+    xl.status_bar(d, 0, bottom + 8, 860, f"{len(rows)} of {total} records found")
+    d.text("<i>Columns D and F through L are hidden, and the Check column is filtered to "
+           "Check. Outlined: the Check column. Blue row numbers mark a filtered Table.</i>", 0,
+           bottom + 40, 860, 20, size=SMALL, color=GRAY)
+    return d
+
+
+def fig_02_07() -> Diagram:
+    d = Diagram("Debit and Credit Totals at the Bottom of the GLEntry Worksheet")
+    cols = ["GLEntryID", "PostingDate", "AccountID", "Debit", "Credit", "VoucherType"]
+    require_columns("GLEntry", cols)
+    table_cols = [r[1] for r in q("PRAGMA table_info(GLEntry)")]
+    assert table_cols[:len(cols)] == cols, table_cols
+    first, last, count = one("SELECT MIN(GLEntryID), MAX(GLEntryID), COUNT(*) FROM GLEntry")
+    assert (first, last) == (1, count), "row numbers assume IDs 1..n in worksheet order"
+    debit, credit = one("SELECT ROUND(SUM(Debit), 2), ROUND(SUM(Credit), 2) FROM GLEntry")
+    rows = q(f"SELECT {', '.join(cols)} FROM GLEntry ORDER BY GLEntryID DESC LIMIT 10")[::-1]
+
+    last_row = last + 1
+    total_row, diff_row = last_row + 2, last_row + 3
+    xl.formula_bar(d, 0, 0, 860, f"D{diff_row}", f"=D{total_row}-E{total_row}")
+    body = [(str(r[0] + 1), [str(r[0]), r[1], str(r[2]), f"{r[3]:.2f}", f"{r[4]:.2f}", r[5]])
+            for r in rows]
+    widths = [70, 96, 112, 90, 140, 140, 120]
+    geo = xl.table_view(d, 0, 40, list("ABCDEF"), widths, cols, body)
+    y = 40 + 22 + ROW_H * (len(body) + 1)
+    below = [(str(last_row + 1), ["", "", "", "", "", ""]),
+             (str(total_row), ["", "", "<b>Total</b>", money(debit), money(credit), ""]),
+             (str(diff_row), ["", "", "<b>Difference</b>", money(round(debit - credit, 2) + 0.0), "", ""])]
+
+    def style(r: int, c: int, value: str) -> dict:
+        return dict(label=value) if value.startswith("<b>") else {}
+
+    geo2 = xl.sheet(d, 0, y, [], widths, below, style, show_letters=False)
+    x0, y0, _, _ = geo2[(1, 2)]
+    xl.emphasis(d, x0, y0, widths[3] + widths[4] + widths[5], ROW_H * 2)
+    xl.select(d, *geo2[(2, 3)])
+    bottom = y + ROW_H * len(below)
+    xl.sheet_tabs(d, 0, bottom + 6, xl.tabs_around("GLEntry", 2, 4), "GLEntry")
+    d.text("<i>The last ledger rows, followed by the totals. Outlined: the debit and credit totals "
+           "and their difference.</i>", 0, bottom + 38, 860, 20, size=SMALL, color=GRAY)
+    return d
+
 FIGURES = {
     "fig-02-01-spectrum-data-structure": fig_02_01,
     "fig-02-02-sources-accounting-data": fig_02_02,
     "fig-02-03-data-quality-problems": fig_02_03,
+    "fig-02-04-shipment-blank-tracking": fig_02_04,
+    "fig-02-05-salesinvoice-date-check": fig_02_05,
     "fig-02-06-messy-vs-tidy-data": fig_02_06,
+    "fig-02-07-glentry-debit-credit-sum": fig_02_07,
 }
 

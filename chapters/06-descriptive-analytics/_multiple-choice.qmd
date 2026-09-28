@@ -1,0 +1,108 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A financial analyst calculates the average and median of Charles River invoice line amounts (LineTotal) and finds that the average is substantially higher than the median. What does this difference indicate about the distribution of line amounts?
+
+A. Most line amounts are close to the average
+B. The distribution is skewed to the right by a relatively small number of high-value lines
+C. The data contains errors that should be corrected before analysis
+D. The median is always more accurate than the average for financial data
+
+**2.** Which Excel function would you use to count the number of invoice lines in the Charles River data where the billed amount exceeds $1,000?
+
+A. =COUNT(InvoiceLines[LineTotal], ">1000")
+B. =COUNTIF(InvoiceLines[LineTotal], ">1000")
+C. =COUNTIFS(InvoiceLines[LineTotal], ">"&1000)
+D. =SUM(InvoiceLines[LineTotal], ">1000")
+
+**3.** An auditor wants to calculate the total dollar value of all journal entries posted during the fourth fiscal quarter. If the data contains columns for Amount and FiscalQuarter, which formula is most appropriate?
+
+A. =SUMIFS(JournalEntries[Amount], JournalEntries[FiscalQuarter], "Q4")
+B. =SUMIF(JournalEntries[FiscalQuarter], "Q4")
+C. =SUM(JournalEntries[Amount]) where FiscalQuarter = "Q4"
+D. =AVERAGEIFS(JournalEntries[Amount], JournalEntries[FiscalQuarter], "Q4")
+
+**4.** When building a SUMIFS formula across a table, an analyst uses the formula =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], A4, InvoiceLines[FiscalQuarter], B3) and plans to copy it across columns and down rows. What is the problem with this formula?
+
+A. SUMIFS cannot accept more than one criteria pair
+B. The formula will produce an error because structured references are incompatible with SUMIFS
+C. The cell references A4 and B3 lack mixed references, so they will shift incorrectly when the formula is copied
+D. The formula should use SUMIF instead of SUMIFS when only two criteria are present
+
+**5.** What happens when you drag a date field into the Columns area of a PivotTable and the date column contains one cell with a text value "TBD" instead of a date?
+
+A. Excel will convert "TBD" to today's date automatically
+B. Excel will exclude the row containing "TBD" from the PivotTable
+C. Excel will be unable to group the dates and will display each individual date as a separate column
+D. The PivotTable will generate an error and refuse to display any results
+
+**6.** A cost accountant creates a PivotTable to analyze Charles River production data. The PivotTable shows item groups as rows and fiscal quarters as columns, with total production cost in the values area. The accountant then uses Show Values As to display % Difference From with the base set to the previous quarter. What does a value of negative 15% in the Q3 column for a particular item group mean?
+
+A. The item group's production cost in Q3 was 15% of the company's total production cost
+B. The item group's production cost in Q3 was 15% lower than in Q2
+C. The item group's production cost in Q3 was 15% lower than the annual average
+D. Fifteen percent of the item group's production orders in Q3 were incomplete
+
+**7.** Which PivotTable area would you use to restrict the entire PivotTable to display data for a single year without removing any rows from the source data?
+
+A. The Rows area
+B. The Columns area
+C. The Values area
+D. The Filters area
+
+**8.** A PivotTable calculated field is defined as = LineTotal / QuantityShipped. If the PivotTable shows an item group with total LineTotal of $500,000 and total QuantityShipped of 10,000, what value will the calculated field display for that item group?
+
+A. The simple average of the per-unit revenue for each individual line
+B. $50, which is the total LineTotal divided by total QuantityShipped (the weighted average)
+C. An error, because calculated fields cannot perform division
+D. The median per-unit revenue for the item group
+
+**9.** An auditor builds a stratification table that divides sales invoice lines into five value ranges. The table shows that the top stratum (lines above $5,000) contains 1% of all lines but 11% of the total dollar value, and the top two strata together contain 12% of the lines but 50% of the value. How should this information affect the audit approach?
+
+A. The auditor should ignore the top strata because they contain too few lines to be representative
+B. The auditor should test only the top strata and skip the others because they are immaterial
+C. The auditor should consider testing the largest items individually and sampling from the remaining strata
+D. The stratification table provides no useful information for audit planning
+
+**10.** Which of the following best describes the relationship between SUMIFS formulas and PivotTables for creating cross-tabulations?
+
+A. SUMIFS formulas are always more accurate than PivotTables
+B. PivotTables can only be used for counting, not for summing values
+C. Both can produce the same cross-tabulation, but PivotTables automate the layout and update dynamically when the source data changes
+D. SUMIFS formulas work with Excel Tables but PivotTables require a different data format
+
+**11.** A financial analyst builds a PivotTable showing revenue by item group as rows and uses Show Values As % of Column Total to display each item group's share of quarterly revenue. In Q2, the Furniture group shows 53%. What does this mean?
+
+A. Furniture revenue in Q2 was 53% higher than in Q1
+B. Furniture accounted for 53% of the company's total Q2 revenue
+C. Fifty-three percent of all Q2 invoice lines involved Furniture
+D. Furniture achieved 53% of its annual revenue target in Q2
+
+**12.** When would AVERAGEIFS be more appropriate than a PivotTable for calculating averages by category?
+
+A. When you need the average for a single specific category and do not need the full cross-tabulation
+B. When the dataset is too small for PivotTables
+C. When you want to calculate a weighted average rather than a simple average
+D. AVERAGEIFS is never more appropriate than a PivotTable
+
+**13.** The STDEV.S function applied to a column of monthly expense amounts for a cost center returns a value of $800, while the AVERAGE of the same column is $25,000. What does this combination suggest about the cost center's spending pattern?
+
+A. The cost center's spending is highly unpredictable and should be investigated for errors
+B. The cost center's monthly spending is relatively stable, varying by approximately $800 around the $25,000 average
+C. The standard deviation is too large relative to the average, indicating data quality problems
+D. The cost center spends exactly $800 more than average every month
+
+**14.** An analyst creates a PivotTable from sales data and groups the InvoiceDate field by both Quarters and Years. What hierarchical structure does this grouping produce?
+
+A. Separate PivotTables for each year
+B. A flat list alternating between year labels and quarter labels
+C. A nested structure where each year expands to show its four quarters
+D. An error, because PivotTables cannot group by two time periods at once
+
+**15.** A cost accountant is reviewing a Charles River production summary PivotTable and notices that one item group has a work order close variance far larger than the others relative to its production volume. Using the descriptive analytics tools from this chapter, which of the following represents the most appropriate next step?
+
+A. Delete the item group from the PivotTable because the variance is an outlier
+B. Investigate the specific work orders within that item group to identify the source of the elevated variance
+C. Change the aggregation method from Sum to Average to reduce the apparent variance
+D. Apply conditional formatting to hide the item group from the management report

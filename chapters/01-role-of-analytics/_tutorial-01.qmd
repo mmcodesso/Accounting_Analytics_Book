@@ -6,22 +6,50 @@
 
 **Step-by-step instructions.**
 
-**Step 1.** Open the file CharlesRiver.xlsx in Excel. Notice that the workbook contains a large number of worksheets, each representing one table in the Charles River database and arranged by table group. Click through several worksheet tabs at the bottom of the screen and note the variety of table names, from Customer and SalesOrder through WorkOrder and PayrollRegister. Use @tbl-01-03 to match the worksheets you see to their table groups.
+**Step 1. Open the workbook and browse its worksheets.**
 
-**Step 2.** Click on the Customer worksheet. Examine the column headers in row 1. You should see columns including CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms. Scroll down to get a sense of the number of records. Turn on filters for the worksheet (Data > Filter) and open the filter on the CustomerSegment column. You should see segments such as Wholesale, Small Business, Design Trade, Strategic, and Design Services, which classify customers by the way Charles River sells to them.
+a. Open the file CharlesRiver.xlsx in Excel.
+b. Click through several worksheet tabs at the bottom of the screen and note the variety of table names, from Customer and SalesOrder through WorkOrder and PayrollRegister.
+c. Use @tbl-01-03 to match the worksheets you see to their table groups.
 
-**Step 3.** Click on the SalesOrder worksheet. Examine the columns, which include SalesOrderID, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, and Status, as shown in @fig-01-07. Notice that CustomerID appears in both the Customer and SalesOrder worksheets. In the Customer table, CustomerID is the primary key, the column whose value uniquely identifies each row. In the SalesOrder table, CustomerID acts as a foreign key, a column that refers to the primary key of another table and so links each order to the customer who placed it. You will study keys and relationships in depth in Chapter 3 and use them constantly when writing SQL joins in Part III.
+The workbook contains a large number of worksheets, each representing one table in the Charles River database and arranged by table group.
+
+**Step 2. Explore the Customer worksheet.**
+
+a. Click the **Customer** worksheet tab and examine the column headers in row 1. You should see columns including CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms.
+b. Scroll down to get a sense of the number of records.
+c. Click the filter button on the CustomerSegment column header. The worksheet stores its data as an Excel Table, so the filter buttons are already in place.
+
+You should see segments such as Wholesale, Small Business, Design Trade, Strategic, and Design Services, which classify customers by the way Charles River sells to them.
+
+**Step 3. Find the link between orders and customers.** Click the **SalesOrder** worksheet tab. Examine the columns, which include SalesOrderID, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, and Status, as shown in @fig-01-07.
+
+Notice that CustomerID appears in both the Customer and SalesOrder worksheets. In the Customer table, CustomerID is the primary key, the column whose value uniquely identifies each row. In the SalesOrder table, CustomerID acts as a foreign key, a column that refers to the primary key of another table and so links each order to the customer who placed it. You will study keys and relationships in depth in Chapter 3 and use them constantly when writing SQL joins in Part III.
 
 
-![Screenshot of the Charles River SalesOrder worksheet in Excel.](/visuals/png/fig-01-07-salesorder.png){#fig-01-07 fig-alt="Screenshot of the Charles River SalesOrder worksheet in Excel, showing the columns from SalesOrderID through SalesRepEmployeeID for the first orders of 2024, with the SalesOrder sheet tab selected. A red box highlights the CustomerID column, which links each order to the customer who placed it."}
+![The Charles River SalesOrder Worksheet.](/visuals/svg/fig-01-07-salesorder-worksheet.svg){#fig-01-07 fig-alt="A mock of the Charles River SalesOrder worksheet in Excel, showing the columns from SalesOrderID through SalesRepEmployeeID for the first orders of 2024, with the SalesOrder sheet tab selected. The CustomerID column, which links each order to the customer who placed it, is outlined."}
 
 
-**Step 4.** Click on the Item worksheet. Examine the columns, which include ItemID, ItemName, ItemGroup, SupplyMode, StandardCost, and ListPrice. Turn on filters and open the filter on the ItemGroup column. The finished goods that Charles River sells fall into four product families: Furniture, Lighting, Textiles, and Accessories. You will also see the Services, Raw Materials, Packaging, and Capex groups. Services holds both the design services that Charles River sells and operating services that it buys, such as insurance and IT support. Raw materials and packaging support manufacturing, and Capex holds capital equipment. Notice also the SupplyMode column, which indicates whether each item is Purchased or Manufactured (produced in-house). These distinctions will be important for cost analysis and manufacturing exercises in later chapters.
+**Step 4. Explore the Item worksheet.** Click the **Item** worksheet tab. Examine the columns, which include ItemID, ItemName, ItemGroup, SupplyMode, StandardCost, and ListPrice. Then click the filter button on the ItemGroup column header.
 
-**Step 5.** Click on the Account worksheet. Examine the columns, which include AccountID, AccountNumber, AccountName, AccountType, and ParentAccountID. This is the chart of accounts for Charles River, and it forms the backbone of the Accounting Core. The AccountType column classifies each account as an asset, liability, equity, revenue, or expense account. The ParentAccountID column nests detailed accounts under summary accounts such as Assets, Liabilities, Revenue, and Cost of Goods Sold, creating the same hierarchy you see in a set of financial statements.
+The finished goods that Charles River sells fall into four product families: Furniture, Lighting, Textiles, and Accessories. You will also see the Services, Raw Materials, Packaging, and Capex groups. Services holds both the design services that Charles River sells and operating services that it buys, such as insurance and IT support. Raw materials and packaging support manufacturing, and Capex holds capital equipment. Notice also the SupplyMode column, which indicates whether each item is Purchased or Manufactured (produced in-house). These distinctions will be important for cost analysis and manufacturing exercises in later chapters.
 
-**Step 6.** Click on the GLEntry worksheet. Examine the columns, which include GLEntryID, PostingDate, AccountID, Debit, Credit, SourceDocumentType, SourceDocumentID, SourceLineID, and CostCenterID. This table contains the individual debit and credit entries that make up the general ledger. Turn on filters and open the filter on the SourceDocumentType column. You should see document types such as SalesInvoice, Shipment, PurchaseInvoice, PayrollPayment, and JournalEntry, each identifying the kind of business event that generated the entry. Together with SourceDocumentID and SourceLineID, this column traces every posting back to the specific document and line that created it. You will use this table extensively in the audit and financial reporting chapters.
+**Step 5. Explore the chart of accounts.** Click the **Account** worksheet tab. Examine the columns, which include AccountID, AccountNumber, AccountName, AccountType, and ParentAccountID.
 
-**Step 7.** Click on one manufacturing table (such as WorkOrder) and one payroll table (such as PayrollRegister). Examine the columns briefly. Notice that the database contains far more than sales and accounting data. Work orders track production with columns for the item produced, the planned quantity, the released, due, and completed dates, and the status. Payroll registers record each employee's pay for a period with columns for gross pay, employee withholdings, employer taxes and benefits, and net pay. These table groups will become important in the SQL and Power BI parts of the book.
+This is the chart of accounts for Charles River, and it forms the backbone of the Accounting Core. The AccountType column classifies each account as an asset, liability, equity, revenue, or expense account. The ParentAccountID column nests detailed accounts under summary accounts such as Assets, Liabilities, Revenue, and Cost of Goods Sold, creating the same hierarchy you see in a set of financial statements.
 
-**Checkpoint.** At this point, you should have examined worksheets from at least four table groups (Order-to-Cash, Master Data, Accounting Core, and either Manufacturing or Payroll and Time). You should be able to answer the following questions. Which four product families make up the finished goods that Charles River sells? (Furniture, Lighting, Textiles, and Accessories.) Which columns in GLEntry trace each entry back to its source document? (SourceDocumentType, which identifies the kind of document, together with SourceDocumentID and SourceLineID, which identify the specific document and line.) Which worksheet contains the chart of accounts? (Account.) If you can answer these three questions, you are ready to proceed.
+**Step 6. Explore the general ledger.** Click the **GLEntry** worksheet tab. Examine the columns, which include GLEntryID, PostingDate, AccountID, Debit, Credit, SourceDocumentType, SourceDocumentID, SourceLineID, and CostCenterID. Then click the filter button on the SourceDocumentType column header.
+
+This table contains the individual debit and credit entries that make up the general ledger. The filter list shows document types such as SalesInvoice, Shipment, PurchaseInvoice, PayrollPayment, and JournalEntry, each identifying the kind of business event that generated the entry. Together with SourceDocumentID and SourceLineID, this column traces every posting back to the specific document and line that created it. You will use this table extensively in the audit and financial reporting chapters.
+
+**Step 7. Look beyond sales and accounting.** Click on one manufacturing table (such as **WorkOrder**) and one payroll table (such as **PayrollRegister**), and examine the columns briefly.
+
+Notice that the database contains far more than sales and accounting data. Work orders track production with columns for the item produced, the planned quantity, the released, due, and completed dates, and the status. Payroll registers record each employee's pay for a period with columns for gross pay, employee withholdings, employer taxes and benefits, and net pay. These table groups will become important in the SQL and Power BI parts of the book.
+
+**Checkpoint.** At this point, you should have examined worksheets from at least four table groups (Order-to-Cash, Master Data, Accounting Core, and either Manufacturing or Payroll and Time). You should be able to answer the following questions:
+
+- Which four product families make up the finished goods that Charles River sells? (Furniture, Lighting, Textiles, and Accessories.)
+- Which columns in GLEntry trace each entry back to its source document? (SourceDocumentType, which identifies the kind of document, together with SourceDocumentID and SourceLineID, which identify the specific document and line.)
+- Which worksheet contains the chart of accounts? (Account.)
+
+If you can answer these three questions, you are ready to proceed.

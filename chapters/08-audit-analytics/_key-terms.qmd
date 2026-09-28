@@ -1,0 +1,31 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Aging analysis.** A technique that classifies outstanding balances, such as accounts receivable or accounts payable, into time-based categories according to the number of days the balance has been outstanding or past due. In financial reporting, aging analysis supports the estimation of expected credit losses under ASC 326.
+
+**Analytical procedure.** An audit technique that evaluates financial information by studying plausible relationships among financial and nonfinancial data. Analytical procedures involve comparing recorded amounts to expectations developed by the auditor and investigating significant differences.
+
+**Audit analytics.** The use of data analysis techniques to examine populations of accounting transactions for the purpose of risk assessment, substantive testing, or internal control evaluation. Audit analytics enables auditors to test entire populations rather than relying solely on sampling.
+
+**Benford's Law.** A mathematical principle stating that in many naturally occurring datasets, the leading digit is more likely to be small than large, with the digit 1 appearing approximately 30.1 percent of the time and the digit 9 appearing approximately 4.6 percent of the time. Deviations from this expected distribution may indicate data anomalies.
+
+**Composite key.** A combination of two or more data fields that together uniquely identify a record. In duplicate detection, composite keys are used to determine whether two records represent the same underlying transaction.
+
+**Duplicate detection.** An analytical procedure that identifies records in a dataset that share the same values across key fields, such as supplier, payment amount, and payment date. Potential duplicates are flagged for investigation rather than automatically removed.
+
+**Gap analysis.** A test of sequence completeness that examines whether a series of sequential numbers, such as invoice numbers or check numbers, contains any missing values. Gaps may indicate deleted, voided, or unrecorded transactions.
+
+**Journal entry testing.** An audit procedure that examines journal entries for characteristics associated with management override of internal controls. Common test criteria include entries posted on weekends, entries with round dollar amounts, and entries recorded just below authorization thresholds.
+
+**Leading digit.** The first nonzero digit in a number. For example, the leading digit of 4,572 is 4, and the leading digit of 0.0038 is 3. Leading digit analysis is the basis of Benford's Law testing.
+
+**Management override.** The ability of management to bypass established internal controls, typically through the use of nonstandard journal entries, adjustments to accounting estimates, or unusual transactions. Auditing standards require auditors to assess the risk of management override on every engagement.
+
+**Risk score.** A composite measure created by summing individual binary flags that indicate whether a transaction exhibits characteristics associated with elevated risk. Transactions with higher risk scores receive priority attention during audit investigation.
+
+**Stratification.** The process of dividing a population of items, such as transactions, balances, or entries, into subgroups based on a defined characteristic such as dollar amount. Stratification supports both risk assessment and the design of audit sampling plans.
+
+**Workpaper.** Documentation that records the nature, timing, and extent of audit procedures performed, the evidence obtained, and the conclusions reached. In Excel-based audit analytics, each analytical test is documented as a separate worksheet within a structured workbook.
+
+**Z-statistic.** A measure of how many standard deviations an observed value falls from the expected value. In Benford's Law analysis, the Z-statistic for each digit indicates whether the deviation between the observed and expected frequency is statistically significant.

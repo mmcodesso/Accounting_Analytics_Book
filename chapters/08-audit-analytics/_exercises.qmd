@@ -1,0 +1,74 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+### Financial Accounting Exercises
+
+**Exercise 8.1 (Financial Accounting): Aging Analysis for Allowance Estimation**
+
+**Table group:** O2C (SalesInvoice, SalesInvoiceLine, CashReceiptApplication, Customer)
+
+**Scenario.** You are a staff accountant at Charles River preparing the quarter-end financial statements. The controller has asked you to build an accounts receivable aging schedule that will support the estimation of the allowance for doubtful accounts. The controller has provided the following historical loss rates based on the company's collection experience: 0.5 percent for balances that are current, 2 percent for balances 1 to 30 days past due, 5 percent for balances 31 to 60 days past due, 15 percent for balances 61 to 90 days past due, and 40 percent for balances over 90 days past due.
+
+**Requirements.** (1) Determine the open balance for each invoice by taking the InvoiceTotal (the sum of SalesInvoiceLine LineTotal plus FreightAmount) and subtracting any amounts applied through the CashReceiptApplication table. Use the last day of the fiscal quarter as the reporting date. (2) Calculate the days past due for each open invoice using the DueDate, and assign each invoice to one of the five aging bands using a nested IF formula or a VLOOKUP approach. Build a summary aging schedule that shows the total open balance in each aging band, both in total and by customer. (3) Apply the historical loss rates provided by the controller to each aging band and calculate the estimated allowance for doubtful accounts. Present the calculation in a clear format showing each band's balance, the applicable loss rate, and the resulting estimated loss. (4) Write a brief memorandum, one half to one page, addressed to the controller that presents the estimated allowance amount, explains the methodology, and notes any limitations of the analysis, such as the fact that the loss rates are based on historical experience and may not fully reflect current economic conditions as required by the CECL framework.
+
+**Deliverable.** An Excel workbook with the detailed aging schedule, the allowance estimation calculation, and the memorandum on a separate worksheet.
+
+
+**Exercise 8.2 (Financial Accounting): Reconciling Revenue Postings to the Sales Invoice Subledger**
+
+**Table group:** Accounting Core (GLEntry, Account) and O2C (SalesInvoice, SalesInvoiceLine)
+
+**Scenario.** You are a financial reporting analyst at Charles River preparing for the quarterly close. The controller has asked you to reconcile the revenue recognized in the general ledger to the billings recorded in the sales invoice subledger and to investigate any discrepancies. This subledger-to-ledger reconciliation confirms that every invoice posted to revenue and that no revenue was recorded without a supporting invoice.
+
+**Requirements.** (1) From the GLEntry worksheet, filter for entries where the SourceDocumentType equals "SalesInvoice" and the AccountID corresponds to a revenue account in the Account table. Sum the credit amounts to determine total revenue posted to the general ledger for the quarter. (2) From the SalesInvoice and SalesInvoiceLine worksheets, calculate the total merchandise and freight revenue billed during the same quarter. Compare the general ledger total to the subledger total and calculate the difference. (3) If a difference exists, investigate the underlying records to determine the cause. Look for invoices that posted to an unexpected account, invoices recorded in the subledger that did not generate a general ledger entry, or timing differences around the period end. Document each discrepancy and its probable cause. (4) Prepare a reconciliation workpaper that shows the general ledger revenue total, the subledger revenue total, the difference, and the explanation, formatted so that it could be reviewed by the controller.
+
+**Deliverable.** An Excel workbook with the general ledger revenue extract, the subledger revenue calculation, the reconciliation comparison, investigation notes for any discrepancies, and a formatted workpaper.
+
+
+### Managerial Accounting Exercises
+
+**Exercise 8.3 (Managerial Accounting): Cost Center Expense Stratification and Budget Variance**
+
+**Table group:** Accounting Core (GLEntry, Account) and Organizational Planning (CostCenter, Budget)
+
+**Scenario.** You are a management accountant at Charles River preparing a quarterly expense review for the chief financial officer. The company organizes spending by cost center, and the chief financial officer wants to understand how expenses are distributed across departments and whether any department shows spending that differs significantly from its budget.
+
+**Requirements.** (1) From the GLEntry worksheet, extract the expense entries for the quarter by filtering for accounts whose AccountType is Expense in the Account table, and classify each entry by its CostCenterID. Calculate the total expense for each cost center. (2) Within each cost center, stratify the expense entries by transaction size using four bands, under 500 dollars, 500 to 1,999 dollars, 2,000 to 9,999 dollars, and 10,000 dollars and above. For each cost center, report the count and total dollar value by band. (3) Using the Budget table, retrieve the budgeted amount for each cost center for the quarter and calculate the variance and variance percentage between actual expense and budget. Flag any cost center where the variance percentage exceeds 15 percent. (4) Prepare a summary report, one page, that identifies the cost centers with the largest budget variances, describes the distribution of transaction sizes within those departments, and recommends which departments warrant further management review.
+
+**Deliverable.** An Excel workbook with the stratification analysis by cost center, the budget variance table, and the summary report.
+
+
+**Exercise 8.4 (Managerial Accounting): Supplier Spending Concentration Analysis**
+
+**Table group:** P2P (DisbursementPayment, PurchaseInvoice, Supplier)
+
+**Scenario.** You are a purchasing analyst at Charles River reviewing the company's supplier spending to assess whether purchasing activity is concentrated among a small number of suppliers. Concentration increases supply chain risk, and the operations director wants to understand the extent of the concentration and whether it has changed over time.
+
+**Requirements.** (1) Calculate the total amount paid to each supplier by summing the DisbursementPayment Amount column grouped by SupplierID, then join to the Supplier table to add the SupplierName and SupplierCategory. Rank the suppliers by total payments from highest to lowest. (2) Build a concentration table that shows how many suppliers account for 50 percent, 75 percent, and 90 percent of total spending, and calculate the percentage of total suppliers represented by each spending tier. (3) Perform the same analysis for two time periods by using the PaymentDate to divide the data into an earlier and a later half, and compare the concentration between the two periods to assess whether concentration is increasing, decreasing, or stable. (4) Write a memorandum, one half to one page, that summarizes the supplier concentration analysis, highlights any risks associated with high concentration, and recommends whether further investigation or diversification efforts are warranted.
+
+**Deliverable.** An Excel workbook with the supplier spending rankings, the concentration analysis, the period-over-period comparison, and the memorandum.
+
+
+### Auditing Exercises
+
+**Exercise 8.5 (Auditing): Benford's Law and Duplicate Detection on Supplier Payments**
+
+**Table group:** P2P (DisbursementPayment, Supplier)
+
+**Scenario.** You are an audit associate at Charles River performing tests of controls on the company's payment process. Your audit senior has asked you to perform two tests on the DisbursementPayment data, a Benford's Law analysis to identify any unusual digit frequency patterns and a duplicate payment detection test to identify potential double payments.
+
+**Requirements.** (1) Perform a first-digit Benford's Law analysis on the DisbursementPayment Amount column. Build a comparison table showing expected proportions, actual proportions, differences, and Z-statistics for each digit. Create a clustered bar chart comparing actual and expected frequencies, and identify any digits with statistically significant deviations, meaning an absolute Z-statistic greater than 1.96. (2) Perform a duplicate detection test by using COUNTIFS on the combination of SupplierID, Amount, and PaymentDate. Flag all records where the count exceeds 1 as potential duplicates. (3) For each potential duplicate identified, examine the records to determine whether they represent true duplicate payments or legitimate separate transactions, and document your assessment for each flagged item, joining to the Supplier table to add context such as the supplier name and category. (4) Prepare an audit workpaper for each test that includes the test objective, the data source, a description of the procedures performed, the results, and a conclusion, following the documentation format described in this chapter.
+
+**Deliverable.** An Excel workbook with the Benford's Law analysis worksheet, including the comparison table, chart, and workpaper header, the duplicate detection worksheet, including flagged records and disposition notes, and a summary findings page.
+
+
+**Exercise 8.6 (Auditing): Journal Entry Testing for Control Override Indicators**
+
+**Table group:** Accounting Core (JournalEntry, GLEntry, Account)
+
+**Scenario.** Your audit team at Charles River is required to perform journal entry testing as part of the risk assessment for management override of controls. The engagement partner has specified three tests to perform on the journal entry data, identification of entries posted on weekends, identification of entries with round dollar amounts divisible by 1,000, and identification of entries where the amount falls between 9,000 and 9,999 dollars, just below the 10,000 dollar approval threshold used by the company.
+
+**Requirements.** (1) Create a worksheet that brings together the GLEntry detail with its JournalEntry header information, focusing on manual entries, and add three flag columns using the formulas described in this chapter, a Weekend flag using the WEEKDAY function on PostingDate, a RoundAmount flag using the MOD function for amounts divisible by 1,000, and a NearThreshold flag using an AND and IF combination for amounts between 9,000 and 9,999.99. (2) Create a RiskScore column that sums the three flags, sort the data by RiskScore in descending order, and identify the total number of entries with a risk score of 1, 2, and 3. (3) For entries with a risk score of 2 or higher, examine the available details such as PostingDate, account, amount, and EntryType, and write a brief assessment of whether the entry warrants further investigation, considering whether the characteristics have innocent explanations such as recurring rent or depreciation entries that legitimately post on fixed dates with round amounts. (4) Prepare a comprehensive audit workpaper that documents the entire journal entry testing procedure, including an index, a description of the three tests, the summary statistics showing how many entries were flagged for each criterion, a listing of high-risk entries with your assessment, and an overall conclusion about whether the results suggest an elevated risk of management override. A callout annotation notes that this documentation would be included as a supporting schedule in the audit file.
+
+**Deliverable.** An Excel workbook with the flagged journal entry data, the risk score summary, the detailed assessment of high-risk entries, and the formatted audit workpaper.

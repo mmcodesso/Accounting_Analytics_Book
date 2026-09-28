@@ -1,0 +1,43 @@
+### Tutorial 8.1: Stratifying Charles River Supplier Payments
+
+**Context and objective.** You will stratify the Charles River supplier payment data by payment amount to understand how payment values are distributed across the population. This profile will serve as the foundation for designing an audit sampling plan and as the population you will test for digit anomalies in the next tutorial.
+
+**Prerequisites.** Open the Charles River Excel workbook and navigate to the DisbursementPayment worksheet in the Procure-to-Pay group.
+
+**Step-by-step instructions.**
+
+1. Create a new worksheet called "Stratification" in your workbook. Copy the DisbursementID, SupplierID, PaymentDate, and Amount columns from the DisbursementPayment worksheet so that you have one row per payment with its amount.
+
+2. Define five stratification bands. In cells A1 through A5 of the Stratification worksheet, enter the following labels: "Under 1,000," "1,000 to 9,999," "10,000 to 49,999," "50,000 to 99,999," and "100,000 and above." In adjacent columns, enter the lower and upper boundaries for each band. For the first band, the lower boundary is 0 and the upper boundary is 999.99. For the last band, the lower boundary is 100,000 and the upper boundary can be left as a very large number such as 99,999,999.
+
+3. In the Count column, use COUNTIFS to count the number of payments that fall within each band. For the first band, the formula is =COUNTIFS(DisbursementPayment[Amount], ">="&LowerBound, DisbursementPayment[Amount], "<="&UpperBound), where LowerBound and UpperBound refer to the boundary cells for that row. Copy the formula down for all five bands.
+
+4. In the Total Value column, use SUMIFS with the same boundary conditions to calculate the total dollar value of payments in each band.
+
+5. In the Percent of Count column, divide each band's count by the total count of all payments. In the Percent of Value column, divide each band's total value by the grand total value. Format both columns as percentages.
+
+6. Add a Total row at the bottom that sums the Count and Total Value columns and confirms that the Percent columns sum to 100 percent.
+
+7. Apply conditional formatting to the Percent of Value column to highlight the band that contains the largest share of total dollar value. This visual emphasis immediately directs attention to where the audit risk is concentrated.
+
+*[Figure 8.2: Completed stratification table for Charles River supplier payments showing five bands with count, total value, percent of count, and percent of value columns. The highest-value band is highlighted with conditional formatting. An annotation notes that although the top band contains relatively few payments, it represents a disproportionate share of the total dollar value.]*
+
+<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
+
+*Caption (placed below figure): Figure 8.2: Completed stratification table for Charles River supplier payments (DisbursementPayment) showing five size bands with transaction count, total dollar value, percentage of count, and percentage of value. The highest-value band is highlighted to indicate where audit risk is concentrated. Although the top band contains relatively few payments, it accounts for a disproportionate share of the total dollar value, which guides the design of the audit sample.*
+
+| Stratum | Lower Bound | Upper Bound | Count | Total Value | % of Count | % of Value |
+|---|---:|---:|---:|---:|---:|---:|
+| Under 1,000 | $0.00 | $999.99 | 412 | $168,540 | 38.1% | 5.2% |
+| 1,000 to 9,999 | $1,000.00 | $9,999.99 | 458 | $1,212,860 | 42.4% | 37.6% |
+| 10,000 to 49,999 | $10,000.00 | $49,999.99 | 168 | $1,005,210 | 15.5% | 31.2% |
+| 50,000 to 99,999 | $50,000.00 | $99,999.99 | 31 | $452,180 | 2.9% | 14.0% |
+| **100,000 and above** | **$100,000.00** | **no limit** | **12** | **$385,470** | **1.1%** | **12.0%** |
+| **Total** | | | **1,081** | **$3,224,260** | **100.0%** | **100.0%** |
+
+*Note: Values are illustrative and based on representative Charles River DisbursementPayment data. Students should verify their totals against the actual dataset. The bold row represents the stratum the auditor would examine most closely, because the small number of high-value payments carries a disproportionate share of the dollar risk.*
+
+**Checkpoint.** Your stratification table should contain five rows of data plus a totals row. The count column should sum to the total number of payments in the DisbursementPayment table. The percent of value column should reveal that a small number of large payments account for a substantial share of total disbursements, which is the concentration that will guide your sampling.
+
+> **[IN PRACTICE]**
+> Auditors routinely stratify accounts receivable, revenue transactions, journal entries, and supplier payment populations before selecting samples. The stratification table is often the first page of an audit workpaper section because it provides the reviewer with an immediate understanding of the population being tested. Large accounting firms have standardized templates for stratification tables that auditors populate using either Excel or specialized audit analytics software.

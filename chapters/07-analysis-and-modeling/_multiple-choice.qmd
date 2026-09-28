@@ -1,0 +1,108 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A cost accountant calculates the correlation between monthly production volume and total manufacturing cost and obtains a value of 0.92. Which of the following is the most appropriate interpretation?
+
+A. Manufacturing cost causes production volume to increase.
+B. There is a strong positive linear relationship between production volume and cost, suggesting that cost increases as production increases.
+C. Ninety-two percent of the variation in cost is explained by production volume.
+D. The cost is entirely variable with respect to production volume.
+
+**2.** When running a regression using the Data Analysis ToolPak, which value indicates what proportion of the variation in the dependent variable is explained by the independent variable?
+
+A. Multiple R
+B. R Square
+C. Standard Error
+D. The p-value of the slope coefficient
+
+**3.** An auditor builds a regression model to predict monthly revenue based on the number of sales invoices issued. The regression output shows an R Square of 0.78 and a p-value for the slope of 0.002. Which of the following conclusions is most appropriate?
+
+A. The model is unreliable because R Square is below 0.80.
+B. The relationship is statistically significant, and the model explains a substantial portion of revenue variation, though 22% of variation remains unexplained.
+C. The model proves that more invoices cause higher revenue.
+D. The p-value indicates that the model should be rejected.
+
+**4.** In a simple linear regression equation y = 15,000 + 425x, where y represents total monthly cost and x represents the number of units produced, what does the value 15,000 represent?
+
+A. The variable cost per unit
+B. The estimated fixed cost component
+C. The total cost at average production
+D. The contribution margin
+
+**5.** A financial analyst builds a CVP model and calculates that the break-even volume is 500 units. The contribution margin per unit is $200 and fixed costs are $100,000. If the selling price increases by $50 per unit while all other values remain constant, how does the break-even volume change?
+
+A. It increases to 667 units.
+B. It decreases to 400 units.
+C. It stays at 500 units because fixed costs did not change.
+D. It cannot be determined without knowing the variable cost.
+
+**6.** Which Excel tool is most appropriate for finding the selling price that would produce a target profit of exactly $200,000 at a given volume?
+
+A. Scenario Manager
+B. Data Table
+C. Goal Seek
+D. Solver
+
+**7.** A management accountant wants to determine the production quantities for four items that maximize total contribution margin, subject to constraints on work center hours and raw material availability. Which Excel tool should the accountant use?
+
+A. Goal Seek
+B. FORECAST.LINEAR
+C. Scenario Manager
+D. Solver
+
+**8.** In Solver, a constraint that specifies the total production hours must not exceed 4,000 hours is an example of which type of constraint?
+
+A. An equality constraint
+B. An inequality constraint (less than or equal to)
+C. An integer constraint
+D. A non-negativity constraint
+
+**9.** After running Solver, the sensitivity report shows a shadow price of $245 for the production hours constraint. What does this mean?
+
+A. Each production hour costs $245 in direct labor.
+B. Increasing the available production hours by one hour would increase the optimal total contribution margin by approximately $245.
+C. Reducing the production hours by one would save $245 in costs.
+D. The production hours constraint is not binding on the solution.
+
+**10.** A two-variable data table in Excel can show how profit changes across a range of selling prices and variable costs. What is the primary limitation of data tables?
+
+A. They can only vary one input at a time.
+B. They recalculate automatically and can slow down large workbooks.
+C. They cannot reference cells outside the data table range.
+D. They are only available with the Data Analysis ToolPak enabled.
+
+**11.** An analyst uses Scenario Manager to compare three pricing strategies. The Scenario Summary report shows the result cells under each scenario. Which of the following best describes what Scenario Manager does NOT provide?
+
+A. The ability to name and save different sets of input values
+B. A side-by-side comparison of outputs under each scenario
+C. A continuous sensitivity analysis showing how outputs change across all possible input values
+D. The ability to switch between scenarios in the model worksheet
+
+**12.** Which of the following is the most important reason for documenting assumptions in an analytical model?
+
+A. To satisfy formatting requirements for professional reports
+B. To allow reviewers to evaluate the reasonableness of the model's conclusions independently
+C. To demonstrate that the model builder used advanced Excel features
+D. To prevent other users from changing the model's inputs
+
+**13.** An auditor uses a regression model to set an expectation for total fourth-quarter revenue. The actual recorded revenue exceeds the regression prediction by $45,000, and the standard error of the regression is $20,000. What should the auditor do?
+
+A. Accept the recorded revenue because the difference is less than three times the standard error.
+B. Investigate the difference because it exceeds the standard error, which may indicate a material misstatement or a change in the underlying trend.
+C. Rerun the regression using only fourth-quarter data from prior years.
+D. Conclude that the regression model is invalid and perform alternative procedures.
+
+**14.** The TREND function and FORECAST.LINEAR function both produce predictions based on linear regression. What is the primary difference between them?
+
+A. TREND uses the Data Analysis ToolPak while FORECAST.LINEAR does not.
+B. TREND returns an array of predictions for multiple new x-values, while FORECAST.LINEAR returns a single prediction.
+C. FORECAST.LINEAR provides diagnostic statistics while TREND does not.
+D. TREND can only be used with time series data.
+
+**15.** In a CVP model, the contribution margin ratio is 0.46 and fixed costs are $300,000. What is the break-even revenue?
+
+A. $138,000
+B. $300,000
+C. $652,174
+D. $750,000

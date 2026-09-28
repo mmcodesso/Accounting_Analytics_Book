@@ -1,0 +1,92 @@
+## Guided Tutorial 4.2: Parameters, Named Cells, and a Summary Grid
+
+**Context and objective.** In this tutorial, you will give the analysis workbook a parameters worksheet and use named cells, absolute references, and mixed references to summarize the invoice lines. You will define a large-line threshold from the data itself rather than typing an amount, and you will build a grid that shows how the invoice lines are distributed across pricing methods and discount rates. The grid is filled from a single formula, which is the purpose of mixed references.
+
+**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorial 4.1, with the SalesInvoiceLine Table and the Analysis worksheet.
+
+**Step-by-step instructions.**
+
+**Step 1. Create the parameters worksheet.** The parameters of the analysis will live in one place, each with a name and a description.
+
+a. Insert a new worksheet and name it `Parameters`.
+b. In row 1, type the headers `Parameter`, `Value`, and `Description` in columns A, B, and C.
+c. In A3, type `Threshold percentile`; in B3, type `0.9`; and in C3, type `Share of invoice lines that fall at or below the large-line threshold`.
+d. Select B3, click the **Name Box** at the left end of the formula bar, type `ThresholdPercentile`, and press Enter.
+e. Format B3 with blue font to mark it as an input that a user may change.
+
+**Step 2. Derive the large-line threshold from the data.** The threshold comes from the line totals themselves rather than from a guess.
+
+a. In A4, type `Large-line threshold`, and in B4, enter this formula:
+
+   ```
+   =PERCENTILE.INC(SalesInvoiceLine[LineTotal],ThresholdPercentile)
+   ```
+
+b. Name B4 `LargeLineThreshold` in the **Name Box**, and format it as currency.
+c. In C4, type `Line total above which an invoice line counts as large`.
+d. Leave B4 in black font, because it is a formula.
+
+The function returns the amount below which 90 percent of the line totals fall. The threshold is a few thousand dollars, well above the median line total but far below the largest lines.
+
+**Step 3. Count the large lines and measure their share.**
+
+a. Go to the **Analysis** worksheet. In A11, type `Large lines`, and in B11, enter this formula:
+
+   ```
+   =COUNTIFS(SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)
+   ```
+
+b. In A12, type `Share of line total`, and in B12, enter this formula, which divides the total of the large lines by the line total you calculated in Tutorial 4.1:
+
+   ```
+   =SUMIFS(SalesInvoiceLine[LineTotal],SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)/$B$5
+   ```
+
+c. Format B12 as a percentage.
+d. Return to the **Parameters** worksheet, change B3 to `0.95`, and watch B4, B11, and B12 update. Then set B3 back to `0.9`.
+
+About a tenth of the lines are large by this definition, yet together they account for close to a third of the value billed.
+
+**Step 4. Lay out the grid.**
+
+a. On the **Analysis** worksheet, type `Invoice lines by pricing method and discount rate` in A14.
+b. In B15 through E15, type the four discount rates that appear on the invoice lines: `0`, `0.08`, `0.1`, and `0.12`, formatted as percentages.
+c. In A16 through A19, type the four pricing methods exactly as they appear in the PricingMethod column: `Approved Override`, `Base List`, `Customer Price List`, and `Segment Price List`. You can check the spelling in the column's filter list.
+d. Type `Total` in A20 and in F15.
+
+**Step 5. Fill the grid with one formula.**
+
+a. In B16, enter this formula:
+
+   ```
+   =COUNTIFS(SalesInvoiceLine[PricingMethod],$A16,SalesInvoiceLine[Discount],B$15)
+   ```
+
+b. Copy B16 with Ctrl+C, select B16:E19, and paste with Ctrl+V. Do not drag the fill handle across the grid, for the reason given in the Watch out box on structured references.
+c. Click E19 and read the formula bar: it should refer to $A19 and E$15.
+
+The reference $A16 locks the column, so every copy of the formula reads its pricing method from column A while the row adjusts. The reference B$15 locks the row, so every copy reads its discount rate from row 15 while the column adjusts.
+
+**Step 6. Add the totals.**
+
+a. In F16, enter `=SUM(B16:E16)` and copy it down to F19.
+b. In B20, enter `=SUM(B16:B19)` and copy it across to F20.
+
+The grand total in F20 must equal the number of invoice lines in B3, because every line has exactly one pricing method and one discount rate. If it does not, a label in column A or row 15 does not match the data exactly.
+
+**Step 7. Convert the counts into shares of all lines.**
+
+a. In A22, type `Share of all invoice lines`, and repeat the pricing method labels in A23 through A26.
+b. In B23, enter `=B16/$F$20`, copy it, and paste it into B23:E26.
+c. Format the block as percentages with one decimal.
+
+The absolute reference $F$20 keeps every copy pointed at the grand total. @fig-04-06 shows the finished worksheet.
+
+![The Analysis Worksheet with the Control Totals and the Summary Grid.](/visuals/svg/fig-04-06-analysis-worksheet.svg){#fig-04-06 fig-alt="A mock of the Analysis worksheet. Rows 3 to 9 hold the control totals, in which the line total and the invoice subtotal agree and the difference is zero. Rows 11 and 12 give the number of large lines and their share of the line total. Rows 15 to 20 hold the grid of invoice lines by pricing method and discount rate, with totals, outlined, and rows 22 to 26 show the same counts as shares of all lines. The Base List row has no discounted lines. Cell E19 is selected, and the formula bar shows =COUNTIFS(SalesInvoiceLine[PricingMethod],$A19,SalesInvoiceLine[Discount],E$15)."}
+
+**Checkpoint.** Before moving on, check that:
+
+- the grand total of the grid equals the number of invoice lines;
+- the share block adds up to 100 percent.
+
+Then read the grid. Most lines are billed at a segment price list with no discount. Discounts of 8, 10, and 12 percent, the rates of the promotion programs, appear alongside every pricing method except Base List, which Charles River uses only for its hourly design services, such as Design Consultation. A promotion is therefore not a separate way of pricing a line. It is a discount applied on top of the line's price, whichever way that price was set. That is why a slicer on the PromotionID column, which you will add in Tutorial 4.3, is the way to find out which promotions were used.
