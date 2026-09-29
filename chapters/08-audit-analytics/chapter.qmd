@@ -1,205 +1,180 @@
 ---
-title: "Excel for Audit and Internal Controls"
+title: "Audit Analytics in Excel"
 ---
 
-<!-- DRAFT: not yet revised. Migrated from drafts/08 unchanged except for the file layout; not registered in _quarto.yml. -->
-**Tools:** Microsoft Excel
-**Table groups:** Accounting Core | Order-to-Cash (O2C) | Procure-to-Pay (P2P)
 
----
-
-## Learning Objectives
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
 
 After completing this chapter, you will be able to:
 
-1. Explain how Excel-based audit analytics supports risk assessment, substantive testing, and internal control evaluation in professional practice.
-2. Apply stratification techniques to segment a transaction population by size and characteristic and use the results to guide audit sampling decisions.
-3. Perform a Benford's Law analysis on accounting transaction data to identify digit frequency patterns that deviate from expected distributions.
-4. Build an aging analysis for receivables that classifies outstanding balances into time-based categories and supports estimation of the allowance for doubtful accounts.
-5. Use Excel formulas and conditional logic to detect duplicate transactions, identify sequence gaps, and flag journal entries that exhibit characteristics associated with control override.
-6. Document Excel-based audit analytics in a workpaper format that meets professional standards for completeness, clarity, and reviewability.
+1. Explain how internal and external auditors use data analytics on whole populations, and reconcile a population to the general ledger before testing it.
+2. Stratify a population by value and use the strata to direct audit attention.
+3. Perform a first-digit test of Benford's Law, measure conformity with the mean absolute deviation, and explain a nonconformity that has a legitimate cause.
+4. Age receivables at a cutoff date and reconcile the aged detail to the general ledger.
+5. Test journal entries for characteristics of management override, combine the results into a risk score, and record a disposition for each exception.
+6. Design duplicate, gap, and threshold tests, and document audit analytics in a workpaper that another auditor can review.
+:::
 
----
 
-## Opening Scenario
+## Opening Scenario {.unnumbered}
 
-You are an internal auditor at Charles River, and the audit manager has assigned you to the quarterly review of journal entries and payment transactions. Your responsibilities include testing whether vendor payment amounts follow expected statistical patterns, determining whether any duplicate payments were processed during the quarter, evaluating the aging of outstanding customer receivables, and reviewing journal entries for indicators of control override such as entries posted on weekends, entries with round-dollar amounts, and entries recorded just below management approval thresholds. The data you need comes from three areas of the company's system. The DisbursementPayment table in the Procure-to-Pay group records every payment to a supplier. The SalesInvoice table in the Order-to-Cash group records every customer billing and its due date. The JournalEntry and GLEntry tables in the Accounting Core record the manual entries and the posted ledger detail that ultimately support the financial statements. All of this data is available to you as the Charles River Excel workbook. The audit manager expects you to deliver your findings in a set of organized workpapers that document each test, its results, and your conclusions. This chapter teaches you the Excel techniques that support every step of that assignment.
+Charles River's audit committee has asked the internal audit team for a data-driven review before the external auditors begin their work on fiscal 2026. You have joined the team, and the chief audit executive has given you three areas to review: the supplier payments of fiscal 2024 through 2026, the accounts receivable at the end of fiscal 2026, and the journal entries of the same three years. The earlier chapters of Part II followed a staff accountant through the question of the Furniture margin, and along the way they turned up conditions that an auditor would want to examine, from reused supplier invoice numbers to invoices dated before their orders. This chapter takes the auditor's view. Its question is not what the numbers mean for the business but whether they can be relied on: whether each population is complete, whether any transactions look unusual, and whether the ledger agrees with the detail behind it.
 
----
 
-## Audit Analytics and the Role of Excel
 
-The previous four chapters introduced Excel as a tool for organizing data, cleaning and preparing it, summarizing it through descriptive analytics, and building analytical models. This chapter applies those same Excel capabilities to a different purpose. Instead of describing business performance or projecting future outcomes, the techniques here focus on testing the integrity of accounting data, identifying anomalies that may indicate errors or fraud, and evaluating whether internal controls operated effectively during the period under review.
+## Audit Analytics and the Internal Auditor
 
-Audit analytics refers to the use of data analysis techniques to examine entire populations of accounting transactions rather than relying exclusively on manual inspection of selected samples. The concept is not new. Vasarhelyi and Halper (1991) proposed continuous auditing as a way to use technology for ongoing monitoring of financial data, and their framework anticipated many of the techniques that auditors now apply routinely using spreadsheet and database tools. What has changed is the accessibility of the tools. Excel provides functions for stratification, statistical analysis, text matching, date calculations, and conditional logic that together support a comprehensive set of audit tests. The AICPA's Guide to Audit Data Analytics (2017) identified Excel as one of the primary tools auditors use for data analytics, noting that its widespread availability and its familiarity to accounting professionals make it a practical starting point for audit analytics programs.
+Internal auditors work for the organization they audit. They evaluate its risk management, controls, and governance, and they report to the audit committee of the board of directors. External auditors are independent of the organization and express an opinion on its financial statements. The two roles differ in purpose, but they rely on much of the same evidence, and increasingly on the same analytics: both need to know whether recorded transactions are complete and valid, and whether the controls over them operated as designed.
 
-The professional standards that govern auditing support and in some cases require the use of analytical techniques. AU-C Section 520, Analytical Procedures (AICPA, 2020), requires auditors to perform analytical procedures during the risk assessment phase and during the overall review of financial statements. AS 2305 of the PCAOB standards similarly requires the use of analytical procedures as substantive tests when they can provide appropriate evidence. Analytical procedures include comparisons of recorded amounts to expectations developed by the auditor, and the precision of those expectations depends on the quality of the data and the rigor of the analytical technique. The techniques in this chapter, including stratification, digital analysis, aging, and anomaly detection, are all forms of analytical procedures or tools that support the design of more effective procedures.
+Traditional audit procedures examine a sample of transactions and draw conclusions about the rest. Data analytics lets an auditor examine every record in a population instead: every payment, every invoice, every journal entry. The American Institute of Certified Public Accountants (AICPA) publishes a *Guide to Audit Data Analytics* that addresses how auditors can use such analyses, including practical considerations for assessing the reliability of the data they use (AICPA, 2026). Testing a whole population changes the nature of the work. A test that examines tens of thousands of records returns a list of exceptions, the records that meet its criteria, and most exceptions turn out to have an ordinary explanation. The auditor's judgment goes into designing the test, investigating each exception, and deciding what it means. @fig-08-01 shows the workflow that this chapter follows.
 
-This chapter draws on three Charles River table groups, each chosen because it represents a population that auditors test in practice. The Procure-to-Pay group supplies the DisbursementPayment table, which records every supplier payment with its amount, payment date, and supplier reference, making it the natural population for digital analysis and duplicate detection. The Order-to-Cash group supplies the SalesInvoice table, which records customer billings along with an invoice date and a due date, making it the natural population for aging analysis. The Accounting Core supplies the JournalEntry and GLEntry tables, which together capture every manual entry and every posted debit and credit in the company. Because every business cycle in Charles River ultimately posts to GLEntry, the Accounting Core serves as the integration point where revenue, expense, and adjustment activity can all be tested for control override. Working with these three groups gives you exposure to the receivable, payable, and ledger populations that anchor most audit analytics work.
+![An Audit Analytics Workflow.](/visuals/svg/fig-08-01-audit-analytics-workflow.svg){#fig-08-01 fig-alt="A diagram of six steps in a row, joined by arrows: the objective, which states the risk the test addresses and what an exception would look like; the population, which is imported and agreed to the ledger; the tests, which stratify, profile, and flag records; the exceptions, which are examined against source documents; the disposition, which classifies each exception as expected with evidence, to follow up, or a misstatement; and the workpaper, which records the work for a reviewer. A dashed arrow loops back from the exceptions to the tests, labeled to refine the test and rerun it when most exceptions are false positives."}
 
-*[Figure 8.1: Audit Analytics Workflow in Excel. A horizontal flow diagram showing five stages: Data Acquisition (importing Charles River data into Excel), Population Profiling (stratification and descriptive statistics), Analytical Testing (Benford's Law, aging, ratio analysis), Anomaly Investigation (duplicate detection, journal entry testing), and Documentation (workpaper preparation). Each stage shows the Excel techniques used and connects to the next with an arrow.]*
+The earlier chapters have already covered two parts of an audit. Chapter 3 described the auditor's requirement to understand a client's information system and how its data flows to the ledger (AICPA, 2021), and the analytical procedures in the exercises of Chapters 6 and 7 compared recorded amounts with an expectation, as the auditing standard of the Public Company Accounting Oversight Board (PCAOB) describes (PCAOB, n.d.-a). This chapter turns to tests of individual transactions: which payments, invoices, and entries deserve a closer look, and why.
 
-> **[CONNECTING THE DOTS]**
-> The audit analytics techniques in this chapter use the same Excel functions and features you learned in Chapters 4 through 7. Stratification uses COUNTIFS and PivotTables from Chapter 6. Benford's Law analysis uses the LEFT and TEXT functions from Chapter 5 and the COUNTIF function from Chapter 6. Aging analysis uses date arithmetic and IF functions from Chapter 4. This chapter applies familiar tools to a new professional context rather than introducing entirely new technical capabilities.
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Charles River's year-end closing entries, dated December 31, move each year's revenue and expenses to retained earnings. Any analysis of revenue or expenses by period must leave them out, as Chapter 7 did when it compared operating expenses with the budget. A journal entry test must do the opposite and include them: a closing entry is a journal entry like any other, and entries at the end of a period are the ones that auditing standards single out for attention.
+:::
 
-## Stratification of Account Balances
 
-Stratification is the process of dividing a population of transactions or balances into subgroups based on a characteristic such as dollar amount, account type, or transaction date. In audit work, stratification serves two purposes. First, it provides the auditor with a profile of the population that reveals how transactions are distributed across size categories, which helps the auditor identify where the largest concentrations of dollar value exist. Second, it supports the design of a sampling strategy by allowing the auditor to select samples from different strata in proportion to their risk or their dollar contribution to the total.
+## Reconciling the Population
 
-The concept is straightforward. Suppose you have a population of supplier payments ranging from a few dollars to several hundred thousand dollars. A stratification table might divide this population into five bands such as payments under 1,000 dollars, payments from 1,000 to 9,999 dollars, payments from 10,000 to 49,999 dollars, payments from 50,000 to 99,999 dollars, and payments of 100,000 dollars or more. For each band, the table reports the count of transactions, the total dollar value, and the percentage of the total population and total value represented by that band. The result is a compact summary that tells the auditor, for example, that most payments are small but represent only a fraction of the total dollar value, while a handful of large payments represent the majority of the dollars at risk. That information directly affects how the auditor allocates testing effort.
+A population is the complete set of records to which a test's conclusion applies, such as every supplier payment dated in the period under review. Before you test a population, confirm that you have all of it. A test on an incomplete extract may find nothing wrong simply because the problem records were never extracted. The check is the one you used in Chapter 6: agree the count and total of the extract to an independent source, the control total. For transactions that post to the ledger, the general ledger is that source. Every Charles River supplier payment credits the cash account, so the count and total of the payments in an extract should equal the count and total of the cash credits that payments posted in the same period. Fay and Negangard (2017) begin their journal entry testing case with the same step, validating that a file of entries is complete before testing it.
 
-Auditing standards recognize the value of stratification. ISA 530, Audit Sampling (IAASB, 2009), states that stratification can increase the efficiency of audit sampling by allowing the auditor to direct testing effort toward the items that are most significant or most likely to contain misstatements. The AICPA's Guide to Audit Data Analytics (2017) describes stratification as one of the foundational data analytics techniques for auditors, applicable to both substantive testing and tests of controls.
+Defining the population also means defining its period. Charles River's ledger already holds a few hundred supplier payments dated early in fiscal 2027, for invoices of fiscal 2026. A review of fiscal 2024 through 2026 filters them out by payment date, and the ledger comparison uses the same cutoff, so that both sides describe the same population.
 
-Stratification also shapes the sampling method the auditor selects. When a population is dominated by a small number of large items, the auditor often examines every item in the top stratum, because those items carry enough individual dollar value that a single misstatement could be material, and then samples from the lower strata where the risk is spread across many smaller transactions. This approach is the foundation of monetary unit sampling, a method in which the probability that an item is selected is proportional to its dollar value. The stratification table makes the logic visible, because once the auditor can see that a handful of payments represent the majority of the dollars, the decision to test those payments in full follows naturally. The AICPA's Guide to Audit Data Analytics (2017) describes this profiling step as a precondition for an efficient sampling design, since an auditor who understands the shape of the population before sampling can direct effort where the dollar risk actually concentrates.
 
-In Excel, stratification can be accomplished using COUNTIFS and SUMIFS with boundary conditions, or by using PivotTables with grouped value ranges. The formula approach gives you precise control over the boundaries, while the PivotTable approach is faster for exploration. Both approaches produce the same result, and the choice depends on whether you need a permanent, documented analysis, where formulas are preferable because they are transparent and auditable, or a quick preliminary look at the data, where PivotTables are more efficient.
+## Stratification
+
+Stratification divides a population into groups, or strata, usually by value. A stratification table reports the number of items and their total value in each stratum, and the share of the population that each represents. It answers a simple question that shapes the rest of the audit: where are the dollars? A population of payments typically contains many small items and a few large ones, and the few large ones can carry a large share of the value.
+
+Auditing standards use stratification in two ways. For audit sampling, the PCAOB's standard notes that separating a population into relatively homogeneous groups, based for example on the recorded value of the items, can reduce the sample size the auditor needs. The same standard directs the auditor to examine in full the items for which accepting any sampling risk is not justified, such as items that could individually equal or exceed the misstatement the auditor can tolerate (PCAOB, n.d.-b). Such items are often called individually significant items. In analytics, where every item is tested anyway, a stratification table still directs attention: the largest items are examined one by one, and the strata that hold most of the value receive the most careful tests.
+
+In Excel, the strata are defined by lower and upper bounds typed in cells, and COUNTIFS and SUMIFS with a pair of criteria, greater than or equal to the lower bound and less than the upper bound, count and total each stratum. Keeping the bounds in cells makes them parameters: you can change a bound and see the table recalculate, and a reviewer can see exactly where each boundary lies.
+
+
+## Benford's Law
+
+### The Expected Pattern of First Digits
+
+In many collections of numbers, the first digit is far more often a 1 than a 9. Simon Newcomb (1881) noticed that the early pages of books of logarithm tables, which cover numbers that begin with 1, wore out faster than the later ones, and Frank Benford (1938) tested the pattern on many different kinds of data. Benford's Law gives the expected proportion of numbers whose first digit is d as `LOG10(1+1/d)`: about 30 percent start with 1, about 18 percent with 2, and fewer than 5 percent with 9. The pattern arises in data that are produced by multiplying and combining many quantities, span several orders of magnitude, and have no built-in minimum or maximum, which describes many accounting amounts. Nigrini and Mittermaier (1997) introduced digit tests based on the law as analytical procedures that auditors could use in planning: because authentic numbers tend to follow the expected frequencies, a population whose digits depart from them may contain invented or altered amounts, and deserves attention.
+
+Not every population should conform, and Nigrini (2017) reviews which kinds of audit data are appropriate for a Benford analysis, a question the analyst must answer before running the test. Numbers that are assigned rather than measured, such as invoice numbers or check numbers, carry no information about magnitude. Amounts constrained by a minimum or a maximum, or a subset of a population selected by its size, cannot spread across the digits as the law expects. And amounts that are set by people, such as prices ending in 99, follow the preferences of the people who set them.
+
+### Measuring Conformity
+
+A first-digit test counts how many amounts begin with each digit from 1 to 9 and compares each digit's actual proportion with its expected proportion. The comparison needs a summary measure, and the obvious statistical tests are of little help with accounting data. With tens of thousands of amounts, a chi-square or z test finds a statistically significant difference in almost any population, however small the difference. Nigrini (2012) recommends instead the mean absolute deviation (MAD), the average of the nine absolute differences between the actual and expected proportions, and gives the ranges in @tbl-08-01 for judging the first-digit test.
+
+| MAD of the first-digit test | Conclusion |
+|---|---|
+| 0.000 to 0.006 | Close conformity |
+| 0.006 to 0.012 | Acceptable conformity |
+| 0.012 to 0.015 | Marginally acceptable conformity |
+| Above 0.015 | Nonconformity |
+
+: First-digit conformity ranges for the mean absolute deviation {#tbl-08-01}
+
+### From a Pattern to Transactions
+
+A nonconforming first-digit test does not show that anything is wrong. It shows where to look. The digits with the largest differences, and the subsets of the population that produce them, lead to the transactions that need an explanation, and the explanation is often a feature of the business: a pricing policy, a fee schedule, or a way of paying invoices. Nigrini (2017) examined a proposed method that selects as an audit sample the transactions whose removal would make a population conform, and found that it can produce large samples of questionable accuracy. Benford analysis is best used as it is used in Tutorial 8.1, to point the auditor toward subsets that deserve a closer look.
+
 
 {{< include _tutorial-01.qmd >}}
 
-## Benford's Law Analysis
 
-Benford's Law, also known as the first-digit law, describes the expected frequency distribution of leading digits in many naturally occurring datasets. The law states that the digit 1 should appear as the leading digit approximately 30.1 percent of the time, the digit 2 approximately 17.6 percent, and so on, with the digit 9 appearing as the leading digit only about 4.6 percent of the time. This pattern was first observed by the astronomer Simon Newcomb in 1881 and later formalized by the physicist Frank Benford in 1938, who demonstrated that the pattern held across data from diverse sources including population figures, street addresses, and river drainage areas.
+## Aging and Reconciling Receivables
 
-The mathematical basis for Benford's Law is the logarithmic distribution of significant digits. The probability that the first digit is d is given by the formula P(d) = log10(1 + 1/d) for d = 1, 2, through 9. This distribution arises naturally in datasets that span several orders of magnitude and that result from multiplicative processes or from the combination of data from multiple sources. Accounting data frequently exhibits these characteristics. Payment amounts, invoice totals, journal entry amounts, and account balances typically range from small to very large values and are generated by many different transactions and processes.
+### The Aging Schedule
 
-Nigrini (1996) demonstrated the application of Benford's Law to accounting and auditing data and showed that deviations from the expected distribution can indicate data anomalies that warrant investigation. His work established digital analysis as a practical audit tool. Subsequent research has confirmed the usefulness of Benford's Law in audit settings. Durtschi, Hillison, and Pacini (2004) provided guidance on when Benford's Law is and is not appropriate, noting that it works well for datasets such as accounts payable, accounts receivable, and general ledger balances, but may not apply to datasets with imposed minimums or maximums, such as reimbursement amounts capped at a policy limit, or to datasets where values are assigned rather than naturally generated, such as check numbers or invoice numbers.
+An aging schedule classifies the unpaid invoices at an as-of date by how long they are past their due date, in buckets such as current, 1 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days. It serves the credit department, which follows up the oldest balances, and it serves the accountants who estimate how much of the receivables will not be collected. Under U.S. generally accepted accounting principles, the standard of the Financial Accounting Standards Board (FASB) on credit losses requires an allowance for credit losses: a valuation account, deducted from the receivables, for the amount not expected to be collected. The standard lists methods based on an aging schedule among the acceptable ways to estimate it, requires the estimate to reflect the risk of loss even when that risk is remote, and illustrates the method with historical loss rates for each age bucket, adjusted for current conditions and reasonable and supportable forecasts (FASB, 2016).
 
-> **[WATCH OUT]**
-> Benford's Law does not apply to every dataset. It works best with data that spans multiple orders of magnitude and is not constrained by minimums, maximums, or assigned ranges. Datasets composed of telephone numbers, identification numbers, or randomly generated values will not follow Benford's distribution. Before performing a Benford's Law analysis, confirm that the dataset has the characteristics that make the analysis meaningful. If a dataset contains only values between 100 and 999 dollars, the leading digit distribution will not follow Benford's Law because the values do not span enough orders of magnitude.
+Aging depends on dates, so it depends on the as-of date described in Chapter 5. An invoice's balance at the as-of date is its total minus the payments and credits recorded on or before that date. Payments applied after the as-of date must be excluded, or the aging will show the receivables as they are today rather than as they were at the reporting date.
 
-In audit practice, a Benford's Law analysis does not prove that fraud or error exists. It identifies deviations from the expected pattern that may justify further investigation. A higher-than-expected frequency of leading digit 5, for example, might indicate nothing more than a coincidental clustering of payment amounts in the 5,000 dollar range. Alternatively, it might indicate that someone is creating payments at amounts just below a review threshold. The analysis raises the question, and the auditor's professional judgment determines the answer.
+### Reconciling the Detail to the Ledger
 
-*[Figure 8.3: Benford's Law Expected Distribution. A bar chart showing the expected frequency of each leading digit (1 through 9) according to Benford's Law. The tallest bar is digit 1 at 30.1 percent, declining to digit 9 at 4.6 percent. The chart uses a clean, professional style with labeled bars.]*
+The open invoices are the detail behind the accounts receivable account in the general ledger, a sub-ledger in the terms of Chapter 2. At any date, the two should agree. A reconciliation lists the balance of the ledger account, the total of the detail, and every reconciling item that explains a difference between them. Some reconciling items are expected, such as a receipt recorded in the ledger before it was matched to its invoices, and each one should clear in a later period. An item that cannot be explained is a finding in itself: either the ledger holds an amount that no invoice supports, or the detail is missing invoices that the ledger recorded. Either way, the aging does not describe the whole balance, and an allowance estimated from it would not cover the whole balance either.
+
 
 {{< include _tutorial-02.qmd >}}
 
-## Aging Analysis
 
-An aging analysis classifies outstanding balances by the length of time they have been outstanding, typically using time bands such as current, 1 to 30 days past due, 31 to 60 days past due, 61 to 90 days past due, and over 90 days past due. Aging analysis is one of the most widely used analytical procedures in accounting because it serves multiple purposes across the three accounting perspectives. In financial accounting, the aging schedule supports the estimation of the allowance for doubtful accounts under the current expected credit loss model, as required by ASC 326 (FASB, 2016). In managerial accounting, the aging schedule provides visibility into collection performance and working capital management. In auditing, the aging schedule serves as the basis for evaluating management's estimate of uncollectible accounts and for selecting balances for confirmation procedures.
+## Journal Entry Testing
 
-The mechanics of aging analysis in Excel depend on calculating the number of days between a reference date, typically the reporting date, and the date that determines when the balance became due, and then classifying each transaction into the appropriate time band using nested IF formulas or lookup logic. Charles River supports this analysis directly because the SalesInvoice table records both an InvoiceDate and a DueDate for every customer invoice. Subtracting the DueDate from the reporting date produces the number of days past due, and a nested IF formula then assigns each invoice to a category based on that number.
+### Management Override
+
+Every control depends on the people who operate it, and the people at the top of an organization are in a position to override it. Management override of controls, the ability of managers to bypass controls that work for everyone else, is a risk in every organization, and journal entries are one of the main ways it can be carried out. Auditing standards therefore treat journal entries as a focus of every audit. The PCAOB's standard on fraud observes that material misstatements due to fraud often involve recording inappropriate or unauthorized journal entries during the year or at the end of a period, and requires the auditor to identify and test journal entries for evidence of such misstatement. It describes the characteristics that fraudulent entries often have, such as entries made to unusual or seldom-used accounts, entries made by individuals who typically do not make journal entries, entries recorded at the end of a period or after closing with little or no explanation, and entries that contain round numbers or a consistent ending number. It adds that the testing should ordinarily focus on the end of the period, while considering whether entries throughout the period also need testing (PCAOB, n.d.-c).
+
+@tbl-08-03 translates these characteristics, and three further indicators used in practice, into tests on Charles River's JournalEntry table. The table records who created each entry and when, who approved it and when, the date it posts to, its type, and its total. The Employee table adds each approver's approval limit, MaxApprovalAmount. Fay and Negangard (2017) build their journal entry case around the same kinds of questions: who recorded an entry, when it was created, how it was described, and whether it was posted to an earlier date than the one on which it was made.
+
+| Characteristic | Charles River columns | Test in Tutorial 8.3 |
+|---|---|---|
+| Made by individuals who typically do not make journal entries (AS 2401) | CreatedByEmployeeID | Entries by creator |
+| Recorded at the end of a period or after it (AS 2401) | PostingDate, CreatedDate | Backdated flag |
+| Round numbers or a consistent ending number (AS 2401) | TotalAmount | RoundAmount flag |
+| Created at an unusual time | CreatedDate | Weekend flag |
+| Approved by the person who made it | CreatedByEmployeeID, ApprovedByEmployeeID | SelfApproved flag |
+| Approved above the approver's authority | TotalAmount, MaxApprovalAmount | AboveLimit flag |
+
+: Characteristics of journal entries and the tests that look for them {#tbl-08-03}
+
+Two of the tests need a word of explanation. A backdated entry is one created on a later day than the date it posts to, so that it changes a period that may already have been reported; it is the journal entry counterpart of a post-closing entry. An entry approved by the person who created it defeats segregation of duties, the principle that no one person should both initiate and approve a transaction.
+
+Digit tests can be applied to journal entries too, but with care. When Debreceny and Gray (2010) examined the journal entries of 29 organizations, the first digits of the amounts departed from Benford's Law in every one of them, so a nonconforming digit test on journal entries is not unusual and does not by itself suggest fraud. Characteristics of the kind in @tbl-08-03 are more direct: each one identifies specific entries and a specific question to ask about them.
+
+### Risk Scores and Dispositions
+
+Each flag in @tbl-08-03 is a TRUE or FALSE value, and adding the flags gives a risk score: the number of characteristics an entry has. A risk score is a way to rank entries for review, not a probability of fraud. An entry with one flag often has an ordinary explanation, while an entry with several flags combines characteristics that are individually common but rarely occur together without a reason. The weights are a judgment, too. Adding the flags treats them as equally important, and an auditor may decide that some matter more.
+
+Most flagged entries are false positives: entries that meet a test's criteria but are legitimate. Nigrini (2019), who classified the numbers used in fraud schemes by their patterns, such as round amounts, amounts just above or below control thresholds, and duplicates of authentic transactions, emphasizes that the analysis should include refining and rerunning the tests and grouping and filtering the results to deal with false positives. The auditor records a disposition for every exception: expected, with the evidence that explains it; follow up, with the question to ask and the document to request; or a misstatement or control deficiency, to be reported. A test whose exceptions are mostly expected is refined, for example by excluding a recurring type of entry that has been examined once, and rerun, as the dashed loop in @fig-08-01 shows.
+
 
 {{< include _tutorial-03.qmd >}}
 
-## Duplicate Detection and Gap Analysis
 
-Duplicate transactions are one of the most common anomalies auditors test for in accounting data. A duplicate payment, for example, occurs when the same supplier is paid twice for the same invoice. Duplicates can arise from data entry errors, system glitches, or, in some cases, deliberate manipulation. Detecting duplicates requires comparing records across multiple fields to identify matches that suggest a payment was processed more than once.
+## Duplicate, Gap, and Threshold Tests
 
-In Excel, duplicate detection relies on building a composite key from the fields that together should uniquely identify a transaction, and then testing whether that composite key appears more than once in the dataset. For the Charles River supplier payments, the relevant fields are the supplier reference, the payment amount, and the payment date. For journal entries, the relevant fields might include the posting date, the account, and the amount.
+### Duplicates and Near-Duplicates
 
-The COUNTIFS function is the primary tool for duplicate detection. The formula counts how many records in the dataset share the same values across all the specified fields. If the count exceeds one, the record is flagged as a potential duplicate. A helper column containing the COUNTIFS result makes it easy to filter for and review the flagged items. Applied to the DisbursementPayment table, the formula =COUNTIFS(DisbursementPayment[SupplierID], [@SupplierID], DisbursementPayment[Amount], [@Amount], DisbursementPayment[PaymentDate], [@PaymentDate]) counts how many payments share the same supplier, amount, and date as the current row.
+Exercise 2.6 tested for exact duplicates: supplier invoice numbers and check numbers that appear twice for the same supplier. A duplicate payment does not always repeat a reference number, so auditors also look for near-duplicates: records that agree on the fields that matter but differ in one, such as the same supplier and amount on different dates. In Excel, sort the payments by supplier, amount, and date, and compare each payment with the one above it. At Charles River, about a hundred pairs of payments share a supplier and an amount on different dates, about a dozen of them within thirty days of each other, and every pair pays two different invoices. Each pair is therefore a false positive with evidence: two invoices of the same amount, each paid once. The test is still worth running, because a near-duplicate that pays the same invoice twice is exactly the error that an exact-duplicate test misses.
 
-An alternative approach creates a composite key by concatenating the relevant fields into a single text string using the CONCAT function or the ampersand operator. For example, =[@SupplierID]&"-"&TEXT([@Amount], "0.00")&"-"&TEXT([@PaymentDate], "YYYY-MM-DD") creates a unique string that combines supplier, amount, and date. You can then use COUNTIF on the composite key column to count occurrences. Any value greater than one indicates a potential duplicate.
+### Gap Tests
 
-A flagged duplicate is a starting point for investigation, not a confirmed error. Two payments to the same supplier for the same amount on the same date may be a genuine double payment, or they may be two legitimate settlements of two separate invoices that happened to carry identical amounts. Before concluding that a payment was duplicated, the auditor examines the supporting records, which in the Charles River data means tracing each flagged DisbursementPayment back to its PurchaseInvoiceID to confirm whether the two payments settled the same invoice or two different ones. This discipline of reviewing before concluding mirrors the principle introduced in Chapter 5, where potential duplicates in a dataset are flagged for review rather than removed automatically, because deleting records without documentation would compromise the completeness of the population and the reliability of the audit conclusion.
+Documents numbered by a system should form a continuous sequence, and a gap may mean a document that was deleted or never recorded. A quick test for each numbering series compares the number of documents with the range of their numbers: if the largest number minus the smallest, plus one, exceeds the count, numbers are missing. Charles River's sales invoice, journal entry, purchase order, and cash receipt numbers run without gaps within each year, a clean result that the workpaper should record as carefully as an exception. A gap test also needs a series that is meant to be continuous. Charles River's check numbers follow the numbering of all its supplier payments, so the payments made by ACH or wire transfer leave thousands of gaps in the check sequence. Matched against the payment numbers, every gap is explained by a payment of another kind, except the numbers of the two checks that reused an earlier check number, the pairs you met in Exercise 2.6.
 
-*[Figure 8.9: Example of a COUNTIFS-based duplicate detection formula applied to Charles River DisbursementPayment data, with a filter showing flagged records where the count exceeds 1. The matching fields are SupplierID, Amount, and PaymentDate. Annotations explain the formula and the interpretation.]*
+### Threshold Tests
 
-### Gap Analysis
+People who want to avoid a control often keep amounts just below the threshold that would trigger it, and amounts just above or below control thresholds are one of the patterns Nigrini (2019) found in fraud schemes. A threshold test counts the items in narrow bands just below and just above each threshold, such as the approval limits in the Employee table's MaxApprovalAmount column, and looks for a concentration below the line. The same test extends to consecutive documents with the same requester and amount, which may be one purchase split to stay under a limit. Exercise 8.5 applies it to Charles River's purchase requisitions.
 
-Gap analysis tests the completeness of a sequence of numbers, such as check numbers, invoice numbers, or journal entry numbers. Accounting systems typically assign sequential numbers to transactions, and gaps in the sequence may indicate missing or deleted transactions. In audit work, sequence testing is a standard procedure for evaluating the completeness assertion.
+### Tests from Earlier Chapters
 
-The Charles River SalesInvoice table assigns each invoice an InvoiceNumber. To perform gap analysis in Excel, isolate the numeric portion of the invoice number if it carries a document-type prefix, sort the data by that number, and then create a column that calculates the difference between each record's number and the previous record's number. The formula =[@InvoiceNum] - A2, which references the cell directly above, calculates the gap. Any result other than 1 indicates a gap in the sequence. You can then filter for gaps greater than 1 to identify the missing numbers.
+Several tests from earlier chapters belong in the same audit program. Exercise 2.5 found purchase requisitions converted to orders without an approver. Exercise 5.2 tested invoice numbers against invoice dates and found invoices whose number carries a different year from their date, and invoices dated before their orders. Exercise 5.5 matched supplier addresses against employee addresses, and Exercise 5.6 reviewed the supplier master file for suppliers that were never approved. Each is a test of a control, and each belongs in the workpapers with its population, its results, and a disposition for every exception.
 
-*[Figure 8.10: Gap analysis on a sequence of Charles River sales invoice numbers. A helper column shows the difference between consecutive invoice numbers. Rows where the gap exceeds 1 are highlighted with conditional formatting, indicating potentially missing invoice numbers.]*
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Pricing is a control area where approval records and transactions can tell different stories. A promotion's approval sets the dates when its discount may be used, and a price override request must be approved before an order is billed at the lower price. Testing these controls means comparing the transactions with the approvals: the order dates of promotion lines with the promotion's effective dates, and the prices billed with the status of the override requests. Exercise 8.6 carries out both tests on Charles River's sales.
+:::
 
-> **[IN PRACTICE]**
-> Auditors test invoice number and check number sequences as part of their evaluation of the completeness of recorded transactions. A gap in the invoice number sequence, for example, might indicate a voided invoice that was not properly recorded. Auditors investigate each gap to determine whether the missing numbers were voided, were part of a test batch, or represent transactions that were improperly removed from the records.
 
-## Journal Entry Testing for Control Override
+## Documenting Audit Analytics
 
-One of the most important applications of audit analytics is testing journal entries for characteristics associated with management override of internal controls. Fraudulent financial reporting often involves manipulating journal entries to inflate revenue, reduce expenses, or shift costs between periods. The auditing standards address this risk directly. AS 2401 of the PCAOB standards and ISA 240 (IAASB, 2009) require auditors to test journal entries as part of their response to the risk of management override of controls.
+An audit test is only as useful as its documentation. The PCAOB's standard on audit documentation requires enough information for an experienced auditor with no previous connection to the engagement to understand the work performed, the evidence obtained, and the conclusions reached, and to identify who performed and who reviewed the work (PCAOB, 2004). The documentation worksheet you built in Chapter 4 recorded the purpose, sources, parameters, and open questions of an analysis. An audit workpaper, like the one in @fig-08-09, adds what an auditor needs to rely on the analysis: the objective of the test, the reconciliation of the population to the ledger, the exceptions and their dispositions, and a conclusion.
 
-In the Charles River database, the JournalEntry table stores the headers for manually created entries, including the PostingDate, the EntryType, and the employee who approved the entry, while the GLEntry table stores the posted debit and credit detail. Because manual journal entries are the mechanism most often used to override controls, the JournalEntry and GLEntry tables together form the population for this testing. The characteristics that auditors look for include entries posted on weekends or holidays when the accounting department is normally closed, entries with unusually round dollar amounts that may indicate estimation rather than actual transaction recording, entries posted just below authorization thresholds to avoid review and approval, entries made by individuals who do not normally make journal entries, and entries posted to unusual account combinations such as a debit to revenue and a credit to an expense account.
+Analytics adds two requirements of its own. The first is reproducibility. A workbook whose queries import the data and whose formulas perform the tests can be refreshed and rerun, but only if the workpaper records which extract it used, its as-of date, and the parameters of each test, such as the strata bounds, the aging buckets, and the approval limits. The second is the treatment of exceptions. A test that flags dozens of records is not complete until each one has a disposition and the evidence behind it, and a test that flags nothing is a result to be recorded, not a reason to omit the test.
 
-In Excel, each of these tests translates into a formula or conditional expression that flags entries meeting the specified criteria.
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+The tests in this chapter rest on the skills of the earlier chapters: importing and filtering Tables with Power Query, merging tables on their keys, conditional aggregation, and PivotTables. They also reach the limits of a workbook. A test that compares every payment with every other payment, or every journal entry line with every account, becomes slow in a worksheet long before it becomes difficult in a database. The later Parts of the book return to the same tests with SQL, which can join and compare whole tables in a single query, and with interactive reports that let a reviewer move from a summary of exceptions to the transactions behind it.
+:::
 
-For weekend testing, the WEEKDAY function returns a number from 1 to 7 for any date. Applied to the GLEntry PostingDate, the formula =IF(OR(WEEKDAY([@PostingDate], 2)=6, WEEKDAY([@PostingDate], 2)=7), "Weekend", "Weekday") flags entries posted on Saturday or Sunday. The second argument of 2 in the WEEKDAY function specifies that the week starts on Monday, which makes Saturday equal to 6 and Sunday equal to 7.
 
-For round-amount testing, the MOD function tests whether an amount is divisible by a round number. Applied to the Debit column, the formula =IF(MOD([@Debit], 1000)=0, "Round (1000s)", IF(MOD([@Debit], 100)=0, "Round (100s)", "Not Round")) identifies entries where the amount is exactly divisible by 1,000 or 100. The auditor defines the threshold for what constitutes a round amount based on the context and the materiality of the engagement.
+## Looking Ahead
 
-For threshold testing, a simple comparison identifies entries that fall just below a known approval limit. If the approval threshold is 10,000 dollars, the formula =IF(AND([@Debit]>=9000, [@Debit]<10000), "Below Threshold", "") flags entries in the range from 9,000 to 9,999.99 dollars. The auditor adjusts the lower bound of the range based on professional judgment about what constitutes just below the threshold.
+This chapter has looked at the Charles River data as an auditor does. You reconciled populations to the ledger before testing them, stratified the supplier payments to see where the dollars are, and used a first-digit test to find a group of payments whose digits depart from Benford's Law for a reason that the payment process explains. You aged the receivables at the end of fiscal 2026 and found that the ledger holds a balance that no invoice supports, and you tested every journal entry for characteristics of management override, ranked them with a risk score, and traced the highest-scoring entry to the same balance. Along the way, you recorded a disposition for every exception and documented each test in a workpaper.
 
-*[Figure 8.11: Journal entry testing formulas applied to Charles River GLEntry data. Three helper columns show the results of the weekend test, the round-amount test, and the threshold test. Entries that are flagged on multiple criteria are highlighted.]*
+This chapter completes Part II. The comprehensive case at the end of the Part brings its techniques together, and Part III then turns from the workbook to the database, where the same questions can be asked of whole tables at once.
 
-> **[WATCH OUT]**
-> Journal entry testing produces flags, not conclusions. A journal entry posted on a Sunday is not necessarily fraudulent. The company may have batch processing that runs on weekends, or an accountant may have worked overtime to meet a deadline. Similarly, a round-dollar amount may reflect a legitimate accrual or estimate rather than a fabricated entry. Many recurring entries in Charles River, such as monthly rent and depreciation, post on fixed calendar days and carry round amounts for legitimate reasons. The purpose of these tests is to identify entries that warrant investigation, not to make accusations. The auditor's professional judgment determines whether a flagged entry requires follow-up, and the follow-up consists of examining supporting documentation and discussing the entry with management.
-
-### Combining Multiple Flags
-
-In practice, auditors are most interested in journal entries that exhibit more than one unusual characteristic simultaneously. An entry that was posted on a weekend, involves a round dollar amount, and falls just below the approval threshold is more suspicious than an entry that exhibits only one of these characteristics. In Excel, you can create a composite risk score by adding the individual flag columns together. Assign a value of 1 to each flag, so that a weekend posting equals 1, a round amount equals 1, and a near-threshold amount equals 1, and sum them in a RiskScore column. Entries with a risk score of 2 or higher deserve priority attention.
-
-*[Figure 8.12: A RiskScore column that sums three binary flag columns (Weekend, RoundAmount, NearThreshold) for Charles River journal entries. The data is sorted by RiskScore in descending order, with the highest-risk entries at the top. Conditional formatting applies red highlighting to entries with a score of 2 or more.]*
-
-> **[CONNECTING THE DOTS]**
-> In Chapter 12, you will build these same journal entry tests using SQL queries against the Charles River GLEntry and JournalEntry tables. The SQL approach allows you to combine multiple tests into a single query using CASE expressions and to save the query as a reusable template for future engagements. In Chapter 19, the journal entry testing framework is extended with additional tests for forensic accounting investigations, including analysis of entries that move amounts between revenue and expense accounts and detection of entries posted near the period-end close.
-
-## Ratio Analysis and Trend Comparison for Analytical Procedures
-
-Ratio analysis and trend comparison are foundational analytical procedures that auditors use to set expectations for account balances and to identify balances that may be misstated. While these techniques were introduced conceptually in earlier chapters, this section focuses specifically on how auditors use them as part of a structured analytical procedure.
-
-An analytical procedure, as defined in AU-C Section 520 (AICPA, 2020), consists of four steps. The auditor develops an expectation for the amount or ratio being tested. The auditor determines the threshold for investigation, which is the amount of difference between the expectation and the recorded balance that would require further inquiry. The auditor compares the recorded amount to the expectation. And the auditor investigates differences that exceed the threshold.
-
-In Excel, these steps translate into a structured worksheet. A common approach is to build a table with columns for the account or ratio name, the current period recorded balance, the expectation, which may come from a prior period balance, a budgeted amount, a regression prediction, or an industry benchmark, the difference, the percentage difference, the threshold, and a flag indicating whether the difference exceeds the threshold. In Charles River, the current period balances come from summing the Debit and Credit columns of GLEntry by account, and budget expectations come from the Budget table in the Organizational Planning group, which records a BudgetAmount for each account and cost center by fiscal period.
-
-The expectation can be derived from several sources. Trend analysis uses the prior period balance adjusted for known changes such as revenue growth or a new product launch. Ratio analysis compares the current period ratio, such as gross margin or days sales outstanding, to the prior period ratio or to an industry benchmark. Regression analysis, covered in Chapter 7, uses a statistical model to generate the expectation. The choice of method depends on the precision required by the circumstances of the engagement.
-
-*[Figure 8.13: An analytical procedures worksheet showing account names, current balances drawn from GLEntry, expectations derived from prior year balances adjusted for growth, differences, percentage differences, thresholds, and investigation flags. Accounts where the percentage difference exceeds the threshold are highlighted.]*
-
-<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
-
-*Caption (placed below figure): Figure 8.13: Analytical procedures worksheet showing account names, current period recorded balances drawn from the Charles River GLEntry table, expectations derived from prior year balances adjusted for a 5 percent growth assumption, dollar differences, percentage differences, investigation thresholds, and flags indicating whether the difference exceeds the threshold. Accounts flagged for investigation require the auditor to examine supporting documentation and determine the cause of the variance.*
-
-| Account | Current Balance | Expectation (PY + 5%) | Difference | % Difference | Threshold | Flag |
-|---|---:|---:|---:|---:|---:|---|
-| Sales Revenue | $4,182,500 | $4,032,000 | $150,500 | 3.7% | 10% |  |
-| Cost of Goods Sold | $2,564,300 | $2,415,000 | $149,300 | 6.2% | 10% |  |
-| Gross Profit | $1,618,200 | $1,617,000 | $1,200 | 0.1% | 10% |  |
-| Selling Expenses | $486,400 | $388,500 | $97,900 | 25.2% | 10% | **Investigate** |
-| Administrative Expenses | $342,800 | $336,000 | $6,800 | 2.0% | 10% |  |
-| Accounts Receivable | $812,600 | $661,500 | $151,100 | 22.8% | 15% | **Investigate** |
-| Inventory | $556,100 | $567,000 | ($10,900) | −1.9% | 15% |  |
-| Accounts Payable | $398,700 | $378,000 | $20,700 | 5.5% | 15% |  |
-
-*Note: Values are illustrative. Current balances are derived by summing the Debit and Credit columns of GLEntry by account. The expectations are calculated as the prior year balance multiplied by 1.05 to reflect an assumed 5 percent growth rate. Selling Expenses and Accounts Receivable exceed their respective thresholds and are flagged for investigation. The auditor would examine supporting documentation such as sales commission agreements, new marketing campaigns, or changes in customer payment terms to determine whether the variances have legitimate explanations.*
-
-> **[IN PRACTICE]**
-> Auditors are required to document their analytical procedures in workpapers that show the expectation, the threshold, the comparison, and the conclusion for each account tested. The worksheet format shown in Figure 8.13 is a common workpaper template used in practice. The precision of the expectation, which is influenced by the analytical method used and the reliability of the underlying data, directly affects the persuasiveness of the audit evidence obtained. A regression-based expectation from independently sourced data provides stronger evidence than a simple trend comparison based on the client's own prior period data.
-
-## Documenting Excel-Based Audit Analytics
-
-Every analytical test performed in Excel should be documented in a format that allows another auditor to understand what was done, why it was done, how it was done, and what conclusions were reached. Documentation is not an afterthought added after the analysis is complete. It is a professional requirement and a quality control mechanism.
-
-The PCAOB's AS 1215, Audit Documentation, requires that audit documentation be sufficient to enable an experienced auditor with no prior connection to the engagement to understand the nature, timing, extent, and results of the procedures performed, the evidence obtained, and the conclusions reached. For Excel-based analytics, this standard means that each workbook should contain enough information for a reviewer to replicate the analysis independently.
-
-A well-documented audit analytics workbook follows a consistent structure. The first worksheet is an index or table of contents that lists all worksheets in the workbook and describes their contents. The second worksheet contains the raw data as imported from the source system, with a note identifying the source, the date of extraction, and the number of records. Subsequent worksheets contain the individual analytical tests, each with a clear title, a description of the test objective, the formulas or procedures applied, and the results. The final worksheet contains a summary of findings that identifies the anomalies detected, the follow-up actions taken or recommended, and the overall conclusion.
-
-Each analytical test worksheet should include several elements. A header section contains the test name, the dataset used, the date performed, and the preparer's name. A description section explains the objective of the test in one or two sentences. The analysis section contains the data, formulas, and results. A conclusion section states the finding in clear, professional language and notes whether the result is consistent with expectations or whether it requires follow-up.
-
-*[Figure 8.14: Example of a well-documented audit analytics worksheet in Excel. The header section shows the test name, "Benford's Law Analysis of Supplier Payments," the dataset, "Charles River DisbursementPayment, Q3," the date, and the preparer. The description states the test objective. The analysis area shows the digit frequency comparison table and chart. The conclusion section summarizes the findings and identifies digits requiring follow-up.]*
-
-> **[IN PRACTICE]**
-> Audit firms often establish templates for Excel-based analytics workpapers that enforce consistent documentation standards. Staff auditors populate the templates with the data and analysis, and senior team members review the workpapers for completeness and accuracy. The documentation standard applies regardless of whether the analysis is performed in Excel, SQL, or specialized audit software. The principle is the same across all tools, that another qualified professional should be able to pick up the workpaper and understand what was done without asking the preparer for explanations.
-
-Table 8.1 summarizes the audit analytics techniques covered in this chapter, the Excel functions used for each, and the professional standards that support them.
-
-*[Table 8.1: Summary of Audit Analytics Techniques in Excel. A table with four columns (Technique, Purpose, Key Excel Functions, Supporting Standard) and seven rows covering stratification, Benford's Law, aging analysis, duplicate detection, gap analysis, journal entry testing, and ratio and trend analysis.]*
-
-<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
-
-*Caption (placed above table): Table 8.1: Summary of audit analytics techniques covered in this chapter, showing the purpose of each technique, the primary Excel functions used, and the professional standards that support their application.*
-
-| Technique | Purpose | Key Excel Functions | Supporting Standard |
-|---|---|---|---|
-| Stratification | Profile the population by size or characteristic to guide sampling | COUNTIFS, SUMIFS, PivotTables | ISA 530, AICPA Guide to ADA |
-| Benford's Law | Test leading digit frequency patterns for anomalies | LEFT, TEXT, VALUE, COUNTIF | AU-C 520, AS 2401 |
-| Aging Analysis | Classify balances by time past due | Date arithmetic, nested IF, SUMIFS | ASC 326, AU-C 540 |
-| Duplicate Detection | Identify potential duplicate transactions | COUNTIFS, CONCAT, EXACT | AS 2401, ISA 240 |
-| Gap Analysis | Test completeness of sequential numbering | Arithmetic (row difference), conditional formatting | AU-C 500, ISA 500 |
-| Journal Entry Testing | Flag entries with control override characteristics | WEEKDAY, MOD, IF, AND/OR | AS 2401, ISA 240 |
-| Ratio and Trend Analysis | Set expectations for analytical procedures | Arithmetic, comparison formulas | AU-C 520, AS 2305 |
-
----
 
 
 {{< include _summary.qmd >}}
@@ -211,3 +186,5 @@ Table 8.1 summarizes the audit analytics techniques covered in this chapter, the
 {{< include _exercises.qmd >}}
 
 {{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

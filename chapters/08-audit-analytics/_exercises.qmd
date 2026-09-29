@@ -4,71 +4,191 @@
 
 ### Financial Accounting Exercises
 
-**Exercise 8.1 (Financial Accounting): Aging Analysis for Allowance Estimation**
+**Exercise 8.1: Estimating the Allowance for Credit Losses**
 
-**Table group:** O2C (SalesInvoice, SalesInvoiceLine, CashReceiptApplication, Customer)
+**Table group:** Order-to-Cash
 
-**Scenario.** You are a staff accountant at Charles River preparing the quarter-end financial statements. The controller has asked you to build an accounts receivable aging schedule that will support the estimation of the allowance for doubtful accounts. The controller has provided the following historical loss rates based on the company's collection experience: 0.5 percent for balances that are current, 2 percent for balances 1 to 30 days past due, 5 percent for balances 31 to 60 days past due, 15 percent for balances 61 to 90 days past due, and 40 percent for balances over 90 days past due.
+**Scenario.** Tutorial 8.2 found that Charles River has never recorded an allowance for credit losses. The controller asks you to estimate one at the end of fiscal 2026 from the aging schedule. The credit department proposes the following loss rates for the buckets, which are an assumption for this exercise and not data from Charles River: 0.5 percent for current balances, 2 percent for 1 to 30 days past due, 5 percent for 31 to 60 days, 15 percent for 61 to 90 days, and 40 percent for balances more than 90 days past due.
 
-**Requirements.** (1) Determine the open balance for each invoice by taking the InvoiceTotal (the sum of SalesInvoiceLine LineTotal plus FreightAmount) and subtracting any amounts applied through the CashReceiptApplication table. Use the last day of the fiscal quarter as the reporting date. (2) Calculate the days past due for each open invoice using the DueDate, and assign each invoice to one of the five aging bands using a nested IF formula or a VLOOKUP approach. Build a summary aging schedule that shows the total open balance in each aging band, both in total and by customer. (3) Apply the historical loss rates provided by the controller to each aging band and calculate the estimated allowance for doubtful accounts. Present the calculation in a clear format showing each band's balance, the applicable loss rate, and the resulting estimated loss. (4) Write a brief memorandum, one half to one page, addressed to the controller that presents the estimated allowance amount, explains the methodology, and notes any limitations of the analysis, such as the fact that the loss rates are based on historical experience and may not fully reflect current economic conditions as required by the CECL framework.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the detailed aging schedule, the allowance estimation calculation, and the memorandum on a separate worksheet.
+(1) Add a `LossRate` column to the Buckets Table of Tutorial 8.2 with the proposed rates, and calculate the expected credit loss of each bucket and in total on the Aging worksheet.
+
+(2) The unsupported opening balance of account 1020 is not part of the aging. Calculate the allowance again with that balance treated as more than 90 days past due, and explain why its age, and whether it should be in the aging at all, cannot be known from the data.
+
+(3) List the open invoices whose balance is less than $10, total them, and show how the aging would change if they were written off.
+
+(4) Draft the adjusting journal entry that would record your recommended allowance, using accounts 6170 Bad Debt Expense and 1030 Allowance for Doubtful Accounts. Explain how the requirement of the credit loss standard of the Financial Accounting Standards Board (FASB) to reflect current conditions and reasonable and supportable forecasts would affect the proposed rates (FASB, 2016).
+
+(5) Write a memo of one half to one page to the controller that presents the estimate, the treatment of the opening balance, and the small-balance write-off.
+
+**Deliverable.** The Aging worksheet with the loss rates and expected credit losses, the adjusting entry, and the memo.
+
+<!-- Instructor notes, Exercise 8.1: at 2026-12-31, aging by due date (OpenBalance > 0 after cash applications and credit memos dated
+     on or before the as-of date): Current 780 invoices, 3,655,971.50; 1-30 days 258, 745,674.84; 31-60 days 28, 16,711.26; 61-90 days
+     10, 405.41; over 90 days 3, 41.31; total 1,079 invoices, 4,418,804.32. Expected losses at the given rates: 18,279.86 + 14,913.50 +
+     835.56 + 60.81 + 16.52 = 34,106.25. With the 380,000.00 opening balance (JE-2024-000001, account 1020) at 40%: 186,106.25. The
+     opening balance has no invoice detail and no cash application, so its age and collectability are unknown; the honest answer is
+     that it must be supported (conversion-date customer detail) or written off, not merely aged. Balances under $10: 10 invoices
+     totalling 23.58 (SI-2026-020608 5.20 is current; the others are 61+ days past due, from 0.03 to 9.98). Entry: Dr 6170 Bad Debt
+     Expense, Cr 1030 Allowance for Doubtful Accounts. Neither account has any GL rows. ASC 326-20-30-3 accepts aging-schedule methods
+     and 326-20-30-10 requires the estimate to reflect risk even when remote; Example 5 (326-20-55-37 to 55-40) adjusts historical
+     bucket rates for current conditions and forecasts. -->
 
 
-**Exercise 8.2 (Financial Accounting): Reconciling Revenue Postings to the Sales Invoice Subledger**
+**Exercise 8.2: Reconciling Accounts Payable to the Ledger**
 
-**Table group:** Accounting Core (GLEntry, Account) and O2C (SalesInvoice, SalesInvoiceLine)
+**Table group:** Procure-to-Pay, with the GLEntry table from Accounting Core
 
-**Scenario.** You are a financial reporting analyst at Charles River preparing for the quarterly close. The controller has asked you to reconcile the revenue recognized in the general ledger to the billings recorded in the sales invoice subledger and to investigate any discrepancies. This subledger-to-ledger reconciliation confirms that every invoice posted to revenue and that no revenue was recorded without a supporting invoice.
+**Scenario.** After the receivables finding, the chief audit executive asks you to perform the same reconciliation for accounts payable at the end of fiscal 2026: the unpaid supplier invoices against account 2010 Accounts Payable, whose AccountID is 22.
 
-**Requirements.** (1) From the GLEntry worksheet, filter for entries where the SourceDocumentType equals "SalesInvoice" and the AccountID corresponds to a revenue account in the Account table. Sum the credit amounts to determine total revenue posted to the general ledger for the quarter. (2) From the SalesInvoice and SalesInvoiceLine worksheets, calculate the total merchandise and freight revenue billed during the same quarter. Compare the general ledger total to the subledger total and calculate the difference. (3) If a difference exists, investigate the underlying records to determine the cause. Look for invoices that posted to an unexpected account, invoices recorded in the subledger that did not generate a general ledger entry, or timing differences around the period end. Document each discrepancy and its probable cause. (4) Prepare a reconciliation workpaper that shows the general ledger revenue total, the subledger revenue total, the difference, and the explanation, formatted so that it could be reviewed by the controller.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the general ledger revenue extract, the subledger revenue calculation, the reconciliation comparison, investigation notes for any discrepancies, and a formatted workpaper.
+(1) Build an OpenPayables query from the PurchaseInvoice Table, filtered to invoices dated before 1/1/2027, and merge it with the supplier payments dated before 1/1/2027, grouped by PurchaseInvoiceID. Calculate each invoice's open balance and keep the invoices with a balance greater than zero.
+
+(2) Calculate the balance of account 2010 at the end of fiscal 2026 from GLEntry. For a liability account, the balance is the credits minus the debits.
+
+(3) Build a PivotTable of the account 2010 rows by SourceDocumentType, and use **Show Details** to list the JournalEntry rows. Identify each reconciling item between the ledger and the open invoices.
+
+(4) For each reconciling item, explain what it is and whether the correction belongs in the ledger, in the invoice detail, or in neither. Look up the purchase orders behind any invoices the reconciliation involves, and note who created and approved them.
+
+(5) Prepare a reconciliation workpaper that shows the ledger balance, the open invoices, each reconciling item with its explanation, and any unexplained difference.
+
+**Deliverable.** A reconciliation workpaper for accounts payable at the end of fiscal 2026, with the PivotTable and the detail of each reconciling item.
+
+<!-- Instructor notes, Exercise 8.2: open invoices at 2026-12-31: 4,781,095.54. GL 2010 (credit minus debit): 6,237,466.66, made up of
+     PurchaseInvoice 56,461,312.87, DisbursementPayment -51,680,217.33, and JournalEntry +1,456,371.12. The JournalEntry rows are three:
+     (a) JE-2024-000001, the opening balance entry, credits 2010 with 2,096,371.12, accounts payable with no invoice detail that has never
+     been paid; the same entry debits cash with exactly the same amount, a coincidence worth a question; (b) JE-2024-000103 (Debt Reclass,
+     360,000.00) and (c) JE-2026-000001 (Debt Reclass, 280,000.00) debit 2010 and credit 2110 Notes Payable, reclassifying note-financed
+     capital invoices V0005-2024-003160 and V0005-2026-021692 (supplier 5, Nelson-Rocha), which have no supplier payments and therefore
+     still appear open in the invoice detail. Reconciliation: 4,781,095.54 - 640,000.00 + 2,096,371.12 = 6,237,466.66. The reclasses are
+     explained (the invoice detail should be closed or flagged as settled by a note), while the opening balance is unsupported, the same
+     finding as accounts receivable. The purchase orders behind the two capital invoices, PO-2024-001942 and PO-2026-011104, were created
+     and approved by the Purchasing Manager, whose limit is 25,000 (Exercise 8.5). -->
 
 
 ### Managerial Accounting Exercises
 
-**Exercise 8.3 (Managerial Accounting): Cost Center Expense Stratification and Budget Variance**
+**Exercise 8.3: Customer Credit Exposure**
 
-**Table group:** Accounting Core (GLEntry, Account) and Organizational Planning (CostCenter, Budget)
+**Table group:** Order-to-Cash, with the Customer table from Master Data
 
-**Scenario.** You are a management accountant at Charles River preparing a quarterly expense review for the chief financial officer. The company organizes spending by cost center, and the chief financial officer wants to understand how expenses are distributed across departments and whether any department shows spending that differs significantly from its budget.
+**Scenario.** The credit manager has seen the aging and asks a different question: which customers owe the most, which of them exceed their credit limits, and how concentrated the receivables are. The answers will help decide where to tighten credit terms.
 
-**Requirements.** (1) From the GLEntry worksheet, extract the expense entries for the quarter by filtering for accounts whose AccountType is Expense in the Account table, and classify each entry by its CostCenterID. Calculate the total expense for each cost center. (2) Within each cost center, stratify the expense entries by transaction size using four bands, under 500 dollars, 500 to 1,999 dollars, 2,000 to 9,999 dollars, and 10,000 dollars and above. For each cost center, report the count and total dollar value by band. (3) Using the Budget table, retrieve the budgeted amount for each cost center for the quarter and calculate the variance and variance percentage between actual expense and budget. Flag any cost center where the variance percentage exceeds 15 percent. (4) Prepare a summary report, one page, that identifies the cost centers with the largest budget variances, describes the distribution of transaction sizes within those departments, and recommends which departments warrant further management review.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the stratification analysis by cost center, the budget variance table, and the summary report.
+(1) Add CustomerSegment and PaymentTerms to the Customers query of Tutorial 8.2 and refresh the OpenInvoices query. Build a PivotTable of the open balance by customer, sorted from largest to smallest.
+
+(2) Beside the PivotTable, look up each customer's CreditLimit and calculate the balance as a percentage of the limit. List the customers whose balance exceeds their limit, and for each one show how much of the balance is past due.
+
+(3) Calculate the share of the receivables held by the five and the ten largest customers, and summarize the open balance and the past-due balance by CustomerSegment and by PaymentTerms.
+
+(4) Write a memo of one half to one page to the credit manager that describes the concentration of the receivables, the customers over their limits, and the credit actions you would recommend, with the reasons for each.
+
+**Deliverable.** A credit exposure worksheet with the customer ranking, the credit limit comparison, the concentration measures, and the memo.
+
+<!-- Instructor notes, Exercise 8.3: 203 customers have open balances at 2026-12-31. Five exceed their credit limit, and none of them has
+     any past-due balance: Miller-Hernandez 143,506.09 against 125,394.78 (Strategic, Net 60), Sanchez, Lee and Jones 82,088.52 against
+     58,146.44 (Wholesale, Net 45), James, Gill and Campbell 34,917.32 against 34,690.20 (Design Trade, Net 90), Jenkins Ltd 14,833.81
+     against 11,873.67 (Small Business, Net 60), Santos-Salazar 12,815.16 against 11,868.51 (Small Business, Net 60). They are over the
+     limit because of recent billing, not slow payment, which argues for reviewing the limits rather than stopping shipments. Largest
+     balances: Wright PLC 251,470.60, Miller-Hernandez, Eaton, Robertson and Grant 105,369.89, Willis and Sons 97,530.65, Sanchez LLC
+     96,886.09, all Strategic. Top 5 hold 15.7% and top 10 24.7% of the open balance. By segment: Wholesale 2,270,774.32, Strategic
+     1,323,927.91, Design Trade 381,811.50, Design Services 252,933.36, Small Business 189,357.23. By terms (open, past due, customers):
+     Net 30 1,394,279.02, 280,641.33, 88; Net 45 1,402,433.58, 270,357.98, 60; Net 60 1,265,864.14, 193,277.93, 48; Net 90 356,227.58,
+     18,555.58, 7. Every invoice's due date matches its customer's PaymentTerms. -->
 
 
-**Exercise 8.4 (Managerial Accounting): Supplier Spending Concentration Analysis**
+**Exercise 8.4: Supplier Concentration and Payment Timing**
 
-**Table group:** P2P (DisbursementPayment, PurchaseInvoice, Supplier)
+**Table group:** Procure-to-Pay
 
-**Scenario.** You are a purchasing analyst at Charles River reviewing the company's supplier spending to assess whether purchasing activity is concentrated among a small number of suppliers. Concentration increases supply chain risk, and the operations director wants to understand the extent of the concentration and whether it has changed over time.
+**Scenario.** The treasurer is reviewing Charles River's working capital and asks two questions about the supplier payments of fiscal 2026: how concentrated the spending is among suppliers, and whether the company pays its suppliers early, on time, or late.
 
-**Requirements.** (1) Calculate the total amount paid to each supplier by summing the DisbursementPayment Amount column grouped by SupplierID, then join to the Supplier table to add the SupplierName and SupplierCategory. Rank the suppliers by total payments from highest to lowest. (2) Build a concentration table that shows how many suppliers account for 50 percent, 75 percent, and 90 percent of total spending, and calculate the percentage of total suppliers represented by each spending tier. (3) Perform the same analysis for two time periods by using the PaymentDate to divide the data into an earlier and a later half, and compare the concentration between the two periods to assess whether concentration is increasing, decreasing, or stable. (4) Write a memorandum, one half to one page, that summarizes the supplier concentration analysis, highlights any risks associated with high concentration, and recommends whether further investigation or diversification efforts are warranted.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the supplier spending rankings, the concentration analysis, the period-over-period comparison, and the memorandum.
+(1) Add SupplierCategory to the Suppliers query and DueDate to the Invoices query of Tutorial 8.1, and refresh the Payments query. Build a PivotTable of fiscal 2026 payments by SupplierName, sorted from largest to smallest, and use **Show Values As > % Running Total In** to show the cumulative share of spending.
+
+(2) Report how many suppliers account for 50 percent, 80 percent, and 90 percent of the spending, and summarize the spending by SupplierCategory.
+
+(3) Add a column `DaysAfterDue` equal to the PaymentDate minus the invoice's DueDate. For fiscal 2026, count the payments made before, on, and after the due date, calculate the median days after due, and count the payments made more than 30 days late.
+
+(4) Write a memo of one half to one page to the treasurer on what the concentration and the timing mean for supplier risk and for cash management, including what the company gains and loses by paying early or late.
+
+**Deliverable.** A worksheet with the supplier ranking, the concentration measures, the category summary, the payment timing analysis, and the memo.
+
+<!-- Instructor notes, Exercise 8.4: fiscal 2026 payments: 20,192 payments to 103 suppliers, 21,958,743.39. 19 suppliers make up 50%, 58
+     make up 80%, and 76 make up 90% of spending; the largest supplier (Berger, Stanley and Cooper, Raw Materials) has 4.45%, so
+     concentration is low. By category: Raw Materials 9,022,917.71; Services 3,007,250.79; Furniture 2,635,672.47; Accessories
+     2,268,117.37; Textiles 1,649,833.90; Packaging 1,485,772.29; Lighting 1,101,793.63; Logistics 787,385.23. Timing: 6,171 payments
+     before the due date, 771 on it, and 13,250 after it (65.6%, holding 66.7% of the value); median 5 days after due, mean 9.9; 2,214
+     payments more than 30 days late. Paying late conserves cash but risks supplier relationships and late fees; paying early forgoes
+     cash without a discount, since the data has no early-payment discounts. -->
 
 
 ### Auditing Exercises
 
-**Exercise 8.5 (Auditing): Benford's Law and Duplicate Detection on Supplier Payments**
+**Exercise 8.5: Testing Purchasing Approvals**
 
-**Table group:** P2P (DisbursementPayment, Supplier)
+**Table group:** Procure-to-Pay, with the Employee table from Master Data
 
-**Scenario.** You are an audit associate at Charles River performing tests of controls on the company's payment process. Your audit senior has asked you to perform two tests on the DisbursementPayment data, a Benford's Law analysis to identify any unusual digit frequency patterns and a duplicate payment detection test to identify potential double payments.
+**Scenario.** The journal entry tests of Tutorial 8.3 found weaknesses in how entries are approved. The chief audit executive asks you to apply the same approach to purchasing: the approval of purchase orders, and the amounts of purchase requisitions around an approval limit.
 
-**Requirements.** (1) Perform a first-digit Benford's Law analysis on the DisbursementPayment Amount column. Build a comparison table showing expected proportions, actual proportions, differences, and Z-statistics for each digit. Create a clustered bar chart comparing actual and expected frequencies, and identify any digits with statistically significant deviations, meaning an absolute Z-statistic greater than 1.96. (2) Perform a duplicate detection test by using COUNTIFS on the combination of SupplierID, Amount, and PaymentDate. Flag all records where the count exceeds 1 as potential duplicates. (3) For each potential duplicate identified, examine the records to determine whether they represent true duplicate payments or legitimate separate transactions, and document your assessment for each flagged item, joining to the Supplier table to add context such as the supplier name and category. (4) Prepare an audit workpaper for each test that includes the test objective, the data source, a description of the procedures performed, the results, and a conclusion, following the documentation format described in this chapter.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the Benford's Law analysis worksheet, including the comparison table, chart, and workpaper header, the duplicate detection worksheet, including flagged records and disposition notes, and a summary findings page.
+(1) Import the PurchaseOrder Table and merge the Employee Table twice, once for the approver's name, JobTitle, MaxApprovalAmount, and TerminationDate, and once for the creator's name.
+
+(2) Add three flags and a risk score: `SelfApproved` when the creator and the approver are the same employee, `AboveLimit` when OrderTotal exceeds the approver's limit, and `AfterTermination` when the approver's TerminationDate is filled in and earlier than the OrderDate. Count the flagged orders and record a disposition for each one, as in Tutorial 8.3.
+
+(3) Import the PurchaseRequisition Table and add a `RequisitionValue` column equal to Quantity times EstimatedUnitCost. With COUNTIFS, count the requisitions in $50 bands from $4,800 to $5,199.99, and chart the counts.
+
+(4) Examine the band just below $5,000. List its requisitions with their requesters, approvers, dates, and statuses, and look for consecutive requisition numbers with the same value. Relate what you find to the approval limits in the Employee table and to Exercise 2.5.
+
+(5) Write a memo of one half to one page that summarizes the exceptions, distinguishes weaknesses in the design of the approval controls from failures in their operation, and recommends follow-up.
+
+**Deliverable.** The flagged purchase orders with their dispositions, the requisition band analysis with its chart, and the memo.
+
+<!-- Instructor notes, Exercise 8.5: 18,832 purchase orders; the CFO approved 99.9% of them. SelfApproved: 9 (PO-2024-000001, -000002,
+     -000003, PO-2024-001942 for 360,000.00, PO-2025-003923, -003924, PO-2026-010468, -010469, and PO-2026-011104 for 280,000.00; the two
+     large ones were created and approved by the Purchasing Manager, limit 25,000, and are the note-financed capital purchases of Exercise
+     8.2). AboveLimit: 13, including orders approved by Buyers and Procurement Analysts with a limit of 0, PO-2024-000040 (Production
+     Manager, 26,027.28 against 25,000) and PO-2024-000042 (Production Supervisor, 13,737.60 against 5,000). AfterTermination: 3
+     (PO-2024-000474, PO-2025-003922, PO-2026-010467), all approved by Daniel Diaz, an Account Executive terminated on 2024-04-26. Risk
+     scores: 11 orders score 2 and 3 score 1. Requisition bands from 4,800: 7, 8, 4, 18, 9, 4, 9, 4, so the 4,950-4,999.99 band has twice
+     the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714,
+     -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are
+     three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different
+     requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). -->
 
 
-**Exercise 8.6 (Auditing): Journal Entry Testing for Control Override Indicators**
+**Exercise 8.6: Testing Pricing Controls**
 
-**Table group:** Accounting Core (JournalEntry, GLEntry, Account)
+**Table group:** Order-to-Cash
 
-**Scenario.** Your audit team at Charles River is required to perform journal entry testing as part of the risk assessment for management override of controls. The engagement partner has specified three tests to perform on the journal entry data, identification of entries posted on weekends, identification of entries with round dollar amounts divisible by 1,000, and identification of entries where the amount falls between 9,000 and 9,999 dollars, just below the 10,000 dollar approval threshold used by the company.
+**Scenario.** Exercise 4.6 found price override requests that were never approved, and the promotion analyses of Chapters 4 through 6 relied on the effective dates in the PromotionProgram Table without testing them. The chief audit executive asks you to test both pricing controls against the sales actually billed.
 
-**Requirements.** (1) Create a worksheet that brings together the GLEntry detail with its JournalEntry header information, focusing on manual entries, and add three flag columns using the formulas described in this chapter, a Weekend flag using the WEEKDAY function on PostingDate, a RoundAmount flag using the MOD function for amounts divisible by 1,000, and a NearThreshold flag using an AND and IF combination for amounts between 9,000 and 9,999.99. (2) Create a RiskScore column that sums the three flags, sort the data by RiskScore in descending order, and identify the total number of entries with a risk score of 1, 2, and 3. (3) For entries with a risk score of 2 or higher, examine the available details such as PostingDate, account, amount, and EntryType, and write a brief assessment of whether the entry warrants further investigation, considering whether the characteristics have innocent explanations such as recurring rent or depreciation entries that legitimately post on fixed dates with round amounts. (4) Prepare a comprehensive audit workpaper that documents the entire journal entry testing procedure, including an index, a description of the three tests, the summary statistics showing how many entries were flagged for each criterion, a listing of high-risk entries with your assessment, and an overall conclusion about whether the results suggest an elevated risk of management override. A callout annotation notes that this documentation would be included as a supporting schedule in the audit file.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with the flagged journal entry data, the risk score summary, the detailed assessment of high-risk entries, and the formatted audit workpaper.
+(1) Import the PromotionProgram Table, and add a flag for promotions whose EffectiveEndDate is on or before their EffectiveStartDate. List the flagged promotions with their approver and approval date.
+
+(2) For the invoice lines of the flagged promotions, bring in each line's OrderDate from the SalesOrder Table through the SalesInvoice Table, and compare it with the promotion's effective dates. By promotion, count the lines and total the discount, calculated as Quantity times UnitPrice times Discount.
+
+(3) Import the PriceOverrideApproval Table and filter it to the Pending requests. Find the invoice lines of their SalesOrderLineIDs, and compare each line's UnitPrice with the request's ReferenceUnitPrice and ApprovedUnitPrice. Note the PricingMethod and PriceOverrideApprovalID recorded on the lines, and calculate the amount billed below the reference price.
+
+(4) For each exception, decide whether it shows a weakness in the design of the control, a failure in its operation, or both, and explain why.
+
+(5) Write a memo of one half to one page to the sales manager and the controller that describes the exceptions, their amounts, and the changes you would recommend to the pricing controls.
+
+**Deliverable.** The flagged promotions with their invoice lines, the pending override requests with the lines billed at their prices, and the memo.
+
+<!-- Instructor notes, Exercise 8.6: promotions 1 (PROMO-2024-001, Alder Collection, effective 2024-03-01 to 2024-03-01), 4 (PROMO-2025-004,
+     Brookside Collection, 2025-03-01 to 2025-02-27), and 7 (PROMO-2026-007, Harbor Collection, 2026-03-01 to 2026-02-28) are 8% collection
+     promotions approved by EmployeeID 6 (Carrie Schultz, Sales Manager) on their start dates. All of their invoice lines were ordered
+     outside the effective dates: 80 lines with discounts of 28,124.77, 74 lines with 32,529.69, and 68 lines with 30,478.57, a total of
+     222 lines and 91,133.03, ordered in March and April of each year and invoiced through July or August. Every line of the other
+     promotions was ordered within its dates. Pending overrides: IDs 2, 165, and 294 on SalesOrderLineIDs 147, 8038, and 15033. They were
+     billed on four invoice lines (SI-2024-000054; SI-2025-007015 and SI-2025-007598, two shipments of one order line; SI-2026-013958) at
+     the pending ApprovedUnitPrice (181.00, 102.70, 351.24) under a price-list PricingMethod (Segment Price List or Customer Price List)
+     with a blank PriceOverrideApprovalID, 755.69 below the reference prices in total. Design: the system accepts end dates before start
+     dates and lets an order line carry a pending price. Operation: the approvals did not prevent the discounts. -->

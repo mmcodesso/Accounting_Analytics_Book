@@ -38,6 +38,9 @@
 % A higher tolerance lets a line with an unbreakable inline formula be set loosely
 % instead of running into the margin.
 \tolerance=3000
+% Part entries in the table of contents set their page numbers in large bold type, and a
+% three-digit number is wider than KOMA's default page-number box.
+\RedeclareSectionCommand[tocpagenumberwidth=2em]{part}
 \renewcommand{\arraystretch}{1.2}
 
 \makeatletter

@@ -1,56 +1,101 @@
-### Tutorial 8.2: Benford's Law Analysis on Charles River Supplier Payments
+## Guided Tutorial 8.2: Aging Receivables and Reconciling Them to the Ledger
 
-**Context and objective.** You will perform a first-digit analysis on the supplier payment amounts in the DisbursementPayment table and compare the observed digit frequencies to the expected Benford's Law distribution. This test is a standard audit procedure used to screen for unusual patterns in payment data, and it runs on the same population you profiled in Tutorial 8.1.
+**Context and objective.** In this tutorial, you will age Charles River's receivables at the end of fiscal 2026 and reconcile the aged invoices to the accounts receivable account in the general ledger. You will calculate each invoice's open balance from the receipts and credit memos recorded by the as-of date, classify the open invoices by days past due, and compare their total with the ledger. You will then investigate the difference and record what it means for the audit.
 
-**Prerequisites.** Open the Charles River Excel workbook and navigate to the DisbursementPayment worksheet. You will use the Amount column.
+**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.1.
 
 **Step-by-step instructions.**
 
-1. Create a new worksheet called "Benfords" in your workbook. Copy the Amount column from the DisbursementPayment worksheet, or reference it from the source sheet. Exclude any zero or negative amounts from the analysis, because Benford's Law applies only to positive values. You can filter these out manually or use a helper column with an IF formula that returns the amount only when it is greater than zero.
+**Step 1. Import the invoices, receipts, and credit memos.** A customer receipt reaches an invoice through CashReceiptApplication, which records how much of each receipt was applied to each invoice, and a credit memo reduces the invoice named in its OriginalSalesInvoiceID.
 
-2. Create a column called "LeadingDigit" next to the payment amounts. Use the formula =VALUE(LEFT(TEXT([@Amount], "0"), 1)) to extract the first digit. The TEXT function converts the amount to a string without scientific notation, the LEFT function extracts the first character, and the VALUE function converts it back to a number. This formula handles amounts of any magnitude correctly.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T16_SalesInvoice**, **T20_CashReceiptApplication**, **T23_CreditMemo**, and **T4_Customer** Tables. Click **Transform Data**.
+b. Rename the queries `OpenInvoices`, `Applied`, `Credited`, and `Customers`. In Customers, keep CustomerID, CustomerName, and CreditLimit, and clear **Enable Load**.
+c. In Applied, filter ApplicationDate to dates before 1/1/2027. Choose **Transform > Group By**, group by SalesInvoiceID, name the new column `Applied`, and choose **Sum** of AppliedAmount. Clear **Enable Load**.
+d. In Credited, filter CreditMemoDate to dates before 1/1/2027, and group by OriginalSalesInvoiceID with a new column `Credited` that sums GrandTotal. Clear **Enable Load**.
 
-3. In a separate area of the worksheet, create a reference table for the expected Benford's distribution. In column A, enter the digits 1 through 9. In column B, enter the expected proportions 0.301, 0.176, 0.125, 0.097, 0.079, 0.067, 0.058, 0.051, and 0.046.
+The extract ends on December 31, 2026, so the two date filters remove nothing today. They keep the aging correct if you rerun it on a later extract, when receipts and credits after the as-of date must not reduce the balances.
 
-4. In column C of the reference table, use COUNTIF to calculate the actual count of each leading digit in the payment data. The formula is =COUNTIF(LeadingDigitColumn, A2), where A2 contains the digit being counted.
+**Step 2. Calculate the open balance of each invoice.**
 
-5. In column D, calculate the actual proportion for each digit by dividing the count by the total number of payments analyzed. Format these cells as percentages with one decimal place.
+a. In OpenInvoices, filter InvoiceDate to dates before 1/1/2027.
+b. Merge OpenInvoices with **Applied** on SalesInvoiceID and expand Applied. Merge it with **Credited**, matching SalesInvoiceID with OriginalSalesInvoiceID, and expand Credited. Merge it with **Customers** on CustomerID, and expand CustomerName and CreditLimit. Use a left outer join each time.
+c. Select the Applied and Credited columns, choose **Transform > Replace Values**, and replace `null` with `0`.
+d. Choose **Add Column > Custom Column**, name it `OpenBalance`, and enter `[GrandTotal] - [Applied] - [Credited]`. Set its type to **Decimal Number**, and choose **Transform > Rounding > Round** with 2 decimal places.
+e. Filter OpenBalance to values greater than 0, and choose **Home > Close & Load**.
 
-6. In column E, calculate the difference between the actual proportion and the expected proportion for each digit. This difference column reveals which digits appear more or less frequently than expected.
+Most invoices are fully paid and drop out, leaving about a thousand open invoices. A negative balance is also removed: it belongs to an invoice that was paid and then credited. Charles River records such a credit as a liability to the customer, in account 2060 Customer Deposits and Unapplied Cash, and later refunds it, so it is not a receivable.
 
-7. Create a clustered bar chart that displays the expected proportion and the actual proportion for each digit side by side. This visual comparison is the standard way to present Benford's Law results. Format the chart with clear labels and a legend that distinguishes the expected bars from the actual bars.
+**Step 3. Age the open invoices.**
 
-8. To assess whether the deviations are statistically significant, calculate the Z-statistic for each digit using the formula Z = (ActualProportion - ExpectedProportion) / SQRT(ExpectedProportion * (1 - ExpectedProportion) / N), where N is the total number of payments analyzed. A Z-statistic with an absolute value greater than 1.96 indicates a statistically significant deviation at the 95 percent confidence level. Add this calculation as column F in your reference table.
+a. Add a worksheet named `Aging`. In A1, type `As-of date`, and in B1 type `2026-12-31`. Click B1, type `AsOfDate` in the **Name Box**, and press Enter.
+b. In F3:G8, type the bucket table in @tbl-08-02. Select it, choose **Insert > Table**, and name the Table `Buckets` in **Table Design > Table Name**.
+c. In the OpenInvoices Table, add a column named `DaysPastDue` with the formula `=AsOfDate-[@DueDate]`, formatted as a whole number.
+d. Add a column named `Bucket` with this formula:
 
-*[Figure 8.4: Screenshot of the LeadingDigit formula in Excel, showing the TEXT, LEFT, and VALUE functions applied to a Charles River DisbursementPayment amount. The formula bar and the resulting digit are visible.]*
+   ```
+   =XLOOKUP([@DaysPastDue],Buckets[From],Buckets[Bucket],,-1)
+   ```
 
-*[Figure 8.5: Completed Benford's Law comparison table showing digits 1 through 9, expected proportions, actual proportions, differences, and Z-statistics for the Charles River supplier payments. Statistically significant deviations are highlighted with conditional formatting.]*
+| From | Bucket |
+|---|---|
+| -9999 | Current |
+| 1 | 1-30 days |
+| 31 | 31-60 days |
+| 61 | 61-90 days |
+| 91 | Over 90 days |
 
-<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
+: The aging buckets on the Aging worksheet {#tbl-08-02}
 
-*Caption (placed below figure): Figure 8.5: Completed Benford's Law comparison table for Charles River supplier payment amounts (DisbursementPayment) showing expected proportions, actual proportions, differences, and Z-statistics for each leading digit. Digits where the absolute Z-statistic exceeds 1.96 (indicated by an asterisk) represent statistically significant deviations at the 95 percent confidence level.*
+The last argument of XLOOKUP, -1, returns the bucket whose From value is the largest one not above the days past due. An invoice that is not yet due has a negative number of days and falls in Current.
 
-| Leading Digit | Expected Proportion | Actual Count | Actual Proportion | Difference | Z-Statistic | Significant? |
-|---:|---:|---:|---:|---:|---:|---|
-| 1 | 30.10% | 296 | 27.38% | −2.72% | −1.95 | No |
-| 2 | 17.61% | 178 | 16.47% | −1.14% | −0.97 | No |
-| 3 | 12.49% | 147 | 13.60% | +1.11% | 1.10 | No |
-| 4 | 9.69% | 101 | 9.34% | −0.35% | −0.39 | No |
-| 5 | 7.92% | 124 | 11.47% | +3.55% | 4.31 | **Yes*** |
-| 6 | 6.69% | 68 | 6.29% | −0.40% | −0.52 | No |
-| 7 | 5.80% | 59 | 5.46% | −0.34% | −0.47 | No |
-| 8 | 5.12% | 56 | 5.18% | +0.06% | 0.09 | No |
-| 9 | 4.58% | 52 | 4.81% | +0.23% | 0.36 | No |
-| **Total** | **100.00%** | **1,081** | **100.00%** | | | |
+**Step 4. Summarize the aging.**
 
-*Note: Values are illustrative. The significant deviation for digit 5 would prompt the auditor to investigate supplier payments in the $5,000 to $5,999 and $50,000 to $59,999 ranges to determine whether there is a legitimate business explanation, such as a recurring service contract at that price point, or whether the concentration warrants expanded testing.*
+a. In A3:D3 of the Aging worksheet, type `Bucket`, `Invoices`, `Open balance`, and `Share of balance`, and type the five bucket names in A4:A8.
+b. In B4, C4, and D4, enter these three formulas, and copy them down to row 8:
 
-*[Figure 8.6: Clustered bar chart comparing expected Benford's distribution to actual leading digit frequencies in Charles River DisbursementPayment amounts. Digits with statistically significant deviations are annotated.]*
+   ```
+   =COUNTIFS(OpenInvoices[Bucket],A4)
+   =SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A4)
+   =C4/C$9
+   ```
+c. In A9, type `Total`, and add the columns with SUM.
+d. Sort the OpenInvoices Table by DaysPastDue from largest to smallest, and look at the oldest invoices.
 
-**Checkpoint.** Your comparison table should have nine rows, one per digit, with expected proportions, actual proportions, differences, and Z-statistics. The bar chart should make it easy to see where the actual distribution deviates from the expected pattern. If any digit shows a Z-statistic with an absolute value greater than 1.96, it should be highlighted as a potential anomaly requiring follow-up.
+Most of the balance is current, and most of the rest is less than thirty days past due. The buckets beyond sixty days hold very little, and most of their invoices carry residual balances of a few cents or a few dollars left after the customer's payment, which are candidates for a small-balance write-off rather than for collection.
 
-> **[IN PRACTICE]**
-> Many audit firms include Benford's Law analysis as a standard procedure in their audit programs for accounts payable, journal entries, and expense reimbursements. The analysis is performed early in the engagement as part of risk assessment. Significant deviations do not necessarily indicate fraud, but they focus the auditor's attention on specific dollar ranges where additional testing is warranted. Nigrini (2012) provides decision frameworks for interpreting Benford's results in audit contexts and recommends follow-up procedures for each type of deviation.
+**Step 5. Reconcile the aging to the ledger.** The accounts receivable account is 1020 Accounts Receivable, whose AccountID is 3. The query also keeps the two accounts where a provision for uncollectible receivables would appear: 1030 Allowance for Doubtful Accounts (AccountID 4) and 6170 Bad Debt Expense (AccountID 74).
 
-> **[CONNECTING THE DOTS]**
-> In Chapter 12, you will perform this same Benford's Law analysis using SQL, which allows you to query the DisbursementPayment table directly from the Charles River database without exporting to Excel. The SQL approach is faster for large populations and can be saved as a reusable query. In Chapter 19, the analysis is extended to second-digit and first-two-digit testing, which provides a more granular view of the digit distribution and is used in forensic accounting investigations.
+a. Import the **T3_GLEntry** Table, name the query `LedgerAR`, and filter it first. Open the filter list of AccountID, choose **Number Filters > Equals**, select **Advanced**, and add three clauses joined by **Or**: AccountID equals 3, equals 4, and equals 74.
+b. Filter PostingDate to dates before 1/1/2027.
+c. Use **Home > Choose Columns** to keep GLEntryID, PostingDate, AccountID, VoucherNumber, SourceDocumentType, Description, Debit, and Credit, in that order. Add a custom column `Amount` with the formula `[Debit] - [Credit]`, set its type to **Decimal Number**, and choose **Close & Load**.
+d. On the Aging worksheet, type the labels in A11:A13 shown in @fig-08-05. In C11, enter `=C9`, in C12 enter `=SUMIFS(LedgerAR[Amount],LedgerAR[AccountID],3)`, and in C13 enter `=C12-C11`.
+
+The ledger balance is larger than the open invoices by a round amount, as @fig-08-05 shows. Both sides end on the same date, so the difference is not a timing difference, and it has to be explained.
+
+![The Receivables Aging Reconciled to the Ledger.](/visuals/svg/fig-08-05-ar-aging-reconciliation.svg){#fig-08-05 fig-alt="A mock of the Aging worksheet, with the SUMIFS formula of cell C12 in the formula bar. The as-of date is December 31, 2026. For the five buckets, from current to over 90 days, it shows the number of open invoices, their balance, and their share, with a total; most of the balance is current and the buckets past 30 days hold very little. Below, the open invoices are compared with the balance of account 1020 in the ledger, and the difference, a round amount, is outlined."}
+
+**Step 6. Investigate the difference.**
+
+a. Select a cell in the LedgerAR Table and choose **Insert > PivotTable**, placing it on a new worksheet.
+b. Drag AccountID and then SourceDocumentType to the **Rows** area, and GLEntryID and Amount to the **Values** area. Set GLEntryID to **Count** in its **Value Field Settings**.
+c. Double-click the Sum of Amount for JournalEntry. Excel lists the rows behind the value on a new worksheet, a feature called **Show Details**.
+
+@fig-08-06 shows what the PivotTable reveals. Only account 1020 appears: in three years, Charles River has posted nothing to the allowance or to bad debt expense. Within account 1020, sales invoices increase the balance, and receipt applications and credit memos reduce it, all of them traceable to invoices. One journal entry line adds the rest: the accounts receivable opening balance in JE-2024-000001, dated January 1, 2024. No invoice stands behind that amount, and no receipt has been applied to it since, because every receipt application names an invoice.
+
+![Accounts Receivable in the Ledger by Source Document.](/visuals/svg/fig-08-06-ar-ledger-by-source.svg){#fig-08-06 fig-alt="A mock of a PivotTable of the LedgerAR query with AccountID and SourceDocumentType in the rows, and the count of rows and the sum of Amount as values. Only AccountID 3 appears, with rows for cash receipt applications and credit memos, which are negative, sales invoices, which are positive, and a single journal entry row, outlined. Below, the Show Details worksheet lists that row: dated January 1, 2024, voucher JE-2024-000001, described as the accounts receivable opening balance."}
+
+**Step 7. Record the findings.**
+
+a. Add a worksheet named `WP Receivables`, with the labels of the workpaper in column A as in Tutorial 8.1.
+b. Record the population check (the number of open invoices and their total), the aging, and the reconciliation to account 1020.
+c. Record three findings, each with its follow-up. The opening balance has no invoice detail and has not been collected in three years: request the customer-level detail behind it, and assess whether any of it is still collectible. The company has recorded no allowance for credit losses, although the credit loss standard of the Financial Accounting Standards Board (FASB) requires one even when the risk of loss is low, and an aging schedule is one of the methods it accepts (FASB, 2016). A handful of invoices carry small residual balances that should be written off or collected.
+d. Save the workbook.
+
+**Checkpoint.** Check that:
+
+- about a thousand invoices are open, and no open balance is negative;
+- the aging total equals the sum of the OpenBalance column, and most of it is current;
+- the difference between account 1020 and the open invoices is a round amount, traced to one journal entry line;
+- the PivotTable shows no rows for accounts 1030 and 6170.
+
+The aging tells the credit department that Charles River's customers pay mostly on time. The reconciliation tells the auditor something more important: part of the receivables balance is not supported by any invoice, and no allowance has been recorded against any of it. Both findings affect the amount at which receivables would be reported, and both go to the audit committee with the evidence behind them.

@@ -1,0 +1,33 @@
+{{< pagebreak >}}
+
+## References
+
+American Institute of Certified Public Accountants. (2021). *Understanding the entity and its environment and assessing the risks of material misstatement* (Statement on Auditing Standards No. 145). <https://www.aicpa-cima.com/resources/download/aicpa-statement-on-auditing-standards-no-145>
+
+American Institute of Certified Public Accountants. (2026). *Guide to audit data analytics*. <https://www.aicpa-cima.com/cpe-learning/publication/guide-to-audit-data-analytics>
+
+Benford, F. (1938). The law of anomalous numbers. *Proceedings of the American Philosophical Society*, *78*(4), 551–572. <https://www.jstor.org/stable/984802>
+
+Debreceny, R. S., & Gray, G. L. (2010). Data mining journal entries for fraud detection: An exploratory study. *International Journal of Accounting Information Systems*, *11*(3), 157–181. <https://doi.org/10.1016/j.accinf.2010.08.001>
+
+Fay, R. G., & Negangard, E. M. (2017). Manual journal entry testing: Data analytics and the risk of fraud. *Journal of Accounting Education*, *38*, 37–49. <https://doi.org/10.1016/j.jaccedu.2016.12.004>
+
+Financial Accounting Standards Board. (2016). *Financial instruments—Credit losses (Topic 326): Measurement of credit losses on financial instruments* (Accounting Standards Update No. 2016-13). <https://storage.fasb.org/ASU%202016-13.pdf>
+
+Newcomb, S. (1881). Note on the frequency of use of the different digits in natural numbers. *American Journal of Mathematics*, *4*(1), 39–40. <https://doi.org/10.2307/2369148>
+
+Nigrini, M. J. (2012). *Benford's Law: Applications for forensic accounting, auditing, and fraud detection*. Wiley. <https://doi.org/10.1002/9781119203094>
+
+Nigrini, M. J. (2017). Audit sampling using Benford's Law: A review of the literature with some new perspectives. *Journal of Emerging Technologies in Accounting*, *14*(2), 29–46. <https://doi.org/10.2308/jeta-51783>
+
+Nigrini, M. J. (2019). The patterns of the numbers used in occupational fraud schemes. *Managerial Auditing Journal*, *34*(5), 606–626. <https://doi.org/10.1108/MAJ-11-2017-1717>
+
+Nigrini, M. J., & Mittermaier, L. J. (1997). The use of Benford's Law as an aid in analytical procedures. *Auditing: A Journal of Practice & Theory*, *16*(2), 52–67. <https://doi.org/10.2308/ajpt-1302507>
+
+Public Company Accounting Oversight Board. (2004). *AS 1215: Audit documentation*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS1215>
+
+Public Company Accounting Oversight Board. (n.d.-a). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>
+
+Public Company Accounting Oversight Board. (n.d.-b). *AS 2315: Audit sampling*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315>
+
+Public Company Accounting Oversight Board. (n.d.-c). *AS 2401: Consideration of fraud in a financial statement audit*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401>

@@ -1,50 +1,105 @@
-### Tutorial 8.3: Aging Analysis on Charles River Sales Invoices
+## Guided Tutorial 8.3: Testing Journal Entries for Management Override
 
-**Context and objective.** You will build an aging analysis of Charles River customer invoices that classifies each outstanding balance by how many days it is past due. This analysis supports the estimation of the allowance for doubtful accounts and identifies the balances that carry the highest collection risk.
+**Context and objective.** In this tutorial, you will test every journal entry of fiscal 2024 through 2026 for the characteristics in @tbl-08-03. You will bring each approver's authority limit onto the entries, add a flag for each characteristic, and combine the flags into a risk score. You will then separate the patterns that have an ordinary explanation from the entries that need follow-up, trace the highest-scoring entry to its ledger lines, and complete the workpaper.
 
-**Prerequisites.** Open the Charles River Excel workbook and navigate to the SalesInvoice worksheet in the Order-to-Cash group. You will use the InvoiceDate and DueDate columns, and you will draw the invoice value from the SalesInvoiceLine worksheet.
+**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.2.
 
 **Step-by-step instructions.**
 
-1. Create a new worksheet called "AgingAnalysis." Copy the SalesInvoiceID, CustomerID, InvoiceDate, DueDate, and FreightAmount columns from the SalesInvoice worksheet.
+**Step 1. Import the journal entries with their creators and approvers.**
 
-2. Calculate the merchandise total for each invoice. Because the SalesInvoice header does not store an invoice total, use SUMIFS to sum the LineTotal column from the SalesInvoiceLine worksheet for each SalesInvoiceID. Add the FreightAmount to produce the full invoice value. Place the result in a column called InvoiceTotal. This mirrors the summing step you learned when working with line-level data in earlier chapters.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T2_JournalEntry**, **T74_Employee**, and **T1_Account** Tables. Click **Transform Data**.
+b. Rename the queries `JournalEntries`, `Employees`, and `Accounts`. In Employees, keep EmployeeID, EmployeeName, JobTitle, and MaxApprovalAmount. In Accounts, keep AccountID, AccountNumber, and AccountName. Clear **Enable Load** for both.
+c. In JournalEntries, set the type of PostingDate to **Date**, and of CreatedDate and ApprovedDate to **Date/Time**.
+d. Merge JournalEntries with **Employees**, matching ApprovedByEmployeeID with EmployeeID. Expand EmployeeName, JobTitle, and MaxApprovalAmount, and rename them `ApproverName`, `ApproverTitle`, and `ApproverLimit`.
+e. Merge JournalEntries with **Employees** again, matching CreatedByEmployeeID with EmployeeID. Expand EmployeeName and JobTitle, and rename them `CreatorName` and `CreatorTitle`.
+f. Choose **Home > Close & Load**.
 
-3. Determine a reference date for the aging analysis. Use the last day of the fiscal quarter under review as the reference date. Enter this date in a named cell, for example name it "ReportDate," so that you can change it easily when performing the analysis for a different period.
+The JournalEntries Table holds several hundred entries, each with the names of the people who created and approved it and the approver's limit.
 
-4. Create a column called "DaysPastDue" that calculates the number of days between the DueDate and the ReportDate. The formula is =ReportDate - [@DueDate]. This returns the number of days as an integer. A negative or zero result means the invoice is not yet past due. If the result shows as a date rather than a number, format the cell as a number.
+**Step 2. Add the five flags.** Each flag is a calculated column that returns TRUE when the entry has the characteristic.
 
-5. Create a column called "AgingCategory" that classifies each invoice into one of five bands. Use a nested IF formula: =IF([@DaysPastDue]<=0, "Current", IF([@DaysPastDue]<=30, "1-30 Days", IF([@DaysPastDue]<=60, "31-60 Days", IF([@DaysPastDue]<=90, "61-90 Days", "Over 90 Days")))). This formula evaluates the days past due and assigns the appropriate label.
+a. Add the five columns in @tbl-08-04 to the right of the JournalEntries Table, one at a time.
+b. Check a few rows by hand. For example, an entry whose CreatedByEmployeeID equals its ApprovedByEmployeeID should show TRUE in SelfApproved.
 
-6. Build a summary table using COUNTIFS and SUMIFS that shows, for each aging category, the number of invoices and the total InvoiceTotal value. Alternatively, create a PivotTable with AgingCategory as the row field, Count of SalesInvoiceID as one value, and Sum of InvoiceTotal as another value.
+| Column | Formula |
+|---|---|
+| `Weekend` | `=WEEKDAY([@CreatedDate],2)>5` |
+| `Backdated` | `=INT([@CreatedDate])>[@PostingDate]` |
+| `SelfApproved` | `=[@CreatedByEmployeeID]=[@ApprovedByEmployeeID]` |
+| `AboveLimit` | `=[@TotalAmount]>[@ApproverLimit]` |
+| `RoundAmount` | `=MOD([@TotalAmount],1000)=0` |
 
-7. Calculate the percentage of total value in each aging category. Add a column that divides each category's total by the grand total.
+: The flag columns of the JournalEntries Table {#tbl-08-04}
 
-8. Format the summary as a professional aging schedule with clear labels, dollar formatting, and percentage formatting. Add conditional formatting that applies increasingly intense shading to older aging categories, providing a visual signal that older balances carry higher risk.
+WEEKDAY with the second argument 2 numbers the days from Monday (1) to Sunday (7), so values above 5 are Saturdays and Sundays. INT removes the time from CreatedDate, so Backdated is TRUE for an entry created on a later day than the date it posts to. ApproverLimit is the approver's MaxApprovalAmount, and RoundAmount is TRUE for totals in exact thousands.
 
-*[Figure 8.7: The nested IF formula for the AgingCategory column applied to Charles River sales invoices, shown in the formula bar with the corresponding aging categories visible in the column below. The DaysPastDue column is derived from the invoice DueDate.]*
+**Step 3. Combine the flags into a risk score.**
 
-*[Figure 8.8: Completed aging schedule summary table for Charles River sales invoices, showing five aging categories with count, total value, and percent of total. Conditional formatting applies progressively darker shading to older categories.]*
+a. Add a column named `RiskScore` with this formula, which adds the five flags because Excel counts TRUE as 1 in arithmetic:
 
-<!-- DRAFT: tabular content moved from drafts/08/ch08-markdown-tables.md; values not yet verified -->
+   ```
+   =[@Weekend]+[@Backdated]+[@SelfApproved]+[@AboveLimit]+[@RoundAmount]
+   ```
 
-*Caption (placed below figure): Figure 8.8: Completed aging schedule summary for Charles River sales invoices (SalesInvoice) classified by days past due from the reporting date. Days past due are measured from each invoice DueDate. Progressively darker shading on older categories provides a visual signal that older balances carry higher collection risk. In a healthy receivables portfolio, the Current category holds the largest share of value, with progressively smaller amounts in the older bands.*
+b. Add a worksheet named `JE Summary`. In A1:A5, type the five flag names, and in B1 enter `=COUNTIF(JournalEntries[Weekend],TRUE)`, with the matching column in B2:B5.
+c. In A8:A13, type the scores 0 to 5, and in B8 enter `=COUNTIF(JournalEntries[RiskScore],A8)`, copied down to B13.
 
-| Aging Category | Count | Total Value | % of Count | % of Value |
-|---|---:|---:|---:|---:|
-| Current (Not Yet Due) | 384 | $1,642,300 | 52.0% | 58.7% |
-| 1-30 Days | 198 | $642,180 | 26.8% | 23.0% |
-| 31-60 Days | 92 | $312,540 | 12.5% | 11.2% |
-| 61-90 Days | 41 | $128,610 | 5.6% | 4.6% |
-| **Over 90 Days** | **23** | **$69,420** | **3.1%** | **2.5%** |
-| **Total** | **738** | **$2,795,050** | **100.0%** | **100.0%** |
+Most entries score 0. About two dozen have one flag, a handful have two, and a single entry has four.
 
-*Note: Values are illustrative and represent open (unpaid) invoices as of the reporting date. The Current category holds the majority of value because most invoices are paid within terms, while the small over-90-days balance is the population the auditor would target for collectibility assessment and the controller would weight most heavily when estimating the allowance.*
+**Step 4. Separate the expected patterns.** Some flags follow from how Charles River's accounting works, and a PivotTable groups them so that you can explain each pattern once.
 
-**Checkpoint.** Your aging schedule should classify every outstanding invoice into one of the five aging bands. The count column should sum to the total number of unpaid invoices in the population, and the percentage column should sum to 100 percent. In a healthy receivables portfolio, the Current category should hold the largest share of value, with progressively smaller amounts in the older bands.
+a. Insert a PivotTable from the JournalEntries Table on a new worksheet, with CreatorTitle and EntryType in the **Rows** area and Count of EntryNumber in the **Values** area.
+b. Insert a second PivotTable with EntryType in the **Rows** area, RiskScore in the **Columns** area, and Count of EntryNumber in the **Values** area.
 
-> **[WATCH OUT]**
-> When building an aging analysis, be careful about the choice of reference date and the date you age from. Using the current date rather than the reporting period end date will produce different results, and the aging schedule should always be tied to a specific reporting date for consistency and auditability. Confirm as well that the date column you are using represents the event you intend to measure. For receivables aging, the relevant date is the invoice due date or the invoice date, not the order date. Charles River provides the DueDate column on SalesInvoice for exactly this purpose, so you can age by days past due rather than relying on a proxy.
+The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, and no employee has an approval limit above $250,000. That is a gap in the approval policy to report, not a sign of override in itself.
 
-> **[IN PRACTICE]**
-> Under ASC 326, companies must estimate expected credit losses over the lifetime of their receivables. Many companies use historical aging schedules as the basis for these estimates, applying loss rates to each aging band and summing the results to determine the total allowance. Auditors evaluate these estimates by independently constructing or recalculating the aging schedule and comparing the loss rates to historical experience and forward-looking economic conditions.
+**Step 5. Record a disposition for each flagged entry.**
+
+a. Sort the JournalEntries Table by RiskScore from largest to smallest, as in @fig-08-07.
+b. Filter RiskScore to values of 1 or more. Copy the visible rows of the EntryNumber through RiskScore columns, and paste them on a new worksheet named `Dispositions` with **Paste Special > Values**. Clear the filter.
+c. On the Dispositions worksheet, add a `Disposition` column, and type a disposition for every entry: expected, with the evidence that explains it, or follow up, with the question to ask.
+
+Pasting values freezes the list of exceptions as evidence of what the test found, and it keeps each disposition beside its entry: text typed next to a query's output can end up beside a different row when the query is refreshed. The entries to follow up stand out in @fig-08-07. The opening balance entry has four flags: it was created by the chief financial officer on a Saturday, five days after the date it posts to, approved under the same employee ID, and far above that approver's limit. Five other entries were created on the same kind of Saturday in the first week of January, after the date they post to. The accounting manager approved several rent entries and a utilities entry that the same person had created, and the two round debt reclassifications exceed the controller's limit.
+
+![Journal Entries Sorted by Risk Score.](/visuals/svg/fig-08-07-journal-entry-flags.svg){#fig-08-07 fig-alt="A mock of the JournalEntries Table sorted by RiskScore, with the RiskScore formula in the formula bar. It shows the entries that score two or more, with their entry number, entry type, total amount, the five flags as TRUE or FALSE, and the score. The first row, outlined, is the opening balance entry, with four flags. The entries that follow score two: a rent entry and four debt principal and interest entries, flagged as created on a weekend and backdated, and two debt reclassifications, flagged as above the approver's limit and round amounts."}
+
+**Step 6. Trace the highest-scoring entry to the ledger.** The JournalEntry Table holds each entry's header; its lines are in GLEntry.
+
+a. Import the **T3_GLEntry** Table, name the query `JournalLines`, and filter SourceDocumentType to JournalEntry as the first step.
+b. Merge JournalLines with **Accounts** on AccountID, and expand AccountNumber and AccountName.
+c. Use **Home > Choose Columns** to keep VoucherNumber, AccountNumber, AccountName, Debit, and Credit, and drag the column headers into that order. Choose **Close & Load**.
+d. On the JE Summary worksheet, enter these two totals in free cells and compare them:
+
+   ```
+   =SUM(JournalEntries[TotalAmount])
+   =SUM(JournalLines[Debit])
+   ```
+
+   The two totals agree, so the entries' headers and their ledger lines describe the same population.
+e. Add a worksheet named `Drilldown`. In A1, type `Entry number`, and in B1 type `JE-2024-000001`. Type the headers in A3:D3 shown in @fig-08-08, and in A4 enter:
+
+   ```
+   =FILTER(JournalLines[[AccountNumber]:[Credit]],JournalLines[VoucherNumber]=B1)
+   ```
+
+The formula spills the entry's eighteen lines, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger. Type any other entry number in B1 to see its lines.
+
+![The Ledger Lines of the Opening Balance Entry.](/visuals/svg/fig-08-08-journal-entry-drilldown.svg){#fig-08-08 fig-alt="A mock of the Drilldown worksheet, with the FILTER formula of cell A4 in the formula bar and the entry number JE-2024-000001 in B1. Eighteen spilled rows list the account number, account name, debit, and credit of each ledger line of the entry: cash, accounts receivable, inventories, prepaid expenses, and equipment on the debit side; accounts payable, accruals, accumulated depreciation, common stock, and retained earnings on the credit side. The accounts receivable line is outlined."}
+
+**Step 7. Complete the workpaper.**
+
+a. Add a worksheet named `WP Journals`, and complete the workpaper items shown in @fig-08-09.
+b. In the Exceptions and disposition entry, summarize the Dispositions worksheet: the patterns that are expected and the evidence for them, and the entries to follow up.
+c. Write a conclusion that says what the tests found and what remains open, and save the workbook.
+
+![A Workpaper for the Journal Entry Tests.](/visuals/svg/fig-08-09-audit-workpaper.svg){#fig-08-09 fig-alt="A mock of the WP Journals worksheet, with workpaper labels in the first column and entries in the second: the objective, based on AS 2401; the source tables; the population check, which agrees the entries' totals with their ledger lines; the procedure, with the five flags and the risk score; the parameters of each flag; the results, as the number of entries with one, two, and four flags; the exceptions and their dispositions; the conclusion, which leaves the approval of opening and recurring entries open for follow-up; and blanks for the preparer and the reviewer."}
+
+**Checkpoint.** Check that:
+
+- the five flag columns and RiskScore calculate for every entry, and only one entry scores 4;
+- the PivotTables explain the weekend depreciation entries and the year-end closes;
+- the Dispositions worksheet holds a disposition for every entry with a score of 1 or more;
+- the totals of the JournalEntries and JournalLines Tables agree, and the Drilldown worksheet shows the accounts receivable line of JE-2024-000001.
+
+The journal entry tests found no sign of a concealed misstatement in the recurring entries. They did find weaknesses in how entries are approved, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.
