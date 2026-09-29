@@ -1,0 +1,23 @@
+{{< pagebreak >}}
+
+## References
+
+Anscombe, F. J. (1973). Graphs in statistical analysis. *The American Statistician*, *27*(1), 17–21. <https://doi.org/10.1080/00031305.1973.10478966>
+
+Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
+
+Frontline Systems. (n.d.). *Excel Solver: Create Solver reports*. <https://www.solver.com/excel-solver-create-solver-reports>
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>
+
+Microsoft. (2026a). *Define and solve a problem by using Solver*. Microsoft Support. <https://support.microsoft.com/en-us/office/define-and-solve-a-problem-by-using-solver-5d1a388f-079d-43ac-a7eb-f63e45925040>
+
+Microsoft. (2026b). *FORECAST and FORECAST.LINEAR functions*. Microsoft Support. <https://support.microsoft.com/en-us/office/forecast-and-forecast-linear-functions-50ca49c9-7b40-4892-94e4-7ad38bbeda99>
+
+Microsoft. (2026c). *Introduction to What-If Analysis*. Microsoft Support. <https://support.microsoft.com/en-us/excel/introduction-to-what-if-analysis>
+
+Microsoft. (2026d). *Load the Analysis ToolPak in Excel*. Microsoft Support. <https://support.microsoft.com/en-us/excel/load-the-analysis-toolpak-in-excel>
+
+Public Company Accounting Oversight Board. (n.d.-a). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>
+
+Public Company Accounting Oversight Board. (n.d.-b). *AS 2501: Auditing accounting estimates, including fair value measurements*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2501>

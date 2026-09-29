@@ -25,11 +25,12 @@ import ch03  # noqa: E402
 import ch04  # noqa: E402
 import ch05  # noqa: E402
 import ch06  # noqa: E402
+import ch07  # noqa: E402
 from data import REPO_ROOT  # noqa: E402
 
 SRC_DIR = REPO_ROOT / "visuals" / "src"
 CHAPTERS = {1: ch01.FIGURES, 2: ch02.FIGURES, 3: ch03.FIGURES, 4: ch04.FIGURES, 5: ch05.FIGURES,
-            6: ch06.FIGURES}
+            6: ch06.FIGURES, 7: ch07.FIGURES}
 
 
 def main() -> int:

@@ -16,14 +16,26 @@ B.  STDEV.S ignores blank cells, while STDEV.P counts them as zeros.
 C.  STDEV.S returns the spread around the median, while STDEV.P returns the spread around the mean.
 D.  STDEV.S works only on Excel Tables, while STDEV.P works on any range.
 
-**3.** An analyst wants the median line total of fiscal 2026 invoice lines only. Why does the formula `=MEDIAN(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=2026))` use FILTER?
+**3.** An analyst wants the median line total of fiscal 2026 invoice lines only, and enters this formula:
+
+```
+=MEDIAN(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=2026))
+```
+
+Why does the formula use FILTER?
 
 A.  FILTER sorts the values, which MEDIAN requires.
 B.  FILTER converts the line totals from text to numbers.
 C.  FILTER removes the outliers that would distort the median.
 D.  MEDIAN accepts no criteria and Excel has no MEDIANIFS, so FILTER supplies only the rows that meet the condition.
 
-**4.** A summary uses `=SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],"Furnture")`, with the group name misspelled. What does the formula return?
+**4.** A summary uses this formula, with the group name misspelled:
+
+```
+=SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],"Furnture")
+```
+
+What does the formula return?
 
 A.  The error #N/A, because no row matches the criterion
 B.  Zero, without an error, which a comparison with a control total would reveal
@@ -58,7 +70,13 @@ B.  Each value's share of the revenue of all groups and quarters together
 C.  The change in each group's revenue from the previous quarter
 D.  Each item group's share of the quarter's revenue
 
-**9.** A formula on the Bridge worksheet refers to the PivotTable with `=GETPIVOTDATA("Sum of Quantity",Drivers!$A$3,"Period","2026-Q3")` rather than with a cell address such as `=Drivers!B5`. What is the advantage?
+**9.** A formula on the Bridge worksheet refers to the PivotTable with GETPIVOTDATA:
+
+```
+=GETPIVOTDATA("Sum of Quantity",Drivers!$A$3,"Period","2026-Q3")
+```
+
+What is its advantage over a cell address such as `=Drivers!B5`?
 
 A.  GETPIVOTDATA identifies the value by its field and item, so it keeps returning the right value when the PivotTable's layout changes.
 B.  GETPIVOTDATA refreshes the PivotTable whenever the formula recalculates.

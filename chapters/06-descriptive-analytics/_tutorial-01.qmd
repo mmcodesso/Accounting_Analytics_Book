@@ -61,9 +61,10 @@ The largest line of the year is not a piece of furniture. It is a design service
 
 a. In A11 through D11, type the headings `Item group`, `Lines`, `Revenue`, and `Average line`.
 b. In A12 through A15, type `Furniture`, `Lighting`, `Textiles`, and `Accessories`.
-c. In B12, enter `=COUNTIFS(InvoiceLines[ItemGroup],$A12,InvoiceLines[FiscalYear],ReportYear)`. In C12, enter:
+c. In B12 and C12, enter these two formulas, the group's number of lines and its revenue:
 
    ```
+   =COUNTIFS(InvoiceLines[ItemGroup],$A12,InvoiceLines[FiscalYear],ReportYear)
    =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],$A12,InvoiceLines[FiscalYear],ReportYear)
    ```
 

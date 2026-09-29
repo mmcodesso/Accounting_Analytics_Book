@@ -2,40 +2,44 @@
 
 ## Key Terms
 
-**Contribution margin.** The difference between the selling price per unit and the variable cost per unit. The contribution margin represents the amount each unit contributes toward covering fixed costs and generating profit.
+**Assumption documentation.** A written record of each key assumption of a model: what it is, the value used, its source, and how sensitive the model's conclusion is to it. It makes a model reviewable and shows where more evidence is needed.
 
-**Contribution margin ratio.** The contribution margin per unit divided by the selling price per unit, expressed as a percentage. This ratio indicates what proportion of each revenue dollar is available to cover fixed costs and contribute to profit.
+**Backtest.** An evaluation of a forecasting method on data that already has an answer: the method is fitted to an earlier part of the history, forecasts a later part that was held back, and is judged by the forecast errors.
 
-**Correlation coefficient.** A statistical measure, ranging from negative one to positive one, that quantifies the strength and direction of the linear relationship between two variables. In accounting, it is used to assess whether two variables are related before building a regression model.
+**Benchmark forecast.** A simple forecasting method, such as the mean, the last value, or the value of the same season last year, against which more elaborate methods are compared. A method that cannot beat the benchmarks is not worth using.
 
-**Cost-volume-profit analysis.** A modeling technique that expresses profit as a function of selling price, variable cost, fixed costs, and sales volume. CVP analysis is used in managerial accounting for break-even analysis, pricing decisions, and production planning.
+**Break-even point.** The volume or revenue at which total contribution margin equals fixed costs, so that profit is zero. Break-even revenue equals fixed costs divided by the contribution margin ratio.
 
-**Data Analysis ToolPak.** An Excel add-in that provides statistical analysis tools including regression, correlation, descriptive statistics, and hypothesis testing. The ToolPak must be enabled through the File, Options, Add-ins menu before first use.
+**Constraint.** A limit that a solution must respect in an optimization model, such as the hours available in a work center or the demand for an item. In Solver, constraints are conditions on cells that depend on the variable cells.
 
-**Data table.** An Excel what-if analysis tool that calculates the results of a formula across a range of input values. A one-variable data table varies one input, and a two-variable data table varies two inputs simultaneously.
+**Contribution margin.** Revenue minus variable costs: the amount available to cover fixed costs and earn a profit. The contribution margin ratio is the contribution margin divided by revenue.
 
-**Dependent variable.** The variable being predicted or explained in a regression model. In accounting, this is typically the account balance, revenue amount, or cost total that the analyst wants to forecast or estimate.
+**Correlation coefficient.** A number from −1 to +1 that measures how closely two variables move together along a straight line, calculated in Excel with CORREL. It does not measure a curved relationship, and it does not show cause.
 
-**FORECAST.LINEAR.** An Excel function that returns a single predicted value based on a linear regression of known data points. It provides a quick forecast without the full diagnostic output of the Data Analysis ToolPak.
+**Data table.** An Excel what-if tool that recalculates a formula for each value in a row or column of inputs, or for every combination of two inputs, and fills in the results.
 
-**Goal Seek.** An Excel tool that finds the value of a single input cell that makes a formula cell equal to a specified target value. Goal Seek works backward from a desired result to determine the required input.
+**Flexible budget.** A budget recalculated at the actual volume of activity, using the budgeted prices and costs per unit. Comparing actual results with it isolates the effects of prices and costs from the effect of volume.
 
-**Independent variable.** The variable used to predict or explain the dependent variable in a regression model. In accounting, this is typically a driver such as time period, volume, or an economic indicator.
+**Flexible-budget variance.** The difference between actual results and the flexible budget. It measures the effect of actual prices and costs differing from the plan on the units actually sold.
 
-**Intercept.** The constant term in a regression equation, representing the predicted value of the dependent variable when the independent variable equals zero. In cost estimation, the intercept represents the estimated fixed cost component.
+**Forecast error.** The difference between a forecast and the actual value, often expressed as a percentage of the actual value. The mean absolute percentage error averages these percentages, ignoring their sign, over the periods forecast.
 
-**R Square.** A statistic that measures the proportion of variation in the dependent variable that is explained by the regression model. An R Square of 0.80 means that 80% of the variation is explained and 20% is unexplained.
+**Goal Seek.** An Excel what-if tool that finds the value of one input cell that makes a formula cell equal a target value, such as the volume at which a decision breaks even.
 
-**Regression analysis.** A statistical technique that models the relationship between a dependent variable and one or more independent variables by fitting an equation to observed data. In accounting, regression supports cost estimation, revenue forecasting, and audit analytical procedures.
+**Margin of safety.** The amount by which actual or planned revenue exceeds break-even revenue, in dollars or as a percentage of revenue.
 
-**Scenario Manager.** An Excel tool that allows users to define and compare named sets of input values (scenarios) and generate a summary report showing the model's outputs under each scenario.
+**P-value.** In regression, the probability of estimating a coefficient at least as far from zero as the one observed if the true coefficient were zero. A p-value below 0.05 is the conventional threshold for statistical significance.
 
-**Sensitivity analysis.** The practice of systematically testing how a model's outputs change when key assumptions change. Sensitivity analysis reveals which assumptions have the greatest impact on the model's conclusions.
+**R Square.** The share of the variation in the dependent variable that a regression line explains, from 0 to 1.
 
-**Slope.** The coefficient in a regression equation that indicates how much the dependent variable changes for each one-unit increase in the independent variable. A positive slope indicates a positive relationship and a negative slope indicates a negative relationship.
+**Residual.** The difference between an actual value and the value a regression line predicts for it. A plot of the residuals shows where a line fits poorly and which observations stand apart.
 
-**Solver.** An Excel add-in that finds the optimal value of a target cell by adjusting one or more variable cells, subject to constraints. Solver can maximize, minimize, or target a specific value and is used for optimization problems such as product mix and resource allocation.
+**Sales-volume variance.** The difference between the flexible budget and the static budget. It measures the effect of selling a different volume than planned, at the planned margins per unit.
 
-**TREND function.** An Excel function that returns an array of predicted values based on a linear regression of known data points. Unlike FORECAST.LINEAR, TREND can return predictions for multiple new values at once.
+**Scenario.** A named set of values for a model's input cells. Excel's Scenario Manager stores scenarios and compares their results in a Scenario Summary report.
 
-**Trendline.** A line added to an Excel chart that represents the best fit through the data points. Trendlines can be linear, exponential, logarithmic, or polynomial, and can be extended beyond the data to project future values.
+**Simple linear regression.** A method that fits the straight line `y = a + bx` minimizing the squared differences between the actual values of a dependent variable and the line, using one independent variable.
+
+**Solver.** An Excel add-in that finds the values of several variable cells that maximize or minimize an objective cell subject to constraints. For linear models, its Simplex LP method finds the optimum and can report shadow prices.
+
+**Static budget.** A budget prepared for a single, planned level of activity and not adjusted for the activity that actually occurs.

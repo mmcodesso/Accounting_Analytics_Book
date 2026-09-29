@@ -168,7 +168,11 @@
 
 **Requirements.**
 
-(1) For each item group, calculate the number of lines, the total revenue, and the average and median line total for fiscal 2026. For the median, combine two conditions in FILTER by multiplying them, as in `FILTER(InvoiceLines[LineTotal],(InvoiceLines[FiscalYear]=2026)*(InvoiceLines[ItemGroup]=A2))`.
+(1) For each item group, calculate the number of lines, the total revenue, and the average and median line total for fiscal 2026. For the median, combine two conditions in FILTER by multiplying them, as in:
+
+```
+FILTER(InvoiceLines[LineTotal],(InvoiceLines[FiscalYear]=2026)*(InvoiceLines[ItemGroup]=A2))
+```
 
 (2) Build a PivotTable of fiscal 2026 revenue by CustomerID, sorted from largest to smallest, and bring each customer's name and segment from the Customer Table. Calculate the share of revenue of the five and the ten largest customers, and note the segment they belong to.
 

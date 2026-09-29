@@ -68,7 +68,13 @@ Standardizing should be deliberate, because it can damage values that were alrea
 
 ### Validating Text
 
-Before you clean a field, test whether it needs cleaning. The formula `=LEN([@CustomerName])=LEN(TRIM([@CustomerName]))` returns TRUE when a name has no stray spaces, and a COUNTIFS on the result tells you how many values fail. Applied to the Charles River names, codes, and addresses, tests like this find nothing to remove: the text fields are clean. That is a finding worth recording, not a wasted step. A preparation workflow that cleans data it has not tested can introduce errors, and one that tests and finds nothing has evidence that the field can be trusted. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
+Before you clean a field, test whether it needs cleaning. This formula returns TRUE when a name has no stray spaces:
+
+```
+=LEN([@CustomerName])=LEN(TRIM([@CustomerName]))
+```
+
+A COUNTIFS on the result tells you how many values fail. Applied to the Charles River names, codes, and addresses, tests like this find nothing to remove: the text fields are clean. That is a finding worth recording, not a wasted step. A preparation workflow that cleans data it has not tested can introduce errors, and one that tests and finds nothing has evidence that the field can be trusted. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -119,7 +125,13 @@ The fourth argument is the value returned when the key is not found. Without it,
 
 ### INDEX and MATCH, and VLOOKUP
 
-Before XLOOKUP was added to Excel, the same retrieval was written by combining two functions. `MATCH(lookup_value, lookup_array, 0)` returns the position of the key in a column, and `INDEX(return_array, position)` returns the value at that position. Together, `=INDEX(SalesInvoice[InvoiceDate],MATCH([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],0))` does what the XLOOKUP formula above does. The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
+Before XLOOKUP was added to Excel, the same retrieval was written by combining two functions. `MATCH(lookup_value, lookup_array, 0)` returns the position of the key in a column, and `INDEX(return_array, position)` returns the value at that position. Together, they do what the XLOOKUP formula above does:
+
+```
+=INDEX(SalesInvoice[InvoiceDate],MATCH([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],0))
+```
+
+The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
 
 VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-03 compares the three.
 

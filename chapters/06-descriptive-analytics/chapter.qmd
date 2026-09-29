@@ -196,7 +196,7 @@ Every summary in this chapter has an equivalent in the tools of Parts III and IV
 
 This chapter has taken the controller's question from description to diagnosis. You profiled the fiscal 2026 invoice lines with statistical functions and learned why the mean and the median tell different stories about a skewed population. You calculated totals by category with conditional aggregation and used a control total to catch a category that was missing. You built PivotTables, added calculated fields that work on totals, displayed the same values as shares and changes, and learned to refresh and reference them safely. Finally, you drilled into the Furniture margin and decomposed its change into volume, mix, price, and cost effects that add up exactly to the change.
 
-The analysis has answered the question that opened Part I. The Furniture margin fell because promotional discounts, mostly from the Furniture Seasonal Promotion, more than doubled from the third quarter to the fourth, and many of the promotion's orders were invoiced after it ended. Knowing why the margin fell is the starting point for deciding what to do about it, and the rest of Part II turns from explaining what happened to estimating what could happen next.
+The analysis has answered the question that opened Part I. The Furniture margin fell because promotional discounts, mostly from the Furniture Seasonal Promotion, more than doubled from the third quarter to the fourth, and many of the promotion's orders were invoiced after it ended. Knowing why the margin fell is the starting point for deciding what to do about it, and Chapter 7 turns from explaining what happened to estimating what could happen next.
 
 
 

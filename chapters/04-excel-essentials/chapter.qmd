@@ -52,7 +52,7 @@ To see why Tables matter, consider the alternative. A plain range is simply a bl
 | Feature | Plain range | Excel Table |
 |---|---|---|
 | Boundaries | Formulas name fixed cells, such as K2:K27934, that must be extended by hand when rows are added | The Table knows its own extent, and new rows typed directly below it become part of it |
-| Formula references | Cell addresses, such as `=SUM(K2:K27934)` | Structured references, such as `=SUM(SalesInvoiceLine[LineTotal])` |
+| Formula references | Cell addresses, such as `K2:K27934` | Structured references, such as `SalesInvoiceLine[LineTotal]` |
 | Column formulas | Copied down by hand, and easy to leave incomplete | A formula entered in a column fills every row automatically as a calculated column |
 | Filter buttons and banding | Added separately | Built into the header row |
 | Slicers | Not available | Available from the Table Design tab |
@@ -134,7 +134,13 @@ Structured references behave differently from cell references when you drag a fo
 
 ### Named Cells
 
-A named cell gives a cell a descriptive name that formulas can use instead of its address. Select the cell, click the Name Box at the left end of the formula bar, type a name such as LargeLineThreshold, and press Enter. From then on, a formula can refer to it by name, as in `=COUNTIFS(SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)`. A named cell behaves like an absolute reference, so it never shifts when the formula is copied, and the formula states its own logic: it counts the lines above the large-line threshold. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed.
+A named cell gives a cell a descriptive name that formulas can use instead of its address. Select the cell, click the Name Box at the left end of the formula bar, type a name such as LargeLineThreshold, and press Enter. From then on, a formula can refer to it by name, as this one does:
+
+```
+=COUNTIFS(SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)
+```
+
+A named cell behaves like an absolute reference, so it never shifts when the formula is copied, and the formula states its own logic: it counts the lines above the large-line threshold. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed.
 
 Named cells are the natural home for the parameters of an analysis, such as the percentile that defines a large transaction, the start and end dates of the period under review, or a materiality amount. Placing every parameter on one worksheet, each with a name and a short description, makes the assumptions of the analysis easy to find and easy to change. When a parameter changes, every formula that uses it updates, and a reviewer can see in one place which values drove the results. The Name Manager, on the Formulas tab, lists every name in the workbook with its value and the cell it refers to. It also lists every Table, because a Table name is a name too.
 

@@ -1,246 +1,181 @@
 ---
-title: "Data Analysis and Modeling in Excel"
+title: "Forecasting, Budgeting, and What-If Analysis in Excel"
 ---
 
-<!-- DRAFT: not yet revised. Migrated from drafts/07 unchanged except for the file layout; not registered in _quarto.yml. -->
-**Tools:** Microsoft Excel
-**Table Groups:** Order-to-Cash (O2C) | Manufacturing (Mfg) | Master Data
 
----
-
-## Learning Objectives
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
 
 After completing this chapter, you will be able to:
 
-1. Explain the difference between descriptive analytics and analytical modeling and identify accounting situations where each is appropriate.
-2. Apply correlation and regression analysis using the Data Analysis ToolPak to examine relationships between accounting variables and evaluate the reliability of the results.
-3. Build a trend analysis from historical accounting data and use it to produce a short-term forecast with documented assumptions.
-4. Construct a cost-volume-profit model in Excel that links revenue, variable costs, fixed costs, and profit into an integrated framework.
-5. Use Scenario Manager, data tables, and Goal Seek to perform what-if analysis and identify the conditions under which accounting outcomes change.
-6. Apply Solver to determine an optimal product mix subject to capacity and cost constraints, and perform sensitivity analysis on key assumptions.
+1. Measure the relationship between two variables with correlation and regression in the Data Analysis ToolPak, and judge the result with R², p-values, and residuals.
+2. Forecast with TREND and FORECAST.LINEAR, and evaluate a forecast by backtesting it against simple benchmark methods.
+3. Compare actual results with a static and a flexible budget, and explain sales-volume and flexible-budget variances.
+4. Build a contribution margin model with documented assumptions, and calculate break-even points.
+5. Evaluate a decision with Scenario Manager, data tables, and Goal Seek, and describe how Solver finds the best plan under constraints.
+:::
 
----
 
-## Opening Scenario
+## Opening Scenario {.unnumbered}
 
-You are a cost analyst at Charles River, a Boston-area company that designs and sells home furnishings and manufactures selected furniture lines in-house. The vice president of operations has asked you to prepare a financial analysis for the upcoming planning meeting. Three questions are on the agenda. First, the sales team wants a forecast of next quarter's revenue based on recent trends, along with a clear statement of the assumptions behind the projection. Second, the product management team wants to understand how changes in material costs and selling prices would affect the profitability of the furniture product line. Third, the production planning team wants to know the best combination of manufactured furniture items to produce next quarter given limited work center hours and warehouse space. Each question requires you to move beyond describing what has already happened and into the territory of analysis and modeling. You need to build regression models, construct what-if scenarios, and solve optimization problems, all within Excel. This chapter teaches you the techniques that make that work possible.
+The controller has read your analysis of the Furniture margin, and she is now preparing for the planning meeting for fiscal 2027. She has three requests. First, she needs a revenue forecast for the coming quarter that she can defend when the sales team pushes for a more optimistic number. Second, she wants to know how 2026 compared with the budget, because the budget will be the starting point for next year's plan and she suspects that some of its assumptions were wrong. Third, the sales team has proposed repeating the Furniture Seasonal Promotion, and she wants a recommendation based on what the promotion actually cost and what it would need to achieve to pay for itself. Each request asks what could happen rather than what did happen. This chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
 
----
 
-## From Description to Analysis
 
-Chapter 6 focused on descriptive analytics, the process of summarizing historical data into totals, averages, distributions, and comparisons. Descriptive analytics answers the question "what happened?" and forms the foundation of most accounting work. This chapter takes the next step. The techniques here answer questions about relationships ("does revenue increase when we spend more on marketing?"), about the future ("what will next quarter's revenue likely be?"), and about decisions ("what product mix maximizes our profit given our constraints?"). These are the questions that move accounting from reporting into analysis and from analysis into decision support.
+## From Explaining to Predicting and Deciding
 
-The distinction between description and modeling matters because the two activities involve different levels of judgment and different types of risk. A PivotTable that summarizes last quarter's revenue by item group is a factual statement about the past. A regression model that projects next quarter's revenue is an estimate about the future that depends on assumptions about the stability of historical patterns. A cost-volume-profit model that evaluates three pricing strategies is a structured form of reasoning that depends on assumptions about cost behavior, demand elasticity, and market conditions. When accountants produce models rather than summaries, they take on a responsibility to document their assumptions, test their sensitivity to changes, and communicate the limits of their conclusions. This chapter teaches both the technical tools and the professional practices that support responsible modeling.
+Chapter 1 introduced four types of analytics. The earlier chapters of Part II used the first two: descriptive analytics to summarize what happened, and diagnostic analytics to explain why the Furniture margin fell. This chapter turns to the other two. Predictive analytics estimates what is likely to happen, such as next quarter's revenue. Prescriptive analytics recommends what to do, such as whether to repeat a promotion or which products to make when capacity is short.
 
-The academic literature supports the growing importance of analytical modeling in accounting practice. Appelbaum, Kogan, Vasarhelyi, and Yan (2017) identified predictive analytics as an area where accounting professionals increasingly need competence, particularly in audit settings where analytical procedures require the auditor to develop independent expectations for account balances. The Institute of Management Accountants (IMA, 2019) included forecasting, cost modeling, and scenario analysis among the core competencies for management accountants, noting that these skills support planning, budgeting, and strategic decision-making. The American Institute of Certified Public Accountants (AICPA, 2017) recognized the role of regression and trend analysis in audit data analytics, recommending that auditors use these techniques to set expectations for substantive analytical procedures.
+The move from description to prediction changes the nature of the work. A PivotTable of last quarter's revenue is a statement of fact that anyone can check against the records. A forecast of next quarter's revenue is an estimate that depends on assumptions about how the future will resemble the past, and a model of a promotion depends on assumptions about how customers will respond. Nobody can check a forecast against the records until the period is over. That is why this chapter pairs every modeling tool with a test: a residual plot that shows where a regression fails, a backtest that compares a forecast method with what actually happened, a flexible budget that separates a plan's volume assumption from its prices, and a documented list of the assumptions behind every model.
 
-The techniques in this chapter draw on two Charles River table groups. The Order-to-Cash group provides the historical sales data for correlation, regression, and trend analysis. Its SalesInvoice and SalesInvoiceLine tables record the company's billed revenue over time, which makes them well suited for introducing forecasting concepts. The Manufacturing group, together with the Item master in the Master Data group, provides the cost, pricing, and production data for cost-volume-profit modeling and optimization. The Item table includes both StandardCost and ListPrice columns, the ProductionCompletion and ProductionCompletionLine tables record completed production quantities and their standard cost, and the WorkOrderClose table records the manufacturing variance resolved at close. These tables provide the detail needed to build realistic cost and production models for the furniture lines that Charles River manufactures in-house.
 
-*[Figure 7.1: The Analysis and Modeling Spectrum. A horizontal diagram showing the progression from Descriptive Analytics (left) through Correlation and Regression (center-left), Forecasting (center), What-If Analysis (center-right), and Optimization (right). Each stage is labeled with the question it answers and an accounting example. An arrow beneath the spectrum indicates that the level of judgment and assumption increases from left to right.]*
+## Correlation and Regression
 
-## Correlation Analysis in Accounting
+### Correlation
 
-Before building a model that uses one variable to predict another, it is good practice to examine whether the two variables are related at all. Correlation analysis measures the strength and direction of the linear relationship between two numeric variables. The result is a single number called the correlation coefficient, typically denoted as r, that ranges from negative one to positive one. A value near positive one indicates a strong positive relationship, meaning that when one variable increases, the other tends to increase as well. A value near negative one indicates a strong negative relationship, meaning that when one variable increases, the other tends to decrease. A value near zero indicates little or no linear relationship.
+A correlation coefficient measures how closely two numeric variables move together along a straight line. It ranges from −1 to +1. A value near +1 means that the variables rise together, a value near −1 means that one falls as the other rises, and a value near 0 means that there is little linear relationship. In Excel, `=CORREL(array1, array2)` returns the coefficient for two columns of equal length. The Data Analysis ToolPak, an add-in that comes with Excel, calculates a correlation matrix for several variables at once: choose **Data > Data Analysis > Correlation**. To make the ToolPak available, choose **File > Options > Add-ins**, select **Excel Add-ins** in the **Manage** box, click **Go**, and check **Analysis ToolPak** (Microsoft, 2026d).
 
-In accounting, correlation analysis has several practical applications. A financial analyst might examine the correlation between monthly revenue and the number of sales invoices to determine whether revenue growth is driven by more transactions or by larger transactions. A cost accountant might examine the correlation between production volume and total manufacturing cost to assess whether cost behaves as a variable cost. An auditor performing analytical procedures might examine the correlation between a client's monthly revenue and an independent economic indicator to determine whether external data can serve as a basis for setting expectations.
+A correlation coefficient is easy to calculate and easy to misread. It measures only linear association, so two variables with a strong curved relationship can show a coefficient near zero. It says nothing about cause: two variables can move together because a third variable drives both. And it is sensitive to unusual observations. Charles River's monthly revenue illustrates the last point. The first month of the data, January 2024, is a start-up month in which the company issued about half as many invoices as in a normal month. With that month included, monthly revenue appears strongly correlated with the number of customers invoiced. Without it, the correlation is much weaker, and revenue correlates more strongly with the average size of an invoice line instead. One month out of thirty-six changes the conclusion, which is a reason to look at the data before reading any coefficient.
 
-Excel provides the CORREL function for calculating the correlation coefficient between two ranges of values. The syntax is =CORREL(array1, array2), where array1 and array2 are the two columns of data you want to compare. The two arrays must have the same number of values. For example, if you have monthly revenue in one column and monthly invoice counts in another, =CORREL(B2:B13, C2:C13) returns the correlation coefficient between the two variables over the twelve-month period.
+### Simple Linear Regression
 
-Interpreting the correlation coefficient requires judgment. There are no universal cutoffs that define a "strong" or "weak" correlation, and the interpretation depends on the context. In accounting, correlations above 0.70 (or below negative 0.70) are generally considered strong enough to suggest a meaningful relationship worth investigating further. Correlations between 0.40 and 0.70 suggest a moderate relationship, and correlations below 0.40 suggest a weak or negligible relationship. These are guidelines, not rules, and the substantive question always matters more than the number itself.
+Simple linear regression fits the straight line `y = a + bx` that minimizes the squared vertical distances between the data points and the line. The dependent variable, y, is the one you want to explain or predict, and the independent variable, x, is the one you use to explain it. The intercept, a, is the value of the line when x is zero, and the slope, b, is the change in y for each one-unit increase in x. In accounting, regression is used to separate the fixed and variable parts of a mixed cost, to model how an expense moves with activity, and to develop the expectations that auditors compare with recorded amounts. Datar and Rajan (2021) treat it as one of the quantitative methods for estimating how costs behave.
 
-> **[WATCH OUT]**
-> Correlation measures the strength of a linear relationship only. Two variables can have a strong nonlinear relationship (for example, a U-shaped curve) and still produce a correlation coefficient near zero. More importantly, correlation does not imply causation. A high correlation between advertising spending and revenue does not prove that advertising causes revenue to increase. There may be a third variable, such as seasonal demand, that drives both. In accounting work, always consider alternative explanations before drawing conclusions from a correlation.
+The ToolPak's Regression tool, under **Data > Data Analysis > Regression**, reports three groups of results, which @fig-07-02 shows for Charles River's monthly revenue. The regression statistics measure the fit. R Square is the share of the variation in y that the line explains, from 0 to 1, and the standard error measures the typical distance of a point from the line, in the units of y. The ANOVA table tests whether the line explains more than chance would. The coefficients table gives the intercept and slope, each with a standard error, a t statistic, a p-value, and a 95 percent confidence interval. The p-value is the probability of seeing a slope at least as far from zero as the estimate if the true slope were zero, and a value below 0.05 is the conventional threshold for calling a relationship statistically significant.
 
-The Data Analysis ToolPak also provides a Correlation tool that calculates the correlation matrix for multiple variables at once. To use it, go to the Data tab, click Data Analysis, and select Correlation. In the dialog box, specify the input range containing all the variables you want to compare, indicate whether the first row contains labels, and specify an output location. Excel will produce a table showing the correlation between every pair of variables. This is useful when you want to explore relationships among several variables before deciding which ones to include in a regression model.
+![Monthly Revenue with Two Fitted Trends.](/visuals/svg/fig-07-01-monthly-revenue-trend.svg){#fig-07-01 fig-alt="A line chart of Charles River's monthly invoiced revenue from January 2024 to December 2026, with two straight trend lines. Revenue moves up and down within a narrow band in almost every month, but the first month, January 2024, labeled as the start-up month, is far below the rest. A dashed trend line fitted to all thirty-six months slopes upward noticeably, while a solid trend line fitted without January 2024 is nearly flat. The legend gives the R Square of each line, both of them low."}
 
-*[Figure 7.2: A correlation matrix produced by the Data Analysis ToolPak showing correlations among four Charles River Order-to-Cash variables: Monthly Revenue, Invoice Count, Average Invoice-Line Amount, and Distinct Customers. The matrix is symmetric, with 1.000 along the diagonal. Strong correlations are highlighted.]*
+![Regression Output from the Data Analysis ToolPak.](/visuals/svg/fig-07-02-regression-output.svg){#fig-07-02 fig-alt="A mock of the ToolPak's summary output for a regression of monthly revenue on a month index. It shows the regression statistics, including a low R Square; the ANOVA table with its Significance F; and the coefficients table for the intercept and the month index, with standard errors, t statistics, p-values, and 95 percent confidence limits. Four numbered markers outline the R Square, the Significance F, the slope, and the slope's p-value, and a legend explains each."}
 
-<!-- DRAFT: tabular content moved from drafts/07/ch07-markdown-tables.md; values not yet verified -->
+Two further checks belong with every regression. The first is the residuals, the differences between the actual values and the line. A residual plot, which the Regression tool draws when you check **Residual Plots**, should look like a patternless band around zero. A single point far from the rest, or a curve in the residuals, means that the line describes the data poorly. The second check is the influence of individual points. As @fig-07-01 shows, the line fitted to all thirty-six months of Charles River's revenue slopes upward, and its slope is statistically significant, but almost all of that slope comes from the start-up month. Fitted without January 2024, the line is nearly flat, and its slope is no longer significant.
 
-*Figure 7.2: Correlation matrix produced by the Data Analysis ToolPak showing correlations among four Charles River Order-to-Cash variables aggregated by month. Values above 0.70 indicate strong positive relationships. The matrix is symmetric, with 1.000 along the diagonal.*
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A statistically significant slope is not proof of a trend. A single unusual observation at one end of the data can tilt a line enough to make its slope significant, and Anscombe (1973) showed that data sets with identical regression lines and fit statistics can look nothing alike when they are plotted. Plot the data and the residuals before you report a regression, investigate any point that stands apart, and report the result both with and without it when it cannot be explained away.
+:::
 
-|  | Monthly Revenue | Invoice Count | Avg Invoice-Line Amount | Distinct Customers |
-|---|---:|---:|---:|---:|
-| **Monthly Revenue** | 1.000 | 0.912 | 0.684 | 0.847 |
-| **Invoice Count** | 0.912 | 1.000 | 0.413 | 0.926 |
-| **Avg Invoice-Line Amount** | 0.684 | 0.413 | 1.000 | 0.381 |
-| **Distinct Customers** | 0.847 | 0.926 | 0.381 | 1.000 |
 
-**Reading the matrix.** Each cell shows the correlation coefficient between the row variable and the column variable. The diagonal values are always 1.000 because every variable is perfectly correlated with itself. The strongest correlation in this matrix is between Invoice Count and Distinct Customers (0.926), which is expected because months with more customers tend to have more invoices. Monthly Revenue is strongly correlated with Invoice Count (0.912) and moderately correlated with Average Invoice-Line Amount (0.684). Average Invoice-Line Amount has the weakest correlations with the other variables, suggesting that revenue growth at Charles River is driven more by transaction volume than by larger individual invoice lines.
+## Forecasting and Backtesting
 
-> **[IN PRACTICE]**
-> Auditors use correlation analysis as part of the expectation-setting process in analytical procedures. AU-C Section 520 (AICPA, 2020) requires auditors to develop an expectation for the balance or ratio being tested. When the auditor can identify an independent variable that is highly correlated with the account balance, that variable can serve as a predictor in a regression-based analytical procedure, which provides stronger audit evidence than a simple trend comparison.
+### Trend Functions
 
-## Regression Analysis with the Data Analysis ToolPak
+Excel has worksheet functions that apply a regression line without the ToolPak. `FORECAST.LINEAR(x, known_y's, known_x's)` returns the value of the least-squares line at a new x, such as the next month's index, and `TREND(known_y's, known_x's, new_x's)` returns the values for several new x's at once, spilling them into adjacent cells (Microsoft, 2026b). On a chart, **Add Trendline** draws the same line and can display its equation and R Square. These tools make a linear forecast quick to produce, which is exactly why it needs testing: extending a line into the future assumes that the pattern of the past continues, and that the pattern is a line.
 
-Correlation tells you that two variables are related, but it does not tell you the nature of that relationship in a form you can use to make predictions. Regression analysis takes the next step. It produces a mathematical equation that describes how changes in one variable (the independent variable, or predictor) are associated with changes in another variable (the dependent variable, or outcome). The simplest form is simple linear regression, which fits a straight line through the data points and produces an equation in the form y = a + bx, where y is the predicted value of the dependent variable, a is the intercept (the value of y when x equals zero), b is the slope (the amount y changes for each one-unit increase in x), and x is the value of the independent variable.
+### Benchmark Forecasts
 
-In accounting, regression analysis supports several important tasks. Financial analysts use it to forecast revenue based on historical trends or economic indicators. Cost accountants use it to estimate the fixed and variable components of a mixed cost, a technique known as the high-low method's statistical alternative. Auditors use it as the basis for substantive analytical procedures, where the regression model provides the "expected" value against which the recorded balance is compared. In each case, the regression model translates a historical pattern into a forward-looking estimate.
+A forecasting method is worth using only if it does better than the simplest alternatives. Hyndman and Athanasopoulos (2021) describe four such benchmarks and recommend comparing every new method with them, because a method that cannot beat them is not worth considering. @tbl-07-01 lists them with their Excel equivalents.
 
-### Enabling the Data Analysis ToolPak
+| Method | Forecast for every future period | Excel example | Works well when |
+|---|---|---|---|
+| Mean | The average of the historical values | `=AVERAGE(C3:C34)` | The series fluctuates around a stable level |
+| Naive | The last observed value | `=C34` | The series wanders without a stable level |
+| Seasonal naive | The value of the same season last year | `=C23` for the same month or quarter a year earlier | There is a strong seasonal pattern |
+| Drift or trend | The last value or the fitted line, extended by the average change | `FORECAST.LINEAR` or `TREND`, as in Tutorial 7.1 | The series grows or shrinks steadily |
 
-The regression tools are part of the Data Analysis ToolPak, an Excel add-in that must be enabled before first use. To enable it, go to the File tab, click Options, select Add-ins from the left panel, confirm that "Excel Add-ins" is selected in the Manage dropdown at the bottom, and click Go. In the Add-Ins dialog, check the box next to "Analysis ToolPak" and click OK. After enabling the ToolPak, a "Data Analysis" button appears in the Analysis group on the Data tab. You only need to enable the ToolPak once; it remains active for all future workbooks.
+: Benchmark forecasting methods {#tbl-07-01}
 
-*[Figure 7.3: Screenshot of the Excel Add-Ins dialog box with the Analysis ToolPak checkbox selected. An annotation points to the checkbox and notes that this step needs to be done only once.]*
+### Backtesting
 
-### Running a Simple Linear Regression
+A backtest evaluates a forecasting method on data that already has an answer. You fit the method to an earlier part of the history, forecast a later part that you held back, and compare the forecasts with what actually happened. The forecast error is the difference between the forecast and the actual value, and it is often expressed as a percentage of the actual, so that errors for periods or product lines of different size can be compared. The mean absolute percentage error averages those percentages, ignoring their sign, over the periods forecast. Charles River's data ends at December 2026, so the most recent quarter with actual results, the fourth quarter of 2026, is the natural holdout. A backtest cannot guarantee that a method will work in the future, but a method that fails on the recent past should not be trusted with the next quarter.
 
-To run a regression, click Data Analysis on the Data tab and select Regression from the list. The Regression dialog box asks for several inputs. The Input Y Range is the column containing the dependent variable (the variable you want to predict). The Input X Range is the column containing the independent variable (the predictor). If your ranges include labels in the first row, check the "Labels" checkbox. The Output Range specifies where Excel should place the results. You can also check boxes for residual plots and normal probability plots, which are useful for evaluating the quality of the model.
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Budgets are negotiated as well as calculated. Managers who are evaluated against a budget have a reason to build slack into it, by underestimating revenue or overestimating costs so that the target is easier to meet (Datar & Rajan, 2021), while others push for optimistic plans that justify more resources. A statistical benchmark and a record of past forecast errors give the finance team an objective reference point for that discussion. The question to ask of any forecast is how it would have performed if it had been used in the past.
+:::
 
-After you click OK, Excel produces a regression output with three sections. The first section, Regression Statistics, contains the Multiple R (the correlation coefficient), R Square (the proportion of variation in the dependent variable explained by the model), Adjusted R Square (which accounts for the number of predictors), Standard Error (the average distance between the predicted and actual values), and the number of observations. The second section is the ANOVA table, which tests whether the overall regression model is statistically significant. The third section, Coefficients, shows the intercept and slope along with their standard errors, t-statistics, and p-values. The p-value for the slope coefficient is the most important number in this section for practical purposes. A p-value below 0.05 indicates that the relationship between the independent and dependent variables is statistically significant at the 95% confidence level.
-
-*[Figure 7.4: Annotated regression output from the Data Analysis ToolPak. Three sections are labeled: Regression Statistics (with R Square highlighted), ANOVA table (with the Significance F value highlighted), and Coefficients (with the Intercept, Slope, and p-values highlighted). Annotations explain what each value means in plain language.]*
-
-### Interpreting Regression Results
-
-The R Square value tells you how well the model fits the data. An R Square of 0.85, for example, means that 85% of the variation in the dependent variable is explained by the independent variable, and 15% is unexplained. In accounting applications, the acceptable R Square depends on the context. For cost estimation, where the relationship between volume and cost is expected to be strong, an R Square above 0.80 is typically expected. For revenue forecasting, where many factors influence revenue beyond the single predictor in the model, an R Square of 0.60 to 0.75 may be acceptable. The key is to evaluate the R Square relative to the decision being supported and to acknowledge unexplained variation as a source of uncertainty in the model's predictions.
-
-The slope coefficient tells you the direction and magnitude of the relationship. If you are regressing monthly revenue on the number of sales invoices, a slope of 525 means that each additional invoice is associated with $525 in additional revenue. The intercept represents the predicted value of the dependent variable when the independent variable is zero. In many accounting applications, the intercept has a meaningful interpretation. In cost estimation, the intercept represents the estimated fixed cost component, the portion of total cost that does not vary with the activity level.
-
-> **[CONNECTING THE DOTS]**
-> In Chapter 11, you will learn SQL window functions that calculate period-over-period changes directly in a query against the Charles River database. The SQL approach is complementary to the regression approach taught here. SQL window functions efficiently compute the raw changes (this quarter versus last quarter) by reading the SalesInvoice and SalesInvoiceLine tables, while regression analysis models the trend across multiple periods and produces a prediction equation. Auditors often use both techniques: SQL to extract the historical data and calculate period changes, and Excel regression to model the trend and set the expectation for the analytical procedure.
 
 {{< include _tutorial-01.qmd >}}
 
-## Trend Analysis and Forecasting
 
-Regression against a time variable is one form of trend analysis, but Excel provides additional tools that make trend work more accessible. The TREND function returns predicted values based on a linear regression without requiring you to run the Data Analysis ToolPak. The FORECAST.LINEAR function provides a point forecast for a single new x-value. And Excel's trendline feature adds a fitted line directly to a chart, allowing you to visualize the trend and extend it into the future.
+## Budgets, Flexible Budgets, and Variances
 
-### The TREND and FORECAST.LINEAR Functions
+### The Master Budget and Its Drivers
 
-The TREND function takes three or four arguments: known_y's (the historical dependent variable values), known_x's (the historical independent variable values), new_x's (the x-values for which you want predictions), and an optional constant argument. The function returns an array of predicted y-values for the new x-values. For the Charles River monthly revenue example, =TREND(C4:C27, B4:B27, B28:B30) would return the predicted revenue for months 25, 26, and 27 in a single formula. Because TREND returns an array, you enter it as a dynamic array formula in a cell, and the results spill into adjacent cells.
+A budget is a plan expressed in money. A master budget combines the operating budgets, for sales, production, purchasing, and expenses, with the financial budgets for cash and the balance sheet. Charles River's budget is recorded in two Tables. BudgetLine holds the detail, one row for each account, month, and where applicable item and cost center, and its DriverType column records how each amount was calculated. Revenue is forecast units multiplied by a planned net price, cost of goods sold is the same units at standard cost, sales commissions are forecast revenue multiplied by a commission rate, payroll taxes and benefits are salaries multiplied by a burden rate, and recurring expenses such as rent follow their own drivers. The Budget Table summarizes the lines by cost center and account.
 
-The FORECAST.LINEAR function is simpler and returns a single predicted value. The syntax is =FORECAST.LINEAR(x, known_y's, known_x's). To predict revenue for month 25, you would enter =FORECAST.LINEAR(25, C4:C27, B4:B27). This function produces the same result as substituting x = 25 into the regression equation, but without requiring you to know the equation's coefficients. FORECAST.LINEAR is convenient for quick predictions, but it does not provide the diagnostic information (R Square, p-values, residuals) that the Data Analysis ToolPak produces. For professional analytical work, running the full regression and documenting the diagnostics is the better practice.
+Knowing the drivers tells you which parts of a budget can be tested separately. Charles River's operating-expense budget, for salaries, rent, depreciation, and the other recurring accounts, turns out to be close to what the company spent. The sales budget is built from two assumptions that can be checked one at a time: how many units would be sold, and at what price. For Charles River, the second assumption is close to reality and the first is not.
 
-### Trendlines on Charts
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A summary does not always contain all of its detail. Charles River's Budget Table summarizes the budget by cost center, and the operating-expense lines that have no cost center, such as rent, utilities, and insurance, do not appear in it. A total taken from the summary is therefore smaller than the budget's true total. Before you rely on a summary table, reconcile it to its detail, as you did with invoice totals in Chapter 4. Exercise 7.2 asks you to do so.
+:::
 
-Excel's trendline feature adds a fitted line to an existing chart. Right-click any data point on the scatter chart you created in Tutorial 7.1, select "Add Trendline," and choose "Linear" from the options. The trendline dialog also allows you to display the equation on the chart (the same y = a + bx equation from the regression) and the R-squared value. You can also set the "Forward" option to extend the trendline beyond the data, which visually projects the forecast into future periods.
+### Static and Flexible Budgets
 
-Trendlines are useful for presentations because they allow the audience to see both the historical data and the projected trend in a single chart. However, the visual simplicity of a trendline can be misleading. The line suggests a precision that the model may not warrant, especially when the data has high variability around the trend. When using trendlines in professional reports, always accompany the chart with a written discussion of the model's R Square, the magnitude of the residuals, and the assumptions underlying the projection.
+A static budget is the budget prepared for a single, planned level of activity. Comparing actual results with it mixes two different questions: whether the company sold the volume it planned, and whether it earned the planned prices and incurred the planned costs on the volume it did sell. A flexible budget separates the two. It keeps the budget's prices and costs per unit but recalculates the budget at the actual volume, so that it shows what the results would have been if everything except volume had gone according to plan (Datar & Rajan, 2021). Variable costs change with volume in a flexible budget, while fixed costs stay at their budgeted amounts. @fig-07-04 shows the three levels of comparison, and @tbl-07-02 defines the two variances that connect them.
 
-*[Figure 7.7: The Charles River monthly revenue scatter chart with a linear trendline added. The equation and R-squared value are displayed on the chart. The trendline is extended three periods forward, with the forecast region shaded in light gray to distinguish it from the historical data.]*
+![Static Budget, Flexible Budget, and Actual Results.](/visuals/svg/fig-07-04-flexible-budget-levels.svg){#fig-07-04 fig-alt="A diagram of three boxes from left to right: the static budget, planned volume at planned prices and standard costs; the flexible budget, actual volume at planned prices and standard costs; and the actual results, actual volume at actual prices, costed at standard. Each box gives the Furniture margin for fiscal 2026, which is far lower in the flexible budget than in the static budget, and a little lower again in the actual results. Brackets between the boxes label the sales-volume variance, a very large unfavorable amount, and the flexible-budget variance, a much smaller unfavorable amount, with a note on what each measures."}
 
-> **[IN PRACTICE]**
-> Financial analysts preparing going-concern assessments use trend analysis to project revenue and cash flows for the forecast period. AU-C Section 570 (AICPA, 2020) requires auditors evaluating going concern to consider management's plans, which often include revenue projections. An auditor who independently builds a trend model from the client's historical data and compares it to management's projection is performing a higher-quality analytical procedure than one who simply reviews management's numbers without an independent expectation.
+| Variance | Calculation | What it measures | Who usually answers for it |
+|---|---|---|---|
+| Sales-volume variance | Flexible-budget margin minus static-budget margin | The effect of selling more or fewer units than planned, at planned margins | Sales and marketing, and whoever prepared the volume forecast |
+| Flexible-budget variance | Actual margin minus flexible-budget margin | The effect of actual prices and costs differing from plan on the units actually sold | Pricing, purchasing, and production |
 
-## Cost-Volume-Profit Analysis in Excel
+: The two variances between the budget levels {#tbl-07-02}
 
-Cost-volume-profit analysis, commonly known as CVP analysis, is a fundamental technique in managerial accounting that models the relationship between a product's selling price, its variable cost per unit, the total fixed costs associated with producing and selling it, and the resulting profit at various sales volumes. CVP analysis answers questions such as "how many units do we need to sell to break even?" and "how will a ten percent increase in material costs affect our profit?" These are the kinds of questions that the product management team at Charles River wants answered.
+A static budget whose volume assumption is far from what happened says more about the forecast than about performance. Charles River's sales budget planned for several times the units the company sold. Its quantities come from a sales forecast, as its DriverType records, and the company's demand-planning forecast has also run well above actual orders in every year of the data, as Exercise 7.6 shows. Compared with that budget, every product line shows an enormous unfavorable variance that no pricing or cost decision could explain. Flexing the budget to the actual quantities removes the volume assumption and leaves the questions that managers can act on.
 
-The basic CVP model expresses profit as a function of volume:
+### Variable and Fixed Costs in the Budget
 
-Profit = (Selling Price per Unit minus Variable Cost per Unit) times Quantity minus Fixed Costs
+Flexing also applies to expenses. A sales commission that is a percentage of revenue is a variable cost, so its flexible budget is the budgeted rate multiplied by actual revenue, not the static budget amount. A cost driven by headcount or by contract, such as salaries or rent, is fixed over the range of activity in question and stays at its budgeted amount. Comparing each expense with the right benchmark matters: a commission expense well below the static budget looks like savings, but most of the difference only reflects the smaller volume of sales. The driver behind a budgeted amount can also be tested directly. Charles River budgeted payroll taxes and benefits at a fixed percentage of salaries, and dividing the actual expense by actual salaries shows whether that rate held.
 
-The term (Selling Price minus Variable Cost) is the contribution margin per unit, the amount each unit contributes toward covering fixed costs and generating profit. When total contribution margin equals total fixed costs, the company breaks even. When total contribution margin exceeds fixed costs, the excess is profit. When total contribution margin falls short of fixed costs, the shortfall is a loss.
-
-Horngren, Datar, and Rajan (2021) describe CVP analysis as one of the most widely used tools in management accounting, noting that its value lies in its ability to clarify the financial consequences of operating decisions before those decisions are made. The simplicity of the model is both its strength and its limitation. CVP analysis assumes that selling price, variable cost per unit, and fixed costs remain constant across the relevant range of volume, and that the company sells everything it produces. These assumptions are approximately true over moderate ranges of volume but break down at extremes. Documenting these assumptions is part of responsible modeling.
-
-### Building a CVP Model
-
-A well-structured CVP model in Excel separates assumptions from calculations. The assumptions section at the top of the worksheet contains the input values that the model depends on: selling price per unit, variable cost per unit, fixed costs, and the range of quantities to evaluate. The calculations section below uses cell references to the assumption cells rather than hard-coded numbers. This structure makes it easy to change an assumption and immediately see the effect on the results, which is the foundation of what-if analysis.
-
-*[Figure 7.8: Layout of a CVP model worksheet. The top section labeled "Assumptions" contains cells for Selling Price ($1,850), Variable Cost per Unit ($1,040), and Fixed Costs ($245,000). The bottom section labeled "Analysis" contains a table with columns for Quantity, Revenue, Total Variable Cost, Total Fixed Cost, Total Cost, Profit, and Contribution Margin Ratio. A cell reference arrow shows that the Revenue formula references the Selling Price cell in the Assumptions section.]*
 
 {{< include _tutorial-02.qmd >}}
 
-## What-If Analysis with Scenario Manager and Data Tables
 
-The CVP model you built in Tutorial 7.2 answers questions at a single set of assumptions. But the real value of the model emerges when you ask "what if?" questions. What if material costs increase by ten percent? What if we lower the selling price to gain market share? What if fixed costs increase because we need to add a production shift? Excel provides three tools for systematic what-if analysis: Scenario Manager, data tables, and Goal Seek.
+## Cost-Volume-Profit Analysis and What-If Tools
 
-### Scenario Manager
+### Contribution Margin and Break-Even
 
-Scenario Manager allows you to define named sets of input values and switch between them to see how the model's outputs change. Each scenario specifies values for one or more input cells. You can create as many scenarios as you need and generate a summary report that compares the results side by side.
+Cost-volume-profit analysis models how profit responds to volume when costs are divided into variable and fixed parts. The contribution margin is revenue minus variable costs, the amount left over to cover fixed costs and earn a profit, and the contribution margin ratio is the contribution margin divided by revenue. Profit is the contribution margin minus fixed costs. The break-even point is the volume or revenue at which profit is zero, so break-even revenue equals fixed costs divided by the contribution margin ratio, and the margin of safety is the amount by which actual or planned revenue exceeds break-even (Datar & Rajan, 2021).
 
-To access Scenario Manager, go to the Data tab, click "What-If Analysis," and select "Scenario Manager." In the dialog box, click "Add" to create a new scenario. Give it a name (such as "Base Case"), specify the changing cells (the assumption cells in your model, such as B4, B5, and B6), and enter the values for each cell. Repeat this process for each scenario you want to evaluate.
+Consider a generic example. A business with fixed costs of $600,000 a year and a contribution margin ratio of 40 percent breaks even at revenue of $1,500,000. If it expects revenue of $2,000,000, its margin of safety is $500,000, or a quarter of expected revenue, and it earns a profit of $200,000. A target profit works the same way: to earn $300,000, revenue must cover the fixed costs and the target, so it must reach ($600,000 + $300,000) / 0.40, or $2,250,000. Exercise 7.3 applies these relationships to Charles River, using the operating-expense budget as the fixed costs.
 
-After creating all scenarios, click "Summary" in the Scenario Manager dialog. Excel asks you to specify the result cells, which are the output cells you want to compare across scenarios (such as the break-even volume and the profit at a specific quantity). Excel then generates a Scenario Summary worksheet that shows each scenario's input values and the corresponding output values in a tabular format.
+The same logic answers questions about a single decision. A price reduction lowers the contribution margin of every unit that receives it, so the volume must rise enough to replace the lost margin. The required increase depends only on the contribution margin before and after the change, not on fixed costs, which the decision does not affect. Tutorial 7.3 uses this to evaluate the Furniture Seasonal Promotion.
 
-{{< include _tutorial-03.qmd >}}
+### What-If Tools
 
-### Data Tables for Sensitivity Analysis
+A model that separates its inputs from its calculations can answer what-if questions, and Excel provides tools for asking them systematically (Microsoft, 2026c). @tbl-07-04 summarizes them.
 
-While Scenario Manager compares discrete scenarios, a data table shows how an output changes continuously as one or two input values change across a range. A one-variable data table varies a single input and shows the effect on one or more outputs. A two-variable data table varies two inputs simultaneously and shows the effect on a single output.
+| Tool | Where to find it | Question it answers |
+|---|---|---|
+| Scenario Manager | **Data > What-If Analysis > Scenario Manager** | What are the results under each of several named sets of inputs? |
+| Data table | **Data > What-If Analysis > Data Table** | How does a result change across a range of values of one or two inputs? |
+| Goal Seek | **Data > What-If Analysis > Goal Seek** | What value of one input produces a target result? |
+| Solver | **Data > Solver**, after loading the Solver add-in | What values of several inputs give the best result within a set of constraints? |
 
-To create a one-variable data table, set up a column of input values (for example, selling prices ranging from $1,600 to $2,100 in $100 increments) and place formulas that reference the model's output cells in a row adjacent to the top of the input column. Select the range that includes both the input column and the output formulas. Go to the Data tab, click "What-If Analysis," and select "Data Table." In the dialog, specify the Column Input Cell (the assumption cell that the input values should be substituted into). Click OK. Excel fills in the table by calculating each output at every input value in the column.
+: Excel's what-if tools {#tbl-07-04}
 
-A two-variable data table works similarly but varies two inputs. The row input values appear across the top, the column input values appear down the left side, and a single output formula is placed in the top-left corner of the table. This is particularly useful for CVP analysis because you can see how profit changes across a range of selling prices and volumes simultaneously.
+Scenario Manager stores named scenarios, each a set of values for the changing cells, and its **Summary** button builds a report that compares the result cells across all of them. A data table recalculates a formula for every value in a row or column of inputs, or for every combination of two inputs, and fills in the results. Goal Seek works backward from a target: it changes one input cell until a formula cell reaches the value you specify, which makes it the quickest way to find a break-even point.
 
-*[Figure 7.11: A two-variable data table showing profit at varying combinations of Selling Price (columns, from $1,600 to $2,100) and Quantity Sold (rows, from 200 to 600). Cells with negative profit (losses) are formatted in red, and cells with positive profit are formatted in black. The transition from red to black across the table shows how the break-even point shifts as selling price changes.]*
-
-<!-- DRAFT: tabular content moved from drafts/07/ch07-markdown-tables.md; values not yet verified -->
-
-*Figure 7.11: Two-variable data table showing profit at varying combinations of Selling Price (columns) and Quantity Sold (rows) for the Beacon dining table. Negative values (losses) are shown in parentheses. The transition from loss to profit across the table reveals how the break-even point shifts as selling price changes.*
-
-| Quantity \ Price | $1,600 | $1,700 | $1,800 | $1,850 | $1,900 | $2,000 | $2,100 |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| **200** | ($133,000) | ($113,000) | ($93,000) | ($83,000) | ($73,000) | ($53,000) | ($33,000) |
-| **250** | ($105,000) | ($80,000) | ($55,000) | ($42,500) | ($30,000) | ($5,000) | $20,000 |
-| **300** | ($77,000) | ($47,000) | ($17,000) | ($2,000) | $13,000 | $43,000 | $73,000 |
-| **350** | ($49,000) | ($14,000) | $21,000 | $38,500 | $56,000 | $91,000 | $126,000 |
-| **400** | ($21,000) | $19,000 | $59,000 | $79,000 | $99,000 | $139,000 | $179,000 |
-| **450** | $7,000 | $52,000 | $97,000 | $119,500 | $142,000 | $187,000 | $232,000 |
-| **500** | $35,000 | $85,000 | $135,000 | $160,000 | $185,000 | $235,000 | $285,000 |
-| **600** | $91,000 | $151,000 | $211,000 | $241,000 | $271,000 | $331,000 | $391,000 |
-
-**Reading the table.** Each cell shows the profit (or loss) at the intersection of that row's quantity and that column's selling price. Variable cost is held constant at $1,040 and fixed costs at $245,000. At the current selling price of $1,850, the company breaks even between 300 and 350 units (consistent with the break-even calculation of 303 units). At a lower selling price of $1,600, break-even shifts upward to between 400 and 450 units. At a higher selling price of $2,100, break-even falls to between 250 and 300 units. In the printed version, loss cells are formatted in red and profit cells in black to make the break-even boundary visually apparent.
-
-> **[WATCH OUT]**
-> Data tables recalculate automatically every time anything in the workbook changes, which can slow down large workbooks. If your workbook becomes sluggish, you can set the calculation mode to "Automatic Except for Data Tables" in the Formulas tab under Calculation Options. With this setting, data tables update only when you press F9 (recalculate), while all other formulas continue to update automatically.
-
-## Goal Seek and Solver
-
-Scenario Manager and data tables let you explore outcomes across a range of inputs. Goal Seek and Solver work in the opposite direction: they start with a desired outcome and find the input values that produce it.
-
-### Goal Seek
-
-Goal Seek is a simple tool that finds the value of a single input cell that makes a formula cell equal to a specified target. To use it, go to the Data tab, click "What-If Analysis," and select "Goal Seek." The dialog asks for three inputs: the Set Cell (the formula cell whose value you want to control), the To Value (the target value), and the By Changing Cell (the input cell that Goal Seek should adjust).
-
-For example, suppose you want to know what selling price would produce a profit of exactly $200,000 at a volume of 500 units. Set the "Set Cell" to the profit formula at 500 units, set the "To Value" to 200000, and set "By Changing Cell" to the selling price cell. Goal Seek will adjust the selling price until the profit formula equals $200,000. This is a fast way to answer targeted questions without building a full data table.
-
-Goal Seek is limited to adjusting one variable at a time and to finding a single target value. For problems that involve multiple variables, multiple constraints, or an objective to maximize or minimize rather than hit a specific target, you need Solver.
-
-### Solver for Optimization
-
-Solver is an Excel add-in that finds the optimal value of a target cell by adjusting one or more input cells, subject to constraints you define. Unlike Goal Seek, Solver can maximize, minimize, or set a target value, and it can handle problems with multiple decision variables and multiple constraints. These capabilities make Solver the appropriate tool for optimization problems in accounting, such as determining the product mix that maximizes contribution margin, the production schedule that minimizes costs, or the resource allocation that maximizes return.
-
-To enable Solver, follow the same process as for the Data Analysis ToolPak: go to File, Options, Add-ins, select "Solver Add-in," and click Go. Once enabled, Solver appears in the Analysis group on the Data tab.
-
-The Solver dialog asks for several inputs. The Objective is the cell you want to optimize (maximize, minimize, or set to a specific value). The Variable Cells are the cells that Solver can change to achieve the objective. The Constraints are conditions that must be satisfied. Constraints can specify that a cell must be less than or equal to, equal to, or greater than or equal to a value, or that a cell must be an integer.
-
-{{< include _tutorial-04.qmd >}}
-
-## Sensitivity Analysis and Documenting Assumptions
-
-Every model depends on assumptions, and the quality of the model's conclusions depends on the quality of those assumptions. Sensitivity analysis is the practice of systematically testing how the model's outputs change when key assumptions change. It answers the question "how wrong can my assumptions be before my conclusions change?" This question is relevant in every accounting context where models are used.
-
-In financial reporting, revenue projections that support going-concern assessments or impairment analyses depend on growth rate assumptions. A sensitivity analysis that shows the projection's conclusion does not change even if the growth rate drops from 5% to 2% provides much stronger support than a projection with no sensitivity testing. In managerial accounting, a CVP model whose break-even conclusion is stable across a wide range of cost assumptions gives management more confidence than one where a small change in variable cost shifts the break-even point dramatically. In auditing, a regression-based expectation that is sensitive to the choice of time period or independent variable should prompt the auditor to consider additional procedures.
-
-The data tables you learned to create in the earlier section are one form of sensitivity analysis. A two-variable data table that shows profit across a range of selling prices and variable costs is a sensitivity analysis of the CVP model. The Solver sensitivity report is another form, showing how the optimal solution changes as constraints are relaxed.
+Solver extends Goal Seek to many inputs and to constraints. You specify an objective cell to maximize or minimize, the variable cells Solver may change, and the constraints the solution must satisfy, such as the hours available in each work center. For a linear model, the Simplex LP method finds the optimum (Microsoft, 2026a), and Solver can then produce a Sensitivity report that shows, among other things, how much the objective would improve with one more unit of each constrained resource, its shadow price. That report is available only when the model has no integer constraints (Frontline Systems, n.d.), so a production plan is usually solved first without requiring whole units. Exercise 7.4 builds such a model from Charles River's routings.
 
 ### Documenting Assumptions
 
-Good modeling practice requires that every model include a clear, written documentation of its assumptions. This documentation serves several purposes. It forces the model builder to make assumptions explicit rather than leaving them embedded and invisible. It allows reviewers to evaluate the reasonableness of the assumptions independently. And it provides a basis for updating the model when circumstances change.
+A model is only as good as its assumptions, and an assumption that is not written down cannot be reviewed. Every model should state each key assumption, the value used, its source, and how sensitive the conclusion is to it. The sensitivity is what makes the documentation useful: an assumption that can move far without changing the recommendation needs little further evidence, while one that reverses the recommendation with a small change deserves the most scrutiny. Data tables and Goal Seek provide the evidence for that column, as Tutorial 7.3 shows.
 
-An assumption documentation worksheet should include four elements for each key assumption: what the assumption is, what value was used, why that value was chosen (the basis or source), and what the sensitivity of the model's conclusions is to changes in that assumption. Table 7.1 shows an example of this format for the CVP model built in Tutorial 7.2.
 
-*Table 7.1: Example Assumption Documentation for the Beacon Dining Table CVP Model*
+{{< include _tutorial-03.qmd >}}
 
-| Assumption | Value Used | Basis | Sensitivity |
-|---|---|---|---|
-| Selling Price per Unit | $1,850 | Item table ListPrice for the Beacon dining table | Break-even increases by approximately 30 units for each $100 decrease in selling price |
-| Variable Cost per Unit | $1,040 | Item table StandardCost for the Beacon dining table | Break-even increases by approximately 30 units for each $100 increase in variable cost |
-| Fixed Costs (Quarterly) | $245,000 | Estimated allocation of manufacturing overhead, selling, and administrative expenses | Break-even increases by approximately 124 units for each $100,000 increase in fixed costs |
-| Relevant Range | 50 to 800 units | Based on historical production levels for this furniture line | Model assumptions may not hold outside this range |
 
-> **[IN PRACTICE]**
-> In audit practice, ISA 520 and AU-C Section 520 require that when auditors use analytical procedures as substantive tests, they must document the expectation developed, the data and assumptions used to develop it, the threshold for investigation, and the auditor's conclusion. The assumption documentation approach described here satisfies these requirements and reflects the level of rigor expected in professional analytical work.
+## Communicating Forecasts and Models
 
-Assumption documentation is not a bureaucratic exercise. It is a discipline that improves the quality of analytical work by making the model builder think carefully about what they know, what they are guessing, and where the conclusions are most vulnerable to error. Students who develop this habit early will carry it into professional practice, where the consequences of undocumented assumptions can be significant.
+A forecast presented as a single number invites more confidence than it deserves. Report a range alongside the point estimate, such as the range of recent quarterly values or the forecast plus or minus its backtest error, and state the method and the period it was fitted to. A budget variance report should say which variances are meaningful and why: for Charles River, the sales-volume variance measures the forecast rather than the business, and the report is clearer if it says so in a sentence than if it leaves a reader to discover it. A recommendation from a model should state the assumption that matters most and how far it would have to move to change the answer.
 
-*[Figure 7.13: A worksheet layout showing the Assumption Documentation for the Beacon dining table CVP model. The table includes the four columns described in Table 7.1, with the sensitivity column populated using results from the data table analysis. A callout annotation notes that this documentation would be included as a supporting schedule in a professional report or audit workpaper.]*
+Models also need maintenance. The inputs of the promotion model come from 2026 data, and a refresh of the workbook updates them, but the assumptions about customer behavior do not update themselves. Record in the workbook's documentation when each assumption was last reviewed, and revisit the assumptions whenever the results they produce stop matching what happens.
 
----
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+The models in this chapter rest on the prepared, reconciled data of the earlier chapters: the invoice lines with their periods and product types, and the ledger totals you tested in Part I. The same questions recur in the later Parts of the book. A SQL query can produce the monthly series a forecast needs directly from the database, and an interactive report can present a variance analysis so that a manager can drill from a product line to its months. In every tool, a model deserves trust only after it has been tested against what actually happened.
+:::
+
+
+## Looking Ahead
+
+This chapter has moved from explaining the past to estimating the future and evaluating decisions. You measured relationships with correlation and regression and learned to read the ToolPak's output, and you saw how a single unusual month can manufacture a trend. You forecast with trend functions and learned to judge a forecast by backtesting it against simple benchmarks. You compared 2026 with the budget, flexed the budget to the actual volume, and separated a volume assumption that failed from a price assumption that was only slightly optimistic. Finally, you built a contribution margin model, asked what-if questions of it with Scenario Manager, data tables, and Goal Seek, and documented the assumptions behind its recommendation.
+
+The controller now has a forecast she can defend, an explanation of the budget variances, and a recommendation on the promotion. Along the way, you have also seen several conditions in the data that an auditor would want to examine more closely, from invoices whose dates and numbers disagree to a planning forecast that has run well above actual demand. The next chapter looks at the Charles River data through the auditor's eyes.
+
 
 
 {{< include _summary.qmd >}}
@@ -252,3 +187,5 @@ Assumption documentation is not a bureaucratic exercise. It is a discipline that
 {{< include _exercises.qmd >}}
 
 {{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

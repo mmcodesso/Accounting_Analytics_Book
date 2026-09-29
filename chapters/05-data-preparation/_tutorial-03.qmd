@@ -57,7 +57,11 @@ Then set each new column's data type with the icon at the left of its header: wh
 a. Choose **Home > Close & Load**. Power Query loads InvoiceLines into a new worksheet as a Table. Rename the worksheet `InvoiceLines`.
 b. On the **Analysis** worksheet, type `InvoiceLines rows` in A49 and `InvoiceLines line total` in A50, and enter `=COUNTA(InvoiceLines[SalesInvoiceLineID])` in B49 and `=SUM(InvoiceLines[LineTotal])` in B50. Compare them with the invoice line count in B3 and the line total in B5.
 c. In B52:E52, repeat the Furniture revenue by quarter from Tutorial 5.2, using InvoiceLines instead of SalesInvoiceLine, and compare the two rows.
-d. In A53, type `Lines with a fractional quantity`, and in B53 enter `=COUNTIF(InvoiceLines[WholeQuantity],FALSE)`.
+d. In A53, type `Lines with a fractional quantity`, and in B53 enter:
+
+   ```
+   =COUNTIF(InvoiceLines[WholeQuantity],FALSE)
+   ```
 
 @fig-05-08 shows the loaded Table.
 

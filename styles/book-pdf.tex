@@ -10,6 +10,12 @@
 \usepackage[table]{xcolor}
 \usepackage{eso-pic}
 
+% Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,
+% instead of running into the margin. Deferred to \begin{document} because a package
+% loaded later in Quarto's template redefines the verbatim environment.
+\usepackage{fvextra}
+\AtBeginDocument{\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakafter={,*},breakaftersymbolpre={}}}
+
 \definecolor{PrimaryBlue}{HTML}{1A5276}
 \definecolor{Teal}{HTML}{17A589}
 \definecolor{Coral}{HTML}{E74C3C}
@@ -29,6 +35,9 @@
 \captionsetup[figure]{position=bottom, justification=raggedright, singlelinecheck=false}
 \captionsetup[table]{position=top, justification=raggedright, singlelinecheck=false}
 \setlength{\emergencystretch}{3em}
+% A higher tolerance lets a line with an unbreakable inline formula be set loosely
+% instead of running into the margin.
+\tolerance=3000
 \renewcommand{\arraystretch}{1.2}
 
 \makeatletter

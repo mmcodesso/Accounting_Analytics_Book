@@ -30,7 +30,13 @@ B.  TODAY changes every day the workbook is opened, so the results cannot be rep
 C.  TODAY returns the date the workbook was created.
 D.  An as-of date makes the calculation run faster.
 
-**5.** What does the fourth argument of `=XLOOKUP([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],SalesInvoice[InvoiceDate],"No match")` do?
+**5.** Consider this formula:
+
+```
+=XLOOKUP([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],SalesInvoice[InvoiceDate],"No match")
+```
+
+What does its fourth argument do?
 
 A.  It supplies the value returned when the SalesInvoiceID is not found.
 B.  It names the column that holds the key.

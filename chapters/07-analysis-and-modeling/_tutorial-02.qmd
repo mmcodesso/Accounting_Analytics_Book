@@ -1,30 +1,124 @@
-### Tutorial 7.2: Building a CVP Model for a Charles River Furniture Line
+## Guided Tutorial 7.2: Comparing 2026 with the Budget
 
-**Context and objective.** You will build a cost-volume-profit model for the Beacon extension dining table, one of the furniture lines that Charles River manufactures in-house. Using the item's list price and standard cost from the Item table, along with estimated fixed costs, you will calculate the break-even point, build a profit schedule across a range of volumes, and create a chart that visualizes the break-even point.
+**Context and objective.** In this tutorial, you will explain how fiscal 2026 compared with the budget. You will import the budget lines, price every 2026 invoice line at the budget's planned net price for its item and month, and build a report that compares the static budget, the flexible budget, and the actual results for each product line. You will then split the price variance into promotional discounts and the rest, see when the Furniture discounts arrived compared with when the budget planned them, and compare the operating expenses with their budget.
 
-**Prerequisites.** Open the Charles River dataset in Excel. Navigate to the Item table (in the Master Data group) and locate the Beacon extension dining table, a manufactured Furniture item (its SupplyMode is "Manufactured" and its ItemGroup is "Furniture"). You will need its ListPrice and StandardCost values. The ListPrice represents the selling price, and the StandardCost represents the variable cost per unit for this exercise. If you are working from the SQLite version of the dataset, you can export the relevant rows to Excel using the techniques from Chapter 4, or you can use the values shown in the steps below.
+**Prerequisites.** You need the analysis workbook from Tutorial 7.1, with the InvoiceLines query and its StdCostAmount and DiscountAmount columns from Chapter 6, and the Item query from Chapter 4.
 
-**Step 1.** Create a new worksheet and name it "CVP_DiningTable." In cell A1, type "Cost-Volume-Profit Analysis: Beacon Dining Table" as a title. Leave row 2 blank. In cell A3, type "Assumptions" and format it as a section header (bold, larger font).
+**Step-by-step instructions.**
 
-**Step 2.** Enter the assumption labels and values. In cell A4, type "Selling Price per Unit" and in cell B4, enter the ListPrice for the item, which is approximately $1,850. In cell A5, type "Variable Cost per Unit" and in cell B5, enter the StandardCost, which is approximately $1,040. In cell A6, type "Fixed Costs (Estimated)" and in cell B6, enter 245000. This is an estimated value representing the fixed manufacturing overhead, selling expenses, and administrative costs allocated to the furniture line for the quarter. In cell A7, type "Contribution Margin per Unit" and in cell B7, enter the formula =B4-B5. In cell A8, type "Contribution Margin Ratio" and in cell B8, enter the formula =B7/B4. Format B8 as a percentage.
+**Step 1. Import the budget lines.**
 
-**Step 3.** Calculate the break-even point. In cell A10, type "Break-Even Analysis" and format it as a section header. In cell A11, type "Break-Even Volume (Units)" and in cell B11, enter the formula =ROUNDUP(B6/B7, 0). This divides total fixed costs by the contribution margin per unit and rounds up because you cannot sell a fraction of a dining table. In cell A12, type "Break-Even Revenue" and in cell B12, enter the formula =B11*B4.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T77_BudgetLine** and **T1_Account** Tables in the **Navigator**. Click **Transform Data**.
+b. Rename the queries `BudgetLine` and `Account`. In the Account query, use **Home > Choose Columns** to keep AccountID, AccountNumber, and AccountName.
+c. In the BudgetLine query, filter FiscalYear to 2026, and clear **Balance Sheet** in the filter list of BudgetCategory, so that the query keeps the revenue, cost of goods sold, and operating-expense lines.
+d. Merge BudgetLine with **Item** on ItemID, with a left outer join, and expand ItemGroup. Merge it with **Account** on AccountID, and expand AccountNumber and AccountName. Choose **Home > Close & Load**.
 
-**Step 4.** Build a volume-profit schedule. In cell A14, type "Volume-Profit Schedule" as a section header. In cell A15, type "Quantity" and in cells B15 through H15, type "Revenue," "Variable Cost," "Fixed Cost," "Total Cost," "Profit," "Margin %," and "Cumulative Profit."
+**Step 2. Price the 2026 invoice lines at the planned prices.** The budget has exactly one planned net price for each item in each month, so merging on the year, month, and item adds one price to each invoice line without adding rows.
 
-**Step 5.** In cells A16 through A31, enter quantities from 50 to 800 in increments of 50. This range should include values below, at, and above the break-even point so the schedule illustrates the transition from loss to profit.
+a. In the Power Query Editor, right-click **BudgetLine** and choose **Reference**. Name the new query `PlannedPrices`, filter BudgetCategory to Revenue, keep FiscalYear, Month, ItemID, and UnitAmount, and rename UnitAmount to `PlannedPrice`. Right-click the query, clear **Enable Load**, so that it is used only inside other queries.
+b. Right-click **InvoiceLines**, choose **Reference**, and name the new query `FlexLines`. Filter FiscalYear to 2026, and filter ItemGroup to exclude Services, which the budget does not plan.
+c. Add the two custom columns in @tbl-07-03, the first before the merge in the next action and the second after it.
+d. Choose **Home > Merge Queries**. Select FiscalYear, Month, and ItemID in FlexLines, holding Ctrl and clicking them in that order, and choose **PlannedPrices** below, selecting its FiscalYear, Month, and ItemID in the same order. Keep **Left Outer**, and expand PlannedPrice.
+e. Set Month to **Whole Number**, and PlannedPrice and FlexRevenue to **Decimal Number**, and choose **Home > Close & Load**.
 
-**Step 6.** In cell B16, enter the revenue formula =A16*$B$4. The dollar signs create an absolute reference to the selling price cell so the formula can be copied down without the reference shifting. In cell C16, enter =A16*$B$5 for total variable cost. In cell D16, enter =$B$6 for fixed cost (which does not change with volume). In cell E16, enter =C16+D16 for total cost. In cell F16, enter =B16-E16 for profit. In cell G16, enter =F16/B16 for the profit margin percentage. In cell H16, enter =F16 for cumulative profit (this will be more meaningful in a multi-product context but illustrates the concept here).
+| New column name | Custom column formula |
+|---|---|
+| `Month` | `Date.Month([InvoiceDate])` |
+| `FlexRevenue` | `if [PlannedPrice] = null then [LineTotal] else [Quantity] * [PlannedPrice]` |
 
-**Step 7.** Copy the formulas in row 16 down through row 31. Format the Revenue, Variable Cost, Fixed Cost, Total Cost, and Profit columns as currency. Format the Margin % column as percentage. Examine the Profit column and confirm that it transitions from negative (loss) to positive (profit) as volume increases. The row where profit first becomes positive should correspond closely to the break-even volume calculated in Step 3.
+: Custom columns of the FlexLines query {#tbl-07-03}
 
-**Step 8.** Create a break-even chart. Select the Quantity column (A15:A31) and the Revenue and Total Cost columns (B15:B31 and E15:E31). Insert a line chart (Insert tab, Line chart). Revenue and Total Cost should appear as two lines. The point where they cross is the break-even point. Add a chart title "Break-Even Analysis: Beacon Dining Table" and label the axes "Units Sold" and "Dollars."
+FlexRevenue is what each line would have been billed at the budget's price. A few lines have no planned price, because their seasonal item was launched in the month it was first sold, and the budget did not plan sales that month. For those lines, FlexRevenue keeps the actual amount, so they create no price variance. Count them with `=COUNTBLANK(FlexLines[PlannedPrice])` on the Analysis worksheet, and note them in the documentation.
 
-*[Figure 7.9: Break-even chart for the Beacon dining table furniture line. Two lines cross: the Revenue line (ascending from the origin) and the Total Cost line (ascending from the fixed cost level). The break-even point is marked where the two lines intersect, with an annotation showing the break-even volume and revenue.]*
+**Step 3. Build the flexible-budget report.** Add a worksheet named `BudgetReport`, and type `Furniture`, `Lighting`, `Textiles`, `Accessories`, and `Total` in B3:F3. In A4:A18, type the row labels shown in @fig-07-05. Then enter these formulas in column B, copy B4:B18 to C4:E18, and in F4:F18 add the four product lines with SUM.
 
-**Step 9.** Add a data label or annotation at the break-even point. You can do this by inserting a text box on the chart and typing the break-even volume and revenue, or by adding a data point at the exact break-even quantity.
+a. Static budget, rows 4 and 5, with `COGS` in place of `Revenue` in B5:
 
-**Checkpoint.** Your CVP_DiningTable worksheet should contain three sections: Assumptions (selling price, variable cost, fixed costs, contribution margin), Break-Even Analysis (break-even volume and revenue), and the Volume-Profit Schedule (quantities from 50 to 800 with all six calculated columns). The break-even volume should be approximately 303 units (245,000 divided by the contribution margin of approximately 810 per unit). The break-even chart should clearly show the crossover point. All formulas in the schedule should reference the assumption cells, so that changing any assumption value immediately updates the entire analysis.
+   ```
+   =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[ItemGroup],B$3,BudgetLine[BudgetCategory],"Revenue")
+   ```
 
-> **[IN PRACTICE]**
-> Cost accountants in manufacturing companies routinely build CVP models during the annual planning cycle to evaluate pricing proposals and production plans. The best models separate assumptions from calculations exactly as described in this tutorial, because the planning process involves multiple rounds of revision as pricing, cost, and volume estimates are refined. A model that hard-codes values requires manual updates at every step, while a model built with cell references to an assumptions section updates instantly.
+b. Flexible budget, rows 7 and 8: enter this formula in B7, and the same formula with StdCostAmount in place of FlexRevenue in B8. The budget's cost per unit is the standard cost, so the flexible budget's cost of goods sold is the standard cost of the units actually sold.
+
+   ```
+   =SUMIFS(FlexLines[FlexRevenue],FlexLines[ItemGroup],B$3)
+   ```
+
+c. Actual, rows 10 and 11: the same formula with LineTotal in B10, and `=B8` in B11.
+d. Margins, rows 6, 9, and 12: `=B4-B5`, `=B7-B8`, and `=B10-B11`.
+e. Units, rows 17 and 18: enter the first formula below in B17 and the second in B18.
+
+   ```
+   =SUMIFS(BudgetLine[Quantity],BudgetLine[ItemGroup],B$3,BudgetLine[BudgetCategory],"Revenue")
+   =SUMIFS(FlexLines[Quantity],FlexLines[ItemGroup],B$3)
+   ```
+
+**Step 4. Calculate the two variances.**
+
+a. In B13, enter `=B9-B6`, the sales-volume variance.
+b. In B14, enter `=B12-B9`, the flexible-budget variance.
+c. Check that B6+B13+B14 equals B12, so that the variances account for the whole difference between the static budget and the actual margin.
+
+The sales-volume variance dwarfs everything else in the report. Compare rows 17 and 18: the budget planned for several times the units that each product line sold. That variance measures the forecast behind the budget, not how the business was run, and it is the reason to judge 2026 against the flexible budget instead. Against the flexible budget, every product line earned less than planned on the units it sold, by a few percent of revenue.
+
+**Step 5. Split the price variance.**
+
+a. In B15, enter the promotional discounts:
+
+   ```
+   =SUMIFS(FlexLines[DiscountAmount],FlexLines[ItemGroup],B$3)
+   ```
+
+b. In B16, enter `=B14+B15`, the price gap before discounts.
+c. In a free area of the worksheet, repeat the flexible revenue, actual revenue, and discounts for Furniture by month, with the month numbers 1 to 12 in a column and a second criterion, `FlexLines[Month],$A21`, added to each SUMIFS.
+
+Two causes separate cleanly. In every product line, the price gap before discounts is a steady few percent of flexible revenue: the budget planned net prices at a larger share of list price than Charles River's price lists actually delivered. Furniture adds the promotional discounts on top. By month, the budget planned the promotion's discount in September and October, spreading it over all of those months' sales, while the actual discounts were concentrated on the promotion's orders and continued into November and December as those orders were invoiced. @fig-07-05 shows the report, and @fig-07-06 shows the Furniture prices by month.
+
+![The Flexible-Budget Report by Product Line.](/visuals/svg/fig-07-05-flexible-budget-report.svg){#fig-07-05 fig-alt="A mock of the BudgetReport worksheet. For Furniture, Lighting, Textiles, Accessories, and the total, it shows the static budget revenue, cost of goods sold, and margin; the flexible budget revenue, cost, and margin; the actual revenue, cost at standard, and margin; the sales-volume and flexible-budget variances, outlined; the promotional discounts; the price gap before discounts; and the budgeted and actual units. The sales-volume variances are very large and unfavorable, the flexible-budget variances are small and unfavorable, and budgeted units are several times the actual units in every product line."}
+
+![Planned and Actual Furniture Prices by Month.](/visuals/svg/fig-07-06-furniture-price-by-month.svg){#fig-07-06 fig-alt="A line chart of Furniture prices as a percentage of list price in each month of fiscal 2026. A dashed line for the budget's planned net price stays above the other two lines in most months and dips in September and October, the promotion months in the budget. A line for the actual price before promotions is nearly flat below the planned line. A line for the actual price after promotions falls sharply in September and October and recovers only partly in November and December."}
+
+**Step 6. Compare the operating expenses with their budget.**
+
+a. Import the **T3_GLEntry** Table with Power Query, and filter FiscalYear to 2026 as the first step, because the Table is large.
+b. Merge it with **Account** on AccountID, expand AccountNumber and AccountName, and filter AccountNumber to values between 6000 and 7999.
+c. Filter VoucherNumber to exclude JE-2026-000296, the 2026 year-end closing entry you identified in the Part I case, and add a custom column `Amount` with the formula `[Debit] - [Credit]`. Name the query `GLOpex`, and choose **Close & Load**.
+d. Add a worksheet named `OpexReport`. In A5, list the budgeted accounts with this formula, which spills down the column:
+
+   ```
+   =SORT(UNIQUE(FILTER(BudgetLine[AccountNumber],BudgetLine[BudgetCategory]="Operating Expense")))
+   ```
+
+e. In B5, C5, and D5, enter these three formulas, each of which spills beside the list: the account name, the budget, and the actual amount.
+
+   ```
+   =XLOOKUP(A5#,Account[AccountNumber],Account[AccountName])
+   =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],A5#,BudgetLine[BudgetCategory],"Operating Expense")
+   =SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],A5#)
+   ```
+
+f. In E5, enter `=D5#-C5#`, the variance of each account.
+
+Most accounts are within a few percent of their budget, and several match it exactly. Two stand out, and both are under budget: Payroll Taxes and Benefits, and Sales Commission Expense.
+
+**Step 7. Test the drivers of the two exceptions.**
+
+a. Below the list, calculate the budgeted burden rate as the budget for account 6060 divided by the budgeted salaries, using `"Salaries*"` as a wildcard criterion on BudgetLine[AccountName], and the actual burden rate in the same way from GLOpex.
+b. Calculate the budgeted commission rate as the budget for account 6290 divided by the static budget revenue in F4 of the BudgetReport worksheet. Multiply it by the actual revenue in F10 to get the flexible budget for commissions, and compare the result with the actual commission expense.
+
+The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 reflects a rate assumption, not a saving in spending. The commission variance is mostly volume: flexed to the actual revenue, the commission budget is close to what Charles River paid, and the remaining difference comes from the rate, because the mix of customer segments determines the commission rate earned.
+
+**Step 8. Document the analysis.**
+
+a. On the **Documentation** worksheet, add the BudgetLine, Account, PlannedPrices, FlexLines, and GLOpex queries to the Query steps entry, and the BudgetReport and OpexReport worksheets to the Worksheets entry.
+b. Add a `Finding` entry of three or four sentences that states the sales-volume variance and its cause, the price gap and the promotions, and the two expense assumptions that did not hold.
+c. Save the workbook.
+
+**Checkpoint.** Check that:
+
+- only a handful of FlexLines rows have no planned price, and you can explain why;
+- on the BudgetReport worksheet, the static margin plus the two variances equals the actual margin for every product line;
+- the price gap before discounts is a similar small percentage of flexible revenue in every product line;
+- the burden rate and the flexed commission explain the two largest operating-expense variances.
+
+The comparison with the budget answers the controller's second question. The plan's volume was far from reality, so the static budget cannot judge 2026. Flexed to what was sold, the plan's prices were slightly optimistic in every product line, the Furniture promotion cost more and later than the budget expected, and the operating expenses were close to plan once two assumptions are corrected.

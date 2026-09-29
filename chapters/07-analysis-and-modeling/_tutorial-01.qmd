@@ -1,34 +1,78 @@
-### Tutorial 7.1: Building a Revenue Forecasting Model from Charles River Sales Data
+## Guided Tutorial 7.1: Forecasting Revenue and Testing the Forecast
 
-**Context and objective.** You will aggregate Charles River sales invoice data into monthly revenue totals, run a regression analysis using month number as the independent variable, and use the resulting model to forecast revenue for the next quarter. This exercise simulates the kind of revenue projection that a financial analyst might prepare for management or that an auditor might use to set expectations for a substantive analytical procedure.
+**Context and objective.** In this tutorial, you will prepare the revenue forecast the controller asked for. You will build a monthly revenue series from the InvoiceLines Table, fit a trend with the Data Analysis ToolPak, and examine what drives it. You will then backtest three forecasting methods on the fourth quarter of 2026, the most recent quarter with actual results, and use the best one to forecast the first quarter of 2027 with a range.
 
-**Prerequisites.** Open the Charles River dataset in Excel. You need the merged InvoiceLines dataset that includes InvoiceDate and LineTotal for each invoice line, as prepared in Chapter 5. If you completed Tutorial 5.3 or Tutorial 6.2, your workbook already contains this data. The Data Analysis ToolPak must be enabled (see instructions above).
+**Prerequisites.** You need the analysis workbook from Chapter 6, with the InvoiceLines Table, and the Analysis ToolPak loaded, as described earlier in this chapter.
 
-**Step 1.** Create a new worksheet and name it "MonthlyRevenue." You will aggregate the invoice lines into monthly totals. In cell A1, type "Monthly Revenue Summary" as a title. In cell A3, type "Month" and in cell B3, type "MonthNumber." In cell C3, type "Revenue."
+**Step-by-step instructions.**
 
-**Step 2.** Determine the range of months in the Charles River data. The sales invoices span a 24-month period from January 2023 through December 2024. List each month in column A, starting with "Jan-2023" in cell A4 and continuing through "Dec-2024" in cell A27. This gives you 24 months of data. In column B, number the months sequentially from 1 (for Jan-2023) through 24 (for Dec-2024). The MonthNumber column serves as the independent variable in the regression because it converts a time sequence into a numeric predictor.
+**Step 1. Build the monthly revenue series.**
 
-**Step 3.** In cell C4, use a SUMIFS formula to calculate the total revenue for January 2023. If your merged dataset table is named "InvoiceLines" and includes an InvoiceDate column, the formula is =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[InvoiceDate], ">="&DATE(2023,1,1), InvoiceLines[InvoiceDate], "<"&DATE(2023,2,1)). This sums the billed amount for all invoice lines with an InvoiceDate in January 2023.
+a. Add a worksheet named `Forecast`, and type the headings `Month`, `MonthIndex`, and `Revenue` in A1:C1.
+b. Type `2024-01-01` in A2. In A3, enter `=EDATE(A2,1)`, and fill it down to A37, which shows December 2026. Format A2:A37 with the custom number format `mmm yyyy`.
+c. Type `1` in B2, enter `=B2+1` in B3, and fill it down to B37.
+d. In C2, enter this formula, and fill it down to C37:
 
-**Step 4.** Copy the formula in C4 down through C27, adjusting the year and month parameters for each row. Alternatively, if you added Year and Month columns during data preparation, you can use simpler SUMIFS criteria referencing those columns directly. Verify that the sum of all monthly values equals the grand total of LineTotal in your source data.
+   ```
+   =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[InvoiceDate],">="&A2,InvoiceLines[InvoiceDate],"<"&EDATE(A2,1))
+   ```
 
-**Step 5.** Before running the regression, examine the data visually. Select the MonthNumber and Revenue columns and insert a scatter chart (Insert tab, Chart group, Scatter). The chart should show monthly revenue on the vertical axis and month number on the horizontal axis. Look for a general upward or downward trend, any obvious outliers, and whether the relationship appears approximately linear. If the data shows a clear curve, a linear regression may not be the best approach.
+e. Type `Control total` in A38, and enter `=SUM(C2:C37)-SUM(InvoiceLines[LineTotal])` in C38.
 
-*[Figure 7.5: Scatter chart of Charles River monthly revenue versus month number. Revenue appears on the vertical axis and month number on the horizontal axis. A general upward trend is visible, though individual months show variation around the trend line.]*
+C38 is zero: every invoice line falls in one of the thirty-six months, so the series accounts for all of the revenue.
 
-**Step 6.** Run the regression. Go to the Data tab, click Data Analysis, and select Regression. In the dialog box, set the Input Y Range to the Revenue column (C3:C27, including the label). Set the Input X Range to the MonthNumber column (B3:B27, including the label). Check the "Labels" box. Under Output options, select "New Worksheet Ply" and type "RegressionOutput" as the sheet name. Check the "Residuals" and "Residual Plots" boxes. Click OK.
+**Step 2. Chart the series.** Select A1:A37, hold Ctrl, select C1:C37, and choose **Insert > Insert Line or Area Chart > Line with Markers**.
 
-**Step 7.** Examine the regression output. Locate the R Square value in the Regression Statistics section. This tells you what proportion of the monthly variation in revenue is explained by the linear time trend. Locate the Coefficients section and note the Intercept and the slope for MonthNumber. The intercept is the model's estimate of revenue in "month zero" (the month before the data begins), and the slope is the estimated amount by which revenue changes each month. Check the p-value for the MonthNumber coefficient. If it is below 0.05, the time trend is statistically significant.
+Almost every month falls within a narrow band, but the first month is far below the rest. January 2024 is the start-up month of the data, in which Charles River issued only about half as many invoices as in a normal month. @fig-07-01 shows the same series with the trend lines you will fit next.
 
-**Step 8.** Write the prediction equation. If the intercept is approximately 385,000 and the slope is approximately 9,500, the equation is: Predicted Revenue = 385,000 + 9,500 times MonthNumber. To forecast revenue for the next three months (months 25, 26, and 27), substitute each month number into the equation. On a new worksheet named "Forecast," create a table with columns for MonthNumber, Month Label (Jan-2025, Feb-2025, Mar-2025), Predicted Revenue, and a column for Notes where you will document assumptions.
+**Step 3. Fit a trend to all thirty-six months.**
 
-**Step 9.** Calculate the predicted revenue for each forecast month. For month 25, the predicted revenue is =385000 + 9500 * 25 (use your actual intercept and slope values, not these examples). Record the prediction for each month. In the Notes column, write the key assumption: "This forecast assumes that the linear trend observed over the 24-month historical period will continue at the same rate."
+a. Choose **Data > Data Analysis**, select **Regression**, and click **OK**.
+b. Enter `$C$1:$C$37` as the **Input Y Range** and `$B$1:$B$37` as the **Input X Range**, and check **Labels**.
+c. Choose **New Worksheet Ply**, type `Trend36`, check **Residuals** and **Residual Plots**, and click **OK**.
+d. On the Trend36 worksheet, read R Square, the MonthIndex coefficient, and its P-value.
 
-**Step 10.** Examine the residuals. Return to the RegressionOutput worksheet and look at the Residuals section, which shows the difference between the actual revenue and the predicted revenue for each month. Large residuals indicate months where the model was a poor fit. Also look at the Residual Plot, which graphs the residuals against the month number. If the residuals show a random scatter around zero, the linear model is appropriate. If the residuals show a pattern (such as a curve or increasing spread), the linear model may be missing an important feature of the data.
+R Square is low: the month index explains only about a sixth of the variation in monthly revenue. Yet the slope is positive and its p-value is below 0.05, so the trend is statistically significant. The residual plot shows why. One residual, January 2024's, lies far below all the others, and a line that must pass near it tilts upward. @fig-07-02 shows the output.
 
-*[Figure 7.6: The regression output worksheet showing the three standard sections (Regression Statistics, ANOVA, Coefficients) and the Residual Plot. Annotations highlight the R Square value, the slope and intercept, and the pattern of residuals in the plot.]*
+**Step 4. Fit the trend again without the start-up month.**
 
-**Checkpoint.** Your workbook should now contain four worksheets related to this analysis: MonthlyRevenue (the aggregated data), a scatter chart (either embedded or on its own sheet), RegressionOutput (the full regression results), and Forecast (the three-month projection). The R Square value should be positive and ideally above 0.50, indicating that at least half the monthly variation in revenue is explained by the time trend. The slope should be positive, indicating that revenue tends to increase over time. The forecast values should be reasonable extensions of the historical trend, not dramatically different from recent months.
+a. Run the Regression tool again, with `$C$3:$C$37` as the **Input Y Range** and `$B$3:$B$37` as the **Input X Range**, and clear the **Labels** check box, because the ranges no longer start with the headings.
+b. Place the output on a new worksheet ply named `Trend35`.
+c. Compare R Square, the slope, and its p-value with those on Trend36.
 
-> **[WATCH OUT]**
-> Regression-based forecasts assume that the historical pattern will continue unchanged into the future. This assumption is often reasonable for short-term projections (one to three periods ahead) but becomes increasingly risky for longer horizons. In accounting, auditors and analysts typically limit regression-based forecasts to one or two periods beyond the historical data unless there is strong reason to believe the trend is driven by stable underlying factors. Always state the time horizon and the key assumptions when presenting a regression-based forecast.
+Without January 2024, R Square falls further, the slope shrinks to about half its former size, and its p-value rises above 0.05. The upward trend was the start-up month, not a pattern in the business. Monthly revenue has fluctuated around a stable level since February 2024.
+
+**Step 5. Backtest three forecasts of the fourth quarter of 2026.** Fit each method to February 2024 through September 2026, rows 3 to 34, and compare its forecast for October through December with what actually happened.
+
+a. Type the headings `Method`, `Oct 2026`, `Nov 2026`, `Dec 2026`, `Quarter`, `Error`, and `Monthly error` in A40:G40, and the labels `Actual`, `Trend`, `Mean`, and `Same quarter last year` in A41:A44.
+b. In B41:D41, enter `=C35`, `=C36`, and `=C37`, the actual revenue of the three months.
+c. In B42, enter the trend forecast for October, which is MonthIndex 34:
+
+   ```
+   =FORECAST.LINEAR($B35,$C$3:$C$34,$B$3:$B$34)
+   ```
+
+   In C42 and D42, enter the same formula with `$B36` and `$B37`.
+d. In B43:D43, enter `=AVERAGE($C$3:$C$34)`, the mean of the fitted months.
+e. In B44:D44, enter `=C23`, `=C24`, and `=C25`, the same months of 2025.
+f. In E41, enter `=SUM(B41:D41)`, and copy it to E42:E44. In F42, enter `=E42/$E$41-1`, and copy it to F43:F44.
+g. In G42, enter `=AVERAGE(ABS(B42:D42-$B$41:$D$41)/$B$41:$D$41)`, the mean absolute percentage error of the three months, and copy it to G43:G44. Format F42:G44 as percentages with two decimals.
+
+The trend forecast overshoots the quarter by several percent, because it extends a slope that the business does not have. The mean misses the quarter by a small fraction of a percent and has the smallest monthly errors. The same quarter of last year comes close on the quarter's total, but only because its large monthly errors offset one another. @fig-07-03 shows the comparison. The simplest method is the best of the three here, which is the reason to test benchmarks before trusting a more elaborate forecast.
+
+![Backtesting Three Forecasts of the Fourth Quarter of 2026.](/visuals/svg/fig-07-03-forecast-backtest.svg){#fig-07-03 fig-alt="A mock of the backtest area of the Forecast worksheet. For October, November, and December 2026 and the whole quarter, it shows the actual revenue and the forecasts of three methods: a trend from FORECAST.LINEAR, the mean of February 2024 to September 2026, and the same quarter of the previous year. The error columns, outlined, show that the trend overshoots the quarter by several percent, the mean is almost exactly right, and the same quarter last year is close on the total but has the largest monthly errors."}
+
+**Step 6. Forecast the first quarter of 2027 with a range.**
+
+a. Type `Forecast, 2027 Q1` in A47, and enter `=3*AVERAGE(C3:C37)` in B47, which applies the mean method to every month after the start-up month.
+b. Type `Low` in A48 and `High` in A49, and enter `=B47*(1-G43)` in B48 and `=B47*(1+G43)` in B49, a range based on the mean method's monthly error in the backtest.
+c. On the **Documentation** worksheet, record the method, the months it uses, the reason January 2024 is excluded, the backtest results, and the range.
+
+**Checkpoint.** Check that:
+
+- C38 is zero, so the monthly series contains all of the revenue;
+- the trend's slope is significant with January 2024 and not significant without it;
+- the mean method has the smallest errors in the backtest;
+- the forecast for the first quarter of 2027 is stated with a low and a high value.
+
+The controller now has a forecast she can defend. It is not the most sophisticated method you could build, but it is the one that performed best on the most recent quarter with an answer, and its range tells her how much to rely on it.

@@ -30,7 +30,13 @@ B.  Mixed reference with the column locked
 C.  Absolute reference
 D.  Structured reference
 
-**5.** A summary grid lists pricing methods in column A and discount rates in row 15. The formula in B16 is `=COUNTIFS(SalesInvoiceLine[PricingMethod],$A16,SalesInvoiceLine[Discount],B$15)`, and it is copied and pasted into C16. What does the copy in C16 refer to?
+**5.** A summary grid lists pricing methods in column A and discount rates in row 15. The formula in B16 is:
+
+```
+=COUNTIFS(SalesInvoiceLine[PricingMethod],$A16,SalesInvoiceLine[Discount],B$15)
+```
+
+The formula is copied and pasted into C16. What does the copy in C16 refer to?
 
 A.  $A16 and C$15
 B.  $A16 and B$15
@@ -100,7 +106,13 @@ B.  A documentation worksheet makes the workbook's formulas calculate faster.
 C.  It records the purpose, sources, steps, parameters, preparer, and reviewer, so that someone with no previous connection to the work can understand and review it.
 D.  Accounting standards require every spreadsheet used by a company to begin with a documentation worksheet.
 
-**15.** An analyst defines a large-line threshold with `=PERCENTILE.INC(SalesInvoiceLine[LineTotal],ThresholdPercentile)` in a cell named LargeLineThreshold, instead of typing an amount such as 5,000. What is the main advantage of this approach?
+**15.** Instead of typing an amount such as 5,000, an analyst defines a large-line threshold with this formula in a cell named LargeLineThreshold:
+
+```
+=PERCENTILE.INC(SalesInvoiceLine[LineTotal],ThresholdPercentile)
+```
+
+What is the main advantage of this approach?
 
 A.  PERCENTILE.INC guarantees that every large line is an error.
 B.  The threshold is derived from the data and stated in one named place, so it updates with the data and every formula that uses it shows its logic.

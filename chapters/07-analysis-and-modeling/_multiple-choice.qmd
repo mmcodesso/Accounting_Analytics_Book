@@ -2,107 +2,107 @@
 
 ## Multiple Choice Questions
 
-**1.** A cost accountant calculates the correlation between monthly production volume and total manufacturing cost and obtains a value of 0.92. Which of the following is the most appropriate interpretation?
+**1.** The correlation coefficient between two monthly accounting measures is −0.80. What does this indicate?
 
-A. Manufacturing cost causes production volume to increase.
-B. There is a strong positive linear relationship between production volume and cost, suggesting that cost increases as production increases.
-C. Ninety-two percent of the variation in cost is explained by production volume.
-D. The cost is entirely variable with respect to production volume.
+A.  The two measures are unrelated.
+B.  The two measures have a strong negative linear relationship: when one is higher, the other tends to be lower.
+C.  One measure causes the other to fall.
+D.  The first measure is 80 percent smaller than the second.
 
-**2.** When running a regression using the Data Analysis ToolPak, which value indicates what proportion of the variation in the dependent variable is explained by the independent variable?
+**2.** Removing a single unusual month from a data set changes the correlation between revenue and the number of customers from strong to weak. What should an analyst do?
 
-A. Multiple R
-B. R Square
-C. Standard Error
-D. The p-value of the slope coefficient
+A.  Report the stronger correlation, because it uses more data.
+B.  Report the weaker correlation, because unusual months should always be deleted.
+C.  Report neither, because correlation cannot be used with monthly data.
+D.  Investigate the unusual month, and report the result both with and without it unless it can be explained.
 
-**3.** An auditor builds a regression model to predict monthly revenue based on the number of sales invoices issued. The regression output shows an R Square of 0.78 and a p-value for the slope of 0.002. Which of the following conclusions is most appropriate?
+**3.** A regression of monthly revenue on a month index reports an R Square of 0.17. What does this mean?
 
-A. The model is unreliable because R Square is below 0.80.
-B. The relationship is statistically significant, and the model explains a substantial portion of revenue variation, though 22% of variation remains unexplained.
-C. The model proves that more invoices cause higher revenue.
-D. The p-value indicates that the model should be rejected.
+A.  The fitted line explains about 17 percent of the variation in monthly revenue.
+B.  Revenue grows by 17 percent a month.
+C.  The slope has a 17 percent chance of being zero.
+D.  The forecast will be accurate to within 17 percent.
 
-**4.** In a simple linear regression equation y = 15,000 + 425x, where y represents total monthly cost and x represents the number of units produced, what does the value 15,000 represent?
+**4.** Fitted to all thirty-six months, the slope of Charles River's revenue trend has a p-value of about 0.01. Fitted without the start-up month, the p-value is about 0.07. What is the best conclusion?
 
-A. The variable cost per unit
-B. The estimated fixed cost component
-C. The total cost at average production
-D. The contribution margin
+A.  Revenue has a strong upward trend that should be extended into the forecast.
+B.  The start-up month should be kept, because it makes the result significant.
+C.  The apparent trend depends on one unusual month, so there is no reliable evidence of a trend.
+D.  A p-value above 0.05 proves that revenue will not grow.
 
-**5.** A financial analyst builds a CVP model and calculates that the break-even volume is 500 units. The contribution margin per unit is $200 and fixed costs are $100,000. If the selling price increases by $50 per unit while all other values remain constant, how does the break-even volume change?
+**5.** What is a backtest of a forecasting method?
 
-A. It increases to 667 units.
-B. It decreases to 400 units.
-C. It stays at 500 units because fixed costs did not change.
-D. It cannot be determined without knowing the variable cost.
+A.  Recalculating a forecast after the period is over and replacing it with the actual amount
+B.  Fitting the method to an earlier part of the history, forecasting a later part that was held back, and comparing the forecasts with the actual results
+C.  Forecasting the past by running the method backward in time
+D.  Checking that the forecast formula has no errors
 
-**6.** Which Excel tool is most appropriate for finding the selling price that would produce a target profit of exactly $200,000 at a given volume?
+**6.** Why should a new forecasting method be compared with simple benchmarks, such as the mean or the value of the same quarter last year?
 
-A. Scenario Manager
-B. Data Table
-C. Goal Seek
-D. Solver
+A.  A method that cannot beat the simple benchmarks is not worth the extra complexity.
+B.  Benchmarks are always more accurate than other methods.
+C.  Auditing standards require every forecast to use the mean.
+D.  Excel cannot calculate more complex forecasts.
 
-**7.** A management accountant wants to determine the production quantities for four items that maximize total contribution margin, subject to constraints on work center hours and raw material availability. Which Excel tool should the accountant use?
+**7.** How do TREND and FORECAST.LINEAR differ?
 
-A. Goal Seek
-B. FORECAST.LINEAR
-C. Scenario Manager
-D. Solver
+A.  TREND uses a curved line and FORECAST.LINEAR a straight line.
+B.  FORECAST.LINEAR requires the Data Analysis ToolPak.
+C.  TREND works only with dates, and FORECAST.LINEAR only with numbers.
+D.  Both fit a least-squares line, but TREND can return values for several new x-values at once, while FORECAST.LINEAR returns one.
 
-**8.** In Solver, a constraint that specifies the total production hours must not exceed 4,000 hours is an example of which type of constraint?
+**8.** What is a flexible budget?
 
-A. An equality constraint
-B. An inequality constraint (less than or equal to)
-C. An integer constraint
-D. A non-negativity constraint
+A.  A budget that managers may change during the year without approval
+B.  The static budget with every amount increased by the same percentage
+C.  The budget recalculated at the actual volume, using the budgeted prices and costs per unit
+D.  The actual results rearranged in the format of the budget
 
-**9.** After running Solver, the sensitivity report shows a shadow price of $245 for the production hours constraint. What does this mean?
+**9.** What does the sales-volume variance measure?
 
-A. Each production hour costs $245 in direct labor.
-B. Increasing the available production hours by one hour would increase the optimal total contribution margin by approximately $245.
-C. Reducing the production hours by one would save $245 in costs.
-D. The production hours constraint is not binding on the solution.
+A.  The effect on margin of selling a different volume than planned, at the planned margins per unit
+B.  The effect of actual prices differing from the budgeted prices
+C.  The difference between actual and budgeted fixed costs
+D.  The effect of producing more units than were sold
 
-**10.** A two-variable data table in Excel can show how profit changes across a range of selling prices and variable costs. What is the primary limitation of data tables?
+**10.** Actual sales commission expense is 75 percent below the static budget, and actual revenue is far below the budgeted revenue. What is the best interpretation?
 
-A. They can only vary one input at a time.
-B. They recalculate automatically and can slow down large workbooks.
-C. They cannot reference cells outside the data table range.
-D. They are only available with the Data Analysis ToolPak enabled.
+A.  The sales team reduced its commission rates, which saved money.
+B.  Most of the difference reflects the lower revenue; the commission budget should be flexed to actual revenue before the difference is judged.
+C.  The commission expense was not recorded in the ledger.
+D.  Commissions are a fixed cost, so any difference is a spending variance.
 
-**11.** An analyst uses Scenario Manager to compare three pricing strategies. The Scenario Summary report shows the result cells under each scenario. Which of the following best describes what Scenario Manager does NOT provide?
+**11.** A company has fixed costs of $900,000 and a contribution margin ratio of 30 percent. What is its break-even revenue?
 
-A. The ability to name and save different sets of input values
-B. A side-by-side comparison of outputs under each scenario
-C. A continuous sensitivity analysis showing how outputs change across all possible input values
-D. The ability to switch between scenarios in the model worksheet
+A.  $270,000
+B.  $1,170,000
+C.  $2,700,000
+D.  $3,000,000
 
-**12.** Which of the following is the most important reason for documenting assumptions in an analytical model?
+**12.** What does Goal Seek do?
 
-A. To satisfy formatting requirements for professional reports
-B. To allow reviewers to evaluate the reasonableness of the model's conclusions independently
-C. To demonstrate that the model builder used advanced Excel features
-D. To prevent other users from changing the model's inputs
+A.  It compares the results of several named sets of inputs.
+B.  It shows a result for every value in a range of inputs.
+C.  It finds the value of one input cell that makes a formula cell equal a target value.
+D.  It maximizes a result subject to several constraints.
 
-**13.** An auditor uses a regression model to set an expectation for total fourth-quarter revenue. The actual recorded revenue exceeds the regression prediction by $45,000, and the standard error of the regression is $20,000. What should the auditor do?
+**13.** An analyst wants to see how the difference in contribution changes for every combination of three discount rates and nine volume increases. Which tool fits best?
 
-A. Accept the recorded revenue because the difference is less than three times the standard error.
-B. Investigate the difference because it exceeds the standard error, which may indicate a material misstatement or a change in the underlying trend.
-C. Rerun the regression using only fourth-quarter data from prior years.
-D. Conclude that the regression model is invalid and perform alternative procedures.
+A.  A two-variable data table
+B.  Goal Seek
+C.  A one-variable data table
+D.  The Correlation tool of the ToolPak
 
-**14.** The TREND function and FORECAST.LINEAR function both produce predictions based on linear regression. What is the primary difference between them?
+**14.** A production-mix model is solved with Solver's Simplex LP method. Under what condition can Solver also produce a Sensitivity report with shadow prices?
 
-A. TREND uses the Data Analysis ToolPak while FORECAST.LINEAR does not.
-B. TREND returns an array of predictions for multiple new x-values, while FORECAST.LINEAR returns a single prediction.
-C. FORECAST.LINEAR provides diagnostic statistics while TREND does not.
-D. TREND can only be used with time series data.
+A.  When every variable cell is required to be a whole number
+B.  When Solver finds an optimal solution and the model has no integer constraints
+C.  When the model uses the Evolutionary method
+D.  Only when the model has a single constraint
 
-**15.** In a CVP model, the contribution margin ratio is 0.46 and fixed costs are $300,000. What is the break-even revenue?
+**15.** Why does a documentation table for a model's assumptions include a sensitivity column?
 
-A. $138,000
-B. $300,000
-C. $652,174
-D. $750,000
+A.  To record the formulas used in each cell
+B.  To prove that the assumptions are correct
+C.  To show how much the conclusion changes when each assumption changes, so that review focuses on the assumptions that matter
+D.  To list the people who approved each assumption
