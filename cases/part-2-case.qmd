@@ -1,0 +1,200 @@
+---
+format:
+  html:
+    number-sections: false
+---
+
+# Comprehensive Case: Deciding on the 2027 Promotion Calendar {#sec-case-part-2 .unnumbered}
+
+This case closes Part II. It asks you to use the five Excel chapters together on a decision that management has to make: whether Charles River should keep running sales promotions. You will build and document a workbook with Power Query, as in Chapters 4 and 5. You will describe the promotions' cost and reconcile it to the ledger with the techniques of Chapter 6, and test and model their effect on sales with the tools of Chapter 7. Finally, you will test the controls over them as the internal auditors did in Chapter 8. The Part I case ended with a memo on whether the data could be trusted. This one ends with a recommendation that someone will act on.
+
+The case uses a new workbook that reads from CharlesRiver.xlsx, so the analysis and audit workbooks from the chapters stay as they are. Every requirement can be completed with techniques you have already practiced.
+
+
+## The Situation
+
+It is early 2027. Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that the orders showed no increase at all. The approved 2027 budget includes no promotions. The sales team has now come back with a broader proposal. In each of the last three years, Charles River ran three promotions: one on a collection of items in the spring, one on an item group in the fall, and one on a customer segment in November. The team proposes to repeat the 2026 calendar in 2027 at the same rates:
+
+- the Harbor Collection Promotion, 8 percent off the items of the Harbor collection in March and April;
+- the Furniture Seasonal Promotion, 10 percent off every Furniture item in September and October;
+- the Design Trade Customer Promotion, 12 percent off every order from Design Trade customers in November.
+
+The team argues that the Chapter 7 model looked at one promotion in one year, and that promotions bring in new customers. The controller wants a decision memo from you before the proposal goes to the chief financial officer. She wants to know four things:
+
+- what three years of promotions have cost, and where that cost appears in the financial statements;
+- whether any of the promotions brought in sales that would not otherwise have been made;
+- what the proposed calendar would do to the 2027 plan;
+- whether the controls over promotions are good enough to run one.
+
+The chief audit executive has shared the pricing-control findings of Exercise 8.6, and asks you to extend those tests to every promotion before anyone relies on them.
+
+
+## The Data You Will Use
+
+Create a new workbook named `Charles River Promotion Case.xlsx` in the same folder as CharlesRiver.xlsx. Import these Tables with Power Query (**Data > Get Data > From File > From Excel Workbook**), using the query names given:
+
+- `Promotions`, from T7_PromotionProgram: the promotions, with their scope, rate, effective dates, and approval;
+- `Orders` (T9_SalesOrder), `Invoices` (T16_SalesInvoice), `Items` (T44_Item), and `Customers` (T4_Customer), used as lookups;
+- `OrderLines`, built from T10_SalesOrderLine and merged with the lookups and `Promotions`: what customers ordered, and when;
+- `BilledLines`, built from T17_SalesInvoiceLine with the invoice date from `Invoices`: what was billed and recognized as revenue;
+- `RevenuePostings`, from T3_GLEntry, with account numbers from `Accounts` (T1_Account): the revenue in the ledger;
+- `BudgetPrices`, from T77_BudgetLine: the prices that each year's budget planned;
+- `Overrides` (T8_PriceOverrideApproval) and `Employees` (T74_Employee): the price override requests and the people who made and approved them.
+
+Follow the Power Query conventions of Part II:
+
+- expand merged columns without the prefix;
+- import T3_GLEntry with **Transform Data**, and filter it before anything is loaded;
+- clear **Enable Load** for queries that only feed others;
+- rename each loaded worksheet after its query.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+PromotionProgram has three columns with the same names as columns of Item and Customer: ItemGroup, CollectionName, and CustomerSegment. Rename them in the `Promotions` query, for example to `PromoItemGroup`, `PromoCollection`, and `PromoSegment`, before you merge it into `OrderLines`, because two columns in one query cannot share a name. Keep the two kinds of date apart, too. A promotion applies to a line by its order date, so questions about timing and volume use `OrderLines`, while revenue and the ledger follow the invoice date in `BilledLines`, as you saw in Chapter 5.
+:::
+
+
+## Requirements
+
+**Requirement 1: Build and validate the case workbook (Chapters 4 and 5).**
+
+- Start the workbook with a Documentation sheet laid out as in Tutorial 4.3. Add a Parameters sheet that holds the proposal's three discount rates and the 2026 commission rate from Tutorial 7.3 as named cells (`HarborRate`, `FurnitureRate`, `DesignTradeRate`, and `CommissionRate`), with the inputs in blue.
+- Build the queries listed above. In `OrderLines`, bring in the OrderDate and CustomerID from `Orders`, and the ItemCode, ItemName, ItemGroup, CollectionName, and StandardCost from `Items`. Add the CustomerSegment from `Customers`, and the scope, rate, and effective dates from `Promotions`. Then add columns for OrderYear and OrderMonth, and three amounts: ListAmount (Quantity times BaseListPrice), GrossAmount (Quantity times UnitPrice), and DiscountAmount (GrossAmount times Discount).
+- Give `BilledLines` the same three amounts, the InvoiceDate with its year and quarter, and the ItemGroup and StandardCost of each item.
+- Show that the queries are complete before you use them. Compare each loaded query's row count with its source Table, and compare the total LineTotal of `OrderLines` with the total OrderTotal of `Orders`. Confirm that no line without a PromotionID carries a discount. Record the checks on the Documentation sheet.
+
+<!-- Instructor notes, Requirement 1: OrderLines has 22,269 rows and a LineTotal of 87,500,091.56, equal to the OrderTotal of the 5,819
+     orders (every order agrees with its own lines). 1,650 order lines carry a PromotionID (DiscountAmount 728,878.86), and no other line has
+     a nonzero Discount. BilledLines has 27,933 rows and a LineTotal of 86,446,845.84. Items 266 rows, Customers 220, Promotions 9, Overrides
+     412, Employees 120; BudgetPrices keeps the 9,616 Revenue rows. CommissionRate is 1.903%: 2026 postings to account 6290 of 566,347.93,
+     excluding closing entry JE-2026-000297, divided by 2026 invoice-line revenue of 29,756,420.08 (Tutorial 7.3). M formulas:
+     OrderYear = Date.Year([OrderDate]), OrderMonth = Date.Month([OrderDate]), InvoiceQuarter = Date.QuarterOfYear([InvoiceDate]).
+     RevenuePostings: T3_GLEntry filtered with Transform Data to SourceDocumentType SalesInvoice and PostingDate in 2026, merged with
+     Accounts, and grouped by AccountNumber with Advanced (sum of Credit, sum of Debit). -->
+
+**Requirement 2: Measure what the promotions cost and where the cost appears (Chapter 6; financial reporting).**
+
+- Build a PivotTable from `BilledLines` of the promotional discount and the number of lines by promotion and invoice year, and chart the yearly totals. Express each year's discount as a percentage of that year's billed revenue.
+- For fiscal 2026, build a gross-to-net schedule by item group. It runs from the list amount, through the reductions of the price lists and approved overrides and then the promotional discounts, to the net amount billed.
+- Tie the net amount billed in fiscal 2026 to the revenue that `RevenuePostings` records from sales invoices, and explain any difference. Then find the account in the chart of accounts where discounts could be recorded, and explain what the income statement shows, and does not show, about the cost of promotions.
+- Show in which quarters of fiscal 2026 the discounts of the three promotions in the proposal were billed.
+
+<!-- Instructor notes, Requirement 2: promotional discounts on billed lines (unrounded Quantity x UnitPrice x Discount): 2024 126,607.64
+     (0.46% of billed revenue of 27,313,723.48), 2025 234,534.72 (0.80% of 29,376,702.28), 2026 362,110.75 (1.22% of 29,756,420.08), in
+     all 723,253.11 on 2,108 lines (Exercise 4.2's line-rounded total is 723,253.29). The cost nearly tripled in two years. By promotion:
+     1 28,124.77; 2 37,544.46; 3 67,454.55; 4 32,529.69; 5 52,089.86; 6 150,920.06; 7 30,478.57; 8 296,053.58; 9 28,057.57.
+     Gross-to-net 2026 (list / price-list and override reductions / promotional discounts / net): Furniture 19,878,268.16 / 2,135,349.32 /
+     347,864.64 / 17,395,054.38; Lighting 6,726,924.19 / 721,561.68 / 7,825.54 / 5,997,536.93; Textiles 3,672,558.39 / 390,249.46 /
+     4,098.06 / 3,278,211.11; Accessories 2,098,042.72 / 223,446.85 / 2,322.51 / 1,872,273.66; Services 1,213,344.00 / 0 / 0 /
+     1,213,344.00; total 33,589,137.45 / 3,470,607.31 / 362,110.75 / 29,756,420.08. Gross less discounts is 29,756,419.39: the 0.69
+     difference is the rounding of LineTotal line by line. Ledger: SalesInvoice credits in 2026 to 4010 17,398,287.56, 4020 5,998,649.16,
+     4030 3,278,211.11, 4040 1,872,510.62, and 4080 1,213,344.00 total 29,761,002.45. The 4,582.37 difference is SI-2026-013741 to 013743
+     (3,233.18 to 4010, 1,112.23 to 4020, 236.96 to 4040), dated in late 2025 but posted 2026-01-01 (Exercise 6.1). Account 4050 Freight
+     Revenue (214,616.66) comes from the invoice header, not from the lines, and account 2050 holds sales tax. Account 4070 Sales Discounts
+     has no postings in any year: revenue is recorded net of every price reduction, so the income statement shows net revenue and nothing
+     about the promotions. A gross-to-net schedule, or recording promotional discounts in 4070, would make the cost visible. Quarters of 2026
+     for the proposal's promotions: 7 Q1 7,596.99, Q2 22,524.82, Q3 356.75; 8 Q3 95,996.97, Q4 200,056.61; 9 Q4 28,057.57. That puts
+     228,114.18 of the 354,589.72 (about 64%) in the fourth quarter, because the fall promotion's orders are invoiced after it ends. -->
+
+**Requirement 3: Test whether the promotions brought in sales (Chapters 6 and 7; managerial accounting).**
+
+- For each promotion, find the months in which it actually ran from the order dates of its lines, and compare them with its recorded effective dates. Identify its scope: an item group, a collection, or a customer segment.
+- Measure the volume ordered in each promotion's scope, month by month, with the ListAmount of `OrderLines`. Explain why the list amount measures volume better than the net amount billed.
+- Compare the volume in each promotion's months with two expectations from Chapter 7. The first is the average of the other months of the same year, scaled to the promotion's number of months. The second is the same months a year earlier, where the data has them. Use the standard deviation of the other months to judge whether a difference is larger than the scope's normal variation from month to month.
+- Test the sales team's claim that promotions bring in new customers: find each customer's first order in the data, and whether it included a promotion line. Consider what the first months of the data can and cannot tell you.
+
+<!-- Instructor notes, Requirement 3: every promotion's lines were ordered within two calendar months (collections March-April, item
+     groups September-October) or one (segments, November). Promotions 1, 4, and 7 have recorded dates that cannot be right (see
+     Requirement 5). The list amount holds price constant, so it moves only with quantity and mix; the net amount falls by the discount itself.
+     Volume in the promotion's months against the average of the other months of the same year (against the same months a year earlier),
+     with the other months' standard deviation (STDEV.S) as a percentage of their mean: 1 Alder -3.3% (sd 14.2%); 2 Accessories +11.9%
+     (10.2%); 3 Strategic -20.7% (18.4%); 4 Brookside -15.4% (-9.8%; 19.2%); 5 Textiles -5.8% (-5.9%; 10.3%); 6 Wholesale +2.5% (+0.9%;
+     9.6%); 7 Harbor +0.4% (-21.1%; 14.3%); 8 Furniture +0.3% (+2.9%; 4.6%); 9 Design Trade +3.1% (-17.1%; 18.0%). No difference is
+     unusual: the largest, promotion 2's +11.9%, is about 1.6 standard deviations of a two-month total (the monthly sd times the square
+     root of 2), and promotion 3's fall is within the Strategic segment's normal swings. Every difference is far below the promotion's
+     break-even increase (Requirement 4). New customers: 211 customers ordered, and no customer's first order in the data included a promotion
+     line. First orders cluster in January to April 2024 only because the data begins in January 2024, and just seven first orders came after
+     June 2024 (the last in July 2025). Students should not rely on CustomerSince: for 27 of the 31 customers with a CustomerSince in 2024
+     or later, the first order came before that date. -->
+
+**Requirement 4: Model the proposed 2027 calendar (Chapter 7; managerial accounting).**
+
+- Extend the contribution margin model of Tutorial 7.3 to the three promotions in the proposal, with one column for each. Use the units, price before discount, and standard cost of each promotion's 2026 billed lines, together with the rates and the commission rate on your Parameters sheet. Find each promotion's break-even lift, the increase in volume at which it just pays for itself.
+- Build a data table of the Furniture promotion's difference in contribution for discount rates of 5, 8, 10, and 12 percent and increases in volume from 0 to 40 percent. Then use Goal Seek to find the Furniture discount at which the largest increase you measured in Requirement 3 would just pay for the promotion.
+- Show from `BudgetPrices` how the budgets for 2024 through 2026 planned their promotions, and whether the 2027 budget plans any. Compare each month's budgeted revenue with its budgeted quantity at list price.
+- Estimate what the proposed calendar would cost Charles River in 2027 against a budget without promotions, and in which quarters the cost would appear. State the volume you base the estimate on, and explain why you did not use the quantities in the budget.
+
+<!-- Instructor notes, Requirement 4: model inputs from the 2026 billed lines: Harbor (promotion 7) 569.21 units, price before discount
+     669.32, standard cost 378.46; Furniture (8) 4,823.89 units, 613.72, 346.36; Design Trade (9) 561.74 units, 416.23, 215.99. With
+     CommissionRate 1.903%, the break-even increases are Harbor 23.3%, Furniture 30.8% (28.9% if fixed overhead is excluded from the
+     standard cost, as in Tutorial 7.3), and Design Trade 34.2%; across all nine promotions they run from 23% to 40%. At a 5% Furniture
+     discount the break-even increase is 13.3%. Goal Seek at promotion 2's +11.9% gives a Furniture discount of about 4.5%. Budgets
+     (BudgetAmount / (Quantity x Item ListPrice) by month): the 2024-2026 budgets planned lower prices in the promotion months, 0.8806 of
+     list for the promoted items (the year's collection in March-April, the year's item group in September-October), with every group lower
+     in November. The 2027 budget, approved by the chief financial officer (EmployeeID 2) on 2026-12-15, is flat at about 0.9277 of list
+     in every month. Cost at 2026 volumes, with no increase: discounts of 354,589.72, or 347,840.88 of contribution after the commission
+     saved. The discounts land in Q1 about 7,600, Q2 22,500, Q3 96,400, and Q4 228,100 (Requirement 2). The budget's volume is several times actual
+     (Chapter 7): it plans 17,580 Furniture units for September-October 2027 against 4,839 ordered in those months of 2026, so a cost
+     taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be
+     costed from the budget at all. -->
+
+**Requirement 5: Test the controls over promotions (Chapter 8; auditing).**
+
+- For every promotion line in `OrderLines`, test four conditions, and count the exceptions by promotion:
+  - the order date falls within the promotion's recorded effective dates;
+  - the item or the customer falls within the promotion's scope;
+  - the discount equals the promotion's rate;
+  - for completeness, every line in a promotion's scope that was ordered during the promotion carries it.
+- For the promotions whose recorded dates fail, look for other evidence of when they were meant to run, such as the months in which their lines were ordered and the months in which the budgets planned their discounts. Decide what kind of error the exception shows.
+- Investigate each line outside its promotion's scope in the item master, and decide whether the discount or the master record is wrong.
+- Review who approved each promotion and when, and who requested and approved the price overrides in `Overrides`. Count the lines that received a promotional discount on top of an approved override price, and state the question this raises for management.
+- Record a disposition for each exception, and decide whether each shows a weakness in the design of a control or a failure in its operation. List the conditions that should be met before any promotion runs in 2027.
+
+<!-- Instructor notes, Requirement 5: dates: every line of promotions 1 (Alder, recorded 2024-03-01 to 2024-03-01), 4 (Brookside,
+     2025-03-01 to 2025-02-27), and 7 (Harbor, 2026-03-01 to 2026-02-28) fails, and every line of the other six passes (Exercise 8.6). All
+     their lines were ordered between March 1 and April 30, every line of the collection ordered in those months carries the promotion, and
+     each year's budget planned the collection's discount in March and April. The evidence points to a March-April window with a wrong
+     end date, a master-data error, rather than discounts given without authority. The generator's AnomalyLog records these end dates as
+     changed to fall before the order dates. Scope: two promotion 1 order lines (SalesOrderLineIDs 1249 and 2142) are on item 11,
+     FUR-CON-0003, the Alder Console Table, whose CollectionName is blank. The discount is right and the item master is incomplete;
+     FUR-SDB-0002 (Willow) and FUR-DSK-0004 (Summit) also lack a collection. Rate: every promotion line carries its promotion's
+     DiscountPct. Completeness: no line in a promotion's scope and months lacks the promotion, with collection months taken as March-April.
+     Approvals: EmployeeID 6 (Carrie Schultz, Sales Manager) approved all nine promotions, each on its start date, and approved all 409
+     approved override requests, 106 of them the manager's own. The manager's three other requests are still Pending (IDs 2, 165, 294), yet
+     they were billed (Exercises 4.6 and 8.6); the other requests came from account executives and sales representatives. Pricing authority
+     sits with one person, and finance approves neither promotions nor overrides. Stacking: 34 order lines (45 billed lines) carry both an
+     approved override and a promotion, 16,006.78 of discount; whether a negotiated price should also receive a promotion is a policy
+     question. Design: the system accepts end dates before start dates and scope from an incomplete item master; operation: approvals by the
+     person who requested them. Conditions: validated dates, complete collection data, approval of promotions by finance as well as sales,
+     independent approval of overrides, a stacking rule, and a post-promotion review. -->
+
+**Requirement 6: Write the decision memo.** Write a memorandum of no more than two pages to the controller. Organize it in three sections:
+
+- **Financial reporting:** what the promotions have cost, how that cost is recorded and why the ledger does not show it, and when a promotion's discounts reach the quarterly results.
+- **Managerial accounting:** what the evidence shows about the promotions' effect on volume and on new customers, the break-even increases the proposed calendar would need, what it would cost against the 2027 budget, and any alternative worth testing.
+- **Auditing:** the exceptions in the controls over promotions, their dispositions, and the conditions for running any promotion.
+
+Close the memo with your recommendation on the proposal.
+
+<!-- Instructor notes, Requirement 6: the evidence supports declining the calendar as proposed. None of nine promotions came near its
+     break-even increase, the proposed three would cost about 350,000 of contribution against the 2027 budget, and about two thirds of that
+     would land in the fourth quarter. A strong memo leaves room for a small, measured test: one scope, a discount near the roughly 4.5%
+     that the best increase ever measured would support, a comparison with a similar scope or period, and a review afterward. It makes any
+     promotion conditional on the control changes of Requirement 5. -->
+
+**Deliverable.** A decision memorandum of no more than two pages. Add a one-page appendix of exhibits: the promotion cost by year, the gross-to-net schedule, the volume comparison, the break-even results, and the summary of exceptions. Submit the case workbook as well, with its Documentation sheet complete.
+
+
+## What a Strong Submission Includes
+
+- A workbook that another person could refresh and follow: named queries, control totals that agree, parameters in named cells, and a Documentation sheet that records the sources, the checks, and the open questions.
+- A cost of the promotions that ties to the ledger, with a clear explanation of why the income statement cannot show it.
+- A volume test that holds price constant, compares each promotion with a stated expectation, and judges each difference against normal variation before calling it an increase.
+- A model with stated assumptions, a break-even result for each proposed promotion, and a justified volume basis for 2027.
+- Control exceptions traced to their cause with evidence from outside the record being tested, each with a disposition.
+- A memo written for the controller: concise, organized by perspective, and ending with a recommendation she can take to the chief financial officer.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Much of this case went into bringing tables together and summarizing them by month and by scope. Part III asks the same kinds of questions of the database directly with SQL, where a join and a grouped query do the work of a merge and a PivotTable. Part IV then turns evidence like yours into reports that management can explore for itself.
+:::

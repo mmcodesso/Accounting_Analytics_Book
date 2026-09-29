@@ -32,6 +32,7 @@ book:
         - chapters/06-descriptive-analytics/chapter.qmd
         - chapters/07-analysis-and-modeling/chapter.qmd
         - chapters/08-audit-analytics/chapter.qmd
+        - cases/part-2-case.qmd
     - part: "Accounting Analytics with SQL"
     - part: "Data Visualization and Power BI"
     - part: "Integrated and Applied Topics"

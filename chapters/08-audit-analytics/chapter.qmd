@@ -204,7 +204,7 @@ The tests in this chapter rest on the skills of the earlier chapters: importing 
 
 This chapter has looked at the Charles River data as an auditor does. You reconciled populations to the ledger before testing them, stratified the supplier payments to see where the dollars are, and used a first-digit test to find a group of payments whose digits depart from Benford's Law for a reason that the payment process explains. You aged the receivables at the end of fiscal 2026, found that the ledger holds a balance that no invoice supports, and selected customer balances for confirmation. You tested every journal entry for characteristics of management override, ranked them with a risk score, and traced the highest-scoring entry to the same balance. Along the way, you recorded a disposition for every exception and documented each test in a workpaper.
 
-This chapter completes Part II. The comprehensive case at the end of the Part brings its techniques together, and Part III then turns from the workbook to the database, where the same questions can be asked of whole tables at once.
+This chapter completes Part II. The [Part II Comprehensive Case](#sec-case-part-2) that follows brings the techniques of all five Excel chapters together on a decision: whether Charles River should run its calendar of promotions again in 2027. Part III then turns from the workbook to the database, where the same questions can be asked of whole tables at once.
 
 
 
