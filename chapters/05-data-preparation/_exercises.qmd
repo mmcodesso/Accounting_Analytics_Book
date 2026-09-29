@@ -4,71 +4,170 @@
 
 ### Financial Accounting Exercises
 
-**Exercise 5.1 (Financial Accounting): Building a Receivables Schedule from Charles River Invoice Data**
+**Exercise 5.1: Net Furniture Revenue by Quarter**
 
-**Table group:** O2C (SalesInvoice, Customer, CashReceiptApplication)
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are a financial reporting analyst preparing an accounts receivable analysis for Charles River. The analysis requires combining sales invoice data with customer details to produce a schedule grouped by customer and by aging period. The invoice data lives in the SalesInvoice table, the customer details live in the Customer table, and the settlement detail lives in the CashReceiptApplication table.
+**Scenario.** You are a financial reporting analyst at Charles River. The InvoiceLines table shows what was billed, but customers returned some goods, and the controller wants the Furniture revenue for fiscal 2026 net of those returns. The returns are recorded as credit memos, whose lines have the same structure as invoice lines.
 
-**Requirements.** (1) Use XLOOKUP or INDEX/MATCH to merge customer information, which is CustomerName, CustomerSegment, and Region, into the SalesInvoice Table by matching on CustomerID. Verify the merge by spot-checking at least five records and document any invoices that fail to match a customer record. (2) Add a calculated column that uses date functions to assign each invoice to its fiscal quarter from the InvoiceDate, assuming a calendar fiscal year. Add a second calculated column that computes the number of days outstanding as the difference between a named reference date and the InvoiceDate, and classify each invoice into aging buckets of 0 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days using a nested IF formula based on the DueDate where appropriate. (3) Apply TRIM to the CustomerName column to remove any extra spaces that would cause grouping inconsistencies in the receivables schedule, and document how many records were affected. (4) Create a summary section on an Analysis worksheet that shows the total number of invoices and the total invoice amount by aging bucket using SUMIFS and COUNTIFS with structured references.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with merged and cleaned invoice data, fiscal quarter and aging classifications, and a summary receivables schedule on the Analysis worksheet.
+(1) Use Power Query to load the CreditMemo and CreditMemoLine Tables from CharlesRiver.xlsx into your analysis workbook, with CreditMemoDate set to the Date type.
+
+(2) Prepare the credit memo lines for the comparison. Bring each line's credit memo date and a period label onto it, and bring the ItemGroup from the Item Table, using either lookups or a Power Query merge. Count the rows that failed to match.
+
+(3) Build a grid with the four quarters of 2026 across a row and three rows below them: gross Furniture revenue from InvoiceLines, Furniture credit memo lines, and net Furniture revenue. Fill it with SUMIFS formulas.
+
+(4) Some credit memos in 2026 reverse invoices issued in an earlier year. Use the credit memo's OriginalSalesInvoiceID to find them, and explain in two or three sentences whether a credit should be assigned to the quarter of the credit memo or to the quarter of the original invoice for this analysis.
+
+**Deliverable.** A quarterly schedule of gross and net Furniture revenue for fiscal 2026 with a short note on the timing of credits.
+
+<!-- Instructor notes, Exercise 5.1: gross Furniture revenue 2026 Q1-Q4 4,354,122.83 / 4,600,820.85 / 4,283,322.86 / 4,156,787.84.
+     Furniture credit memo lines by CreditMemoDate: Q1 30 lines 42,139.69; Q2 15 lines 23,789.08; Q3 28 lines 55,437.94; Q4 25 lines 39,719.44
+     (98 lines, 161,086.15). Net: 4,311,983.14 / 4,577,031.77 / 4,227,884.92 / 4,117,068.40. No unmatched rows. 14 credit memo lines dated in
+     2026 reverse invoices from earlier years. For a margin comparison by quarter, assigning credits to the credit memo's date matches how
+     the ledger records them; assigning them to the original invoice's quarter measures the net sale, but restates closed periods. Either
+     is defensible if stated. The credits are small relative to revenue and do not explain the change between Q3 and Q4. -->
 
 
-**Exercise 5.2 (Financial Accounting): Standardizing Revenue Data for Period Reporting**
+**Exercise 5.2: Testing Document Numbers Against Dates**
 
-**Table group:** O2C (SalesInvoiceLine, SalesInvoice, Item)
+**Table group:** Order-to-Cash
 
-**Scenario.** The financial reporting team needs a revenue dataset that includes the invoice date, the item name, the item group, and the billed line amount for every invoice line, organized by fiscal quarter. The data currently resides in three separate tables.
+**Scenario.** Your audit senior asks whether Charles River's invoice numbers can be relied on to identify the fiscal year of an invoice, as the finance team assumes. Each invoice number contains a year, such as the 2025 in SI-2025-007947.
 
-**Requirements.** (1) Use lookup functions to create a merged dataset on the SalesInvoiceLine Table that includes InvoiceDate from SalesInvoice and ItemName and ItemGroup from Item. Match SalesInvoiceLine to SalesInvoice on SalesInvoiceID and to Item on ItemID. (2) Use YEAR and the fiscal quarter formula to create FiscalYear and FiscalQuarter columns for every line from the InvoiceDate. (3) Examine the ItemName column for trailing spaces or inconsistent formatting, apply TRIM, and document the number of records cleaned. (4) On an Analysis worksheet, calculate total billed revenue by fiscal quarter using SUMIFS on the LineTotal column, and calculate the percentage of total annual revenue represented by each quarter. Write three to five sentences interpreting whether revenue is distributed evenly across quarters or concentrated in specific periods, and whether any item group drives the pattern.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with a fully merged and cleaned revenue dataset, fiscal period columns, and a quarterly revenue summary with written interpretation.
+(1) On the SalesInvoice Table, add a calculated column that extracts the year from the InvoiceNumber with a text function, and a second column that converts it to a number.
+
+(2) Add a column that compares the number's year with the year of the InvoiceDate, and count the invoices where they differ.
+
+(3) Use the SalesOrderID to bring each invoice's OrderDate onto the SalesInvoice Table, add a column that flags invoices dated before their order, and count them.
+
+(4) List the invoices flagged by either test. Compare the list with the invoices dated before their first shipment that you found in Tutorial 2.1, and describe what the three findings together suggest about how these invoices were dated.
+
+(5) Write a brief memo (one half page) to your senior that explains the tests, the results, and the evidence you would request from the billing team.
+
+**Deliverable.** A SalesInvoice Table with the test columns and a half-page memo on the invoices whose numbers or dates are inconsistent.
+
+<!-- Instructor notes, Exercise 5.2: six invoices carry the next year's number prefix: SI-2025-006733 (2024-11-23), SI-2025-006734 (2024-12-05),
+     SI-2025-006735 (2024-12-15), SI-2026-013741 (2025-11-29), SI-2026-013742 (2025-12-04), SI-2026-013743 (2025-12-03). Three invoices are dated
+     before their order: SI-2024-000001 (2024-01-01, order 2024-01-02), SI-2024-000002 (2024-01-02, order 2024-01-03), SI-2024-000003 (2024-01-01,
+     order 2024-01-02). These nine are exactly the nine invoices dated before their first shipment in Tutorial 2.1. Together they suggest
+     backdated invoices: numbered in the later period but dated earlier, which is a revenue cutoff risk. Order and shipment numbers show no
+     such mismatch. Evidence to request: the invoice creation logs, the shipping documents, and customer acknowledgments. -->
 
 
 ### Managerial Accounting Exercises
 
-**Exercise 5.3 (Managerial Accounting): Product Margin Data Preparation**
+**Exercise 5.3: The Furniture Product Mix**
 
-**Table group:** O2C (SalesOrderLine, Customer) and Master Data (Item)
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are a cost analyst preparing data for a product margin analysis. The analysis requires combining item cost and price data, which are StandardCost and ListPrice, with SalesOrderLine quantities to calculate unit and total margins by item. Before the analysis can proceed, the data must be merged, validated, and prepared.
+**Scenario.** You are a management accountant supporting the controller's margin analysis. Before measuring the causes of the margin change, she wants to know whether the mix of Furniture products sold changed between the third and fourth quarters of fiscal 2026.
 
-**Requirements.** (1) Convert the SalesOrderLine, Item, and Customer worksheets into named Excel Tables. Use XLOOKUP to add StandardCost and ListPrice from the Item Table to each row of the SalesOrderLine Table by matching on ItemID. (2) Add a calculated column called UnitMargin that computes the difference between ListPrice and StandardCost for each line. Add a second column called TotalMargin that multiplies UnitMargin by the ordered quantity on the line. (3) Use the MarginCheck approach from Tutorial 5.2 to flag any lines where UnitMargin is negative, count the number of negative-margin lines, and calculate their total margin impact. (4) Use Power Query to create a separate, repeatable version of this merged dataset. Import SalesOrderLine, merge it with the Item Table on ItemID and with the Customer Table on the CustomerID retrieved through SalesOrder, select only the columns needed for margin analysis, and load the result as a new worksheet. Document the Applied Steps on a Documentation worksheet. (5) Write a brief assessment of whether the data is ready for a product margin analysis, noting any issues that would need to be resolved.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with both a formula-based merged dataset and a Power Query-based merged dataset, margin calculations, and a written data readiness assessment.
+(1) Using InvoiceLines, build a grid with the eight Furniture product types as rows and, for 2026-Q3 and 2026-Q4, columns for revenue and quantity. Use the product type names from Tutorial 5.1 as row labels.
+
+(2) Add columns for each product type's share of Furniture revenue in each quarter, and for the change in share.
+
+(3) Apply conditional formatting that highlights the product types whose share changed by more than two percentage points.
+
+(4) Write three to four sentences describing how the mix changed. Explain why quantities should be interpreted with care in this data, and why revenue shares are the more reliable measure of mix here.
+
+**Deliverable.** A product mix grid for the Furniture group in 2026-Q3 and 2026-Q4, with a short interpretation.
+
+<!-- Instructor notes, Exercise 5.3: Furniture revenue by product type, Q3 / Q4 (quantity Q3 / Q4): BKC 259,617.77 / 297,121.44 (475.61 / 517.59);
+     BNH 234,227.64 / 239,562.62 (374.62 / 422.79); CON 454,136.92 / 504,299.85 (636.04 / 667.36); CTB 732,861.82 / 690,150.36 (1,296.08 / 1,240.95);
+     DSK 768,977.89 / 751,338.42 (1,050.73 / 1,195.45); NGT 457,540.67 / 369,972.92 (905.06 / 734.14); SDB 633,110.81 / 558,717.15 (1,072.57 / 958.22);
+     TBL 742,849.34 / 745,625.08 (1,280.52 / 1,385.62). Totals 4,283,322.86 / 4,156,787.84. Nightstands and sideboards lost the most revenue;
+     consoles and bookcases gained. Share changes: NGT -1.8 pts, SDB -1.3 pts, CON +1.5 pts, BKC +1.1 pts; the two-point threshold highlights
+     none, a useful result: the mix shift is modest. Quantities are fractional on most lines (the validity finding), so unit counts are not
+     whole products; revenue shares avoid the issue. -->
 
 
-**Exercise 5.4 (Managerial Accounting): Cleaning and Combining Item Master Data**
+**Exercise 5.4: How Long Orders Take to Be Invoiced**
 
-**Table group:** Master Data (Item) and O2C (SalesOrderLine)
+**Table group:** Order-to-Cash
 
-**Scenario.** The operations team has requested a clean item profitability summary that combines a standardized item master with ordered quantities so that margin can be compared across item groups. The information is currently split between the Item table and the SalesOrderLine table.
+**Scenario.** The controller has learned from Tutorial 5.2 that promotional orders can be invoiced after a promotion ends. She asks how long orders normally take to be invoiced, and whether the lag is stable from quarter to quarter, before she decides how to treat promotion timing in the margin analysis.
 
-**Requirements.** (1) Apply TRIM to the ItemName column and PROPER to standardize its capitalization, and apply UPPER with TRIM to the ItemGroup column to produce a standardized ItemGroupStd column. Document any item names where PROPER produces an incorrect result that requires a manual correction. (2) Use XLOOKUP to add the standardized ItemName and ItemGroupStd to each row of the SalesOrderLine Table by matching on ItemID, and add a calculated TotalMargin column from the item UnitMargin and the ordered quantity. (3) Build a Power Query workflow that imports SalesOrderLine, merges the Item Table on ItemID, groups the result by ItemGroup, and produces a summary of total ordered quantity and total margin by item group. Load the result as a new worksheet. (4) Compare your formula-based result with your Power Query result to verify consistency, and write two to three sentences identifying which item group contributes the most margin.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with a standardized item master, a merged margin dataset created through formulas, and a Power Query summary of margin by item group.
+(1) On the SalesInvoice Table, bring each invoice's OrderDate from the SalesOrder Table and calculate the number of days from order to invoice.
+
+(2) For each quarter of fiscal 2026, calculate the number of invoices and the median lag, using MEDIAN with IF or the AGGREGATE function. Describe how stable the lag is.
+
+(3) For each promotion in the PromotionProgram Table, count its invoice lines and the lines invoiced after its EffectiveEndDate.
+
+(4) Write a brief memo (three to five sentences) recommending whether the margin analysis should assign promotional revenue by invoice date or by order date, and why.
+
+**Deliverable.** A lag analysis by quarter, a count of promotion lines invoiced after each promotion ended, and a short recommendation.
+
+<!-- Instructor notes, Exercise 5.4: median order-to-invoice lag across all invoices 12 days (90th percentile 52 days). Fiscal 2026 medians by
+     quarter: Q1 13 days (1,845 invoices), Q2 11 (1,782), Q3 13 (1,756), Q4 12 (1,788): stable. Promotion lines invoiced after the end date:
+     PROMO-2024-001 80 of 80, PROMO-2024-002 147 of 431, PROMO-2024-003 74 of 149, PROMO-2025-004 74 of 74, PROMO-2025-005 74 of 228,
+     PROMO-2025-006 201 of 414, PROMO-2026-007 68 of 68, PROMO-2026-008 160 of 576, PROMO-2026-009 27 of 88. Promotions 001, 004, and 007 have
+     every line after the end date because their dates are wrong (a one-day promotion, and two whose end dates precede their start dates);
+     these are left for the audit analytics chapter. Revenue belongs to the invoice date; the order date explains the price. Three invoices
+     have a negative lag (Exercise 5.2). -->
 
 
 ### Auditing Exercises
 
-**Exercise 5.5 (Auditing): Standardizing Supplier Names for Duplicate Detection**
+**Exercise 5.5: Testing for Related-Party Suppliers**
 
-**Table group:** P2P (Supplier)
+**Table group:** Procure-to-Pay, with the Employee table from Master Data
 
-**Scenario.** Your audit team suspects that the Charles River supplier master file may contain duplicate suppliers entered under slightly different names. Before running a formal duplicate detection test, you need to standardize the supplier names so that near-duplicates can be identified.
+**Scenario.** As part of the audit of purchasing, your senior asks you to test whether any supplier shares an address with an employee, a common indicator of an undisclosed related party or a fictitious vendor.
 
-**Requirements.** (1) Open the Supplier Table and examine the SupplierName column. Apply TRIM to remove extra spaces, apply UPPER to standardize capitalization, and apply SUBSTITUTE to remove common variations such as periods in abbreviations by replacing "." with nothing, and to standardize "Inc." and "Incorporated" to a single form and "Ltd." and "Limited" to a single form. Chain these functions into a new column called StdSupplierName. (2) Sort the StdSupplierName column alphabetically and scan for near-duplicates, which are suppliers with very similar names that may represent the same entity. Document any potential duplicates you identify, including the original names and the standardized names. (3) Use COUNTIFS on the StdSupplierName column to count how many suppliers share the same standardized name, where any count greater than 1 indicates a potential duplicate, and record the results. Consider also whether suppliers with the same standardized name share the same SupplierCategory or SupplierRiskRating, which would strengthen the case that they are truly the same vendor. (4) Write a brief memorandum of one half to one page documenting your standardization approach, the potential duplicates identified, and a recommendation for whether these findings warrant further investigation. Note that this manual approach has limits and that Chapter 12 will introduce SQL-based duplicate detection that can handle larger datasets and more complex matching criteria.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with standardized supplier names, flagged potential duplicates, and a written audit memorandum.
+(1) Use Power Query to load the Supplier and Employee Tables from CharlesRiver.xlsx into a new workbook, keeping the identifying and address columns.
+
+(2) On each Table, build a match key that joins the Address and City columns. Standardize the key with TRIM and UPPER so that differences in spacing and case do not hide a match, and explain why the key includes the city.
+
+(3) Use XLOOKUP or COUNTIFS to find the suppliers whose match key appears in the Employee Table, and bring the matching employee's name and job title onto the Supplier Table.
+
+(4) For each match, use the DisbursementPayment Table to total the payments made to the supplier.
+
+(5) Prepare a brief memo (one half page) that lists the matches, the payments involved, and the procedures you would perform next.
+
+**Deliverable.** A Supplier Table with the match key and the matched employee details, and a half-page memo.
+
+<!-- Instructor notes, Exercise 5.5: six suppliers share an exact address and city with an employee: Supplier 1 Anderson-Noble and employee 22
+     Rose Kim (Assembler); 2 Watson, Mitchell and Chen and 46 Michael Hinton (Machine Operator); 3 Lucas, Green and Richardson and 33 Doris
+     Rivera (Assembler); 4 Stokes, Mann and Keller and 119 Kaitlyn Johnson (Designer); 5 Nelson-Rocha and 65 Chelsea Horn (Quality Technician);
+     6 Wright, Sanchez and Garza and 20 Kenneth Boyd (Assembler). Payments: supplier 1 394 payments 356,457.22; 2 325 450,394.32; 3 390 370,084.55;
+     4 215 690,348.44; 5 237 563,948.67; 6 376 352,041.01. These are the AnomalyLog's related_party_address_match items. The addresses match
+     exactly, so standardizing does not change the result, which students should note. Next procedures: confirm ownership, review the
+     approval of these suppliers and of their invoices, and compare prices with other suppliers. -->
 
 
-**Exercise 5.6 (Auditing): Documenting a Repeatable P2P Data Preparation Process**
+**Exercise 5.6: Reviewing the Supplier Master File**
 
-**Table group:** P2P (PurchaseOrder, PurchaseOrderLine, Supplier)
+**Table group:** Procure-to-Pay
 
-**Scenario.** Your audit team needs to perform recurring analytical procedures on Charles River purchasing data. The same data preparation steps, which are merging purchase order headers with their lines and adding supplier context, must be performed each period when updated data is received. Your senior has asked you to build a Power Query workflow that automates this preparation so that future periods require only a data refresh rather than manual rebuilding.
+**Scenario.** Before the audit team tests purchasing, your senior asks you to prepare and review the supplier master file: produce a clean supplier list for the workpapers, and test it for duplicate suppliers and for suppliers that should not be receiving business.
 
-**Requirements.** (1) Build a Power Query workflow that imports the PurchaseOrderLine Table and merges it with the PurchaseOrder Table on PurchaseOrderID to add the OrderDate, the ExpectedDeliveryDate, and the SupplierID to each line. Document each step by reviewing the Applied Steps panel and recording the step names and their purposes on a Documentation worksheet. (2) Merge the result with the Supplier Table on SupplierID to add SupplierName, PaymentTerms, and SupplierCategory, and add a custom column that computes an extended ordered cost from the line Quantity and UnitCost. (3) Load the query result as a new worksheet and verify the result by spot-checking at least five records against the source tables. (4) Test the repeatability of the workflow by adding a row to the source PurchaseOrderLine Table and refreshing the query, then confirm that the refreshed result includes the new line. (5) Write a process documentation memorandum of one page that describes the Power Query workflow, lists the Applied Steps, and explains how the team should refresh the data each period. This memorandum should be suitable for inclusion in the audit workpapers as documentation of the data preparation procedure.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with a Power Query workflow that merges PurchaseOrderLine, PurchaseOrder, and Supplier, a verified output worksheet, and a one-page process documentation memorandum suitable for audit workpaper inclusion.
+(1) Using the Supplier Table, add a column that applies PROPER to SupplierName, and count the names that change. Examine the changed names and explain why applying PROPER to this field would be a mistake.
+
+(2) Test for duplicate suppliers: count the suppliers that share a TaxID and the suppliers that share a BankAccount. Explain what a clean result shows and what it does not.
+
+(3) List the suppliers whose IsApproved flag is 0 and the suppliers whose SupplierRiskRating is High.
+
+(4) Using the PurchaseOrder and DisbursementPayment Tables, count the purchase orders and payments for each unapproved supplier.
+
+(5) Prepare a brief memo (one half page) that summarizes the review and recommends which suppliers the purchasing tests should focus on.
+
+**Deliverable.** A reviewed supplier list with the test columns and a half-page memo.
+
+<!-- Instructor notes, Exercise 5.6: PROPER changes 62 of 110 supplier names, for example "Watson, Mitchell and Chen" to "Watson, Mitchell And
+     Chen" and "Donaldson LLC" to "Donaldson Llc": the names are already consistently cased, so standardizing damages them. No TaxID or
+     BankAccount is shared: no duplicate suppliers on these keys, although duplicates with different identifiers would not be caught.
+     Seven suppliers are unapproved (IDs 104 to 110), and none has a purchase order or a payment: the approval control appears to work.
+     Seven suppliers are rated High risk (IDs 11, 24, 40, 55, 57, 80, and 104), six of them approved and receiving business. The six
+     related-party suppliers of Exercise 5.5 are also worth focusing on. -->

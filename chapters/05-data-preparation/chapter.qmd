@@ -2,253 +2,209 @@
 title: "Data Preparation and Cleaning in Excel"
 ---
 
-<!-- DRAFT: not yet revised. Migrated from drafts/05 unchanged except for the file layout; not registered in _quarto.yml. -->
-**Tools:** Microsoft Excel
-**Table groups:** O2C | P2P
 
----
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
 
-## Learning Objectives
+After completing this chapter, you will be able to:
 
-After completing this chapter, you will be able to do the following.
+1. Explain why accounting data must be prepared before it is analyzed, and document the preparation so that a reviewer can repeat it.
+2. Use text functions to extract, standardize, and validate text fields, such as the product type encoded in an item code.
+3. Use date functions to assign transactions to fiscal periods and to measure the time between business events.
+4. Combine data from related tables with XLOOKUP, INDEX and MATCH, and VLOOKUP, and recognize when a one-to-many relationship calls for a different approach.
+5. Build a repeatable preparation workflow in Power Query that merges tables, adds calculated columns, and can be refreshed when the source data changes.
+:::
 
-1. Apply Excel text functions to standardize item names, customer names, supplier names, and other qualitative fields in the Charles River data.
-2. Use date functions to extract fiscal periods from transaction dates and assign each order or invoice to the appropriate reporting quarter or year.
-3. Merge data from multiple Charles River tables into a single analysis-ready dataset using VLOOKUP, XLOOKUP, and INDEX/MATCH.
-4. Identify and remove duplicate records and handle missing values using Excel tools and formulas.
-5. Build a repeatable data preparation workflow in Power Query that documents each transformation step and can be refreshed when source data changes.
 
----
+## Opening Scenario {.unnumbered}
 
-## Opening Scenario
+The analysis workbook you built in Chapter 4 ended with a clue and an open question. The Furniture Seasonal Promotion carries more invoice lines and more discount dollars than any other promotion, and its effective dates, September and October 2026, straddle the two quarters whose margins the controller wants explained. When you tell her, she asks the obvious next question: how many of those discounted lines fell in the fourth quarter, and how much of the Furniture revenue did they account for? You cannot answer yet. The invoice lines record what was sold, at what price, and under which promotion, but not when the invoice was issued, which product group the item belongs to, or which customer bought it. That information lives in other Tables: the invoices, the items, the customers, and the sales orders. Before any of the analysis in the rest of Part II can begin, you have to bring it together, check that it came together correctly, and make the result easy to refresh. This chapter teaches you how.
 
-You are a staff accountant at Charles River, the Boston-area company that designs and sells home furnishings and also provides interior design services. The controller has asked you to prepare a customer profitability view for the upcoming quarterly review. The raw data you need is spread across several tables in the company's order management system. The SalesOrder table records the order date and status for each order but holds no customer names or item descriptions. The SalesOrderLine table records the item, the ordered quantity, and the base list price for each line but holds no order date. The Customer table stores customer names, the customer segment, and the region. The Item table stores item names, the item group, the standard cost, and the list price. To answer the controller's question, you need to combine these tables into a single dataset where each row carries the order date, the customer name, the item name, the ordered quantity, the price, and a calculated line amount. When you begin examining the data, you also find problems. Some customer names carry extra spaces. Orders that have not yet shipped have no shipment date. Item names that should match across tables are formatted inconsistently. Before any analysis can begin, you must clean and merge this data. This chapter teaches you the Excel functions and tools that make that work efficient and repeatable.
 
----
 
-## The Reality of Data Preparation
+## Why Data Preparation Comes First
 
-Chapter 2 introduced the idea of data quality and described the problems that accounting data commonly contains. Chapter 4 established the organizational foundation for working with data in Excel, including Tables, structured references, and conditional formatting, using the Charles River O2C tables. This chapter connects those two foundations by teaching you to fix the problems that Chapter 2 identified inside the Excel environment that Chapter 4 set up. Data preparation is the bridge between having data and being able to analyze it.
+Data preparation is the work of transforming data from the form in which it was recorded into a form that suits a particular analysis. A review of the field describes it as the process of discovering, cleaning, integrating, and restructuring data, and it names the activities involved: profiling the data, matching records across sources, mapping one structure onto another, transforming formats, and repairing values that are wrong (Fernandes et al., 2023). In the analytics workflow you met in Chapter 1, it is the third stage, after the question has been defined and the data has been obtained, and before any analysis begins.
 
-Research on analytics practice consistently finds that data preparation consumes a disproportionate share of the time analysts spend on any project. Dasu and Johnson (2003) estimated that data cleaning and transformation account for as much as eighty percent of the effort in a typical data analysis engagement. While that proportion varies by context, the underlying point holds for accounting work. An auditor who extracts general ledger data for analytical procedures spends more time verifying, cleaning, and structuring that data than running the actual tests. A management accountant who combines production and sales data from several tables spends more time resolving inconsistencies between sources than calculating margins. The techniques in this chapter are therefore not preliminary tasks to rush through before the real analysis begins. They are a core part of the analytical work itself, and doing them well is what separates reliable results from misleading ones.
+For accountants, preparation is rarely optional. Transaction systems store data in the form that suits recording it, spread across related tables, as you saw in Chapter 3. An analysis needs a different form: one table in which every row carries all the attributes the question depends on. Auditors face the same problem with data they receive from clients. Lee et al. (2020) note that client data often arrives incomplete and in an unusable format, so that considerable time must be spent cleansing, transforming, standardizing, and validating it before it can be analyzed. The same concern runs through accounting education. In a review of published data analytics teaching cases, Raschke and Charron (2021) found that most cases focus on analysis and communication, and that few cover the steps that come before analysis, such as extraction and data preparation.
 
-The chapter covers four categories of Excel functions, followed by an introduction to Power Query. Text functions standardize the qualitative fields that accounting data contains, such as item names, customer names, and account descriptions. Date functions extract time-period information from transaction dates, which enables fiscal quarter and fiscal year analysis. Lookup functions merge data from separate tables by matching on shared identifiers, which is the Excel equivalent of the SQL joins you will learn in Chapter 10. Power Query provides a structured, documented, and repeatable approach to all of these transformations that is superior to manual formula-based cleaning for any task you will perform more than once.
+Preparation is also where many analytical errors begin. A lookup that silently fails, a date assigned to the wrong quarter, or a join that duplicates rows can change every number that follows, and none of these errors announces itself. That is why this chapter pairs every preparation technique with a check: a count of the rows that failed to match, a total that must agree with its source, or a test that a field has the form it should. The quality dimensions you studied in Chapter 2, accuracy, completeness, consistency, and timeliness, are the standard the checks apply. And because preparation involves many small decisions, it has to be documented, as you learned in Chapter 4, so that someone else can repeat it and reach the same result.
 
-Figure 5.1 places these stages in sequence so you can see how a raw extract becomes an analysis-ready dataset.
+@fig-05-01 shows the destination of this chapter. By the end of Tutorial 5.3, your workbook will contain a single table, InvoiceLines, in which every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. The rest of Part II analyzes that table.
 
-*[Figure 5.1: A nine-stage data preparation workflow flowchart, from importing the Charles River tables through inspecting the data, cleaning text, converting data types, handling missing values, removing duplicates, merging, validating, and documenting. The stages are grouped by color into acquire and assess, transform and combine, and verify and document.]*
+![From Related Tables to One Analytical Table.](/visuals/svg/fig-05-01-invoicelines-map.svg){#fig-05-01 fig-alt="A diagram of the preparation this chapter performs. Four Tables from the analysis workbook, SalesInvoiceLine, SalesInvoice, Item, and Customer, are connected by their keys: each invoice line carries a SalesInvoiceID and an ItemID, and each invoice carries a CustomerID. Arrows show the columns each Table contributes to a single InvoiceLines table: the line's own quantity, prices, discount, line total, and promotion; the invoice date and customer from SalesInvoice; the item group, item code, and standard cost from Item; and the segment and region from Customer. Columns calculated during preparation, the fiscal year, fiscal quarter, period label, product type, and a whole-quantity check, are shown as added columns."}
 
-> **[IN PRACTICE]**
-> The AICPA's Guide to Audit Data Analytics (2017) recommends that auditors document all data preparation steps performed before analytical procedures. This documentation requirement exists because an analytical result is only as reliable as the preparation that produced the data behind it. Undocumented changes to data, such as removing records, modifying values, or combining sources, undermine the integrity of the analysis. The techniques in this chapter, particularly Power Query, support this documentation requirement by creating a visible record of every transformation applied.
 
-## Text Functions for Cleaning Accounting Data
+## Text Functions
 
-Accounting datasets contain substantial amounts of text. Item names, customer names, supplier names, account descriptions, and cost center labels are all text fields that must be consistent and correctly formatted for analysis to work. When these fields contain extra spaces, inconsistent capitalization, embedded special characters, or variations in abbreviation, formulas that depend on exact matches fail silently. A VLOOKUP that matches on customer name returns an error if the name in one table carries a trailing space that the name in the other table does not.
+Text fields carry more information than their appearance suggests. An item code, an invoice number, or an account name often encodes attributes, such as a category, a year, or a sequence, that are not stored anywhere else. Text functions let you extract those attributes, standardize text so that values that mean the same thing also look the same, and test that each value has the form it should. @tbl-05-01 summarizes the functions this chapter uses.
 
-Excel provides a family of text functions designed to address these problems. Each function performs a specific transformation, and combining several functions in a single formula resolves most of the text quality issues you will meet in accounting data.
+| Function | What it returns | Example with a Charles River value |
+|---|---|---|
+| `LEFT(text, n)` | The first n characters | `LEFT("FUR-DSK-0075",3)` returns `FUR` |
+| `MID(text, start, n)` | n characters starting at a position | `MID("FUR-DSK-0075",5,3)` returns `DSK` |
+| `RIGHT(text, n)` | The last n characters | `RIGHT("SI-2025-007947",6)` returns `007947` |
+| `LEN(text)` | The number of characters | `LEN("FUR-DSK-0075")` returns 12 |
+| `FIND(find, text)` | The position of one text inside another | `FIND("-","FUR-DSK-0075")` returns 4 |
+| `TRIM(text)` | The text without leading, trailing, or repeated spaces | Removes stray spaces from an imported name |
+| `CLEAN(text)` | The text without non-printing characters | Removes line breaks copied in from another system |
+| `SUBSTITUTE(text, old, new)` | The text with one string replaced by another | Replaces "Street" with "St" to standardize addresses |
+| `UPPER`, `LOWER`, `PROPER` | The text in capitals, lower case, or with each word capitalized | `UPPER("Smith Ltd")` returns `SMITH LTD` |
+| `VALUE(text)` | The number that a text value represents | Converts `"007947"` to 7947 |
 
-### Removing Unwanted Spaces and Characters
+: Text functions used for data preparation {#tbl-05-01}
 
-The TRIM function removes all leading spaces, trailing spaces, and extra interior spaces from a text value, leaving only single spaces between words. The syntax is =TRIM(text). If cell A2 contains "  Beacon Hill Interiors  " with extra spaces on both sides, =TRIM(A2) returns "Beacon Hill Interiors" with clean spacing. TRIM is often the first function applied to any text column imported from an external source because extra spaces are among the most common and most invisible formatting problems. Two values that appear identical on screen may fail to match in a lookup because one carries a trailing space that is not visible in the cell.
+### Extracting Parts of a Text Value
 
-The CLEAN function removes non-printable characters from text. Non-printable characters are control codes that sometimes appear in data imported from databases, web sources, or legacy systems. They are invisible in the cell but can prevent text matching and cause unexpected behavior in formulas. The syntax is =CLEAN(text). In practice, wrapping text cleaning in =TRIM(CLEAN(text)) handles both non-printable characters and spacing problems in a single formula.
+Charles River's item codes follow a pattern. Every item the company sells has a code of three parts separated by hyphens: a three-letter group code, a three-letter product type code, and a four-digit number. FUR-DSK-0075 is a desk in the Furniture group, and FUR-SDB-0002 is a sideboard. The Item Table has an ItemGroup column, but no column for the product type, so the only way to analyze sales by product type, such as desks against sideboards, is to extract it from the code. Because the parts have a fixed length, the formula `=MID([@ItemCode],5,3)` returns the product type for every item: it takes three characters starting at the fifth. When the parts of a code vary in length, you can locate the separators with FIND and compute the positions instead, and Microsoft 365 adds TEXTBEFORE and TEXTAFTER, which return the text before or after a separator directly.
 
-The SUBSTITUTE function replaces every occurrence of a specified text string within a value with a different string. The syntax is =SUBSTITUTE(text, old_text, new_text). This function is useful for removing or replacing specific characters. If an account description contains periods that you want to remove, =SUBSTITUTE(A2, ".", "") replaces every period with nothing and effectively deletes them. If supplier names inconsistently use "Inc." and "Incorporated", =SUBSTITUTE(A2, "Incorporated", "Inc.") standardizes to the abbreviated form. Unlike Find and Replace, which changes cells in place, SUBSTITUTE creates a new value in a formula and preserves the original data.
+Invoice numbers encode information too. SI-2025-007947 contains a document prefix, a year, and a sequence number. The year in the number is assigned when the invoice is numbered, and in a well-controlled system it should agree with the year of the invoice date. Extracting it with `=MID([@InvoiceNumber],4,4)` and comparing it with the invoice date is a simple validity test, which you will apply in the exercises.
 
-### Standardizing Capitalization
+### Standardizing Text
 
-The UPPER, LOWER, and PROPER functions convert text to uppercase, lowercase, and proper case, where proper case capitalizes the first letter of each word. In accounting data, inconsistent capitalization is a frequent source of matching failures. If one table records an item group as "FURNITURE" and another records it as "Furniture", a direct comparison treats them as different values. Applying =UPPER(A2) to both sources before matching ensures that capitalization differences do not prevent valid matches.
+Values that mean the same thing should look the same, or lookups, filters, and counts will treat them as different. TRIM removes spaces at the start and end of a value and reduces repeated spaces to one. CLEAN removes non-printing characters, such as line breaks, that are often copied in from other systems. SUBSTITUTE replaces one string with another, which is useful for standardizing abbreviations. UPPER, LOWER, and PROPER change the case of the letters.
 
-Proper case is useful for cleaning customer and supplier names for presentation, but it has limits. PROPER capitalizes the first letter of every word, which produces incorrect results for names that contain intentional lowercase elements such as "McKenzie" becoming "Mckenzie" or acronyms such as "LLC" becoming "Llc". When you use PROPER for standardization, review the results for these edge cases and apply targeted corrections where necessary.
+Standardizing should be deliberate, because it can damage values that were already correct. PROPER capitalizes the first letter of every word and lowers the rest, so it turns a supplier named Donaldson LLC into Donaldson Llc and the connecting word in Watson, Mitchell and Chen into And. It also changes item names such as a sideboard "48 in" wide into "48 In". When a field is already consistent, the right preparation step is to leave it alone and record that you checked it.
 
-### Extracting Parts of Text Values
+### Validating Text
 
-The LEFT, RIGHT, and MID functions extract portions of a text value based on position. LEFT returns a specified number of characters from the beginning of the text. RIGHT returns characters from the end. MID returns characters starting at a specified position. These functions are valuable when a single text field carries more than one piece of information that you need to separate for analysis.
+Before you clean a field, test whether it needs cleaning. The formula `=LEN([@CustomerName])=LEN(TRIM([@CustomerName]))` returns TRUE when a name has no stray spaces, and a COUNTIFS on the result tells you how many values fail. Applied to the Charles River names, codes, and addresses, tests like this find nothing to remove: the text fields are clean. That is a finding worth recording, not a wasted step. A preparation workflow that cleans data it has not tested can introduce errors, and one that tests and finds nothing has evidence that the field can be trusted. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
 
-A common accounting application appears in the chart of accounts. The Charles River Account table stores account numbers such as "1020", "4050", and "6290" as text rather than as numbers because they are identifiers rather than quantities. The first digit of each account number encodes the account class, where 1 marks assets, 2 marks liabilities, 3 marks equity, 4 marks revenue, 5 marks cost of goods sold, and 6 marks operating expenses. To group ledger activity by account class, you extract the leading digit. The formula =LEFT(A2, 1) applied to "4050" returns "4", which identifies the row as revenue. Some accounting systems use longer compound codes that combine an account number, an account type, and a segment in a single field such as "4050-REV-WHL". In a field of that form, =LEFT(A2, 4) returns "4050", =MID(A2, 6, 3) returns "REV", and =RIGHT(A2, 3) returns "WHL". Once extracted, these components serve as the basis for grouping, filtering, and summarization in the analyses you will build in Chapters 6 and 7.
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Some problems are invisible on screen. Text copied from a web page can contain a non-breaking space, character 160, which looks like an ordinary space but is not removed by TRIM. If a value that looks clean still fails to match, `=SUBSTITUTE(A2,CHAR(160)," ")` replaces non-breaking spaces with ordinary ones before TRIM runs. Numbers stored as text are another invisible problem: they look like numbers but do not add up, and they fail to match the same number stored as a number. VALUE converts them.
+:::
 
-The LEN function returns the number of characters in a text value and is often used together with LEFT, RIGHT, and MID when the position of the component you need varies across records. The FIND and SEARCH functions return the position of a specified character or substring within a text value. FIND is case-sensitive and SEARCH is not. These functions help you locate delimiters such as hyphens or slashes that separate components within a compound field.
-
-*[Figure 5.2: Text Function Examples Applied to Charles River Data. A table showing seven sample values in column A with problems such as extra spaces, inconsistent capitalization, and a compound account code, the cleaned results in column B, and the formula used in column C. Each row uses a Charles River value such as a customer name, an item group, or an account number, with annotations explaining the transformation performed by each function.]*
-
-<!-- DRAFT: tabular content moved from drafts/05/ch05-markdown-tables.md; values not yet verified -->
-
-*Caption (placed below figure): Figure 5.2: Seven common text quality problems in the Charles River data and the Excel functions that resolve each one. Column A shows the original value with the problem present. Column B shows the cleaned result. Column C displays the formula used.*
-
-| Row | Column A (Original Value) | Problem | Column B (Cleaned Result) | Column C (Formula) |
-|---|---|---|---|---|
-| 1 | `  Beacon Hill Interiors  ` | Leading and trailing spaces | `Beacon Hill Interiors` | `=TRIM(A1)` |
-| 2 | `FURNITURE` | Inconsistent capitalization (all uppercase item group) | `Furniture` | `=PROPER(A2)` |
-| 3 | `Eastern Region.` | Trailing period in a region label | `Eastern Region` | `=SUBSTITUTE(A3, ".", "")` |
-| 4 | `4050-REV-WHL` | Compound account code, account number needed | `4050` | `=LEFT(A4, 4)` |
-| 5 | `4050-REV-WHL` | Compound account code, account type needed | `REV` | `=MID(A5, 6, 3)` |
-| 6 | `lighting` | Lowercase item group needs standardization | `LIGHTING` | `=UPPER(A6)` |
-| 7 | `  Oak  Dining  Table ` | Extra interior and exterior spaces in an item name | `Oak Dining Table` | `=TRIM(CLEAN(A7))` |
-
-> **[WATCH OUT]**
-> Text functions create new values in formula cells. They do not change the original data. If you clean a customer name with =TRIM(PROPER(A2)) in cell B2, the original messy value still exists in A2. When you are ready to replace the original data with the cleaned version, you must copy the formula column, paste it as values over the original column, and then delete the formula column. This paste-as-values step is critical because pasting formulas rather than values creates circular references or breaks the formulas when the original column is removed. Chapter 4's principle of separating data from analysis applies here as well. Perform cleaning on a separate worksheet or in separate columns, verify the results, and only then replace the originals.
-
-Figure 5.3 shows the cumulative effect of chaining these functions on a column of supplier names, where several spellings of the same vendor collapse into one standardized value.
-
-*[Figure 5.3: A before-and-after comparison of Charles River supplier names. The left panel shows raw SupplierName values with spacing, capitalization, and Inc. versus Incorporated and Ltd. versus Limited variations. A chained TRIM, UPPER, and SUBSTITUTE formula shown in the center maps them to the standardized values in the right panel, which lets a duplicate test group them correctly.]*
-
-## Date Functions for Fiscal Period Analysis
-
-Transaction dates are among the most important fields in accounting data, yet they frequently require transformation before they can support period-based analysis. A date such as "2024-07-15" tells you exactly when a transaction occurred, but most accounting analyses need to know which fiscal quarter, which fiscal year, or which month the transaction belongs to. Date functions extract these period components from raw dates and assign transactions to the correct reporting period. The Charles River SalesOrder table stores an OrderDate for each order and the SalesInvoice table stores an InvoiceDate and a DueDate for each invoice, and all of these are genuine date values you can decompose.
-
-### Extracting Year, Month, and Day
-
-The YEAR, MONTH, and DAY functions extract the corresponding component from a date value. The syntax is straightforward. =YEAR(A2) returns the four-digit year. =MONTH(A2) returns the month as a number from 1 to 12. =DAY(A2) returns the day of the month. These functions work only on values that Excel recognizes as dates. If a date is stored as text, which happens frequently with imported data, these functions return an error, and you must first convert the text to a date using the DATEVALUE function.
-
-### Assigning Fiscal Quarters
-
-Many accounting analyses summarize data by fiscal quarter. If the organization uses a calendar fiscal year that runs from January through December, you can assign a quarter with the formula =ROUNDUP(MONTH(A2)/3, 0). This formula divides the month number by 3 and rounds up to the nearest whole number, which produces 1 for January through March, 2 for April through June, 3 for July through September, and 4 for October through December.
-
-Organizations that use a non-calendar fiscal year require a different approach. A company whose fiscal year starts on April 1 needs a formula that maps April to the first quarter rather than the second. The formula =ROUNDUP(MOD(MONTH(A2)-4+12, 12)/3, 0) shifts the month numbering so that April becomes the first month of the fiscal year. The MOD function handles the wraparound so that January through March correctly map to the fourth quarter of the fiscal year that began the previous April. When you build fiscal period formulas, always confirm the organization's fiscal year start month and test the formula against known dates before applying it to the full dataset.
-
-### Calculating Date Differences
-
-The simplest way to calculate the number of days between two dates in Excel is to subtract one from the other. If cell A2 contains the order date and cell B2 contains the shipment date, =B2-A2 returns the number of days between the two events. The DATEDIF function provides more flexibility and returns the difference in complete years, months, or days depending on the unit parameter. The syntax is =DATEDIF(start_date, end_date, unit) where unit is "Y" for years, "M" for months, or "D" for days.
-
-For aging analysis, which is one of the most common accounting applications of date functions, you calculate the number of days between a transaction date and a reference date, typically the reporting date or the current date. An accounts receivable aging schedule classifies each invoice based on how many days have elapsed since the invoice date. The formula =TODAY()-A2 returns the number of days since the date in A2, and a nested IF function classifies that result into aging buckets such as 0 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days. You will build a complete aging analysis in Chapter 8 using the Charles River SalesInvoice data and its InvoiceDate and DueDate columns.
-
-*[Figure 5.4: Date Function Examples Applied to Charles River Orders. A table showing sample SalesOrder OrderDate values in column A, with derived columns for Year using YEAR, Month using MONTH, Fiscal Quarter using ROUNDUP, the related ShipmentDate, and Days to Ship using subtraction of OrderDate from ShipmentDate. Each formula is displayed in a row beneath the results.]*
-
-<!-- DRAFT: tabular content moved from drafts/05/ch05-markdown-tables.md; values not yet verified -->
-
-*Caption (placed below figure): Figure 5.4: Date functions applied to sample Charles River SalesOrder dates. Each derived column shows the formula used and the resulting value. The Fiscal Quarter formula assumes a calendar fiscal year (January through December).*
-
-| SalesOrderID | OrderDate (Column A) | Year | Month | Fiscal Quarter | ShipmentDate | Days to Ship |
-|---|---|---|---|---|---|---|
-| 1001 | 2024-02-12 | 2024 | 2 | 1 | 2024-02-20 | 8 |
-| 1002 | 2024-04-03 | 2024 | 4 | 2 | 2024-04-09 | 6 |
-| 1003 | 2024-07-18 | 2024 | 7 | 3 | 2024-07-25 | 7 |
-| 1004 | 2024-09-30 | 2024 | 9 | 3 | 2024-10-04 | 4 |
-| 1005 | 2024-11-15 | 2024 | 11 | 4 | 2024-11-22 | 7 |
-| **Formula** | *(source)* | `=YEAR(A)` | `=MONTH(A)` | `=ROUNDUP(MONTH(A)/3,0)` | *(from Shipment)* | `=ShipmentDate-OrderDate` |
-
-> **[CONNECTING THE DOTS]**
-> The fiscal period extraction you learn here in Excel has a direct counterpart in SQL. In Chapter 11 you will use SQL date functions such as strftime to extract year and month components from the same Charles River dates stored in the SQLite database. The analytical purpose is identical. The difference is the syntax and the environment. Understanding date manipulation in Excel first will make the SQL version feel familiar when you reach it.
-
-## Lookup Functions for Merging Accounting Data
-
-In a relational database, data about a single transaction is spread across multiple related tables. The Charles River database stores order dates in the SalesOrder table, line-item detail in the SalesOrderLine table, item names in the Item table, and customer names in the Customer table. To build an analysis that includes order dates alongside customer names and item information, you must merge these tables. In SQL this operation is called a join, and you will learn it in Chapter 10. In Excel the equivalent operation uses lookup functions that search for a value in one table and retrieve corresponding information from another.
-
-Figure 5.5 shows the five Charles River tables this section draws on and the one-to-many relationships that the lookup functions reverse.
-
-*[Figure 5.5: A focused entity-relationship diagram of the Customer, SalesOrder, SalesOrderLine, Item, and SalesInvoice tables. Primary and foreign keys are marked, one-to-many relationships use crow's foot notation, and an annotation traces the lookup chain used in Tutorial 5.1.]*
-
-### VLOOKUP
-
-VLOOKUP is the most widely known lookup function in Excel. The syntax is =VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup]). The function searches for the lookup_value in the first column of the table_array, and when it finds a match, it returns the value from the column specified by col_index_num. The range_lookup parameter should be set to FALSE for exact matches, which is almost always what accounting applications require.
-
-To retrieve a customer's name for each order in the Charles River SalesOrder table, you would write =VLOOKUP([@CustomerID], Customer, 2, FALSE). This formula takes the CustomerID from the current order row, searches for it in the first column of the Customer Table, and returns the value from the second column, which holds CustomerName. The structured reference [@CustomerID] means the formula automatically uses the CustomerID from whatever row it occupies.
-
-VLOOKUP has two significant limitations. First, it can only search the leftmost column of the table_array. If the column you need to search is not the first column, you must rearrange the table or use a different function. Second, the col_index_num is a hard-coded number. If you insert a column in the lookup table, the column index shifts and the formula returns the wrong value. These limitations are why many experienced Excel users have moved to XLOOKUP or INDEX/MATCH.
-
-### XLOOKUP
-
-XLOOKUP was introduced in Microsoft 365 and Excel 2021 as a more flexible replacement for VLOOKUP. The syntax is =XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode]). Unlike VLOOKUP, XLOOKUP searches a specific column, the lookup_array, and returns a value from a different specific column, the return_array. The columns do not need to be adjacent, and the lookup column does not need to be the leftmost column.
-
-To retrieve a customer's name with XLOOKUP, you would write =XLOOKUP([@CustomerID], Customer[CustomerID], Customer[CustomerName], "Not Found"). This formula searches the CustomerID column of the Customer Table for the current row's CustomerID and returns the corresponding CustomerName. The optional "Not Found" parameter specifies what to display when no match exists, which is more informative than the #N/A error that VLOOKUP returns by default.
-
-XLOOKUP also supports approximate matching, wildcard matching, and reverse search order through its optional parameters, but for most accounting data preparation tasks exact matching is all you need. The primary advantages over VLOOKUP are the ability to search any column, the explicit specification of the return column by name rather than by index number, and the built-in error handling through the if_not_found parameter.
-
-### INDEX/MATCH
-
-The INDEX/MATCH combination predates XLOOKUP and remains valuable because it works in all versions of Excel. INDEX returns the value from a specified row and column of a range. MATCH returns the position of a value within a range. Combined, they perform the same operation as XLOOKUP but in two steps.
-
-The formula =INDEX(Customer[CustomerName], MATCH([@CustomerID], Customer[CustomerID], 0)) first uses MATCH to find the position of the current CustomerID within the Customer Table's CustomerID column, where the 0 parameter specifies an exact match. INDEX then uses that position to return the corresponding value from the CustomerName column. The result is identical to the XLOOKUP version.
-
-INDEX/MATCH has two advantages beyond backward compatibility. First, it handles situations where the return value sits in a different table or range from the lookup value, which can occur in complex multi-table workbooks. Second, because the lookup and return columns are specified independently, the formula does not break when columns are inserted or deleted in the source table. For accounting professionals who share workbooks with colleagues using older Excel versions, INDEX/MATCH remains the most reliable choice.
-
-*[Table 5.1: Comparison of Lookup Functions. A table with four columns, Feature, VLOOKUP, XLOOKUP, and INDEX/MATCH, and six rows comparing the three functions across capabilities including search direction, column specification method, error handling, Excel version requirement, and a typical Charles River use case.]*
-
-<!-- DRAFT: tabular content moved from drafts/05/ch05-markdown-tables.md; values not yet verified -->
-
-*Caption (placed above table): Table 5.1: Comparison of three Excel lookup functions by capability, syntax, and typical Charles River application.*
-
-| Feature | VLOOKUP | XLOOKUP | INDEX/MATCH |
-|---|---|---|---|
-| **Search direction** | First (leftmost) column of table_array only | Any column specified as lookup_array | Any column specified in MATCH range |
-| **Return column specification** | Column index number (e.g., 2 for the second column) | Named column range (e.g., Customer[CustomerName]) | Named column range in INDEX (e.g., Customer[CustomerName]) |
-| **Error handling** | Returns #N/A if no match found; requires wrapping in IFERROR for custom messages | Built-in if_not_found parameter (e.g., "Not Found") | Returns #N/A if no match found; requires wrapping in IFERROR |
-| **Column insertion risk** | Formula breaks if columns are inserted in the lookup table because col_index_num shifts | No risk; lookup and return columns are specified independently by name | No risk; lookup and return columns are specified independently by name |
-| **Excel version required** | All versions | Microsoft 365 and Excel 2021 or later | All versions |
-| **Typical Charles River use** | Simple lookups in a stable table, such as retrieving CustomerName when CustomerID is the leftmost column | General-purpose merges across Charles River tables, such as adding ItemName and ItemGroup to SalesOrderLine; recommended default for new workbooks | Merges in shared workbooks where backward compatibility with older Excel versions is required, such as adding Region from the Customer master |
-
-> **[IN PRACTICE]**
-> In audit fieldwork, analysts frequently receive data exports from client systems as separate files or worksheets, one for the sales register, another for the customer master, and another for the item catalog. Lookup functions are the primary tool for combining these exports into a single working file that supports analytical procedures. An auditor who can merge a Charles River sales register with the customer master and the item catalog in fifteen minutes can begin substantive testing while a colleague who does the same work by hand is still copying and pasting. The efficiency gain compounds across every engagement.
 
 {{< include _tutorial-01.qmd >}}
 
-## Handling Missing Values and Duplicate Records
 
-Chapter 2 identified missing values and duplicate records as two of the most common data quality problems in accounting datasets. This section teaches the specific Excel tools and formulas for detecting and resolving these problems.
+## Date Functions
 
-### Detecting and Handling Missing Values
+Accounting analysis is organized by period, so assigning each transaction to the right period is one of the most common preparation steps. Excel stores a date as a number of days, which is why dates can be subtracted and compared, and it provides functions that return the parts of a date. `YEAR`, `MONTH`, and `DAY` return the year, month, and day. `EOMONTH(date, 0)` returns the last day of the date's month, which is useful for month-end cutoff tests, and `EOMONTH(date, -1)+1` returns the first day.
 
-Missing values in accounting data take several forms. A cell may be completely blank, it may contain the text "N/A" or "TBD", or it may contain a zero that actually represents a missing value rather than a true zero amount. The approach to handling a missing value depends on why the value is missing and what you intend to do with the data.
+### Assigning Fiscal Periods
 
-In the Charles River O2C data, a natural source of missing values appears in the fulfillment chain. An order that has been placed but not yet shipped has no shipment date, because the Shipment table contains no row for it yet. When you merge SalesOrder with Shipment using a lookup, those unshipped orders return no match, which surfaces as a blank or an if_not_found label in the shipment date column. This is not necessarily a data error. It is a meaningful business state that your analysis must handle deliberately rather than ignore.
+Charles River's fiscal year is the calendar year, so the fiscal year of an invoice is `=YEAR([@InvoiceDate])` and its fiscal quarter is `=ROUNDUP(MONTH([@InvoiceDate])/3,0)`, which returns 1 for January through March and 4 for October through December. A period label such as 2026-Q4 is more useful than two separate numbers when you group, sort, and filter, and you can build one by joining text: `=[@FiscalYear]&"-Q"&[@FiscalQuarter]`.
 
-The ISBLANK function returns TRUE if a cell is empty and FALSE otherwise. You can use ISBLANK in a helper column to flag blank cells for review. The formula =IF(ISBLANK([@ShipmentDate]), "Not Yet Shipped", "Shipped") creates a column that clearly marks which orders have a shipment date and which do not. The COUNTBLANK function counts the number of blank cells in a range and is useful for assessing the extent of missing data across an entire column. The formula =COUNTBLANK(Orders[ShipmentDate]) returns the number of orders with no shipment date, which gives you a quick measure of how many orders remain open.
+Many organizations use a fiscal year that does not follow the calendar. For a fiscal year that begins in April, the formula `=INT(MOD(MONTH([@InvoiceDate])-4,12)/3)+1` returns quarter 1 for April through June and quarter 4 for January through March. The fiscal year itself then depends on the convention the organization uses to name it, typically the calendar year in which the fiscal year ends.
 
-Once you have identified missing values, the appropriate response depends on the context. In some cases the missing value is acceptable and can be left as is. An unshipped order legitimately has no shipment date, and an analysis of fulfillment timing should simply exclude or separately report those orders. In other cases the missing value must be filled in. The IF function can substitute a default label where appropriate. The formula =IF(ISBLANK([@Region]), "Not Specified", [@Region]) replaces a blank region with a label that ensures the record is included in grouped analyses rather than silently dropped.
+### Measuring Time Between Events
 
-### Detecting and Removing Duplicates
+Subtracting one date from another returns the number of days between them. The formula `=[@DueDate]-[@InvoiceDate]` returns the payment terms of each invoice in days, and the difference between an invoice date and its order date measures how long an order took to be billed. For whole months or years between two dates, DATEDIF returns the difference in a chosen unit, as in `=DATEDIF(start, end, "m")`, although Excel does not suggest it as you type.
 
-Excel provides a built-in Remove Duplicates tool that identifies and removes rows where all specified columns contain identical values. To use it, click anywhere in the Table, go to the Data tab, and click Remove Duplicates. A dialog box lists all columns in the Table. Select the columns that should be considered when determining whether two rows are duplicates, click OK, and Excel removes duplicate rows while keeping only the first occurrence.
+Measuring the age of a balance requires an as-of date. It is tempting to write `=TODAY()-[@InvoiceDate]`, but TODAY returns the date on which the workbook is opened, so the result changes every day and cannot be reproduced. A historical extract such as the Charles River data ends on a fixed date. Store the as-of date in a named parameter cell, as you did with the threshold in Chapter 4, and subtract from it instead.
 
-For accounting data, you should exercise caution with the Remove Duplicates tool. Two journal entries with the same date, amount, and account may be a legitimate pair of entries or may be a true duplicate, and the decision requires professional judgment rather than automatic removal. A safer approach is to flag potential duplicates first and review them before deletion. You can flag duplicates with the COUNTIFS function. In the Charles River P2P data, the formula =COUNTIFS(DisbursementPayment[SupplierID], [@SupplierID], DisbursementPayment[PaymentDate], [@PaymentDate], DisbursementPayment[Amount], [@Amount]) counts how many payment rows share the same supplier, date, and amount as the current row. A count greater than 1 indicates a potential duplicate payment that warrants investigation.
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A date that is stored as text looks like a date but behaves like text: it sorts alphabetically, it does not subtract, and it fails to match a real date. Text dates are common in data exported from other systems, especially when the export uses a different date order from your computer's settings. `DATEVALUE` converts a text date that Excel can recognize, and Power Query's data type setting, which you used in Chapter 4, converts a whole column. The Charles River workbook stores its dates as real dates, but always check the data type of a date column before you rely on it.
+:::
 
-*[Figure 5.8: The Remove Duplicates dialog box in Excel, showing column selection options for the Charles River SalesOrder Table. An annotation warns that automatic removal should follow manual review in accounting contexts, because apparent duplicates may be legitimate transactions.]*
 
-> **[WATCH OUT]**
-> Never remove records from an accounting dataset without documenting which records were removed and why. In audit work, removing records from the population without documentation invalidates the completeness of the dataset and may compromise the audit conclusion. Even in managerial accounting, deleting records without explanation creates a gap between the original data and the analytical results that makes the work difficult to review or reproduce. The best practice is to flag potential issues in a separate column rather than deleting rows, and to document your treatment decisions on a Documentation worksheet.
+## Lookup Functions
 
-## Introduction to Power Query
+A lookup function retrieves a value from one table using a key from another. It is the spreadsheet equivalent of following a foreign key to the row it references, which you practiced by hand in Tutorial 3.2. Each invoice line carries a SalesInvoiceID, and the SalesInvoice Table holds exactly one row for each SalesInvoiceID, with its invoice date, customer, and totals. A lookup finds that row and returns the column you ask for, as @fig-05-04 shows.
 
-Every technique covered so far in this chapter uses formulas to clean and transform data. Formulas are effective for individual transformations, but they have a significant limitation for accounting work. When you clean data with formulas, the transformation steps are embedded in individual cells scattered across the worksheet. There is no central record of what was done, in what order, or why. If the source data is updated next month or next quarter, you must repeat the entire process by hand, with all the risk of inconsistency and error that entails.
+![How XLOOKUP Retrieves a Value from Another Table.](/visuals/svg/fig-05-04-xlookup-anatomy.svg){#fig-05-04 fig-alt="A diagram of an XLOOKUP formula on real Charles River rows. On the left, an invoice line from the SalesInvoiceLine Table shows its SalesInvoiceID. On the right, rows of the SalesInvoice Table show SalesInvoiceID, InvoiceNumber, and InvoiceDate. Arrows show the three arguments of the formula: the lookup value is the line's SalesInvoiceID, the lookup array is the SalesInvoiceID column of SalesInvoice, where the matching row is highlighted, and the return array is the InvoiceDate column, from which the matching row's date is returned to the invoice line."}
 
-Power Query addresses this limitation. Power Query is a data transformation tool built into Excel, available in Excel 2016 and later, that allows you to import data from external sources, apply a sequence of transformation steps, and load the cleaned result into your workbook. Every step you take in Power Query is recorded in an ordered list that you can review, edit, and rerun at any time. When the source data changes, you refresh the query, and Power Query reapplies all the transformation steps automatically and produces updated results without manual intervention.
+### XLOOKUP
 
-For accounting professionals, the advantages of Power Query over formula-based cleaning are substantial. First, every transformation step is documented automatically. The list of applied steps serves as a processing log that describes exactly what was done to convert the raw data into the analysis-ready dataset, which satisfies the documentation requirements that auditing standards impose on analytical procedures (AICPA, 2017). Second, the transformation is repeatable. A quarterly analysis that requires the same cleaning steps each period can be refreshed with a single click. Third, Power Query can combine data from multiple sources, including multiple worksheets, multiple workbooks, and external databases, which makes it the Excel equivalent of the multi-table merges you performed with lookup functions earlier in this chapter.
+`XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found])` searches the lookup array for the lookup value and returns the value in the same position of the return array. To bring the invoice date onto each invoice line, the formula in a calculated column of the SalesInvoiceLine Table is:
 
-### Launching Power Query
+```
+=XLOOKUP([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],SalesInvoice[InvoiceDate],"No match")
+```
 
-To launch Power Query, go to the Data tab in Excel and look for the Get Data button, or the From Table/Range button in the Get and Transform Data group. To transform data already in your workbook, click on your Excel Table and then click From Table/Range. Power Query opens in a separate editor window with a preview of your data.
+The fourth argument is the value returned when the key is not found. Without it, XLOOKUP returns the error #N/A. A text value such as "No match" is easier to count, and counting it is the first check on any lookup: a clean lookup has no unmatched rows.
 
-The Power Query Editor window has three main areas. The center shows a preview of the data as it looks at the current step. The left panel shows the list of queries in the workbook. The right panel, labeled Applied Steps, shows every transformation step that has been applied to the current query. Each step has a name, and clicking on any step shows what the data looked like at that point in the sequence. You can rename steps, reorder them, delete them, or insert new steps between existing ones.
+### INDEX and MATCH, and VLOOKUP
 
-### Common Transformations
+Before XLOOKUP was added to Excel, the same retrieval was written by combining two functions. `MATCH(lookup_value, lookup_array, 0)` returns the position of the key in a column, and `INDEX(return_array, position)` returns the value at that position. Together, `=INDEX(SalesInvoice[InvoiceDate],MATCH([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],0))` does what the XLOOKUP formula above does. The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
 
-Power Query provides a wide range of transformation operations through the ribbon and through right-click menus on column headers. The transformations most relevant to accounting data preparation include changing data types, such as converting a text column to a date or number, removing or renaming columns, filtering rows based on criteria, replacing values such as replacing "N/A" with null, splitting columns by delimiter to separate a compound account code into its components, trimming and cleaning text to remove extra spaces and non-printable characters, merging queries to combine two tables on a shared key column, and grouping rows to aggregate detail into summary rows by category.
+VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-03 compares the three.
 
-Each transformation you apply appears as a new step in the Applied Steps panel. Power Query uses a formula language called M behind the scenes, but you do not need to learn M to use Power Query effectively. The visual interface generates the M code automatically when you click buttons and configure options.
+| Feature | VLOOKUP | INDEX and MATCH | XLOOKUP |
+|---|---|---|---|
+| Where the key can be | Only in the first column of the range | In any column | In any column |
+| How the return column is chosen | By its number in the range | By reference to the column | By reference to the column |
+| Effect of inserting or deleting columns | Can return the wrong column | None | None |
+| Default match | Approximate, unless the last argument is FALSE | Exact when the last argument is 0 | Exact |
+| When the key is not found | #N/A | #N/A | #N/A, or a value you supply |
+| Availability | All versions of Excel | All versions of Excel | Microsoft 365 and Excel 2021 or later |
 
-### Merging Queries
+: Lookup functions compared {#tbl-05-03}
 
-The merge operation in Power Query is particularly important for accounting work because it combines two tables based on a matching key column, equivalent to XLOOKUP in formulas or a JOIN in SQL. To merge two queries, click the Merge Queries button on the Home tab of the Power Query Editor. Select the first table and the key column from it, then select the second table and the matching key column. Choose the join type, most commonly Left Outer, which keeps all rows from the first table and adds matching information from the second table. Click OK, and Power Query creates a new column containing the matched records from the second table. You then expand this column to select which fields from the second table you want to include.
+### Lookups Across Several Tables
 
-This merge operation replaces the multi-column XLOOKUP approach from Tutorial 5.1 with a single, documented, repeatable step. If you need to combine SalesOrder with Customer and then merge the result with Item, you perform the merge operations in sequence, and Power Query records each one as a named step that you can review and re-execute.
+Some attributes are two keys away. An invoice line does not carry a sales order key, but its invoice does. To find the date on which a line was ordered, first bring the invoice's SalesOrderID onto the line with one lookup, and then use that SalesOrderID to look up the order date in the SalesOrder Table with a second. Keeping each step in its own column makes the chain easy to check.
 
-*[Figure 5.9: The Power Query Editor showing the Merge Queries dialog. The first selection shows the SalesOrder query with the CustomerID column highlighted. The second selection shows the Customer query with its CustomerID column highlighted. The join type is set to Left Outer. An annotation explains that this operation is the Power Query equivalent of XLOOKUP or a SQL LEFT JOIN.]*
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A lookup returns one value, the first match it finds. That is correct when the lookup follows a relationship toward its "one" side, from an invoice line to its invoice or from an invoice to its customer, because the key appears exactly once. It is wrong when it follows a relationship toward the "many" side. A sales order can have several shipments, so a lookup of an order's shipment date returns the date of whichever shipment comes first in the Table, not necessarily the earliest one. When the relationship is one-to-many, summarize instead: MINIFS returns the earliest shipment date, as in Tutorial 2.1, and SUMIFS or COUNTIFS return totals and counts. Chapter 3's discussion of cardinality tells you which side of a relationship you are on.
+:::
 
-> **[CONNECTING THE DOTS]**
-> The merge operation in Power Query is functionally identical to the LEFT JOIN you will learn in SQL in Chapter 10, where you will join the same Charles River SalesOrder and Customer tables on CustomerID. Both operations combine two tables by matching on a shared column and keep all rows from the primary table even when no match exists in the secondary table. Learning the merge concept here in Power Query will make the SQL JOIN syntax feel natural when you reach it, because the underlying logic is the same.
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Every lookup in this chapter follows a foreign key to a primary key, the relationship you studied in Chapter 3. The same operation is called a join in SQL, where it is written in a query rather than in a column formula, and it is called a relationship in Power BI's data model. The skill of asking which key connects two tables, and on which side of the relationship each table sits, carries over to both of the tools you will learn in Parts III and IV.
+:::
+
 
 {{< include _tutorial-02.qmd >}}
 
+
+## Missing, Meaningful, and Invalid Values
+
+Chapter 2 introduced missing values and duplicate records as data quality problems. Preparation adds a practical distinction: a blank cell does not always mean that information is missing. In the Charles River invoice lines, a blank PromotionID means that the line carried no promotion, and a blank ShipmentLineID on a design-service line means that nothing was shipped. These are meaningful blanks. They record a fact, and replacing them or treating them as errors would be wrong. A blank TrackingNumber on a shipment, as you found in Tutorial 2.1, is different: the information should exist and does not. Before you fill, remove, or flag blanks, decide which kind they are, and record the decision.
+
+Formulas complicate the test for blanks. `ISBLANK` returns TRUE only for a cell that contains nothing at all, so it returns FALSE for a cell whose formula returns an empty text value, even though the cell looks empty. To find the rows a lookup failed to match, count the value you told the lookup to return, such as "No match", rather than testing for blanks.
+
+A value can also be present and still be invalid for its purpose. A validity test checks that each value has the form or range it should. Charles River sells most items by the unit, recorded in the Item Table's UnitOfMeasure column as Each, so you might expect every quantity for those items to be a whole number. The test `=[@Quantity]<>INT([@Quantity])`, which returns TRUE for a quantity with a fractional part, finds that most invoice lines for items sold by the unit carry fractional quantities, such as the 3.74 sideboards billed on invoice line 10646. In practice, a finding like this goes to the owners of the source system with a question, because the cause could be a partial-unit shipping practice, a unit-of-measure setting, or an error in how quantities are recorded. For the analysis, what matters is whether the finding changes the answer. Revenue, list amounts, and discounts are recorded on each line and are consistent with one another, and an average price calculated as revenue divided by quantity is consistent across periods. Record the finding in the documentation as a known limitation of the quantity data, and avoid conclusions that depend on whole units.
+
+Duplicates are the last familiar problem. Excel's Remove Duplicates command, on the Data tab, deletes rows that repeat the values of the columns you choose. Use it with care: it deletes without asking which row to keep, and two rows that look the same may record two genuine transactions. As in Chapter 2, count and examine suspected duplicates before removing anything, and remove them in a query or a copy, never in the source data.
+
+
+## Power Query for Repeatable Preparation
+
+The lookup columns you add in Tutorial 5.2 work, but they have two weaknesses for a lasting analysis. They live as formulas in the loaded Table, so every refresh recalculates thousands of lookups, and the preparation they perform is spread across several columns rather than recorded as a single procedure. Power Query, which you used in Chapter 4 to import the data, can perform the same preparation as a recorded sequence of steps that runs whenever the data is refreshed.
+
+### Merging Queries
+
+Power Query's equivalent of a lookup is a merge. Merge Queries, on the Home tab of the Power Query Editor, combines two queries by matching a key column in each, and adds the matching rows of the second query as a new column that you then expand into the columns you need. A merge has a join kind, which decides which rows appear in the result. @tbl-05-04 lists the join kinds you will use most.
+
+| Join kind | Rows in the result | Accounting use |
+|---|---|---|
+| Left outer | Every row of the first query, with the matching rows of the second | Adding invoice and item details to every invoice line |
+| Inner | Only the rows that match in both queries | Keeping only lines whose item appears in a filtered item list |
+| Full outer | Every row of both queries, matched where possible | Comparing two lists, such as a subledger and a ledger extract |
+| Left anti | Only the rows of the first query that have no match in the second | Finding orphaned records, such as lines whose item is missing |
+
+: Join kinds in Power Query merges {#tbl-05-04}
+
+For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. Because every key in the Charles River invoice lines refers to a single row in the table it references, a left outer merge returns exactly as many rows as the invoice lines query started with, and checking that the row count has not changed is the first test of any merge.
+
+### Custom Columns
+
+A custom column, added through Add Column > Custom Column, calculates a new column with a formula written in Power Query's formula language, called M. The functions differ from Excel's, but the ideas are the same. `Date.Year([InvoiceDate])` returns the year, `Date.QuarterOfYear([InvoiceDate])` returns the quarter, and `Text.Middle([ItemCode], 4, 3)` returns three characters of the item code starting after the fourth. Note that Text.Middle counts positions from zero, where Excel's MID counts from one, so the same product type code starts at position 4 in M and position 5 in Excel. As in Chapter 4, every custom column appears in the Applied Steps list, so the query records exactly how each value was calculated.
+
+### Reference Queries and Refresh
+
+A merge can change the query it is applied to, so it is good practice to build the combined table in a new query rather than altering the queries that load the source Tables. Right-clicking a query in the Queries pane and choosing Reference creates a new query that starts from the result of the first one. The original query is unchanged, and the new query updates whenever the original does. When the data is refreshed, Power Query runs the source queries and then every step of the combined query, so the combined table is rebuilt from the current data without any formula being copied down.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Junior auditors are routinely asked to prepare client data for testing. In a teaching case built around that task, Hunter et al. (2020) describe cleaning large data sets as a vital task that is routinely performed by the most junior member of the audit team, and they pair the cleaning with checks that the prepared data is complete and accurate. A preparation workflow that records its steps, reconciles its row counts and totals to the source, and can be rerun on the next extract is exactly the evidence such checks require.
+:::
+
+
 {{< include _tutorial-03.qmd >}}
+
 
 ## Looking Ahead
 
-This chapter taught you the practical techniques for transforming raw Charles River data into a format ready for analysis. You can now clean text fields using TRIM, CLEAN, SUBSTITUTE, and related functions. You can extract fiscal period information from dates using YEAR, MONTH, and period-assignment formulas. You can merge data from multiple tables using VLOOKUP, XLOOKUP, and INDEX/MATCH. You can detect and handle missing values and duplicate records. And you can build repeatable, documented data preparation workflows in Power Query that record every transformation step and refresh automatically when source data changes.
+This chapter has prepared the Charles River invoice lines for analysis. You have used text functions to extract a product type from an item code and learned when standardizing text helps and when it harms. You have assigned invoices to fiscal periods, measured the time between orders and invoices, and seen why an as-of date is better than TODAY. You have combined Tables with lookups, followed a key through two tables, and learned to count the rows a lookup failed to match. You have distinguished meaningful blanks from missing information and recorded a validity finding about quantities. Finally, you have built the same enrichment in Power Query as a refreshable InvoiceLines table and reconciled it with your lookups and with the source.
 
-In the next chapter, you will put these clean, merged datasets to work. Chapter 6 introduces descriptive analytics and summarization in Excel, including statistical functions, PivotTables, and conditional aggregation formulas, applied across the O2C and Manufacturing table groups. The analysis-ready data you prepared in this chapter becomes the input for the revenue summaries by item group and customer segment, the profitability rankings, and the period-over-period comparisons you will build next.
+The preparation has already sharpened the controller's question. The Furniture Seasonal Promotion priced orders placed in September and October, but many of those orders were invoiced after the promotion ended, so its effect reaches further into the fourth quarter than its dates suggest. InvoiceLines now holds, for every invoice line, the period, the product group and type, and the customer segment that an answer requires. The remaining chapters of Part II analyze that table.
 
----
 
 
 {{< include _summary.qmd >}}
@@ -260,3 +216,5 @@ In the next chapter, you will put these clean, merged datasets to work. Chapter 
 {{< include _exercises.qmd >}}
 
 {{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

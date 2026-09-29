@@ -1,33 +1,79 @@
-## Guided Tutorial 5.3: Building a Repeatable Data Preparation Workflow in Power Query
+## Guided Tutorial 5.3: Building InvoiceLines in Power Query
 
-**Context and objective.** In this tutorial, you will use Power Query to import the Charles River SalesOrder and Customer tables, clean the data, merge the two tables on CustomerID, and load the result as a new worksheet. The goal is to create a documented, repeatable data preparation workflow that you can refresh whenever the source data is updated.
+**Context and objective.** In this tutorial, you will build the table the rest of Part II analyzes. Instead of adding more formula columns, you will create a new Power Query query, InvoiceLines, that starts from the invoice lines, merges in the invoice, item, and customer details, and calculates the fiscal period, the product type, and a quantity check as custom columns. You will load it as a Table, reconcile it with the source and with the lookups from Tutorial 5.2, and record it on the Documentation worksheet. Because it is a query, it rebuilds itself whenever you refresh the workbook.
 
-**Prerequisites.** You need the Charles River Excel workbook open with the SalesOrder and Customer worksheets available as named Excel Tables.
+**Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, Item, and SalesOrder queries.
 
 **Step-by-step instructions.**
 
-**Step 1.** Click on the SalesOrder Table. Go to the Data tab and click From Table/Range in the Get and Transform Data group. The Power Query Editor opens with a preview of the SalesOrder data.
+**Step 1. Open the Power Query Editor and import the customers.** The customer segment and region live in the Customer Table, which the workbook does not have yet.
 
-**Step 2.** In the Power Query Editor, locate the Applied Steps panel on the right side. You should see initial steps such as Source and Changed Type that Power Query applied automatically. Click on each step to observe how the data changes.
+a. Choose **Data > Get Data > Launch Power Query Editor**.
+b. In the editor, choose **Home > New Source > File > Excel Workbook**, select CharlesRiver.xlsx, and select the **T4_Customer** Table in the **Navigator**. Click **OK**.
+c. Rename the new query `Customer`, and use **Home > Choose Columns** to keep CustomerID, CustomerName, CustomerSegment, and Region.
 
-**Step 3.** Remove columns that are not needed for this analysis. Click the Choose Columns button on the Home tab. Keep SalesOrderID, OrderNumber, CustomerID, and OrderDate, and uncheck RequestedDeliveryDate, FreightTerms, and Status. Click OK. A new step called Removed Other Columns appears in the Applied Steps panel.
+**Step 2. Start the InvoiceLines query from the invoice lines.**
 
-**Step 4.** Confirm the date type on the OrderDate column. Click on the OrderDate column header and verify that the data type icon shows a date type. If the column includes a time component you do not need, use the Date Only transformation on the Transform tab.
+a. In the **Queries** pane, right-click **SalesInvoiceLine** and choose **Reference**.
+b. Rename the new query `InvoiceLines`.
 
-**Step 5.** Add a custom column for the fiscal quarter. Go to the Add Column tab and click Custom Column. Name the column FiscalQuarter and enter the formula =Number.RoundUp(Date.Month([OrderDate]) / 3). Click OK. A new column appears with the fiscal quarter number for each order, and a new step is recorded in the Applied Steps panel.
+The new query starts from the result of SalesInvoiceLine, which stays unchanged. It holds the invoice lines as Power Query loads them, without the calculated columns you added to the worksheet in Chapter 4 and Tutorial 5.2.
 
-*[Figure 5.11: The Power Query Editor showing the Custom Column dialog for creating the FiscalQuarter column from the Charles River SalesOrder data. The formula is visible in the formula field. The Applied Steps panel on the right shows the sequence of transformations performed so far, including Source, Changed Type, Removed Other Columns, and the new Added Custom step.]*
+**Step 3. Merge in the invoice details.**
 
-**Step 6.** Now merge the Customer table. On the Home tab, click Merge Queries. In the merge dialog, the current query, SalesOrder, is shown on top. Select CustomerID as the key column by clicking on it. In the lower section, select the Customer query from the dropdown and select CustomerID in the Customer table. Set the join kind to Left Outer, which keeps all rows from the first table and the matching rows from the second. Click OK. A new column called Customer appears in the table, containing expandable table objects.
+a. With **InvoiceLines** selected, choose **Home > Merge Queries**.
+b. In the upper table, click the SalesInvoiceID column. In the drop-down list below it, choose **SalesInvoice**, and click its SalesInvoiceID column.
+c. Leave the **Join Kind** set to **Left Outer (all from first, matching from second)**, and read the message at the bottom of the dialog, which reports how many of the invoice lines found a match. Click **OK**.
+d. A new column appears at the right, with a Table in every row. Click the expand button in its header, clear **Select All Columns**, select InvoiceDate, SalesOrderID, and CustomerID, clear **Use original column name as prefix**, and click **OK**.
 
-**Step 7.** Click the expand icon, a double-arrow icon, on the Customer column header. A dialog lists all columns from the Customer table. Select only CustomerName, CustomerSegment, and Region. Uncheck the option that adds the original column name as a prefix to keep the column names clean. Click OK. The CustomerName, CustomerSegment, and Region columns now appear in the query result, populated with the matching customer information for each order.
+@fig-05-06 shows the Merge dialog.
 
-*[Figure 5.12: The expanded result in Power Query showing the Charles River SalesOrder data merged with CustomerName, CustomerSegment, and Region from the Customer table. The Applied Steps panel shows the complete sequence of steps, including the merge and the expansion. An annotation highlights that every step is documented and can be reviewed or modified.]*
+![The Merge Dialog in Power Query.](/visuals/svg/fig-05-06-merge-dialog.svg){#fig-05-06 fig-alt="A mock of the Power Query Merge dialog. The upper table is the InvoiceLines query with its SalesInvoiceID column selected, and the lower table is the SalesInvoice query with its SalesInvoiceID column selected, both showing their first rows. The Join Kind is Left Outer, and a message at the bottom reports that the selection matches every row from the first table. The two key columns and the join kind are outlined."}
 
-**Step 8.** Review the Applied Steps panel. You should see a sequence that includes the source connection, the type change, the column removal, the custom FiscalQuarter column, the merge operation, and the column expansion. Click on each step in sequence to see the data at each point in the transformation. This step-by-step visibility is the key advantage of Power Query over formula-based cleaning.
+**Step 4. Merge in the item and customer details.** Repeat the merge for the two other Tables.
 
-**Step 9.** Click Close and Load on the Home tab. Power Query creates a new worksheet in your workbook containing the cleaned and merged data, and the worksheet name matches the query name. The data loads as an Excel Table that is connected to the Power Query transformation. To update it when source data changes, right-click the Table and select Refresh.
+a. Merge **InvoiceLines** with **Item** on ItemID, with a left outer join. Expand ItemCode, ItemGroup, and StandardCost, without the prefix.
+b. Merge **InvoiceLines** with **Customer** on CustomerID, the column you added in Step 3, with a left outer join. Expand CustomerSegment and Region, without the prefix.
+c. In each Merge dialog, read the match message before you click **OK**. Every row of the first table should find a match, because every key refers to exactly one row, so the merges add columns without adding or losing rows. The editor's status bar shows only a preview of the rows, so you will confirm the exact count after loading, in Step 6.
 
-**Step 10.** Open a Documentation worksheet and record the Power Query transformation you created. Note the query name, the source tables used, the transformation steps applied, and the output worksheet name.
+**Step 5. Add the calculated columns.** Choose **Add Column > Custom Column** for each of the columns below. Type the name in **New column name** and the formula in **Custom column formula**, and click **OK**.
 
-**Checkpoint.** Your workbook should now contain a new worksheet with a merged and cleaned dataset that includes SalesOrderID, OrderNumber, CustomerID, OrderDate, FiscalQuarter, CustomerName, CustomerSegment, and Region. The Applied Steps panel in Power Query should contain six to eight named steps that document the entire transformation. If you right-click the output Table and click Refresh, the query should re-execute without errors, which demonstrates its repeatability. This workflow can serve as a template for any future data preparation task where you need to combine and clean multiple Charles River tables.
+| New column name | Custom column formula |
+|---|---|
+| `FiscalYear` | `Date.Year([InvoiceDate])` |
+| `FiscalQuarter` | `Date.QuarterOfYear([InvoiceDate])` |
+| `Period` | `Text.From([FiscalYear]) & "-Q" & Text.From([FiscalQuarter])` |
+| `ProductType` | `Text.Middle([ItemCode], 4, 3)` |
+| `WholeQuantity` | `[Quantity] = Number.RoundDown([Quantity])` |
+
+: Custom columns for the InvoiceLines query {#tbl-05-05}
+
+Then set each new column's data type with the icon at the left of its header: whole number for FiscalYear and FiscalQuarter, text for Period and ProductType, and true/false for WholeQuantity. @fig-05-07 shows the dialog for the ProductType column.
+
+![The Custom Column Dialog in Power Query.](/visuals/svg/fig-05-07-custom-column.svg){#fig-05-07 fig-alt="A mock of the Power Query Custom Column dialog for the InvoiceLines query. The new column name is ProductType, and the custom column formula is Text.Middle([ItemCode], 4, 3). A list of available columns, including ItemCode, InvoiceDate, and Quantity, is shown on the right, and the dialog reports that no syntax errors have been detected. The formula is outlined."}
+
+**Step 6. Load InvoiceLines and check the result.**
+
+a. Choose **Home > Close & Load**. Power Query loads InvoiceLines into a new worksheet as a Table. Rename the worksheet `InvoiceLines`.
+b. On the **Analysis** worksheet, type `InvoiceLines rows` in A49 and `InvoiceLines line total` in A50, and enter `=COUNTA(InvoiceLines[SalesInvoiceLineID])` in B49 and `=SUM(InvoiceLines[LineTotal])` in B50. Compare them with the invoice line count in B3 and the line total in B5.
+c. In B52:E52, repeat the Furniture revenue by quarter from Tutorial 5.2, using InvoiceLines instead of SalesInvoiceLine, and compare the two rows.
+d. In A53, type `Lines with a fractional quantity`, and in B53 enter `=COUNTIF(InvoiceLines[WholeQuantity],FALSE)`.
+
+@fig-05-08 shows the loaded Table.
+
+![The InvoiceLines Table Loaded by Power Query.](/visuals/svg/fig-05-08-invoicelines-table.svg){#fig-05-08 fig-alt="A mock of the InvoiceLines worksheet. The Table holds, for each invoice line, its ID, quantity, line total, and promotion, together with the merged InvoiceDate, ItemGroup, CustomerSegment, and Region and the calculated Period, ProductType, and WholeQuantity columns. The Queries and Connections pane at the right lists every query with the number of rows it loaded, and InvoiceLines has as many rows as SalesInvoiceLine. The InvoiceLines entry in the pane is outlined."}
+
+**Step 7. Record the query and refresh.**
+
+a. On the **Documentation** worksheet, add InvoiceLines to the Worksheets entry, and describe its steps in the Query steps entry: a reference to SalesInvoiceLine, left outer merges with SalesInvoice, Item, and Customer, and five custom columns.
+b. Add the fractional quantities to the Open questions entry as a known limitation of the quantity data.
+c. Choose **Data > Refresh All**, confirm that the row counts and totals are unchanged, update the Last refreshed date, and save the workbook.
+
+**Checkpoint.** Check that:
+
+- InvoiceLines has exactly as many rows as SalesInvoiceLine, and the same line total;
+- its Furniture revenue for each quarter of 2026 agrees with the lookups from Tutorial 5.2;
+- most lines are flagged as having a fractional quantity, and the Documentation worksheet records it;
+- a refresh rebuilds InvoiceLines without any change to the totals.
+
+The two methods agree, which is the evidence that the preparation is correct. From here on, the analysis uses InvoiceLines, because it is a single recorded procedure that repeats itself on every refresh, while the lookup columns on SalesInvoiceLine remain in the workbook as the check that confirmed it.

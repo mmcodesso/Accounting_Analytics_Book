@@ -2,30 +2,32 @@
 
 ## Key Terms
 
-**CLEAN function.** An Excel function that removes non-printable characters from a text value. Non-printable characters are invisible control codes that can cause unexpected behavior in formulas and prevent text matching.
+**As-of date.** A fixed date, usually stored in a named parameter cell, from which ages and elapsed times are measured. Unlike TODAY, an as-of date gives the same result every time the workbook is opened, so the calculation can be reproduced and reviewed.
 
-**Data preparation.** The process of transforming raw data into a format suitable for analysis, including cleaning text fields, standardizing formats, merging tables, handling missing values, and removing duplicates. Data preparation typically consumes the largest portion of time in an analytics project.
+**Custom column.** A column added to a Power Query query and calculated with a formula in Power Query's formula language, M. Custom columns are recorded as applied steps and recalculated on every refresh.
 
-**Date arithmetic.** The process of calculating the difference between two dates, typically to determine the number of days elapsed. In Excel, subtracting one date from another returns the number of days between them.
+**Data preparation.** The work of transforming data from the form in which it was recorded into a form suitable for an analysis, including profiling, combining, restructuring, cleaning, and validating it. It is the third stage of the analytics workflow.
 
-**Fiscal quarter.** A three-month period within an organization's fiscal year. Assigning transactions to fiscal quarters requires extracting the month from the transaction date and mapping it to the appropriate quarter based on the organization's fiscal year start month.
+**Fiscal period.** The accounting period, such as a fiscal year, quarter, or month, to which a transaction is assigned. Charles River's fiscal year is the calendar year, and its fiscal quarters run from January through March, April through June, and so on.
 
-**INDEX function.** An Excel function that returns the value at a specified row position within a range. Combined with MATCH, it provides a flexible lookup capability that works in all Excel versions.
+**INDEX and MATCH.** A pair of Excel functions used together to look up a value: MATCH returns the position of a key in a column, and INDEX returns the value at that position in another column. The combination works in every version of Excel.
 
-**MATCH function.** An Excel function that returns the position of a specified value within a range. Used with INDEX to create a two-step lookup that is not limited to searching the leftmost column.
+**Join kind.** The rule that decides which rows appear in the result of a merge, such as left outer, inner, full outer, or left anti. The join kind determines whether rows without a match are kept, dropped, or returned on their own.
 
-**Merge (Power Query).** A Power Query operation that combines two tables based on a matching key column, equivalent to a join in SQL or a lookup function in Excel formulas. The merge creates a single table that includes columns from both source tables.
+**Left outer join.** A join kind that keeps every row of the first table and adds the matching rows of the second, leaving the added columns empty where no match exists. It is the usual choice for enriching transactions with details from related tables.
 
-**Nested lookup.** A formula in which one lookup function is placed inside another so that the result of the inner lookup becomes the search value for the outer lookup. In the Charles River data, a nested lookup retrieves a customer name from a sales order line by first finding the CustomerID from the order and then finding the name from the customer master.
+**Lookup function.** An Excel function, such as XLOOKUP or VLOOKUP, that retrieves a value from one table using a key from another. A lookup is the spreadsheet equivalent of following a foreign key to the row it references.
 
-**Power Query.** A data transformation tool built into Excel that allows users to import, clean, transform, and merge data through a visual interface. Every transformation step is recorded automatically and can be refreshed when source data changes.
+**Match key.** A value built to match records that do not share an identifier, usually by joining and standardizing several columns, such as an address and a city. Match keys are used to compare lists from different sources.
 
-**Referential integrity.** The condition in which every foreign key value in one table corresponds to an existing primary key value in the referenced table. A lookup that returns an if_not_found result can reveal a referential integrity problem in the data.
+**Meaningful blank.** An empty value that records a fact rather than missing information, such as a blank PromotionID on an invoice line that carried no promotion. Meaningful blanks should be kept, not filled or flagged as errors.
 
-**SUBSTITUTE function.** An Excel function that replaces every occurrence of a specified text string within a value with a different string. Used for removing unwanted characters or standardizing abbreviations in accounting data.
+**Merge.** A Power Query operation that combines two queries by matching a key column in each and adds the matching rows of the second query as columns of the first. It is Power Query's equivalent of a lookup or a SQL join.
 
-**TRIM function.** An Excel function that removes leading spaces, trailing spaces, and extra interior spaces from a text value, leaving only single spaces between words. TRIM is essential for preparing text fields for matching and lookup operations.
+**Reference query.** A Power Query query created from another query with the Reference command, which starts from the other query's result and updates whenever it does. Building a combined table as a reference query leaves the source queries unchanged.
 
-**VLOOKUP function.** An Excel function that searches for a value in the leftmost column of a table and returns a corresponding value from a specified column. VLOOKUP is the most widely known lookup function but is limited by its requirement to search the first column.
+**Text function.** An Excel function that extracts, changes, or tests text, such as MID, TRIM, SUBSTITUTE, or PROPER. Text functions are used to pull attributes out of codes and to standardize values so that they match.
 
-**XLOOKUP function.** An Excel function introduced in Microsoft 365 that searches a specified column and returns a value from a different specified column. XLOOKUP is more flexible than VLOOKUP and includes built-in error handling through an optional if_not_found parameter.
+**Validity check.** A test that each value has the form or range it should for its purpose, such as an item code of the expected length or a quantity that is a whole number. A validity check can fail even when the value is present and accurately recorded.
+
+**XLOOKUP.** An Excel function that searches one column for a key and returns the value in the same position of another column, with an optional value to return when the key is not found. It is available in Microsoft 365 and Excel 2021 or later.
