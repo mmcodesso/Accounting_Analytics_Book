@@ -16,4 +16,6 @@ Microsoft. (2026a). *Calculate values in a PivotTable*. Microsoft Support. <http
 
 Microsoft. (2026b). *Show different calculations in PivotTable value fields*. Microsoft Support. <https://support.microsoft.com/en-us/office/show-different-calculations-in-pivottable-value-fields-014d2777-baaf-480b-a32b-98431f48bfec>
 
+Microsoft. (2026c). *Create a histogram*. Microsoft Support. <https://support.microsoft.com/en-us/office/create-a-histogram-85680173-064b-4024-b39d-80f17ff2f4e8>
+
 Public Company Accounting Oversight Board. (n.d.). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>

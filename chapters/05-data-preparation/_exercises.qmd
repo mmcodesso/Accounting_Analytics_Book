@@ -2,6 +2,8 @@
 
 ## Applied Exercises
 
+As in Chapter 4, work on these exercises in a fresh copy of your analysis workbook, made after you finish this chapter's tutorials, or in a new workbook where an exercise says so. Put each exercise on its own worksheets, named after it, and do not rename or edit the queries the tutorials created.
+
 ### Financial Accounting Exercises
 
 **Exercise 5.1: Net Furniture Revenue by Quarter**
@@ -12,9 +14,9 @@
 
 **Requirements.**
 
-(1) Use Power Query to load the CreditMemo and CreditMemoLine Tables from CharlesRiver.xlsx into your analysis workbook, with CreditMemoDate set to the Date type.
+(1) Use Power Query to load the CreditMemo and CreditMemoLine Tables from CharlesRiver.xlsx into your copy of the analysis workbook, with CreditMemoDate set to the Date type.
 
-(2) Prepare the credit memo lines for the comparison. Bring each line's credit memo date and a period label onto it, and bring the ItemGroup from the Item Table, using either lookups or a Power Query merge. Count the rows that failed to match.
+(2) Prepare the credit memo lines for the comparison. Bring each line's CreditMemoDate from the CreditMemo Table, matching on CreditMemoID, and add a period label. Bring the ItemGroup from the Item Table, matching on ItemID. Use either lookups or Power Query merges, and count the rows that failed to match.
 
 (3) Build a grid with the four quarters of 2026 across a row and three rows below them: gross Furniture revenue from InvoiceLines, Furniture credit memo lines, and net Furniture revenue. Fill it with SUMIFS formulas.
 
@@ -34,7 +36,7 @@
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Your audit senior asks whether Charles River's invoice numbers can be relied on to identify the fiscal year of an invoice, as the finance team assumes. Each invoice number contains a year, such as the 2025 in SI-2025-007947.
+**Scenario.** You are a financial reporting analyst preparing the year-end close. Part of the close is a revenue cutoff review, which checks that every invoice is recorded in the fiscal year in which the sale was made. The finance team uses the year in each invoice number, such as the 2025 in SI-2025-007947, as a quick check of an invoice's fiscal year, and the controller asks you to test whether that is reliable.
 
 **Requirements.**
 
@@ -46,7 +48,7 @@
 
 (4) List the invoices flagged by either test. Compare the list with the invoices dated before their first shipment that you found in Tutorial 2.1, and describe what the three findings together suggest about how these invoices were dated.
 
-(5) Write a brief memo (one half page) to your senior that explains the tests, the results, and the evidence you would request from the billing team.
+(5) Write a brief memo (one half page) to the controller that explains the tests, the results, the effect the findings could have on revenue cutoff, and the evidence you would request from the billing team.
 
 **Deliverable.** A SalesInvoice Table with the test columns and a half-page memo on the invoices whose numbers or dates are inconsistent.
 
@@ -95,9 +97,9 @@
 
 **Requirements.**
 
-(1) On the SalesInvoice Table, bring each invoice's OrderDate from the SalesOrder Table and calculate the number of days from order to invoice.
+(1) On the SalesInvoice Table, bring each invoice's OrderDate from the SalesOrder Table, unless you already added it in Exercise 5.2, and calculate the number of days from order to invoice.
 
-(2) For each quarter of fiscal 2026, calculate the number of invoices and the median lag, using MEDIAN with IF or the AGGREGATE function. Describe how stable the lag is.
+(2) For each quarter of fiscal 2026, use COUNTIFS and AVERAGEIFS to calculate the number of invoices and the average lag. Use MEDIAN to calculate the median lag of all the invoices, and explain why the average is higher than the median. Describe how stable the lag is from quarter to quarter.
 
 (3) For each promotion in the PromotionProgram Table, count its invoice lines and the lines invoiced after its EffectiveEndDate.
 
@@ -105,8 +107,9 @@
 
 **Deliverable.** A lag analysis by quarter, a count of promotion lines invoiced after each promotion ended, and a short recommendation.
 
-<!-- Instructor notes, Exercise 5.4: median order-to-invoice lag across all invoices 12 days (90th percentile 52 days). Fiscal 2026 medians by
-     quarter: Q1 13 days (1,845 invoices), Q2 11 (1,782), Q3 13 (1,756), Q4 12 (1,788): stable. Promotion lines invoiced after the end date:
+<!-- Instructor notes, Exercise 5.4: order-to-invoice lag across all 20,914 invoices: median 12 days, mean 21.3 (90th percentile 52 days);
+     the mean exceeds the median because a minority of orders take much longer to invoice (right skew). Fiscal 2026 by quarter, invoices and
+     average lag: Q1 1,845, 23.1 days; Q2 1,782, 20.5; Q3 1,756, 21.4; Q4 1,788, 21.6 (medians 13, 11, 13, 12): stable. Promotion lines invoiced after the end date:
      PROMO-2024-001 80 of 80, PROMO-2024-002 147 of 431, PROMO-2024-003 74 of 149, PROMO-2025-004 74 of 74, PROMO-2025-005 74 of 228,
      PROMO-2025-006 201 of 414, PROMO-2026-007 68 of 68, PROMO-2026-008 160 of 576, PROMO-2026-009 27 of 88. Promotions 001, 004, and 007 have
      every line after the end date because their dates are wrong (a one-day promotion, and two whose end dates precede their start dates);
@@ -130,7 +133,7 @@
 
 (3) Use XLOOKUP or COUNTIFS to find the suppliers whose match key appears in the Employee Table, and bring the matching employee's name and job title onto the Supplier Table.
 
-(4) For each match, use the DisbursementPayment Table to total the payments made to the supplier.
+(4) Load the DisbursementPayment Table into the same workbook, and for each match, use SUMIFS on SupplierID to total the payments made to the supplier.
 
 (5) Prepare a brief memo (one half page) that lists the matches, the payments involved, and the procedures you would perform next.
 
@@ -145,29 +148,41 @@
      approval of these suppliers and of their invoices, and compare prices with other suppliers. -->
 
 
-**Exercise 5.6: Reviewing the Supplier Master File**
+**Exercise 5.6: Reviewing the Supplier and Item Master Files**
 
-**Table group:** Procure-to-Pay
+**Table group:** Procure-to-Pay, with the Item table from Master Data
 
-**Scenario.** Before the audit team tests purchasing, your senior asks you to prepare and review the supplier master file: produce a clean supplier list for the workpapers, and test it for duplicate suppliers and for suppliers that should not be receiving business.
+**Scenario.** Before the audit team tests purchasing and sales, your senior asks you to review two master files. The supplier master file should yield a clean supplier list for the workpapers and be tested for duplicate suppliers and for suppliers that should not be receiving business. The item master file should be tested for items that are sold although their status says they should not be.
 
 **Requirements.**
 
-(1) Using the Supplier Table, add a column that applies PROPER to SupplierName, and count the names that change. Examine the changed names and explain why applying PROPER to this field would be a mistake.
+(1) In the workbook of Exercise 5.5, using the Supplier Table, add a column that applies PROPER to SupplierName, and count the names that change. Examine the changed names and explain why applying PROPER to this field would be a mistake.
 
 (2) Test for duplicate suppliers: count the suppliers that share a TaxID and the suppliers that share a BankAccount. Explain what a clean result shows and what it does not.
 
 (3) List the suppliers whose IsApproved flag is 0 and the suppliers whose SupplierRiskRating is High.
 
-(4) Using the PurchaseOrder and DisbursementPayment Tables, count the purchase orders and payments for each unapproved supplier.
+(4) Load the PurchaseOrder Table into the same workbook, and use COUNTIFS on SupplierID with the PurchaseOrder and DisbursementPayment Tables to count the purchase orders and payments for each unapproved supplier.
 
-(5) Prepare a brief memo (one half page) that summarizes the review and recommends which suppliers the purchasing tests should focus on.
+(5) In your copy of the analysis workbook, load the Item Table again as a new query named `ItemMaster`, with all its columns. Then test the item master against the invoice lines:
 
-**Deliverable.** A reviewed supplier list with the test columns and a half-page memo.
+   - list the items whose LifecycleStatus is Discontinued but whose IsActive flag is 1;
+   - on ItemMaster, count each item's invoice lines with COUNTIFS on `SalesInvoiceLine[ItemID]`, and list the items with IsActive 0 that were still invoiced, with the latest InvoiceDate of each;
+   - on the SalesInvoiceLine Table, look up each line's LaunchDate from ItemMaster, flag the lines invoiced before their item's launch, and count them by item.
+
+(6) Prepare a brief memo (one half page) that summarizes both reviews, recommends which suppliers the purchasing tests should focus on, and explains what each item finding means for the reliability of the item master.
+
+**Deliverable.** A reviewed supplier list and item master with the test columns, and a half-page memo.
 
 <!-- Instructor notes, Exercise 5.6: PROPER changes 62 of 110 supplier names, for example "Watson, Mitchell and Chen" to "Watson, Mitchell And
      Chen" and "Donaldson LLC" to "Donaldson Llc": the names are already consistently cased, so standardizing damages them. No TaxID or
      BankAccount is shared: no duplicate suppliers on these keys, although duplicates with different identifiers would not be caught.
      Seven suppliers are unapproved (IDs 104 to 110), and none has a purchase order or a payment: the approval control appears to work.
      Seven suppliers are rated High risk (IDs 11, 24, 40, 55, 57, 80, and 104), six of them approved and receiving business. The six
-     related-party suppliers of Exercise 5.5 are also worth focusing on. -->
+     related-party suppliers of Exercise 5.5 are also worth focusing on. Item master: three items are Discontinued but IsActive 1 (IDs 1, 2, 6:
+     ACC-MIR-0001, LGT-TBL-0001, TXT-THR-0001), a status conflict. Three Discontinued items with IsActive 0 were still invoiced in every year
+     through 2026-12-31: ACC-PLN-0002 (132 lines), LGT-PND-0002 (68), and FUR-SDB-0002 (216), the sideboard used as an example in the chapter.
+     Two items were invoiced before their LaunchDate: LGT-CHD-0019 (launch 2026-01-21; 58 lines from 2024-02-11 to 2026-01-15) and ACC-ART-0020
+     (launch 2025-02-05; 54 lines from 2024-01-11 to 2025-01-31), 112 lines and 206,424.41 in all. These are the AnomalyLog's
+     item_status_alignment_conflict, discontinued_item_in_new_activity, and prelaunch_item_in_new_activity items; the log also names item 228,
+     but no line of item 228 is dated before its launch. The findings mean the status and launch fields cannot be relied on to control sales. -->

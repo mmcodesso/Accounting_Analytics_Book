@@ -16,6 +16,8 @@
 
 **Left outer join.** A join kind that keeps every row of the first table and adds the matching rows of the second, leaving the added columns empty where no match exists. It is the usual choice for enriching transactions with details from related tables.
 
+**Logical function.** An Excel function that works with logical tests, expressions that are either TRUE or FALSE. IF and IFS return a value that depends on a test, AND, OR, and NOT combine or reverse tests, and IFERROR substitutes a value when a formula returns an error. Logical functions classify values into groups and flag the rows that need attention.
+
 **Lookup function.** An Excel function, such as XLOOKUP or VLOOKUP, that retrieves a value from one table using a key from another. A lookup is the spreadsheet equivalent of following a foreign key to the row it references.
 
 **Match key.** A value built to match records that do not share an identifier, usually by joining and standardizing several columns, such as an address and a city. Match keys are used to compare lists from different sources.

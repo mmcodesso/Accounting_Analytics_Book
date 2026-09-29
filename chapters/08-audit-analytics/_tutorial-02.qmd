@@ -1,6 +1,6 @@
 ## Guided Tutorial 8.2: Aging Receivables and Reconciling Them to the Ledger
 
-**Context and objective.** In this tutorial, you will age Charles River's receivables at the end of fiscal 2026 and reconcile the aged invoices to the accounts receivable account in the general ledger. You will calculate each invoice's open balance from the receipts and credit memos recorded by the as-of date, classify the open invoices by days past due, and compare their total with the ledger. You will then investigate the difference and record what it means for the audit.
+**Context and objective.** In this tutorial, you will age Charles River's receivables at the end of fiscal 2026 and reconcile the aged invoices to the accounts receivable account in the general ledger. You will calculate each invoice's open balance from the receipts and credit memos recorded by the as-of date, classify the open invoices by days past due, and compare their total with the ledger. You will then investigate the difference, select customer balances for confirmation, and record what the work means for the audit.
 
 **Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.1.
 
@@ -8,29 +8,36 @@
 
 **Step 1. Import the invoices, receipts, and credit memos.** A customer receipt reaches an invoice through CashReceiptApplication, which records how much of each receipt was applied to each invoice, and a credit memo reduces the invoice named in its OriginalSalesInvoiceID.
 
-a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T16_SalesInvoice**, **T20_CashReceiptApplication**, **T23_CreditMemo**, and **T4_Customer** Tables. Click **Transform Data**.
-b. Rename the queries `OpenInvoices`, `Applied`, `Credited`, and `Customers`. In Customers, keep CustomerID, CustomerName, and CreditLimit, and clear **Enable Load**.
-c. In Applied, filter ApplicationDate to dates before 1/1/2027. Choose **Transform > Group By**, group by SalesInvoiceID, name the new column `Applied`, and choose **Sum** of AppliedAmount. Clear **Enable Load**.
-d. In Credited, filter CreditMemoDate to dates before 1/1/2027, and group by OriginalSalesInvoiceID with a new column `Credited` that sums GrandTotal. Clear **Enable Load**.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select the **T16_SalesInvoice**, **T20_CashReceiptApplication**, **T23_CreditMemo**, and **T4_Customer** Tables, and click **Transform Data**.
+c. Rename the queries `OpenInvoices`, `Applied`, `Credited`, and `Customers`.
+d. In Customers, keep CustomerID, CustomerName, and CreditLimit.
+e. In Applied, filter ApplicationDate to dates before `2027-01-01`. Choose **Transform > Group By**, group by SalesInvoiceID, name the new column `AppliedTotal`, and choose **Sum** of AppliedAmount.
+f. In Credited, filter CreditMemoDate to dates before `2027-01-01`, and group by OriginalSalesInvoiceID with a new column `CreditedTotal` that sums GrandTotal.
+g. Clear **Enable Load** for Customers, Applied, and Credited.
 
 The extract ends on December 31, 2026, so the two date filters remove nothing today. They keep the aging correct if you rerun it on a later extract, when receipts and credits after the as-of date must not reduce the balances.
 
 **Step 2. Calculate the open balance of each invoice.**
 
-a. In OpenInvoices, filter InvoiceDate to dates before 1/1/2027.
-b. Merge OpenInvoices with **Applied** on SalesInvoiceID and expand Applied. Merge it with **Credited**, matching SalesInvoiceID with OriginalSalesInvoiceID, and expand Credited. Merge it with **Customers** on CustomerID, and expand CustomerName and CreditLimit. Use a left outer join each time.
-c. Select the Applied and Credited columns, choose **Transform > Replace Values**, and replace `null` with `0`.
-d. Choose **Add Column > Custom Column**, name it `OpenBalance`, and enter `[GrandTotal] - [Applied] - [Credited]`. Set its type to **Decimal Number**, and choose **Transform > Rounding > Round** with 2 decimal places.
-e. Filter OpenBalance to values greater than 0, and choose **Home > Close & Load**.
+a. In OpenInvoices, filter InvoiceDate to dates before `2027-01-01`.
+b. Merge OpenInvoices with **Applied** on SalesInvoiceID, with a left outer join, and expand AppliedTotal without the prefix.
+c. Merge OpenInvoices with **Credited**, matching SalesInvoiceID with OriginalSalesInvoiceID, with a left outer join, and expand CreditedTotal without the prefix.
+d. Merge OpenInvoices with **Customers** on CustomerID, with a left outer join, and expand CustomerName and CreditLimit without the prefix.
+e. Select the AppliedTotal and CreditedTotal columns, choose **Transform > Replace Values**, and replace `null` with `0`. An invoice with no receipt or no credit memo finds no match in the merge, which leaves a null, and a subtraction with a null returns null.
+f. Choose **Add Column > Custom Column**, name it `OpenBalance`, and enter `[GrandTotal] - [AppliedTotal] - [CreditedTotal]`.
+g. Set the type of OpenBalance to **Decimal Number**, and choose **Transform > Rounding > Round** with `2` decimal places.
+h. Filter OpenBalance to values greater than 0, choose **Home > Close & Load**, and rename the new worksheet `OpenInvoices`.
 
 Most invoices are fully paid and drop out, leaving about a thousand open invoices. A negative balance is also removed: it belongs to an invoice that was paid and then credited. Charles River records such a credit as a liability to the customer, in account 2060 Customer Deposits and Unapplied Cash, and later refunds it, so it is not a receivable.
 
 **Step 3. Age the open invoices.**
 
-a. Add a worksheet named `Aging`. In A1, type `As-of date`, and in B1 type `2026-12-31`. Click B1, type `AsOfDate` in the **Name Box**, and press Enter.
-b. In F3:G8, type the bucket table in @tbl-08-02. Select it, choose **Insert > Table**, and name the Table `Buckets` in **Table Design > Table Name**.
-c. In the OpenInvoices Table, add a column named `DaysPastDue` with the formula `=AsOfDate-[@DueDate]`, formatted as a whole number.
-d. Add a column named `Bucket` with this formula:
+a. Add a worksheet named `Aging`. In A1, type `As-of date`, and in B1, type `2026-12-31`.
+b. Click B1, type `AsOfDate` in the **Name Box**, and press Enter.
+c. In F3:G8, type the bucket table in @tbl-08-02. Select it, choose **Insert > Table**, and name the Table `Buckets` in **Table Design > Table Name**.
+d. In the OpenInvoices Table, add a column named `DaysPastDue` with the formula `=AsOfDate-[@DueDate]`, formatted as a whole number.
+e. Add a column named `Bucket` with this formula:
 
    ```
    =XLOOKUP([@DaysPastDue],Buckets[From],Buckets[Bucket],,-1)
@@ -51,24 +58,30 @@ The last argument of XLOOKUP, -1, returns the bucket whose From value is the lar
 **Step 4. Summarize the aging.**
 
 a. In A3:D3 of the Aging worksheet, type `Bucket`, `Invoices`, `Open balance`, and `Share of balance`, and type the five bucket names in A4:A8.
-b. In B4, C4, and D4, enter these three formulas, and copy them down to row 8:
+b. In B4 and C4, enter these two formulas, and copy them down to row 8:
 
    ```
    =COUNTIFS(OpenInvoices[Bucket],A4)
    =SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A4)
-   =C4/C$9
    ```
-c. In A9, type `Total`, and add the columns with SUM.
-d. Sort the OpenInvoices Table by DaysPastDue from largest to smallest, and look at the oldest invoices.
+
+c. In A9, type `Total`, and in B9 and C9, add the columns with SUM.
+d. In D4, enter `=C4/C$9`, copy it down to row 8, and add column D with SUM in D9.
+e. Sort the OpenInvoices Table by DaysPastDue from largest to smallest, and look at the oldest invoices.
 
 Most of the balance is current, and most of the rest is less than thirty days past due. The buckets beyond sixty days hold very little, and most of their invoices carry residual balances of a few cents or a few dollars left after the customer's payment, which are candidates for a small-balance write-off rather than for collection.
 
 **Step 5. Reconcile the aging to the ledger.** The accounts receivable account is 1020 Accounts Receivable, whose AccountID is 3. The query also keeps the two accounts where a provision for uncollectible receivables would appear: 1030 Allowance for Doubtful Accounts (AccountID 4) and 6170 Bad Debt Expense (AccountID 74).
 
-a. Import the **T3_GLEntry** Table, name the query `LedgerAR`, and filter it first. Open the filter list of AccountID, choose **Number Filters > Equals**, select **Advanced**, and add three clauses joined by **Or**: AccountID equals 3, equals 4, and equals 74.
-b. Filter PostingDate to dates before 1/1/2027.
-c. Use **Home > Choose Columns** to keep GLEntryID, PostingDate, AccountID, VoucherNumber, SourceDocumentType, Description, Debit, and Credit, in that order. Add a custom column `Amount` with the formula `[Debit] - [Credit]`, set its type to **Decimal Number**, and choose **Close & Load**.
-d. On the Aging worksheet, type the labels in A11:A13 shown in @fig-08-05. In C11, enter `=C9`, in C12 enter `=SUMIFS(LedgerAR[Amount],LedgerAR[AccountID],3)`, and in C13 enter `=C12-C11`.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, select the **T3_GLEntry** Table, and click **Transform Data**, not **Load**.
+b. Name the query `LedgerAR`. Open the filter list of AccountID, choose **Number Filters > Equals**, and select **Advanced**.
+c. Add three clauses joined by **Or**: AccountID equals `3`, equals `4`, and equals `74`, and click **OK**.
+d. Filter PostingDate to dates before `2027-01-01`.
+e. Use **Home > Choose Columns** to keep GLEntryID, PostingDate, AccountID, VoucherNumber, SourceDocumentType, Description, Debit, and Credit.
+f. Add a custom column `Amount` with the formula `[Debit] - [Credit]`, and set its type to **Decimal Number**.
+g. Choose **Home > Close & Load**, and rename the new worksheet `LedgerAR`.
+h. On the Aging worksheet, type `Open invoices (sub-ledger)`, `Account 1020 (AccountID 3)`, and `Difference` in A11:A13.
+i. In C11, enter `=C9`; in C12, enter `=SUMIFS(LedgerAR[Amount],LedgerAR[AccountID],3)`; and in C13, enter `=C12-C11`.
 
 The ledger balance is larger than the open invoices by a round amount, as @fig-08-05 shows. Both sides end on the same date, so the difference is not a timing difference, and it has to be explained.
 
@@ -76,26 +89,57 @@ The ledger balance is larger than the open invoices by a round amount, as @fig-0
 
 **Step 6. Investigate the difference.**
 
-a. Select a cell in the LedgerAR Table and choose **Insert > PivotTable**, placing it on a new worksheet.
-b. Drag AccountID and then SourceDocumentType to the **Rows** area, and GLEntryID and Amount to the **Values** area. Set GLEntryID to **Count** in its **Value Field Settings**.
-c. Double-click the Sum of Amount for JournalEntry. Excel lists the rows behind the value on a new worksheet, a feature called **Show Details**.
+a. Select a cell in the LedgerAR Table, choose **Insert > PivotTable**, and place it on a new worksheet.
+b. Drag AccountID and then SourceDocumentType to the **Rows** area.
+c. Drag GLEntryID and Amount to the **Values** area, and set GLEntryID to **Count** in its **Value Field Settings**.
+d. Double-click the Sum of Amount for JournalEntry. Excel lists the rows behind the value on a new worksheet, a feature called **Show Details**.
 
 @fig-08-06 shows what the PivotTable reveals. Only account 1020 appears: in three years, Charles River has posted nothing to the allowance or to bad debt expense. Within account 1020, sales invoices increase the balance, and receipt applications and credit memos reduce it, all of them traceable to invoices. One journal entry line adds the rest: the accounts receivable opening balance in JE-2024-000001, dated January 1, 2024. No invoice stands behind that amount, and no receipt has been applied to it since, because every receipt application names an invoice.
 
 ![Accounts Receivable in the Ledger by Source Document.](/visuals/svg/fig-08-06-ar-ledger-by-source.svg){#fig-08-06 fig-alt="A mock of a PivotTable of the LedgerAR query with AccountID and SourceDocumentType in the rows, and the count of rows and the sum of Amount as values. Only AccountID 3 appears, with rows for cash receipt applications and credit memos, which are negative, sales invoices, which are positive, and a single journal entry row, outlined. Below, the Show Details worksheet lists that row: dated January 1, 2024, voucher JE-2024-000001, described as the accounts receivable opening balance."}
 
-**Step 7. Record the findings.**
+**Step 7. Select balances for confirmation.** The largest customer balances are confirmed in full, and a random sample of the other customers represents the rest. The selection is made by customer, because a confirmation asks each customer for its whole balance.
 
-a. Add a worksheet named `WP Receivables`, with the labels of the workpaper in column A as in Tutorial 8.1.
+a. Choose **Data > Get Data > Launch Power Query Editor**, right-click **OpenInvoices** in the **Queries** pane, choose **Reference**, and name the new query `CustomerBalances`.
+b. Choose **Transform > Group By**, select **Advanced**, group by CustomerID, click **Add grouping**, and choose CustomerName.
+c. Name the new column `Balance`, choose **Sum** of OpenBalance, and click **OK**.
+d. Choose **Home > Close & Load**, and rename the new worksheet `CustomerBalances`.
+e. Add a worksheet named `Confirmations`. Type `Key item threshold` in A1 and `50000` in B1, and `Sample size` in A2 and `20` in B2.
+f. Type `Key items` in A4, and in A5, enter:
+
+   ```
+   =FILTER(CustomerBalances,CustomerBalances[Balance]>=B1)
+   ```
+
+g. Type `Other customers in random order` in E4, and in E5, enter:
+
+   ```
+   =SORTBY(FILTER(CustomerBalances,CustomerBalances[Balance]<B1),RANDARRAY(COUNTIF(CustomerBalances[Balance],"<"&B1)))
+   ```
+
+h. Type `Random sample` in I4, and in I5, enter `=INDEX(E5#,SEQUENCE(B2),{1,2,3})`, which returns the first B2 rows of the shuffled list.
+i. Select the sample, from I5 to the last row it fills in column K, copy it, and choose **Home > Paste > Paste Values** without moving the selection.
+
+About two dozen customers are key items, and together they hold about two-fifths of the open balance. The random sample gives each of the other customers the same chance of selection. Grouping by CustomerID as well as by name keeps apart the two different customers named Brown LLC. The list in column E reshuffles every time the workbook recalculates, and pasting values froze the sample in column I as the record of what was selected.
+
+**Step 8. Record the findings.**
+
+a. Add a worksheet named `WP Receivables`, with the workpaper labels of Tutorial 8.1 in column A.
 b. Record the population check (the number of open invoices and their total), the aging, and the reconciliation to account 1020.
-c. Record three findings, each with its follow-up. The opening balance has no invoice detail and has not been collected in three years: request the customer-level detail behind it, and assess whether any of it is still collectible. The company has recorded no allowance for credit losses, although the credit loss standard of the Financial Accounting Standards Board (FASB) requires one even when the risk of loss is low, and an aging schedule is one of the methods it accepts (FASB, 2016). A handful of invoices carry small residual balances that should be written off or collected.
-d. Save the workbook.
+c. Record the confirmation selection: the threshold, the sample size, the date of the selection, and the customers selected.
+d. Record the unsupported opening balance as a finding: it has no invoice detail and has not been collected in three years. The follow-up is to request the customer-level detail behind it and assess whether any of it is still collectible.
+e. Record the missing allowance as a finding. The credit loss standard of the Financial Accounting Standards Board (FASB) requires an allowance even when the risk of loss is remote, and an aging schedule is one of the methods it accepts (FASB, 2016).
+f. Record the small residual balances as a finding, to be written off or collected.
+g. Save the workbook.
+
+The workpaper now holds the evidence of the reconciliation, the plan for external confirmation, and three findings, each with its follow-up.
 
 **Checkpoint.** Check that:
 
 - about a thousand invoices are open, and no open balance is negative;
 - the aging total equals the sum of the OpenBalance column, and most of it is current;
 - the difference between account 1020 and the open invoices is a round amount, traced to one journal entry line;
-- the PivotTable shows no rows for accounts 1030 and 6170.
+- the PivotTable shows no rows for accounts 1030 and 6170;
+- the Confirmations worksheet lists the key items and a random sample of twenty other customers, pasted as values.
 
 The aging tells the credit department that Charles River's customers pay mostly on time. The reconciliation tells the auditor something more important: part of the receivables balance is not supported by any invoice, and no allowance has been recorded against any of it. Both findings affect the amount at which receivables would be reported, and both go to the audit committee with the evidence behind them.

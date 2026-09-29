@@ -5,16 +5,16 @@
 **1.** For the Charles River invoice lines of fiscal 2026, the average line total is about half again as large as the median line total. What does this suggest about the distribution of line totals?
 
 A.  It is symmetric, so the average and the median describe the typical line equally well.
-B.  It is skewed to the left, with a minority of very small lines pulling the average down.
-C.  It is skewed to the right, with a minority of large lines pulling the average up.
+B.  It is skewed to the right, with a minority of large lines pulling the average up.
+C.  It is skewed to the left, with a minority of very small lines pulling the average down.
 D.  It contains errors, because the average and the median of accounting data should be equal.
 
 **2.** What is the difference between STDEV.S and STDEV.P?
 
-A.  STDEV.S treats the values as a sample and divides by their number minus one, while STDEV.P treats them as the whole population and divides by their number.
-B.  STDEV.S ignores blank cells, while STDEV.P counts them as zeros.
-C.  STDEV.S returns the spread around the median, while STDEV.P returns the spread around the mean.
-D.  STDEV.S works only on Excel Tables, while STDEV.P works on any range.
+A.  STDEV.S measures the spread around the median, while STDEV.P measures the spread around the mean.
+B.  STDEV.S ignores blank cells in the range, while STDEV.P counts every blank cell as a zero.
+C.  STDEV.S treats the values as a sample and divides by n − 1; STDEV.P treats them as a population and divides by n.
+D.  STDEV.S works only on the columns of Excel Tables, while STDEV.P works on any range of cells.
 
 **3.** An analyst wants the median line total of fiscal 2026 invoice lines only, and enters this formula:
 
@@ -24,10 +24,10 @@ D.  STDEV.S works only on Excel Tables, while STDEV.P works on any range.
 
 Why does the formula use FILTER?
 
-A.  FILTER sorts the values, which MEDIAN requires.
-B.  FILTER converts the line totals from text to numbers.
-C.  FILTER removes the outliers that would distort the median.
-D.  MEDIAN accepts no criteria and Excel has no MEDIANIFS, so FILTER supplies only the rows that meet the condition.
+A.  MEDIAN accepts no criteria, so FILTER supplies only the rows of fiscal 2026.
+B.  FILTER converts the line totals from text into numbers first.
+C.  FILTER removes the outliers that would otherwise distort the median.
+D.  FILTER sorts the line totals into order, which MEDIAN requires.
 
 **4.** A summary uses this formula, with the group name misspelled:
 
@@ -37,38 +37,38 @@ D.  MEDIAN accepts no criteria and Excel has no MEDIANIFS, so FILTER supplies on
 
 What does the formula return?
 
-A.  The error #N/A, because no row matches the criterion
-B.  Zero, without an error, which a comparison with a control total would reveal
+A.  The error #N/A, because no row of the Table matches the criterion
+B.  The Furniture total, because SUMIFS corrects near matches in text
 C.  The total of every row, because an invalid criterion is ignored
-D.  The Furniture total, because SUMIFS corrects near matches
+D.  Zero, without an error, which a comparison with a control total would reveal
 
 **5.** In Tutorial 6.1, the revenue of the four product lines falls short of the fiscal 2026 control total by exactly the revenue of the Services item group. What does the difference show?
 
-A.  The control total double-counts some invoice lines.
-B.  The SUMIFS formulas of the product lines contain an error.
-C.  The summary leaves out a category that is part of the population, and it is complete only when the category is added.
-D.  Services revenue should be excluded from the control total.
+A.  The summary leaves out a category, and it is complete only when the category is added.
+B.  The SUMIFS formulas of the four product lines contain a spelling error.
+C.  The control total double-counts some invoice lines of the Services group.
+D.  Services revenue should be excluded from the control total of the year.
 
-**6.** A text field, such as CustomerSegment, is dragged into the Values area of a PivotTable. How does Excel summarize it by default?
+**6.** An analyst wants to show how the fiscal 2026 invoice line totals are distributed: how many lines are small, how many are medium, and how many are large. Which chart suits the question best?
 
-A.  It counts the rows.
-B.  It sums the values.
-C.  It lists each value.
-D.  It returns an error, because text cannot be summarized.
+A.  A pie chart of revenue by item group
+B.  A line chart of the line totals in invoice order
+C.  A histogram of the line totals, in bins of equal width
+D.  A stacked column chart of revenue by quarter
 
 **7.** An analyst defines a PivotTable calculated field with the formula `=Quantity*UnitPrice` to show revenue. What does the field return for each cell of the PivotTable?
 
 A.  The revenue of the cell, because the formula is applied to each row and the results are summed
-B.  The sum of the quantities multiplied by the sum of the unit prices, which is not the revenue
+B.  An error, because calculated fields cannot multiply two fields
 C.  The average revenue per line in the cell
-D.  An error, because calculated fields cannot multiply two fields
+D.  The sum of the quantities multiplied by the sum of the unit prices, which is not the revenue
 
 **8.** A PivotTable shows fiscal 2026 revenue with item groups in its rows and quarters in its columns. What does Show Values As % of Column Total display?
 
 A.  Each quarter's share of the item group's revenue for the year
-B.  Each value's share of the revenue of all groups and quarters together
+B.  Each item group's share of the quarter's revenue
 C.  The change in each group's revenue from the previous quarter
-D.  Each item group's share of the quarter's revenue
+D.  Each value's share of the revenue of all groups and quarters together
 
 **9.** A formula on the Bridge worksheet refers to the PivotTable with GETPIVOTDATA:
 
@@ -78,49 +78,67 @@ D.  Each item group's share of the quarter's revenue
 
 What is its advantage over a cell address such as `=Drivers!B5`?
 
-A.  GETPIVOTDATA identifies the value by its field and item, so it keeps returning the right value when the PivotTable's layout changes.
-B.  GETPIVOTDATA refreshes the PivotTable whenever the formula recalculates.
-C.  GETPIVOTDATA reads the value from the source Table, so the PivotTable can be deleted.
-D.  GETPIVOTDATA rounds the value to the number format of the PivotTable.
+A.  GETPIVOTDATA reads the value from the source Table, so the PivotTable can be deleted.
+B.  GETPIVOTDATA refreshes the PivotTable every time the formula recalculates.
+C.  It names the value by field and item, so it survives changes to the PivotTable's layout.
+D.  GETPIVOTDATA rounds the value to the number format shown in the PivotTable.
 
 **10.** An analyst adds a custom column to the InvoiceLines query and loads the query, but the new field does not appear in a PivotTable built from InvoiceLines. What is the most likely explanation?
 
-A.  PivotTables cannot use columns added by Power Query.
-B.  The custom column must first be converted to values.
-C.  A PivotTable summarizes its own copy of the data, which updates only when the PivotTable is refreshed, for example with Refresh All.
-D.  The PivotTable must be deleted and built again.
+A.  A PivotTable summarizes its own copy of the data, which updates only when it is refreshed.
+B.  The custom column must first be converted to values in the Table.
+C.  PivotTables cannot use any of the columns that Power Query adds.
+D.  The PivotTable must be deleted and built again from the Table.
 
 **11.** A PivotTable of the Charles River general ledger shows negative revenue for the Furniture account in the fourth quarter of fiscal 2026. What is the most likely cause?
 
-A.  Credit memos issued in the fourth quarter exceeded the invoices.
-B.  The year-end closing entry, which debits every revenue account on the last day of the year, is included in the PivotTable.
-C.  The PivotTable sums debits and credits in the wrong columns.
-D.  The Furniture Seasonal Promotion reduced revenue below zero.
+A.  Credit memos issued in the fourth quarter exceeded the invoices of the quarter.
+B.  The Furniture Seasonal Promotion reduced the quarter's revenue below zero.
+C.  The PivotTable sums the debits and the credits in the wrong columns.
+D.  The year-end closing entry, which debits every revenue account, is included.
 
-**12.** In a margin bridge, what does the mix effect measure?
+**12.** An analyst builds a trial balance at December 31, 2026, from GLEntry and leaves out the two 2026 closing entries. Why are they left out?
 
-A.  The change in margin caused by selling more or fewer units in total
-B.  The change in margin caused by charging different prices for the same items
-C.  The change in margin caused by a change in the standard cost of each item
-D.  The change in margin caused by a shift in sales between items that earn different margins
+A.  The closing entries do not balance, so the trial balance would not balance.
+B.  The closing entries zero the revenue and expense accounts, so the income statement could not be prepared.
+C.  The closing entries are posted in fiscal 2027, after the cutoff.
+D.  The closing entries hold the opening balances of the balance sheet accounts.
 
 **13.** Why is the cost effect zero in the Furniture margin bridge of Tutorial 6.3?
 
-A.  The Furniture product line has no cost of goods sold.
-B.  Costs are excluded from the bridge because they are recorded in the ledger.
-C.  InvoiceLines values every quantity at the item's standard cost, and each item has a single standard cost, so the cost of the same items cannot differ between the quarters.
-D.  The cost effect is combined with the volume effect in every bridge.
+A.  The Furniture product line has no cost of goods sold in the ledger.
+B.  Costs are excluded from the bridge because they are recorded only in the ledger.
+C.  Each item has one standard cost, so the same items cost the same in both quarters.
+D.  The cost effect is always combined with the volume effect in a bridge.
 
 **14.** From the third quarter to the fourth, the Furniture margin at standard cost falls, while the margin before promotional discounts rises slightly. What can you conclude?
 
-A.  The decline comes from the promotional discounts, not from list prices, the items sold, or their costs.
-B.  The decline comes from higher standard costs in the fourth quarter.
-C.  The decline comes from a fall in the number of units sold.
+A.  The decline comes from the promotional discounts, not from list prices, mix, or costs.
+B.  The decline comes from higher standard costs of the Furniture items in the fourth quarter.
+C.  The decline comes from a fall in the number of Furniture units sold in the fourth quarter.
 D.  The two margins are calculated inconsistently, so no conclusion is possible.
 
-**15.** Under the PCAOB's standard on substantive analytical procedures, what should an auditor do before evaluating the difference between recorded revenue and an expectation?
+**15.** Under the standard of the Public Company Accounting Oversight Board (PCAOB) on substantive analytical procedures, what should an auditor do before evaluating the difference between recorded revenue and an expectation?
 
-A.  Ask management for the expected amount and accept it if it is close to the recorded amount.
-B.  Develop the expectation from plausible relationships and decide how large a difference can be accepted without further investigation.
+A.  Ask management for the expected amount and accept it if it is close to the recorded one.
+B.  Develop the expectation and decide in advance how large a difference is acceptable.
 C.  Replace the expectation with the recorded amount of the previous year.
-D.  Select a random sample of transactions, because analytical procedures cannot use expectations.
+D.  Select a random sample of transactions, because analytical procedures use no expectations.
+
+<!-- Answer key, Chapter 6 (for instructors; HTML comments are removed from every rendered format):
+     1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 15 B.
+     1 B: a mean well above the median signals a right skew: a minority of large lines pulls the average up.
+     2 C: STDEV.S divides by n - 1 for a sample; STDEV.P divides by n for a whole population.
+     3 A: MEDIAN accepts no criteria and there is no MEDIANIFS, so FILTER supplies the year's rows.
+     4 D: a misspelled criterion matches nothing, so SUMIFS returns zero silently; a control total catches it.
+     5 A: the difference equals a whole category, Services, missing from the summary.
+     6 C: a histogram shows how values are distributed across bins of equal width.
+     7 D: a calculated field applies its formula to sums, so Quantity*UnitPrice multiplies two sums.
+     8 B: % of Column Total shows each group's share of the quarter's revenue.
+     9 C: GETPIVOTDATA names the value by field and item, so layout changes do not break it.
+     10 A: a PivotTable reads its pivot cache, which updates only on refresh.
+     11 D: the year-end closing entry debits every revenue account on December 31.
+     12 B: the closing entries zero the revenue and expense accounts, so a pre-closing trial balance leaves them out.
+     13 C: each item has one standard cost, so the cost effect at standard is zero.
+     14 A: margin before discounts rising while margin falls isolates the promotional discounts as the cause.
+     15 B: the auditor develops the expectation and sets the acceptable difference before evaluating it. -->

@@ -4,7 +4,7 @@
 
 **Aging schedule.** A classification of the unpaid invoices at an as-of date by how long each is past its due date, in buckets such as current, 1 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days. It supports credit follow-up and the estimate of credit losses.
 
-**Allowance for credit losses.** A valuation account, deducted from receivables, for the amount not expected to be collected. Under the credit loss standard of the Financial Accounting Standards Board (FASB), it reflects expected losses even when the risk of loss is remote and may be estimated from an aging schedule.
+**Allowance for credit losses.** A valuation account, deducted from receivables, for the amount not expected to be collected. Under the credit loss standard of the Financial Accounting Standards Board (FASB), it reflects expected losses even when the risk of loss is remote and may be estimated from an aging schedule. Charles River's account for it is named Allowance for Doubtful Accounts, the older term.
 
 **Audit workpaper.** The documentation of an audit test: its objective, source, population check, procedure, parameters, results, exceptions and their dispositions, conclusion, preparer, and reviewer, recorded so that an experienced auditor with no connection to the engagement can understand and review the work.
 
@@ -12,7 +12,13 @@
 
 **Benford's Law.** The observation that in many collections of numbers the first digit d occurs with a proportion of about `LOG10(1+1/d)`, so that about 30 percent of the numbers begin with 1 and fewer than 5 percent with 9.
 
+**Confirmation.** Audit evidence obtained directly from a third party, such as a customer asked to state its balance to the auditor. The PCAOB's standard on confirmation requires it for accounts receivable unless the evidence is obtained directly from a knowledgeable external source in another way.
+
+**Control deficiency.** A weakness in the design or operation of a control that keeps it from preventing or detecting misstatements on time.
+
 **Disposition.** The auditor's conclusion about an exception: expected, with the evidence that explains it; follow up, with the question to ask or the document to request; or a misstatement or control deficiency to be reported.
+
+**Exception.** A record that meets a test's criteria and therefore needs an explanation, such as a payment above an approval limit or a journal entry created after its posting date. An exception is not an error until it has been investigated.
 
 **False positive.** A record that meets a test's criteria but turns out to be legitimate. Most exceptions from tests of whole populations are false positives, and the auditor's work is to explain them and refine the tests.
 
@@ -32,12 +38,18 @@
 
 **Population.** The complete set of records to which a test's conclusion applies, such as every supplier payment dated in the period under review.
 
+**Reconciliation.** A comparison of two balances that should agree, such as a ledger account and the detail behind it, that lists every reconciling item explaining the difference between them.
+
 **Reconciling item.** An amount that explains a difference between two balances that should agree, such as a ledger account and the detail behind it. An item that cannot be explained is a finding in itself.
 
 **Risk score.** The number of risk characteristics a record has, calculated by adding its flags. It ranks records for review; it is not a probability of fraud.
+
+**Sampling risk.** The risk that the conclusion drawn from a sample differs from the conclusion the whole population would support. Examining individually significant items in full removes it for those items.
 
 **Segregation of duties.** The principle that no one person should both initiate and approve a transaction, or both record and authorize it, so that one person's error or fraud is caught by another.
 
 **Stratification.** The division of a population into groups, or strata, usually by value, to show where the items and the value are concentrated and to direct audit attention.
 
 **Threshold test.** A test that counts items in narrow bands just below and just above a control threshold, such as an approval limit, to look for amounts kept below it.
+
+**Tolerable misstatement.** The largest misstatement in an account or class of transactions that, combined with misstatements elsewhere, would not make the financial statements materially misstated.

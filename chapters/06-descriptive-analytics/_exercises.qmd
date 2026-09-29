@@ -2,46 +2,60 @@
 
 ## Applied Exercises
 
+As in the earlier chapters, work on these exercises in a fresh copy of your analysis workbook, made after you finish this chapter's tutorials. Put each exercise on its own worksheets, named after it, and do not rename or edit the queries the tutorials created.
+
 ### Financial Accounting Exercises
 
-**Exercise 6.1: Reconciling Product-Line Revenue to the Ledger**
+**Exercise 6.1: From the Ledger to the Income Statement**
 
-**Table group:** Order-to-Cash and the General Ledger
+**Table group:** Accounting Core, with the invoice lines from Order-to-Cash
 
-**Scenario.** Before the revenue PivotTable from Tutorial 6.2 goes to the management meeting, the controller wants evidence that it agrees with the general ledger. Each product line posts to its own revenue account: Furniture to 4010, Lighting to 4020, Textiles to 4030, Accessories to 4040, and design services to 4080.
+**Scenario.** The controller wants the fiscal 2026 income statement for the management meeting, prepared from the general ledger rather than typed from a report, and she wants to know that its revenue agrees with the product-line revenue in your PivotTables. Build it by following the method in the section "From the Ledger to the Financial Statements".
 
 **Requirements.**
 
-(1) Use Power Query to load the GLEntry Table filtered to fiscal year 2026 before you load it, and merge in the AccountNumber and AccountName from the Account Table. Remember that GLEntry.AccountID is the Account Table's surrogate key, not the account number: AccountID 42, for example, is account 4010. Keep only accounts 4000 through 4999, and add a quarter column calculated from FiscalPeriod.
+(1) Build the trial balance query in your copy of the analysis workbook:
 
-(2) Build a PivotTable of credits minus debits by account and quarter, with SourceDocumentType in the Filters area. Show only the SalesInvoice rows.
+   - Import the **T3_GLEntry** Table, clicking **Transform Data** rather than **Load**, and name the query `TrialBalance`.
+   - Filter PostingDate to dates before `2027-01-01`, and filter VoucherNumber to exclude JE-2026-000296 and JE-2026-000297, the 2026 closing entries.
+   - Choose **Transform > Group By**, select **Advanced**, group by AccountID, and add two aggregations: `Debit`, the sum of Debit, and `Credit`, the sum of Credit.
+   - Import the **T1_Account** Table as a second query named `ChartOfAccounts`, keep AccountID, AccountNumber, AccountName, AccountType, and AccountSubType, and clear **Enable Load**.
+   - Merge TrialBalance with ChartOfAccounts on AccountID, expand the four other columns without the prefix, and choose **Close & Load**.
 
-(3) Compare each account's SalesInvoice postings by quarter with the InvoiceLines revenue of its item group from Tutorial 6.2. Identify every difference, find the invoices responsible, and compare their invoice dates, posting dates, and the shipment dates of their orders.
+(2) In the TrialBalance Table, add three calculated columns: `Balance`, equal to Debit minus Credit; `DebitBalance`, equal to `=MAX(0,[@Balance])`; and `CreditBalance`, equal to `=MAX(0,-[@Balance])`. Turn on **Table Design > Total Row** and show the sums of DebitBalance and CreditBalance. Explain why the revenue and expense accounts show only the activity of fiscal 2026, although the query includes 2024 and 2025.
 
-(4) Remove the SourceDocumentType filter. List the other source document types that post to the revenue accounts in 2026, and explain whether each belongs in a comparison of product-line revenue.
+(3) On a worksheet named `IncomeStatement`, build the income statement of @fig-06-07 with one SUMIFS formula per line on the Balance column by AccountSubType: operating revenue (the Operating Revenue subtype, with the sign reversed), sales returns and allowances (Contra Revenue), net revenue, cost of goods sold (COGS), gross margin, operating expenses (Operating Expense), operating income, other income and expense (the Other Income or Expense and Other Expense subtypes), and net income. Add a column that expresses every line as a percentage of net revenue.
 
-(5) Write a reconciliation memo of half a page that states what agrees, what does not and why, and which date you believe determines the period of the revenue for the invoices you found.
+(4) Check the statement in two ways. First, compare net income with the TotalAmount of JE-2026-000297, the entry that closed the income summary to retained earnings. Second, use SUMIFS by AccountType to show that the assets equal the liabilities and equity once net income is added to equity.
 
-**Deliverable.** A reconciliation PivotTable with the differences identified and explained, and a half-page memo.
+(5) Compare the balances of the product revenue accounts, 4010 to 4040 and 4080, with the fiscal 2026 revenue of their item groups in InvoiceLines. Three accounts differ by small amounts. Identify the invoices responsible, using what you found in Exercise 5.2 about invoices numbered in one fiscal year and dated in another, and explain which date should determine the period of their revenue.
 
-<!-- Instructor notes, Exercise 6.1: SalesInvoice postings agree with InvoiceLines to the cent for every revenue account in 2026 Q2-Q4.
-     Q1 differs: 4010 GL 4,357,356.01 vs Furniture lines 4,354,122.83 (+3,233.18); 4020 1,570,492.78 vs 1,569,380.55 (+1,112.23);
-     4040 475,813.58 vs 475,576.62 (+236.96); 4030 and 4080 agree. The differences are SI-2026-013742 (Furniture, invoice date 2025-12-04),
-     SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03), all posted 2026-01-01 and all numbered with the
-     next year's prefix (Exercise 5.2; the same invoices are dated before their first shipment in Tutorial 2.1). Their orders shipped on
-     2025-12-01, 2025-12-06, and 2025-12-05, so the shipping evidence places the sales in fiscal 2025, as the invoice dates do, while the
-     ledger records them in fiscal 2026 with the invoice numbers: a cutoff issue that understates 2025 and overstates 2026 Q1 revenue.
-     Other 2026 sources: the year-end close JournalEntry debits every revenue account on 2026-12-31 (4010 17,398,287.56, which is the
-     2026 Furniture lines plus 3,233.18) and credits 4060; CreditMemo rows post to 4060 Sales Returns and Allowances (242,764.56 debit)
-     and 4050 Freight Revenue (1,796.63 debit); SalesInvoice also credits 4050 for freight, which has no invoice line. None of these
-     belongs in a product-line comparison of gross billed revenue, although returns belong in a net revenue analysis (Exercise 5.1). -->
+(6) Write a memo of half a page to the controller that presents the common-size income statement, describes what it shows about Charles River's cost structure, and explains the reconciling differences.
+
+**Deliverable.** A trial balance whose debit and credit balances agree, a common-size income statement for fiscal 2026 that ties to the closing entry, a revenue reconciliation, and a half-page memo.
+
+<!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at 2026-12-31 (GLEntry with PostingDate before 2027-01-01, without
+     JE-2026-000296 and JE-2026-000297, 45 rows) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both
+     67,107,722.36. Revenue and expense accounts show only fiscal 2026 because the 2024 and 2025 closing entries zeroed them.
+     Income statement: operating revenue 29,973,822.48 (100.82% of net revenue); sales returns and allowances -242,764.56 (4060); net
+     revenue 29,731,057.92; cost of goods sold -18,634,303.63 (62.68%; includes freight-out 5050, purchase price variance 5060, and
+     manufacturing variance 5080); gross margin 11,096,754.29 (37.32%); operating expenses -6,471,696.58 (21.77%); operating income
+     4,625,057.71 (15.56%); other income and expense -121,446.47 (loss on asset disposal 7020 of 92,500.00, an account typed Revenue with
+     subtype Other Income or Expense, and interest expense 7030 of 28,946.47); net income 4,503,611.24 (15.15%), equal to JE-2026-000297.
+     Balance sheet: assets 39,328,524.11 = liabilities 13,896,428.43 + equity 20,928,484.44 + net income 4,503,611.24. The balances
+     include the unsupported opening balances found in Chapter 8. Revenue reconciliation, account balance vs InvoiceLines 2026: 4010
+     17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020 5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030 3,278,211.11 vs
+     Textiles, equal; 4040 1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080 1,213,344.00 vs Services, equal. The differences are
+     SI-2026-013742 (Furniture, dated 2025-12-04), SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03),
+     posted 2026-01-01 with the next year's number; their orders shipped in early December 2025, so the sales belong to fiscal 2025, a
+     cutoff issue that overstates fiscal 2026 revenue by 4,582.37. Freight revenue (4050, 212,820.03) has no invoice line. -->
 
 
 **Exercise 6.2: Disaggregating Revenue by Segment and Product Line**
 
 **Table group:** Order-to-Cash, with the Customer and Item tables from Master Data
 
-**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and they offer major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare the disaggregation that Charles River would disclose on that basis.
+**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and it offers major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare the disaggregation that Charles River would disclose on that basis.
 
 **Requirements.**
 

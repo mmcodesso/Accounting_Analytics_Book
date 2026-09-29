@@ -1,6 +1,6 @@
 ## Guided Tutorial 6.1: Profiling Fiscal 2026 and Proving the Total
 
-**Context and objective.** In this tutorial, you will build the first part of the controller's request: a statistical profile of the invoice lines billed in fiscal 2026 and a summary of revenue by product line. You will store the fiscal year in a named cell, so that one change updates every number, calculate statistics with and without criteria, and compare the product lines with a control total. The comparison will find something the product-line list leaves out.
+**Context and objective.** In this tutorial, you will build the first part of the controller's request: a statistical profile of the invoice lines billed in fiscal 2026 and a summary of revenue by product line. You will store the fiscal year in a named cell, so that one change updates every number, calculate statistics with and without criteria, and compare the product lines with a control total. The comparison will find something the product-line list leaves out. Finally, you will chart the distribution of the line totals as a histogram.
 
 **Prerequisites.** You need the analysis workbook from Chapter 5, with the InvoiceLines Table loaded by Power Query and the Parameters worksheet from Chapter 4.
 
@@ -8,15 +8,19 @@
 
 **Step 1. Add the report year as a parameter.**
 
-a. On the **Parameters** worksheet, type `Report year` in A5, `2026` in B5, and `The fiscal year that the Profile worksheet summarizes` in C5.
+a. On the **Parameters** worksheet, type `Report year` in A5, `2026` in B5, and `Fiscal year shown on the Profile worksheet` in C5.
 b. Select B5, type `ReportYear` in the **Name Box**, and press Enter.
 c. Format B5 in blue font, the convention for input cells you adopted in Chapter 4.
+
+The report year is now a named input, like the threshold percentile above it, so every formula in this tutorial can refer to ReportYear instead of a typed year.
 
 **Step 2. Set up the Profile worksheet.**
 
 a. Add a worksheet named `Profile` after the Analysis worksheet.
 b. Type `Fiscal year` in A1, and enter `=ReportYear` in B1.
 c. In A2 through A9, type the labels `Invoice lines`, `Line total`, `Average line`, `Median line`, `Standard deviation`, `Smallest line`, `Largest line`, and `90th percentile`.
+
+B1 shows 2026, the value of the parameter, and the labels in column A name the measures that the next two steps calculate.
 
 **Step 3. Calculate the measures that accept criteria.**
 
@@ -30,6 +34,8 @@ b. In B3, enter the year's total, which is the control total for the rest of the
 c. In B4, enter the same formula with AVERAGEIFS in place of SUMIFS.
 d. In B7 and B8, enter the same formula with MINIFS and MAXIFS.
 
+B2 counts several thousand lines, and B3 holds the year's revenue from invoice lines, the total that every later summary in this tutorial must agree with.
+
 **Step 4. Calculate the measures that need FILTER.** MEDIAN, STDEV.S, and PERCENTILE.INC accept no criteria, so FILTER supplies the year's line totals to them.
 
 a. In B5, enter:
@@ -42,7 +48,7 @@ b. In B6, enter the same formula with STDEV.S in place of MEDIAN.
 c. In B9, enter:
 
    ```
-   =PERCENTILE.INC(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=ReportYear),0.9)
+   =PERCENTILE.INC(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=ReportYear),ThresholdPercentile)
    ```
 
 d. Format B3 through B9 as numbers with two decimals and a thousands separator.
@@ -53,7 +59,8 @@ Compare the average in B4 with the median in B5. The average is about half again
 
 a. On the **InvoiceLines** worksheet, filter the FiscalYear column to 2026, and sort the LineTotal column from largest to smallest.
 b. Read the ItemGroup, ItemCode, and Quantity of the first rows.
-c. Clear the sort and the filter.
+c. InvoiceLines carries no item names, so look up the ItemCode of the first row in the ItemCode column of the **Item** worksheet to read its ItemName.
+d. Clear the sort and the filter.
 
 The largest line of the year is not a piece of furniture. It is a design service, Specification Development, billed for well over a hundred hours, and the next largest lines are desks and console tables. The lines combine two very different kinds of sales, products and professional services, which is worth keeping in mind whenever a single statistic describes them all.
 
@@ -85,15 +92,48 @@ Services is the design services line, billed by the hour. It is a revenue line w
 
 ![A Profile of Fiscal 2026 Invoice Lines with a Control Total.](/visuals/svg/fig-06-01-fiscal-2026-profile.svg){#fig-06-01 fig-alt="A mock of the Profile worksheet. Rows 1 through 9 show the fiscal year, 2026, and the count, total, average, median, standard deviation, smallest and largest line, and 90th percentile of the year's invoice line totals, with the median cell selected and its MEDIAN and FILTER formula in the formula bar. Rows 11 through 18 show the lines, revenue, and average line of each item group, with the Services row added below Furniture, Lighting, Textiles, and Accessories, a total of the groups, and a difference from the control total of zero. The Services row and the difference row are outlined."}
 
-**Step 8. Document the profile.**
+**Step 8. Count the lines in $1,000 bins.** A frequency table counts the lines in each range of amounts, the bins of the histogram you draw next.
 
-a. On the **Documentation** worksheet, add ReportYear (Parameters!B5) to the Parameters entry and the Profile worksheet to the Worksheets entry.
+a. On the **Profile** worksheet, type `From` in F1 and `Lines` in G1.
+b. Type `0` in F2 and `1000` in F3, select F2:F3, and drag the fill handle down to F17, so that F2:F17 hold the lower bounds from 0 to 15,000.
+c. In G2, enter this formula, which counts the year's lines from the bound in its row up to the next bound, and copy it down to G16:
+
+   ```
+   =COUNTIFS(InvoiceLines[FiscalYear],ReportYear,InvoiceLines[LineTotal],">="&F2,InvoiceLines[LineTotal],"<"&F3)
+   ```
+
+d. In G17, the last bin, which has no upper bound, enter:
+
+   ```
+   =COUNTIFS(InvoiceLines[FiscalYear],ReportYear,InvoiceLines[LineTotal],">="&F17)
+   ```
+
+e. Type `Total` in F18, and enter `=SUM(G2:G17)` in G18.
+
+G18 equals the number of lines in B2, so every line of the year falls in exactly one bin. The first bin holds the most lines, and the counts shrink as the amounts grow.
+
+**Step 9. Chart the bins as a histogram.**
+
+a. Select G1:G17 and choose **Insert > Insert Column or Bar Chart > Clustered Column**.
+b. Right-click the chart, choose **Select Data**, click **Edit** under **Horizontal (Category) Axis Labels**, select F2:F17, and click **OK** twice.
+c. Right-click a bar, choose **Format Data Series**, and set **Gap Width** to 0%.
+
+The chart in @fig-06-02 rises to its highest bar at the left and trails off to the right: most lines are under a few thousand dollars, and a thin tail reaches far beyond them. That is the right skew that the average and the median described in Step 4, now visible at a glance.
+
+![The Distribution of Fiscal 2026 Line Totals.](/visuals/svg/fig-06-02-line-total-histogram.svg){#fig-06-02 fig-alt="A mock of columns F and G of the Profile worksheet and a chart beside them. The table lists the lower bound of each 1,000-dollar bin, from 0 to 15,000, with the number of fiscal 2026 invoice lines in each and a total that equals the year's line count; the formula bar shows the COUNTIFS formula of the first bin. The chart is a histogram of the counts: the first bins are the tallest, and the bars fall steadily toward the right, with a long, thin tail of large lines and a small last bin for lines of 15,000 dollars or more."}
+
+**Step 10. Document the profile.**
+
+a. On the **Documentation** worksheet, add ReportYear (Parameters!B5) to the Parameters entry and the Profile worksheet, with its histogram, to the Worksheets entry.
 b. Save the workbook.
+
+The Documentation worksheet now records the second parameter and the new worksheet, so a reviewer can see which year the profile describes and how to change it.
 
 **Checkpoint.** Check that:
 
 - the average line is well above the median line, and you can explain why;
 - the Profile worksheet lists five item groups, and both differences from the control total are zero;
+- the bins of the histogram add up to the year's line count, and the chart shows a right skew;
 - changing ReportYear on the Parameters worksheet to 2025 updates every number on the Profile worksheet, and changing it back to 2026 restores them.
 
 The profile gives the controller her first answer: how much Charles River billed in fiscal 2026, how the lines are distributed, and how the revenue divides among the five item groups. The next step is to see how each group moved from quarter to quarter.

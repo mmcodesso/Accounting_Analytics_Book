@@ -2,6 +2,8 @@
 
 ## Applied Exercises
 
+Work on these exercises in a copy of your analysis workbook, made after you finish the chapter's tutorials, or in a new workbook where an exercise says so. Put each exercise on its own worksheets, named after it (such as `Ex 4.1`), and do not rename or edit the queries the tutorials created. The tutorials of the next chapters continue in the original workbook and expect it to be exactly as the tutorials left it.
+
 ### Financial Accounting Exercises
 
 **Exercise 4.1: A Billing Schedule by Fiscal Year**
@@ -12,11 +14,11 @@
 
 **Requirements.**
 
-(1) In the analysis workbook from Tutorial 4.1, or in a new workbook, use Power Query to load the SalesInvoice Table from CharlesRiver.xlsx, with its date columns set to the Date type.
+(1) In your copy of the analysis workbook, use the SalesInvoice Table that Tutorial 4.1 loaded, with its date columns already set to the Date type.
 
-(2) On a Parameters worksheet, create two named cells, PeriodStart and PeriodEnd, and apply data validation that allows only dates from January 1, 2024, to December 31, 2026. Enter the first and last days of fiscal 2026. Remember that Charles River's fiscal year is the calendar year.
+(2) On a worksheet named `Ex 4.1`, create two named cells, PeriodStart and PeriodEnd, and apply data validation that allows only dates from January 1, 2024, to December 31, 2026. Enter the first and last days of fiscal 2026. Remember that Charles River's fiscal year is the calendar year.
 
-(3) On an Analysis worksheet, use COUNTIFS and SUMIFS with the named cells to calculate, for the period, the number of invoices and the totals of SubTotal, FreightAmount, TaxAmount, and GrandTotal. Confirm that SubTotal plus FreightAmount plus TaxAmount equals GrandTotal.
+(3) On the same worksheet, use COUNTIFS and SUMIFS with the named cells to calculate, for the period, the number of invoices and the totals of SubTotal, FreightAmount, TaxAmount, and GrandTotal. Confirm that SubTotal plus FreightAmount plus TaxAmount equals GrandTotal.
 
 (4) Build a grid with the fiscal years 2024, 2025, and 2026 in a column and the four amounts across a row. Fill it with one SUMIFS formula that uses mixed references, calculating each year's start and end dates with the DATE function. Add a total row and show that it equals the totals of the entire SalesInvoice Table.
 
@@ -42,7 +44,7 @@
 
 **Requirements.**
 
-(1) Using the SalesInvoiceLine and PromotionProgram Tables from Tutorial 4.1, including the DiscountAmount calculated column, build a summary on an Analysis worksheet with one row for each PromotionID in the PromotionProgram Table. For each promotion, show the PromotionCode and PromotionName, the number of invoice lines, the total LineTotal, and the total DiscountAmount.
+(1) Using the SalesInvoiceLine and PromotionProgram Tables from Tutorial 4.1, including the DiscountAmount calculated column, build a summary on a worksheet named `Ex 4.2` with one row for each PromotionID in the PromotionProgram Table. For each promotion, show the PromotionCode and PromotionName, the number of invoice lines, the total LineTotal, and the total DiscountAmount.
 
 (2) Add a column that shows each promotion's share of all discount dollars, using an absolute reference to the grand total. Apply data bars to the discount column of the summary.
 
@@ -75,7 +77,7 @@
 
 **Requirements.**
 
-(1) Using the Item Table from Tutorial 4.1, add two calculated columns: UnitMargin, equal to ListPrice minus StandardCost, and MarginPct, equal to UnitMargin divided by ListPrice.
+(1) In your copy of the workbook, add two calculated columns to the Item Table from Tutorial 4.1: UnitMargin, equal to ListPrice minus StandardCost, and MarginPct, equal to UnitMargin divided by ListPrice.
 
 (2) Filter the Table to the items whose ItemType is Finished Good, which excludes the design services. Explain why the design services would distort a margin comparison.
 
@@ -105,7 +107,7 @@
 
 **Requirements.**
 
-(1) Use Power Query to load the Shipment and SalesOrder Tables from CharlesRiver.xlsx into your workbook.
+(1) Use Power Query to load the Shipment and SalesOrder Tables from CharlesRiver.xlsx into your copy of the workbook.
 
 (2) On the Shipment Table, add a calculated column FreightTerms that brings in the FreightTerms of each shipment's sales order with XLOOKUP, using SalesOrderID, as you did with lookups in Part I. Add a second calculated column, FreightMargin, equal to BillableFreightAmount minus FreightCost.
 
@@ -166,7 +168,7 @@
 
 **Requirements.**
 
-(1) Use Power Query to load the PriceOverrideApproval Table (T8_PriceOverrideApproval) from CharlesRiver.xlsx. Set RequestDate and ApprovedDate to the Date type.
+(1) Use Power Query to load the PriceOverrideApproval Table (T8_PriceOverrideApproval) from CharlesRiver.xlsx into a new workbook. Set RequestDate and ApprovedDate to the Date type.
 
 (2) Add a calculated column, DiscountFromReference, equal to one minus ApprovedUnitPrice divided by ReferenceUnitPrice, formatted as a percentage.
 

@@ -30,7 +30,7 @@ The dataset is designed so that students can follow a transaction from the busin
 
 ## Progressive Introduction
 
-The book does not ask students to work with the entire database from the beginning. Part I introduces the company, its business model, and the way its data is organized, and its tutorials already work in the Excel workbook: exploring the tables, testing data quality, and tracing a sale from the order to the ledger. The Excel chapters in Part II begin with a focused set of sales and general ledger tables. The SQL chapters in Part III expand into purchasing and manufacturing data, where relational joins become essential. The Power BI chapters in Part IV build data models that span the business cycles, and the chapters in Part V require students to move fluently across the full dataset and all three tools within integrated projects.
+The book does not ask students to work with the entire database from the beginning. Part I introduces the company, its business model, and the way its data is organized, and its tutorials already work in the Excel workbook: exploring the tables, testing data quality, and tracing a sale from the order to the ledger. The Excel chapters in Part II begin with a focused set of sales and general ledger tables and later draw on the planning and purchasing tables for budgeting and audit tests. The SQL chapters in Part III expand into purchasing and manufacturing data, where relational joins become essential. The Power BI chapters in Part IV build data models that span the business cycles, and the chapters in Part V require students to move fluently across the full dataset and all three tools within integrated projects.
 
 
 ## Distribution Formats

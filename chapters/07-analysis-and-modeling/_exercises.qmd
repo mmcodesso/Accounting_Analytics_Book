@@ -2,13 +2,15 @@
 
 ## Applied Exercises
 
+As in the earlier chapters, work on these exercises in a fresh copy of your analysis workbook, made after you finish this chapter's tutorials. Put each exercise on its own worksheets, named after it, and do not rename or edit the queries the tutorials created. When an exercise needs a Table the tutorials filtered, import it again as a new query with the name the exercise gives.
+
 ### Financial Accounting Exercises
 
 **Exercise 7.1: Forecasting Revenue by Product Line**
 
 **Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** The planning package for fiscal 2027 needs a revenue forecast for each product line, not only for the company. The controller asks you to test the forecasting methods of Tutorial 7.1 on each product line before choosing one.
+**Scenario.** Charles River's loan agreement requires management to send the bank, with the annual financial statements, a revenue forecast for the coming quarter by product line, which the bank uses to monitor the company's covenants. Because the forecast goes to an external user who will rely on it, the controller asks you to test the forecasting methods of Tutorial 7.1 on each product line before choosing one.
 
 **Requirements.**
 
@@ -37,19 +39,19 @@
 
 **Table group:** Organizational Planning, with the Account table from Accounting Core
 
-**Scenario.** A colleague prepared a summary of the 2026 budget for the board from the Budget Table, which summarizes the budget by cost center and account. Before the summary is used again for the 2027 plan, the controller asks you to confirm that it agrees with the detailed budget lines.
+**Scenario.** The bank also receives Charles River's annual budget, and last year's budget summary for the bank was prepared from the Budget Table, which summarizes the budget by cost center and account. Before the 2027 budget is sent in the same form, the controller asks you to confirm that the summary agrees with the detailed budget lines.
 
 **Requirements.**
 
-(1) Import the T76_Budget Table with Power Query, and total its 2026 amounts by account. Merge in the account numbers and names from the Account Table.
+(1) Import the T76_Budget Table with Power Query as a query named `BudgetSummary`. Use **Transform > Group By**, with **Advanced**, to total BudgetAmount by FiscalYear and AccountID, and merge in AccountNumber and AccountName from the Account query of Tutorial 7.2, without the prefix.
 
-(2) Total the 2026 BudgetLine amounts by account for the revenue, cost of goods sold, and operating-expense categories.
+(2) Import the T77_BudgetLine Table again as a new query named `BudgetLineAll`, because the BudgetLine query of Tutorial 7.2 holds only 2026. Keep the Revenue, COGS, and Operating Expense categories of every year, and total BudgetAmount by FiscalYear and AccountID with Group By.
 
-(3) Compare the two by account, and list every account whose totals differ. Examine the BudgetLine rows behind the differences and identify what they have in common.
+(3) Compare the two for 2026 by account, and list every account whose totals differ. Examine the BudgetLine rows behind the differences and identify what they have in common.
 
 (4) Repeat the comparison for 2024 and 2025.
 
-(5) Write a memo of half a page that explains the difference, states which Table should be used for budget reporting, and recommends a control that would detect the problem in future.
+(5) Write a memo of half a page that explains the difference, states which Table should be used for the budget sent to the bank, and recommends a control that would detect the problem in future.
 
 **Deliverable.** A reconciliation by account for 2026, the totals for 2024 and 2025, and a half-page memo.
 
@@ -79,7 +81,7 @@
 
 (3) Calculate the break-even revenue and the margin of safety in dollars and as a percentage of 2026 revenue.
 
-(4) The fixed costs in (2) leave out the freight-out expense and the purchase price and manufacturing variances recorded in 2026. Add their 2026 totals from the ledger, accounts 5050, 5060, and 5080, to the fixed costs, and recalculate the break-even revenue and margin of safety.
+(4) The fixed costs in (2) leave out the freight-out expense and the purchase price and manufacturing variances recorded in 2026, which GLOpex does not contain. Import the T3_GLEntry Table again as a new query named `GLCostVariances`, clicking **Transform Data**, and filter FiscalYear to 2026, AccountID to 54, 55, and 93 (accounts 5050, 5060, and 5080), and SourceDocumentType to exclude JournalEntry, whose only rows on these accounts are the closing entry. Add the three accounts' totals to the fixed costs, and recalculate the break-even revenue and margin of safety.
 
 (5) Build a two-variable data table of break-even revenue for contribution margin ratios from 40 to 50 percent and fixed costs from $6 million to $10 million, and use Goal Seek to find the revenue that produces an operating income of $4 million under the assumptions of (4).
 
@@ -105,11 +107,11 @@
 
 **Requirements.**
 
-(1) Import the Item Table with its StandardCost, StandardFixedOverheadCost, SupplyMode, and RoutingID columns, and the RoutingOperation, WorkCenter, and WorkCenterCalendar Tables. List the manufactured items that sold in 2026.
+(1) Import the T44_Item Table again as a new query named `ItemRouting`, keeping ItemID, ItemCode, ItemGroup, StandardCost, StandardFixedOverheadCost, SupplyMode, and RoutingID, because the Item query of Chapter 4 does not have the last three columns. Import the T50_RoutingOperation, T47_WorkCenter, and T48_WorkCenterCalendar Tables, and list the manufactured items that sold in 2026.
 
 (2) For each item, calculate its 2026 demand in units, its contribution per unit as the 2026 average price per unit minus the variable standard cost (StandardCost minus StandardFixedOverheadCost) minus the commission rate from Tutorial 7.3 times the price, and its run hours per unit at each work center, summing StandardRunHoursPerUnit over the operations of its routing.
 
-(3) Calculate each work center's capacity as half of its 2026 available hours, and set up the production quantities as the variable cells, the total contribution as the objective, and the hours used at each work center as SUMPRODUCT formulas.
+(3) Calculate each work center's capacity as half of its 2026 available hours, and set up the production quantities as the variable cells, the total contribution as the objective, and the hours used at each work center as SUMPRODUCT formulas. SUMPRODUCT multiplies two ranges of the same size cell by cell and adds the products, so `=SUMPRODUCT(Hours,Quantities)` gives the hours that a production plan uses.
 
 (4) Use Solver with the Simplex LP method to maximize the total contribution, subject to hours used within capacity at every work center and production between zero and demand for every item. Do not require whole units, so that Solver can produce its Sensitivity report.
 
@@ -136,7 +138,7 @@
 
 **Requirements.**
 
-(1) Build a monthly table for 2024 through 2026 with revenue from InvoiceLines, the number of invoices from the SalesInvoice Table, and commission expense from the GLOpex query of Tutorial 7.2, with the 2024 and 2025 closing entries also excluded.
+(1) Build a monthly table for 2024 through 2026 with revenue from InvoiceLines and the number of invoices from the SalesInvoice Table. GLOpex holds only 2026, so import the T3_GLEntry Table again as a new query named `GLCommission`, clicking **Transform Data**, and filter AccountID to 104 (account 6290, Sales Commission Expense) and SourceDocumentType to exclude JournalEntry, whose only rows on this account are the three year-end closing entries. Add the monthly commission expense to the table.
 
 (2) Regress monthly revenue on the number of invoices, with and without January 2024, and compare R Square and the standard error with the average monthly revenue. Explain whether the expectation would be precise enough to detect a misstatement of 5 percent of a month's revenue.
 
@@ -144,7 +146,7 @@
 
 (4) Flag the 2026 months whose recorded commission expense differs from the expectation by more than 3 percent, and describe the evidence you would examine for each. Look at the signs of the differences in consecutive months.
 
-(5) Reconcile the 2026 commission accruals in the SalesCommissionAccrual Table to the commission expense in the ledger, and identify the source document type that explains the difference.
+(5) Import the T27_SalesCommissionAccrual Table, total the CommissionAmount of the accruals dated in 2026, and reconcile the total to the 2026 commission expense in GLCommission. Identify the source document type that explains the difference.
 
 **Deliverable.** Two regressions, a table of 2026 expectations and differences, and a half-page memo to your senior.
 
@@ -165,23 +167,33 @@
 
 **Requirements.**
 
-(1) Import the DemandForecast Table with Power Query, keeping the current version, and total ForecastQuantity by year and item group from the ForecastWeekStartDate.
+(1) Import the T78_DemandForecast Table with Power Query, keeping the rows whose IsCurrent is 1, the current version. Merge in ItemGroup from the Item query without the prefix, and total ForecastQuantity by item group and by the year of ForecastWeekStartDate.
 
-(2) Total the ordered quantity by year and item group from the SalesOrderLine and SalesOrder Tables, and calculate the ratio of forecast to orders for each year and item group.
+(2) Import the T10_SalesOrderLine Table as a query named `OrderLines`. Merge in OrderDate from the SalesOrder query of Tutorial 5.2 and ItemGroup from the Item query, both without the prefix, total Quantity by item group and by the year of OrderDate, and calculate the ratio of forecast to orders for each year and item group.
 
 (3) Describe how the ratio has changed over the three years, and whether it differs among the item groups.
 
 (4) Compare the 2026 budget's quantities with the 2026 forecast and with the 2026 orders.
 
-(5) Write a memo of half a page that states whether the forecast is consistent with historical experience, the consequences for any estimate or plan that relies on it, and the evidence and explanations you would request from management.
+(5) Each forecast records the baseline quantity that the forecasting method produced, the quantity after any planner adjustment, the planner, and the employee who approved it. Add a column with the ratio of ForecastQuantity to BaselineForecastQuantity, list the forecasts adjusted by more than half of their baseline, and look up their planners and approvers in the Employee Table. Explain which control the list tests and what it shows.
 
-**Deliverable.** A comparison of forecast and actual orders by year and item group, and a half-page memo.
+(6) Write a memo of half a page that states whether the forecast is consistent with historical experience, the consequences for any estimate or plan that relies on it, what the adjusted forecasts show about the review of planners' changes, and the evidence and explanations you would request from management.
+
+**Deliverable.** A comparison of forecast and actual orders by year and item group, a list of the adjusted forecasts, and a half-page memo.
 
 <!-- Instructor notes, Exercise 7.6: forecast / orders by year: 2024 about 2.35 (Furniture 2.31, Lighting 2.30, Textiles 2.34, Accessories 2.36);
      2025 about 2.60 (2.51 / 2.55 / 2.60 / 2.67); 2026 about 2.91 (2.92 / 2.83 / 2.84 / 2.90). The forecast is consistently more than twice the
      orders in every group, and the bias grows each year, so it is not consistent with historical experience. 2026 product-group totals:
      forecast 220,910.5 units, budget 264,493.7 units (higher still), orders 76,023.4, invoiced 76,088.9. Forecast methods in the Table:
-     Seasonal Trend, Planner Adjusted, and Lifecycle Adjusted; the forecast weeks run to February 2027. Consequences: inflated purchasing and
+     Seasonal Trend, Planner Adjusted, and Lifecycle Adjusted; the forecast weeks run to February 2027. All 66,496 rows are IsCurrent 1
+     (one version, Current Weekly Plan). Requirement (5): every forecast is within about 10 percent of its baseline (ratios 0.92-1.10)
+     except DemandForecastID 1, 107, and 211, the first forecast week of 2024, 2025, and 2026 (2024-01-01, 2025-01-06, 2026-01-05)
+     for item ACC-MIR-0001 (Foundry Mirror Glass Soft White, Accessories) at warehouse 1, East Distribution Center: ForecastMethod
+     Planner Adjusted, ForecastQuantity 3.1 times BaselineForecastQuantity (23.78 against 7.67, 28.15 against 9.08, 28.06 against
+     9.05), planner employee 90, Michelle Garcia, a Buyer, and no ApprovedByEmployeeID. They are the only unapproved forecasts in the
+     Table, so the control is the approval of planner adjustments: every other adjustment was approved. The quantities are small, but
+     an unapproved override by a buyer, who also places purchase orders (employee 90 plans most
+     forecasts and created 2,884 purchase orders), is a control exception worth reporting. Consequences: inflated purchasing and
      production plans, excess inventory and a possible need for an obsolescence reserve, and a budget whose volume cannot be used to evaluate
      performance (Tutorial 7.2). Evidence to request: the forecasting method and its inputs, the planners' adjustments, and management's own
      comparisons of forecast with actual. -->

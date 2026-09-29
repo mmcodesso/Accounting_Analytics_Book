@@ -1,6 +1,6 @@
-## Guided Tutorial 5.1: Adding Text and Date Columns
+## Guided Tutorial 5.1: Adding Text, Date, and Logical Columns
 
-**Context and objective.** In this tutorial, you will prepare two of the Tables in your analysis workbook for the lookups and summaries that follow. On the Item Table, you will extract each item's product type from its code and test that every code has the expected form. On the SalesInvoice Table, you will assign each invoice to a fiscal year, a fiscal quarter, and a period label, and measure its payment terms in days. Each new column is a calculated column, so it fills every row and extends to rows added by a refresh.
+**Context and objective.** In this tutorial, you will prepare two of the Tables in your analysis workbook for the lookups and summaries that follow. On the Item Table, you will extract each item's product type from its code and test that every code has the expected form. On the SalesInvoice Table, you will assign each invoice to a fiscal year, a fiscal quarter, and a period label, measure its payment terms in days, and use logical functions to group the terms and test them. Each new column is a calculated column, so it fills every row and extends to rows added by a refresh.
 
 **Prerequisites.** You need the Charles River Furniture Analysis workbook from Chapter 4, with the SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram Tables loaded by Power Query.
 
@@ -12,7 +12,7 @@ a. Go to the **Item** worksheet. Click the first empty cell to the right of the 
 b. In the first data row of the new column, enter `=MID([@ItemCode],5,3)`.
 c. Check a few rows: FUR-DSK-0075 should return DSK, and FUR-SDB-0002 should return SDB.
 
-The Furniture product types and their codes are listed below. Other groups have their own codes, such as PND for pendant lights and RUG for rugs.
+Every item now carries a three-letter product type. @tbl-05-03 lists the Furniture product types and their codes; other groups have their own codes, such as PND for pendant lights and RUG for rugs.
 
 | Code | Furniture product type | Code | Furniture product type |
 |---|---|---|---|
@@ -21,7 +21,7 @@ The Furniture product types and their codes are listed below. Other groups have 
 | CON | Console table | SDB | Sideboard |
 | CTB | Coffee table | TBL | Dining table |
 
-: Furniture product type codes {#tbl-05-02}
+: Furniture product type codes {#tbl-05-03}
 
 **Step 2. Test that every item code has the expected form.** A code of the form GRP-TYP-9999 has twelve characters, with hyphens in the fourth and eighth positions.
 
@@ -45,29 +45,53 @@ a. Go to the **SalesInvoice** worksheet. In the first empty column after Payment
 b. Add a column `FiscalQuarter` with the formula `=ROUNDUP(MONTH([@InvoiceDate])/3,0)`.
 c. Add a column `Period` with the formula `=[@FiscalYear]&"-Q"&[@FiscalQuarter]`, which returns labels such as 2026-Q4.
 
-**Step 4. Measure the payment terms in days.**
+Each invoice now carries its fiscal year, its quarter, and a single label that combines them. The label sorts correctly because the year comes first.
+
+**Step 4. Measure the payment terms in days.** Subtracting the invoice date from the due date gives the number of days a customer has to pay.
 
 a. Add a column `DaysToDue` with the formula `=[@DueDate]-[@InvoiceDate]`.
 b. If Excel formats the result as a date, change the column's number format to **General** or **Number** with no decimals.
 
-@fig-05-03 shows the SalesInvoice Table with the four new columns.
+Each invoice now shows its payment terms as a whole number of days. @fig-05-03 shows the SalesInvoice Table with the four new columns.
 
 ![The SalesInvoice Table with Fiscal Period and Payment Terms Columns.](/visuals/svg/fig-05-03-salesinvoice-periods.svg){#fig-05-03 fig-alt="A mock of the SalesInvoice Table in the analysis workbook, showing SalesInvoiceID, InvoiceNumber, InvoiceDate, and DueDate for several invoices, and four new calculated columns: FiscalYear, FiscalQuarter, Period, which joins the two into a label such as 2024-Q1, and DaysToDue, the number of days between the invoice date and the due date. The formula bar shows the formula for Period. The new columns are outlined."}
 
-**Step 5. Check the new columns.**
+**Step 5. Group and test the payment terms.** Logical functions turn the terms into a label for reporting and a check for review.
 
-a. Open the filter list on the Period column and read the values it shows.
-b. Open the filter list on the DaysToDue column and read the values it shows.
+a. Add a column `TermsGroup` with this formula, which places each invoice in one of three bands:
 
-The Period column holds one label for each quarter of the three fiscal years in the data, and the DaysToDue column holds only a few distinct values, the payment terms Charles River offers its customers. A value outside that short list would point to an invoice whose due date was entered by hand.
+   ```
+   =IFS([@DaysToDue]<=30,"Up to 30 days",[@DaysToDue]<=60,"31 to 60 days",TRUE,"Over 60 days")
+   ```
 
-**Step 6. Record the new columns.** On the **Documentation** worksheet, add the new calculated columns to the Calculated columns entry: ProductType and CodeCheck on Item, and FiscalYear, FiscalQuarter, Period, and DaysToDue on SalesInvoice, each with its formula. Save the workbook.
+b. Add a column `StandardTerms` with this formula, which is TRUE when the terms are one of the four that Charles River offers:
+
+   ```
+   =OR([@DaysToDue]=30,[@DaysToDue]=45,[@DaysToDue]=60,[@DaysToDue]=90)
+   ```
+
+c. On the **Analysis** worksheet, type `Invoices with nonstandard terms` in A39.
+d. In B39, enter `=COUNTIF(SalesInvoice[StandardTerms],FALSE)`.
+
+B39 shows zero: every invoice has one of the four standard terms, so no due date appears to have been typed by hand. Most invoices fall in the two lower bands of TermsGroup, and only a few hundred have terms longer than 60 days.
+
+**Step 6. Check the period labels.** Open the filter list on the Period column and read the values it shows.
+
+The Period column holds one label for each quarter of the three fiscal years in the data, from 2024-Q1 to 2026-Q4. A label outside that range would point to an invoice dated outside the period of the extract.
+
+**Step 7. Record the new columns.**
+
+a. On the **Documentation** worksheet, add the new calculated columns to the Calculated columns entry, each with its formula: ProductType and CodeCheck on Item, and FiscalYear, FiscalQuarter, Period, DaysToDue, TermsGroup, and StandardTerms on SalesInvoice.
+b. Add the check in B39 to the entry that describes the Analysis worksheet.
+c. Save the workbook.
+
+The Documentation worksheet now accounts for every column this tutorial added, so a reviewer can see how each value was calculated.
 
 **Checkpoint.** Check that:
 
 - every item has a three-letter ProductType, and no item code fails the CodeCheck test;
 - every invoice has a Period label from 2024-Q1 to 2026-Q4;
-- DaysToDue takes only the handful of values that match Charles River's payment terms;
+- every invoice has a TermsGroup label, and no invoice fails the StandardTerms test;
 - the Documentation worksheet lists the new columns.
 
 The product type and the period are the two attributes the controller's question needs that the invoice lines do not carry. The next tutorial brings them onto the lines.

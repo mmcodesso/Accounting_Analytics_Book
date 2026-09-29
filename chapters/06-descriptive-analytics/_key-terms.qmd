@@ -4,17 +4,23 @@
 
 **Calculated field.** A field defined inside a PivotTable with a formula that uses other fields. Excel sums each field over the rows behind a cell and then applies the formula to those sums, so calculated fields suit ratios and differences of totals, such as margin percentages.
 
+**Common-size statement.** A financial statement that expresses every line as a percentage of a base, such as net revenue for the income statement, so that its structure can be compared across periods or companies. Comparing lines within one period in this way is vertical analysis.
+
 **Conditional aggregation.** Calculating a total, count, average, minimum, or maximum over only the rows that meet one or more criteria, as SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS do.
 
-**Control total.** An independently calculated total that the parts of a summary must add up to. A difference between the control total and the sum of the parts reveals a missing category, a duplicated row, or a formula error.
+**Control total.** A total calculated independently from a set of data, which the data must agree with, such as the sum of the invoice subtotals against the sum of the invoice lines. In a summary by category, the categories must add up to the control total, so a difference reveals a missing category, a duplicated row, or a formula that fails silently.
 
 **Cost effect.** The part of a change in margin caused by a change in the cost of the same items. In a margin measured at standard cost, it is zero unless the standard costs themselves change.
 
-**Cross-tabulation.** A summary of a measure across two dimensions at once, with one dimension in the rows and the other in the columns, such as revenue by product line and quarter.
+**Cross-tabulation.** A summary of a measure across two dimensions at once, with one dimension in the rows and the other in the columns, such as revenue by product line and quarter. A PivotTable produces one.
 
 **Drill-down.** Moving from a total to the parts or rows behind it, for example by double-clicking a value in a PivotTable or by adding a more detailed field to its Rows area.
 
 **GETPIVOTDATA.** An Excel function that returns a value from a PivotTable by naming its value field and items rather than its cell address, so that the reference stays correct when the PivotTable's layout changes.
+
+**Group By.** A Power Query command that summarizes the rows of a query by one or more columns, with aggregations such as sums and counts, before the result is loaded. It produces a trial balance from the ledger by grouping the entries by account.
+
+**Histogram.** A chart of how the values of a measure are distributed, drawn as bars that count the values falling in each of a set of bins of equal width. It shows the shape of a distribution, such as a right skew.
 
 **Margin bridge.** A decomposition of the change in margin between two periods into effects, such as volume, mix, price, and cost, that add up exactly to the change. It is often presented as a waterfall chart.
 
@@ -24,7 +30,11 @@
 
 **Mix effect.** The part of a change in margin caused by a shift in sales between items or products that earn different margins per unit, while the total number of units is held constant.
 
+**Pivot cache.** The copy of the source data that a PivotTable summarizes. PivotTables built from the same source share it, with its calculated fields, and it updates only when the PivotTable is refreshed.
+
 **PivotTable.** An interactive Excel summary built from a source table by placing its fields in the Rows, Columns, Values, and Filters areas. It calculates a value for every combination of row and column items, with totals, and it is updated by refreshing.
+
+**Pre-closing trial balance.** A trial balance prepared at the end of a period before that period's closing entries, so that the revenue and expense accounts still hold the period's activity from which the income statement is prepared.
 
 **Price effect.** The part of a change in margin caused by charging different prices for the same items, including changes in price-list reductions and promotional discounts.
 
@@ -33,6 +43,8 @@
 **Skewed distribution.** A distribution whose values are not spread symmetrically around its center. In a distribution skewed to the right, the usual shape of accounting populations, a minority of large values pulls the mean above the median.
 
 **Standard deviation.** A measure of how widely values are spread around their mean. In Excel, STDEV.S treats the values as a sample of a larger population, and STDEV.P treats them as the complete population.
+
+**Substantive analytical procedure.** An analytical procedure that an auditor uses as evidence about whether an amount is misstated, by comparing the recorded amount with an expectation developed from plausible relationships and investigating differences above a threshold set in advance.
 
 **Value field.** A field placed in the Values area of a PivotTable and summarized, by a calculation such as Sum, Count, or Average, for every cell of the PivotTable.
 

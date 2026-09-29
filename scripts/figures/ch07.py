@@ -306,8 +306,8 @@ def fig_07_03() -> Diagram:
     ys = [v for _, v in rows]
     fit = regression(list(range(2, 34)), ys[1:33])
     actual = ys[33:]
-    methods = [("Trend (FORECAST.LINEAR)", [fit["a"] + fit["b"] * x for x in (34, 35, 36)]),
-               ("Mean of Feb 2024 to Sep 2026", [statistics.mean(ys[1:33])] * 3),
+    methods = [("Trend", [fit["a"] + fit["b"] * x for x in (34, 35, 36)]),
+               ("Mean", [statistics.mean(ys[1:33])] * 3),
                ("Same quarter last year", ys[21:24])]
     assert [m for m, _ in rows[21:24]] == ["2025-10", "2025-11", "2025-12"]
     body = [("40", ["Method", "Oct 2026", "Nov 2026", "Dec 2026", "Quarter", "Error", "Monthly error"])]
@@ -319,7 +319,7 @@ def fig_07_03() -> Diagram:
         errors[name] = (err, mape)
         body.append((str(42 + i), [name, *(xl.num(v, 0) for v in f), xl.num(sum(f), 0), f"{100 * err:+.2f}%",
                                    f"{100 * mape:.2f}%"]))
-    assert abs(errors["Mean of Feb 2024 to Sep 2026"][0]) < abs(errors["Trend (FORECAST.LINEAR)"][0])
+    assert abs(errors["Mean"][0]) < abs(errors["Trend"][0])
 
     def style(r: int, c: int, value: str) -> dict:
         if r == 0:
@@ -334,9 +334,10 @@ def fig_07_03() -> Diagram:
     xl.emphasis(d, x0, y0, widths[6] + widths[7], ROW_H * 3)
     bottom = 22 + ROW_H * len(body)
     d.text("<i>Every method is fitted to February 2024 through September 2026 and compared with the "
-           "actual fourth quarter. Error is the quarter's forecast against its actual; monthly error is the "
-           "average absolute percentage error of the three months. Outlined: the errors.</i>", 0,
-           bottom + 8, 860, 40, size=SMALL, color=GRAY)
+           "actual fourth quarter: Trend with FORECAST.LINEAR, Mean as the average of the fitted months. Error "
+           "is the quarter's forecast against its actual; monthly error is the average absolute percentage "
+           "error of the three months. Outlined: the errors.</i>", 0,
+           bottom + 8, 860, 60, size=SMALL, color=GRAY)
     return d
 
 

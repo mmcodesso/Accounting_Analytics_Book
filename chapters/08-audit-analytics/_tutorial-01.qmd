@@ -2,44 +2,55 @@
 
 **Context and objective.** In this tutorial, you will begin the internal audit review of supplier payments. You will create an audit workbook, import the payments of fiscal 2024 through 2026, and reconcile them to the ledger before testing them. You will then stratify the payments by amount, examine the largest ones individually, and run a first-digit test to see whether the amounts follow Benford's Law, investigating the payments that do not.
 
-**Prerequisites.** You need CharlesRiver.xlsx and the Power Query skills of Chapters 4 and 5. The tutorial starts a new workbook, AuditAnalytics.xlsx, which Tutorials 8.2 and 8.3 extend.
+**Prerequisites.** You need CharlesRiver.xlsx and the Power Query skills of Chapters 4 to 6. The tutorial starts a new workbook, AuditAnalytics.xlsx, which Tutorials 8.2 and 8.3 extend.
 
 **Step-by-step instructions.**
 
 **Step 1. Create the audit workbook and import the payments.** An audit workbook keeps the evidence for one engagement apart from the analysis workbook of the earlier chapters.
 
 a. Create a blank workbook and save it as `AuditAnalytics.xlsx`.
-b. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T39_DisbursementPayment**, **T37_PurchaseInvoice**, and **T31_Supplier** Tables in the **Navigator**. Click **Transform Data**.
-c. Rename the queries `Payments`, `Invoices`, and `Suppliers`. In Invoices, use **Home > Choose Columns** to keep PurchaseInvoiceID, InvoiceNumber, and GrandTotal, and in Suppliers keep SupplierID and SupplierName. Right-click each of the two queries and clear **Enable Load**.
-d. In Payments, open the filter list of PaymentDate, choose **Date Filters > Before**, and enter 1/1/2027, so that the query keeps the payments of fiscal 2024 through 2026.
-e. Merge Payments with **Invoices** on PurchaseInvoiceID, with a left outer join, and expand InvoiceNumber and GrandTotal. Merge it with **Suppliers** on SupplierID, and expand SupplierName.
-f. Choose **Home > Close & Load**.
+b. Choose **Data > Get Data > From File > From Excel Workbook**, and select CharlesRiver.xlsx.
+c. In the **Navigator**, select the **T39_DisbursementPayment**, **T37_PurchaseInvoice**, and **T31_Supplier** Tables, and click **Transform Data**.
+d. Rename the queries `Payments`, `PurchaseInvoices`, and `Suppliers`.
+e. In PurchaseInvoices, use **Home > Choose Columns** to keep PurchaseInvoiceID, InvoiceNumber, and GrandTotal, and in Suppliers, keep SupplierID and SupplierName.
+f. Right-click PurchaseInvoices and then Suppliers in the **Queries** pane, and clear **Enable Load** for each.
+g. In Payments, open the filter list of PaymentDate, choose **Date Filters > Before**, and enter `2027-01-01`, so that the query keeps the payments of fiscal 2024 through 2026.
+h. Merge Payments with **PurchaseInvoices** on PurchaseInvoiceID, with a left outer join, and expand InvoiceNumber and GrandTotal without the prefix.
+i. Merge Payments with **Suppliers** on SupplierID, with a left outer join, and expand SupplierName without the prefix.
+j. Choose **Home > Close & Load**, and rename the new worksheet `Payments`.
 
 The Payments Table holds tens of thousands of payments. The date filter leaves out the few hundred payments that the ledger already records in fiscal 2027, so that the population matches the three years under review.
 
-**Step 2. Reconcile the population to the ledger.** Every supplier payment credits the cash account, 1010 Cash and Cash Equivalents, whose AccountID is 2, so the ledger gives an independent count and total of the payments.
+**Step 2. Reconcile the population to the ledger.** Every supplier payment credits the cash account, 1010 Cash and Cash Equivalents, whose AccountID is 2, so the ledger gives an independent count and total of the payments. Group By, which you used in Chapter 6, reduces the ledger rows to those two numbers before they are loaded.
 
-a. Import the **T3_GLEntry** Table with Power Query and name the query `PaymentPostings`. Because the Table is large, filter it first: SourceDocumentType equal to DisbursementPayment, AccountID equal to 2, and PostingDate before 1/1/2027.
-b. Choose **Transform > Group By**. Group by SourceDocumentType, name the new column `Postings`, and choose the operation **Count Rows**. Click **Add aggregation**, name the second column `CashCredited`, and choose **Sum** of Credit. Click **OK**, and choose **Home > Close & Load**.
-c. Add a worksheet named `Population`. In A1:C1, type `Source`, `Count`, and `Total`. In A2, type `Payments Table`, and in B2 and C2 enter `=ROWS(Payments[Amount])` and `=SUM(Payments[Amount])`.
-d. In A3, type `Cash credits in the ledger`, and in B3 and C3 enter `=SUM(PaymentPostings[Postings])` and `=SUM(PaymentPostings[CashCredited])`.
-e. In A4, type `Difference`, and in B4 and C4 enter `=B2-B3` and `=C2-C3`.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, select the **T3_GLEntry** Table, and click **Transform Data**, not **Load**, because the Table has hundreds of thousands of rows.
+b. Name the query `PaymentPostings`, and filter it: SourceDocumentType equal to DisbursementPayment, AccountID equal to 2, and PostingDate before `2027-01-01`.
+c. Choose **Transform > Group By**, select **Advanced**, and group by SourceDocumentType.
+d. Name the first new column `Postings`, and choose the operation **Count Rows**.
+e. Click **Add aggregation**, name the second column `CashCredited`, choose **Sum** of Credit, and click **OK**.
+f. Choose **Home > Close & Load**, and rename the new worksheet `PaymentPostings`.
+g. Add a worksheet named `Population`, and type `Source`, `Count`, and `Total` in A1:C1.
+h. In A2, type `Payments Table`, and in B2 and C2, enter `=ROWS(Payments[Amount])` and `=SUM(Payments[Amount])`.
+i. In A3, type `Cash credits in the ledger`, and in B3 and C3, enter `=SUM(PaymentPostings[Postings])` and `=SUM(PaymentPostings[CashCredited])`.
+j. In A4, type `Difference`, and in B4 and C4, enter `=B2-B3` and `=C2-C3`.
 
 Both differences are zero: the extract contains every payment that the ledger recorded in the period, for the same total. A difference would mean that one side is missing payments, and no test on the extract could be relied on until it was explained.
 
 **Step 3. Stratify the payments.**
 
-a. Add a worksheet named `Strata`, and type the headers shown in @fig-08-02 in A1:F1.
-b. In A2:A6, type the lower bounds 0, 1000, 10000, 50000, and 100000. In B2, enter `=A3` and copy it to B3:B5. In B6, enter `=MAX(Payments[Amount])+0.01`, so that the top stratum includes the largest payment.
-c. In C2 and E2, enter the count and the total of the stratum:
+a. Add a worksheet named `Strata`, and type the headings `Lower bound`, `Upper bound`, `Payments`, `Share of payments`, `Value`, and `Share of value` in A1:F1.
+b. In A2:A6, type the lower bounds `0`, `1000`, `10000`, `50000`, and `100000`.
+c. In B2, enter `=A3`, and copy it to B3:B5. In B6, enter `=MAX(Payments[Amount])+0.01`, so that the top stratum includes the largest payment.
+d. In C2 and E2, enter the count and the total of the stratum, and copy them down to row 6:
 
    ```
    =COUNTIFS(Payments[Amount],">="&A2,Payments[Amount],"<"&B2)
    =SUMIFS(Payments[Amount],Payments[Amount],">="&A2,Payments[Amount],"<"&B2)
    ```
 
-d. In D2 and F2, enter `=C2/C$7` and `=E2/E$7`, and copy C2:F2 to rows 3 through 6.
-e. In A7, type `Total`, and in C7:F7 add the column totals with SUM. Check that C7 and E7 equal the count and total on the Population worksheet.
+e. In A7, type `Total`, and in C7 and E7, add the columns with SUM.
+f. In D2 and F2, enter `=C2/C$7` and `=E2/E$7`, and copy them down to row 6. In D7 and F7, add the shares with SUM.
+g. Check that C7 and E7 equal the count and total on the Population worksheet.
 
 @fig-08-02 shows the result. About three-quarters of the payments are under $1,000, yet they hold less than a quarter of the value, while fewer than a thousand payments between $10,000 and $50,000 hold about a third of it. Only four payments are larger than that.
 
@@ -47,63 +58,79 @@ e. In A7, type `Total`, and in C7:F7 add the column totals with SUM. Check that 
 
 **Step 4. Examine the top strata in full.** Items this large are examined one by one rather than sampled.
 
-a. On the worksheet of the Payments Table, open the filter list of Amount, choose **Number Filters > Greater Than Or Equal To**, and type 50000.
+a. On the Payments worksheet, open the filter list of Amount, choose **Number Filters > Greater Than Or Equal To**, and type `50000`.
 b. For each payment, compare Amount with GrandTotal, and note the supplier and the invoice.
-c. Copy the four rows below the stratification table on the Strata worksheet, and add a `Disposition` column that states the evidence you would examine for each.
-d. Clear the filter.
+c. Copy the four rows to A10 of the Strata worksheet, below the stratification table.
+d. Add a `Disposition` column beside them, and state the evidence you would examine for each payment.
+e. Clear the filter.
 
-The four payments went to two suppliers, and each pays a single invoice in full. None of them is an exception yet: each is a large, individually significant payment whose disposition is to vouch it to its purchase order, its receiving record, and the approval of its invoice.
+The four payments went to two suppliers, and each pays a single invoice in full. None of them is an exception yet. Each is a large, individually significant payment whose disposition is to vouch it: to trace it back to its purchase order, its receiving record, and the approval of its invoice, and to confirm that each supports the payment.
 
 **Step 5. Add the first digit of each payment.**
 
-a. In the first empty column to the right of the Payments Table, type `LeadDigit` as the header, and in the first row enter:
+a. In the first empty column to the right of the Payments Table, type `LeadDigit` as the header, and in the first row enter the formula below. The two minus signs convert the text digit that LEFT returns into a number.
 
    ```
    =--LEFT(TEXT([@Amount],"0.00000000E+00"),1)
    ```
 
-b. Check the column with `=COUNTIF(Payments[LeadDigit],0)` in a free cell, which should return 0.
+b. On the Population worksheet, type `Payments with LeadDigit 0` in A6, and enter `=COUNTIF(Payments[LeadDigit],0)` in B6.
 
-Scientific notation always starts with the first significant digit, so this formula works for every amount. Two shorter formulas do not. `LEFT([@Amount],1)` returns 0 for the payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit, so that $0.60 becomes 1 and $9.70 becomes 10, which starts with 1. Together, the two shortcuts misclassify several hundred payments.
+B6 returns 0. Scientific notation always starts with the first significant digit, so this formula works for every amount. Two shorter formulas do not. `LEFT([@Amount],1)` returns 0 for the payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit, so that $0.60 becomes 1 and $9.70 becomes 10, which starts with 1. Together, the two shortcuts misclassify several hundred payments.
 
 **Step 6. Compare the first digits with Benford's Law.**
 
-a. Add a worksheet named `Benford`, type the headers shown in @fig-08-03 in A1:E1, and type the digits 1 to 9 in A2:A10.
-b. In B2, C2, D2, and E2, enter `=LOG10(1+1/A2)`, `=COUNTIF(Payments[LeadDigit],A2)`, `=C2/C$11`, and `=ABS(D2-B2)`, and copy them down to row 10.
-c. In A11, type `Total`, and add the columns with SUM in B11:D11. In A12, type `MAD`, and in E12 enter `=AVERAGE(E2:E10)`. Format columns B, D, and E as percentages with two decimals, and E12 as a number with five decimals.
-d. Select D1:D10, hold Ctrl, and select B1:B10. Choose **Insert > Insert Combo Chart > Clustered Column - Line**, so that the actual proportions are columns and the expected proportions a line.
+a. Add a worksheet named `Benford`, type the headings `Digit`, `Expected`, `Payments`, `Actual`, and `Difference` in A1:E1, and type the digits `1` to `9` in A2:A10.
+b. In B2 and C2, enter `=LOG10(1+1/A2)` and `=COUNTIF(Payments[LeadDigit],A2)`, and copy them down to row 10.
+c. In A11, type `Total`, and in B11 and C11, add the columns with SUM.
+d. In D2 and E2, enter `=C2/C$11` and `=ABS(D2-B2)`, copy them down to row 10, and add column D with SUM in D11.
+e. In A12, type `MAD`, and in E12, enter `=AVERAGE(E2:E10)`, the mean absolute deviation.
+f. Format columns B, D, and E as percentages with two decimals, and E12 as a number with five decimals.
+g. Select D1:D10, hold Ctrl, and select B1:B10.
+h. Choose **Insert > Insert Combo Chart > Clustered Column - Line**, so that the actual proportions are columns and the expected proportions a line. The chart section of Chapter 6 compares chart types; a combo chart suits a comparison of actual values with a standard.
 
 The MAD falls in the marginally acceptable range of @tbl-08-01. The chart in @fig-08-03 shows the pattern behind it: the digits 1 and 2 appear less often than Benford's Law expects, and the digits from 5 to 9 more often. With this many payments, a chi-square test would call the difference highly significant; the MAD says that it is modest but worth explaining.
 
 ![A First-Digit Test of Supplier Payments.](/visuals/svg/fig-08-03-benford-all-payments.svg){#fig-08-03 fig-alt="A mock of the Benford worksheet, with the COUNTIF formula of cell C2 in the formula bar. For the digits 1 to 9, it lists the expected proportion, the number of payments, the actual proportion, and the absolute difference, with a total row and the mean absolute deviation, outlined, in the last row. Below, a combo chart shows the actual proportions as columns and the expected proportions as a line with markers. The columns for 1 and 2 are below the line, and the columns for 5 to 9 are above it."}
 
-**Step 7. Find the payments that depart from the pattern.** A nonconforming test points to a subset of the population. Charles River pays some invoices in several parts, and a part of an invoice is a different kind of number from a whole invoice.
+**Step 7. Split the payments into full and partial payments.** A nonconforming test points to a subset of the population. Charles River pays some invoices in several parts, and a part of an invoice is a different kind of number from a whole invoice.
 
 a. In the Payments Table, add a column named `Partial` with the formula `=[@Amount]<[@GrandTotal]`, which is TRUE for a payment of part of its invoice.
-b. On the Benford worksheet, type `Full`, `Partial`, `Full share`, and `Partial share` in F1:I1. In F2 and G2, enter the counts of full and partial payments that start with each digit:
+b. On the Benford worksheet, type `Full`, `Partial`, `Full share`, and `Partial share` in F1:I1.
+c. In F2 and G2, enter the counts of full and partial payments that start with each digit:
 
    ```
    =COUNTIFS(Payments[LeadDigit],A2,Payments[Partial],FALSE)
    =COUNTIFS(Payments[LeadDigit],A2,Payments[Partial],TRUE)
    ```
 
-c. In H2 and I2, enter `=F2/SUM(F$2:F$10)` and `=G2/SUM(G$2:G$10)`, and copy F2:I2 down to row 10.
-d. In H12 and I12, calculate the MAD of each subset with `=SUMPRODUCT(ABS(H2:H10-$B2:$B10))/9` and the same formula for column I.
-e. In a free cell, enter this formula, which returns the smallest invoice paid in parts:
+d. In H2 and I2, enter `=F2/SUM(F$2:F$10)` and `=G2/SUM(G$2:G$10)`, and copy F2:I2 down to row 10.
+
+Columns H and I now hold the first-digit proportions of each subset, which can be compared with the expected proportions in column B as the whole population was.
+
+**Step 8. Measure the conformity of each subset.**
+
+a. In H12, enter `=AVERAGE(ABS(H2:H10-$B$2:$B$10))`, the MAD of the full payments. It is the same average of absolute differences as E12, calculated in one formula without a difference column.
+b. Copy H12 to I12 for the partial payments.
+c. In F14, type `Smallest invoice paid in parts`, and in I14, enter:
 
    ```
    =MINIFS(Payments[GrandTotal],Payments[Partial],TRUE)
    ```
 
-@fig-08-04 shows the two subsets. The full payments conform acceptably. The partial payments do not conform at all, and the reason lies in how they arise: Charles River pays in parts only invoices of $1,000 or more, and most of those invoices are between $1,000 and $2,000. Split into two or three payments, such an invoice produces amounts in the hundreds that start with the digits 3 to 9. The nonconformity comes from the payment process, not from invented amounts, and the invoices themselves, whose first digits you can test in the same way, conform closely.
+@fig-08-04 shows the two subsets. The full payments conform acceptably. The partial payments do not conform at all, and the reason lies in how they arise: I14 shows that Charles River pays in parts only invoices of $1,000 or more, and most of those invoices are between $1,000 and $2,000. Split into two or three payments, such an invoice produces amounts in the hundreds that start with the digits 3 to 9. The nonconformity comes from the payment process, not from invented amounts, and the invoices themselves, whose first digits you can test in the same way, conform closely.
 
 ![First Digits of Full and Partial Payments.](/visuals/svg/fig-08-04-benford-by-payment-type.svg){#fig-08-04 fig-alt="Two combo charts side by side, each with actual proportions as columns and Benford's expected proportions as a line. The left chart, for full payments, follows the expected line closely and is labeled with a mean absolute deviation in the acceptable range. The right chart, for partial payments, departs sharply: the digits 2 and 3 are far below the line and the digits 5 to 9 far above it, with a mean absolute deviation in the nonconformity range."}
 
-**Step 8. Document the tests.**
+**Step 9. Document the tests.**
 
-a. Add a worksheet named `WP Payments`. In column A, type the labels shown in @fig-08-09 (Objective, Source, Population check, Procedure, Parameters, Results, Exceptions and disposition, Conclusion, Prepared by, and Reviewed by), and in column B describe the payment tests for each.
-b. In the Parameters entry, record the date filter, the strata bounds, and the digit formula. In the Exceptions and disposition entry, record the four largest payments to vouch and the explanation of the partial payments.
-c. Save the workbook.
+a. Add a worksheet named `WP Payments`, and type the workpaper labels in A1:A10: `Objective`, `Source`, `Population check`, `Procedure`, `Parameters`, `Results`, `Exceptions and disposition`, `Conclusion`, `Prepared by`, and `Reviewed by`.
+b. In column B, describe the payment tests beside each label.
+c. Record the date filter, the strata bounds, and the digit formula in the Parameters entry.
+d. Record the four largest payments to vouch and the explanation of the partial payments in the Exceptions and disposition entry.
+e. Save the workbook.
+
+The workpaper now tells a reviewer what was tested, on which population, with which parameters, and what each result means. Tutorial 8.3 shows a completed workpaper of the same form.
 
 **Checkpoint.** Check that:
 

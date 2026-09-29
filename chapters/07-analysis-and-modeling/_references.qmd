@@ -14,7 +14,7 @@ Microsoft. (2026a). *Define and solve a problem by using Solver*. Microsoft Supp
 
 Microsoft. (2026b). *FORECAST and FORECAST.LINEAR functions*. Microsoft Support. <https://support.microsoft.com/en-us/office/forecast-and-forecast-linear-functions-50ca49c9-7b40-4892-94e4-7ad38bbeda99>
 
-Microsoft. (2026c). *Introduction to What-If Analysis*. Microsoft Support. <https://support.microsoft.com/en-us/excel/introduction-to-what-if-analysis>
+Microsoft. (2026c). *Introduction to what-if analysis*. Microsoft Support. <https://support.microsoft.com/en-us/excel/introduction-to-what-if-analysis>
 
 Microsoft. (2026d). *Load the Analysis ToolPak in Excel*. Microsoft Support. <https://support.microsoft.com/en-us/excel/load-the-analysis-toolpak-in-excel>
 

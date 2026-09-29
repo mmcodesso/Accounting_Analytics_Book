@@ -107,3 +107,20 @@ B.  Diagnostic analytics
 C.  Predictive analytics
 D.  Prescriptive analytics
 
+<!-- Answer key, Chapter 1 (for instructors; HTML comments are removed from every rendered format):
+     1 D, 2 A, 3 C, 4 D, 5 A, 6 C, 7 B, 8 A, 9 C, 10 D, 11 B, 12 A, 13 C, 14 B, 15 B.
+     1 D: data volume and complexity have outgrown traditional manual methods of analysis.
+     2 A: summarizing past costs and their changes describes what happened.
+     3 C: an expectation of future results built from past data is predictive.
+     4 D: Solver recommends the best product mix under constraints, which is prescriptive.
+     5 A: the workflow runs from the question through access, preparation, analysis, and visualization to communication.
+     6 C: Accounting Core holds the chart of accounts, journal entries, and ledger detail.
+     7 B: SQL queries relational databases directly.
+     8 A: the book builds from the most accessible table groups to the more complex ones.
+     9 C: the IMA competency framework includes technology and analytics as a core domain.
+     10 D: Power BI builds interactive dashboards with filters and drill-down.
+     11 B: SourceDocumentType, SourceDocumentID, and SourceLineID trace a ledger row to its source.
+     12 A: data preparation and cleaning usually takes the most time.
+     13 C: the Manufacturing group holds work orders, production, and variance data.
+     14 B: one company's data, learned deeply, connects the same transactions across the tools.
+     15 B: breaking a change down to find its cause is diagnostic analytics. -->

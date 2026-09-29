@@ -20,13 +20,20 @@ e. Click **Transform Data**, not **Load**, so that you can shape the data before
 
 ![The Power Query Navigator for CharlesRiver.xlsx.](/visuals/svg/fig-04-02-power-query-navigator.svg){#fig-04-02 fig-alt="A mock of the Power Query Navigator for CharlesRiver.xlsx. The Select multiple items check box is checked. The list shows worksheets, such as SalesInvoiceLine, with a worksheet icon, and below them four checked Excel Tables with a table icon: T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram. T17_SalesInvoiceLine is selected, and the preview pane shows its first rows. The check box and the Transform Data button are outlined."}
 
-**Step 3. Rename the queries.** The Power Query Editor opens, with the four queries listed in the **Queries** pane on the left. Each query is named after its Table, such as T17_SalesInvoiceLine. Because the query name becomes the name of the Table that Power Query loads into your workbook, rename the queries now. Double-click each name in the **Queries** pane and type `SalesInvoice`, `SalesInvoiceLine`, `Item`, and `PromotionProgram`, respectively.
+**Step 3. Rename the queries.** Each query's name becomes the name of the Table that Power Query loads into your workbook, so give the queries short names before you load them.
+
+a. In the **Queries** pane on the left of the Power Query Editor, double-click **T16_SalesInvoice** and type `SalesInvoice`.
+b. Rename the other three queries `SalesInvoiceLine`, `Item`, and `PromotionProgram` in the same way.
+
+The **Queries** pane now lists the four queries under their short names.
 
 **Step 4. Keep only the items Charles River sells.** The Item Table holds every item Charles River buys or sells, but the analysis needs only the items it sells. As you found in Tutorial 2.1, the items with a blank ListPrice are ones Charles River buys, such as raw materials, packaging, capital equipment, and operating services.
 
 a. Select the **Item** query.
 b. Click the filter button on the ListPrice column header.
 c. Clear the check box for the blank value, which Power Query shows as **(null)**, and click **OK**.
+
+The preview now shows only items that have a list price, and a new step, Filtered Rows, appears in the **Applied Steps** list.
 
 **Step 5. Keep only the columns the analysis needs.** The analysis uses fewer than half of the Item Table's columns.
 
@@ -73,7 +80,7 @@ Discount holds a rate, such as 0.10 for 10 percent, and it is zero on lines with
 
 ![The SalesInvoiceLine Table with Its Calculated Columns.](/visuals/svg/fig-04-04-salesinvoiceline-table.svg){#fig-04-04 fig-alt="A mock of the SalesInvoiceLine Table after Tutorial 4.1, with columns B through F and L through O hidden. The Table Name box on the Table Design tab reads SalesInvoiceLine, and the formula bar shows =ROUND([@Quantity]*[@BaseListPrice],2) for the selected ListAmount cell. Of five consecutive invoice lines, two carry a promotional discount of 0.1 and have a DiscountAmount greater than zero, and the other three have a DiscountAmount of zero. The ListAmount and DiscountAmount calculated columns are outlined."}
 
-**Step 10. Build control totals that prove the import is complete.**
+**Step 10. Build control totals that prove the import is complete.** A control total is a total calculated independently from a set of data, which the data must agree with. Here, the invoice lines must add up to the invoices they belong to.
 
 a. Insert a new worksheet and name it `Analysis`.
 b. In cell A1, type `Control totals`.
@@ -90,7 +97,14 @@ f. Format the amounts with a thousands separator and two decimals.
 
 The SubTotal on each invoice is the sum of its lines, so the two totals in B5 and B6 come from different Tables but should agree to the cent, and B7 should show zero. The ROUND in B7 removes the tiny differences, far smaller than a cent, that computers produce when they add long columns of decimal numbers. Compare the list amount in B9 with the line total in B5.
 
-**Step 11. Test the refresh.** Choose **Data > Refresh All**. Power Query reads CharlesRiver.xlsx again and repeats every step. When it finishes, confirm that the row counts in the **Queries & Connections** pane and your control totals are unchanged, and that the ListAmount and DiscountAmount columns are still filled. Save the workbook.
+**Step 11. Test the refresh.** Power Query reads CharlesRiver.xlsx again and repeats every step, so a refresh should change nothing while the source is unchanged.
+
+a. Choose **Data > Refresh All**.
+b. When it finishes, confirm that the row counts in the **Queries & Connections** pane and your control totals are unchanged.
+c. Confirm that the ListAmount and DiscountAmount columns are still filled.
+d. Save the workbook.
+
+The calculated columns survive the refresh because Excel keeps a Table's calculated columns when a query reloads its rows.
 
 
 **Checkpoint.** Your workbook should now contain four data worksheets, each holding a Table named after its query, and an Analysis worksheet. Check that:

@@ -4,73 +4,73 @@
 
 **1.** The correlation coefficient between two monthly accounting measures is −0.80. What does this indicate?
 
-A.  The two measures are unrelated.
-B.  The two measures have a strong negative linear relationship: when one is higher, the other tends to be lower.
-C.  One measure causes the other to fall.
-D.  The first measure is 80 percent smaller than the second.
+A.  They are unrelated, because a negative coefficient means no relationship.
+B.  The first measure is, on average, 80 percent smaller than the second.
+C.  A rise in one measure causes the other to fall.
+D.  They move strongly in opposite directions along a straight line.
 
 **2.** Removing a single unusual month from a data set changes the correlation between revenue and the number of customers from strong to weak. What should an analyst do?
 
-A.  Report the stronger correlation, because it uses more data.
+A.  Investigate the month, and report both results unless it can be explained.
 B.  Report the weaker correlation, because unusual months should always be deleted.
 C.  Report neither, because correlation cannot be used with monthly data.
-D.  Investigate the unusual month, and report the result both with and without it unless it can be explained.
+D.  Report the stronger correlation, because it uses more of the data.
 
 **3.** A regression of monthly revenue on a month index reports an R Square of 0.17. What does this mean?
 
-A.  The fitted line explains about 17 percent of the variation in monthly revenue.
-B.  Revenue grows by 17 percent a month.
-C.  The slope has a 17 percent chance of being zero.
-D.  The forecast will be accurate to within 17 percent.
+A.  Revenue grows by about 17 percent from one month to the next.
+B.  The fitted line explains about 17 percent of the variation in monthly revenue.
+C.  The slope has a 17 percent chance of being zero in the population.
+D.  The forecast will be accurate to within 17 percent of actual revenue.
 
 **4.** Fitted to all thirty-six months, the slope of Charles River's revenue trend has a p-value of about 0.01. Fitted without the start-up month, the p-value is about 0.07. What is the best conclusion?
 
 A.  Revenue has a strong upward trend that should be extended into the forecast.
 B.  The start-up month should be kept, because it makes the result significant.
-C.  The apparent trend depends on one unusual month, so there is no reliable evidence of a trend.
-D.  A p-value above 0.05 proves that revenue will not grow.
+C.  The trend depends on one unusual month, so there is no reliable evidence of one.
+D.  A p-value above 0.05 proves that revenue will not grow in the coming year.
 
 **5.** What is a backtest of a forecasting method?
 
-A.  Recalculating a forecast after the period is over and replacing it with the actual amount
-B.  Fitting the method to an earlier part of the history, forecasting a later part that was held back, and comparing the forecasts with the actual results
-C.  Forecasting the past by running the method backward in time
-D.  Checking that the forecast formula has no errors
+A.  Recalculating a forecast after the period and replacing it with the actual amount
+B.  Fitting it to earlier data and comparing its forecasts of held-back later data with the actuals
+C.  Forecasting the past by running the method backward from the latest period
+D.  Checking that the forecast formulas contain no errors before the forecast is used
 
 **6.** Why should a new forecasting method be compared with simple benchmarks, such as the mean or the value of the same quarter last year?
 
-A.  A method that cannot beat the simple benchmarks is not worth the extra complexity.
-B.  Benchmarks are always more accurate than other methods.
-C.  Auditing standards require every forecast to use the mean.
-D.  Excel cannot calculate more complex forecasts.
+A.  Excel cannot calculate forecasts more complex than the benchmarks.
+B.  Benchmarks are always more accurate than more elaborate methods.
+C.  Auditing standards require every forecast to be compared with the mean.
+D.  A method that cannot beat them is not worth its extra complexity.
 
 **7.** How do TREND and FORECAST.LINEAR differ?
 
-A.  TREND uses a curved line and FORECAST.LINEAR a straight line.
-B.  FORECAST.LINEAR requires the Data Analysis ToolPak.
-C.  TREND works only with dates, and FORECAST.LINEAR only with numbers.
-D.  Both fit a least-squares line, but TREND can return values for several new x-values at once, while FORECAST.LINEAR returns one.
+A.  Both fit a least-squares line; TREND can return several values at once, FORECAST.LINEAR one.
+B.  FORECAST.LINEAR requires the Data Analysis ToolPak, while TREND does not.
+C.  TREND works only with dates, while FORECAST.LINEAR works only with numbers.
+D.  TREND fits a curved line, while FORECAST.LINEAR fits a straight line.
 
 **8.** What is a flexible budget?
 
 A.  A budget that managers may change during the year without approval
 B.  The static budget with every amount increased by the same percentage
-C.  The budget recalculated at the actual volume, using the budgeted prices and costs per unit
-D.  The actual results rearranged in the format of the budget
+C.  The budget recalculated at actual volume with the budgeted prices and unit costs
+D.  The actual results rearranged in the format and order of the budget
 
 **9.** What does the sales-volume variance measure?
 
-A.  The effect on margin of selling a different volume than planned, at the planned margins per unit
-B.  The effect of actual prices differing from the budgeted prices
-C.  The difference between actual and budgeted fixed costs
-D.  The effect of producing more units than were sold
+A.  The difference between the actual and the budgeted fixed costs
+B.  The effect of actual selling prices differing from the budgeted prices
+C.  The effect on margin of selling more or fewer units than planned, at planned margins
+D.  The effect of producing more units than were sold in the period
 
 **10.** Actual sales commission expense is 75 percent below the static budget, and actual revenue is far below the budgeted revenue. What is the best interpretation?
 
-A.  The sales team reduced its commission rates, which saved money.
-B.  Most of the difference reflects the lower revenue; the commission budget should be flexed to actual revenue before the difference is judged.
-C.  The commission expense was not recorded in the ledger.
-D.  Commissions are a fixed cost, so any difference is a spending variance.
+A.  The sales team cut its commission rates, which saved the company money.
+B.  Most of it reflects lower revenue, so flex the budget before judging the rest.
+C.  Part of the commission expense was never recorded in the ledger.
+D.  Commissions are a fixed cost, so the whole difference is a spending variance.
 
 **11.** A company has fixed costs of $900,000 and a contribution margin ratio of 30 percent. What is its break-even revenue?
 
@@ -81,28 +81,46 @@ D.  $3,000,000
 
 **12.** What does Goal Seek do?
 
-A.  It compares the results of several named sets of inputs.
-B.  It shows a result for every value in a range of inputs.
-C.  It finds the value of one input cell that makes a formula cell equal a target value.
-D.  It maximizes a result subject to several constraints.
+A.  It finds the value of one input that makes a formula cell equal a target.
+B.  It shows a formula's result for every value in a range of one or two inputs.
+C.  It compares the results of several named sets of input values in a report.
+D.  It maximizes or minimizes a result subject to several constraints on its inputs.
 
 **13.** An analyst wants to see how the difference in contribution changes for every combination of three discount rates and nine volume increases. Which tool fits best?
 
-A.  A two-variable data table
-B.  Goal Seek
+A.  Goal Seek
+B.  A two-variable data table
 C.  A one-variable data table
 D.  The Correlation tool of the ToolPak
 
 **14.** A production-mix model is solved with Solver's Simplex LP method. Under what condition can Solver also produce a Sensitivity report with shadow prices?
 
 A.  When every variable cell is required to be a whole number
-B.  When Solver finds an optimal solution and the model has no integer constraints
-C.  When the model uses the Evolutionary method
-D.  Only when the model has a single constraint
+B.  When the model is solved with the Evolutionary method instead
+C.  When it finds an optimum and the model has no integer constraints
+D.  Only when the model has a single constraint on its variable cells
 
 **15.** Why does a documentation table for a model's assumptions include a sensitivity column?
 
-A.  To record the formulas used in each cell
-B.  To prove that the assumptions are correct
-C.  To show how much the conclusion changes when each assumption changes, so that review focuses on the assumptions that matter
-D.  To list the people who approved each assumption
+A.  To show which assumptions change the conclusion most, so review focuses on them
+B.  To prove that the assumptions used in the model are correct
+C.  To record the formula used in each cell of the model
+D.  To list the people who approved each assumption and when
+
+<!-- Answer key, Chapter 7 (for instructors; HTML comments are removed from every rendered format):
+     1 D, 2 A, 3 B, 4 C, 5 B, 6 D, 7 A, 8 C, 9 C, 10 B, 11 D, 12 A, 13 B, 14 C, 15 A.
+     1 D: a coefficient of -0.80 is a strong negative linear association; it says nothing about cause or size.
+     2 A: when one observation changes the conclusion, investigate it and report both results unless it can be explained.
+     3 B: R Square is the share of the variation in y that the line explains.
+     4 C: the slope is significant only with the start-up month, so there is no reliable evidence of a trend.
+     5 B: a backtest fits the method to earlier data and compares its forecasts of held-back data with the actuals.
+     6 D: a method that cannot beat simple benchmarks is not worth its extra complexity.
+     7 A: both fit the same least-squares line; TREND can return several values, FORECAST.LINEAR one.
+     8 C: a flexible budget recalculates the budget at actual volume with budgeted prices and costs per unit.
+     9 C: the sales-volume variance values the difference in units at the planned margins per unit.
+     10 B: commissions are variable, so the budget must be flexed to actual revenue before the difference is judged.
+     11 D: break-even revenue is fixed costs divided by the contribution margin ratio: 900,000 / 0.30 = 3,000,000.
+     12 A: Goal Seek changes one input until a formula cell reaches a target value.
+     13 B: a two-variable data table fills in a result for every combination of two inputs.
+     14 C: the Sensitivity report requires an optimal solution and no integer constraints.
+     15 A: the sensitivity column shows which assumptions change the conclusion, so review focuses on them. -->

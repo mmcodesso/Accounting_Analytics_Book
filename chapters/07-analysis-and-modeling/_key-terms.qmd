@@ -16,6 +16,8 @@
 
 **Correlation coefficient.** A number from −1 to +1 that measures how closely two variables move together along a straight line, calculated in Excel with CORREL. It does not measure a curved relationship, and it does not show cause.
 
+**Cost-volume-profit analysis.** A model of how profit responds to changes in volume, prices, and costs, built by dividing costs into variable and fixed parts. It gives the break-even point, the margin of safety, and the volume needed to earn a target profit.
+
 **Data table.** An Excel what-if tool that recalculates a formula for each value in a row or column of inputs, or for every combination of two inputs, and fills in the results.
 
 **Flexible budget.** A budget recalculated at the actual volume of activity, using the budgeted prices and costs per unit. Comparing actual results with it isolates the effects of prices and costs from the effect of volume.
@@ -28,6 +30,8 @@
 
 **Margin of safety.** The amount by which actual or planned revenue exceeds break-even revenue, in dollars or as a percentage of revenue.
 
+**Master budget.** The complete budget of an organization for a period, combining the operating budgets for sales, production, purchasing, and expenses with the financial budgets for cash and the balance sheet.
+
 **P-value.** In regression, the probability of estimating a coefficient at least as far from zero as the one observed if the true coefficient were zero. A p-value below 0.05 is the conventional threshold for statistical significance.
 
 **R Square.** The share of the variation in the dependent variable that a regression line explains, from 0 to 1.
@@ -38,8 +42,12 @@
 
 **Scenario.** A named set of values for a model's input cells. Excel's Scenario Manager stores scenarios and compares their results in a Scenario Summary report.
 
+**Shadow price.** In an optimization model, the amount by which the objective would improve if a constraint, such as the hours available in a work center, were relaxed by one unit. Solver reports it in the Sensitivity report of a linear model.
+
 **Simple linear regression.** A method that fits the straight line `y = a + bx` minimizing the squared differences between the actual values of a dependent variable and the line, using one independent variable.
 
 **Solver.** An Excel add-in that finds the values of several variable cells that maximize or minimize an objective cell subject to constraints. For linear models, its Simplex LP method finds the optimum and can report shadow prices.
+
+**Spill range.** The range of cells that a dynamic array formula, such as TREND, FILTER, UNIQUE, or SORT, fills with its results. The address of its first cell followed by #, as in A5#, refers to the whole range.
 
 **Static budget.** A budget prepared for a single, planned level of activity and not adjusted for the activity that actually occurs.

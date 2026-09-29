@@ -88,5 +88,5 @@ Close the memo with a recommendation for the analysis the team should perform ne
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-The data map and the corrected margin measure you build here are the starting point for Part II. There, you will use Excel to break the margin change into its price, mix, and cost effects, which is the diagnostic question this case prepares you to answer.
+The data map and the corrected margin measure you build here are the starting point for Part II. There, you will use Excel to break the margin change into its volume, mix, price, and cost effects, which is the diagnostic question this case prepares you to answer.
 :::

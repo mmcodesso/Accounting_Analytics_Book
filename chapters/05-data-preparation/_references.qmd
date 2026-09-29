@@ -6,6 +6,6 @@ Fernandes, A. A. A., Koehler, M., Konstantinou, N., Pankin, P., Paton, N. W., & 
 
 Hunter, K., Alberti, C. T., Boss, S. R., & Thibodeau, J. C. (2020). IntelliClean: A teaching case designed to integrate data cleaning and spreadsheet skills into the audit curriculum. *Journal of Emerging Technologies in Accounting*, *17*(2), 17–24. <https://doi.org/10.2308/jeta-2020-025>
 
-Lee, L. S., Casterella, G., & Wray, B. (2020). Preparing for audit data analytics with the AICPA general ledger audit data standards. *Journal of Emerging Technologies in Accounting*, *18*(1), 131–157. <https://doi.org/10.2308/jeta-2020-022>
+Lee, L. S., Casterella, G., & Wray, B. (2021). Preparing for audit data analytics with the AICPA general ledger audit data standards. *Journal of Emerging Technologies in Accounting*, *18*(1), 131–157. <https://doi.org/10.2308/jeta-2020-022>
 
 Raschke, R. L., & Charron, K. F. (2021). Review of data analytic teaching cases, have we covered enough? *Journal of Emerging Technologies in Accounting*, *18*(2), 247–255. <https://doi.org/10.2308/jeta-2020-036>

@@ -10,9 +10,11 @@
 
 a. Insert a new worksheet and name it `Parameters`.
 b. In row 1, type the headers `Parameter`, `Value`, and `Description` in columns A, B, and C.
-c. In A3, type `Threshold percentile`; in B3, type `0.9`; and in C3, type `Share of invoice lines that fall at or below the large-line threshold`.
+c. In A3, type `Threshold percentile`; in B3, type `0.9`; and in C3, type `Share of lines at or below the threshold`.
 d. Select B3, click the **Name Box** at the left end of the formula bar, type `ThresholdPercentile`, and press Enter.
 e. Format B3 with blue font to mark it as an input that a user may change.
+
+The Parameters worksheet now holds one named input. Every formula that needs the percentile will refer to ThresholdPercentile, so changing B3 later changes them all.
 
 **Step 2. Derive the large-line threshold from the data.** The threshold comes from the line totals themselves rather than from a guess.
 
@@ -23,10 +25,10 @@ a. In A4, type `Large-line threshold`, and in B4, enter this formula:
    ```
 
 b. Name B4 `LargeLineThreshold` in the **Name Box**, and format it as currency.
-c. In C4, type `Line total above which an invoice line counts as large`.
+c. In C4, type `Line total above which a line counts as large`.
 d. Leave B4 in black font, because it is a formula.
 
-The function returns the amount below which 90 percent of the line totals fall. The threshold is a few thousand dollars, well above the median line total but far below the largest lines.
+The function returns the amount below which 90 percent of the line totals fall. The threshold is a few thousand dollars: well above the median line total, the middle value when the lines are sorted by amount (Chapter 6 returns to it), but far below the largest lines.
 
 **Step 3. Count the large lines and measure their share.**
 
@@ -54,6 +56,8 @@ b. In B15 through E15, type the four discount rates that appear on the invoice l
 c. In A16 through A19, type the four pricing methods exactly as they appear in the PricingMethod column: `Approved Override`, `Base List`, `Customer Price List`, and `Segment Price List`. You can check the spelling in the column's filter list.
 d. Type `Total` in A20 and in F15.
 
+The grid's labels are in place, with the discount rates across row 15 and the pricing methods down column A. Because the next formula matches these labels against the data, they must be spelled exactly as the data spells them.
+
 **Step 5. Fill the grid with one formula.**
 
 a. In B16, enter this formula:
@@ -63,9 +67,9 @@ a. In B16, enter this formula:
    ```
 
 b. Copy B16 with Ctrl+C, select B16:E19, and paste with Ctrl+V. Do not drag the fill handle across the grid, for the reason given in the Watch out box on structured references.
-c. Click E19 and read the formula bar: it should refer to $A19 and E$15.
+c. Click E19 and read the formula bar: it should refer to `$A19` and `E$15`.
 
-The reference $A16 locks the column, so every copy of the formula reads its pricing method from column A while the row adjusts. The reference B$15 locks the row, so every copy reads its discount rate from row 15 while the column adjusts.
+The reference `$A16` locks the column, so every copy of the formula reads its pricing method from column A while the row adjusts. The reference `B$15` locks the row, so every copy reads its discount rate from row 15 while the column adjusts.
 
 **Step 6. Add the totals.**
 
@@ -80,7 +84,7 @@ a. In A22, type `Share of all invoice lines`, and repeat the pricing method labe
 b. In B23, enter `=B16/$F$20`, copy it, and paste it into B23:E26.
 c. Format the block as percentages with one decimal.
 
-The absolute reference $F$20 keeps every copy pointed at the grand total. @fig-04-06 shows the finished worksheet.
+The absolute reference `$F$20` keeps every copy pointed at the grand total. @fig-04-06 shows the finished worksheet.
 
 ![The Analysis Worksheet with the Control Totals and the Summary Grid.](/visuals/svg/fig-04-06-analysis-worksheet.svg){#fig-04-06 fig-alt="A mock of the Analysis worksheet. Rows 3 to 9 hold the control totals, in which the line total and the invoice subtotal agree and the difference is zero. Rows 11 and 12 give the number of large lines and their share of the line total. Rows 15 to 20 hold the grid of invoice lines by pricing method and discount rate, with totals, outlined, and rows 22 to 26 show the same counts as shares of all lines. The Base List row has no discounted lines. Cell E19 is selected, and the formula bar shows =COUNTIFS(SalesInvoiceLine[PricingMethod],$A19,SalesInvoiceLine[Discount],E$15)."}
 

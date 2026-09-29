@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the table the rest of Part II analyzes. Instead of adding more formula columns, you will create a new Power Query query, InvoiceLines, that starts from the invoice lines, merges in the invoice, item, and customer details, and calculates the fiscal period, the product type, and a quantity check as custom columns. You will load it as a Table, reconcile it with the source and with the lookups from Tutorial 5.2, and record it on the Documentation worksheet. Because it is a query, it rebuilds itself whenever you refresh the workbook.
 
-**Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, Item, and SalesOrder queries.
+**Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, and Item queries.
 
 **Step-by-step instructions.**
 
@@ -11,6 +11,8 @@
 a. Choose **Data > Get Data > Launch Power Query Editor**.
 b. In the editor, choose **Home > New Source > File > Excel Workbook**, select CharlesRiver.xlsx, and select the **T4_Customer** Table in the **Navigator**. Click **OK**.
 c. Rename the new query `Customer`, and use **Home > Choose Columns** to keep CustomerID, CustomerName, CustomerSegment, and Region.
+
+The **Queries** pane now lists Customer below the queries you created in Chapter 4 and Tutorial 5.2. It will load as its own Table when you close the editor in Step 6.
 
 **Step 2. Start the InvoiceLines query from the invoice lines.**
 
@@ -32,11 +34,19 @@ d. A new column appears at the right, with a Table in every row. Click the expan
 
 **Step 4. Merge in the item and customer details.** Repeat the merge for the two other Tables.
 
-a. Merge **InvoiceLines** with **Item** on ItemID, with a left outer join. Expand ItemCode, ItemGroup, and StandardCost, without the prefix.
-b. Merge **InvoiceLines** with **Customer** on CustomerID, the column you added in Step 3, with a left outer join. Expand CustomerSegment and Region, without the prefix.
-c. In each Merge dialog, read the match message before you click **OK**. Every row of the first table should find a match, because every key refers to exactly one row, so the merges add columns without adding or losing rows. The editor's status bar shows only a preview of the rows, so you will confirm the exact count after loading, in Step 6.
+a. Merge **InvoiceLines** with **Item** on ItemID, with a left outer join, and read the match message before you click **OK**.
+b. Expand ItemCode, ItemGroup, and StandardCost, without the prefix.
+c. Merge **InvoiceLines** with **Customer** on CustomerID, the column you added in Step 3, with a left outer join, and read the match message.
+d. Expand CustomerSegment and Region, without the prefix.
 
-**Step 5. Add the calculated columns.** Choose **Add Column > Custom Column** for each of the columns below. Type the name in **New column name** and the formula in **Custom column formula**, and click **OK**.
+Each match message reports that every row of the first table found a match, because every key refers to exactly one row, so the merges add columns without adding or losing rows. The editor's status bar shows only a preview of the rows, so you will confirm the exact count after loading, in Step 6.
+
+**Step 5. Add the calculated columns.** Custom columns calculate the period, the product type, and the quantity check inside the query, so that they are rebuilt on every refresh.
+
+a. Choose **Add Column > Custom Column**.
+b. Type the first name in @tbl-05-06 in **New column name** and its formula in **Custom column formula**, and click **OK**.
+c. Repeat the two actions for each of the other columns in the table.
+d. Set each new column's data type with the icon at the left of its header: whole number for FiscalYear and FiscalQuarter, text for Period and ProductType, and true/false for WholeQuantity.
 
 | New column name | Custom column formula |
 |---|---|
@@ -46,24 +56,29 @@ c. In each Merge dialog, read the match message before you click **OK**. Every r
 | `ProductType` | `Text.Middle([ItemCode], 4, 3)` |
 | `WholeQuantity` | `[Quantity] = Number.RoundDown([Quantity])` |
 
-: Custom columns for the InvoiceLines query {#tbl-05-05}
+: Custom columns for the InvoiceLines query {#tbl-05-06}
 
-Then set each new column's data type with the icon at the left of its header: whole number for FiscalYear and FiscalQuarter, text for Period and ProductType, and true/false for WholeQuantity. @fig-05-07 shows the dialog for the ProductType column.
+Two of the M functions need a word of explanation. `Text.From` converts a number to text, so that the year and the quarter can be joined with "-Q" into a label, and `Number.RoundDown` removes the fractional part of a number, so WholeQuantity is true only when the quantity is a whole number. @fig-05-07 shows the dialog for the ProductType column.
 
 ![The Custom Column Dialog in Power Query.](/visuals/svg/fig-05-07-custom-column.svg){#fig-05-07 fig-alt="A mock of the Power Query Custom Column dialog for the InvoiceLines query. The new column name is ProductType, and the custom column formula is Text.Middle([ItemCode], 4, 3). A list of available columns, including ItemCode, InvoiceDate, and Quantity, is shown on the right, and the dialog reports that no syntax errors have been detected. The formula is outlined."}
 
 **Step 6. Load InvoiceLines and check the result.**
 
-a. Choose **Home > Close & Load**. Power Query loads InvoiceLines into a new worksheet as a Table. Rename the worksheet `InvoiceLines`.
+a. Choose **Home > Close & Load**. Power Query loads InvoiceLines and Customer into two new worksheets as Tables. Rename the worksheets `InvoiceLines` and `Customer`.
 b. On the **Analysis** worksheet, type `InvoiceLines rows` in A49 and `InvoiceLines line total` in A50, and enter `=COUNTA(InvoiceLines[SalesInvoiceLineID])` in B49 and `=SUM(InvoiceLines[LineTotal])` in B50. Compare them with the invoice line count in B3 and the line total in B5.
-c. In B52:E52, repeat the Furniture revenue by quarter from Tutorial 5.2, using InvoiceLines instead of SalesInvoiceLine, and compare the two rows.
+c. In A52, type `Furniture revenue from InvoiceLines`. In B52, enter the formula below, and copy and paste it into C52:E52:
+
+   ```
+   =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],"Furniture",InvoiceLines[Period],B$44)
+   ```
+
 d. In A53, type `Lines with a fractional quantity`, and in B53 enter:
 
    ```
    =COUNTIF(InvoiceLines[WholeQuantity],FALSE)
    ```
 
-@fig-05-08 shows the loaded Table.
+B49 and B50 equal the invoice line count and line total from Chapter 4, and row 52 repeats row 45 to the cent, so the query and the lookups agree. B53 shows that most lines carry a fractional quantity, the validity finding described earlier in this chapter. @fig-05-08 shows the loaded Table.
 
 ![The InvoiceLines Table Loaded by Power Query.](/visuals/svg/fig-05-08-invoicelines-table.svg){#fig-05-08 fig-alt="A mock of the InvoiceLines worksheet. The Table holds, for each invoice line, its ID, quantity, line total, and promotion, together with the merged InvoiceDate, ItemGroup, CustomerSegment, and Region and the calculated Period, ProductType, and WholeQuantity columns. The Queries and Connections pane at the right lists every query with the number of rows it loaded, and InvoiceLines has as many rows as SalesInvoiceLine. The InvoiceLines entry in the pane is outlined."}
 
@@ -71,7 +86,11 @@ d. In A53, type `Lines with a fractional quantity`, and in B53 enter:
 
 a. On the **Documentation** worksheet, add InvoiceLines to the Worksheets entry, and describe its steps in the Query steps entry: a reference to SalesInvoiceLine, left outer merges with SalesInvoice, Item, and Customer, and five custom columns.
 b. Add the fractional quantities to the Open questions entry as a known limitation of the quantity data.
-c. Choose **Data > Refresh All**, confirm that the row counts and totals are unchanged, update the Last refreshed date, and save the workbook.
+c. Add T4_Customer to the Source entry.
+d. Choose **Data > Refresh All**, and confirm that the row counts and totals are unchanged.
+e. Update the Last refreshed date, and save the workbook.
+
+The refresh rebuilds InvoiceLines from the source Tables, and the unchanged totals show that the query repeats itself exactly.
 
 **Checkpoint.** Check that:
 
@@ -80,4 +99,4 @@ c. Choose **Data > Refresh All**, confirm that the row counts and totals are unc
 - most lines are flagged as having a fractional quantity, and the Documentation worksheet records it;
 - a refresh rebuilds InvoiceLines without any change to the totals.
 
-The two methods agree, which is the evidence that the preparation is correct. From here on, the analysis uses InvoiceLines, because it is a single recorded procedure that repeats itself on every refresh, while the lookup columns on SalesInvoiceLine remain in the workbook as the check that confirmed it.
+The two methods agree, which is the evidence that the preparation is correct. From here on, the analysis uses InvoiceLines, because it is a single recorded procedure that repeats itself on every refresh, while the lookup columns on SalesInvoiceLine remain in the workbook as the check that confirmed it. The order date stays on SalesInvoiceLine, for the analyses that need it.

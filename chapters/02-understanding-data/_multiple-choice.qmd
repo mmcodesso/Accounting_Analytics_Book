@@ -107,3 +107,20 @@ B.  Identifying manual journal entries that may indicate management override of 
 C.  Verifying that the general ledger is in a tidy data format
 D.  Confirming that all customers in the Customer table have placed at least one order
 
+<!-- Answer key, Chapter 2 (for instructors; HTML comments are removed from every rendered format):
+     1 A, 2 B, 3 C, 4 A, 5 D, 6 D, 7 C, 8 A, 9 C, 10 A, 11 B, 12 C, 13 B, 14 D, 15 B.
+     1 A: a recorded value that differs from the true value is an accuracy problem.
+     2 B: blank values in a required field are a completeness problem.
+     3 C: two columns of the same record that disagree are a consistency problem.
+     4 A: a cost center's name is a category, not a measurement.
+     5 D: months as column headers leave the month without a column and put several observations in one row.
+     6 D: an extract taken before the final entries were posted is not current as of the reporting date.
+     7 C: most accounting work uses structured data, while unstructured data is growing.
+     8 A: one product under two ItemIDs is a duplicate record.
+     9 C: the general ledger records every financial transaction of the organization.
+     10 A: SourceDocumentType names the kind of business event that created the ledger row.
+     11 B: the structure is tidy, but the entry errors mean it is not clean.
+     12 C: grouping by name merges two different customers that share it.
+     13 B: an ERP system integrates the data of several functional areas in one database.
+     14 D: quality problems can make results unreliable, so they are found and addressed first.
+     15 B: separating manual journal entries from system-generated ones targets management override. -->

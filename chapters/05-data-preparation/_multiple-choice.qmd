@@ -6,29 +6,29 @@
 
 A.  FUR
 B.  -DS
-C.  DSK
-D.  0075
+C.  0075
+D.  DSK
 
 **2.** An analyst applies PROPER to a list of supplier names to standardize them for a report. What happens to the name Donaldson LLC?
 
-A.  It becomes Donaldson Llc, because PROPER lowers every letter after the first in each word.
-B.  It stays Donaldson LLC, because PROPER leaves words in capitals unchanged.
+A.  It stays Donaldson LLC, because PROPER leaves words in capitals unchanged.
+B.  It becomes Donaldson Llc, because PROPER lowers every letter after the first in each word.
 C.  It becomes DONALDSON LLC, because PROPER converts names to capitals.
 D.  It returns an error, because PROPER cannot process abbreviations.
 
 **3.** A company's fiscal year begins on April 1. To which fiscal quarter does an invoice dated February 10 belong?
 
-A.  The first quarter
+A.  The fourth quarter
 B.  The second quarter
 C.  The third quarter
-D.  The fourth quarter
+D.  The first quarter
 
 **4.** An auditor wants to measure how many days old each open invoice is. Why is a fixed as-of date in a named cell better than `=TODAY()`?
 
-A.  TODAY cannot be used in a calculated column.
-B.  TODAY changes every day the workbook is opened, so the results cannot be reproduced, while an as-of date gives the same result every time.
-C.  TODAY returns the date the workbook was created.
-D.  An as-of date makes the calculation run faster.
+A.  TODAY cannot be used in a calculated column of an Excel Table.
+B.  TODAY returns the date on which the workbook was first created.
+C.  TODAY changes each day, so the results cannot be reproduced; an as-of date does not change.
+D.  An as-of date makes the calculation of each age run faster.
 
 **5.** Consider this formula:
 
@@ -38,38 +38,38 @@ D.  An as-of date makes the calculation run faster.
 
 What does its fourth argument do?
 
-A.  It supplies the value returned when the SalesInvoiceID is not found.
-B.  It names the column that holds the key.
+A.  It names the column that holds the key.
+B.  It supplies the value returned when the SalesInvoiceID is not found.
 C.  It forces an approximate match.
 D.  It limits the search to the first matching row.
 
 **6.** Each invoice line carries a SalesInvoiceID, and each invoice carries a SalesOrderID. How can you bring the order date onto each invoice line?
 
 A.  Look up the order date directly with the line's SalesInvoiceID in the SalesOrder Table.
-B.  Use VLOOKUP, because XLOOKUP cannot search the SalesOrder Table.
-C.  First look up the invoice's SalesOrderID with the line's SalesInvoiceID, then look up the order date with that SalesOrderID.
-D.  Sort both Tables by date and copy the dates across.
+B.  Use VLOOKUP on the SalesOrder Table, because XLOOKUP cannot search more than one Table.
+C.  Sort both Tables by date and copy the order dates across to the invoice lines.
+D.  Look up the invoice's SalesOrderID first, and then use it to look up the order date.
 
 **7.** A sales order can have several shipments. An analyst uses XLOOKUP to bring a shipment date onto each order. What is the problem, and what is the better approach?
 
-A.  XLOOKUP cannot return dates; use VLOOKUP instead.
-B.  XLOOKUP returns only the first matching shipment, which may not be the earliest; use MINIFS to return the earliest shipment date.
-C.  XLOOKUP returns the sum of the shipment dates; use AVERAGEIFS instead.
+A.  XLOOKUP cannot return dates from another Table; use VLOOKUP instead.
+B.  XLOOKUP returns the sum of the shipment dates; use AVERAGEIFS instead.
+C.  XLOOKUP returns the first match, which may not be the earliest; use MINIFS instead.
 D.  There is no problem, because XLOOKUP always returns the earliest date.
 
 **8.** A cell contains a formula that returns an empty text value, so the cell looks blank. What does the ISBLANK function return for that cell?
 
-A.  TRUE, because the cell looks blank
+A.  FALSE, because the cell contains a formula
 B.  TRUE, because the formula returns no value
 C.  An error, because ISBLANK cannot test formulas
-D.  FALSE, because the cell contains a formula
+D.  TRUE, because the cell looks blank
 
 **9.** Which of the following is a meaningful blank in the Charles River data?
 
-A.  A blank PromotionID on an invoice line that carried no promotion
+A.  A blank CustomerID on a sales order
 B.  A blank TrackingNumber on a shipment that was delivered
 C.  A blank InvoiceDate on an invoice
-D.  A blank CustomerID on a sales order
+D.  A blank PromotionID on an invoice line that carried no promotion
 
 **10.** An analyst wants a list of the invoice lines whose ItemID does not appear in the Item query. Which Power Query join kind returns exactly those lines?
 
@@ -80,35 +80,59 @@ D.  Full outer
 
 **11.** After a left outer merge in Power Query, a query has more rows than it had before the merge. What is the most likely explanation?
 
-A.  The join kind was changed to left anti.
-B.  The key appears more than once in the second table, so some rows matched several rows.
-C.  The first table contained blank keys.
-D.  Power Query adds a header row to every merge.
+A.  The join kind was changed to left anti after the merge.
+B.  The key appears more than once in the second table.
+C.  The first table contained blank keys that matched every row.
+D.  Power Query adds a header row to the result of every merge.
 
 **12.** In Power Query, `Text.Middle([ItemCode], 4, 3)` returns the same product type code as Excel's `=MID([@ItemCode],5,3)`. Why do the starting positions differ?
 
-A.  Power Query counts the hyphens differently.
-B.  Excel's MID skips the first character.
-C.  Text.Middle reads the code from right to left.
-D.  Text.Middle counts positions from zero, while Excel's MID counts from one.
+A.  Text.Middle counts positions from zero, and MID counts from one.
+B.  Excel's MID always skips the first character of the text.
+C.  Text.Middle reads the code from right to left, not left to right.
+D.  Power Query counts the hyphens in a code differently from Excel.
 
 **13.** What is the main advantage of building InvoiceLines as a reference query instead of adding merge steps to the SalesInvoiceLine query itself?
 
-A.  The SalesInvoiceLine query stays unchanged, and the new query starts from its result and updates whenever it does.
-B.  Reference queries run without CharlesRiver.xlsx.
-C.  Reference queries cannot be refreshed, so their results are fixed.
+A.  Reference queries cannot be refreshed, so their results are fixed.
+B.  Reference queries run without needing CharlesRiver.xlsx to be available.
+C.  The original query stays unchanged, and the new one updates whenever it does.
 D.  A reference query copies the worksheet formulas of the original Table.
 
-**14.** After building InvoiceLines, you confirm that it has as many rows as SalesInvoiceLine and the same line total. What does this reconciliation show?
+**14.** A calculated column on the invoice lines uses this formula, where PromoEnd is a named cell that holds the date 2026-10-31:
 
-A.  That the Furniture margin fell because of the promotion
-B.  That every invoice line has a whole-number quantity
-C.  That the merges neither added nor lost invoice lines, so the table is complete
-D.  That no invoice was dated before its shipment
+```
+=IF(AND([@Discount]>0,[@InvoiceDate]>PromoEnd),"Late","OK")
+```
 
-**15.** A validity test finds that most invoice lines for items sold by the unit carry fractional quantities. What is the most appropriate response?
+What does it return for a line with a 10 percent discount that was invoiced on 2026-10-15?
 
-A.  Round every quantity to the nearest whole number before analyzing it.
-B.  Record the finding as a limitation, raise it with the owners of the source system, and avoid conclusions that depend on whole units.
-C.  Delete the lines with fractional quantities from the analysis.
-D.  Ignore the finding, because quantities do not affect revenue.
+A.  "OK", because both tests must be true to return "Late"
+B.  "Late", because the line carries a discount
+C.  TRUE, because AND returns TRUE or FALSE
+D.  An error, because AND cannot compare dates
+
+**15.** A validity check finds that most invoice lines for items sold by the unit carry fractional quantities. What is the most appropriate response?
+
+A.  Round every quantity to the nearest whole number before analyzing any of the lines.
+B.  Record it as a limitation, raise it with the system's owners, and avoid relying on whole units.
+C.  Delete the lines with fractional quantities from the analysis so that the totals are clean.
+D.  Ignore the finding, because quantities do not affect the revenue recorded on each line.
+
+<!-- Answer key, Chapter 5 (for instructors; HTML comments are removed from every rendered format):
+     1 D, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 A, 15 B.
+     1 D: MID returns 3 characters starting at position 5, the product type DSK.
+     2 B: PROPER capitalizes the first letter of each word and lowers the rest, so LLC becomes Llc.
+     3 A: with a fiscal year starting April 1, January to March is the fourth quarter.
+     4 C: TODAY changes daily, so results cannot be reproduced; an as-of date is fixed.
+     5 B: the fourth argument is the value returned when the key is not found.
+     6 D: the order date is two keys away: invoice first, then order.
+     7 C: a lookup returns the first match; on the many side, MINIFS returns the earliest date.
+     8 A: ISBLANK is FALSE for a cell that holds a formula, even one that returns empty text.
+     9 D: a blank PromotionID records the fact that the line carried no promotion.
+     10 C: a left anti join returns the rows of the first query with no match in the second.
+     11 B: a key repeated in the second table makes a left outer merge add rows.
+     12 A: Text.Middle counts positions from zero, MID from one.
+     13 C: a reference query leaves the original unchanged and updates with it.
+     14 A: AND needs both tests true; the invoice date is before PromoEnd, so the result is OK.
+     15 B: record the limitation, raise it with the system owners, and avoid conclusions that need whole units. -->

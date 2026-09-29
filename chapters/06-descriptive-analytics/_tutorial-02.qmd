@@ -1,8 +1,8 @@
 ## Guided Tutorial 6.2: Revenue and Margin by Product Line and Quarter
 
-**Context and objective.** In this tutorial, you will answer the controller's second request with PivotTables. You will add the extended standard cost to the InvoiceLines query, summarize fiscal 2026 revenue by item group and quarter, and reconcile the result with the control total from Tutorial 6.1. You will then add the gross margin at standard cost as a calculated field, read the same revenue as shares and as changes, and compare the customer segments with the previous year.
+**Context and objective.** In this tutorial, you will answer the controller's second request with PivotTables. You will add the extended standard cost to the InvoiceLines query, summarize fiscal 2026 revenue by item group and quarter, and reconcile the result with the control total from Tutorial 6.1. You will then add the gross margin at standard cost as a calculated field, read the same revenue as shares and as changes, compare the customer segments with the previous year, and chart the margins with a PivotChart.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 6.1, with the Profile worksheet and the ReportYear parameter.
+**Prerequisites.** You need the analysis workbook from Tutorial 6.1, with the Profile worksheet and its control total.
 
 **Step-by-step instructions.**
 
@@ -11,7 +11,9 @@
 a. Choose **Data > Get Data > Launch Power Query Editor**, and select the **InvoiceLines** query.
 b. Choose **Add Column > Custom Column**. Type `StdCostAmount` in **New column name** and `[Quantity] * [StandardCost]` in **Custom column formula**, and click **OK**.
 c. Set the new column's data type to **Decimal Number** with the icon at the left of its header.
-d. Choose **Home > Close & Load**. The InvoiceLines Table now ends with a StdCostAmount column.
+d. Choose **Home > Close & Load**.
+
+The InvoiceLines Table now ends with a StdCostAmount column, the standard cost of each line's quantity, which can be summed like revenue.
 
 **Step 2. Create the PivotTable.**
 
@@ -25,27 +27,29 @@ Compare the grand total at the bottom right of the PivotTable with the control t
 **Step 3. Add the margin as a calculated field.**
 
 a. With a cell of the PivotTable selected, choose **PivotTable Analyze > Fields, Items, & Sets > Calculated Field**.
-b. Type `MarginPct` in **Name** and `=(LineTotal-StdCostAmount)/LineTotal` in **Formula**, as @fig-06-04 shows. Click **Add**, and then **OK**. Excel adds the new field to the **Values** area as Sum of MarginPct.
+b. Type `MarginPct` in **Name** and `=(LineTotal-StdCostAmount)/LineTotal` in **Formula**, as @fig-06-05 shows. Click **Add**, and then **OK**. Excel adds the new field to the **Values** area as Sum of MarginPct.
 c. Format Sum of MarginPct as a percentage with two decimals, through **Value Field Settings > Number Format**.
 d. In the **Columns** area, Excel has added a field named Σ Values. Drag it to the **Rows** area, below ItemGroup, so that each group shows its revenue and its margin on two rows.
 
-![The Insert Calculated Field Dialog.](/visuals/svg/fig-06-04-calculated-field.svg){#fig-06-04 fig-alt="A mock of Excel's Insert Calculated Field dialog. The Name box holds MarginPct and the Formula box holds the formula that subtracts StdCostAmount from LineTotal and divides the result by LineTotal. The Fields list shows some of the InvoiceLines fields, with LineTotal and StdCostAmount highlighted, and the dialog has Add, Delete, Insert Field, OK, and Close buttons. The name and the formula are outlined."}
+![The Insert Calculated Field Dialog.](/visuals/svg/fig-06-05-calculated-field.svg){#fig-06-05 fig-alt="A mock of Excel's Insert Calculated Field dialog. The Name box holds MarginPct and the Formula box holds the formula that subtracts StdCostAmount from LineTotal and divides the result by LineTotal. The Fields list shows some of the InvoiceLines fields, with LineTotal and StdCostAmount highlighted, and the dialog has Add, Delete, Insert Field, OK, and Close buttons. The name and the formula are outlined."}
 
-The label Sum of MarginPct looks odd for a percentage, but it is accurate: Excel sums LineTotal and StdCostAmount for each cell and then applies the formula, so every cell shows the margin of its total revenue. @fig-06-05 shows the result. The Furniture margin is lower than that of the other product lines in every quarter, and it falls in the fourth quarter, while the margins of Lighting, Textiles, and Accessories barely move. The ledger margin you calculated in the Part I case uses the standard cost of the goods shipped in each quarter, and this one uses the standard cost of the goods invoiced, so the two differ slightly in level but show the same decline.
+The label Sum of MarginPct looks odd for a percentage, but it is accurate: Excel sums LineTotal and StdCostAmount for each cell and then applies the formula, so every cell shows the margin of its total revenue.
 
-![Revenue and Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-06-05-revenue-margin-pivot.svg){#fig-06-05 fig-alt="A mock of the RevenuePivot worksheet. The PivotTable is filtered to fiscal year 2026, with the four quarters and a Grand Total across the top. Down the side, each of the five item groups shows two rows, Sum of LineTotal and Sum of MarginPct, followed by the totals of both measures. The Furniture margin row is outlined, showing a lower margin in the fourth quarter than in the third, and the Services margin row is outlined, showing 100 percent in every quarter."}
+**Step 4. Read the margins.** @fig-06-06 shows the result. The Furniture margin is lower than that of the other product lines in every quarter, and it falls in the fourth quarter, while the margins of Lighting, Textiles, and Accessories barely move. The ledger margin you calculated in the Part I case uses the standard cost of the goods shipped in each quarter, and this one uses the standard cost of the goods invoiced, so the two differ slightly in level but show the same decline.
+
+![Revenue and Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-06-06-revenue-margin-pivot.svg){#fig-06-06 fig-alt="A mock of the RevenuePivot worksheet. The PivotTable is filtered to fiscal year 2026, with the four quarters and a Grand Total across the top. Down the side, each of the five item groups shows two rows, Sum of LineTotal and Sum of MarginPct, followed by the totals of both measures. The Furniture margin row is outlined, showing a lower margin in the fourth quarter than in the third, and the Services margin row is outlined, showing 100 percent in every quarter."}
 
 Services shows a margin of 100 percent. That is not a finding about design services: the Item Table carries no standard cost for them, because their cost is the time of the design staff, which the ledger records through payroll as a salaries expense rather than as a cost of the item. A margin at standard cost is meaningful only for the product lines, and a report that includes Services should say so or leave its margin out.
 
-**Step 4. Read the revenue as shares and as changes.**
+**Step 5. Read the revenue as shares and as changes.**
 
 a. Right-click any value in a Sum of LineTotal row and choose **Show Values As > % of Column Total**. Each group's revenue now appears as its share of the quarter.
 b. Right-click a value again and choose **Show Values As > % Difference From**. Choose Period as the **Base field** and **(previous)** as the **Base item**, and click **OK**. Each value now shows the change from the previous quarter, and the first quarter is blank because the PivotTable has no earlier period to compare it with.
 c. Right-click a value and choose **Show Values As > No Calculation** to restore the dollar amounts.
 
-In the fourth quarter, Furniture's share of revenue fell, and its revenue declined by a few percent from the third quarter. Lighting's revenue also declined, but its margin did not, which points to prices or costs within Furniture rather than to demand across the business. @fig-06-03 shows the same three views.
+In the fourth quarter, Furniture's share of revenue fell, and its revenue declined by a few percent from the third quarter. Lighting's revenue also declined, but its margin did not, which points to prices or costs within Furniture rather than to demand across the business. @fig-06-04 shows the same three views.
 
-**Step 5. Compare the customer segments with the previous year.**
+**Step 6. Compare the customer segments with the previous year.**
 
 a. Select a cell in the InvoiceLines Table and insert a second PivotTable on a new worksheet named `SegmentPivot`.
 b. Drag CustomerSegment to **Rows**, FiscalYear to **Columns**, and LineTotal to **Values** twice.
@@ -55,17 +59,29 @@ e. Format the first value field as a number with two decimals.
 
 Wholesale, the largest segment, with about half of the year's revenue, grew from 2025 to 2026. The Strategic and Design Trade segments declined, Small Business grew, and total revenue rose by about one percent. The segment view does not explain the Furniture margin, but it shows where the company's revenue comes from and how that changed, which the controller will want for the management meeting.
 
-**Step 6. Refresh and document.**
+**Step 7. Chart the margins with a PivotChart.** A line chart of the margins shows the Furniture decline in one picture.
 
-a. Choose **Data > Refresh All**, and confirm that the totals on both PivotTable worksheets are unchanged. If a PivotTable does not show a column you have just added to the query, choose **Refresh All** a second time: with background refresh turned on, Excel can refresh a PivotTable before its query has finished.
-b. On the **Documentation** worksheet, add the StdCostAmount custom column to the Query steps entry, the RevenuePivot and SegmentPivot worksheets to the Worksheets entry, and a new entry, `Calculated fields`, with the MarginPct formula.
+a. Select a cell in the InvoiceLines Table and choose **Insert > PivotChart**, place it on a new worksheet, and rename the worksheet `MarginChart`.
+b. Drag FiscalYear to **Filters** and select 2026, Period to **Axis (Categories)**, ItemGroup to **Legend (Series)**, and MarginPct to **Values**. MarginPct is in the field list because PivotTables built from the same Table share their calculated fields; if it is missing, create it again as in Step 3.
+c. Open the ItemGroup filter on the chart and clear Services, whose 100 percent margin would squeeze the other lines together.
+d. Right-click the chart, choose **Change Chart Type**, and choose **Line with Markers**.
+
+The chart shows four lines. The Furniture line is the lowest in every quarter, and it is the only one that turns down in the fourth quarter. Because the chart is built on a PivotTable, changing its FiscalYear filter redraws it for another year.
+
+**Step 8. Refresh and document.**
+
+a. Choose **Data > Refresh All**, and confirm that the totals on the PivotTable worksheets are unchanged. If a PivotTable does not show a column you have just added to the query, choose **Refresh All** a second time. With background refresh, a setting that is on by default and lets you keep working while a query runs, Excel can refresh a PivotTable before its query has finished.
+b. On the **Documentation** worksheet, add the StdCostAmount custom column to the Query steps entry, the RevenuePivot, SegmentPivot, and MarginChart worksheets to the Worksheets entry, and a new entry, `Calculated fields`, with the MarginPct formula.
 c. Save the workbook.
+
+The workbook now records how each PivotTable and chart was built, and a refresh updates them all from the query.
 
 **Checkpoint.** Check that:
 
 - the grand total of the RevenuePivot PivotTable equals the control total on the Profile worksheet, and each group's Grand Total equals its revenue there;
 - the Furniture margin falls from 2026-Q3 to 2026-Q4, while the margins of the other product lines change very little;
 - you can explain why Services shows a margin of 100 percent;
-- the SegmentPivot PivotTable shows each segment's revenue in 2025 and 2026 and its change from the previous year.
+- the SegmentPivot PivotTable shows each segment's revenue in 2025 and 2026 and its change from the previous year;
+- the MarginChart shows the Furniture margin below the others and falling in the fourth quarter.
 
 The PivotTable has described the problem precisely. The Furniture margin fell in the fourth quarter, the other product lines did not, and the business as a whole kept growing. Why the Furniture margin fell is a diagnostic question, and it needs the tools of the next section.

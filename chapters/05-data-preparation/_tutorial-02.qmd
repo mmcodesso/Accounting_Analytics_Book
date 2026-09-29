@@ -13,9 +13,11 @@ b. Rename the query `SalesOrder`, and use **Home > Choose Columns** to keep Sale
 c. Set the OrderDate column's data type to **Date** if it shows a time.
 d. Choose **Home > Close & Load**, and rename the new worksheet `SalesOrder`.
 
-**Step 2. Bring the invoice date and period onto each line.** Go to the **SalesInvoiceLine** worksheet and add the new columns to the right of DiscountAmount, the last calculated column you added in Chapter 4.
+The workbook now has a SalesOrder Table with one row for each sales order, keyed by SalesOrderID.
 
-a. Add a column `InvoiceDate` with this formula, and format the column as a date:
+**Step 2. Bring the invoice date and period onto each line.** Each invoice line carries the key of its invoice, SalesInvoiceID, so one lookup per column brings the invoice's attributes onto the line.
+
+a. Go to the **SalesInvoiceLine** worksheet. In the first empty column after DiscountAmount, the last calculated column you added in Chapter 4, add a column `InvoiceDate` with this formula, and format the column as a date:
 
    ```
    =XLOOKUP([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],SalesInvoice[InvoiceDate],"No match")
@@ -23,14 +25,18 @@ a. Add a column `InvoiceDate` with this formula, and format the column as a date
 
 b. Add a column `Period` with the same formula, returning `SalesInvoice[Period]` instead of `SalesInvoice[InvoiceDate]`.
 
+Every line now shows the date and period of its invoice, so the lines can be totaled by quarter.
+
 **Step 3. Follow the key from the invoice to the order.** The order date is two keys away: the line leads to its invoice, and the invoice leads to its order.
 
 a. Add a column `SalesOrderID` that returns `SalesInvoice[SalesOrderID]` with the same lookup as in Step 2.
-b. Add a column `OrderDate` with this formula, and format it as a date:
+b. Add a column `OrderDate` with the formula below, and format it as a date. It uses INDEX and MATCH, the form that works in every version of Excel, wrapped in IFERROR so that a missing order returns "No match" as the XLOOKUP formulas do:
 
    ```
-   =XLOOKUP([@SalesOrderID],SalesOrder[SalesOrderID],SalesOrder[OrderDate],"No match")
+   =IFERROR(INDEX(SalesOrder[OrderDate],MATCH([@SalesOrderID],SalesOrder[SalesOrderID],0)),"No match")
    ```
+
+The line now shows when its order was placed. The OrderDate column is the end of a two-step chain, from the line to its invoice and from the invoice to its order, and each step sits in its own column where you can check it.
 
 **Step 4. Bring the item group and product type onto each line.**
 
@@ -41,6 +47,8 @@ a. Add a column `ItemGroup` with this formula:
    ```
 
 b. Add a column `ProductType` with the same formula, returning `Item[ProductType]`.
+
+Every line now carries its item group and product type, the two attributes the Furniture question is organized by.
 
 **Step 5. Check that every lookup found its match.** A lookup that fails returns "No match", so counting that value tests every lookup.
 
@@ -69,24 +77,34 @@ The totals should agree to the cent. That agreement is evidence that the lookups
 **Step 7. Find the promotion lines invoiced after the promotion ended.**
 
 a. On the **SalesInvoiceLine** worksheet, use the PromotionID slicer from Chapter 4 to show promotion 8, the Furniture Seasonal Promotion.
-b. Open the filter list on the InvoiceDate column and choose **Date Filters > After**, and enter 2026-10-31, the promotion's end date.
+b. Open the filter list on the InvoiceDate column, choose **Date Filters > After**, and enter `2026-10-31`, the promotion's end date.
 c. Read the status bar, and look at the OrderDate column of the lines in view.
-d. On the **Analysis** worksheet, record the count with this formula in B47, with the label `Promotion 8 lines invoiced after its end date` in A47:
+d. On the **Analysis** worksheet, type `Promotion 8 lines invoiced after its end date` in A47.
+e. In B47, enter this formula, which counts the same lines without the filters:
 
    ```
    =COUNTIFS(SalesInvoiceLine[PromotionID],8,SalesInvoiceLine[InvoiceDate],">"&DATE(2026,10,31))
    ```
 
-e. Clear the filters.
+f. Clear the filters.
 
 More than a hundred promotion lines were invoiced in November and December, after the promotion ended, and every one of them comes from an order placed while the promotion was running. The promotional price was set when the order was placed, but the revenue was recorded when the order was invoiced. @fig-05-05 shows some of these lines.
 
 ![Invoice Lines with Their Looked-Up Dates and Groups.](/visuals/svg/fig-05-05-invoice-line-lookups.svg){#fig-05-05 fig-alt="A mock of the SalesInvoiceLine Table with the lookup columns added in this tutorial: InvoiceDate, Period, SalesOrderID, OrderDate, ItemGroup, and ProductType, next to the line's ID, promotion, and line total. The rows shown are Furniture lines of the Furniture Seasonal Promotion invoiced in December 2026, after the promotion's end date, whose orders were placed in September and October 2026. The InvoiceDate and OrderDate columns are outlined, and the formula bar shows the XLOOKUP formula for InvoiceDate."}
 
+**Step 8. Record the new Table and columns.**
+
+a. On the **Documentation** worksheet, add T9_SalesOrder to the Source entry and the SalesOrder query to the Query steps entry.
+b. Add the six lookup columns on SalesInvoiceLine to the Calculated columns entry: InvoiceDate, Period, SalesOrderID, OrderDate, ItemGroup, and ProductType.
+c. Add the checks in rows 41 to 47 of the Analysis worksheet to the entry that describes it, and save the workbook.
+
+A reviewer can now trace every new column on the invoice lines to the Table it came from and the key it followed.
+
 **Checkpoint.** Check that:
 
 - the SalesInvoiceLine Table has six new lookup columns, and none of them contains "No match";
 - the Furniture revenue for 2026-Q3 and 2026-Q4 agrees with the Part I case;
-- you have counted the promotion 8 lines invoiced after the promotion's end date.
+- you have counted the promotion 8 lines invoiced after the promotion's end date;
+- the Documentation worksheet lists the SalesOrder Table and the six new columns.
 
 The last finding changes how the controller's question should be read. The promotion's effect on the fourth quarter depends on when its orders were invoiced, not only on its effective dates, so a quarter-by-quarter analysis must use the invoice date for revenue and keep the order date in view to explain it.

@@ -289,9 +289,9 @@ def fig_01_08() -> Diagram:
     p1 = part(0, 120, 140, 90, card("Part I", "Foundations", INK), GRAY_TINT,
               "All table groups, at overview level")
     p2 = part(205, 0, 190, 64, card("Part II", "Excel", WHITE), TEAL,
-              "Order-to-Cash and Accounting Core")
+              "Sales and ledger, then planning and purchasing")
     p3 = part(205, 125, 190, 64, card("Part III", "SQL", WHITE), BLUE,
-              "Adds Procure-to-Pay and Manufacturing")
+              "Expands into Procure-to-Pay and Manufacturing")
     p4 = part(205, 250, 190, 64, card("Part IV", "Power BI", INK), HIGHLIGHT,
               "Data models that span table groups")
     p5 = part(452, 105, 196, 120, card("Part V", "Integrated and Applied Topics<br>All three tools",

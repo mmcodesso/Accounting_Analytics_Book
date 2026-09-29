@@ -9,7 +9,7 @@ title: "Data Preparation and Cleaning in Excel"
 After completing this chapter, you will be able to:
 
 1. Explain why accounting data must be prepared before it is analyzed, and document the preparation so that a reviewer can repeat it.
-2. Use text functions to extract, standardize, and validate text fields, such as the product type encoded in an item code.
+2. Use text and logical functions to extract, standardize, classify, and validate fields, such as the product type encoded in an item code or the payment terms of an invoice.
 3. Use date functions to assign transactions to fiscal periods and to measure the time between business events.
 4. Combine data from related tables with XLOOKUP, INDEX and MATCH, and VLOOKUP, and recognize when a one-to-many relationship calls for a different approach.
 5. Build a repeatable preparation workflow in Power Query that merges tables, adds calculated columns, and can be refreshed when the source data changes.
@@ -26,7 +26,7 @@ The analysis workbook you built in Chapter 4 ended with a clue and an open quest
 
 Data preparation is the work of transforming data from the form in which it was recorded into a form that suits a particular analysis. A review of the field describes it as the process of discovering, cleaning, integrating, and restructuring data, and it names the activities involved: profiling the data, matching records across sources, mapping one structure onto another, transforming formats, and repairing values that are wrong (Fernandes et al., 2023). In the analytics workflow you met in Chapter 1, it is the third stage, after the question has been defined and the data has been obtained, and before any analysis begins.
 
-For accountants, preparation is rarely optional. Transaction systems store data in the form that suits recording it, spread across related tables, as you saw in Chapter 3. An analysis needs a different form: one table in which every row carries all the attributes the question depends on. Auditors face the same problem with data they receive from clients. Lee et al. (2020) note that client data often arrives incomplete and in an unusable format, so that considerable time must be spent cleansing, transforming, standardizing, and validating it before it can be analyzed. The same concern runs through accounting education. In a review of published data analytics teaching cases, Raschke and Charron (2021) found that most cases focus on analysis and communication, and that few cover the steps that come before analysis, such as extraction and data preparation.
+For accountants, preparation is rarely optional. Transaction systems store data in the form that suits recording it, spread across related tables, as you saw in Chapter 3. An analysis needs a different form: one table in which every row carries all the attributes the question depends on. Auditors face the same problem with data they receive from clients. Lee et al. (2021) note that client data often arrives incomplete and in an unusable format, so that considerable time must be spent cleansing, transforming, standardizing, and validating it before it can be analyzed. The same concern runs through accounting education. In a review of published data analytics teaching cases, Raschke and Charron (2021) found that most cases focus on analysis and communication, and that few cover the steps that come before analysis, such as extraction and data preparation.
 
 Preparation is also where many analytical errors begin. A lookup that silently fails, a date assigned to the wrong quarter, or a join that duplicates rows can change every number that follows, and none of these errors announces itself. That is why this chapter pairs every preparation technique with a check: a count of the rows that failed to match, a total that must agree with its source, or a test that a field has the form it should. The quality dimensions you studied in Chapter 2, accuracy, completeness, consistency, and timeliness, are the standard the checks apply. And because preparation involves many small decisions, it has to be documented, as you learned in Chapter 4, so that someone else can repeat it and reach the same result.
 
@@ -82,12 +82,9 @@ Some problems are invisible on screen. Text copied from a web page can contain a
 :::
 
 
-{{< include _tutorial-01.qmd >}}
-
-
 ## Date Functions
 
-Accounting analysis is organized by period, so assigning each transaction to the right period is one of the most common preparation steps. Excel stores a date as a number of days, which is why dates can be subtracted and compared, and it provides functions that return the parts of a date. `YEAR`, `MONTH`, and `DAY` return the year, month, and day. `EOMONTH(date, 0)` returns the last day of the date's month, which is useful for month-end cutoff tests, and `EOMONTH(date, -1)+1` returns the first day.
+Accounting analysis is organized by period, so assigning each transaction to the right period is one of the most common preparation steps. Excel stores a date as a number of days, which is why dates can be subtracted and compared, and it provides functions that return the parts of a date. `YEAR`, `MONTH`, and `DAY` return the year, month, and day. `EOMONTH(date, 0)` returns the last day of the date's month, which is useful for month-end cutoff tests, the checks that each transaction is recorded in the period in which it occurred, and `EOMONTH(date, -1)+1` returns the first day.
 
 ### Assigning Fiscal Periods
 
@@ -107,6 +104,52 @@ A date that is stored as text looks like a date but behaves like text: it sorts 
 :::
 
 
+## Conditional Logic
+
+Preparation often needs a column whose value depends on a condition: a flag that marks exceptions, a label that groups values into bands, or a fallback when a formula fails. The building block is a logical test, an expression that is either true or false, such as `[@DaysToDue]>45` or `[@ItemGroup]="Furniture"`. Excel evaluates a logical test to TRUE or FALSE, and a column of such results is already useful: you can count it with COUNTIF, filter it, and use it in conditional formatting. @tbl-05-02 summarizes the functions that work with logical tests.
+
+| Function | What it returns | Example |
+|---|---|---|
+| `IF(test, if_true, if_false)` | One of two values, depending on a test | Label invoices with extended payment terms |
+| `IFS(test1, value1, ...)` | The value paired with the first true test | Group payment terms into bands |
+| `AND(test1, test2, ...)` | TRUE only if every test is true | Check each part of an item code |
+| `OR(test1, test2, ...)` | TRUE if at least one test is true | Check that terms are one of the standard values |
+| `NOT(test)` | The opposite of the test | Flag the lines that are not Furniture |
+| `IFERROR(value, if_error)` | The value, or a substitute if the value is an error | Return "No match" when a lookup fails |
+
+: Logical functions used for data preparation {#tbl-05-02}
+
+### IF and IFS
+
+`IF(logical_test, value_if_true, value_if_false)` returns one value when the test is true and another when it is false. The formula `=IF([@DaysToDue]>45,"Extended","Standard")` labels each invoice by its payment terms. When there are more than two outcomes, you can place one IF inside another, but a nested formula is hard to read and easy to get wrong. IFS lists the tests in order and returns the value paired with the first one that is true:
+
+```
+=IFS([@DaysToDue]<=30,"Up to 30 days",[@DaysToDue]<=60,"31 to 60 days",TRUE,"Over 60 days")
+```
+
+The last test, TRUE, is always true, so it catches every value that the earlier tests did not. Without it, a value that meets none of the tests returns the error #N/A. The order of the tests matters too: IFS stops at the first true test, so bands must be tested in order, from the lowest up or from the highest down.
+
+### AND, OR, and NOT
+
+AND returns TRUE only when all of its tests are true, OR returns TRUE when at least one of them is, and NOT reverses a result. You can use them on their own, as the item code check in Tutorial 5.1 does with AND, or inside IF to combine conditions. This formula, for example, is TRUE for an invoice whose terms are one of the four that Charles River offers:
+
+```
+=OR([@DaysToDue]=30,[@DaysToDue]=45,[@DaysToDue]=60,[@DaysToDue]=90)
+```
+
+### IFERROR
+
+Some formulas return an error for rows that are not wrong, such as a lookup whose key is missing, which returns #N/A, or a ratio whose denominator is zero, which returns #DIV/0!. `IFERROR(value, value_if_error)` returns the result of a formula, or a value you choose when the formula returns any error. It makes a column readable, but use it deliberately. IFERROR hides every kind of error, including a mistyped reference, so the substitute should be a value you can count, such as "No match", rather than a zero or a blank that disappears into totals. XLOOKUP's own if_not_found argument, described in the next section, is narrower, because it applies only when the key is not found.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A logical test compares values exactly. Text comparisons ignore upper and lower case, so "furniture" equals "Furniture", but an extra space or a number stored as text makes two values that look alike unequal. When a test returns FALSE for a row that looks as if it should pass, check the value for hidden spaces with the LEN and TRIM test earlier in this chapter, and check its data type.
+:::
+
+
+{{< include _tutorial-01.qmd >}}
+
+
 ## Lookup Functions
 
 A lookup function retrieves a value from one table using a key from another. It is the spreadsheet equivalent of following a foreign key to the row it references, which you practiced by hand in Tutorial 3.2. Each invoice line carries a SalesInvoiceID, and the SalesInvoice Table holds exactly one row for each SalesInvoiceID, with its invoice date, customer, and totals. A lookup finds that row and returns the column you ask for, as @fig-05-04 shows.
@@ -121,7 +164,7 @@ A lookup function retrieves a value from one table using a key from another. It 
 =XLOOKUP([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],SalesInvoice[InvoiceDate],"No match")
 ```
 
-The fourth argument is the value returned when the key is not found. Without it, XLOOKUP returns the error #N/A. A text value such as "No match" is easier to count, and counting it is the first check on any lookup: a clean lookup has no unmatched rows.
+The fourth argument is the value returned when the key is not found. Without it, XLOOKUP returns the error #N/A. A text value such as "No match" is easier to count, and counting it is the first check on any lookup: a clean lookup has no unmatched rows. INDEX and MATCH, described next, have no such argument, so a formula built with them is wrapped in IFERROR to return the same text.
 
 ### INDEX and MATCH, and VLOOKUP
 
@@ -133,7 +176,7 @@ Before XLOOKUP was added to Excel, the same retrieval was written by combining t
 
 The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
 
-VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-03 compares the three.
+VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-04 compares the three.
 
 | Feature | VLOOKUP | INDEX and MATCH | XLOOKUP |
 |---|---|---|---|
@@ -144,11 +187,11 @@ VLOOKUP is the oldest of the three and the most limited. It searches only the fi
 | When the key is not found | #N/A | #N/A | #N/A, or a value you supply |
 | Availability | All versions of Excel | All versions of Excel | Microsoft 365 and Excel 2021 or later |
 
-: Lookup functions compared {#tbl-05-03}
+: Lookup functions compared {#tbl-05-04}
 
 ### Lookups Across Several Tables
 
-Some attributes are two keys away. An invoice line does not carry a sales order key, but its invoice does. To find the date on which a line was ordered, first bring the invoice's SalesOrderID onto the line with one lookup, and then use that SalesOrderID to look up the order date in the SalesOrder Table with a second. Keeping each step in its own column makes the chain easy to check.
+Some attributes are two keys away. An invoice line does not carry a sales order key, but its invoice does. To find the date on which a line was ordered, first bring the invoice's SalesOrderID onto the line with one lookup, and then use that SalesOrderID to look up the order date in the SalesOrder Table with a second. Keeping each step in its own column makes the chain easy to check. When two tables share no key at all, such as a supplier and an employee who may share an address, you can build a match key by joining and standardizing the fields they do share, as Exercise 5.5 does.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -170,7 +213,9 @@ Chapter 2 introduced missing values and duplicate records as data quality proble
 
 Formulas complicate the test for blanks. `ISBLANK` returns TRUE only for a cell that contains nothing at all, so it returns FALSE for a cell whose formula returns an empty text value, even though the cell looks empty. To find the rows a lookup failed to match, count the value you told the lookup to return, such as "No match", rather than testing for blanks.
 
-A value can also be present and still be invalid for its purpose. A validity test checks that each value has the form or range it should. Charles River sells most items by the unit, recorded in the Item Table's UnitOfMeasure column as Each, so you might expect every quantity for those items to be a whole number. The test `=[@Quantity]<>INT([@Quantity])`, which returns TRUE for a quantity with a fractional part, finds that most invoice lines for items sold by the unit carry fractional quantities, such as the 3.74 sideboards billed on invoice line 10646. In practice, a finding like this goes to the owners of the source system with a question, because the cause could be a partial-unit shipping practice, a unit-of-measure setting, or an error in how quantities are recorded. For the analysis, what matters is whether the finding changes the answer. Revenue, list amounts, and discounts are recorded on each line and are consistent with one another, and an average price calculated as revenue divided by quantity is consistent across periods. Record the finding in the documentation as a known limitation of the quantity data, and avoid conclusions that depend on whole units.
+A value can also be present and still be invalid for its purpose. A validity check tests that each value has the form or range it should. Charles River sells most items by the unit, recorded in the Item Table's UnitOfMeasure column as Each, so you might expect every quantity for those items to be a whole number. The test `=[@Quantity]<>INT([@Quantity])`, which returns TRUE for a quantity with a fractional part, finds that most invoice lines for items sold by the unit carry fractional quantities, such as the 3.74 sideboards billed on invoice line 10646.
+
+In practice, a finding like this goes to the owners of the source system with a question, because the cause could be a partial-unit shipping practice, a unit-of-measure setting, or an error in how quantities are recorded. For the analysis, what matters is whether the finding changes the answer. Revenue, list amounts, and discounts are recorded on each line and are consistent with one another, and an average price calculated as revenue divided by quantity is consistent across periods. Record the finding in the documentation as a known limitation of the quantity data, and avoid conclusions that depend on whole units.
 
 Duplicates are the last familiar problem. Excel's Remove Duplicates command, on the Data tab, deletes rows that repeat the values of the columns you choose. Use it with care: it deletes without asking which row to keep, and two rows that look the same may record two genuine transactions. As in Chapter 2, count and examine suspected duplicates before removing anything, and remove them in a query or a copy, never in the source data.
 
@@ -181,22 +226,22 @@ The lookup columns you add in Tutorial 5.2 work, but they have two weaknesses fo
 
 ### Merging Queries
 
-Power Query's equivalent of a lookup is a merge. Merge Queries, on the Home tab of the Power Query Editor, combines two queries by matching a key column in each, and adds the matching rows of the second query as a new column that you then expand into the columns you need. A merge has a join kind, which decides which rows appear in the result. @tbl-05-04 lists the join kinds you will use most.
+Power Query's equivalent of a lookup is a merge. Merge Queries, on the Home tab of the Power Query Editor, combines two queries by matching a key column in each, and adds the matching rows of the second query as a new column that you then expand into the columns you need. When you expand it, Power Query offers to prefix each new column's name with the name of the query it came from, as in Item.ItemGroup. The tutorials in this book always clear the Use original column name as prefix check box, so that each column keeps its own name and later formulas can refer to it directly. A merge has a join kind, which decides which rows appear in the result. @tbl-05-05 lists the join kinds you will use most.
 
 | Join kind | Rows in the result | Accounting use |
 |---|---|---|
 | Left outer | Every row of the first query, with the matching rows of the second | Adding invoice and item details to every invoice line |
 | Inner | Only the rows that match in both queries | Keeping only lines whose item appears in a filtered item list |
-| Full outer | Every row of both queries, matched where possible | Comparing two lists, such as a subledger and a ledger extract |
+| Full outer | Every row of both queries, matched where possible | Comparing two lists, such as a sub-ledger and a ledger extract |
 | Left anti | Only the rows of the first query that have no match in the second | Finding orphaned records, such as lines whose item is missing |
 
-: Join kinds in Power Query merges {#tbl-05-04}
+: Join kinds in Power Query merges {#tbl-05-05}
 
 For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. Because every key in the Charles River invoice lines refers to a single row in the table it references, a left outer merge returns exactly as many rows as the invoice lines query started with, and checking that the row count has not changed is the first test of any merge.
 
 ### Custom Columns
 
-A custom column, added through Add Column > Custom Column, calculates a new column with a formula written in Power Query's formula language, called M. The functions differ from Excel's, but the ideas are the same. `Date.Year([InvoiceDate])` returns the year, `Date.QuarterOfYear([InvoiceDate])` returns the quarter, and `Text.Middle([ItemCode], 4, 3)` returns three characters of the item code starting after the fourth. Note that Text.Middle counts positions from zero, where Excel's MID counts from one, so the same product type code starts at position 4 in M and position 5 in Excel. As in Chapter 4, every custom column appears in the Applied Steps list, so the query records exactly how each value was calculated.
+A custom column, added through Add Column > Custom Column, calculates a new column with a formula written in Power Query's formula language, called M. The functions differ from Excel's, but the ideas are the same. `Date.Year([InvoiceDate])` returns the year, `Date.QuarterOfYear([InvoiceDate])` returns the quarter, and `Text.Middle([ItemCode], 4, 3)` returns three characters of the item code starting after the fourth. Note that Text.Middle counts positions from zero, where Excel's MID counts from one, so the same product type code starts at position 4 in M and position 5 in Excel. As in Chapter 4, every custom column appears in the Applied Steps list, so the query records exactly how each value was calculated. The Conditional Column command, also on the Add Column tab, builds the Power Query equivalent of IF through a dialog: if a column meets a condition, then one value, else another. It writes the M formula `if ... then ... else` for you.
 
 ### Reference Queries and Refresh
 
@@ -213,7 +258,7 @@ Junior auditors are routinely asked to prepare client data for testing. In a tea
 
 ## Looking Ahead
 
-This chapter has prepared the Charles River invoice lines for analysis. You have used text functions to extract a product type from an item code and learned when standardizing text helps and when it harms. You have assigned invoices to fiscal periods, measured the time between orders and invoices, and seen why an as-of date is better than TODAY. You have combined Tables with lookups, followed a key through two tables, and learned to count the rows a lookup failed to match. You have distinguished meaningful blanks from missing information and recorded a validity finding about quantities. Finally, you have built the same enrichment in Power Query as a refreshable InvoiceLines table and reconciled it with your lookups and with the source.
+This chapter has prepared the Charles River invoice lines for analysis. You have used text functions to extract a product type from an item code and learned when standardizing text helps and when it harms. You have assigned invoices to fiscal periods, measured the time between orders and invoices, and seen why an as-of date is better than TODAY. You have written logical tests with IF, IFS, AND, and OR to classify and check values, and used IFERROR to handle a lookup that fails. You have combined Tables with lookups, followed a key through two tables, and learned to count the rows a lookup failed to match. You have distinguished meaningful blanks from missing information and recorded a validity finding about quantities. Finally, you have built the same enrichment in Power Query as a refreshable InvoiceLines table and reconciled it with your lookups and with the source.
 
 The preparation has already sharpened the controller's question. The Furniture Seasonal Promotion priced orders placed in September and October, but many of those orders were invoiced after the promotion ended, so its effect reaches further into the fourth quarter than its dates suggest. InvoiceLines now holds, for every invoice line, the period, the product group and type, and the customer segment that an answer requires. Chapter 6 summarizes that table and uses it to explain the change in the Furniture margin, and the rest of Part II builds on the result.
 

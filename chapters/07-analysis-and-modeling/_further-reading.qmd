@@ -8,7 +8,7 @@ Frontline Systems. (n.d.). *Excel Solver: Create Solver reports*. <https://www.s
 
 Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/> A free, widely used online textbook on forecasting. Its chapters on simple benchmark methods and on evaluating forecast accuracy expand on the backtesting approach of Tutorial 7.1, and later chapters cover methods for seasonal and trending series.
 
-Microsoft. (2026c). *Introduction to What-If Analysis*. Microsoft Support. <https://support.microsoft.com/en-us/excel/introduction-to-what-if-analysis> Microsoft's overview of Scenario Manager, Goal Seek, and data tables, with links to step-by-step instructions for each tool and to Solver.
+Microsoft. (2026c). *Introduction to what-if analysis*. Microsoft Support. <https://support.microsoft.com/en-us/excel/introduction-to-what-if-analysis> Microsoft's overview of Scenario Manager, Goal Seek, and data tables, with links to step-by-step instructions for each tool and to Solver.
 
 Nikitkov, A. (2024). Budget variance analysis case: Contrasting Excel with Tableau. *Accounting Perspectives*, *23*(4), 605–612. <https://doi.org/10.1111/1911-3838.12383> A teaching case in which you prepare a budgetary variance analysis for a board meeting, first in Excel and then as a visual analysis in Tableau. It extends the variance report of Tutorial 7.2 toward the presentation tools of Part IV.
 

@@ -10,9 +10,12 @@
 
 a. On the **Parameters** worksheet, select B3, the ThresholdPercentile cell, and choose **Data > Data Validation**.
 b. On the **Settings** tab, allow **Decimal** between a minimum of `0.5` and a maximum of `0.99`.
-c. On the **Input Message** tab, type the title `Threshold percentile` and the message `Enter a share between 0.5 and 0.99, such as 0.9 for the top 10 percent of lines.`
+c. On the **Input Message** tab, type the title `Threshold percentile` and the message `Enter a share from 0.5 to 0.99, such as 0.9.`
 d. On the **Error Alert** tab, choose the **Stop** style and type a short explanation. Click **OK**.
-e. Test the rule by typing `1.5` in B3. Excel should refuse the entry. Press Escape or click **Cancel** so that 0.9 remains.
+e. Type `1.5` in B3 to test the rule.
+f. When Excel displays the alert, click **Cancel** so that 0.9 remains.
+
+Excel refuses the entry and shows your explanation, so the parameter can only hold a sensible share. Selecting B3 now also displays the input message, which tells the next user what the cell expects.
 
 **Step 2. Highlight every line with a promotional discount.** A formula rule can shade an entire row based on the value in one of its columns.
 
@@ -39,6 +42,8 @@ b. Move the slicer beside the Table. It shows one button for each promotion numb
 c. Click the button for promotion 1, and read the status bar at the bottom of the window, which reports how many of the Table's records are in view.
 d. Click each of the other promotion buttons in turn and compare the counts.
 
+Each button filters the Table to the lines of one promotion, and the slicer shows which button is active. The Table's rows are hidden, not deleted, so clearing the slicer later brings them all back.
+
 **Step 5. Measure the lines in view.**
 
 a. On the **Analysis** worksheet, type `Lines in view` in A28 and enter this formula in B28:
@@ -64,32 +69,43 @@ d. Return to the slicer and click its **Clear Filter** button so that every line
 
 Promotion 8 is PROMO-2026-008, the Furniture Seasonal Promotion. It applied a 10 percent discount to the entire Furniture item group, and it was effective from September 1 to October 31, 2026.
 
-**Step 7. Create the documentation worksheet.**
+**Step 7. Create the documentation worksheet.** The documentation worksheet comes first in the workbook, so that a reviewer reads it before anything else.
 
-a. Insert a new worksheet, name it `Documentation`, and drag its tab to the far left so that it is the first worksheet in the workbook.
-b. In column A, type the labels below, and in column B, enter the information for your workbook:
-   - **Purpose:** Diagnose the decline in Furniture gross margin from the third to the fourth quarter of fiscal 2026, as requested by the controller.
-   - **Source:** CharlesRiver.xlsx and its folder location; Tables T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram, imported with Power Query.
-   - **Query steps:** Item keeps only items with a list price and eleven columns; SalesInvoice has its date columns set to the Date type; the other queries keep every row and column.
-   - **Last refreshed:** the date of your last Refresh All.
-   - **Parameters:** ThresholdPercentile (Parameters!B3, an input validated between 0.5 and 0.99) and LargeLineThreshold (Parameters!B4, a formula).
-   - **Calculated columns:** ListAmount and DiscountAmount on the SalesInvoiceLine Table, with their formulas.
-   - **Worksheets:** each worksheet in the workbook and what it contains.
-   - **Conventions:** blue font marks input cells; black font marks formulas.
-   - **Prepared by** and **Date prepared:** your name and today's date. **Reviewed by** and **Date reviewed:** left blank for the reviewer.
-   - **Open questions:** Promotion 8, the Furniture Seasonal Promotion (10 percent, September 1 to October 31, 2026), has the most promotion lines and the most discount dollars. Its dates straddle the two quarters under review. Its effect on Furniture prices in each quarter cannot yet be measured, because the invoice lines carry no invoice date or item group.
-c. Format column A in bold and widen column B so that the text is readable.
-d. Open **Formulas > Name Manager** and confirm that it lists your two named cells alongside the four Tables.
+a. Insert a new worksheet, name it `Documentation`, and drag its tab to the far left.
+b. In A1 through A11, type these labels: `Purpose`, `Source`, `Query steps`, `Last refreshed`, `Parameters`, `Calculated columns`, `Worksheets`, `Conventions`, `Prepared by`, `Reviewed by`, and `Open questions`.
+c. Format column A in bold, and widen column B so that the entries you type next are readable.
 
-@fig-04-09 shows a completed example.
+The labels give the worksheet the structure of @fig-04-09. Column B, which you fill in next, holds what a reviewer needs to know under each label.
+
+**Step 8. Record what the workbook contains.** The entries below describe what to record; your wording can differ.
+
+a. In column B, beside each label, enter the information for your workbook:
+
+   - Purpose: diagnose the decline in Furniture gross margin from the third to the fourth quarter of fiscal 2026, as requested by the controller.
+   - Source: CharlesRiver.xlsx and its folder location; Tables T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram, imported with Power Query.
+   - Query steps: Item keeps only items with a list price, and eleven columns; SalesInvoice has its date columns set to the Date type; the other queries keep every row and column.
+   - Last refreshed: the date of your last Refresh All.
+   - Parameters: ThresholdPercentile (Parameters!B3, an input validated between 0.5 and 0.99) and LargeLineThreshold (Parameters!B4, a formula).
+   - Calculated columns: ListAmount and DiscountAmount on the SalesInvoiceLine Table, with their formulas.
+   - Worksheets: each worksheet in the workbook and what it contains.
+   - Conventions: blue font marks input cells; black font marks formulas.
+   - Prepared by: your name and today's date. Reviewed by: left blank for the reviewer.
+   - Open questions: Promotion 8, the Furniture Seasonal Promotion (10 percent, September 1 to October 31, 2026), has the most promotion lines and the most discount dollars, and its dates straddle the two quarters under review. Its effect on Furniture prices in each quarter cannot yet be measured, because the invoice lines carry no invoice date or item group.
+
+b. Open **Formulas > Name Manager** and read the list of names.
+
+The Name Manager lists your two named cells alongside the four Tables, and it may also list a name for the slicer. Together with the Parameters entry, it gives a reviewer a complete list of the names that the workbook's formulas use. @fig-04-09 shows a completed example.
 
 ![The Documentation Worksheet of the Analysis Workbook.](/visuals/svg/fig-04-09-documentation-sheet.svg){#fig-04-09 fig-alt="A mock of the Documentation worksheet, the first of the worksheet tabs. Column A holds the labels Purpose, Source, Query steps, Last refreshed, Parameters, Calculated columns, Worksheets, Conventions, Prepared by, Reviewed by, and Open questions, and column B holds the entries. The open question, outlined, notes that promotion 8, the Furniture Seasonal Promotion, has the most promotion lines and the most discount dollars, and that its effect in each quarter cannot yet be measured."}
 
-**Step 8. Put the workbook in order and refresh it.**
+**Step 9. Put the workbook in order and refresh it.**
 
 a. Arrange the worksheet tabs in the order of the layers in @fig-04-07: Documentation first, then the four data worksheets, then Parameters and Analysis.
 b. Choose **Data > Refresh All** one more time, and check that the calculated columns and the highlighting are still in place.
-c. Update the Last refreshed date on the Documentation worksheet, and save the workbook.
+c. Update the Last refreshed date on the Documentation worksheet.
+d. Save the workbook.
+
+The workbook now opens on its own explanation, and a refresh repeats every query step without disturbing the formulas, formats, or documentation built on top of the data.
 
 **Checkpoint.** Your workbook should now open on a Documentation worksheet that explains it. Check that:
 

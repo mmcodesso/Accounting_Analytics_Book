@@ -171,6 +171,154 @@ def fig_06_01() -> Diagram:
     return d
 
 
+def fig_06_histogram() -> Diagram:
+    d = Diagram("The Distribution of Fiscal 2026 Line Totals")
+    fy = [r["R"] for r in lines() if r["fy"] == 2026]
+    bounds = list(range(0, 16000, 1000))
+    counts = []
+    for i, low in enumerate(bounds):
+        high = bounds[i + 1] if i + 1 < len(bounds) else None
+        counts.append(sum(1 for v in fy if v >= low and (high is None or v < high)))
+    assert sum(counts) == len(fy)
+    assert counts[0] == max(counts) and counts[-2] < counts[0] / 50, "a right-skewed distribution"
+    body = [("1", ["From", "Lines"])]
+    for i, (low, n) in enumerate(zip(bounds, counts)):
+        body.append((str(i + 2), [xl.num(low, 0), f"{n:,}"]))
+    body.append((str(len(bounds) + 2), ["Total", f"{sum(counts):,}"]))
+    xl.formula_bar(d, 0, 0, 860, "G2", '=COUNTIFS(InvoiceLines[FiscalYear],ReportYear,'
+                   'InvoiceLines[LineTotal],">="&F2,InvoiceLines[LineTotal],"<"&F3)')
+
+    def style(r: int, c: int, value: str) -> dict:
+        if r == 0:
+            return dict(fill=GRAY_TINT, label=f"<b>{esc(value)}</b>", align="left" if c == 0 else "right")
+        if r == len(body) - 1:
+            return dict(label=f"<b>{esc(value)}</b>", align="left" if c == 0 else "right")
+        return {}
+
+    widths = [36, 100, 90]
+    geo = xl.sheet(d, 0, 40, ["F", "G"], widths, body, style, row_h=22)
+    xl.select(d, *geo[(1, 1)])
+    # The column chart with no gap between the bars, beside the table.
+    left, right, top, height = 300, 850, 70, 330
+    peak = 2500
+    y_of = lambda v: top + (peak - v) * height / peak
+    for tick in range(0, peak + 1, 500):
+        d.box("", left, y_of(tick), right - left, 1, fill=RULE, stroke=RULE, rounded=False)
+        d.text(f"{tick:,}", left - 50, y_of(tick) - 11, 44, 22, size=SMALL, align="right", valign="middle")
+    slot = (right - left) / len(counts)
+    for i, n in enumerate(counts):
+        x = left + i * slot
+        d.box("", x, y_of(n), slot, y_of(0) - y_of(n), fill=BLUE, stroke=WHITE, rounded=False)
+    for i in range(0, len(counts), 3):
+        label = "0" if i == 0 else f"{bounds[i] // 1000}k"
+        d.text(label, left + i * slot - 10, top + height + 4, slot + 20, 20, size=SMALL, align="center")
+    d.text("15k+", left + (len(counts) - 1) * slot - 10, top + height + 4, slot + 20, 20, size=SMALL,
+           align="center")
+    d.text("Line total, lower bound of the $1,000 bin", left, top + height + 26, right - left, 22,
+           size=SMALL, align="center")
+    d.text("Lines", left - 50, top - 30, 60, 22, size=SMALL, align="right")
+    bottom = 40 + 22 + 22 * len(body)
+    d.text("<i>Invoice lines of fiscal 2026. F2:F17 hold the lower bound of each bin; G17, the last bin, "
+           "counts every line of $15,000 or more. The chart is a clustered column chart of G2:G17 with a "
+           "gap width of 0.</i>", 0, bottom + 10, 860, 40, size=SMALL, color=GRAY)
+    return d
+
+
+@lru_cache(maxsize=1)
+def trial_balance() -> list[tuple]:
+    """The pre-closing trial balance at the end of fiscal 2026, as the ledger section builds it:
+    GLEntry through 2026-12-31 without the two 2026 closing entries, grouped by account."""
+    require_columns("GLEntry", ["AccountID", "Debit", "Credit", "PostingDate", "VoucherNumber"])
+    require_columns("Account", ["AccountID", "AccountNumber", "AccountName", "AccountType", "AccountSubType"])
+    closes = [r[0] for r in q("SELECT EntryNumber FROM JournalEntry WHERE EntryType LIKE 'Year-End Close%' "
+                              "AND PostingDate LIKE '2026%' ORDER BY EntryNumber")]
+    assert closes == ["JE-2026-000296", "JE-2026-000297"], closes
+    rows = q("SELECT a.AccountNumber, a.AccountName, a.AccountType, a.AccountSubType, SUM(g.Debit), SUM(g.Credit) "
+             "FROM GLEntry g JOIN Account a USING (AccountID) WHERE g.PostingDate < '2027-01-01' "
+             "AND g.VoucherNumber NOT IN (?, ?) GROUP BY a.AccountID ORDER BY a.AccountNumber", *closes)
+    debit = sum(max(0.0, r[4] - r[5]) for r in rows)
+    credit = sum(max(0.0, r[5] - r[4]) for r in rows)
+    assert abs(debit - credit) < 0.01, (debit, credit)
+    return rows
+
+
+def income_statement() -> list[tuple[str, float]]:
+    tb = trial_balance()
+    by = defaultdict(float)
+    for _, _, _, subtype, dr, cr in tb:
+        by[subtype] += dr - cr
+    revenue = -by["Operating Revenue"]
+    returns = by["Contra Revenue"]
+    net = revenue - returns
+    cogs = by["COGS"]
+    opex = by["Operating Expense"]
+    other = by["Other Income or Expense"] + by["Other Expense"] - by["Other Income"]
+    income = net - cogs - opex - other
+    close = one("SELECT TotalAmount FROM JournalEntry WHERE EntryNumber = 'JE-2026-000297'")[0]
+    assert abs(income - close) < 0.01, (income, close)
+    return [("Operating revenue", revenue), ("Sales returns and allowances", -returns), ("Net revenue", net),
+            ("Cost of goods sold", -cogs), ("Gross margin", net - cogs), ("Operating expenses", -opex),
+            ("Operating income", net - cogs - opex), ("Other income and expense", -other),
+            ("Net income", income)]
+
+
+def fig_06_ledger() -> Diagram:
+    d = Diagram("From the Trial Balance to the Income Statement")
+    tb = trial_balance()
+    kept = ["AccountID", "Debit", "Credit", "AccountNumber", "AccountName", "AccountType", "AccountSubType",
+            "Balance", "DebitBalance", "CreditBalance"]
+    heads = ["AccountNumber", "AccountName", "AccountSubType", "DebitBalance", "CreditBalance"]
+    letters = [chr(65 + kept.index(h)) for h in heads]
+    rows = []
+    for i, (number, name, _, subtype, dr, cr) in enumerate(tb[:6]):
+        bal = dr - cr
+        rows.append((str(i + 2), [str(number), name, subtype, xl.num(max(0.0, bal)), xl.num(max(0.0, -bal))]))
+    rows.append(("…", ["…", "", "", "", ""]))
+    debit = sum(max(0.0, r[4] - r[5]) for r in tb)
+    credit = sum(max(0.0, r[5] - r[4]) for r in tb)
+    rows.append((str(len(tb) + 2), ["Total", "", "", xl.num(debit), xl.num(credit)]))
+
+    def extra(r: int, c: int, value: str) -> dict:
+        if r == len(rows) - 1:
+            return dict(label=f"<b>{esc(value)}</b>", fill=GRAY_TINT)
+        return {}
+
+    widths = [36, 116, 250, 150, 150, 150]
+    d.text("<b>TrialBalance worksheet</b>", 0, 0, 860, 22, size=SMALL)
+    geo = xl.table_view(d, 0, 24, letters, widths, heads, rows, extra=extra)
+    x0, y0, _, _ = geo[(len(rows), 3)]
+    xl.emphasis(d, x0, y0, widths[4] + widths[5], ROW_H)
+    y = 24 + 22 + ROW_H * (len(rows) + 1) + 26
+    d.text("<b>IncomeStatement worksheet</b>", 0, y, 860, 22, size=SMALL)
+    statement = income_statement()
+    net = statement[2][1]
+    body = [("1", ["Fiscal 2026", "Amount", "% of net revenue"])]
+    for i, (label, value) in enumerate(statement):
+        body.append((str(i + 2), [label, xl.num(value), f"{100 * value / net:.2f}%"]))
+    totals = {"Net revenue", "Gross margin", "Operating income", "Net income"}
+
+    def style(r: int, c: int, value: str) -> dict:
+        out: dict = dict(align="left") if c == 0 else {}
+        if r == 0:
+            out.update(fill=GRAY_TINT, label=f"<b>{esc(value)}</b>")
+        elif body[r][1][0] in totals:
+            out.update(label=f"<b>{esc(value)}</b>")
+        return out
+
+    xl.formula_bar(d, 0, y + 24, 860, "B2",
+                   '=-SUMIFS(TrialBalance[Balance],TrialBalance[AccountSubType],"Operating Revenue")')
+    geo2 = xl.sheet(d, 0, y + 64, ["A", "B", "C"], [36, 280, 170, 170], body, style)
+    xl.select(d, *geo2[(1, 1)])
+    x0, y0, _, _ = geo2[(len(body) - 1, 0)]
+    xl.emphasis(d, x0, y0, 280 + 170 + 170, ROW_H)
+    bottom = y + 64 + 22 + ROW_H * len(body)
+    d.text("<i>The trial balance holds one row for each account with postings through 2026-12-31, without the "
+           "2026 closing entries, and a Total Row; columns such as Debit, Credit, and Balance are hidden. Outlined: the equal "
+           "debit and credit balances, and net income, which equals the 2026 closing entry to retained "
+           "earnings.</i>", 0, bottom + 8, 860, 56, size=SMALL, color=GRAY)
+    return d
+
+
 def fig_06_02() -> Diagram:
     d = Diagram("How the PivotTable Fields Areas Build a PivotTable")
     # Left: the PivotTable Fields pane.
@@ -540,11 +688,13 @@ def fig_06_08() -> Diagram:
 
 FIGURES = {
     "fig-06-01-fiscal-2026-profile": fig_06_01,
-    "fig-06-02-pivottable-areas": fig_06_02,
-    "fig-06-03-show-values-as": fig_06_03,
-    "fig-06-04-calculated-field": fig_06_04,
-    "fig-06-05-revenue-margin-pivot": fig_06_05,
-    "fig-06-06-furniture-drivers": fig_06_06,
-    "fig-06-07-margin-bridge": fig_06_07,
-    "fig-06-08-discounts-by-promotion": fig_06_08,
+    "fig-06-02-line-total-histogram": fig_06_histogram,
+    "fig-06-03-pivottable-areas": fig_06_02,
+    "fig-06-04-show-values-as": fig_06_03,
+    "fig-06-05-calculated-field": fig_06_04,
+    "fig-06-06-revenue-margin-pivot": fig_06_05,
+    "fig-06-07-ledger-to-income-statement": fig_06_ledger,
+    "fig-06-08-furniture-drivers": fig_06_06,
+    "fig-06-09-margin-bridge": fig_06_07,
+    "fig-06-10-discounts-by-promotion": fig_06_08,
 }

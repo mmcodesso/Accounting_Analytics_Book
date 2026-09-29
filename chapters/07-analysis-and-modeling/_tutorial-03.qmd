@@ -9,9 +9,15 @@
 **Step 1. Set up the Model worksheet.**
 
 a. Add a worksheet named `Model`, and type the headings `Input or result`, `Value`, `Name`, and `Source` in A1:D1.
-b. In A2:A7, type the labels `Discount rate`, `Volume lift`, `Units on promotion lines`, `Price before discount per unit`, `Variable cost per unit`, and `Commission rate`. In A9:A11, type `Contribution without promotion`, `Contribution with promotion`, and `Difference`.
-c. Type `0.1` in B2 and `0` in B3, format both as percentages, and color them blue, because they are the inputs the analysis will change.
-d. Using the **Name Box**, name B2 through B7 `Discount`, `Lift`, `PromoUnits`, `PriceBeforeDiscount`, `VariableCost`, and `CommissionRate`, and name B9 through B11 `ContributionWithout`, `ContributionWith`, and `Difference`. Type each name in column C beside its cell, as documentation.
+b. In A2:A7, type the labels `Discount rate`, `Volume lift`, `Units on promotion lines`, `Price before discount per unit`, `Variable cost per unit`, and `Commission rate`.
+c. In A9:A11, type `Contribution without promotion`, `Contribution with promotion`, and `Difference`.
+d. Type `0.1` in B2 and `0` in B3, format both as percentages, and color them blue, because they are the inputs the analysis will change.
+e. Using the **Name Box**, name B2 through B7 `Discount`, `Lift`, `PromoUnits`, `PriceBeforeDiscount`, `VariableCost`, and `CommissionRate`.
+f. Name B9 through B11 `ContributionWithout`, `ContributionWith`, and `Difference` in the same way.
+g. Type each name in column C beside its cell, as documentation.
+h. In D2:D7, type the sources `PromotionProgram, promotion 8`, `Assumption; order data shows none`, `InvoiceLines, promotion 8`, `InvoiceLines, promotion 8`, `Standard cost per unit`, and `Tutorial 7.2, actual 2026`, and type `Formula` in D9:D11.
+
+Every input and result of the model now has a label, a name, and a source, and the two inputs you will change stand out in blue.
 
 **Step 2. Calculate the inputs from the data.** The promotion's own lines tell you how many units it discounted, at what price, and at what cost.
 
@@ -33,11 +39,13 @@ c. In B6, enter the standard cost per unit. This treats the whole standard cost 
    =SUMIFS(InvoiceLines[StdCostAmount],InvoiceLines[PromotionID],8)/PromoUnits
    ```
 
-d. In B7, enter the actual commission rate of 2026:
+d. In B7, enter the actual commission rate of 2026, the year's commission expense divided by all of its revenue:
 
    ```
    =SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],6290)/SUMIFS(InvoiceLines[LineTotal],InvoiceLines[FiscalYear],2026)
    ```
+
+The price before discount is well above the standard cost per unit, and the commission rate is about two percent. These four values describe the promotion as it actually ran.
 
 **Step 3. Build the model.** The model compares the contribution of the promotion's orders with and without the discount, assuming that without the promotion the same orders would have been placed at the price before discount.
 
@@ -62,8 +70,10 @@ With no volume lift, the difference is the cost of the discount, net of the comm
 **Step 4. Compare scenarios with Scenario Manager.**
 
 a. Choose **Data > What-If Analysis > Scenario Manager**, and click **Add**.
-b. Type the first scenario's name from @tbl-07-05, enter `B2:B3` as the **Changing cells**, and click **OK**. Enter the scenario's discount and lift in the **Scenario Values** dialog, and click **Add** to continue with the next scenario. Click **OK** after the last one.
-c. Click **Summary**, choose **Scenario summary**, enter `B10:B11` as the **Result cells**, and click **OK**.
+b. Type the first scenario's name from @tbl-07-04 in **Scenario name**, enter `B2:B3` as the **Changing cells**, and click **OK**.
+c. In the **Scenario Values** dialog, enter the scenario's discount and lift as decimals, such as `0.1` for 10%, and click **Add** to go on to the next scenario.
+d. Repeat the two actions for the other scenarios, and click **OK** after the last one.
+e. Click **Summary**, choose **Scenario summary**, enter `B10:B11` as the **Result cells**, and click **OK**.
 
 | Scenario | Discount | Lift |
 |---|---|---|
@@ -72,7 +82,7 @@ c. Click **Summary**, choose **Scenario summary**, enter `B10:B11` as the **Resu
 | Repeat with 15% lift | 10% | 15% |
 | Deeper discount | 15% | 15% |
 
-: Scenarios for the promotion decision {#tbl-07-05}
+: Scenarios for the promotion decision {#tbl-07-04}
 
 Excel adds a Scenario Summary worksheet, shown in @fig-07-08. Every scenario that keeps a discount has a lower contribution than ending the promotion. Even a 15 percent increase in volume recovers only part of the cost of a 10 percent discount, and a deeper discount with the same increase is worse than repeating the 2026 promotion.
 
@@ -80,10 +90,12 @@ Excel adds a Scenario Summary worksheet, shown in @fig-07-08. Every scenario tha
 
 **Step 5. Map the result with a data table.**
 
-a. In A15, enter `=Difference`. In B15:D15, type `0.05`, `0.1`, and `0.15`, and in A16:A24, type the lifts `0` to `0.4` in steps of `0.05`.
-b. Select A15:D24, and choose **Data > What-If Analysis > Data Table**.
-c. Enter `$B$2` as the **Row input cell** and `$B$3` as the **Column input cell**, and click **OK**.
-d. Format the results as numbers with no decimals, and apply a conditional formatting rule that highlights the positive values.
+a. On the Model worksheet, enter `=Difference` in A15.
+b. In B15:D15, type the discounts `0.05`, `0.1`, and `0.15`.
+c. In A16:A24, type the lifts `0` to `0.4` in steps of `0.05`.
+d. Select A15:D24, and choose **Data > What-If Analysis > Data Table**.
+e. Enter `$B$2` as the **Row input cell** and `$B$3` as the **Column input cell**, and click **OK**.
+f. Format the results as numbers with no decimals, and apply a conditional formatting rule that highlights the positive values.
 
 The table shows where the promotion would break even. At a 10 percent discount, the difference turns positive only between a 30 and a 35 percent increase in volume. At 5 percent, a much smaller increase would be enough, and at 15 percent even a 40 percent increase leaves the promotion short.
 
@@ -91,19 +103,28 @@ The table shows where the promotion would break even. At a 10 percent discount, 
 
 a. Choose **Data > What-If Analysis > Goal Seek**.
 b. Enter `B11` in **Set cell**, `0` in **To value**, and `B3` in **By changing cell**, and click **OK**.
-c. Record the lift that Goal Seek finds, then press Ctrl+Z, or type `0` in B3, to restore the input.
+c. Note the lift that Goal Seek finds in B3, for the assumption table in Step 8.
+d. Click **Cancel** in the **Goal Seek Status** dialog, so that B3 returns to 0.
 
 At the 2026 discount, the promotion's orders would have had to be almost a third larger for the promotion to pay for itself.
 
 **Step 7. Check the lift against the order data.**
 
-a. Insert a PivotTable from the SalesInvoiceLine Table on a new worksheet named `OrderVolume`.
-b. Drag OrderDate to **Rows**, and group it by **Years** and **Months**. Drag ItemGroup to **Filters** and select Furniture, and drag Quantity to **Values**.
-c. Compare the units ordered in September and October 2026, the promotion's months, with the other months of 2026 and with September and October of 2024 and 2025.
+a. Select a cell in the SalesInvoiceLine Table, choose **Insert > PivotTable**, and place the PivotTable on a new worksheet named `OrderVolume`.
+b. Drag OrderDate to **Rows**, right-click a date, choose **Group**, and select **Months** and **Years**.
+c. Drag ItemGroup to **Filters**, and select Furniture.
+d. Drag Quantity to **Values**.
+e. Compare the units ordered in September and October 2026, the promotion's months, with the other months of 2026 and with September and October of 2024 and 2025.
 
 Furniture orders in the promotion's months were in line with the other months of the year and with the same months of earlier years. There is no sign of the increase the promotion needed. November and especially December 2026 look low because some orders placed then were not yet invoiced when the data ends, which is a reason to read those months with care.
 
-**Step 8. Document the assumptions and the recommendation.** Add the assumption table in @tbl-07-06 to the Model worksheet, below the data table, and complete its sensitivity column from Steps 5 and 6.
+**Step 8. Document the assumptions and the recommendation.** The assumption documentation belongs next to the model it describes, so that a reviewer reads both together.
+
+a. Type the assumption table in @tbl-07-05 in A27:D32 of the Model worksheet, below the data table, with its headings in row 27.
+b. Complete its sensitivity column from what the data table and Goal Seek showed in Steps 5 and 6.
+c. On the **Documentation** worksheet, add the Model, Scenario Summary, and OrderVolume worksheets to the Worksheets entry, and the nine names of the Model worksheet to the Parameters entry.
+d. Add a `Recommendation` entry that states whether to repeat the promotion, the evidence, and the assumption that would have to change to reverse the recommendation.
+e. Save the workbook.
 
 | Assumption | Value used | Basis | Sensitivity |
 |---|---|---|---|
@@ -111,11 +132,11 @@ Furniture orders in the promotion's months were in line with the other months of
 | Volume lift | 0% | Furniture orders in the promotion's months matched other months | The break-even lift is almost a third of the promotion's volume |
 | Orders without the promotion | Same orders at the price before discount | Promotion lines carry the customer's usual price, with the discount applied on top | If some orders would have been lost without it, the promotion's cost is lower |
 | Variable cost per unit | Standard cost per unit | Item standard costs of the promotion's items | Treating the fixed overhead in standard cost as fixed lowers the break-even lift slightly |
-| Commission rate | 2026 actual rate | Commission expense over 2026 revenue | Small; commissions fall with the discount |
+| Commission rate | 2026 actual rate | Commission expense over all 2026 revenue, including design services, which earn a higher rate | Small; commissions fall with the discount |
 
-: Assumptions of the promotion model {#tbl-07-06}
+: Assumptions of the promotion model {#tbl-07-05}
 
-On the Documentation worksheet, add a `Recommendation` entry that states whether to repeat the promotion, the evidence, and the assumption that would have to change to reverse the recommendation.
+The Model worksheet now carries its own documentation: a reviewer can see each assumption, where it came from, and which one would change the answer.
 
 **Checkpoint.** Check that:
 

@@ -24,10 +24,12 @@ Nigrini, M. J. (2019). The patterns of the numbers used in occupational fraud sc
 
 Nigrini, M. J., & Mittermaier, L. J. (1997). The use of Benford's Law as an aid in analytical procedures. *Auditing: A Journal of Practice & Theory*, *16*(2), 52–67. <https://doi.org/10.2308/ajpt-1302507>
 
-Public Company Accounting Oversight Board. (2004). *AS 1215: Audit documentation*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS1215>
+Public Company Accounting Oversight Board. (n.d.-a). *AS 1215: Audit documentation*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS1215>
 
-Public Company Accounting Oversight Board. (n.d.-a). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>
+Public Company Accounting Oversight Board. (n.d.-b). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>
 
-Public Company Accounting Oversight Board. (n.d.-b). *AS 2315: Audit sampling*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315>
+Public Company Accounting Oversight Board. (n.d.-c). *AS 2310: The auditor's use of confirmation*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2310>
 
-Public Company Accounting Oversight Board. (n.d.-c). *AS 2401: Consideration of fraud in a financial statement audit*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401>
+Public Company Accounting Oversight Board. (n.d.-d). *AS 2315: Audit sampling*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315>
+
+Public Company Accounting Oversight Board. (n.d.-e). *AS 2401: Consideration of fraud in a financial statement audit*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401>

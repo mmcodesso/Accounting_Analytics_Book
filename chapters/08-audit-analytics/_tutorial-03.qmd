@@ -8,12 +8,15 @@
 
 **Step 1. Import the journal entries with their creators and approvers.**
 
-a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T2_JournalEntry**, **T74_Employee**, and **T1_Account** Tables. Click **Transform Data**.
-b. Rename the queries `JournalEntries`, `Employees`, and `Accounts`. In Employees, keep EmployeeID, EmployeeName, JobTitle, and MaxApprovalAmount. In Accounts, keep AccountID, AccountNumber, and AccountName. Clear **Enable Load** for both.
-c. In JournalEntries, set the type of PostingDate to **Date**, and of CreatedDate and ApprovedDate to **Date/Time**.
-d. Merge JournalEntries with **Employees**, matching ApprovedByEmployeeID with EmployeeID. Expand EmployeeName, JobTitle, and MaxApprovalAmount, and rename them `ApproverName`, `ApproverTitle`, and `ApproverLimit`.
-e. Merge JournalEntries with **Employees** again, matching CreatedByEmployeeID with EmployeeID. Expand EmployeeName and JobTitle, and rename them `CreatorName` and `CreatorTitle`.
-f. Choose **Home > Close & Load**.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select the **T2_JournalEntry**, **T74_Employee**, and **T1_Account** Tables, and click **Transform Data**.
+c. Rename the queries `JournalEntries`, `Employees`, and `Accounts`.
+d. In Employees, keep EmployeeID, EmployeeName, JobTitle, and MaxApprovalAmount. In Accounts, keep AccountID, AccountNumber, and AccountName. Clear **Enable Load** for both.
+e. In JournalEntries, set the type of PostingDate to **Date**, and of CreatedDate and ApprovedDate to **Date/Time**.
+f. Merge JournalEntries with **Employees**, matching ApprovedByEmployeeID with EmployeeID, with a left outer join. Expand EmployeeName, JobTitle, and MaxApprovalAmount without the prefix.
+g. Rename the three new columns `ApproverName`, `ApproverTitle`, and `ApproverLimit`.
+h. Merge JournalEntries with **Employees** again, matching CreatedByEmployeeID with EmployeeID. Expand EmployeeName and JobTitle without the prefix, and rename them `CreatorName` and `CreatorTitle`.
+i. Choose **Home > Close & Load**, and rename the new worksheet `JournalEntries`.
 
 The JournalEntries Table holds several hundred entries, each with the names of the people who created and approved it and the approver's limit.
 
@@ -42,23 +45,28 @@ a. Add a column named `RiskScore` with this formula, which adds the five flags b
    =[@Weekend]+[@Backdated]+[@SelfApproved]+[@AboveLimit]+[@RoundAmount]
    ```
 
-b. Add a worksheet named `JE Summary`. In A1:A5, type the five flag names, and in B1 enter `=COUNTIF(JournalEntries[Weekend],TRUE)`, with the matching column in B2:B5.
-c. In A8:A13, type the scores 0 to 5, and in B8 enter `=COUNTIF(JournalEntries[RiskScore],A8)`, copied down to B13.
+b. Add a worksheet named `JE Summary`, and type the five flag names, `Weekend`, `Backdated`, `SelfApproved`, `AboveLimit`, and `RoundAmount`, in A1:A5.
+c. In B1, enter `=COUNTIF(JournalEntries[Weekend],TRUE)`, and in B2:B5, enter the same formula with the matching column.
+d. In A8:A13, type the scores `0` to `5`, and in B8, enter `=COUNTIF(JournalEntries[RiskScore],A8)`, copied down to B13.
 
 Most entries score 0. About two dozen have one flag, a handful have two, and a single entry has four.
 
 **Step 4. Separate the expected patterns.** Some flags follow from how Charles River's accounting works, and a PivotTable groups them so that you can explain each pattern once.
 
-a. Insert a PivotTable from the JournalEntries Table on a new worksheet, with CreatorTitle and EntryType in the **Rows** area and Count of EntryNumber in the **Values** area.
-b. Insert a second PivotTable with EntryType in the **Rows** area, RiskScore in the **Columns** area, and Count of EntryNumber in the **Values** area.
+a. Insert a PivotTable from the JournalEntries Table on a new worksheet.
+b. Drag CreatorTitle and then EntryType to the **Rows** area, and EntryNumber to the **Values** area, where Excel counts it because it is text.
+c. Insert a second PivotTable from the same Table on a new worksheet.
+d. Drag EntryType to the **Rows** area, RiskScore to the **Columns** area, and EntryNumber to the **Values** area.
 
 The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, and no employee has an approval limit above $250,000. That is a gap in the approval policy to report, not a sign of override in itself.
 
 **Step 5. Record a disposition for each flagged entry.**
 
 a. Sort the JournalEntries Table by RiskScore from largest to smallest, as in @fig-08-07.
-b. Filter RiskScore to values of 1 or more. Copy the visible rows of the EntryNumber through RiskScore columns, and paste them on a new worksheet named `Dispositions` with **Paste Special > Values**. Clear the filter.
-c. On the Dispositions worksheet, add a `Disposition` column, and type a disposition for every entry: expected, with the evidence that explains it, or follow up, with the question to ask.
+b. Filter RiskScore to values of 1 or more.
+c. Copy the visible rows of the EntryNumber through RiskScore columns, and paste them on a new worksheet named `Dispositions` with **Paste Special > Values**.
+d. Clear the filter on the JournalEntries Table.
+e. On the Dispositions worksheet, add a `Disposition` column, and type a disposition for every entry: expected, with the evidence that explains it, or follow up, with the question to ask.
 
 Pasting values freezes the list of exceptions as evidence of what the test found, and it keeps each disposition beside its entry: text typed next to a query's output can end up beside a different row when the query is refreshed. The entries to follow up stand out in @fig-08-07. The opening balance entry has four flags: it was created by the chief financial officer on a Saturday, five days after the date it posts to, approved under the same employee ID, and far above that approver's limit. Five other entries were created on the same kind of Saturday in the first week of January, after the date they post to. The accounting manager approved several rent entries and a utilities entry that the same person had created, and the two round debt reclassifications exceed the controller's limit.
 
@@ -66,32 +74,39 @@ Pasting values freezes the list of exceptions as evidence of what the test found
 
 **Step 6. Trace the highest-scoring entry to the ledger.** The JournalEntry Table holds each entry's header; its lines are in GLEntry.
 
-a. Import the **T3_GLEntry** Table, name the query `JournalLines`, and filter SourceDocumentType to JournalEntry as the first step.
-b. Merge JournalLines with **Accounts** on AccountID, and expand AccountNumber and AccountName.
-c. Use **Home > Choose Columns** to keep VoucherNumber, AccountNumber, AccountName, Debit, and Credit, and drag the column headers into that order. Choose **Close & Load**.
-d. On the JE Summary worksheet, enter these two totals in free cells and compare them:
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, select the **T3_GLEntry** Table, and click **Transform Data**, not **Load**.
+b. Name the query `JournalLines`, and filter SourceDocumentType to JournalEntry as the first step.
+c. Merge JournalLines with **Accounts** on AccountID, with a left outer join, and expand AccountNumber and AccountName without the prefix.
+d. Use **Home > Choose Columns** to keep VoucherNumber, AccountNumber, AccountName, Debit, and Credit, and drag the column headers into that order.
+e. Choose **Home > Close & Load**, and rename the new worksheet `JournalLines`.
+f. On the JE Summary worksheet, type `Entry totals` in A15 and `Ledger debits` in A16, and enter these two formulas in B15 and B16:
 
    ```
    =SUM(JournalEntries[TotalAmount])
    =SUM(JournalLines[Debit])
    ```
 
-   The two totals agree, so the entries' headers and their ledger lines describe the same population.
-e. Add a worksheet named `Drilldown`. In A1, type `Entry number`, and in B1 type `JE-2024-000001`. Type the headers in A3:D3 shown in @fig-08-08, and in A4 enter:
+g. Add a worksheet named `Drilldown`. In A1, type `Entry number`, and in B1, type `JE-2024-000001`.
+h. Type the headings `AccountNumber`, `AccountName`, `Debit`, and `Credit` in A3:D3, and in A4, enter:
 
    ```
    =FILTER(JournalLines[[AccountNumber]:[Credit]],JournalLines[VoucherNumber]=B1)
    ```
 
-The formula spills the entry's eighteen lines, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger. Type any other entry number in B1 to see its lines.
+i. Type another entry number, such as `JE-2026-000296`, in B1 to see its lines, and then type `JE-2024-000001` again.
+
+B15 and B16 agree, so the entries' headers and their ledger lines describe the same population. The formula in A4 spills the eighteen lines of the opening balance entry, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger.
 
 ![The Ledger Lines of the Opening Balance Entry.](/visuals/svg/fig-08-08-journal-entry-drilldown.svg){#fig-08-08 fig-alt="A mock of the Drilldown worksheet, with the FILTER formula of cell A4 in the formula bar and the entry number JE-2024-000001 in B1. Eighteen spilled rows list the account number, account name, debit, and credit of each ledger line of the entry: cash, accounts receivable, inventories, prepaid expenses, and equipment on the debit side; accounts payable, accruals, accumulated depreciation, common stock, and retained earnings on the credit side. The accounts receivable line is outlined."}
 
 **Step 7. Complete the workpaper.**
 
-a. Add a worksheet named `WP Journals`, and complete the workpaper items shown in @fig-08-09.
+a. Add a worksheet named `WP Journals`, with the workpaper labels of Tutorial 8.1 in column A, and complete each entry as @fig-08-09 shows.
 b. In the Exceptions and disposition entry, summarize the Dispositions worksheet: the patterns that are expected and the evidence for them, and the entries to follow up.
-c. Write a conclusion that says what the tests found and what remains open, and save the workbook.
+c. Write a conclusion that says what the tests found and what remains open.
+d. Save the workbook.
+
+The completed workpaper records the journal entry tests in a form that another auditor can review and rerun.
 
 ![A Workpaper for the Journal Entry Tests.](/visuals/svg/fig-08-09-audit-workpaper.svg){#fig-08-09 fig-alt="A mock of the WP Journals worksheet, with workpaper labels in the first column and entries in the second: the objective, based on AS 2401; the source tables; the population check, which agrees the entries' totals with their ledger lines; the procedure, with the five flags and the risk score; the parameters of each flag; the results, as the number of entries with one, two, and four flags; the exceptions and their dispositions; the conclusion, which leaves the approval of opening and recurring entries open for follow-up; and blanks for the preparer and the reviewer."}
 

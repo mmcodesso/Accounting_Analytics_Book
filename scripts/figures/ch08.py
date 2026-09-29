@@ -318,7 +318,7 @@ def fig_08_05() -> Diagram:
     body.append(("9", ["Total", f"{sum(v[0] for v in a['buckets'].values()):,}", xl.num(a["subledger"]),
                        "100.00%"]))
     body += [("10", ["", "", "", ""]),
-             ("11", ["Open invoices (subledger)", "", xl.num(a["subledger"]), ""]),
+             ("11", ["Open invoices (sub-ledger)", "", xl.num(a["subledger"]), ""]),
              ("12", ["Account 1020 (AccountID 3)", "", xl.num(a["gl"]), ""]),
              ("13", ["Difference", "", xl.num(a["gl"] - a["subledger"]), ""])]
     assert a["buckets"]["Current"][1] / a["subledger"] > 0.8

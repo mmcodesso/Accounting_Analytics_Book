@@ -2,13 +2,21 @@
 
 ## Applied Exercises
 
+Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish this chapter's tutorials, and put each exercise on its own worksheets, named after it. Exercises 8.3 and 8.4 add columns to queries of the tutorials, which is safe in the copy; every other exercise imports the Tables it needs as new queries with the names it gives.
+
 ### Financial Accounting Exercises
 
 **Exercise 8.1: Estimating the Allowance for Credit Losses**
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Tutorial 8.2 found that Charles River has never recorded an allowance for credit losses. The controller asks you to estimate one at the end of fiscal 2026 from the aging schedule. The credit department proposes the following loss rates for the buckets, which are an assumption for this exercise and not data from Charles River: 0.5 percent for current balances, 2 percent for 1 to 30 days past due, 5 percent for 31 to 60 days, 15 percent for 61 to 90 days, and 40 percent for balances more than 90 days past due.
+**Scenario.** Tutorial 8.2 found that Charles River has never recorded an allowance for credit losses. The controller asks you to estimate one at the end of fiscal 2026 from the aging schedule. The credit department proposes these loss rates for the buckets, which are an assumption for this exercise and not data from Charles River:
+
+- current: 0.5 percent;
+- 1 to 30 days past due: 2 percent;
+- 31 to 60 days: 5 percent;
+- 61 to 90 days: 15 percent;
+- more than 90 days: 40 percent.
 
 **Requirements.**
 
@@ -44,13 +52,13 @@
 
 **Requirements.**
 
-(1) Build an OpenPayables query from the PurchaseInvoice Table, filtered to invoices dated before 1/1/2027, and merge it with the supplier payments dated before 1/1/2027, grouped by PurchaseInvoiceID. Calculate each invoice's open balance and keep the invoices with a balance greater than zero.
+(1) Import the T37_PurchaseInvoice Table again as a new query named `OpenPayables`, filtered to invoices dated before `2027-01-01`. Create a query named `PaidByInvoice` that references the Payments query of Tutorial 8.1, which already holds the payments dated before `2027-01-01`, and group it by PurchaseInvoiceID with the sum of Amount as `PaidTotal`. Merge PaidByInvoice into OpenPayables, replace the nulls with 0, calculate each invoice's open balance, and keep the invoices with a balance greater than zero.
 
-(2) Calculate the balance of account 2010 at the end of fiscal 2026 from GLEntry. For a liability account, the balance is the credits minus the debits.
+(2) Import the T3_GLEntry Table again as a new query named `LedgerAP`, clicking **Transform Data**, and filter it to AccountID 22 and to PostingDate before `2027-01-01`. Calculate the balance of account 2010 at the end of fiscal 2026. For a liability account, the balance is the credits minus the debits.
 
 (3) Build a PivotTable of the account 2010 rows by SourceDocumentType, and use **Show Details** to list the JournalEntry rows. Identify each reconciling item between the ledger and the open invoices.
 
-(4) For each reconciling item, explain what it is and whether the correction belongs in the ledger, in the invoice detail, or in neither. Look up the purchase orders behind any invoices the reconciliation involves, and note who created and approved them.
+(4) For each reconciling item, explain what it is and whether the correction belongs in the ledger, in the invoice detail, or in neither. Import the T33_PurchaseOrder Table, look up the purchase orders behind any invoices the reconciliation involves, and note who created and approved them.
 
 (5) Prepare a reconciliation workpaper that shows the ledger balance, the open invoices, each reconciling item with its explanation, and any unexplained difference.
 
@@ -78,9 +86,9 @@
 
 **Requirements.**
 
-(1) Add CustomerSegment and PaymentTerms to the Customers query of Tutorial 8.2 and refresh the OpenInvoices query. Build a PivotTable of the open balance by customer, sorted from largest to smallest.
+(1) Add CustomerSegment and PaymentTerms to the columns kept in the Customers query of Tutorial 8.2, and select them in the step of the OpenInvoices query that expands Customers, so that they reach the OpenInvoices Table. Refresh, and build a PivotTable of the open balance by CustomerID and CustomerName, sorted from largest to smallest.
 
-(2) Beside the PivotTable, look up each customer's CreditLimit and calculate the balance as a percentage of the limit. List the customers whose balance exceeds their limit, and for each one show how much of the balance is past due.
+(2) Add CreditLimit, which is already on OpenInvoices, to the PivotTable as the Max of CreditLimit, and beside the PivotTable, calculate each customer's balance as a percentage of the limit. List the customers whose balance exceeds their limit, and for each one show how much of the balance is past due.
 
 (3) Calculate the share of the receivables held by the five and the ten largest customers, and summarize the open balance and the past-due balance by CustomerSegment and by PaymentTerms.
 
@@ -108,7 +116,7 @@
 
 **Requirements.**
 
-(1) Add SupplierCategory to the Suppliers query and DueDate to the Invoices query of Tutorial 8.1, and refresh the Payments query. Build a PivotTable of fiscal 2026 payments by SupplierName, sorted from largest to smallest, and use **Show Values As > % Running Total In** to show the cumulative share of spending.
+(1) Add SupplierCategory to the columns kept in the Suppliers query and DueDate to those kept in the PurchaseInvoices query of Tutorial 8.1, and select them in the two steps of the Payments query that expand those queries. Refresh the Payments query. Build a PivotTable of fiscal 2026 payments by SupplierName, sorted from largest to smallest, and use **Show Values As > % Running Total In** to show the cumulative share of spending.
 
 (2) Report how many suppliers account for 50 percent, 80 percent, and 90 percent of the spending, and summarize the spending by SupplierCategory.
 
@@ -129,25 +137,36 @@
 
 ### Auditing Exercises
 
-**Exercise 8.5: Testing Purchasing Approvals**
+**Exercise 8.5: Testing Purchasing and Payment Controls**
 
 **Table group:** Procure-to-Pay, with the Employee table from Master Data
 
-**Scenario.** The journal entry tests of Tutorial 8.3 found weaknesses in how entries are approved. The chief audit executive asks you to apply the same approach to purchasing: the approval of purchase orders, and the amounts of purchase requisitions around an approval limit.
+**Scenario.** The journal entry tests of Tutorial 8.3 found weaknesses in how entries are approved. The chief audit executive asks you to apply the same approach to purchasing and payments: the approval of purchase orders and supplier invoices, the amounts of purchase requisitions around an approval limit, and the duplicate and gap tests described in this chapter.
 
 **Requirements.**
 
-(1) Import the PurchaseOrder Table and merge the Employee Table twice, once for the approver's name, JobTitle, MaxApprovalAmount, and TerminationDate, and once for the creator's name.
+(1) Import the T33_PurchaseOrder Table, and import the T74_Employee Table again as a query named `Approvers` that keeps EmployeeID, EmployeeName, JobTitle, MaxApprovalAmount, and TerminationDate. Merge Approvers into the purchase orders twice, once for the approver's name, JobTitle, MaxApprovalAmount, and TerminationDate, and once for the creator's name.
 
 (2) Add three flags and a risk score: `SelfApproved` when the creator and the approver are the same employee, `AboveLimit` when OrderTotal exceeds the approver's limit, and `AfterTermination` when the approver's TerminationDate is filled in and earlier than the OrderDate. Count the flagged orders and record a disposition for each one, as in Tutorial 8.3.
 
-(3) Import the PurchaseRequisition Table and add a `RequisitionValue` column equal to Quantity times EstimatedUnitCost. With COUNTIFS, count the requisitions in $50 bands from $4,800 to $5,199.99, and chart the counts.
+(3) Import the T37_PurchaseInvoice Table again as a query named `InvoiceApprovals`, and merge in the approver's name, JobTitle, and MaxApprovalAmount from Approvers. List the invoices approved by anyone other than the chief financial officer, flag those above the approver's limit, and note whether each approver's role belongs in the approval of supplier invoices.
 
-(4) Examine the band just below $5,000. List its requisitions with their requesters, approvers, dates, and statuses, and look for consecutive requisition numbers with the same value. Relate what you find to the approval limits in the Employee table and to Exercise 2.5.
+(4) Import the T32_PurchaseRequisition Table and add a `RequisitionValue` column equal to Quantity times EstimatedUnitCost. With COUNTIFS, count the requisitions in $50 bands from $4,800 to $5,199.99, and chart the counts. Examine the band just below $5,000: list its requisitions with their requesters, approvers, dates, and statuses, look for consecutive requisition numbers with the same value, and relate what you find to the approval limits in the Employee table and to Exercise 2.5.
 
-(5) Write a memo of one half to one page that summarizes the exceptions, distinguishes weaknesses in the design of the approval controls from failures in their operation, and recommends follow-up.
+(5) Test the payments for near-duplicates. In the Payments Table of Tutorial 8.1, add a column `SameAmount` that is TRUE when another payment has the same SupplierID and Amount, and a column `SameInvoice` that is TRUE when another payment also has the same PurchaseInvoiceID:
 
-**Deliverable.** The flagged purchase orders with their dispositions, the requisition band analysis with its chart, and the memo.
+   ```
+   =COUNTIFS([SupplierID],[@SupplierID],[Amount],[@Amount])>1
+   =COUNTIFS([SupplierID],[@SupplierID],[Amount],[@Amount],[PurchaseInvoiceID],[@PurchaseInvoiceID])>1
+   ```
+
+   Count each flag, and explain what the difference between the two counts shows.
+
+(6) Run a gap test on the purchase order numbers. Add a column with the year of each PONumber, `=--MID([@PONumber],4,4)`, and one with its sequence number, `=--RIGHT([@PONumber],6)`. For each year, compare the number of orders with the largest sequence number minus the smallest, plus one, and state whether any numbers are missing.
+
+(7) Write a memo of one half to one page that summarizes the exceptions, distinguishes weaknesses in the design of the approval controls from failures in their operation, records the clean results of the duplicate and gap tests, and recommends follow-up.
+
+**Deliverable.** The flagged purchase orders and invoices with their dispositions, the requisition band analysis with its chart, the duplicate and gap tests, and the memo.
 
 <!-- Instructor notes, Exercise 8.5: 18,832 purchase orders; the CFO approved 99.9% of them. SelfApproved: 9 (PO-2024-000001, -000002,
      -000003, PO-2024-001942 for 360,000.00, PO-2025-003923, -003924, PO-2026-010468, -010469, and PO-2026-011104 for 280,000.00; the two
@@ -159,28 +178,40 @@
      the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714,
      -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are
      three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different
-     requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). -->
+     requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO
+     approved 40,196 of 40,204; the other 8 are PI 7038, 7047, 20345, and 20399 (200.69, 3,102.49, 794.96, 23.20), approved by Melinda
+     Murphy, a Product Analyst with a limit of 0; PI 7122 and 20452 (1,301.21, 1,269.12), approved by Daniel Odom, a Production
+     Supervisor, within the 5,000 limit but outside the purchasing and accounting roles; and PI 3160 and 21692 (360,000.00 and
+     280,000.00), approved by Jennifer Cole, the Purchasing Manager, above the 25,000 limit, the note-financed capital invoices of
+     Exercise 8.2. Near-duplicates, payments dated before 2027-01-01: SameAmount flags 226 payments in 113 pairs (no group larger than
+     two; 13 pairs within 30 days); SameInvoice flags none, so every pair pays two different invoices and no invoice was paid twice.
+     Gap test: PO-2024 runs 1 to 3,921 (3,921 orders), PO-2025 3,922 to 10,466 (6,545), PO-2026 10,467 to 18,832 (8,366); no numbers
+     are missing, and the sequence continues across years rather than restarting. -->
 
 
 **Exercise 8.6: Testing Pricing Controls**
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Exercise 4.6 found price override requests that were never approved, and the promotion analyses of Chapters 4 through 6 relied on the effective dates in the PromotionProgram Table without testing them. The chief audit executive asks you to test both pricing controls against the sales actually billed.
+**Scenario.** Exercise 4.6 found price override requests that were never approved, and the promotion analyses of Chapters 4 through 6 relied on the effective dates in the PromotionProgram Table without testing them. The price lists that set most prices have effective dates too. The chief audit executive asks you to test these pricing controls against the sales actually ordered and billed.
 
 **Requirements.**
 
-(1) Import the PromotionProgram Table, and add a flag for promotions whose EffectiveEndDate is on or before their EffectiveStartDate. List the flagged promotions with their approver and approval date.
+(1) Import the T7_PromotionProgram Table as a query named `Promotions`, and add a flag for promotions whose EffectiveEndDate is on or before their EffectiveStartDate. List the flagged promotions with their approver and approval date.
 
-(2) For the invoice lines of the flagged promotions, bring in each line's OrderDate from the SalesOrder Table through the SalesInvoice Table, and compare it with the promotion's effective dates. By promotion, count the lines and total the discount, calculated as Quantity times UnitPrice times Discount.
+(2) Import the T17_SalesInvoiceLine, T16_SalesInvoice, and T9_SalesOrder Tables as queries named `InvoiceLines`, `InvoiceHeaders`, and `Orders`. For the invoice lines of the flagged promotions, bring in each line's OrderDate from Orders through the SalesOrderID of InvoiceHeaders, and compare it with the promotion's effective dates. By promotion, count the lines and total the discount, calculated as Quantity times UnitPrice times Discount.
 
-(3) Import the PriceOverrideApproval Table and filter it to the Pending requests. Find the invoice lines of their SalesOrderLineIDs, and compare each line's UnitPrice with the request's ReferenceUnitPrice and ApprovedUnitPrice. Note the PricingMethod and PriceOverrideApprovalID recorded on the lines, and calculate the amount billed below the reference price.
+(3) Import the T8_PriceOverrideApproval Table and filter it to the Pending requests. Find the invoice lines of their SalesOrderLineIDs, and compare each line's UnitPrice with the request's ReferenceUnitPrice and ApprovedUnitPrice. Note the PricingMethod and PriceOverrideApprovalID recorded on the lines, and calculate the amount billed below the reference price.
 
-(4) For each exception, decide whether it shows a weakness in the design of the control, a failure in its operation, or both, and explain why.
+(4) Import the T5_PriceList, T6_PriceListLine, and T10_SalesOrderLine Tables. Flag the price lists whose Status is Expired or whose EffectiveEndDate is before their EffectiveStartDate. Bring each order line's PriceListID through its PriceListLineID and its OrderDate from Orders, and count by price list and year the order lines dated after their list's EffectiveEndDate. List any active price lists that no order line uses.
 
-(5) Write a memo of one half to one page to the sales manager and the controller that describes the exceptions, their amounts, and the changes you would recommend to the pricing controls.
+(5) For the customers that have their own price list (ScopeType Customer), find the order lines whose PricingMethod is neither Customer Price List nor Approved Override. Compare each line's UnitPrice with the customer's own list and with the list the line cites, and explain what the comparison shows.
 
-**Deliverable.** The flagged promotions with their invoice lines, the pending override requests with the lines billed at their prices, and the memo.
+(6) For each exception, decide whether it shows a weakness in the design of the control, a failure in its operation, or both, and explain why.
+
+(7) Write a memo of one half to one page to the sales manager and the controller that describes the exceptions, their amounts, and the changes you would recommend to the pricing controls.
+
+**Deliverable.** The flagged promotions with their invoice lines, the pending override requests with the lines billed at their prices, the price-list tests, and the memo.
 
 <!-- Instructor notes, Exercise 8.6: promotions 1 (PROMO-2024-001, Alder Collection, effective 2024-03-01 to 2024-03-01), 4 (PROMO-2025-004,
      Brookside Collection, 2025-03-01 to 2025-02-27), and 7 (PROMO-2026-007, Harbor Collection, 2026-03-01 to 2026-02-28) are 8% collection
@@ -190,5 +221,15 @@
      promotions was ordered within its dates. Pending overrides: IDs 2, 165, and 294 on SalesOrderLineIDs 147, 8038, and 15033. They were
      billed on four invoice lines (SI-2024-000054; SI-2025-007015 and SI-2025-007598, two shipments of one order line; SI-2026-013958) at
      the pending ApprovedUnitPrice (181.00, 102.70, 351.24) under a price-list PricingMethod (Segment Price List or Customer Price List)
-     with a blank PriceOverrideApprovalID, 755.69 below the reference prices in total. Design: the system accepts end dates before start
-     dates and lets an order line carry a pending price. Operation: the approvals did not prevent the discounts. -->
+     with a blank PriceOverrideApprovalID, 755.69 below the reference prices in total. Price lists: 1 (Strategic segment, ends
+     2024-12-29), 2 (Wholesale, ends 2025-12-29), and 4 (Small Business, ends 2023-12-29, before its 2024-01-01 start) are Expired and
+     have no successor, yet they priced 8,135 order lines dated after their end dates (31,004,051.07): list 1 11 in late December 2024,
+     1,340 in 2025, and 1,200 in 2026; list 2 33 in late December 2025 and 3,710 in 2026; list 4 all 1,841 of its lines (550, 650,
+     641). Lists 12, 13, and 14, three Active copies of the Design Trade list named Overlap with the same dates as list 3, have no
+     price list lines and price nothing. Customer lists: customer 106 (Richardson, Porter and Chavez, Strategic, list 11) has three
+     order lines under Segment Price List that cite list 1: SalesOrderLineIDs 368 (2024-01-02), 7675 (2025-01-01), and 15031
+     (2026-01-02). Their UnitPrice equals the customer's own list (21.88, 913.83, 564.75), not list 1 (22.65, 946.08, 584.68): the
+     customer paid its contract price, but the record names the wrong, and in 2025 and 2026 expired, list. No other customer with its
+     own list has Segment Price List lines. Design: the system accepts end dates before start dates, lets an order line carry a
+     pending price, and prices from expired lists. Operation: the approvals did not prevent the discounts, and nobody renewed the
+     segment lists. -->

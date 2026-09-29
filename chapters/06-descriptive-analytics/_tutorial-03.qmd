@@ -9,7 +9,7 @@
 **Step 1. Add the list amount and the discount to the query.** Chapter 4 calculated these amounts as calculated columns on the SalesInvoiceLine Table. The InvoiceLines query starts from the query rather than the Table, so it needs its own versions.
 
 a. Open the Power Query Editor and select the **InvoiceLines** query.
-b. Add the two custom columns in @tbl-06-03 with **Add Column > Custom Column**, and set both to the **Decimal Number** type.
+b. Add the two custom columns in @tbl-06-04 with **Add Column > Custom Column**, and set both to the **Decimal Number** type.
 c. Choose **Home > Close & Load**, and then **Data > Refresh All**.
 
 | New column name | Custom column formula |
@@ -17,7 +17,7 @@ c. Choose **Home > Close & Load**, and then **Data > Refresh All**.
 | `ListAmount` | `[Quantity] * [BaseListPrice]` |
 | `DiscountAmount` | `[Quantity] * [UnitPrice] * [Discount]` |
 
-: Custom columns added to InvoiceLines for the margin bridge {#tbl-06-03}
+: Custom columns added to InvoiceLines for the margin bridge {#tbl-06-04}
 
 The custom columns are not rounded, so their totals can differ by a few cents from the ROUND formulas of Chapter 4. The bridge uses the query's columns throughout, so it is consistent with itself.
 
@@ -30,22 +30,34 @@ d. Drag Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount to **
 e. Choose **PivotTable Design > Grand Totals > Off for Rows and Columns**, because a total of the two quarters is not part of the comparison.
 f. Format every value field as a number with two decimals and a thousands separator.
 
-**Step 3. Add the per-unit measures.** Calculated fields belong to the pivot cache, which the PivotTables built from the same Table share, so MarginPct from Tutorial 6.2 appears in the field list. Check its box to add it to **Values**, or create it again if it does not appear. Then create the calculated fields in @tbl-06-04, as you did in Tutorial 6.2, and format the per-unit fields as numbers and the percentage as a percentage.
+The PivotTable now shows the five Furniture totals of the third and fourth quarters side by side, the inputs of every per-unit measure and of the bridge.
+
+**Step 3. Add the per-unit measures.** Calculated fields belong to the pivot cache, the copy of the source data that the PivotTables built from the same Table share, so MarginPct from Tutorial 6.2 appears in the field list.
+
+a. Check the MarginPct box to add it to **Values**, or create it again if it does not appear.
+b. Create the calculated fields in @tbl-06-05, as you did in Tutorial 6.2.
+c. Format the per-unit fields as numbers and MarginBeforeDiscountPct as a percentage.
 
 | Name | Formula |
 |---|---|
 | `PricePerUnit` | `=LineTotal/Quantity` |
 | `ListPerUnit` | `=ListAmount/Quantity` |
 | `CostPerUnit` | `=StdCostAmount/Quantity` |
-| `MarginBeforeDiscountPct` | `=(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)` |
+| `MarginBeforeDiscountPct` | The margin with the discounts added back to revenue, in the block below |
 
-: Calculated fields for the driver PivotTable {#tbl-06-04}
+: Calculated fields for the driver PivotTable {#tbl-06-05}
 
-Read the two columns side by side, as @fig-06-06 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. The drivers point to a single cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost.
+The formula of MarginBeforeDiscountPct is:
 
-![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-06-furniture-drivers.svg){#fig-06-06 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
+```
+=(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)
+```
 
-**Step 4. Build the bridge.** The bridge applies the calculations in @tbl-06-02 to the driver totals.
+Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. The drivers point to a single cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost.
+
+![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-08-furniture-drivers.svg){#fig-06-08 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
+
+**Step 4. Collect the driver totals.** The bridge applies the calculations in @tbl-06-03 to the driver totals, so it starts by linking them to the PivotTable.
 
 a. Add a worksheet named `Bridge`. Type the headings `Driver`, `2026-Q3`, and `2026-Q4` in A3:C3, and the labels `Quantity`, `ListAmount`, `LineTotal`, `DiscountAmount`, and `StdCostAmount` in A4:A8.
 b. In B4, type an equal sign, click the 2026-Q3 value of Sum of Quantity on the **Drivers** worksheet, and press Enter. Excel writes a GETPIVOTDATA formula such as this one:
@@ -56,8 +68,15 @@ b. In B4, type an equal sign, click the 2026-Q3 value of Sum of Quantity on the 
 
 c. Fill B4:C8 in the same way, clicking the matching value of the PivotTable for each cell.
 d. Type `Margin` in A9, enter `=B6-B8` in B9, and copy it to C9.
-e. In A11:A14, type `Margin per unit`, `List margin per unit`, `Price-list reduction per unit`, and `Discount per unit`. In B11:B14, enter `=B9/B4`, `=(B5-B8)/B4`, `=(B5-B6-B7)/B4`, and `=B7/B4`, and copy B11:B14 to C11:C14.
-f. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Promotions`, `Cost`, `2026-Q4 margin`, and `Check` in A16:A23, and enter these formulas in B16:B23:
+
+B4:C9 now hold the totals of both quarters and their margins, each linked to the PivotTable by GETPIVOTDATA.
+
+**Step 5. Calculate the per-unit measures and the bridge.**
+
+a. In A11:A14, type `Margin per unit`, `List margin per unit`, `Price-list reduction per unit`, and `Discount per unit`.
+b. In B11:B14, enter `=B9/B4`, `=(B5-B8)/B4`, `=(B5-B6-B7)/B4`, and `=B7/B4`.
+c. Copy B11:B14 to C11:C14.
+d. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Promotions`, `Cost`, `2026-Q4 margin`, and `Check` in A16:A23, and enter these formulas in B16:B23:
    - B16: `=B9`
    - B17: `=(C4-B4)*B11`
    - B18: `=C4*(C12-B12)`
@@ -66,36 +85,39 @@ f. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Pro
    - B21: `0`, with the note `Each item has one standard cost` in C21
    - B22: `=C9`
    - B23: `=B16+SUM(B17:B21)-B22`
-g. Format B16:B23 as numbers with no decimals.
+e. Format B16:B23 as numbers with no decimals.
 
 B23 is zero: the effects account for the whole change in margin. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin.
 
-**Step 5. Chart the bridge as a waterfall.**
+**Step 6. Chart the bridge as a waterfall.** Chart types are compared in the section on charting earlier in this chapter; a waterfall suits a change that is built from parts.
 
 a. Select A16:B22 and choose **Insert > Insert Waterfall, Funnel, Stock, Surface, or Radar Chart > Waterfall**.
 b. Click the first bar, and click it again so that only that bar is selected. Right-click it and choose **Set as Total**. Do the same for the last bar.
-c. Right-click the vertical axis, choose **Format Axis**, and set the **Minimum** bound to 1600000, so that the small effects are visible. Say so in the chart title or a note, because a truncated axis exaggerates differences for a reader who does not notice it.
+c. Right-click the vertical axis, choose **Format Axis**, and set the **Minimum** bound to `1600000`, so that the small effects are visible.
+d. Say in the chart title or a note that the axis starts at 1.6 million, because a truncated axis exaggerates differences for a reader who does not notice it.
 
-@fig-06-07 shows the finished bridge. One bar dominates it, and it is not volume, mix, or cost.
+@fig-06-09 shows the finished bridge. One bar dominates it, and it is not volume, mix, or cost.
 
-![The Furniture Margin Bridge from the Third to the Fourth Quarter.](/visuals/svg/fig-06-07-margin-bridge.svg){#fig-06-07 fig-alt="A waterfall chart of the Furniture margin at standard cost. It starts with a total bar for the 2026-Q3 margin, followed by a small increase for volume, small changes for mix and price lists, a large decrease for promotions, and no change for cost, and it ends with a lower total bar for the 2026-Q4 margin. Each bar is labeled with its dollar amount and sign, and a legend distinguishes totals, increases, decreases, and no effect. The vertical axis starts at 1.6 million dollars."}
+![The Furniture Margin Bridge from the Third to the Fourth Quarter.](/visuals/svg/fig-06-09-margin-bridge.svg){#fig-06-09 fig-alt="A waterfall chart of the Furniture margin at standard cost. It starts with a total bar for the 2026-Q3 margin, followed by a small increase for volume, small changes for mix and price lists, a large decrease for promotions, and no change for cost, and it ends with a lower total bar for the 2026-Q4 margin. Each bar is labeled with its dollar amount and sign, and a legend distinguishes totals, increases, decreases, and no effect. The vertical axis starts at 1.6 million dollars."}
 
-**Step 6. Drill into the discounts.** The bridge says the promotions caused the decline. The next question is which promotions.
+**Step 7. Drill into the discounts.** The bridge says the promotions caused the decline. The next question is which promotions.
 
 a. Insert a PivotTable from the InvoiceLines Table on a new worksheet named `Discounts`. Drag ItemGroup to **Filters** and select Furniture, and drag Period to **Columns** and select only 2026-Q3 and 2026-Q4.
 b. Drag PromotionID to **Rows**, and drag SalesInvoiceLineID and DiscountAmount to **Values**.
 c. Excel sums SalesInvoiceLineID, because it is a number. Open its **Value Field Settings**, choose **Count**, and type the custom name `Count of Lines`. Give DiscountAmount the custom name `Sum of Discount`.
 d. Turn off the grand totals, and find the promotions that appear in the PivotTable on the **PromotionProgram** worksheet.
 
-@fig-06-08 shows the result. Most of the Furniture discounts in both quarters come from promotion 8, the Furniture Seasonal Promotion, and its discounts more than doubled from the third quarter to the fourth. The reason is timing. The promotion priced orders placed in September and October, so the third quarter received only its September invoices, while the fourth quarter received the October invoices and, as you found in Tutorial 5.2, the lines of promotion orders invoiced after the promotion had ended. Promotion 9, the Design Trade Customer Promotion, which ran in November, added a smaller amount of discounts on Furniture lines in the fourth quarter.
+@fig-06-10 shows the result. Most of the Furniture discounts in both quarters come from promotion 8, the Furniture Seasonal Promotion, and its discounts more than doubled from the third quarter to the fourth. The reason is timing. The promotion priced orders placed in September and October, so the third quarter received only its September invoices, while the fourth quarter received the October invoices and, as you found in Tutorial 5.2, the lines of promotion orders invoiced after the promotion had ended. Promotion 9, the Design Trade Customer Promotion, which ran in November, added a smaller amount of discounts on Furniture lines in the fourth quarter.
 
-![Furniture Discounts by Promotion and Quarter.](/visuals/svg/fig-06-08-discounts-by-promotion.svg){#fig-06-08 fig-alt="A mock of the Discounts worksheet. A PivotTable filtered to Furniture shows, for 2026-Q3 and 2026-Q4, the count of invoice lines and the sum of discounts for lines with no promotion and for promotions 7, 8, and 9. The promotion 8 row is outlined across both quarters, with far more lines and discount in the fourth quarter, and the promotion 9 cells of the fourth quarter are outlined. Below, rows of the PromotionProgram Table give the code, name, scope, and discount rate of promotions 7, 8, and 9."}
+![Furniture Discounts by Promotion and Quarter.](/visuals/svg/fig-06-10-discounts-by-promotion.svg){#fig-06-10 fig-alt="A mock of the Discounts worksheet. A PivotTable filtered to Furniture shows, for 2026-Q3 and 2026-Q4, the count of invoice lines and the sum of discounts for lines with no promotion and for promotions 7, 8, and 9. The promotion 8 row is outlined across both quarters, with far more lines and discount in the fourth quarter, and the promotion 9 cells of the fourth quarter are outlined. Below, rows of the PromotionProgram Table give the code, name, scope, and discount rate of promotions 7, 8, and 9."}
 
-**Step 7. Record the finding.**
+**Step 8. Record the finding.**
 
 a. On the **Documentation** worksheet, add the ListAmount and DiscountAmount custom columns to the Query steps entry, the four calculated fields to the Calculated fields entry, and the Drivers, Bridge, and Discounts worksheets to the Worksheets entry.
 b. Replace the open question about promotion 8, which you recorded in Chapter 4, with a `Finding` entry of two or three sentences that states the change in the Furniture margin, the effect of the promotions, and the effects that were small.
 c. Save the workbook.
+
+The Documentation worksheet now states the answer to the controller's question in the place where a reviewer looks first, next to the evidence that supports it.
 
 **Checkpoint.** Check that:
 

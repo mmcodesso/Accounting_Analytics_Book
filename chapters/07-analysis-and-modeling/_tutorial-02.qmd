@@ -1,67 +1,95 @@
 ## Guided Tutorial 7.2: Comparing 2026 with the Budget
 
-**Context and objective.** In this tutorial, you will explain how fiscal 2026 compared with the budget. You will import the budget lines, price every 2026 invoice line at the budget's planned net price for its item and month, and build a report that compares the static budget, the flexible budget, and the actual results for each product line. You will then split the price variance into promotional discounts and the rest, see when the Furniture discounts arrived compared with when the budget planned them, and compare the operating expenses with their budget.
+**Context and objective.** In this tutorial, you will explain how fiscal 2026 compared with the budget. You will import the budget lines, price every 2026 invoice line at the budget's planned net price for its item and month, and build a report that compares the static budget, the flexible budget, and the actual results for each product line. You will then split the price variance into promotional discounts and the rest, chart when the Furniture discounts arrived compared with when the budget planned them, and compare the operating expenses with their budget.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 7.1, with the InvoiceLines query and its StdCostAmount and DiscountAmount columns from Chapter 6, and the Item query from Chapter 4.
+**Prerequisites.** You need the analysis workbook from Tutorial 7.1, with the InvoiceLines query and its StdCostAmount, ListAmount, and DiscountAmount columns from Chapter 6, and the Item query from Chapter 4.
 
 **Step-by-step instructions.**
 
 **Step 1. Import the budget lines.**
 
-a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and select the **T77_BudgetLine** and **T1_Account** Tables in the **Navigator**. Click **Transform Data**.
-b. Rename the queries `BudgetLine` and `Account`. In the Account query, use **Home > Choose Columns** to keep AccountID, AccountNumber, and AccountName.
-c. In the BudgetLine query, filter FiscalYear to 2026, and clear **Balance Sheet** in the filter list of BudgetCategory, so that the query keeps the revenue, cost of goods sold, and operating-expense lines.
-d. Merge BudgetLine with **Item** on ItemID, with a left outer join, and expand ItemGroup. Merge it with **Account** on AccountID, and expand AccountNumber and AccountName. Choose **Home > Close & Load**.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select the **T77_BudgetLine** and **T1_Account** Tables, and click **Transform Data**.
+c. Rename the queries `BudgetLine` and `Account`.
+d. In the Account query, use **Home > Choose Columns** to keep AccountID, AccountNumber, and AccountName.
+e. In the BudgetLine query, filter FiscalYear to 2026, and clear **Balance Sheet** in the filter list of BudgetCategory, so that the query keeps the revenue, cost of goods sold, and operating-expense lines.
+f. Merge BudgetLine with **Item** on ItemID, with a left outer join, and expand ItemGroup without the prefix.
+g. Merge BudgetLine with **Account** on AccountID, with a left outer join, and expand AccountNumber and AccountName without the prefix.
+h. Choose **Home > Close & Load**, and rename the two new worksheets `BudgetLine` and `Account`.
 
-**Step 2. Price the 2026 invoice lines at the planned prices.** The budget has exactly one planned net price for each item in each month, so merging on the year, month, and item adds one price to each invoice line without adding rows.
+The BudgetLine Table now holds the 2026 budget, one row for each account and month, and for revenue and cost of goods sold, for each item, with the item group and the account number beside each row. The operating-expense rows have no item, so their ItemGroup is blank.
 
-a. In the Power Query Editor, right-click **BudgetLine** and choose **Reference**. Name the new query `PlannedPrices`, filter BudgetCategory to Revenue, keep FiscalYear, Month, ItemID, and UnitAmount, and rename UnitAmount to `PlannedPrice`. Right-click the query, clear **Enable Load**, so that it is used only inside other queries.
-b. Right-click **InvoiceLines**, choose **Reference**, and name the new query `FlexLines`. Filter FiscalYear to 2026, and filter ItemGroup to exclude Services, which the budget does not plan.
-c. Add the two custom columns in @tbl-07-03, the first before the merge in the next action and the second after it.
-d. Choose **Home > Merge Queries**. Select FiscalYear, Month, and ItemID in FlexLines, holding Ctrl and clicking them in that order, and choose **PlannedPrices** below, selecting its FiscalYear, Month, and ItemID in the same order. Keep **Left Outer**, and expand PlannedPrice.
-e. Set Month to **Whole Number**, and PlannedPrice and FlexRevenue to **Decimal Number**, and choose **Home > Close & Load**.
+**Step 2. Extract the planned prices.** The budget has exactly one planned net price for each item in each month, and a query that references BudgetLine can extract them.
 
-| New column name | Custom column formula |
-|---|---|
-| `Month` | `Date.Month([InvoiceDate])` |
-| `FlexRevenue` | `if [PlannedPrice] = null then [LineTotal] else [Quantity] * [PlannedPrice]` |
+a. Choose **Data > Get Data > Launch Power Query Editor** to reopen the editor.
+b. In the **Queries** pane, right-click **BudgetLine**, choose **Reference**, and name the new query `PlannedPrices`.
+c. Filter BudgetCategory to Revenue, and use **Home > Choose Columns** to keep FiscalYear, Month, ItemID, and UnitAmount.
+d. Rename UnitAmount to `PlannedPrice`.
+e. Right-click **PlannedPrices** in the **Queries** pane, and clear **Enable Load**, so that the query is used only inside other queries.
 
-: Custom columns of the FlexLines query {#tbl-07-03}
+PlannedPrices lists one price for each item and month of 2026. Because its load is disabled, it will not add a worksheet to the workbook.
 
-FlexRevenue is what each line would have been billed at the budget's price. A few lines have no planned price, because their seasonal item was launched in the month it was first sold, and the budget did not plan sales that month. For those lines, FlexRevenue keeps the actual amount, so they create no price variance. Count them with `=COUNTBLANK(FlexLines[PlannedPrice])` on the Analysis worksheet, and note them in the documentation.
+**Step 3. Price the 2026 invoice lines at the planned prices.** Merging on the year, the month, and the item adds one planned price to each invoice line without adding rows.
 
-**Step 3. Build the flexible-budget report.** Add a worksheet named `BudgetReport`, and type `Furniture`, `Lighting`, `Textiles`, `Accessories`, and `Total` in B3:F3. In A4:A18, type the row labels shown in @fig-07-05. Then enter these formulas in column B, copy B4:B18 to C4:E18, and in F4:F18 add the four product lines with SUM.
+a. Right-click **InvoiceLines**, choose **Reference**, and name the new query `FlexLines`.
+b. Filter FiscalYear to 2026, and filter ItemGroup to exclude Services, which the budget does not plan.
+c. Choose **Add Column > Custom Column**, and add a column `Month` with the formula `Date.Month([InvoiceDate])`.
+d. Set the type of Month to **Whole Number**, the type of Month in PlannedPrices, so that the two columns can be matched.
+e. Choose **Home > Merge Queries**. In FlexLines, hold Ctrl and click FiscalYear, Month, and ItemID, in that order.
+f. Choose **PlannedPrices** in the lower list, click its FiscalYear, Month, and ItemID in the same order, keep **Left Outer**, and click **OK**.
+g. Expand PlannedPrice, without the prefix.
+h. Add a custom column `FlexRevenue` with the formula below. Power Query's `if … then … else` works like Excel's IF: it returns the value after `then` when the condition is true and the value after `else` otherwise.
 
-a. Static budget, rows 4 and 5, with `COGS` in place of `Revenue` in B5:
+   ```
+   if [PlannedPrice] = null then [LineTotal] else [Quantity] * [PlannedPrice]
+   ```
+
+i. Set the type of PlannedPrice and FlexRevenue to **Decimal Number**.
+j. Choose **Home > Close & Load**, and rename the new worksheet `FlexLines`.
+
+FlexRevenue is what each line would have been billed at the budget's price. A few lines have no planned price, because their seasonal item was launched in the month it was first sold, and the budget did not plan sales that month. For those lines, FlexRevenue keeps the actual amount, so they create no price variance.
+
+**Step 4. Build the flexible-budget report.**
+
+a. Add a worksheet named `BudgetReport`, and type `Furniture`, `Lighting`, `Textiles`, `Accessories`, and `Total` in B3:F3.
+b. In A4:A18, type the row labels `Static budget revenue`, `Static budget COGS`, `Static budget margin`, `Flexible budget revenue`, `Flexible budget COGS`, `Flexible budget margin`, `Actual revenue`, `Actual COGS at standard`, `Actual margin`, `Sales-volume variance`, `Flexible-budget variance`, `Promotional discounts`, `Price gap before discounts`, `Budgeted units`, and `Actual units`.
+c. In B4, enter the static budget revenue with this formula, and enter the same formula in B5 with `"COGS"` in place of `"Revenue"`:
 
    ```
    =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[ItemGroup],B$3,BudgetLine[BudgetCategory],"Revenue")
    ```
 
-b. Flexible budget, rows 7 and 8: enter this formula in B7, and the same formula with StdCostAmount in place of FlexRevenue in B8. The budget's cost per unit is the standard cost, so the flexible budget's cost of goods sold is the standard cost of the units actually sold.
+d. In B7, enter the flexible budget revenue with the formula below, and in B8, the same formula with StdCostAmount in place of FlexRevenue. The budget's cost per unit is the standard cost, so the flexible budget's cost of goods sold is the standard cost of the units actually sold.
 
    ```
    =SUMIFS(FlexLines[FlexRevenue],FlexLines[ItemGroup],B$3)
    ```
 
-c. Actual, rows 10 and 11: the same formula with LineTotal in B10, and `=B8` in B11.
-d. Margins, rows 6, 9, and 12: `=B4-B5`, `=B7-B8`, and `=B10-B11`.
-e. Units, rows 17 and 18: enter the first formula below in B17 and the second in B18.
+e. In B10, enter the same formula with LineTotal in place of FlexRevenue, and in B11, enter `=B8`.
+f. Enter the margins: `=B4-B5` in B6, `=B7-B8` in B9, and `=B10-B11` in B12.
+g. In B17 and B18, enter the budgeted and the actual units:
 
    ```
    =SUMIFS(BudgetLine[Quantity],BudgetLine[ItemGroup],B$3,BudgetLine[BudgetCategory],"Revenue")
    =SUMIFS(FlexLines[Quantity],FlexLines[ItemGroup],B$3)
    ```
 
-**Step 4. Calculate the two variances.**
+h. Copy B4:B12 to C4:E12 and B17:B18 to C17:E18.
+i. In F4, enter `=SUM(B4:E4)`, and copy it to F5:F12 and F17:F18.
+j. Type `Lines without a planned price` in A20, and enter `=COUNTBLANK(FlexLines[PlannedPrice])` in B20.
+
+Each product line now shows its revenue, cost, and margin three ways, with the units behind them in rows 17 and 18. B20 counts only a handful of lines, the seasonal launches described in Step 3.
+
+**Step 5. Calculate the two variances.**
 
 a. In B13, enter `=B9-B6`, the sales-volume variance.
 b. In B14, enter `=B12-B9`, the flexible-budget variance.
-c. Check that B6+B13+B14 equals B12, so that the variances account for the whole difference between the static budget and the actual margin.
+c. Copy B13:B14 to C13:E14, and copy F12 to F13:F14.
+d. Check that, in every column, the static margin in row 6 plus the two variances in rows 13 and 14 equals the actual margin in row 12.
 
 The sales-volume variance dwarfs everything else in the report. Compare rows 17 and 18: the budget planned for several times the units that each product line sold. That variance measures the forecast behind the budget, not how the business was run, and it is the reason to judge 2026 against the flexible budget instead. Against the flexible budget, every product line earned less than planned on the units it sold, by a few percent of revenue.
 
-**Step 5. Split the price variance.**
+**Step 6. Split the price variance.**
 
 a. In B15, enter the promotional discounts:
 
@@ -70,26 +98,54 @@ a. In B15, enter the promotional discounts:
    ```
 
 b. In B16, enter `=B14+B15`, the price gap before discounts.
-c. In a free area of the worksheet, repeat the flexible revenue, actual revenue, and discounts for Furniture by month, with the month numbers 1 to 12 in a column and a second criterion, `FlexLines[Month],$A21`, added to each SUMIFS.
+c. Copy B15:B16 to C15:E16, and copy F14 to F15:F16.
 
-Two causes separate cleanly. In every product line, the price gap before discounts is a steady few percent of flexible revenue: the budget planned net prices at a larger share of list price than Charles River's price lists actually delivered. Furniture adds the promotional discounts on top. By month, the budget planned the promotion's discount in September and October, spreading it over all of those months' sales, while the actual discounts were concentrated on the promotion's orders and continued into November and December as those orders were invoiced. @fig-07-05 shows the report, and @fig-07-06 shows the Furniture prices by month.
+Two causes separate cleanly. In every product line, the price gap before discounts is a steady few percent of flexible revenue: the budget planned net prices at a larger share of list price than Charles River's price lists actually delivered. Furniture adds the promotional discounts on top. @fig-07-05 shows the report.
 
 ![The Flexible-Budget Report by Product Line.](/visuals/svg/fig-07-05-flexible-budget-report.svg){#fig-07-05 fig-alt="A mock of the BudgetReport worksheet. For Furniture, Lighting, Textiles, Accessories, and the total, it shows the static budget revenue, cost of goods sold, and margin; the flexible budget revenue, cost, and margin; the actual revenue, cost at standard, and margin; the sales-volume and flexible-budget variances, outlined; the promotional discounts; the price gap before discounts; and the budgeted and actual units. The sales-volume variances are very large and unfavorable, the flexible-budget variances are small and unfavorable, and budgeted units are several times the actual units in every product line."}
 
+**Step 7. Chart the Furniture prices by month.** Dividing each kind of revenue by the list value of the same units turns it into a price as a percentage of list, which can be compared from month to month.
+
+a. Add a worksheet named `FurniturePrices`, and type the headings `Month`, `FlexRevenue`, `LineTotal`, `DiscountAmount`, `ListAmount`, `Planned`, `Before promotions`, and `After promotions` in A1:H1.
+b. Type `1` in A2 and `2` in A3, select A2:A3, and drag the fill handle down to A13, so that A2:A13 hold the months 1 to 12.
+c. In B2, enter this formula, and fill it down to B13:
+
+   ```
+   =SUMIFS(FlexLines[FlexRevenue],FlexLines[ItemGroup],"Furniture",FlexLines[Month],$A2)
+   ```
+
+d. In C2, D2, and E2, enter the same formula with LineTotal, DiscountAmount, and ListAmount in place of FlexRevenue, and fill them down to row 13.
+e. In F2, G2, and H2, enter `=B2/E2`, `=(C2+D2)/E2`, and `=C2/E2`, and fill them down to row 13.
+f. Format F2:H13 as percentages with one decimal.
+g. Select F1:H13, and choose **Insert > Insert Line or Area Chart > Line with Markers**.
+h. Right-click the chart, choose **Select Data**, click **Edit** under **Horizontal (Category) Axis Labels**, select A2:A13, and click **OK** twice.
+
+The planned price lies above the actual price before promotions in every month except September and October, when the budget planned the promotion's discount and spread it over all of those months' sales. The actual discounts were concentrated on the promotion's orders, and they continued into November and December as those orders were invoiced. @fig-07-06 shows the chart.
+
 ![Planned and Actual Furniture Prices by Month.](/visuals/svg/fig-07-06-furniture-price-by-month.svg){#fig-07-06 fig-alt="A line chart of Furniture prices as a percentage of list price in each month of fiscal 2026. A dashed line for the budget's planned net price stays above the other two lines in most months and dips in September and October, the promotion months in the budget. A line for the actual price before promotions is nearly flat below the planned line. A line for the actual price after promotions falls sharply in September and October and recovers only partly in November and December."}
 
-**Step 6. Compare the operating expenses with their budget.**
+**Step 8. Import the operating expenses from the ledger.**
 
-a. Import the **T3_GLEntry** Table with Power Query, and filter FiscalYear to 2026 as the first step, because the Table is large.
-b. Merge it with **Account** on AccountID, expand AccountNumber and AccountName, and filter AccountNumber to values between 6000 and 7999.
-c. Filter VoucherNumber to exclude JE-2026-000296, the 2026 year-end closing entry you identified in the Part I case, and add a custom column `Amount` with the formula `[Debit] - [Credit]`. Name the query `GLOpex`, and choose **Close & Load**.
-d. Add a worksheet named `OpexReport`. In A5, list the budgeted accounts with this formula, which spills down the column:
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, select the **T3_GLEntry** Table, and click **Transform Data**, not **Load**, because the Table has hundreds of thousands of rows.
+b. Name the query `GLOpex`, and filter FiscalYear to 2026 as the first step.
+c. Merge GLOpex with **Account** on AccountID, and expand AccountNumber and AccountName without the prefix.
+d. Filter AccountNumber to values between 6000 and 7999.
+e. Filter VoucherNumber to exclude JE-2026-000296, the 2026 year-end closing entry you identified in the Part I case.
+f. Add a custom column `Amount` with the formula `[Debit] - [Credit]`.
+g. Choose **Home > Close & Load**, and rename the new worksheet `GLOpex`.
+
+GLOpex holds the 2026 postings to the operating-expense accounts without the closing entry, so the Amount of each account adds up to its expense for the year.
+
+**Step 9. Compare the operating expenses with their budget.** The formulas below spill: each returns a list of values, which fills the cells below it. A reference such as `A5#` means the whole list that spills from A5, however long it is.
+
+a. Add a worksheet named `OpexReport`, and type the headings `Account`, `Name`, `Budget`, `Actual`, and `Variance` in A4:E4.
+b. In A5, list the budgeted accounts with this formula:
 
    ```
    =SORT(UNIQUE(FILTER(BudgetLine[AccountNumber],BudgetLine[BudgetCategory]="Operating Expense")))
    ```
 
-e. In B5, C5, and D5, enter these three formulas, each of which spills beside the list: the account name, the budget, and the actual amount.
+c. In B5, C5, and D5, enter these three formulas: the account name, the budget, and the actual amount.
 
    ```
    =XLOOKUP(A5#,Account[AccountNumber],Account[AccountName])
@@ -97,28 +153,51 @@ e. In B5, C5, and D5, enter these three formulas, each of which spills beside th
    =SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],A5#)
    ```
 
-f. In E5, enter `=D5#-C5#`, the variance of each account.
+d. In E5, enter `=D5#-C5#`, the variance of each account.
 
 Most accounts are within a few percent of their budget, and several match it exactly. Two stand out, and both are under budget: Payroll Taxes and Benefits, and Sales Commission Expense.
 
-**Step 7. Test the drivers of the two exceptions.**
+**Step 10. Test the drivers of the two exceptions.** Each of the two budgets was calculated from a driver, and testing the driver shows whether the difference is a saving or a wrong assumption.
 
-a. Below the list, calculate the budgeted burden rate as the budget for account 6060 divided by the budgeted salaries, using `"Salaries*"` as a wildcard criterion on BudgetLine[AccountName], and the actual burden rate in the same way from GLOpex.
-b. Calculate the budgeted commission rate as the budget for account 6290 divided by the static budget revenue in F4 of the BudgetReport worksheet. Multiply it by the actual revenue in F10 to get the flexible budget for commissions, and compare the result with the actual commission expense.
+a. In G5:G9, type the labels `Budgeted burden rate`, `Actual burden rate`, `Budgeted commission rate`, `Flexed commission budget`, and `Actual commissions`.
+b. In H5, enter the budgeted burden rate, the budget for account 6060 divided by the budgeted salaries. The asterisk in `"Salaries*"` is a wildcard that stands for any text, so the criterion matches every account whose name starts with Salaries.
 
-The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 reflects a rate assumption, not a saving in spending. The commission variance is mostly volume: flexed to the actual revenue, the commission budget is close to what Charles River paid, and the remaining difference comes from the rate, because the mix of customer segments determines the commission rate earned.
+   ```
+   =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],6060)/SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountName],"Salaries*")
+   ```
 
-**Step 8. Document the analysis.**
+c. In H6, enter the actual burden rate:
 
-a. On the **Documentation** worksheet, add the BudgetLine, Account, PlannedPrices, FlexLines, and GLOpex queries to the Query steps entry, and the BudgetReport and OpexReport worksheets to the Worksheets entry.
-b. Add a `Finding` entry of three or four sentences that states the sales-volume variance and its cause, the price gap and the promotions, and the two expense assumptions that did not hold.
-c. Save the workbook.
+   ```
+   =SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],6060)/SUMIFS(GLOpex[Amount],GLOpex[AccountName],"Salaries*")
+   ```
+
+d. In H7, enter the budgeted commission rate, the commission budget divided by the static budget revenue of the product lines:
+
+   ```
+   =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],6290)/BudgetReport!F4
+   ```
+
+e. In H8, enter `=H7*BudgetReport!F10`, the commission budget flexed to the actual revenue of the product lines.
+f. In H9, enter `=SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],6290)`.
+
+The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 reflects a rate assumption, not a saving in spending. The commission variance is mostly volume: flexed to the actual revenue, the commission budget comes within about a tenth of what Charles River paid. The rest of the difference comes from the rate, because the mix of customer segments determines the commission rate earned. The actual expense also includes the commissions on design services, which the budget did not plan, so on product sales alone the actual rate was lower still.
+
+**Step 11. Document the analysis.**
+
+a. On the **Documentation** worksheet, add the BudgetLine, Account, PlannedPrices, FlexLines, and GLOpex queries to the Query steps entry, with the number of FlexLines rows that have no planned price.
+b. Add the BudgetLine, Account, FlexLines, GLOpex, BudgetReport, FurniturePrices, and OpexReport worksheets to the Worksheets entry.
+c. Add a `Finding` entry of three or four sentences that states the sales-volume variance and its cause, the price gap and the promotions, and the two expense assumptions that did not hold.
+d. Save the workbook.
+
+The Documentation worksheet now lists every query and worksheet that the budget comparison added, and the finding that answers the controller's question.
 
 **Checkpoint.** Check that:
 
 - only a handful of FlexLines rows have no planned price, and you can explain why;
 - on the BudgetReport worksheet, the static margin plus the two variances equals the actual margin for every product line;
 - the price gap before discounts is a similar small percentage of flexible revenue in every product line;
+- the Furniture price after promotions falls in September and October and stays below the price before promotions through December;
 - the burden rate and the flexed commission explain the two largest operating-expense variances.
 
 The comparison with the budget answers the controller's second question. The plan's volume was far from reality, so the static budget cannot judge 2026. Flexed to what was sold, the plan's prices were slightly optimistic in every product line, the Furniture promotion cost more and later than the budget expected, and the operating expenses were close to plan once two assumptions are corrected.
