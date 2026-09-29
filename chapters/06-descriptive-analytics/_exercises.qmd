@@ -4,71 +4,189 @@
 
 ### Financial Accounting Exercises
 
-**Exercise 6.1 (Financial Accounting): Revenue Summarization and Period-over-Period Comparison**
+**Exercise 6.1: Reconciling Product-Line Revenue to the Ledger**
 
-**Table group:** O2C (SalesInvoice, SalesInvoiceLine, Item, Customer)
+**Table group:** Order-to-Cash and the General Ledger
 
-**Scenario.** You are a financial reporting analyst at Charles River preparing materials for the quarterly earnings review. The CFO wants a revenue summary broken down by item group and fiscal quarter, along with an analysis of which item groups grew or declined relative to the prior quarter.
+**Scenario.** Before the revenue PivotTable from Tutorial 6.2 goes to the management meeting, the controller wants evidence that it agrees with the general ledger. Each product line posts to its own revenue account: Furniture to 4010, Lighting to 4020, Textiles to 4030, Accessories to 4040, and design services to 4080.
 
-**Requirements.** (1) Using the merged InvoiceLines dataset you prepared in Chapter 5, or by merging SalesInvoiceLine with Item, Customer, and SalesInvoice now using XLOOKUP or Power Query, build a PivotTable that shows item groups as rows, fiscal quarters as columns, and total LineTotal as the aggregated value. Format the values as currency. (2) Use the Show Values As feature to display the percentage change from the prior quarter for each item group. Identify which item group showed the largest quarter-over-quarter increase and which showed the largest decline. (3) Add a second PivotTable on a separate worksheet that summarizes revenue by customer segment (Wholesale and Direct) and item group, then use Show Values As % of Column Total to show each segment's share of revenue within each item group. Identify which segment dominates each item group. (4) On an Analysis worksheet, write a three-to-five-sentence interpretive summary that identifies the two most notable findings from your analysis and explains their potential implications for financial reporting. Reference specific numbers from your PivotTables.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with two PivotTables (one showing quarter-over-quarter growth rates, one showing segment revenue share) and a written interpretive summary on the Analysis worksheet.
+(1) Use Power Query to load the GLEntry Table filtered to fiscal year 2026 before you load it, and merge in the AccountNumber and AccountName from the Account Table. Remember that GLEntry.AccountID is the Account Table's surrogate key, not the account number: AccountID 42, for example, is account 4010. Keep only accounts 4000 through 4999, and add a quarter column calculated from FiscalPeriod.
+
+(2) Build a PivotTable of credits minus debits by account and quarter, with SourceDocumentType in the Filters area. Show only the SalesInvoice rows.
+
+(3) Compare each account's SalesInvoice postings by quarter with the InvoiceLines revenue of its item group from Tutorial 6.2. Identify every difference, find the invoices responsible, and compare their invoice dates, posting dates, and the shipment dates of their orders.
+
+(4) Remove the SourceDocumentType filter. List the other source document types that post to the revenue accounts in 2026, and explain whether each belongs in a comparison of product-line revenue.
+
+(5) Write a reconciliation memo of half a page that states what agrees, what does not and why, and which date you believe determines the period of the revenue for the invoices you found.
+
+**Deliverable.** A reconciliation PivotTable with the differences identified and explained, and a half-page memo.
+
+<!-- Instructor notes, Exercise 6.1: SalesInvoice postings agree with InvoiceLines to the cent for every revenue account in 2026 Q2-Q4.
+     Q1 differs: 4010 GL 4,357,356.01 vs Furniture lines 4,354,122.83 (+3,233.18); 4020 1,570,492.78 vs 1,569,380.55 (+1,112.23);
+     4040 475,813.58 vs 475,576.62 (+236.96); 4030 and 4080 agree. The differences are SI-2026-013742 (Furniture, invoice date 2025-12-04),
+     SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03), all posted 2026-01-01 and all numbered with the
+     next year's prefix (Exercise 5.2; the same invoices are dated before their first shipment in Tutorial 2.1). Their orders shipped on
+     2025-12-01, 2025-12-06, and 2025-12-05, so the shipping evidence places the sales in fiscal 2025, as the invoice dates do, while the
+     ledger records them in fiscal 2026 with the invoice numbers: a cutoff issue that understates 2025 and overstates 2026 Q1 revenue.
+     Other 2026 sources: the year-end close JournalEntry debits every revenue account on 2026-12-31 (4010 17,398,287.56, which is the
+     2026 Furniture lines plus 3,233.18) and credits 4060; CreditMemo rows post to 4060 Sales Returns and Allowances (242,764.56 debit)
+     and 4050 Freight Revenue (1,796.63 debit); SalesInvoice also credits 4050 for freight, which has no invoice line. None of these
+     belongs in a product-line comparison of gross billed revenue, although returns belong in a net revenue analysis (Exercise 5.1). -->
 
 
-**Exercise 6.2 (Financial Accounting): Disaggregated Revenue Analysis by Customer Segment**
+**Exercise 6.2: Disaggregating Revenue by Segment and Product Line**
 
-**Table group:** O2C (SalesInvoice, SalesInvoiceLine, Customer, Item)
+**Table group:** Order-to-Cash, with the Customer and Item tables from Master Data
 
-**Scenario.** You are a financial reporting analyst at Charles River preparing the disaggregated revenue analysis that supports the revenue disclosure in the notes to the financial statements. The disclosure requires the company to report revenue by major customer channel and by product category.
+**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and they offer major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare the disaggregation that Charles River would disclose on that basis.
 
-**Requirements.** (1) Create a merged dataset that includes customer segment, region, item group, and LineTotal. Build a PivotTable that shows customer segment as rows and item group as columns, with total LineTotal as the aggregated value. (2) Use Show Values As % of Grand Total to determine which segment and item group combination generates the largest share of the company's total revenue. (3) Create a second PivotTable that groups revenue by customer segment and region, then by year. Calculate the year-over-year percentage change using Show Values As % Difference From (previous). Identify any segment or region that showed a revenue decline in the most recent year. (4) Write a one-paragraph disclosure-style narrative that summarizes the disaggregation of revenue by channel and product category, suitable for inclusion in the notes to the financial statements. Reference your PivotTable data to support each statement.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with two PivotTables, calculated percentages, and a disclosure narrative.
+(1) Build a PivotTable from InvoiceLines with CustomerSegment in the Rows area, ItemGroup in the Columns area, and LineTotal in the Values area, filtered to fiscal 2026. Show the values as % of Grand Total and identify the three largest combinations of segment and product line.
+
+(2) Add FiscalYear to the Columns area, above ItemGroup, show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest increases and the two largest decreases among the combinations with at least $500,000 of revenue in 2025.
+
+(3) Repeat the year-over-year comparison by Region instead of by segment.
+
+(4) Write a disclosure-style paragraph of four to six sentences that presents the disaggregation you would recommend, states why you chose its categories, and summarizes the changes from the previous year.
+
+**Deliverable.** Two PivotTables, a list of the largest combinations and changes, and a disclosure paragraph.
+
+<!-- Instructor notes, Exercise 6.2: 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24%
+     (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes
+     from 2025 for combinations over $500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting
+     +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4%
+     (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade
+     -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the
+     segment and the product line coincide there. A nonpublic entity may elect not to give the quantitative disaggregation
+     (ASC 606-10-50-7); the exercise treats the disclosure as if it were required. -->
 
 
 ### Managerial Accounting Exercises
 
-**Exercise 6.3 (Managerial Accounting): Product Line Profitability Analysis**
+**Exercise 6.3: Product-Line Profitability at Standard Cost**
 
-**Table group:** O2C (SalesInvoiceLine) and Master Data (Item)
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are a cost analyst at Charles River. The VP of Operations has asked you to analyze the profitability of each item group by comparing the standard cost to the list price and to the actual billed amounts observed in the sales data.
+**Scenario.** The vice president of sales asks which product lines contribute the most margin relative to their revenue, and which Furniture product types earn the highest and lowest margins.
 
-**Requirements.** (1) Build a summary table or PivotTable that shows each item group with its average StandardCost, average ListPrice (both from the Item table), and average billed unit revenue derived from the sales data (LineTotal divided by QuantityShipped). Calculate the average markup percentage, which is list price minus standard cost, divided by standard cost, and the average realized margin percentage, which is billed unit revenue minus standard cost, divided by billed unit revenue. (2) Use COUNTIFS or a PivotTable to count the number of distinct items and the total units shipped (QuantityShipped) within each item group. (3) Identify the item group with the highest realized margin and the one with the lowest. (4) On an Analysis worksheet, write three to five sentences interpreting your findings. Address whether the item group with the highest margin is also the one with the highest sales volume, and discuss what this pattern might suggest about the company's pricing strategy.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with profitability summary data by item group, margin calculations, and a written interpretation.
+(1) Using the StdCostAmount column and the MarginPct calculated field from Tutorial 6.2, build a PivotTable for fiscal 2026 that shows, for each item group, the revenue, the margin in dollars (a new calculated field), and the margin percentage.
+
+(2) Add each product line's share of revenue and share of margin, excluding Services, and identify the product lines whose share of margin is larger than their share of revenue.
+
+(3) Filter the PivotTable to Furniture and replace ItemGroup with ProductType. Identify the two product types with the highest margin percentage and the two with the lowest, and name them with the product type codes from Chapter 5.
+
+(4) Explain in three to five sentences why the Services margin cannot be read from this PivotTable, and describe the data you would need to measure it.
+
+**Deliverable.** A profitability PivotTable by product line and by Furniture product type, and a short written interpretation.
+
+<!-- Instructor notes, Exercise 6.3: 2026 margin at standard cost: Accessories 50.96% (margin 954,080.96 on 1,872,273.66), Textiles 49.47%
+     (1,621,892.16 on 3,278,211.11), Lighting 46.66% (2,798,584.12 on 5,997,536.93), Furniture 42.34% (7,365,245.96 on 17,395,054.38).
+     Excluding Services, revenue shares are Furniture 60.9%, Lighting 21.0%, Textiles 11.5%, Accessories 6.6%, and margin shares 57.8%,
+     22.0%, 12.7%, 7.5%, so Lighting, Textiles, and Accessories contribute more margin than revenue. Furniture types: highest DSK (desk)
+     44.36% and CON (console table) 44.00%; lowest BNH (bench) 39.04% and BKC (bookcase) 39.37%. Services items carry StandardCost 0, so
+     their margin shows 100%; their cost is design staff time. Possible measures: ServiceTimeEntry.ExtendedCost for 2026 work dates
+     (220,317.28, a margin of about 82%) or the 2026 Design Services salaries expense in account 6280 (471,214.88, about 61%). The gap
+     shows that the answer depends on the cost definition, which the report must state. -->
 
 
-**Exercise 6.4 (Managerial Accounting): Production Performance Summary Using Work Order Data**
+**Exercise 6.4: The Margin Bridge by Product Type**
 
-**Table group:** Manufacturing (WorkOrder, ProductionCompletion, ProductionCompletionLine, WorkOrderClose) and Master Data (Item)
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are a production analyst at Charles River. The plant manager wants a summary of manufacturing performance by item group, including total planned production volume, completed volume, completion rate, and the manufacturing variance recognized at close.
+**Scenario.** The controller has read your bridge from Tutorial 6.3 and asks whether the story changes if the change is decomposed product type by product type, the level at which the sales team plans its assortment.
 
-**Requirements.** (1) Build a PivotTable that shows item groups as rows and summarizes the total planned quantity from the WorkOrder table and the total completed quantity from ProductionCompletionLine. Create a calculated field or formula column for completion rate, calculated as completed quantity divided by planned quantity. (2) Group the work order dates by quarter and analyze whether completion rates changed over time for the item groups with the lowest overall completion rates. (3) Using the WorkOrderClose table, build a second PivotTable that summarizes the total manufacturing variance amount by item group and identifies which item group carries the largest variance relative to its production volume. (4) On an Analysis worksheet, write a three-to-five-sentence memorandum for the plant manager summarizing the key findings and recommending which item groups should receive the most attention based on completion rates and variance amounts.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with production performance PivotTables, completion rate and variance calculations, and a management memorandum.
+(1) Build a PivotTable filtered to Furniture with ProductType in the Rows area, Period in the Columns area showing only 2026-Q3 and 2026-Q4, and the sums of Quantity, LineTotal, and StdCostAmount in the Values area. Copy the values to a new worksheet with Paste Values, or reference them with GETPIVOTDATA.
+
+(2) For each product type, calculate the price per unit, the standard cost per unit, and the margin per unit in each quarter, and each type's share of units in the third quarter.
+
+(3) Calculate the four effects, and check that they sum to the change in the Furniture margin:
+   - price: the sum over the types of Q4 units × (Q4 price per unit − Q3 price per unit);
+   - cost: minus the sum over the types of Q4 units × (Q4 cost per unit − Q3 cost per unit);
+   - volume: (total Q4 units − total Q3 units) × the Q3 margin per unit of Furniture as a whole;
+   - mix: the sum over the types of (Q4 units − total Q4 units × the type's Q3 share of units) × the type's Q3 margin per unit.
+
+(4) Compare the effects with those of Tutorial 6.3. Explain why the cost effect is no longer zero even though no item's standard cost changed, using the product type with the largest change in cost per unit as an example.
+
+(5) Recommend, in three or four sentences, the level at which the controller's report should present the bridge, and why.
+
+**Deliverable.** A product-type bridge that ties to the change in margin, and a short comparison and recommendation.
+
+<!-- Instructor notes, Exercise 6.4: Furniture margin 1,810,257.09 (Q3) to 1,695,211.02 (Q4), change -115,046.07. Product-type bridge:
+     price -183,737.35, cost +43,345.66, volume +7,885.63, mix +17,459.98 (sums exactly). The cost effect is not zero because each type's
+     average standard cost per unit depends on which of its items were sold: DSK (desks) price per unit 731.85 to 628.50 and cost per unit
+     406.55 to 359.63, as cheaper desks made up more of the quarter; TBL, BNH, and others move the same way. At this level, within-type item
+     mix appears as price and cost; the price effect also contains the promotional discount (about -119,800 at this level). Units by type
+     Q3 to Q4: NGT 905.06 to 734.14 and SDB 1,072.57 to 958.22 fell; DSK 1,050.73 to 1,195.45 and TBL 1,280.52 to 1,385.62 rose. Tutorial
+     6.3's Furniture-level bridge is the better headline because each of its effects has one meaning (cost zero, mix at the item level),
+     with the product-type view as supporting detail for the sales team. -->
 
 
 ### Auditing Exercises
 
-**Exercise 6.5 (Auditing): Transaction Stratification for Audit Planning**
+**Exercise 6.5: A Substantive Analytical Procedure on Quarterly Revenue**
 
-**Table group:** O2C (SalesInvoice, SalesInvoiceLine)
+**Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are an audit associate assigned to plan the substantive testing of Charles River's revenue transactions. Your senior has asked you to stratify the sales invoice lines by billed amount to understand the distribution of the transaction population and to determine an appropriate approach for selecting items to test.
+**Scenario.** As part of the audit of fiscal 2026 revenue, your senior asks you to perform a simple analytical procedure: develop an expectation of each product line's revenue for each quarter, compare the recorded revenue with it, and identify the differences that need investigation, as the auditing standard of the Public Company Accounting Oversight Board (PCAOB) describes (PCAOB, n.d.).
 
-**Requirements.** (1) Build a stratification table with at least five strata of your own design, based on your examination of the LineTotal distribution. Use COUNTIFS and SUMIFS to determine the line count and dollar value within each stratum. Calculate the percentage of total count and percentage of total revenue for each stratum, as well as the cumulative percentage of revenue. (2) Determine the threshold above which individual items should be selected for testing. A common approach is to identify the stratum boundary above which a small number of lines account for a large share, such as 50 percent or more, of total revenue. State your recommended threshold and justify it based on the stratification data. (3) Calculate summary statistics (AVERAGE, MEDIAN, STDEV.S, MIN, MAX) for the LineTotal of the full population and for each stratum separately. Discuss how the statistics differ across strata. (4) On an Analysis worksheet, write a one-page memorandum to your audit senior summarizing the population characteristics, your recommended stratification approach, and the rationale for your testing thresholds. This memorandum should be suitable for inclusion in the audit workpapers.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with a stratification table, summary statistics by stratum, and a one-page audit planning memorandum.
+(1) Build a PivotTable with ItemGroup in the Rows area and FiscalQuarter and FiscalYear in the Columns area, showing 2025 and 2026.
+
+(2) On a separate worksheet, use each group's revenue in the same quarter of 2025 as the expectation for 2026, and calculate the difference in dollars and as a percentage of the expectation.
+
+(3) Flag the differences that exceed both 10 percent of the expectation and $50,000, and list them.
+
+(4) Identify the largest difference in dollars that your threshold does not flag, and explain what that says about the design of the threshold.
+
+(5) Choose one flagged difference and describe the evidence you would obtain and the questions you would ask management to explain it.
+
+**Deliverable.** An expectation worksheet with the flagged differences and a half-page explanation of the threshold and the follow-up.
+
+<!-- Instructor notes, Exercise 6.5: flagged (over 10% and over $50,000): Lighting Q1 +215,084.80 (+15.9%), Textiles Q4 +166,764.46 (+24.4%),
+     Accessories Q2 -76,547.35 (-15.0%), Services Q2 -66,187.40 (-20.9%), Services Q3 -52,688.80 (-16.4%), Services Q4 +77,195.65 (+26.9%).
+     Not flagged: Furniture Q4 -315,983.47 (-7.1%), the largest dollar difference, and Furniture Q2 +266,724.77 (+6.2%). A percentage test
+     alone misses large dollar differences in the largest product line; a tolerable amount based on materiality, or an expectation that
+     reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it
+     ignores growth and known events, which students may note. Follow-up examples: for Furniture Q4, the promotion discounts (Tutorial 6.3)
+     and the late-invoiced promotion lines (Tutorial 5.2); for Services, engagement and time records by quarter. -->
 
 
-**Exercise 6.6 (Auditing): Descriptive Profiling of Transaction Patterns for Anomaly Identification**
+**Exercise 6.6: A Descriptive Profile of the Revenue Population**
 
-**Table group:** O2C (SalesInvoice, SalesInvoiceLine, SalesOrderLine, Customer, Item)
+**Table group:** Order-to-Cash, with the Customer and Item tables from Master Data
 
-**Scenario.** Your audit team is performing analytical procedures on Charles River's revenue data. Before running specific anomaly detection tests, which you will learn in Chapter 8, your senior has asked you to build a descriptive profile of the transaction data to establish expectations about what normal looks like for this company.
+**Scenario.** Before the audit team designs its detailed tests of revenue, your senior asks for a profile of the fiscal 2026 invoice lines that describes what a normal line looks like, where the revenue is concentrated, and how the lines were priced. The profile will be the baseline for the audit work later in Part II.
 
-**Requirements.** (1) Build a PivotTable that shows the count of invoice lines, total revenue (LineTotal), and average revenue per line for each item group. Identify any item group where the average revenue per line is much higher or lower than the overall average. (2) Create a second PivotTable that shows the count of invoices by customer, sorted from highest to lowest. Identify the top five customers by invoice count and the top five by total revenue. Note whether the same customers appear on both lists, and calculate what share of total revenue the top five customers represent, which speaks to customer concentration. (3) Using the PricingMethod column on the SalesInvoiceLine or SalesOrderLine table, use COUNTIFS to determine how many lines used standard price-list pricing, promotion pricing, and approved override pricing. Calculate the percentage of non-standard pricing for each item group. Identify any item group where non-standard pricing is notably more frequent than the overall rate. (4) On an Analysis worksheet, write a descriptive profile of the transaction population in three to five paragraphs. This profile should describe the overall volume, revenue distribution, customer concentration, and pricing-method patterns, noting any observations that might warrant further investigation during the audit. This profile serves as the baseline against which anomaly detection tests in Chapter 8 will be compared.
+**Requirements.**
 
-**Deliverable.** An Excel workbook with PivotTables for item group analysis and customer analysis, pricing-method frequency calculations, and a written descriptive profile suitable for audit workpapers.
+(1) For each item group, calculate the number of lines, the total revenue, and the average and median line total for fiscal 2026. For the median, combine two conditions in FILTER by multiplying them, as in `FILTER(InvoiceLines[LineTotal],(InvoiceLines[FiscalYear]=2026)*(InvoiceLines[ItemGroup]=A2))`.
+
+(2) Build a PivotTable of fiscal 2026 revenue by CustomerID, sorted from largest to smallest, and bring each customer's name and segment from the Customer Table. Calculate the share of revenue of the five and the ten largest customers, and note the segment they belong to.
+
+(3) Build a PivotTable of the count of lines and the revenue by PricingMethod and ItemGroup, and show each pricing method's share of the year's revenue.
+
+(4) Build a PivotTable of the count of lines and the sum of DiscountAmount by PromotionID for fiscal 2026, and calculate the share of each item group's lines that carry a promotion. Identify the promotions whose lines were invoiced in 2026 although the promotion ran in 2025.
+
+(5) Write a profile of three to five paragraphs that describes the population, its concentration, and its pricing, and notes anything that might warrant attention during the audit.
+
+**Deliverable.** A profile workbook with the four summaries and a written profile suitable for the audit workpapers.
+
+<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08;
+     Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.89; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66,
+     923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of
+     revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez,
+     Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816),
+     Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10,
+     662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:
+     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, 2025) and 6 (Wholesale, November
+     2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are
+     left for the audit work later in Part II. -->

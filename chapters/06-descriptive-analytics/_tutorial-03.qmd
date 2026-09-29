@@ -1,38 +1,107 @@
-### Tutorial 6.3: Building a Revenue PivotTable from Charles River Data
+## Guided Tutorial 6.3: Explaining the Furniture Margin
 
-**Context and objective.** You will build a PivotTable that summarizes Charles River revenue by item group and fiscal quarter. This produces the same output as the SUMIFS table in Tutorial 6.2, but with far less effort and far more flexibility.
+**Context and objective.** In this tutorial, you will answer the controller's question. You will add the list amount and the promotional discount of each line to the InvoiceLines query, compare the drivers of the Furniture margin in the third and fourth quarters with a PivotTable, and decompose the change in margin into volume, mix, price, and cost effects on a bridge worksheet. You will chart the bridge as a waterfall and drill into the discounts to find the promotions behind them.
 
-**Prerequisites.** Your workbook should contain the merged InvoiceLines dataset, including columns for ItemGroup, FiscalQuarter (or InvoiceDate), and LineTotal.
+**Prerequisites.** You need the analysis workbook from Tutorial 6.2, with the StdCostAmount column in the InvoiceLines query and the MarginPct calculated field.
 
-**Step 1.** Click any cell within your merged data table. Go to the Insert tab and click PivotTable. In the dialog box, confirm that Excel has selected the InvoiceLines table. Select New Worksheet and click OK.
+**Step-by-step instructions.**
 
-**Step 2.** In the PivotTable Fields pane, drag the ItemGroup field to the Rows area. Excel immediately creates a list of the four item groups as row labels in the PivotTable.
+**Step 1. Add the list amount and the discount to the query.** Chapter 4 calculated these amounts as calculated columns on the SalesInvoiceLine Table. The InvoiceLines query starts from the query rather than the Table, so it needs its own versions.
 
-**Step 3.** Drag the LineTotal field to the Values area. Excel creates a column showing "Sum of LineTotal" with the total revenue for each item group. The PivotTable has already produced a one-dimensional revenue summary with a single drag-and-drop action.
+a. Open the Power Query Editor and select the **InvoiceLines** query.
+b. Add the two custom columns in @tbl-06-03 with **Add Column > Custom Column**, and set both to the **Decimal Number** type.
+c. Choose **Home > Close & Load**, and then **Data > Refresh All**.
 
-**Step 4.** Now add the time dimension. If you have a FiscalQuarter column, drag it to the Columns area. The PivotTable now displays a grid with item groups as rows, quarters as columns, and revenue values in the cells. This is the same structure you built manually in Tutorial 6.2, but Excel generated it automatically.
+| New column name | Custom column formula |
+|---|---|
+| `ListAmount` | `[Quantity] * [BaseListPrice]` |
+| `DiscountAmount` | `[Quantity] * [UnitPrice] * [Discount]` |
 
-**Step 5.** If your data contains only the InvoiceDate column without a separate FiscalQuarter field, drag InvoiceDate to the Columns area instead. Excel may group the dates by month automatically. To change the grouping to quarters, right-click any date label in the PivotTable, select Group, and in the Grouping dialog, select Quarters (and optionally Years if your data spans multiple years). Click OK. Excel will regroup the dates into Q1 through Q4.
+: Custom columns added to InvoiceLines for the margin bridge {#tbl-06-03}
 
-**Step 6.** Format the PivotTable values as currency. Right-click any revenue value in the PivotTable, select Number Format, choose Currency with zero decimal places, and click OK. The formatting applies to all values in the PivotTable, not just the cell you right-clicked.
+The custom columns are not rounded, so their totals can differ by a few cents from the ROUND formulas of Chapter 4. The bridge uses the query's columns throughout, so it is consistent with itself.
 
-**Step 7.** Rename the PivotTable worksheet to "RevenuePivot." Right-click the worksheet tab and select Rename.
+**Step 2. Build the driver PivotTable.**
 
-**Checkpoint.** Your PivotTable should display four item groups as rows, four fiscal quarters as columns, and formatted revenue values in the cells. Grand totals should appear automatically in the bottom row and the rightmost column. The grand total of approximately $3,332,300 should match the total from your SUMIFS table in Tutorial 6.2 and the total of the LineTotal column in your source data. If the totals do not match, verify that the PivotTable source includes all rows and that no filters are active.
+a. Insert a PivotTable from the InvoiceLines Table on a new worksheet named `Drivers`.
+b. Drag ItemGroup to **Filters**, and select Furniture in the filter in B1.
+c. Drag Period to **Columns**. Open the **Column Labels** filter, select only 2026-Q3 and 2026-Q4, and click **OK**.
+d. Drag Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount to **Values**, in that order, and then drag Σ Values from **Columns** to **Rows**.
+e. Choose **PivotTable Design > Grand Totals > Off for Rows and Columns**, because a total of the two quarters is not part of the comparison.
+f. Format every value field as a number with two decimals and a thousands separator.
 
-*[Figure 6.4: The completed revenue PivotTable showing item groups as rows, fiscal quarters as columns, currency-formatted revenue values, and grand totals. The PivotTable Fields pane is visible on the right, showing ItemGroup in Rows, FiscalQuarter in Columns, and Sum of LineTotal in Values.]*
+**Step 3. Add the per-unit measures.** Calculated fields belong to the pivot cache, which the PivotTables built from the same Table share, so MarginPct from Tutorial 6.2 appears in the field list. Check its box to add it to **Values**, or create it again if it does not appear. Then create the calculated fields in @tbl-06-04, as you did in Tutorial 6.2, and format the per-unit fields as numbers and the percentage as a percentage.
 
-<!-- DRAFT: tabular content moved from drafts/06/table-06-04-revenue-pivottable.md; values not yet verified -->
+| Name | Formula |
+|---|---|
+| `PricePerUnit` | `=LineTotal/Quantity` |
+| `ListPerUnit` | `=ListAmount/Quantity` |
+| `CostPerUnit` | `=StdCostAmount/Quantity` |
+| `MarginBeforeDiscountPct` | `=(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)` |
 
-*Figure 6.4: The completed PivotTable showing item groups as rows, fiscal quarters as columns, and currency-formatted revenue values. Grand totals appear automatically in the bottom row and rightmost column. The PivotTable Fields pane (shown in Figure 6.3) displays ItemGroup in the Rows area, FiscalQuarter in the Columns area, and Sum of LineTotal in the Values area. This PivotTable produces the same output as the SUMIFS table in Figure 6.2, but Excel generates the layout, aggregation, and totals automatically.*
+: Calculated fields for the driver PivotTable {#tbl-06-04}
 
-| Sum of LineTotal |          |          |          |          |               |
-|------------------|----------|----------|----------|----------|---------------|
-| **ItemGroup**    | **Q1**   | **Q2**   | **Q3**   | **Q4**   | **Grand Total** |
-| Furniture        | $412,500 | $438,200 | $401,800 | $521,400 |    $1,773,900 |
-| Lighting         | $168,300 | $175,600 | $161,200 | $209,800 |      $714,900 |
-| Textiles         | $121,400 | $128,900 | $118,700 | $152,300 |      $521,300 |
-| Accessories      |  $74,600 |  $79,300 |  $71,900 |  $96,400 |      $322,200 |
-| **Grand Total**  | **$776,800** | **$822,000** | **$753,600** | **$979,900** | **$3,332,300** |
+Read the two columns side by side, as @fig-06-06 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. The drivers point to a single cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost.
 
-*Note: This table represents the same data as Figure 6.2 but is produced by a PivotTable rather than SUMIFS formulas. In the actual workbook, the PivotTable header row reads "Sum of LineTotal" as generated by Excel. The matching grand totals between Figure 6.2 and Figure 6.4 serve as a verification check. Values are approximate and must be verified against the Charles River dataset.*
+![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-06-furniture-drivers.svg){#fig-06-06 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
+
+**Step 4. Build the bridge.** The bridge applies the calculations in @tbl-06-02 to the driver totals.
+
+a. Add a worksheet named `Bridge`. Type the headings `Driver`, `2026-Q3`, and `2026-Q4` in A3:C3, and the labels `Quantity`, `ListAmount`, `LineTotal`, `DiscountAmount`, and `StdCostAmount` in A4:A8.
+b. In B4, type an equal sign, click the 2026-Q3 value of Sum of Quantity on the **Drivers** worksheet, and press Enter. Excel writes a GETPIVOTDATA formula such as this one:
+
+   ```
+   =GETPIVOTDATA("Sum of Quantity",Drivers!$A$3,"Period","2026-Q3")
+   ```
+
+c. Fill B4:C8 in the same way, clicking the matching value of the PivotTable for each cell.
+d. Type `Margin` in A9, enter `=B6-B8` in B9, and copy it to C9.
+e. In A11:A14, type `Margin per unit`, `List margin per unit`, `Price-list reduction per unit`, and `Discount per unit`. In B11:B14, enter `=B9/B4`, `=(B5-B8)/B4`, `=(B5-B6-B7)/B4`, and `=B7/B4`, and copy B11:B14 to C11:C14.
+f. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Promotions`, `Cost`, `2026-Q4 margin`, and `Check` in A16:A23, and enter these formulas in B16:B23:
+   - B16: `=B9`
+   - B17: `=(C4-B4)*B11`
+   - B18: `=C4*(C12-B12)`
+   - B19: `=-C4*(C13-B13)`
+   - B20: `=-C4*(C14-B14)`
+   - B21: `0`, with the note `Each item has one standard cost` in C21
+   - B22: `=C9`
+   - B23: `=B16+SUM(B17:B21)-B22`
+g. Format B16:B23 as numbers with no decimals.
+
+B23 is zero: the effects account for the whole change in margin. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin.
+
+**Step 5. Chart the bridge as a waterfall.**
+
+a. Select A16:B22 and choose **Insert > Insert Waterfall, Funnel, Stock, Surface, or Radar Chart > Waterfall**.
+b. Click the first bar, and click it again so that only that bar is selected. Right-click it and choose **Set as Total**. Do the same for the last bar.
+c. Right-click the vertical axis, choose **Format Axis**, and set the **Minimum** bound to 1600000, so that the small effects are visible. Say so in the chart title or a note, because a truncated axis exaggerates differences for a reader who does not notice it.
+
+@fig-06-07 shows the finished bridge. One bar dominates it, and it is not volume, mix, or cost.
+
+![The Furniture Margin Bridge from the Third to the Fourth Quarter.](/visuals/svg/fig-06-07-margin-bridge.svg){#fig-06-07 fig-alt="A waterfall chart of the Furniture margin at standard cost. It starts with a total bar for the 2026-Q3 margin, followed by a small increase for volume, small changes for mix and price lists, a large decrease for promotions, and no change for cost, and it ends with a lower total bar for the 2026-Q4 margin. Each bar is labeled with its dollar amount and sign, and a legend distinguishes totals, increases, decreases, and no effect. The vertical axis starts at 1.6 million dollars."}
+
+**Step 6. Drill into the discounts.** The bridge says the promotions caused the decline. The next question is which promotions.
+
+a. Insert a PivotTable from the InvoiceLines Table on a new worksheet named `Discounts`. Drag ItemGroup to **Filters** and select Furniture, and drag Period to **Columns** and select only 2026-Q3 and 2026-Q4.
+b. Drag PromotionID to **Rows**, and drag SalesInvoiceLineID and DiscountAmount to **Values**.
+c. Excel sums SalesInvoiceLineID, because it is a number. Open its **Value Field Settings**, choose **Count**, and type the custom name `Count of Lines`. Give DiscountAmount the custom name `Sum of Discount`.
+d. Turn off the grand totals, and find the promotions that appear in the PivotTable on the **PromotionProgram** worksheet.
+
+@fig-06-08 shows the result. Most of the Furniture discounts in both quarters come from promotion 8, the Furniture Seasonal Promotion, and its discounts more than doubled from the third quarter to the fourth. The reason is timing. The promotion priced orders placed in September and October, so the third quarter received only its September invoices, while the fourth quarter received the October invoices and, as you found in Tutorial 5.2, the lines of promotion orders invoiced after the promotion had ended. Promotion 9, the Design Trade Customer Promotion, which ran in November, added a smaller amount of discounts on Furniture lines in the fourth quarter.
+
+![Furniture Discounts by Promotion and Quarter.](/visuals/svg/fig-06-08-discounts-by-promotion.svg){#fig-06-08 fig-alt="A mock of the Discounts worksheet. A PivotTable filtered to Furniture shows, for 2026-Q3 and 2026-Q4, the count of invoice lines and the sum of discounts for lines with no promotion and for promotions 7, 8, and 9. The promotion 8 row is outlined across both quarters, with far more lines and discount in the fourth quarter, and the promotion 9 cells of the fourth quarter are outlined. Below, rows of the PromotionProgram Table give the code, name, scope, and discount rate of promotions 7, 8, and 9."}
+
+**Step 7. Record the finding.**
+
+a. On the **Documentation** worksheet, add the ListAmount and DiscountAmount custom columns to the Query steps entry, the four calculated fields to the Calculated fields entry, and the Drivers, Bridge, and Discounts worksheets to the Worksheets entry.
+b. Replace the open question about promotion 8, which you recorded in Chapter 4, with a `Finding` entry of two or three sentences that states the change in the Furniture margin, the effect of the promotions, and the effects that were small.
+c. Save the workbook.
+
+**Checkpoint.** Check that:
+
+- the Check cell, B23 on the Bridge worksheet, is zero;
+- the promotions effect is larger than the decline in margin, and the volume, mix, and price-list effects are small by comparison;
+- the margin before discounts does not fall from the third quarter to the fourth;
+- promotion 8 accounts for most of the Furniture discounts in both quarters, and promotion 9 adds to them in the fourth.
+
+The controller now has her answer, and it is one she can check. The Furniture margin fell because promotional discounts more than doubled, mostly under the Furniture Seasonal Promotion, whose orders were invoiced across the end of the third quarter and well into the fourth. Volume, mix, list prices, and standard costs explain almost none of it.

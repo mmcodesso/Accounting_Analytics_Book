@@ -1,26 +1,98 @@
-### Tutorial 6.1: Building a Statistical Profile of Charles River Invoice Line Data
+## Guided Tutorial 6.1: Profiling Fiscal 2026 and Proving the Total
 
-**Context and objective.** You will calculate a set of summary statistics for the Charles River invoice line data to build a profile of billed line characteristics. This profile tells you the typical billed amount, the typical shipped quantity, and how much variation exists in both measures. These statistics provide context for the more detailed analyses you will perform later in the chapter.
+**Context and objective.** In this tutorial, you will build the first part of the controller's request: a statistical profile of the invoice lines billed in fiscal 2026 and a summary of revenue by product line. You will store the fiscal year in a named cell, so that one change updates every number, calculate statistics with and without criteria, and compare the product lines with a control total. The comparison will find something the product-line list leaves out.
 
-**Prerequisites.** Open the merged invoice line dataset you prepared in Chapter 5, which combines SalesInvoiceLine with Item, Customer, and SalesInvoice into a single Excel Table named InvoiceLines, with columns including LineTotal, QuantityShipped, ItemGroup, CustomerSegment, InvoiceDate, and FiscalQuarter.
+**Prerequisites.** You need the analysis workbook from Chapter 5, with the InvoiceLines Table loaded by Power Query and the Parameters worksheet from Chapter 4.
 
-**Step 1.** Create a new worksheet and name it "SummaryStats." In cell A1, type "Statistical Profile of Invoice Lines" as a descriptive title. In cell A3, type "Measure" as a column header. In cell B3, type "LineTotal" and in cell C3, type "QuantityShipped."
+**Step-by-step instructions.**
 
-**Step 2.** In cells A4 through A10, enter the following labels, one per row. Average, Median, Standard Deviation, Minimum, Maximum, Count, and Count Blank.
+**Step 1. Add the report year as a parameter.**
 
-**Step 3.** In cell B4, enter the formula =AVERAGE(InvoiceLines[LineTotal]). This calculates the average billed amount across all invoice lines. Your result should be approximately $793.
+a. On the **Parameters** worksheet, type `Report year` in A5, `2026` in B5, and `The fiscal year that the Profile worksheet summarizes` in C5.
+b. Select B5, type `ReportYear` in the **Name Box**, and press Enter.
+c. Format B5 in blue font, the convention for input cells you adopted in Chapter 4.
 
-**Step 4.** In cell B5, enter =MEDIAN(InvoiceLines[LineTotal]). Your result should be approximately $512. Notice that the median is lower than the average, which tells you that the line amount distribution is skewed to the right by some higher-value lines.
+**Step 2. Set up the Profile worksheet.**
 
-**Step 5.** In cell B6, enter =STDEV.S(InvoiceLines[LineTotal]). This returns approximately $864, which is larger than the mean itself. This large standard deviation confirms that line amounts vary widely, from small accessory lines to large furniture orders.
+a. Add a worksheet named `Profile` after the Analysis worksheet.
+b. Type `Fiscal year` in A1, and enter `=ReportYear` in B1.
+c. In A2 through A9, type the labels `Invoice lines`, `Line total`, `Average line`, `Median line`, `Standard deviation`, `Smallest line`, `Largest line`, and `90th percentile`.
 
-**Step 6.** In cells B7 and B8, enter =MIN(InvoiceLines[LineTotal]) and =MAX(InvoiceLines[LineTotal]). The minimum should be near $18 and the maximum near $11,480, confirming the wide range suggested by the standard deviation.
+**Step 3. Calculate the measures that accept criteria.**
 
-**Step 7.** In cell B9, enter =COUNT(InvoiceLines[LineTotal]) to count the number of lines with a numeric amount. In cell B10, enter =COUNTBLANK(InvoiceLines[LineTotal]) to check for missing values. The count should be approximately 4,200 and the blank count should be 0.
+a. In B2, count the year's invoice lines with `=COUNTIFS(InvoiceLines[FiscalYear],ReportYear)`.
+b. In B3, enter the year's total, which is the control total for the rest of the tutorial:
 
-**Step 8.** Repeat steps 3 through 7 in column C for the QuantityShipped field. Your results should show an average quantity near 15, a median near 10, a standard deviation near 14, a minimum of 1, and a maximum near 96.
+   ```
+   =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[FiscalYear],ReportYear)
+   ```
 
-**Checkpoint.** Your SummaryStats worksheet should now contain a table with seven statistical measures calculated for both LineTotal and QuantityShipped. The fact that the average line amount exceeds the median by roughly $280 tells you the distribution is right-skewed. The standard deviation of the QuantityShipped field being nearly as large as its mean indicates substantial variability in line sizes. These observations will inform the PivotTable analyses you build later in this chapter.
+c. In B4, enter the same formula with AVERAGEIFS in place of SUMIFS.
+d. In B7 and B8, enter the same formula with MINIFS and MAXIFS.
 
-> **[WATCH OUT]**
-> When using statistical functions with Excel Tables, reference the table column using structured references such as InvoiceLines[LineTotal] rather than a cell range such as F2:F4201. Structured references adjust automatically if rows are added to or removed from the Table, while cell references do not. Chapter 4 explained this distinction in detail. In summarization work, where you may return to the same workbook with updated data in a future quarter, using structured references prevents your summary statistics from becoming stale.
+**Step 4. Calculate the measures that need FILTER.** MEDIAN, STDEV.S, and PERCENTILE.INC accept no criteria, so FILTER supplies the year's line totals to them.
+
+a. In B5, enter:
+
+   ```
+   =MEDIAN(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=ReportYear))
+   ```
+
+b. In B6, enter the same formula with STDEV.S in place of MEDIAN.
+c. In B9, enter:
+
+   ```
+   =PERCENTILE.INC(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=ReportYear),0.9)
+   ```
+
+d. Format B3 through B9 as numbers with two decimals and a thousands separator.
+
+Compare the average in B4 with the median in B5. The average is about half again as large as the median, and the standard deviation is almost as large as the average: the lines are widely spread and skewed to the right, with a long tail of large lines.
+
+**Step 5. Look at the extremes.**
+
+a. On the **InvoiceLines** worksheet, filter the FiscalYear column to 2026, and sort the LineTotal column from largest to smallest.
+b. Read the ItemGroup, ItemCode, and Quantity of the first rows.
+c. Clear the sort and the filter.
+
+The largest line of the year is not a piece of furniture. It is a design service, Specification Development, billed for well over a hundred hours, and the next largest lines are desks and console tables. The lines combine two very different kinds of sales, products and professional services, which is worth keeping in mind whenever a single statistic describes them all.
+
+**Step 6. Total the product lines.** The controller's report lists four product lines. Summarize them and compare their total with the control total.
+
+a. In A11 through D11, type the headings `Item group`, `Lines`, `Revenue`, and `Average line`.
+b. In A12 through A15, type `Furniture`, `Lighting`, `Textiles`, and `Accessories`.
+c. In B12, enter `=COUNTIFS(InvoiceLines[ItemGroup],$A12,InvoiceLines[FiscalYear],ReportYear)`. In C12, enter:
+
+   ```
+   =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],$A12,InvoiceLines[FiscalYear],ReportYear)
+   ```
+
+d. In D12, enter `=C12/B12`. Copy B12:D12 and paste it into B13:D15.
+e. Type `Total of groups` in A16, and enter `=SUM(B12:B15)` in B16 and `=SUM(C12:C15)` in C16.
+f. Type `Difference from control total` in A17, and enter `=B16-B2` in B17 and `=C16-B3` in C17.
+
+The differences are not zero. The four product lines account for fewer lines and less revenue than the year's total, so the summary is incomplete.
+
+**Step 7. Find and add the missing group.**
+
+a. On the **InvoiceLines** worksheet, open the filter list of the ItemGroup column and read the values it offers. There are five item groups, not four.
+b. On the **Profile** worksheet, right-click the header of row 16 and choose **Insert**. Type `Services` in the new A16, then copy B15:D15 and paste it into B16:D16.
+c. The totals are now in row 17. Click B17 and C17: their SUM formulas still end at row 15, because Excel does not extend a range when you insert a row just below it. Change them to `=SUM(B12:B16)` and `=SUM(C12:C16)`.
+d. Check that both differences, now in row 18, are zero.
+
+Services is the design services line, billed by the hour. It is a revenue line with its own account, but not a product, which is why a list of product lines leaves it out. The control total found the gap in a single subtraction, and the edited SUM formulas show how easily a summary can miss a row even after the missing category is added. @fig-06-01 shows the completed Profile worksheet.
+
+![A Profile of Fiscal 2026 Invoice Lines with a Control Total.](/visuals/svg/fig-06-01-fiscal-2026-profile.svg){#fig-06-01 fig-alt="A mock of the Profile worksheet. Rows 1 through 9 show the fiscal year, 2026, and the count, total, average, median, standard deviation, smallest and largest line, and 90th percentile of the year's invoice line totals, with the median cell selected and its MEDIAN and FILTER formula in the formula bar. Rows 11 through 18 show the lines, revenue, and average line of each item group, with the Services row added below Furniture, Lighting, Textiles, and Accessories, a total of the groups, and a difference from the control total of zero. The Services row and the difference row are outlined."}
+
+**Step 8. Document the profile.**
+
+a. On the **Documentation** worksheet, add ReportYear (Parameters!B5) to the Parameters entry and the Profile worksheet to the Worksheets entry.
+b. Save the workbook.
+
+**Checkpoint.** Check that:
+
+- the average line is well above the median line, and you can explain why;
+- the Profile worksheet lists five item groups, and both differences from the control total are zero;
+- changing ReportYear on the Parameters worksheet to 2025 updates every number on the Profile worksheet, and changing it back to 2026 restores them.
+
+The profile gives the controller her first answer: how much Charles River billed in fiscal 2026, how the lines are distributed, and how the revenue divides among the five item groups. The next step is to see how each group moved from quarter to quarter.

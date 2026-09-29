@@ -1,40 +1,71 @@
-### Tutorial 6.2: Calculating Revenue by Item Group and Quarter Using SUMIFS
+## Guided Tutorial 6.2: Revenue and Margin by Product Line and Quarter
 
-**Context and objective.** You will use SUMIFS to build a revenue summary table that shows total revenue for each item group in each fiscal quarter. This produces the same output you will later build more efficiently with a PivotTable, but constructing it with formulas first helps you understand the underlying logic of conditional aggregation.
+**Context and objective.** In this tutorial, you will answer the controller's second request with PivotTables. You will add the extended standard cost to the InvoiceLines query, summarize fiscal 2026 revenue by item group and quarter, and reconcile the result with the control total from Tutorial 6.1. You will then add the gross margin at standard cost as a calculated field, read the same revenue as shares and as changes, and compare the customer segments with the previous year.
 
-**Prerequisites.** You need the merged InvoiceLines dataset from Chapter 5, with columns for InvoiceDate, ItemGroup, QuantityShipped, LineTotal, and a FiscalQuarter column derived from InvoiceDate.
+**Prerequisites.** You need the analysis workbook from Tutorial 6.1, with the Profile worksheet and the ReportYear parameter.
 
-**Step 1.** Create a new worksheet and name it "RevenueByGroupQtr." In cell A1, type "Revenue by Item Group and Fiscal Quarter" as a title. In cell A3, type "Item Group." In cells B3 through E3, type "Q1," "Q2," "Q3," and "Q4." In cell F3, type "Total."
+**Step-by-step instructions.**
 
-**Step 2.** In cells A4 through A7, enter the four Charles River item groups. Furniture, Lighting, Textiles, and Accessories.
+**Step 1. Add the extended standard cost to the query.** A margin needs the cost of each line, not the cost of one unit, so calculate it in the query.
 
-**Step 3.** Before writing the SUMIFS formula, confirm how fiscal quarters appear in your data. If you added a FiscalQuarter column during the data preparation in Chapter 5, you can reference that column directly. If your data contains only the InvoiceDate, you will need to define the quarter boundaries. For this tutorial, assume the fiscal year aligns with the calendar year and that Q1 covers January through March, Q2 covers April through June, Q3 covers July through September, and Q4 covers October through December.
+a. Choose **Data > Get Data > Launch Power Query Editor**, and select the **InvoiceLines** query.
+b. Choose **Add Column > Custom Column**. Type `StdCostAmount` in **New column name** and `[Quantity] * [StandardCost]` in **Custom column formula**, and click **OK**.
+c. Set the new column's data type to **Decimal Number** with the icon at the left of its header.
+d. Choose **Home > Close & Load**. The InvoiceLines Table now ends with a StdCostAmount column.
 
-**Step 4.** In cell B4, enter the SUMIFS formula for Furniture revenue in Q1. With the InvoiceLines table and its FiscalQuarter column, the formula is =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], $A4, InvoiceLines[FiscalQuarter], B$3). Note the mixed references. $A4 locks the column reference so you can copy the formula across columns, and B$3 locks the row reference so you can copy it down rows.
+**Step 2. Create the PivotTable.**
 
-**Step 5.** Copy the formula in B4 across columns B through E and down rows 4 through 7 to fill the entire revenue table. The dollar signs in the mixed references ensure that each formula points to the correct item group in column A and the correct quarter label in row 3.
+a. Select a cell in the InvoiceLines Table and choose **Insert > PivotTable**, and then **From Table/Range** if Excel offers a choice. Confirm that the source is the InvoiceLines Table, choose **New Worksheet**, and click **OK**. Rename the worksheet `RevenuePivot`.
+b. In the **PivotTable Fields** pane, drag FiscalYear to **Filters**, Period to **Columns**, ItemGroup to **Rows**, and LineTotal to **Values**.
+c. Open the FiscalYear filter in cell B1 and select 2026.
+d. In the **Values** area, click **Sum of LineTotal**, choose **Value Field Settings > Number Format**, and choose **Number** with two decimals and a thousands separator.
 
-**Step 6.** In column F, enter =SUM(B4:E4) for each row to calculate the annual total for each item group. In row 8, enter =SUM(B4:B7) for each column to calculate the quarterly totals across all item groups.
+Compare the grand total at the bottom right of the PivotTable with the control total in B3 of the Profile worksheet, and each item group's Grand Total with its revenue in column C of the Profile worksheet. They agree to the cent, so the PivotTable covers the same lines as the formulas, and it adds the quarterly detail.
 
-**Step 7.** Format the revenue values as currency with no decimal places for readability. Apply a bottom border above the totals row and a right border to the left of the totals column to distinguish the summary totals from the detail cells.
+**Step 3. Add the margin as a calculated field.**
 
-**Checkpoint.** Your revenue summary table should show four item groups across four quarters, with row and column totals. The grand total in cell F8 should equal approximately $3,332,300 and should match the sum of all LineTotal values in your source data. If it does not, check that your SUMIFS criteria match correctly and that every row in the source data has a valid ItemGroup and FiscalQuarter value. Common mismatches occur when item group labels contain trailing spaces or when some invoices fall outside the four quarter definitions.
+a. With a cell of the PivotTable selected, choose **PivotTable Analyze > Fields, Items, & Sets > Calculated Field**.
+b. Type `MarginPct` in **Name** and `=(LineTotal-StdCostAmount)/LineTotal` in **Formula**, as @fig-06-04 shows. Click **Add**, and then **OK**. Excel adds the new field to the **Values** area as Sum of MarginPct.
+c. Format Sum of MarginPct as a percentage with two decimals, through **Value Field Settings > Number Format**.
+d. In the **Columns** area, Excel has added a field named Σ Values. Drag it to the **Rows** area, below ItemGroup, so that each group shows its revenue and its margin on two rows.
 
-*[Figure 6.2: The completed revenue by item group and quarter table built with SUMIFS formulas. Row headers show the four item groups, column headers show Q1 through Q4 and Total, and cells contain formatted currency values. The formula bar displays the SUMIFS formula for the active cell with mixed references visible.]*
+![The Insert Calculated Field Dialog.](/visuals/svg/fig-06-04-calculated-field.svg){#fig-06-04 fig-alt="A mock of Excel's Insert Calculated Field dialog. The Name box holds MarginPct and the Formula box holds the formula that subtracts StdCostAmount from LineTotal and divides the result by LineTotal. The Fields list shows some of the InvoiceLines fields, with LineTotal and StdCostAmount highlighted, and the dialog has Add, Delete, Insert Field, OK, and Close buttons. The name and the formula are outlined."}
 
-<!-- DRAFT: tabular content moved from drafts/06/table-06-02-revenue-by-item-group-quarter.md; values not yet verified -->
+The label Sum of MarginPct looks odd for a percentage, but it is accurate: Excel sums LineTotal and StdCostAmount for each cell and then applies the formula, so every cell shows the margin of its total revenue. @fig-06-05 shows the result. The Furniture margin is lower than that of the other product lines in every quarter, and it falls in the fourth quarter, while the margins of Lighting, Textiles, and Accessories barely move. The ledger margin you calculated in the Part I case uses the standard cost of the goods shipped in each quarter, and this one uses the standard cost of the goods invoiced, so the two differ slightly in level but show the same decline.
 
-*Figure 6.2: Total revenue (Sum of LineTotal) by item group and fiscal quarter, built using SUMIFS formulas with mixed references. Each cell represents the sum of LineTotal for rows matching the item group in column A and the quarter in row 3. Row and column totals verify that the formula grid is complete. The formula bar for the active cell would display =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], $A4, InvoiceLines[FiscalQuarter], B$3).*
+![Revenue and Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-06-05-revenue-margin-pivot.svg){#fig-06-05 fig-alt="A mock of the RevenuePivot worksheet. The PivotTable is filtered to fiscal year 2026, with the four quarters and a Grand Total across the top. Down the side, each of the five item groups shows two rows, Sum of LineTotal and Sum of MarginPct, followed by the totals of both measures. The Furniture margin row is outlined, showing a lower margin in the fourth quarter than in the third, and the Services margin row is outlined, showing 100 percent in every quarter."}
 
-| Item Group       |       Q1 |       Q2 |       Q3 |       Q4 |       Total |
-|------------------|---------:|---------:|---------:|---------:|------------:|
-| Furniture        | $412,500 | $438,200 | $401,800 | $521,400 |  $1,773,900 |
-| Lighting         | $168,300 | $175,600 | $161,200 | $209,800 |    $714,900 |
-| Textiles         | $121,400 | $128,900 | $118,700 | $152,300 |    $521,300 |
-| Accessories      |  $74,600 |  $79,300 |  $71,900 |  $96,400 |    $322,200 |
-| **Grand Total**  | **$776,800** | **$822,000** | **$753,600** | **$979,900** | **$3,332,300** |
+Services shows a margin of 100 percent. That is not a finding about design services: the Item Table carries no standard cost for them, because their cost is the time of the design staff, which the ledger records through payroll as a salaries expense rather than as a cost of the item. A margin at standard cost is meaningful only for the product lines, and a report that includes Services should say so or leave its margin out.
 
-*Note: Revenue values are approximate and must be verified against the Charles River dataset. Values are formatted as currency with no decimal places. The grand total should equal the sum of the LineTotal column in the merged InvoiceLines source data. Furniture is the dominant item group across all quarters, and Q4 is the strongest quarter for every group.*
+**Step 4. Read the revenue as shares and as changes.**
 
-> **[WATCH OUT]**
-> A common error when building SUMIFS tables is forgetting to use mixed references. If you write =SUMIFS(InvoiceLines[LineTotal], InvoiceLines[ItemGroup], A4, InvoiceLines[FiscalQuarter], B3) without any dollar signs and then copy the formula, the references will shift in both directions and produce incorrect results. The formula will appear to work without generating an error, but the values will be wrong. Always verify your SUMIFS table by checking that the row and column totals equal the sum of the individual cells, and that the grand total matches the total of the source data.
+a. Right-click any value in a Sum of LineTotal row and choose **Show Values As > % of Column Total**. Each group's revenue now appears as its share of the quarter.
+b. Right-click a value again and choose **Show Values As > % Difference From**. Choose Period as the **Base field** and **(previous)** as the **Base item**, and click **OK**. Each value now shows the change from the previous quarter, and the first quarter is blank because the PivotTable has no earlier period to compare it with.
+c. Right-click a value and choose **Show Values As > No Calculation** to restore the dollar amounts.
+
+In the fourth quarter, Furniture's share of revenue fell, and its revenue declined by a few percent from the third quarter. Lighting's revenue also declined, but its margin did not, which points to prices or costs within Furniture rather than to demand across the business. @fig-06-03 shows the same three views.
+
+**Step 5. Compare the customer segments with the previous year.**
+
+a. Select a cell in the InvoiceLines Table and insert a second PivotTable on a new worksheet named `SegmentPivot`.
+b. Drag CustomerSegment to **Rows**, FiscalYear to **Columns**, and LineTotal to **Values** twice.
+c. Open the **Column Labels** filter, clear 2024, and click **OK**, so that the PivotTable compares 2025 with 2026.
+d. Click the second value field in the **Values** area and choose **Value Field Settings**. Type `Change from previous year` in **Custom Name**. On the **Show Values As** tab, choose **% Difference From**, with FiscalYear as the **Base field** and **(previous)** as the **Base item**, and click **OK**.
+e. Format the first value field as a number with two decimals.
+
+Wholesale, the largest segment, with about half of the year's revenue, grew from 2025 to 2026. The Strategic and Design Trade segments declined, Small Business grew, and total revenue rose by about one percent. The segment view does not explain the Furniture margin, but it shows where the company's revenue comes from and how that changed, which the controller will want for the management meeting.
+
+**Step 6. Refresh and document.**
+
+a. Choose **Data > Refresh All**, and confirm that the totals on both PivotTable worksheets are unchanged. If a PivotTable does not show a column you have just added to the query, choose **Refresh All** a second time: with background refresh turned on, Excel can refresh a PivotTable before its query has finished.
+b. On the **Documentation** worksheet, add the StdCostAmount custom column to the Query steps entry, the RevenuePivot and SegmentPivot worksheets to the Worksheets entry, and a new entry, `Calculated fields`, with the MarginPct formula.
+c. Save the workbook.
+
+**Checkpoint.** Check that:
+
+- the grand total of the RevenuePivot PivotTable equals the control total on the Profile worksheet, and each group's Grand Total equals its revenue there;
+- the Furniture margin falls from 2026-Q3 to 2026-Q4, while the margins of the other product lines change very little;
+- you can explain why Services shows a margin of 100 percent;
+- the SegmentPivot PivotTable shows each segment's revenue in 2025 and 2026 and its change from the previous year.
+
+The PivotTable has described the problem precisely. The Furniture margin fell in the fourth quarter, the other product lines did not, and the business as a whole kept growing. Why the Furniture margin fell is a diagnostic question, and it needs the tools of the next section.

@@ -2,44 +2,40 @@
 
 ## Key Terms
 
-**AVERAGE function.** An Excel function that calculates the arithmetic mean of a set of numeric values. In accounting analytics, AVERAGE helps determine typical transaction sizes, average account balances, and mean period-over-period changes.
+**Calculated field.** A field defined inside a PivotTable with a formula that uses other fields. Excel sums each field over the rows behind a cell and then applies the formula to those sums, so calculated fields suit ratios and differences of totals, such as margin percentages.
 
-**AVERAGEIFS function.** An Excel function that calculates the arithmetic mean of values that meet one or more specified criteria. It combines the averaging capability of AVERAGE with the filtering logic of SUMIFS, enabling calculations such as the average line amount for a specific customer segment or item group.
+**Conditional aggregation.** Calculating a total, count, average, minimum, or maximum over only the rows that meet one or more criteria, as SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS do.
 
-**Calculated field.** A user-defined field within a PivotTable that performs a calculation using other fields in the source data. Calculated fields derive measures such as unit revenue, profit margins, and markup percentages directly within the PivotTable, and they update automatically when the PivotTable refreshes.
+**Control total.** An independently calculated total that the parts of a summary must add up to. A difference between the control total and the sum of the parts reveals a missing category, a duplicated row, or a formula error.
 
-**Completion rate.** A production measure that compares the quantity completed (from ProductionCompletion) to the quantity planned (from WorkOrder), expressed as a percentage. A completion rate below 100 percent indicates that planned production was not fully achieved.
+**Cost effect.** The part of a change in margin caused by a change in the cost of the same items. In a margin measured at standard cost, it is zero unless the standard costs themselves change.
 
-**Conditional aggregation.** The process of calculating totals, counts, or averages for a subset of data that meets specified criteria. In Excel, conditional aggregation is performed using the SUMIFS, COUNTIFS, and AVERAGEIFS family of functions.
+**Cross-tabulation.** A summary of a measure across two dimensions at once, with one dimension in the rows and the other in the columns, such as revenue by product line and quarter.
 
-**COUNTIFS function.** An Excel function that counts the number of rows in a dataset that meet one or more specified criteria. In accounting, COUNTIFS helps determine transaction counts by period, segment, or threshold, such as the number of invoice lines above a materiality limit.
+**Drill-down.** Moving from a total to the parts or rows behind it, for example by double-clicking a value in a PivotTable or by adding a more detailed field to its Rows area.
 
-**Cross-tabulation.** A summarization technique that displays a measure such as revenue or count broken down by two or more dimensions at once, such as item group and customer segment. PivotTables are the primary tool for cross-tabulation in Excel.
+**GETPIVOTDATA.** An Excel function that returns a value from a PivotTable by naming its value field and items rather than its cell address, so that the reference stays correct when the PivotTable's layout changes.
 
-**Customer segment.** A classification in the Customer table (CustomerSegment) that distinguishes Wholesale from Direct customers at Charles River. Summarizing by customer segment supports disaggregated revenue analysis.
+**Margin bridge.** A decomposition of the change in margin between two periods into effects, such as volume, mix, price, and cost, that add up exactly to the change. It is often presented as a waterfall chart.
 
-**Date grouping.** A PivotTable feature that groups date values into periods such as days, months, quarters, or years. Date grouping enables time-based summarization without requiring the analyst to add period columns to the source data.
+**Mean.** The arithmetic average of a set of values, their sum divided by their number, calculated in Excel with AVERAGE. A few very large or very small values pull it away from the typical value.
 
-**Descriptive analytics.** The category of analytics that answers the question "what happened?" by summarizing historical data into totals, averages, counts, distributions, and comparisons. Descriptive analytics is the most common form of analytics in accounting practice.
+**Median.** The middle value of a set of values sorted in order, or the average of the two middle values when their number is even, calculated in Excel with MEDIAN. It is not affected by how extreme the largest or smallest values are.
 
-**Item group.** A classification in the Item table (ItemGroup) that organizes Charles River products into Furniture, Lighting, Textiles, and Accessories. Item group is a common dimension for revenue and production summaries.
+**Mix effect.** The part of a change in margin caused by a shift in sales between items or products that earn different margins per unit, while the total number of units is held constant.
 
-**LineTotal.** The extended billed amount on a single sales invoice line in the SalesInvoiceLine table. LineTotal is the authoritative line-level revenue figure used throughout this chapter for sales summarization.
+**PivotTable.** An interactive Excel summary built from a source table by placing its fields in the Rows, Columns, Values, and Filters areas. It calculates a value for every combination of row and column items, with totals, and it is updated by refreshing.
 
-**Measures of central tendency.** Statistical measures that describe the center of a data distribution, including the mean (AVERAGE) and the median (MEDIAN). In accounting data, differences between the mean and median indicate that the distribution is skewed by extreme values.
+**Price effect.** The part of a change in margin caused by charging different prices for the same items, including changes in price-list reductions and promotional discounts.
 
-**Measures of dispersion.** Statistical measures that describe how spread out values are in a dataset, including the standard deviation (STDEV.S), the range (MAX minus MIN), and the minimum and maximum values. Dispersion measures indicate variability in account balances, transaction amounts, or production metrics.
+**Show Values As.** A PivotTable setting that displays a value field as a share of a total, a difference from a base item, a running total, or a rank, without changing the values behind it.
 
-**MEDIAN function.** An Excel function that returns the middle value of a set of numeric values when arranged in order. Unlike the mean, the median is not influenced by extreme values, making it a more robust measure of central tendency for skewed accounting distributions.
+**Skewed distribution.** A distribution whose values are not spread symmetrically around its center. In a distribution skewed to the right, the usual shape of accounting populations, a minority of large values pulls the mean above the median.
 
-**PivotTable.** An interactive Excel feature that summarizes data from a source table by organizing it into a flexible grid of row labels, column labels, and aggregated values. PivotTables automate multidimensional summarization and support grouping, filtering, and multiple calculation types.
+**Standard deviation.** A measure of how widely values are spread around their mean. In Excel, STDEV.S treats the values as a sample of a larger population, and STDEV.P treats them as the complete population.
 
-**Show Values As.** A PivotTable feature that transforms the displayed values from raw aggregates into derived calculations such as percentages of row or column totals, differences from a base value, or running totals. This feature enables comparative and trend analysis within a PivotTable without modifying the source data.
+**Value field.** A field placed in the Values area of a PivotTable and summarized, by a calculation such as Sum, Count, or Average, for every cell of the PivotTable.
 
-**STDEV.S function.** An Excel function that calculates the sample standard deviation of a set of numeric values. A larger standard deviation indicates greater variability in the data. In accounting, standard deviation helps assess the predictability of revenue streams, expense patterns, and production metrics.
+**Volume effect.** The part of a change in margin caused by selling more or fewer units in total, valued at the earlier period's margin per unit.
 
-**Stratification.** The process of dividing a dataset into groups (strata) based on ranges of a numeric variable and examining the count and monetary value within each group. Auditors use stratification to understand the distribution of a transaction population and to design sampling plans that focus testing on the most significant items.
-
-**SUMIFS function.** An Excel function that calculates the sum of values in a range that meet one or more specified criteria. SUMIFS is the most commonly used conditional aggregation function in accounting analytics, supporting calculations such as total revenue by item group, total expenses by department, and total payments by supplier.
-
-**Work order close variance.** The manufacturing variance recognized when a work order is closed, recorded in the WorkOrderClose table and posted to the manufacturing variance account. It represents the difference between accumulated production costs and standard cost absorbed into finished goods.
+**Waterfall chart.** A chart that shows how a starting value becomes an ending value through a sequence of increases and decreases, with the starting and ending values drawn as totals.

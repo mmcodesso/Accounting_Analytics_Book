@@ -1,0 +1,19 @@
+{{< pagebreak >}}
+
+## References
+
+Anscombe, F. J. (1973). Graphs in statistical analysis. *The American Statistician*, *27*(1), 17–21. <https://doi.org/10.1080/00031305.1973.10478966>
+
+Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
+
+Domino, M. A., Schrag, D., Webinger, M., & Troy, C. (2021). Linking data analytics to real-world business issues: The power of the pivot table. *Journal of Accounting Education*, *57*, Article 100744. <https://doi.org/10.1016/j.jaccedu.2021.100744>
+
+Financial Accounting Standards Board. (2014). *Revenue from contracts with customers (Topic 606)* (Accounting Standards Update No. 2014-09). <https://storage.fasb.org/ASU%202014-09_Section%20A.pdf>
+
+Institute of Management Accountants. (2025). *IMA competency framework*. <https://www.imanet.org/career-resources/competency-framework>
+
+Microsoft. (2026a). *Calculate values in a PivotTable*. Microsoft Support. <https://support.microsoft.com/en-us/office/calculate-values-in-a-pivottable-11f41417-da80-435c-a5c6-b0185e59da77>
+
+Microsoft. (2026b). *Show different calculations in PivotTable value fields*. Microsoft Support. <https://support.microsoft.com/en-us/office/show-different-calculations-in-pivottable-value-fields-014d2777-baaf-480b-a32b-98431f48bfec>
+
+Public Company Accounting Oversight Board. (n.d.). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>

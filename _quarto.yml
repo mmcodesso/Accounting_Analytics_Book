@@ -29,6 +29,7 @@ book:
       chapters:
         - chapters/04-excel-essentials/chapter.qmd
         - chapters/05-data-preparation/chapter.qmd
+        - chapters/06-descriptive-analytics/chapter.qmd
     - part: "Accounting Analytics with SQL"
     - part: "Data Visualization and Power BI"
     - part: "Integrated and Applied Topics"
