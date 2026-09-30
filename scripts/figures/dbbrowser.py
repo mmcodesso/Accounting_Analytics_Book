@@ -27,6 +27,9 @@ KEYWORDS = {
     "ASC", "DESC", "LIMIT", "BETWEEN", "LIKE", "DISTINCT", "ROUND", "JOIN", "INNER", "LEFT",
     "ON", "GROUP", "HAVING", "SUM", "COUNT", "AVG", "MIN", "MAX", "CASE", "WHEN", "THEN",
     "ELSE", "END", "WITH", "OVER", "PARTITION", "CREATE", "VIEW", "COALESCE", "UNION", "ALL",
+    "EXISTS", "DROP", "IF", "TEMP", "WINDOW", "ROWS", "RANGE", "PRECEDING", "FOLLOWING",
+    "UNBOUNDED", "CURRENT", "ROW", "RANK", "DENSE_RANK", "ROW_NUMBER", "LAG", "LEAD",
+    "STRFTIME", "DATE", "JULIANDAY",
 }
 _TOKEN = re.compile(r"(--.*$)|('(?:[^']|'')*')|(\b[A-Za-z_]+\b)|(\s+)|(.)")
 

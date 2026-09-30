@@ -86,8 +86,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 **Deliverable.** A script with the comparison and a half-page memo.
 
 <!-- Instructor notes, Exercise 12.3: counting only the time recorded while the operation was open, every work center falls below plan in
-     fiscal 2026: Assembly 0.33, Cutting 0.28, Finishing and Test 0.38, Packing 0.22, Quality Assurance 0.79 (against all-hours ratios of
-     0.39, 0.40, 0.55, 4.07, 3.92). In 2024 the in-window ratios were 0.62, 0.55, 0.68, 0.38, 1.28. The Packing excess disappears, which
+     fiscal 2026: Assembly 0.34, Cutting 0.29, Finishing and Test 0.39, Packing 0.22, Quality Assurance 0.81 (against all-hours ratios of
+     0.40, 0.41, 0.56, 4.19, 4.01; operations that ended by 2026-12-11, the last day with time records, as in Tutorial 11.2). In 2024 the in-window ratios were 0.62, 0.55, 0.68, 0.38, 1.28. The Packing excess disappears, which
      shows that it came from time charged after the operation ended; Packing is the last operation of every routing, so late time lands
      there. Direct hours by work date stayed flat (about 60,400, 57,600, and 62,800) while indirect manufacturing time grew from about
      23,200 to 35,800 and 38,500, so the extra paid hours of Chapter 10 were recorded as indirect time; the late direct time is misplaced

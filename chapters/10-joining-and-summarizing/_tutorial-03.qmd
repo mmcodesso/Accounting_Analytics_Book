@@ -75,7 +75,32 @@ b. Compare the Registers and Employees columns.
 
 Each employee has a register in every pay period, so `COUNT(*)` counts well over a thousand registers a year, while `COUNT(DISTINCT pr.EmployeeID)` counts the people. The manufacturing payroll paid the same number of people in each year. The extra hours were worked by the same workforce, more of them as overtime.
 
-**Step 4. Compare the hours recorded with the standard hours, by kind of labor.** The hours come from the labor time entries, dated by the day worked, and the output from the completions. Each is summarized by year in a derived table, and the two are joined on the year.
+**Step 4. Check that the hours and the output cover the same days.** A ratio compares like with like only if its two sides cover the same period, so find where each set of records ends before you divide one by the other.
+
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 10.3: the last day of the time records and of the output
+   SELECT (SELECT MAX(WorkDate) FROM LaborTimeEntry) AS LastWorkDate,
+       (SELECT MAX(CompletionDate) FROM ProductionCompletion)
+           AS LastCompletionDate;
+   ```
+
+b. Type and run the query below, which lists the pay periods at the end of the data.
+
+   ```sql
+   -- Tutorial 10.3: the pay periods at the end of the data
+   SELECT PeriodNumber, PeriodStartDate, PeriodEndDate, PayDate, Status
+   FROM PayrollPeriod
+   WHERE PeriodEndDate >= '2026-12-01'
+   ORDER BY PeriodStartDate;
+   ```
+
+c. Compare the two last dates, and read the Status of each pay period.
+
+The completions run to the last day of fiscal 2026, but the time records end on 11 December 2026, the last working day of the last pay period that was processed. The two periods after it are still Open, and no time has been recorded for them. Hours counted to the end of the year would miss the last three weeks of December, while the output would not, and the ratio of the two would look better than it is. The next step therefore counts only the output completed up to the last day with time records.
+
+**Step 5. Compare the hours recorded with the standard hours, by kind of labor.** The hours come from the labor time entries, dated by the day worked, and the output from the completions up to the last day with time records, which a scalar subquery finds. Each is summarized by year in a derived table, and the two are joined on the year.
 
 a. Type and run the query below.
 
@@ -98,6 +123,8 @@ a. Type and run the query below.
                INNER JOIN ProductionCompletion AS pc
                    ON pc.ProductionCompletionID = pcl.ProductionCompletionID
                INNER JOIN Item AS i ON i.ItemID = pcl.ItemID
+           WHERE pc.CompletionDate
+               <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)
            GROUP BY WorkYear
        ) AS o ON o.WorkYear = h.WorkYear
    ORDER BY h.WorkYear, h.LaborType;
@@ -106,11 +133,11 @@ a. Type and run the query below.
 b. Read the HoursPerStandardHour column for Direct Manufacturing across the three years.
 c. Read it for Indirect Manufacturing, and add the two rows of each year.
 
-The result, shown in @fig-10-08, has two rows for each year. Both derived tables return the year as text, so the join compares text with text. The direct labor recorded against work order operations stayed below the standard hours in every year, although it moved closer to them. Indirect time, which no work order carries, grew from about a third of the standard hours to more than half. Together, by fiscal 2026 the plant recorded about half as many hours again as the standard hours of its output, and most of the growth was indirect.
+The result, shown in @fig-10-08, has two rows for each year. Both derived tables return the year as text, so the join compares text with text. The cut-off changes only fiscal 2026, the one year whose time records stop early. The direct labor recorded against work order operations stayed below the standard hours in every year, although it moved closer to them. Indirect time, which no work order carries, grew from about a third of the standard hours to more than half. Together, by fiscal 2026 the plant recorded about half as many hours again as the standard hours of its output, and most of the growth was indirect.
 
 ![Hours per Standard Hour by Labor Type and Year.](/visuals/svg/fig-10-08-hours-per-standard-hour.svg){#fig-10-08 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins two derived tables on the year: one with the hours of labor time by year and labor type, without NonManufacturing time, and one with the standard labor hours of the units completed. The result has six rows, Direct Manufacturing and Indirect Manufacturing for 2024, 2025, and 2026. The HoursPerStandardHour column, outlined, stays below one for direct labor in every year and rises for indirect labor."}
 
-**Step 5. Test the time that has no work order operation.** An anti-join from LaborTimeEntry to WorkOrderOperation finds the time with no operation, and grouping it by LaborType shows which of it is expected.
+**Step 6. Test the time that has no work order operation.** An anti-join from LaborTimeEntry to WorkOrderOperation finds the time with no operation, and grouping it by LaborType shows which of it is expected.
 
 a. Type and run the query below.
 
@@ -132,7 +159,7 @@ d. Remove the condition you added.
 
 Indirect and non-manufacturing time has no operation by design, and it makes up nearly all of the result. The few direct labor entries are exceptions: time charged as direct labor that no operation carries. The query of item c keeps only the entries whose WorkOrderOperationID is filled in but matches no operation, and most of the direct entries are of that kind, keys that point to nothing. They are the untested keys that the chapter warned about, and Exercise 10.5 traces them to their work orders.
 
-**Step 6. Complete and save the script.** The header comment should record the checks that the chapter's queries passed.
+**Step 7. Complete and save the script.** The header comment should record the checks that the chapter's queries passed.
 
 a. Replace the last line of the header comment of Chapter10.sql, so that the header reads as below.
 
@@ -152,6 +179,7 @@ The script now holds every query of the chapter under a comment that says what i
 - output was nearly flat, with a dip in fiscal 2025, and its standard hours moved with it;
 - the payroll paid the same number of people in each year, with overtime hours more than doubling;
 - `COUNT(*)` counts registers and `COUNT(DISTINCT pr.EmployeeID)` counts people;
+- the time records end on 11 December 2026, so the output is counted only up to that day;
 - direct labor stayed below the standard hours in every year, while indirect time grew;
 - a few direct labor entries have no valid operation;
 - Chapter10.sql is saved with a completed header and a comment above each query.

@@ -1,16 +1,24 @@
 ## Guided Tutorial 11.1: Classifying the Payroll and Measuring the Hours by Month
 
-**Context and objective.** In this tutorial, you will classify the manufacturing payroll of fiscal 2026 with a CASE expression and tie the result to the ledger. You will then turn the manufacturing labor time into a month-by-month table of regular hours, overtime hours, and hours not charged to any work order, and measure how long work orders took from release to completion in each year.
+**Context and objective.** In this tutorial, you will classify the manufacturing payroll of fiscal 2026 with a CASE expression and tie the result to the ledger. You will then turn the manufacturing labor time into a month-by-month table of direct, indirect, and overtime hours, find how far the time records fall short of the year's end, compare the overtime share of each kind of labor, and measure how long work orders took from release to completion in each year.
 
-**Prerequisites.** Complete Chapter 10, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script, `Chapter11.sql`, with a header comment.
+**Prerequisites.** Complete Chapter 10, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter11.sql` beside your working copy. As in Chapters 9 and 10, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
+
+```sql
+/* Chapter 11: the plant's hours, month by month
+   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
+   Prepared by: your name, date
+   Checks: listed at the end of Tutorial 11.3 */
+```
 
 **Step-by-step instructions.**
 
-**Step 1. Classify the manufacturing payroll.** The payroll register lines record pay, the employer's taxes and benefits, and the deductions withheld from employees' pay. Only some of these are a cost to Charles River.
+**Step 1. Classify the manufacturing payroll, and tie it to the ledger.** The payroll register lines record pay, the employer's taxes and benefits, and the deductions withheld from employees' pay. Only some of these are a cost to Charles River.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.1: the manufacturing payroll of 2026 by category
    SELECT
        CASE
            WHEN prl.LineType IN ('Regular Earnings', 'Overtime Earnings')
@@ -32,73 +40,100 @@ a. Type and run the query below.
    ORDER BY Amount DESC;
    ```
 
-b. Run the query below, which totals the payroll that the ledger charged to account 1090 in fiscal 2026.
+b. Type and run the query below, which totals the payroll that the ledger charged to account 1090 in fiscal 2026.
 
    ```sql
-   SELECT ROUND(SUM(gl.Debit), 2) AS PayrollCharged
-   FROM GLEntry AS gl
-   WHERE gl.AccountID = 92 AND gl.FiscalYear = 2026
-       AND gl.SourceDocumentType = 'PayrollSummary';
+   -- Tutorial 11.1: the payroll charged to account 1090 in 2026
+   SELECT ROUND(SUM(Debit), 2) AS PayrollCharged
+   FROM GLEntry
+   WHERE AccountID = 92 AND FiscalYear = 2026
+       AND SourceDocumentType = 'PayrollSummary';
    ```
 
 c. Add up the three categories other than employee deductions, and compare the sum with the ledger.
 
 The three cost categories add up to the ledger's charge to the cent. Employee deductions are left out, because they are withheld from pay that is already counted, not an additional cost. The CASE expression has turned seven line types into the four categories the accounting needs.
 
-**Step 2. Pivot the labor time by month.** Conditional aggregation puts the hours of each category in a column of its own.
+**Step 2. Pivot the labor time by month.** Conditional aggregation puts the hours of each kind of labor in a column of its own, and a count of the distinct work dates shows how many days of each month have time records.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.1: manufacturing labor time by month
    SELECT strftime('%Y-%m', lt.WorkDate) AS WorkMonth,
-       ROUND(SUM(lt.RegularHours), 0) AS RegularHours,
-       ROUND(SUM(lt.OvertimeHours), 0) AS OvertimeHours,
-       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
+       COUNT(DISTINCT lt.WorkDate) AS DaysWithTime,
+       ROUND(SUM(CASE lt.LaborType WHEN 'Direct Manufacturing'
            THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
-           AS NotOnWorkOrder
+           AS DirectHours,
+       ROUND(SUM(CASE lt.LaborType WHEN 'Indirect Manufacturing'
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
+           AS IndirectHours,
+       ROUND(SUM(lt.OvertimeHours), 0) AS OvertimeHours
    FROM LaborTimeEntry AS lt
    WHERE lt.LaborType <> 'NonManufacturing'
    GROUP BY WorkMonth
    ORDER BY WorkMonth;
    ```
 
-b. Read the number of rows, and look at the first and last few months.
+b. Read the number of rows in the message pane.
+c. Read the DirectHours and IndirectHours of the first six months, and the DaysWithTime of the last row.
 
-The result has one row for each month from January 2024 to December 2026, three years of months. Each row shows the regular hours, the overtime hours, and the hours not charged to a work order operation, which is the indirect time you found in Tutorial 10.3.
+The result has one row for each month from January 2024 to December 2026, 36 in all, so a window over it can count months by counting rows. The first months tell a story of their own. January 2024 is the month in which the data begins, when the first work orders were only starting, and from February to May 2024 almost no indirect time was recorded. In March 2024 there is none at all; the month still has a row, because its direct entries create it, and the CASE gives it an IndirectHours of zero. From June 2024 on, indirect time appears in every month. The last row has far fewer days with time records than any other month, because the time records end on 11 December 2026, as Tutorial 10.3 found.
 
-**Step 3. Add the shares.** Hours on their own rise and fall with the number of working days in a month. Shares of the total can be compared from month to month.
+**Step 3. Find how far the time records fall short of the month's end.** The date function's modifiers move a date to the end of its month, and julianday measures the distance between two dates.
 
-a. Add two columns to the SELECT list of the query in Step 2, after NotOnWorkOrder, so that it reads as below, and run it.
+a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.1: how far the time records fall short of month-end
+   SELECT MAX(WorkDate) AS LastWorkDate,
+       date(MAX(WorkDate), 'start of month', '+1 month', '-1 day')
+           AS MonthEnd,
+       julianday(date(MAX(WorkDate), 'start of month', '+1 month',
+           '-1 day')) - julianday(MAX(WorkDate)) AS DaysNotRecorded
+   FROM LaborTimeEntry;
+   ```
+
+b. Compare LastWorkDate with MonthEnd, and read DaysNotRecorded.
+
+The time records end nearly three weeks before the end of December 2026. The measure of Tutorial 11.3 therefore counts the output only up to the same day, as Tutorial 10.3 did, so that its last month compares hours and output over the same days.
+
+**Step 4. Compare the overtime share of each kind of labor.** Hours rise and fall with the number of working days in a month, but shares of the total can be compared from month to month. Each share divides one conditional sum by another.
+
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 11.1: the overtime share of each kind of labor by month
    SELECT strftime('%Y-%m', lt.WorkDate) AS WorkMonth,
-       ROUND(SUM(lt.RegularHours), 0) AS RegularHours,
-       ROUND(SUM(lt.OvertimeHours), 0) AS OvertimeHours,
-       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
-           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
-           AS NotOnWorkOrder,
-       ROUND(SUM(lt.OvertimeHours)
-           / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS OvertimeShare,
-       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
-           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END)
-           / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS NotOnWorkOrderShare
+       ROUND(SUM(CASE lt.LaborType WHEN 'Direct Manufacturing'
+               THEN lt.OvertimeHours ELSE 0 END)
+           / SUM(CASE lt.LaborType WHEN 'Direct Manufacturing'
+               THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 3)
+           AS DirectOvertimeShare,
+       ROUND(SUM(CASE lt.LaborType WHEN 'Indirect Manufacturing'
+               THEN lt.OvertimeHours ELSE 0 END)
+           / SUM(CASE lt.LaborType WHEN 'Indirect Manufacturing'
+               THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 3)
+           AS IndirectOvertimeShare
    FROM LaborTimeEntry AS lt
    WHERE lt.LaborType <> 'NonManufacturing'
    GROUP BY WorkMonth
    ORDER BY WorkMonth;
    ```
 
-b. Compare the OvertimeShare of the months of 2024 with those of 2026.
+b. Compare the DirectOvertimeShare of the months of 2024 with those of 2026.
+c. Compare the IndirectOvertimeShare across the three years.
 
-The result for fiscal 2026 appears in @fig-11-02. In the first half of 2024, overtime was about a tenth of the hours worked or less. In most months of 2026, it was around a fifth. The share of time not charged to a work order swings widely from month to month, which is a warning that single months can mislead, and that the controller's measure will need a longer window.
+The result for fiscal 2026 appears in @fig-11-02. In the first half of 2024, overtime was about a tenth of the direct hours or less. In most months of 2026 it was a quarter or more, although two months dip well below the rest, a warning that single months can mislead. Overtime on indirect labor stayed at about a twelfth of its hours throughout. March 2024 shows NULL for the indirect share, because it has no indirect hours, and SQLite returns NULL for a division by zero instead of an error. The growth in overtime is a growth in overtime on direct labor, the work that the output requires.
 
-![Labor Hours by Category and Month.](/visuals/svg/fig-11-02-hours-by-month.svg){#fig-11-02 fig-alt="A mock of the Execute SQL tab. The query groups the manufacturing labor time by month with strftime and uses CASE inside SUM to put regular hours, overtime hours, and hours not on a work order in separate columns, with the overtime share and the share not on a work order. The result grid shows the twelve months of 2026, and the OvertimeShare column, mostly around one fifth, is outlined."}
+![Overtime Shares by Kind of Labor and Month.](/visuals/svg/fig-11-02-overtime-shares.svg){#fig-11-02 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that groups the manufacturing labor time by month and divides conditional sums, written with the simple form of CASE on LaborType, to give the overtime share of direct and of indirect labor. The result grid shows the twelve months of 2026. The DirectOvertimeShare column, outlined, is a quarter or more in most months, while the IndirectOvertimeShare stays below a tenth."}
 
-**Step 4. Measure how long work orders take.** julianday turns a date into a number of days, so the difference between two dates is a subtraction.
+**Step 5. Measure how long work orders take.** julianday turns a date into a number of days, so the difference between two dates is a subtraction.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.1: days from release to completion and to close
    SELECT strftime('%Y', ClosedDate) AS CloseYear,
        COUNT(*) AS WorkOrders,
        ROUND(AVG(julianday(CompletedDate) - julianday(ReleasedDate)), 1)
@@ -113,13 +148,15 @@ a. Type and run the query below.
 
 b. Compare the two averages across the three years.
 
-The time from completion to close stayed at about the same number of days in each year. The time from release to completion more than doubled, from under three weeks for the work orders closed in fiscal 2024 to nearly six weeks for those closed in fiscal 2026. Work orders spent far longer on the plant floor, which fits a plant that needed more hours for the same output.
+The time from completion to close stayed at about the same number of days in each year. The time from release to completion more than doubled, from under three weeks for the work orders closed in fiscal 2024 to nearly six weeks for those closed in fiscal 2026. The first year's average is held down, because a work order closed in fiscal 2024 had to be released in the same year, the first of the data. Tutorial 10.3 found that direct hours per standard hour rose only a little, so work orders spent far longer on the plant floor without needing much more work, which fits a plant whose people spent more of their time away from the work orders.
 
 **Checkpoint.** Check that:
 
 - the payroll categories other than employee deductions add up to the ledger's charge to account 1090 for fiscal 2026;
-- the monthly pivot has one row for each month of the three years, with the hours of each category in its own column;
-- the overtime share is about a tenth or less in the first half of 2024 and around a fifth in most months of 2026;
-- the average time from release to completion more than doubled from fiscal 2024 to fiscal 2026.
+- the monthly pivot has one row for each of the 36 months, with almost no indirect time from February to May 2024 and few days of time records in December 2026;
+- the time records end nearly three weeks before the end of December 2026;
+- the overtime share of direct labor rose from about a tenth to a quarter or more, while that of indirect labor stayed at about a twelfth;
+- the average time from release to completion more than doubled from fiscal 2024 to fiscal 2026;
+- Chapter11.sql holds the header and the queries of this tutorial, each under a comment.
 
-CASE, conditional aggregation, and the date functions have given the controller three views of the same change: more overtime, more time off the work orders, and work orders that take longer to finish.
+CASE, conditional aggregation, and the date functions have given the controller three views of the same change: indirect time that appears in the records in the middle of 2024, more overtime on direct labor, and work orders that take longer to finish.

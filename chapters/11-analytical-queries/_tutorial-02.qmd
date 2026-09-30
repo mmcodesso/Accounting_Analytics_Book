@@ -1,8 +1,8 @@
 ## Guided Tutorial 11.2: Tracking the Gap Month by Month
 
-**Context and objective.** In Chapter 10 you followed the conversion cost through account 1090 for whole years. In this tutorial, you will measure the gap between the actual cost charged to the account and the standard cost released by completions for each month, accumulate it through each year, compare each month with the same month a year earlier, and rank the months. You will then rank the work centers by the hours recorded against their planned hours.
+**Context and objective.** In Chapter 10 you followed the conversion cost through account 1090 for whole years. In this tutorial, you will measure the gap between the actual cost charged to the account and the standard cost released by completions for each month, accumulate it through each year, compare each month with the same month a year earlier, rank the months, and find what the largest months have in common. You will then rank the work centers by the hours recorded against their planned hours.
 
-**Prerequisites.** Complete Tutorial 11.1, and continue in Chapter11.sql.
+**Prerequisites.** Complete Tutorial 11.1, and continue at the end of Chapter11.sql.
 
 **Step-by-step instructions.**
 
@@ -11,10 +11,12 @@
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.2: the gap in account 1090 by month and year to date
    SELECT FiscalYear, FiscalPeriod,
        ROUND(SUM(Debit) - SUM(Credit), 2) AS Gap,
        ROUND(SUM(SUM(Debit) - SUM(Credit)) OVER (
-           PARTITION BY FiscalYear ORDER BY FiscalPeriod), 2) AS GapYearToDate
+           PARTITION BY FiscalYear ORDER BY FiscalPeriod), 2)
+           AS GapYearToDate
    FROM GLEntry
    WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026
        AND SourceDocumentType <> 'WorkOrderClose'
@@ -24,21 +26,21 @@ a. Type and run the query below.
 
 b. Read the GapYearToDate column in the December row of each year.
 
-The result, shown in @fig-11-04, has one row for each month. The window function sums the monthly gaps within each fiscal year, in order of period, and starts again at zero each January. The December figure is the year's total gap, and it grew in each year: by fiscal 2026 it was nearly twice the figure of fiscal 2024. The window works on the results of the grouping, because window functions are calculated after GROUP BY.
+The result, shown in @fig-11-04, has one row for each month. The window function sums the monthly gaps within each fiscal year, in order of period, and starts again at zero each January. Each period appears once in its year, so the default window, which includes tied rows, gives a plain running total. The December figure is the year's total gap, and it grew in each year, to nearly twice its fiscal 2024 figure by fiscal 2026. The window works on the results of the grouping, because window functions are calculated after GROUP BY.
 
-![The Monthly Gap in Account 1090 and Its Year-to-Date Total.](/visuals/svg/fig-11-04-gap-year-to-date.svg){#fig-11-04 fig-alt="A mock of the Execute SQL tab. The query groups the postings to account 1090, without the work order closes, by fiscal year and period, and calculates the monthly gap between actual and standard cost and a year-to-date total with SUM over a window partitioned by fiscal year. The grid shows the twelve months of fiscal 2026, and the GapYearToDate column, which accumulates through the year, is outlined."}
+![The Monthly Gap in Account 1090 and Its Year-to-Date Total.](/visuals/svg/fig-11-04-gap-year-to-date.svg){#fig-11-04 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that groups the postings to account 1090, without the work order closes, by fiscal year and period, and calculates the monthly gap between actual and standard cost and a year-to-date total with SUM over a window partitioned by fiscal year. The grid shows the twelve months of fiscal 2026, and the GapYearToDate column, which accumulates through the year, is outlined."}
 
-**Step 2. Compare each month with the same month a year earlier.** LAG with an offset of 12 reaches back twelve rows, one year of months.
+**Step 2. Compare each month with the same month a year earlier.** LAG over a window partitioned by the fiscal period compares each month with the same month of the previous year.
 
-a. Add a column after GapYearToDate, so that the query reads as below, and run it.
+a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.2: the gap against the same month a year earlier
    SELECT FiscalYear, FiscalPeriod,
        ROUND(SUM(Debit) - SUM(Credit), 2) AS Gap,
-       ROUND(SUM(SUM(Debit) - SUM(Credit)) OVER (
-           PARTITION BY FiscalYear ORDER BY FiscalPeriod), 2) AS GapYearToDate,
-       ROUND(LAG(SUM(Debit) - SUM(Credit), 12) OVER (
-           ORDER BY FiscalYear, FiscalPeriod), 2) AS GapSameMonthLastYear
+       ROUND(LAG(SUM(Debit) - SUM(Credit)) OVER (
+           PARTITION BY FiscalPeriod ORDER BY FiscalYear), 2)
+           AS GapSameMonthLastYear
    FROM GLEntry
    WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026
        AND SourceDocumentType <> 'WorkOrderClose'
@@ -48,13 +50,14 @@ a. Add a column after GapYearToDate, so that the query reads as below, and run i
 
 b. Compare the Gap and GapSameMonthLastYear columns for the months of fiscal 2026.
 
-The LAG column is NULL for the twelve months of fiscal 2024, which have no earlier year in the data. In most months of fiscal 2026, the gap was larger than in the same month of fiscal 2025. The comparison with the same month removes the effect of the season, which a comparison with the previous month would not.
+GapSameMonthLastYear is NULL for the twelve months of fiscal 2024, which have no earlier year in the data. In most months of fiscal 2026 the gap was larger than in the same month of fiscal 2025. Two comparisons stand out from the rest, though: July 2026 was nearly three times July 2025, and August 2026 was only about half of August 2025. A comparison with the same month removes a seasonal pattern, if there is one, but something else moved the gap in those two months, and the next steps find it.
 
 **Step 3. Rank the months within each year.** A ranking function numbers the months by the size of their gap, and a derived table lets the outer query keep the top three of each year.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 11.2: the three largest months of each year
    SELECT FiscalYear, FiscalPeriod, Gap, GapRank
    FROM (
        SELECT FiscalYear, FiscalPeriod,
@@ -72,19 +75,57 @@ a. Type and run the query below.
 
 b. Read the three largest months of each year.
 
-The query returns nine rows, three for each year. The ranking cannot be filtered in the inner query's WHERE clause, because WHERE runs before the window function is calculated. The derived table calculates the rank first, and the outer WHERE keeps the top three. In each year, the largest months are two or more times the size of the smallest ones, a reminder of how much a single month can swing.
+The query returns nine rows, three for each year. The ranking cannot be filtered in the inner query's WHERE clause, because WHERE runs before the window function is calculated. The derived table calculates the rank first, and the outer WHERE keeps the top three. In each year, the largest months are far larger than a typical month.
 
-**Step 4. Rank the work centers by the hours recorded against their plan.** Each work order operation records its planned hours and its work center, and the direct labor time is recorded against the operation.
+**Step 4. Count the pay dates of the largest months.** Payroll is the largest debit to account 1090, and a count of the distinct posting dates of the payroll summaries shows how many payrolls each month received.
+
+a. Type and run the query below, which adds a PayDates column to the ranking.
+
+   ```sql
+   -- Tutorial 11.2: the three largest months with their pay dates
+   SELECT FiscalYear, FiscalPeriod, Gap, PayDates, GapRank
+   FROM (
+       SELECT FiscalYear, FiscalPeriod,
+           ROUND(SUM(Debit) - SUM(Credit), 2) AS Gap,
+           COUNT(DISTINCT CASE WHEN SourceDocumentType = 'PayrollSummary'
+               THEN PostingDate END) AS PayDates,
+           RANK() OVER (PARTITION BY FiscalYear
+               ORDER BY SUM(Debit) - SUM(Credit) DESC) AS GapRank
+       FROM GLEntry
+       WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026
+           AND SourceDocumentType <> 'WorkOrderClose'
+       GROUP BY FiscalYear, FiscalPeriod
+   ) AS monthly
+   WHERE GapRank <= 3
+   ORDER BY FiscalYear, GapRank;
+   ```
+
+b. Compare the PayDates of the months ranked first with those of the others.
+
+The result, shown in @fig-11-05, explains the largest months. Charles River pays every two weeks, so most months have two pay dates, but a few have three, and the largest month of every year is one of them. The ledger records payroll when it is paid, and no entry at a month's end records the wages that were earned but not yet paid, so a month with three pay dates carries three payrolls. That also explains the comparisons of Step 2: July 2026 had three pay dates and July 2025 two, while August 2025 had three. The months with three pay dates are not months of worse performance. Single months of this account are unreliable, but a year-to-date or trailing total is not, because over a year the pay dates even out. They do not quite even out between years: fiscal 2024 charged fewer payrolls to the account than the two later years, because the data begins in January and the manufacturing part of the first payroll of 2024 was posted to the variance account, so part of the growth from fiscal 2024 comes from the calendar.
+
+![The Largest Months of the Gap and Their Pay Dates.](/visuals/svg/fig-11-05-gap-pay-dates.svg){#fig-11-05 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that ranks the months of each year by their gap in account 1090 in a derived table, counts the distinct pay dates of each month's payroll postings with COUNT DISTINCT over a CASE expression, and keeps the three largest months of each year. The grid shows nine rows, three for each of 2024, 2025, and 2026. The PayDates cells that show three pay dates are outlined, and they include the month ranked first in every year."}
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Under accrual accounting, wages that employees have earned but not yet been paid at the end of a period are an expense of that period and a liability at its end. A company that closes its books every month usually records them with an accrual entry at the month's end, reversed when the payroll is paid. The Charles River ledger has no such entry for its wages, so its monthly payroll cost follows the pay calendar. An analyst who meets a lumpy monthly series should ask how its postings are timed before reading anything into a single month.
+:::
+
+**Step 5. Rank the work centers by the hours recorded against their plan.** Each work order operation records its planned hours and its work center, and the direct labor time is recorded against the operation. Only the operations that ended by the last day with time records are counted, so that no operation is compared with time that has not yet been recorded.
 
 a. Type and run the query below.
 
    ```sql
-   SELECT CloseYear, WorkCenterName, PlannedHours, RecordedHours,
+   -- Tutorial 11.2: work centers ranked by hours recorded against plan
+   SELECT EndYear, WorkCenterName,
+       RecordedHours - PlannedHours AS ExcessHours,
        ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,
-       RANK() OVER (PARTITION BY CloseYear
-           ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank
+       RANK() OVER (PARTITION BY EndYear
+           ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank,
+       SUM(RecordedHours - PlannedHours) OVER (PARTITION BY EndYear)
+           AS PlantExcessHours
    FROM (
-       SELECT strftime('%Y', op.ActualEndDate) AS CloseYear,
+       SELECT strftime('%Y', op.ActualEndDate) AS EndYear,
            wc.WorkCenterName,
            ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,
            ROUND(SUM(lab.Hours), 0) AS RecordedHours
@@ -97,23 +138,26 @@ a. Type and run the query below.
                WHERE LaborType = 'Direct Manufacturing'
                GROUP BY WorkOrderOperationID
            ) AS lab ON lab.WorkOrderOperationID = op.WorkOrderOperationID
-       WHERE op.ActualEndDate IS NOT NULL
-       GROUP BY CloseYear, wc.WorkCenterName
+       WHERE op.ActualEndDate <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)
+       GROUP BY EndYear, wc.WorkCenterName
    ) AS centers
-   ORDER BY CloseYear, CenterRank;
+   ORDER BY EndYear, CenterRank;
    ```
 
 b. Compare the RecordedPerPlanned column across the work centers and years.
+c. Read the PlantExcessHours column of each year.
 
-The result, shown in @fig-11-05, ranks the five work centers within each year. The pattern is lopsided. Packing and Quality Assurance record far more direct hours than their operations planned, several times more by fiscal 2026, while Assembly, Cutting, and Finishing record well under their plans, and the gap widens in each year. An efficiency problem would be expected to show up across the plant. Hours concentrated at the end of the routing, beyond anything planned there, could instead mean that time is being recorded against the wrong operations. That is a finding to investigate, not yet an explanation.
+The result, shown in @fig-11-06, ranks the five work centers within each year. The condition on ActualEndDate also leaves out the operations that have not ended, because a comparison with NULL is never true. The pattern is lopsided. Packing and Quality Assurance record far more direct hours than their operations planned, several times more by fiscal 2026, while Assembly, Cutting, and Finishing record well under their plans. Quality Assurance plans so few hours that its ratio is high on a small base, and Packing holds nearly all the excess hours. The window with no ORDER BY, `OVER (PARTITION BY EndYear)`, adds up the excess hours of all five work centers in each year, and the total is negative in every year: the plant as a whole recorded fewer direct hours than its operations planned. If Packing were simply slow, Assembly would not be recording less than its plan at the same time. Hours that move from the start of the routing, the sequence of operations each work order follows, to its end while the total stays within plan point instead to time recorded against the wrong operations. That is a finding to investigate, not yet an explanation.
 
-![Work Centers Ranked by Hours Recorded Against Plan.](/visuals/svg/fig-11-05-work-center-rank.svg){#fig-11-05 fig-alt="A mock of the Execute SQL tab. The query compares the direct labor hours recorded against each work center's operations with their planned load hours, by year, and ranks the work centers with RANK over a window partitioned by year. The grid shows fifteen rows, five work centers for each of three years. Packing and Quality Assurance rank first and second in each year with several times their planned hours, and those rows are outlined."}
+![Work Centers Ranked by Hours Recorded Against Plan.](/visuals/svg/fig-11-06-work-center-rank.svg){#fig-11-06 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that compares the direct labor hours recorded against each work center's operations with their planned load hours, by the year in which the operations ended, in a derived table. The outer query calculates the excess hours and the ratio of recorded to planned hours, ranks the work centers with RANK over a window partitioned by year, and totals the excess hours of each year with SUM over the same partition. The grid is scrolled to the five work centers of 2026. Packing and Quality Assurance rank first and second with about four times their planned hours, and those rows are outlined, while the plant's total excess is negative."}
 
 **Checkpoint.** Check that:
 
 - the year-to-date gap restarts each January, and its December figure grew in each year;
-- the same-month comparison is NULL for fiscal 2024 and shows larger gaps in most months of fiscal 2026;
+- the same-month comparison is NULL for fiscal 2024 and shows larger gaps in most months of fiscal 2026, with July and August 2026 far from the rest;
 - the ranking query returns the three largest months of each year, filtered in the outer query;
-- Packing and Quality Assurance record several times their planned hours, while the other work centers record less than planned.
+- the largest month of each year has three pay dates;
+- Packing and Quality Assurance record several times their planned hours, while the plant as a whole records fewer direct hours than planned;
+- Chapter11.sql holds this tutorial's queries under their comments.
 
-The window functions show that the gap grew steadily and was not the work of a few bad months. They also expose a pattern in the time records that the controller cannot explain from the numbers alone.
+The window functions show that the gap grew from year to year and that its largest months come from the pay calendar, not from a few bad months. They also expose a pattern in the time records that the controller cannot explain from the numbers alone.

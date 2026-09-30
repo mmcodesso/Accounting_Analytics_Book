@@ -2,26 +2,28 @@
 
 ## Key Terms
 
-**CASE expression.** An expression that returns a value chosen by conditions, tested in the order written, with the value of the first true condition returned. A CASE without ELSE returns NULL for rows that meet no condition.
+**CASE expression.** An expression that returns a value chosen by conditions, tested in the order written, with the value of the first true condition returned. A CASE without ELSE returns NULL for rows that meet no condition. The simple form, `CASE x WHEN value THEN ...`, compares one expression with a list of values using `=`, so it never matches NULL.
 
 **Common table expression (CTE).** A named subquery defined at the start of a query with WITH, which the rest of the query can use like a table. Several CTEs in a row turn a long analysis into steps that can be read and checked one at a time.
 
-**Conditional aggregation.** Calculating a total, count, average, minimum, or maximum over only the rows that meet one or more criteria, as SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS do. In SQL, a CASE expression inside an aggregate function, such as `SUM(CASE WHEN ... THEN x ELSE 0 END)`, does the same, so that each category of a column becomes a column of its own in the result.
+**Conditional aggregation.** Calculating a total, count, average, minimum, or maximum over only the rows that meet one or more criteria, as SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS do. In SQL, a CASE expression inside an aggregate function, such as `SUM(CASE WHEN ... THEN x ELSE 0 END)`, does the same, so that each category of a column becomes a column of its own in the result, as in a PivotTable.
 
-**Date function.** A function that reads, formats, or moves a date. In SQLite, strftime formats a date into parts such as a year or a month, date moves a date with modifiers, and julianday converts a date to a number of days.
+**Date function.** A function that reads, formats, or moves a date. In SQLite, strftime formats a date into parts such as a year or a month, date moves a date with modifiers applied in order, and julianday converts a date to a number of days.
 
-**Frame.** The part of a window partition that a window function's calculation uses for each row, such as `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`, the current row and the eleven before it.
+**Frame.** The part of a window partition that a window function's calculation uses for each row, such as `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`, the current row and the eleven before it. A ROWS frame counts rows, not periods. Without a frame clause, an ordered window runs from the first row of the partition through the current row and the rows tied with it.
 
-**LAG and LEAD.** Window functions that return a value from an earlier or a later row of the partition. Over rows ordered by month, `LAG(x, 12)` returns x for the same month of the previous year.
+**LAG and LEAD.** Window functions that return a value from an earlier or a later row of the partition. Over rows ordered by month, with one row for every month, `LAG(x, 12)` returns x for the same month of the previous year; partitioned by the month and ordered by the year, `LAG(x)` does so whatever months are missing.
 
-**Partition.** A group of rows defined by PARTITION BY in a window function. The window never crosses from one partition into another, so a running total partitioned by fiscal year restarts each year.
+**Named window.** A window defined once in a WINDOW clause, as in `WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)`, and used by several window functions with `OVER w`.
+
+**Partition.** A group of rows defined by PARTITION BY in a window function. The window never crosses from one partition into another, so a running total partitioned by fiscal year restarts each year. Unlike GROUP BY, PARTITION BY keeps every row.
 
 **Ranking function.** A window function that numbers the rows of a partition in order. ROW_NUMBER gives every row a different number, RANK gives ties the same number and skips the numbers after them, and DENSE_RANK gives ties the same number without skipping.
 
 **Running total.** A total that accumulates row by row in a set order, such as a year-to-date total. In SQL it is an aggregate window function with ORDER BY, often partitioned by period.
 
-**Trailing twelve months.** A measure calculated over the current month and the eleven before it, which smooths out the swings of single months. In SQL it is a window with the frame `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`.
+**Trailing twelve months.** A measure calculated over the current month and the eleven before it, which smooths out the swings of single months. In SQL it is a window with the frame `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`, over a result with one row for every month.
 
-**View.** A query saved in the database under a name, which can be queried like a table. A view stores the query, not the rows, so every query of it reflects the current data.
+**View.** A query saved in the database under a name, which can be queried like a table. A view stores the query, not the rows, so every query of it reflects the current data. It is changed by dropping it and creating it again.
 
-**Window function.** A function that calculates across a set of rows, its window, while returning a value on every row, written with OVER. Window functions are calculated after WHERE, GROUP BY, and HAVING.
+**Window function.** A function that calculates across a set of rows, its window, while returning a value on every row, written with OVER. Window functions are calculated with the SELECT list, after WHERE, GROUP BY, and HAVING, so neither WHERE nor HAVING can filter on them.

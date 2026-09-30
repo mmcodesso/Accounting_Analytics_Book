@@ -9,17 +9,17 @@ title: "Analytical Queries in SQL"
 After completing this chapter, you will be able to:
 
 1. Classify rows with CASE expressions, and turn values into columns with conditional aggregation.
-2. Use SQLite's date functions to group transactions by period and to measure the time between two dates.
-3. Apply window functions, including ROW_NUMBER, RANK, running totals, moving windows, and LAG, to rank rows and compare periods without collapsing the detail.
+2. Use SQLite's date functions to group transactions by period, find period ends, and measure the time between two dates.
+3. Apply window functions, with partitions, frames, ranking functions, and offset functions such as LAG, to compare rows and periods without collapsing the detail.
 4. Organize a multi-step analysis as a chain of common table expressions that can be read and checked one step at a time.
 5. Save a repeatable analysis as a view in a working copy of the database, and query it like a table.
-6. Combine these techniques into a monthly performance measure that management can track.
+6. Combine these techniques into a monthly performance measure, matched over the same days, that management can track.
 :::
 
 
 ## Opening Scenario {.unnumbered}
 
-The controller has read your answer from Chapter 10. The plant produced about as much in fiscal 2026 as in fiscal 2024, but it recorded about half as many hours again as the standard hours of its output, up from somewhat more than the standard in 2024. Direct labor stayed within the standard, so the extra hours were indirect time, and overtime more than doubled. Their cost, above the standard cost of the output, is most of the manufacturing variance. She wants to take the finding to the plant manager, and she knows the first questions that will come back. When did it start? Is it still getting worse? How much of the extra time is overtime? Is it spread across the plant, or concentrated in a few places?
+The controller has read your answer from Chapter 10. The plant produced about as much in fiscal 2026 as in fiscal 2024, but it recorded about half as many hours again as the standard hours of its output, up from somewhat more than the standard in 2024. Direct labor stayed within the standard, so the extra hours were indirect time, and overtime more than doubled. The cost of those hours was charged to account 1090 and cleared to the variance account when the work orders closed. She wants to take the finding to the plant manager, and she asks you, her staff accountant, to be ready for the first questions that will come back. When did it start? Is it still getting worse? How much of the extra time is overtime? Is it spread across the plant, or concentrated in a few places?
 
 Annual totals cannot answer those questions. She needs a measure she can follow month by month, one that still makes sense in months when production is lumpy. It should also be saved in the database, so that it can be run again next month without rebuilding it. This chapter teaches the SQL features that make such a measure possible: classifying rows, working with dates, calculating across rows without losing them, and organizing a long query into steps that a reviewer can follow.
 
@@ -27,14 +27,14 @@ Annual totals cannot answer those questions. She needs a measure she can follow 
 
 ## Beyond Grouping
 
-The queries of Chapter 10 summarized rows into groups. Many analytical questions need more than that. Sometimes a row must be placed in a category that no column records, such as whether a payroll line is a cost of the company or a deduction from an employee's pay. Sometimes the categories must become columns, so that regular and overtime hours sit side by side for each month. Some questions compare one row with others, such as this month with the same month last year, or ask for a total that accumulates through the year while every month stays visible. And some take so many steps that a single query, with subqueries nested inside subqueries, becomes hard to read and harder to check.
+The queries of Chapter 10 summarized rows into groups. Many analytical questions need more than that. Sometimes a row must be placed in a category that no column records, such as whether a payroll line is a cost of the company or a deduction from an employee's pay. Sometimes the categories must become columns, so that direct and indirect hours sit side by side for each month. Some questions compare one row with others, such as this month with the same month last year, or ask for a total that accumulates through the year while every month stays visible. And some take so many steps that a single query, with subqueries nested inside subqueries, becomes hard to read and harder to check.
 
 The four features of this chapter answer those needs. CASE expressions classify rows. Date functions turn dates into periods and measure the time between them. Window functions calculate across rows without collapsing them. Common table expressions and views break a long analysis into named steps and save it for reuse.
 
 
 ## Classifying Rows with CASE
 
-A CASE expression returns a value chosen by conditions, much as nested IF formulas do in Excel. The searched form lists conditions in order and returns the value of the first one that is true:
+A CASE expression returns a value chosen by conditions, much as the IFS function does in Excel (Chapter 5). The searched form lists conditions in order and returns the value of the first one that is true:
 
 ```sql
 SELECT PayrollRegisterLineID, LineType, Amount,
@@ -49,43 +49,23 @@ SELECT PayrollRegisterLineID, LineType, Amount,
 FROM PayrollRegisterLine;
 ```
 
-CASE can appear anywhere a value can: in SELECT, in WHERE, in GROUP BY, and in ORDER BY. Three details matter. The conditions are tested in the order written, and the first true one wins, so a broad condition placed first hides the narrower ones below it. A CASE with no ELSE returns NULL for rows that meet no condition, which is rarely what you want, so write an ELSE even when you expect it never to be used. The simple form, `CASE LineType WHEN 'Regular Earnings' THEN ... END`, compares one column with a list of values, and it is shorter when every condition is an equality on the same column.
+CASE can appear anywhere a value can: in SELECT, in WHERE, in GROUP BY, and in ORDER BY. Three details matter. The conditions are tested in the order written, and the first true one wins, so a broad condition placed first hides the narrower ones below it. A CASE with no ELSE returns NULL for rows that meet no condition. In a classification that is rarely what you want, so write an ELSE even when you expect it never to be used; the exception, in the next section, is a CASE whose NULL is meant to be skipped. The simple form, `CASE LineType WHEN 'Regular Earnings' THEN ... END`, compares one expression with a list of values, and it is shorter when every condition is an equality on the same column. It compares with `=`, so `WHEN NULL` never matches, because a comparison with NULL is never true; test for NULL with the searched form, `WHEN x IS NULL`.
 
-CASE is also the way to sort rows in an order that no column holds, such as the order of the financial statements. This ORDER BY clause lists the assets first and the expenses last, where an alphabetical sort would put Equity before Liability:
-
-<!-- sql-check: skip -->
+CASE is also the way to sort rows in an order that no column holds, such as the order of the financial statements. This query counts the accounts of each type and lists the assets first and the expenses last, where an alphabetical sort would put Equity before Liability:
 
 ```sql
+SELECT AccountType, COUNT(*) AS Accounts
+FROM Account
+GROUP BY AccountType
 ORDER BY CASE AccountType
     WHEN 'Asset' THEN 1 WHEN 'Liability' THEN 2 WHEN 'Equity' THEN 3
-    WHEN 'Revenue' THEN 4 ELSE 5 END
+    WHEN 'Revenue' THEN 4 ELSE 5 END;
 ```
-
-
-## Turning Rows into Columns with Conditional Aggregation
-
-A CASE expression inside an aggregate function turns categories into columns. The expression passes the value of the rows that meet a condition and zero for the others, so the sum counts only the rows of one category:
-
-```sql
-SELECT strftime('%Y-%m', WorkDate) AS WorkMonth,
-    ROUND(SUM(RegularHours), 0) AS RegularHours,
-    ROUND(SUM(OvertimeHours), 0) AS OvertimeHours,
-    ROUND(SUM(CASE WHEN WorkOrderOperationID IS NULL
-        THEN RegularHours + OvertimeHours ELSE 0 END), 0) AS NotOnWorkOrder
-FROM LaborTimeEntry
-WHERE LaborType <> 'NonManufacturing'
-GROUP BY WorkMonth
-ORDER BY WorkMonth;
-```
-
-Each month becomes one row, and each category a column, as @fig-11-01 illustrates. The technique is called conditional aggregation, and it does in one query what a PivotTable does in Excel: it spreads a measure across the values of a category. Unlike a PivotTable, the columns must be named in the query, so it suits categories you know in advance. `COUNT(CASE WHEN ... THEN 1 END)` counts the rows of a category in the same way, because COUNT skips the NULL that a CASE without ELSE returns.
-
-![Conditional Aggregation Turns Rows into Columns.](/visuals/svg/fig-11-01-conditional-aggregation.svg){#fig-11-01 fig-alt="On the left, a sample of six Charles River labor time entries of one day, each with its regular hours, overtime hours, and whether it is charged to a work order operation. On the right, one summary row for the sample with separate columns for regular hours, overtime hours, and hours not on a work order, each the sum of a CASE expression that passes the hours of one category and zero for the others."}
 
 
 ## Working with Dates
 
-SQLite has no date type. The Charles River dates are text in the form year-month-day, and times, where they exist, follow a space, as in 2024-01-06 10:00:00. SQLite's date functions read text in that form, calculate with it, and return text or numbers (SQLite, n.d.-a). @tbl-11-01 lists the ones you will use most.
+The Charles River dates are text in the form year-month-day, as Chapter 9 showed, and times, where they exist, follow a space, as in 2024-01-06 10:00:00. SQLite's date functions read text in that form, calculate with it, and return text or numbers (SQLite, n.d.-b). The date function returns a date moved by modifiers, text arguments such as `'start of month'` or `'+1 month'` that follow the date and are applied in order, from left to right. @tbl-11-01 lists the functions you will use most.
 
 | Function | Returns | Example result |
 |---|---|---|
@@ -100,13 +80,52 @@ SQLite has no date type. The Charles River dates are text in the form year-month
 
 : SQLite date functions, for the date d of 2026-03-06 {#tbl-11-01}
 
-strftime formats a date. Its first argument is a pattern in which each code beginning with `%` is replaced by a part of the date, so `strftime('%Y-%m', WorkDate)` gives the month of each work date, ready to group by. The date function returns a date, moved by any modifiers that follow it, which are applied in order. `date(d, 'start of month', '+1 month', '-1 day')` is the last day of d's month, a common need in accounting. julianday converts a date to a count of days, so the difference between two julianday values is the number of days between the dates. It is the SQL counterpart of subtracting one date from another in Excel.
+strftime formats a date. Its first argument is a pattern in which each code beginning with `%` is replaced by a part of the date, so `strftime('%Y-%m', WorkDate)` gives the month of each work date, ready to group by. A common need in accounting is the last day of a month. `date(d, 'start of month', '+1 month', '-1 day')` moves to the first of d's month, then to the first of the next month, and then back one day, so it returns the month's last day whatever its length. The query below uses it to count the journal entries posted on the last day of a month:
+
+```sql
+SELECT EntryType, COUNT(*) AS Entries
+FROM JournalEntry
+WHERE PostingDate
+    = date(PostingDate, 'start of month', '+1 month', '-1 day')
+GROUP BY EntryType
+ORDER BY Entries DESC;
+```
+
+Most of the entries it finds are accruals and depreciation, the entries that close each month. julianday converts a date to a count of days, so the difference between two julianday values is the number of days between the dates. It is the SQL counterpart of subtracting one date from another in Excel.
 
 In this data, the fiscal year is the calendar year, and GLEntry's FiscalPeriod is the calendar month, so strftime on a posting date and the FiscalYear and FiscalPeriod columns always agree. That is not true of every company, and a fiscal year that starts in another month needs a mapping from calendar months to fiscal periods.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-Date functions return text, except julianday, which returns a number. `strftime('%Y', d)` returns '2026', not 2026, and text never equals a number in a comparison between expressions, so a condition such as `strftime('%Y', PostingDate) = 2026` finds no rows. Compare with text, as in `strftime('%Y', PostingDate) = '2026'`, or convert with CAST. Other database systems name these functions differently, for example YEAR, DATEADD, and DATEDIFF in Microsoft SQL Server, so date logic is the part of a query most likely to need rewriting in another system.
+The order of the modifiers matters. `date('2026-01-31', '+1 month')` returns 2026-03-03, because SQLite moves to 31 February and then carries the extra days into March, so apply `'start of month'` first whenever you step from month to month. Date functions also return text, except julianday, which returns a number. Chapter 9 showed that a quoted number is converted to the type of the column it is compared with, but a function's result is not a column, and nothing is converted: `strftime('%Y', PostingDate) = 2026` compares text with a number and finds no rows. Compare with text, as in `strftime('%Y', PostingDate) = '2026'`, or convert with CAST. Other database systems name these functions differently, for example YEAR, DATEADD, and DATEDIFF in Microsoft SQL Server, so date logic is the part of a query most likely to need rewriting in another system.
+:::
+
+
+## Turning Rows into Columns with Conditional Aggregation
+
+A CASE expression inside an aggregate function turns categories into columns. Tutorial 10.2 listed the postings to account 1090 by year and source document type, one row for each combination. The query below puts the sources side by side instead, with one row for each year. Each CASE passes the amount of the rows of one source and zero for the others, so each sum collects one source:
+
+```sql
+SELECT FiscalYear,
+    ROUND(SUM(CASE WHEN SourceDocumentType = 'PayrollSummary'
+        THEN Debit ELSE 0 END), 2) AS Payroll,
+    ROUND(SUM(CASE WHEN SourceDocumentType = 'JournalEntry'
+        THEN Debit ELSE 0 END), 2) AS JournalEntries,
+    ROUND(SUM(CASE WHEN SourceDocumentType = 'ProductionCompletion'
+        THEN Credit ELSE 0 END), 2) AS Completions
+FROM GLEntry
+WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026
+GROUP BY FiscalYear
+ORDER BY FiscalYear;
+```
+
+@fig-11-01 shows the rows of fiscal 2026 before and after. The technique is called conditional aggregation. Unlike a PivotTable, which creates a column for every value it finds, the query names its columns, so it suits categories you know in advance. The same idea counts rows. `COUNT(CASE WHEN LaborType = 'Indirect Manufacturing' THEN 1 END)` counts the indirect entries, because the CASE, with no ELSE, returns NULL for the other rows, and COUNT skips NULLs. `SUM(CASE WHEN LaborType = 'Indirect Manufacturing' THEN 1 ELSE 0 END)` gives the same count, and its CASE is the form to use when you want a flag of 1 or 0 on every row.
+
+![Conditional Aggregation Turns Rows into Columns.](/visuals/svg/fig-11-01-conditional-aggregation.svg){#fig-11-01 fig-alt="On the left, the postings to account 1090 in fiscal 2026 summarized by source document type, one row each for journal entries, payroll summaries, production completions, and work order closes, with their debits and credits. On the right, one row for fiscal 2026 with a column each for payroll, journal entries, and completions. Numbered badges link each source's debit or credit on the left to the column that receives it, and three lines below give the CASE expression behind each column. A note explains that the work order close rows meet no condition and add zero to every column."}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+In Chapter 5 you classified invoices by their payment terms with IFS, and in Chapter 6 you totaled revenue by category with SUMIFS and PivotTables. CASE is the SQL form of IFS, and a CASE inside SUM is the SQL form of SUMIFS: the condition decides which rows count, and the sum adds what passes. The difference is where the result lives. The Excel formulas sit in cells and are checked cell by cell. The query is one piece of text that produces every row and column at once, and it runs unchanged on next year's data.
 :::
 
 
@@ -115,7 +134,25 @@ Date functions return text, except julianday, which returns a number. `strftime(
 
 ## Window Functions
 
-An aggregate with GROUP BY collapses rows into one row per group. A window function calculates across a set of rows but returns a value on every row, so the detail stays visible beside the calculation (SQLite, n.d.-b). SQLite added window functions in version 3.25, and every current release of DB Browser includes a later version. You write it with OVER, which defines the window, the set of rows the function looks at:
+An aggregate with GROUP BY collapses rows into one row per group. A window function calculates across a set of rows but returns a value on every row, so the detail stays visible beside the calculation (SQLite, n.d.-c). You write it with OVER, which defines the window, the set of rows the function looks at for each row. SQLite added window functions in version 3.25, released in 2018. DB Browser 3.13.1 includes a much later version, and `SELECT sqlite_version();` shows the version on any computer.
+
+### Partitions and Order
+
+With nothing inside the parentheses, `OVER ()`, the window is every row of the result. With PARTITION BY, it is the rows that share the current row's values of the partition columns. The query below shows each sellable item with the average standard cost of its item group and of all the items:
+
+```sql
+SELECT ItemCode, ItemGroup, StandardCost,
+    ROUND(AVG(StandardCost) OVER (PARTITION BY ItemGroup), 2)
+        AS GroupAverage,
+    ROUND(AVG(StandardCost) OVER (), 2) AS OverallAverage
+FROM Item
+WHERE ListPrice IS NOT NULL
+ORDER BY ItemGroup, ItemCode;
+```
+
+`GROUP BY ItemGroup` would return one row for each group. `PARTITION BY ItemGroup` keeps every item and places its group's average beside it. GROUP BY decides which rows the result has, and PARTITION BY decides which rows each calculation sees. The window never crosses from one partition into another.
+
+ORDER BY inside OVER sets the order of the rows within each partition. For an aggregate such as SUM, it also changes the window: unless the query says otherwise, the window runs from the first row of the partition through the current row, so the sum becomes a running total. The expression below is a year-to-date total that starts again at zero in each fiscal year:
 
 <!-- sql-check: skip -->
 
@@ -123,28 +160,99 @@ An aggregate with GROUP BY collapses rows into one row per group. A window funct
 SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)
 ```
 
-PARTITION BY divides the rows into groups, much as GROUP BY does, but without collapsing them, and the window never crosses from one partition into another. ORDER BY inside OVER sets the order of the rows within each partition. For an aggregate such as SUM, an ORDER BY also limits the window to the rows up to the current one, so the expression above is a running total, a year-to-date total that starts again at zero in each fiscal year. @fig-11-03 shows a partition and a moving window over the months of two years.
+One detail of this default matters. The window it defines includes every row tied with the current row on the ORDER BY columns, its peers, so tied rows all show the total through the last of them (SQLite, n.d.-c). Each fiscal period appears once in each year, so the year-to-date total above has no ties. A running total of postings ordered by their date would have many, and there you should say explicitly that the window stops at the current row, with `ROWS UNBOUNDED PRECEDING`, as the next pages explain.
+
+### Ranking Rows
+
+Ranking functions number the rows of a partition in the order of the window's ORDER BY. ROW_NUMBER gives every row a different number. RANK gives tied rows the same number and skips the numbers after them, and DENSE_RANK gives ties the same number without skipping. The query below ranks the Furniture items by the standard labor hours each unit needs, a column in which several pairs of items tie:
+
+```sql
+SELECT ItemCode, StandardLaborHoursPerUnit,
+    ROW_NUMBER() OVER (ORDER BY StandardLaborHoursPerUnit DESC)
+        AS RowNum,
+    RANK() OVER (ORDER BY StandardLaborHoursPerUnit DESC) AS RankNum,
+    DENSE_RANK() OVER (ORDER BY StandardLaborHoursPerUnit DESC)
+        AS DenseRankNum
+FROM Item
+WHERE ItemGroup = 'Furniture'
+ORDER BY StandardLaborHoursPerUnit DESC, ItemCode
+LIMIT 10;
+```
+
+The first two ties appear in the seventh to tenth rows. RANK and DENSE_RANK give each pair one number, and after the first pair RANK skips a number while DENSE_RANK does not. ROW_NUMBER gives the two items of a pair different numbers, in whatever order it meets them, which need not be the order of the result. When you need a stable numbering, add a column that is unique, such as ItemCode, to the window's ORDER BY.
+
+### Frames
+
+A frame clause sets exactly which rows of the partition each calculation uses. `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` takes the current row and the eleven rows before it, so a sum over months with that frame is a trailing twelve-month total. `ROWS UNBOUNDED PRECEDING` takes every row from the first of the partition to the current one, a running total that ignores ties. @fig-11-03 shows a partition and a moving frame over the months of two years.
 
 ![Partitions and Frames in a Window Function.](/visuals/svg/fig-11-03-window-frames.svg){#fig-11-03 fig-alt="Twenty-four months of fiscal 2025 and 2026 in a column, each with a monthly amount. One bracket shows a partition, the months of one fiscal year, and beside it a year-to-date total that restarts in January. A second bracket shows a moving frame of three months, the current month and the two before it, sliding down the column, with the total of the three months shown beside each row. A note explains that a partition decides which rows belong together and a frame decides which of them each row's calculation uses."}
 
-Window functions fall into three families, which @tbl-11-02 summarizes. Ranking functions number the rows of a partition in order. ROW_NUMBER gives every row a different number. RANK gives tied rows the same number and skips the numbers after them, and DENSE_RANK gives ties the same number without skipping. Aggregate functions, such as SUM, AVG, and COUNT, become running or moving totals when their window has an ORDER BY. Offset functions look at another row: `LAG(x, 1)` returns x from the previous row of the partition and `LEAD(x, 1)` from the next, so `LAG(x, 12)` over months returns the same month of the previous year.
+A ROWS frame counts rows, not months. Over a result with one row for every month, eleven rows back is eleven months back. If a month is missing, because nothing was recorded in it, the frame silently reaches one month further, so a query that relies on a frame should first check that it has one row for every month. Moving totals like these smooth out a month in which production or payroll happens to be lumpy, which is why management reports so often show them.
+
+When several functions share one window, the WINDOW clause names it once. It follows the WHERE, GROUP BY, and HAVING clauses and comes before ORDER BY, and each function then refers to the window by name:
+
+<!-- sql-check: skip -->
+
+```sql
+SUM(LaborHours) OVER w / SUM(StandardHours) OVER w
+...
+WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)
+```
+
+`COUNT(*) OVER w` counts the rows in each window, which shows where a window holds fewer than twelve months, as the first eleven months of the data do.
+
+### Comparing with Earlier Rows
+
+Offset functions return a value from another row of the partition. `LAG(x, 1)` returns x from the previous row, `LEAD(x, 1)` from the next, and the second argument can be left out when it is 1. Over rows ordered by year and month, `LAG(x, 12)` returns the value of the same month of the previous year, provided that every month has a row. Partitioning by the month removes that proviso: `LAG(x) OVER (PARTITION BY FiscalPeriod ORDER BY FiscalYear)` compares each month with the same month of the previous year, whatever else is missing. The query below compares each item group's manufacturing variance with its variance of the year before:
+
+```sql
+SELECT i.ItemGroup, strftime('%Y', woc.CloseDate) AS CloseYear,
+    ROUND(SUM(woc.TotalVarianceAmount), 2) AS Variance,
+    ROUND(LAG(SUM(woc.TotalVarianceAmount)) OVER (
+        PARTITION BY i.ItemGroup
+        ORDER BY strftime('%Y', woc.CloseDate)), 2) AS PriorYear
+FROM WorkOrderClose AS woc
+    INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID
+    INNER JOIN Item AS i ON i.ItemID = wo.ItemID
+GROUP BY i.ItemGroup, CloseYear
+ORDER BY i.ItemGroup, CloseYear;
+```
+
+PriorYear is NULL in the first year of each group, which has no earlier row in its partition. The window repeats the expression `strftime('%Y', woc.CloseDate)` rather than the alias CloseYear, because an alias of the SELECT list cannot be used inside OVER; SQLite answers `no such column: CloseYear`. @tbl-11-02 summarizes the window functions of this chapter, and @tbl-11-03 the clauses that shape a window.
 
 | Function | Returns |
 |---|---|
 | `ROW_NUMBER()` | A sequence number within the partition: 1, 2, 3, even for ties |
 | `RANK()`, `DENSE_RANK()` | A rank in which ties share a number; RANK skips numbers after a tie |
 | `SUM(x) OVER (...)` | A total over the window: the whole partition, or a running or moving total |
+| `AVG`, `COUNT`, `MIN`, `MAX` | The same aggregates over the window |
 | `LAG(x, n)`, `LEAD(x, n)` | The value of x n rows before, or after, the current row |
 
 : Window functions used in this chapter {#tbl-11-02}
 
-A frame clause controls exactly which rows of the partition each calculation uses. `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` takes the current row and the eleven before it, so a sum over months with that frame is a trailing twelve-month total. Moving totals like this smooth out a month in which production or payroll happens to be lumpy, which is why management reports so often show them.
+| Clause | Effect |
+|---|---|
+| `OVER ()` | The window is every row of the result |
+| `PARTITION BY` | Divides the rows into groups that the window never crosses |
+| `ORDER BY` | Orders each partition; for an aggregate, the default window runs to the current row and its peers |
+| `ROWS BETWEEN n PRECEDING AND CURRENT ROW` | The current row and the n rows before it |
+| `ROWS UNBOUNDED PRECEDING` | Every row from the first of the partition to the current one |
+| `WINDOW w AS (...)` | Names a window, for use as `OVER w` |
 
-Window functions are calculated after WHERE, GROUP BY, and HAVING, just before ORDER BY. Two consequences follow. A window function can work on the results of a grouping, so `SUM(SUM(Debit)) OVER (...)` is a running total of monthly totals. But a WHERE clause cannot filter on a window function's result, because WHERE has already run. To keep only the top-ranked rows, or only the months with a full twelve-month window, calculate the window function in a derived table or a common table expression, and filter the result in the outer query.
+: Clauses that define a window {#tbl-11-03}
+
+### When Window Functions Are Calculated
+
+In the logical order of @fig-10-05, window functions are calculated with the SELECT list, after WHERE, GROUP BY, and HAVING, and before DISTINCT, ORDER BY, and LIMIT. Two consequences follow. A window function can work on the results of a grouping, so `SUM(SUM(Debit)) OVER (...)` is a running total of monthly totals. But neither WHERE nor HAVING can filter on a window function's result, because both have already run; SQLite rejects the attempt with `misuse of window function`. To keep only the top-ranked rows, or only the months with a full twelve-month window, calculate the window function in a derived table or a common table expression, and filter the result in the outer query.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Trailing twelve-month totals and year-over-year comparisons are standard in management reporting, because they separate a trend from the swings of a single month. A plant controller who reports that labor hours per standard hour rose in March may be reporting noise. A controller who reports that the trailing twelve-month figure has risen in each quarter for two years is reporting a trend, and the window functions of this section produce both figures from the same rows.
+Trailing twelve-month totals and year-over-year comparisons are standard in management reporting, because they separate a trend from the swings of a single month. A plant controller who reports that labor hours per standard hour rose in March may be reporting noise. A controller who reports that the trailing twelve-month figure has risen over two years is reporting a trend. The price of the smoothing is delay: a trailing figure turns months after the monthly figures do, so the two are read together, and the window functions of this section produce both from the same rows.
+:::
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Chapter 6 showed the same calculations in a PivotTable with Show Values As: a share of a total, a running total, a difference from the previous item, and a rank. Window functions are their SQL form, with `OVER ()` for the share, an ordered SUM for the running total, LAG for the difference, and RANK for the rank. In Chapter 7 you compared each quarter with the same quarter a year earlier to judge a forecast; `LAG` partitioned by the month makes the same comparison for every month at once.
 :::
 
 
@@ -171,30 +279,47 @@ FROM MonthlyGap
 ORDER BY FiscalYear, FiscalPeriod;
 ```
 
-The CTE totals, for each month, the actual cost charged to account 1090 less the standard cost released by completions, leaving out the work order closes that clear the difference to the variance account. The outer query then adds a year-to-date total. A query can define several CTEs, separated by commas, and each one can use the ones before it. A long analysis then reads from top to bottom as a series of steps, each with a name that says what it produces, instead of from the inside out as nested subqueries do. Each step can be checked on its own, by running the query with a final `SELECT * FROM` the step's name. The database treats a CTE much as it treats a derived table, so the choice between them is about readability, not speed. For anything longer than one subquery, and for any step used more than once, a CTE is easier to follow and to review.
+The CTE totals, for each month, the actual cost charged to account 1090 less the standard cost released by completions, leaving out the work order closes that clear the difference to the variance account. The outer query then adds a year-to-date total. A query can define several CTEs, separated by commas, and each one can use the ones before it. A long analysis then reads from top to bottom as a series of steps, each with a name that says what it produces, instead of from the inside out as nested subqueries do. Each step can be checked on its own, by running the steps up to it with a final `SELECT * FROM` its name.
 
-@fig-11-06, in Tutorial 11.3, shows the chain of CTEs that builds the controller's monthly measure. Output and labor hours are summarized in separate steps, the steps are joined by month, and the last step calculates the trailing twelve-month figures.
+A CTE also gives a query one place for its parameters. A one-row CTE holds a value, and a scalar subquery from Chapter 10 reads it wherever it is needed, so that changing the value in one place changes the whole query:
+
+```sql
+WITH Params AS (
+    SELECT '2026-12-31' AS AsOfDate
+)
+SELECT COUNT(*) AS Postings
+FROM GLEntry
+WHERE PostingDate <= (SELECT AsOfDate FROM Params);
+```
+
+The SQLite documentation describes a CTE as working like a view that exists for the length of one statement (SQLite, n.d.-d). The database is free to calculate it once and keep the result, or to treat it like a derived table, whichever it expects to be faster, so the choice between a CTE and a derived table is about readability, not speed. For anything longer than one subquery, and for any step used more than once, a CTE is easier to follow and to review. @fig-11-07, in Tutorial 11.3, shows the chain of CTEs that builds the controller's monthly measure.
 
 
 ## Saving an Analysis as a View
 
-A view is a query saved in the database under a name. Once created, it can be queried like a table, and every query of it runs the saved query again against the current data. A view stores the query, not the rows, so it never goes out of date:
+A view is a query saved in the database under a name. Once created, it can be queried like a table, and every query of it runs the saved query again against the current data. A view stores the query, not the rows, so it never goes out of date (SQLite, n.d.-a). A view cannot be changed in place, so a script that creates one drops it first, and can then be run again whenever the query changes:
 
 <!-- sql-check: skip -->
 
 ```sql
+DROP VIEW IF EXISTS MonthlyLaborEfficiency;
 CREATE VIEW MonthlyLaborEfficiency AS
 WITH ...
 SELECT ...;
 ```
 
-Views suit analyses that are run again and again, such as a monthly report, a standard audit extract, or a reconciliation. The person who uses the view does not have to understand every join inside it, and every user gets the same logic, which makes a view a control as well as a convenience. To change a view, drop it and create it again: `DROP VIEW IF EXISTS MonthlyLaborEfficiency;` removes it, and does nothing if it does not exist.
+`DROP VIEW IF EXISTS` removes the view, and does nothing if it does not exist yet. Leave ORDER BY out of a view: the order of the rows belongs to the query that uses the view, which adds its own ORDER BY. Views suit analyses that are run again and again, such as a monthly report, a standard audit extract, or a reconciliation. The person who uses the view does not have to understand every join inside it, and every user gets the same logic, which makes a view a control as well as a convenience.
 
-A view is the one thing in this Part that you write into the database, which is the reason for the working copy you made in Chapter 9. The view lives in CharlesRiver_Work.sqlite, and the file you downloaded is never changed. In DB Browser, a CREATE VIEW statement takes effect at once in the open database, but it is saved in the file only when you click Write Changes. If you only need a view for one session, `CREATE TEMP VIEW` creates it in memory, even in a database opened read-only, and it disappears when the database is closed.
+A view is the one thing in this Part that you write into the database, which is the reason for the working copy you made in Chapter 9. The view lives in CharlesRiver_Work.sqlite, and the file you downloaded is never changed. In DB Browser, a CREATE VIEW statement takes effect at once in the open database, and the view appears on the Database Structure tab, but it is saved in the file only when you click Write Changes. If you close the database first, DB Browser asks whether to save the changes, and Discard removes the view. If you need a view only for one session, `CREATE TEMP VIEW` creates it in a temporary database that disappears when the database is closed, and it works even in a database opened read-only.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
 A view depends on the names of the tables and columns it uses. If one of them is renamed or removed, the view stops working, and the error appears only when someone queries the view. Document every view with a comment in its script, stating its purpose, its source tables, and the checks its results should pass, just as you document any other query.
+:::
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+A chain of CTEs is the SQL form of the Applied Steps of a Power Query query in Chapters 4 and 5, where each step takes the result of the one before it and can be inspected by selecting it. A view is the counterpart of a loaded query that you refresh: the steps are kept, not their results, and each refresh, or each query of the view, runs them again on the current data.
 :::
 
 
@@ -203,9 +328,11 @@ A view depends on the names of the tables and columns it uses. If one of them is
 
 ## Looking Ahead
 
-This chapter has added four tools to your SQL. You classified rows with CASE and turned categories into columns with conditional aggregation. You used strftime, date, and julianday to group transactions by month and to measure how long work orders took. You applied window functions to calculate year-to-date totals, compare each month with the same month a year earlier, rank months and work centers, and build trailing twelve-month measures. Finally, you organized the controller's monthly measure as a chain of common table expressions and saved it as a view, which she can now run again whenever the data changes.
+This chapter has added four tools to your SQL. You classified rows with CASE and turned categories into columns with conditional aggregation. You used strftime, date, and julianday to group transactions by month, to find how far the time records fall short of a month's end, and to measure how long work orders took. You applied window functions to calculate year-to-date totals, compare each month with the same month a year earlier, rank months and work centers, and build trailing twelve-month measures. Finally, you organized the controller's monthly measure as a chain of common table expressions and saved it as a view, which she can now run again whenever the data changes.
 
-The measure tells a consistent story. Hours per standard hour, measured over a trailing twelve months, rose through fiscal 2025 and fiscal 2026. The share of overtime rose with it, and work orders took far longer to complete. The time recorded against work orders tells a stranger one. The Packing and Quality Assurance work centers recorded several times the hours their operations planned, while Assembly, Cutting, and Finishing recorded well under their plans. The controller's explanation will go to the audit committee, and its first question will be whether those hours are real. Were they worked, recorded against the right operations, approved, and paid correctly? That is a question about the reliability of the records rather than their meaning, and in Chapter 12 the internal auditors take it up.
+The measure answers her four questions. The change began in the middle of fiscal 2024. Indirect time is almost absent from the time records in the first months of that year and appears in every month from June 2024, and the overtime share of direct labor started to climb in the same summer. Whether it is still getting worse depends on the kind of labor. Indirect time per standard hour has been roughly flat since the middle of fiscal 2025, while direct hours per standard hour crept up through fiscal 2026, still within the standard, and the trailing measure reached its highest point in October 2026. By the end of fiscal 2026 about a fifth of all the hours were overtime, and the share had risen only on direct labor, where more than a quarter of the hours were paid at overtime rates. And the time recorded against work orders is concentrated in a way that the plant's totals hide: the Packing and Quality Assurance work centers recorded several times the hours their operations planned, while Assembly, Cutting, and Finishing recorded well under their plans.
+
+The controller's explanation will go to the audit committee, and its first question will be whether the records behind it are reliable. Were the hours worked, recorded against the right operations, approved, and paid correctly? Why does indirect time almost vanish from the records for four months? That is a question about the reliability of the records rather than their meaning, and in Chapter 12 the internal auditors take it up.
 
 
 

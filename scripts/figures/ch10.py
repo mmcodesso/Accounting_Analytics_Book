@@ -161,6 +161,15 @@ QUERIES = [
      "WHERE cc.CostCenterName = 'Manufacturing'\n"
      "    AND pp.FiscalYear BETWEEN 2024 AND 2026\n"
      "GROUP BY pp.FiscalYear;"),
+    ("record_ends", "-- Tutorial 10.3: the last day of the time records and of the output",
+     "SELECT (SELECT MAX(WorkDate) FROM LaborTimeEntry) AS LastWorkDate,\n"
+     "    (SELECT MAX(CompletionDate) FROM ProductionCompletion)\n"
+     "        AS LastCompletionDate;"),
+    ("last_periods", "-- Tutorial 10.3: the pay periods at the end of the data",
+     "SELECT PeriodNumber, PeriodStartDate, PeriodEndDate, PayDate, Status\n"
+     "FROM PayrollPeriod\n"
+     "WHERE PeriodEndDate >= '2026-12-01'\n"
+     "ORDER BY PeriodStartDate;"),
     ("hours_by_type", "-- Tutorial 10.3: hours per standard hour, by labor type",
      "SELECT h.WorkYear, h.LaborType, h.Hours, o.StandardHours,\n"
      "    ROUND(h.Hours / o.StandardHours, 2) AS HoursPerStandardHour\n"
@@ -179,6 +188,8 @@ QUERIES = [
      "            INNER JOIN ProductionCompletion AS pc\n"
      "                ON pc.ProductionCompletionID = pcl.ProductionCompletionID\n"
      "            INNER JOIN Item AS i ON i.ItemID = pcl.ItemID\n"
+     "        WHERE pc.CompletionDate\n"
+     "            <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)\n"
      "        GROUP BY WorkYear\n"
      "    ) AS o ON o.WorkYear = h.WorkYear\n"
      "ORDER BY h.WorkYear, h.LaborType;"),
@@ -404,6 +415,10 @@ def fig_10_08() -> Diagram:
     direct = [r[4] for r in rows if r[1] == "Direct Manufacturing"]
     indirect = [r[4] for r in rows if r[1] == "Indirect Manufacturing"]
     assert [r[0] for r in rows] == ["2024", "2024", "2025", "2025", "2026", "2026"], rows
+    last_work, last_completion = one(CHAPTER10.location("record_ends")[1])
+    assert last_work == "2026-12-11" and last_completion == "2026-12-31", (last_work, last_completion)
+    open_periods = [r[0] for r in db.run(CHAPTER10.location("last_periods")[1])[1] if r[4] == "Open"]
+    assert open_periods == ["PP-2026-078", "PP-2026-079"], open_periods
     assert all(0.8 < x < 1.0 for x in direct), direct            # direct time within standard
     assert indirect == sorted(indirect) and indirect[2] > 1.5 * indirect[0], indirect
     totals = [round(a + b, 2) for a, b in zip(direct, indirect)]

@@ -13,15 +13,15 @@ D.  NULL
 
 A.  It is classified as Very large, because that condition is more specific
 B.  It is classified as Large, because the first true condition wins
-C.  It is classified in both categories
-D.  It is left unclassified, because two conditions are true
+C.  It is classified as Very large, because the larger threshold is tested first
+D.  It returns NULL, because CASE cannot choose between two true conditions
 
 **3.** Which expression totals only the overtime earnings in a query grouped by month?
 
 A.  `SUM(Amount) WHERE LineType = 'Overtime Earnings'`
-B.  `COUNT(LineType = 'Overtime Earnings')`
+B.  `COUNT(CASE WHEN LineType = 'Overtime Earnings' THEN Amount END)`
 C.  `SUM(CASE WHEN LineType = 'Overtime Earnings' THEN Amount ELSE 0 END)`
-D.  `CASE WHEN SUM(Amount) > 0 THEN 'Overtime Earnings' END`
+D.  `CASE WHEN LineType = 'Overtime Earnings' THEN SUM(Amount) END`
 
 **4.** What does `strftime('%Y-%m', WorkDate)` return for a WorkDate of 2026-03-06?
 
@@ -51,7 +51,7 @@ B.  The total gap of the whole fiscal year, repeated on every monthly row
 C.  The gap of the previous month in the same fiscal year
 D.  The total of all the gaps in the table, across every fiscal year
 
-**8.** Over rows ordered by fiscal year and period, what does `LAG(Gap, 12)` return?
+**8.** Over rows ordered by fiscal year and period, with one row for every month, what does `LAG(Gap, 12)` return?
 
 A.  The average gap of the last twelve months, including this one
 B.  The gap of the same month of the previous year
@@ -72,19 +72,19 @@ B.  WHERE runs before window functions, so no rank exists yet
 C.  RANK can only be used in an ORDER BY clause, not in a condition
 D.  A WHERE clause cannot appear in a query that also uses GROUP BY
 
-**11.** What does the frame `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` produce over rows ordered by month?
+**11.** A query calculates `SUM(Amount) OVER (ORDER BY PostingDate)` over ledger lines, and two lines share a PostingDate. What does the running total show on those two lines?
 
-A.  The current month and the eleven months before it
-B.  The current month and the eleven months after it
-C.  Every month in the table, from the first to the last
-D.  The same month in each of the last eleven years
+A.  The same total on both, including the amounts of both lines
+B.  A total on the first that leaves out the second, and on the second that includes both
+C.  NULL on both, because the order of tied rows is undefined
+D.  An error, because the ORDER BY inside OVER must be unique
 
 **12.** What is the main advantage of writing a long analysis as a chain of common table expressions?
 
 A.  CTEs always run faster than the same query written with derived tables
 B.  CTEs save their results in the database for use by later queries
 C.  Each step is named and can be checked on its own, from the top down
-D.  CTEs remove the need to join tables, because each step reads one table
+D.  A CTE is the only way to use the same subquery twice in one query
 
 **13.** What does a view such as MonthlyLaborEfficiency store in the database?
 
@@ -93,14 +93,14 @@ B.  A summary table that must be refreshed by hand after each change
 C.  The result of its query as of the last time Write Changes was clicked
 D.  The query itself, which runs on the current data each time
 
-**14.** Why do the Part III tutorials create the view in CharlesRiver_Work.sqlite rather than in the downloaded file?
+**14.** What is the difference between `GROUP BY ItemGroup` in a query and `PARTITION BY ItemGroup` in a window function?
 
-A.  Only a file with a new name can hold a view that you create
-B.  A view changes the file, and the download stays unchanged
-C.  Views cannot be created in a database file of more than 100 MB
-D.  The downloaded file does not show a Database Structure tab
+A.  GROUP BY sorts the rows by group, while PARTITION BY only filters them
+B.  GROUP BY returns one row per group, while PARTITION BY keeps every row
+C.  PARTITION BY returns one row per group, while GROUP BY keeps every row
+D.  They are two spellings of one clause, and they give the same result
 
-**15.** The monthly ratio of labor hours to standard hours swings widely, while the trailing twelve-month ratio rises steadily over two years. What should the controller conclude?
+**15.** The monthly ratio of labor hours to standard hours swings widely, while the trailing twelve-month ratio rises over two years. What should the controller conclude?
 
 A.  The rise is a trend, since the trailing measure smooths single months
 B.  The monthly figures are wrong, because they differ from the trailing ones
@@ -111,16 +111,16 @@ D.  The swings show that the plant's efficiency improved in some months
      1 D, 2 B, 3 C, 4 A, 5 D, 6 C, 7 A, 8 B, 9 D, 10 B, 11 A, 12 C, 13 D, 14 B, 15 A.
      1 D: a CASE without ELSE returns NULL for rows that meet no condition.
      2 B: conditions are tested in order, and the first true one wins.
-     3 C: conditional aggregation passes the amounts of one category and zero for the others.
+     3 C: conditional aggregation passes the amounts of one category and zero for the others; B counts rows, and D is not an aggregate of the category.
      4 A: strftime returns text formatted by its pattern.
      5 D: the difference of two julianday values is a number of days.
      6 C: date functions return text; compare with '2026' or CAST.
-     7 A: an ordered aggregate window is a running total, restarting in each partition.
-     8 B: LAG with offset 12 over months returns the same month a year earlier.
+     7 A: an ordered aggregate window is a running total, restarting in each partition (each period appears once a year, so there are no ties).
+     8 B: LAG with offset 12 over one row per month returns the same month a year earlier.
      9 D: RANK gives ties the same number; ROW_NUMBER numbers every row differently.
      10 B: WHERE runs before window functions; filter in an outer query.
-     11 A: the frame covers the current row and the eleven before it.
-     12 C: named steps can be read and checked one at a time.
+     11 A: the default window of an ordered aggregate runs through the current row and its peers, the rows tied with it; B describes ROWS UNBOUNDED PRECEDING.
+     12 C: named steps can be read and checked one at a time; a subquery can also be repeated, so D is false.
      13 D: a view stores its query and runs it again each time.
-     14 B: the view changes the database, so it goes in the working copy.
+     14 B: PARTITION BY decides which rows each calculation sees, without collapsing them.
      15 A: a trailing measure separates a trend from single-month swings. -->

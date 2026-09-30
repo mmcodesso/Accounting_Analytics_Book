@@ -14,7 +14,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Requirements.**
 
-(1) Write a CTE that holds the as-of date and the two closing entries to leave out, and a second CTE that builds the pre-closing trial balance at that date, with each account's type and subtype and its balance expressed as credits less debits.
+(1) Write a CTE that holds the as-of date, a second that finds the year's closing entries to leave out (the journal entries whose EntryType begins with Year-End Close and whose PostingDate is the as-of date), and a third that builds the pre-closing trial balance at that date, with each account's type and subtype and its balance expressed as credits less debits. Read the date with a scalar subquery wherever it is needed.
 
 (2) Use a CASE expression on AccountType and AccountSubType to assign each account to a statement line: operating revenue, contra revenue, cost of goods sold, operating expenses, other income and expense, current assets, fixed assets, contra fixed assets, current liabilities, long-term liabilities, and equity.
 
@@ -22,7 +22,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (4) Show that total assets equal total liabilities plus equity plus net income, and compare net income with the closing entry of fiscal 2026 that moves it to retained earnings.
 
-(5) Sort the statement lines in statement order with a CASE expression in ORDER BY, and save the query as a view.
+(5) Save the query as a view, without an ORDER BY, and query the view with a CASE expression in ORDER BY that sorts the statement lines in statement order.
 
 **Deliverable.** A script and a view that produce the income statement and the balance sheet check, with a short note comparing the results with Chapter 6.
 
@@ -32,8 +32,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      11,096,754.29 (37.32%); operating income 4,625,057.71 (15.56%); net income 4,503,611.24, equal to the credit of JE-2026-000297 to
      retained earnings (Chapter 6). Assets: Current 37,236,780.57 + Fixed 4,354,000.00 - Contra Fixed 2,262,256.46 = 39,328,524.11;
      liabilities 13,507,123.75 + 389,304.68 and equity 20,928,484.44 plus net income 4,503,611.24 = 39,328,524.11. The Closing subtype
-     (8010 Income Summary) has a zero balance before the closes. A CTE such as `WITH Params AS (SELECT '2026-12-31' AS AsOfDate)` joined
-     to the ledger makes the date one parameter; the closing entry numbers change with the year. -->
+     (8010 Income Summary) has a zero balance before the closes. A CTE such as `WITH Params AS (SELECT '2026-12-31' AS AsOfDate)`, read with
+     `(SELECT AsOfDate FROM Params)`, makes the date one parameter; the closes are found with `EntryType LIKE 'Year-End Close%'
+     AND PostingDate = AsOfDate` (JE-2026-000296 and JE-2026-000297 at 2026-12-31), so nothing else changes with the year. -->
 
 
 **Exercise 11.2: Monthly Revenue with Year-to-Date and Prior-Year Comparisons**
@@ -50,7 +51,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (3) Add the revenue of the same month of the previous year with LAG, partitioned by product line, and the percentage change.
 
-(4) Confirm that the December year-to-date figures of fiscal 2026 equal the revenue in the trial balance of Tutorial 10.2.
+(4) Confirm that the December year-to-date figures of fiscal 2026 equal the balances of accounts 4010 to 4040 and 4080 in the trial balance of Tutorial 10.2.
 
 (5) For Furniture, identify the months of fiscal 2026 with the largest decline and the largest increase against the prior year, and suggest what you would look at to explain them.
 
@@ -59,7 +60,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 <!-- Instructor notes, Exercise 11.2: the only journal entries that post to the revenue accounts are the year-end closes (JE-2024-000265,
      JE-2025-000287, JE-2026-000296), so SourceDocumentType <> 'JournalEntry' removes exactly them. 180 rows (5 lines x 36 months). December
      year-to-date, fiscal 2026: Furniture 17,398,287.56, Lighting 5,998,649.16, Textiles 3,278,211.11, Accessories 1,872,510.62, Services
-     1,213,344.00, total 29,761,002.45, equal to the trial balance and to the SalesInvoice postings of Exercise 10.1. Furniture, fiscal 2026
+     1,213,344.00, total 29,761,002.45, equal to the trial balance balances of those accounts (operating revenue in the trial balance also
+     includes 4050 Freight, 212,820.03) and to the SalesInvoice postings of Exercise 10.1. Furniture, fiscal 2026
      against 2025: largest decline October (1,314,620.10 against 1,700,781.60, -22.7%), largest increase November (1,425,903.01 against
      1,264,497.48, +12.8%). October 2025 was unusually high; the fiscal 2026 promotion (Chapter 6) lowered prices in September and October
      and its orders were invoiced into November and December, so the timing of invoicing and promotions is the first thing to examine. -->
@@ -93,8 +95,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      Wall Sconce Brushed Brass (329.60); Services DSV-SPC-0001 Specification Development (210.00); Accessories ACC-VAS-0032 Harbor Decor
      Vase Ceramic Natural (151.60). Ranges: Furniture 135.71 to 974.49; Accessories 9.24 to 151.60; Lighting 32.29 to 329.60; Textiles
      32.05 to 386.13; Services 145.00 to 210.00. Services carry a StandardCost of zero, because their cost is design staff payroll
-     (Chapter 6); StandardCost includes fixed overhead, so ListPrice minus StandardCost is not a contribution margin, and list price is
-     not the price charged. Unrounded differences may show binary fractions; ROUND fixes the display. -->
+     (Chapter 6). For the 88 manufactured items StandardCost includes fixed overhead (the 131 purchased finished goods carry none),
+     and for every item the measure ignores variable selling costs such as commissions, freight, and discounts, so ListPrice minus
+     StandardCost is not a contribution margin; list price is also not the price charged. Unrounded differences may show binary fractions; ROUND fixes the display. -->
 
 
 **Exercise 11.4: Is Overtime Concentrated?**
@@ -105,7 +108,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Requirements.**
 
-(1) Total the fiscal 2026 overtime hours of each employee from the manufacturing labor time, with the employee's job title.
+(1) Total the fiscal 2026 overtime hours of each employee from the manufacturing labor time, by work date, with the employee's job title.
 
 (2) Rank the employees by overtime hours, and add a running total of overtime as a share of the whole, ordered from the highest to the lowest.
 
@@ -118,11 +121,12 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 **Deliverable.** A script with the queries and a half-page memo.
 
 <!-- Instructor notes, Exercise 11.4: 64 employees recorded manufacturing overtime in fiscal 2026 (LaborType other than
-     NonManufacturing). The largest totals are close together: employee 48 (Machine Operator) 348.8 hours, 43 (Machine Operator) 338.2, 66
+     NonManufacturing, by WorkDate: 20,030 hours; the payroll year of Chapter 10 gives 20,411). The largest totals are close together: employee 48 (Machine Operator) 348.8 hours, 43 (Machine Operator) 338.2, 66
      (Quality Technician) 336.7, 18 (Assembler) 333.5, 62 (Machine Operator) 333.0. Half of the overtime is reached at rank 32, half of the
      employees, so overtime is spread evenly, about six hours a week each. By job title: Assemblers 24 employees, 7,483 hours (311.8 each);
      Machine Operators 22, 6,931 (315.0); Quality Technicians 18, 5,616 (312.0). The claim is not supported: overtime is plant-wide. A
-     running share needs SUM(x) OVER (ORDER BY x DESC ROWS UNBOUNDED PRECEDING) divided by SUM(x) OVER (). -->
+     running share needs SUM(x) OVER (ORDER BY x DESC ROWS UNBOUNDED PRECEDING) divided by SUM(x) OVER (), both taught in the
+     section on window functions; ROWS matters if two employees tie. -->
 
 
 ### Auditing Exercises
@@ -178,5 +182,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      band just below 5,000 holds twice as many as its neighbors. Two runs of three consecutive requisitions of 4,990.92, each on January 1:
      PR-2025-004714 to 004716 (2025-01-01, requesters 80, 76, 80) and PR-2026-013258 to 013260 (2026-01-01, requesters 21, 74, 78). In each
      run, two requisitions have no approver (IDs 4714, 4715, 13258, 13259) and the third was approved by employee 2, the chief financial
-     officer; all six were converted to purchase orders. The unapproved ones are among the six of Exercise 2.5, and all six of those, the only requisitions without an approver, fall just below 5,000 (4,990.92 to 4,993.92). The approval limits in
+     officer; all six were converted to purchase orders. The unapproved ones are among the six of Exercise 2.5, and all six of those, the only requisitions without an approver, fall just below 5,000 (4,990.92 to 4,993.92). LAG and LEAD flag only the middle row of each run (4715 and 13259); to list all three, keep the flagged rows in a CTE with
+     LAG(RequisitionID) and LEAD(RequisitionID) and join back to the requisitions whose RequisitionID lies between them, or flag
+     the first and last rows too with offsets of 2. The approval limits in
      Employee are 0, 5,000 (two production employees), 25,000, and 250,000. -->
