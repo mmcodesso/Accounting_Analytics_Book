@@ -241,28 +241,38 @@ class Script:
         return "\n\n".join([self.header] + [f"{c}\n{sql}" for _, c, sql in self.queries])
 
     def location(self, key: str) -> tuple[str, str, int]:
-        """The comment, the query, and the editor line of the comment for one query."""
+        """The comment, the query, and the editor line of the comment for one query. A
+        comment may run over more than one line."""
         line = self.header.count("\n") + 3     # the header, a blank line, the first comment
         for k, comment, sql in self.queries:
             if k == key:
                 return comment, sql, line
-            line += 1 + sql.count("\n") + 2    # comment, query lines, blank line
+            line += comment.count("\n") + 1 + sql.count("\n") + 2   # comment, query, blank line
         raise KeyError(key)
 
     def mock(self, d: Diagram, key: str, widths: list[float], shown: slice | None = None,
-             sql: str | None = None) -> dict:
+             sql: str | None = None, lines: slice | None = None) -> dict:
         """An Execute SQL mock of one query, shown with its comment where it sits in the
-        script. sql replaces the saved query, for a step that shows an earlier version."""
+        script. sql replaces the saved query, for a step that shows an earlier version.
+        lines draws only those lines of the comment and query, as an editor scrolled
+        through a long query; the query still runs in full."""
         comment, saved, line = self.location(key)
         text = sql or saved
         headers, rows = run(text)
+        shown_text = f"{comment}\n{text}"
+        first_line = line
+        if lines:
+            all_lines = shown_text.split("\n")
+            shown_text = "\n".join(all_lines[lines])
+            first_line = line + (lines.start or 0)
         y = window(d)
-        y = editor(d, 0, y, 860, f"{comment}\n{text}", tab=self.tab, first_line=line) + 8
+        y = editor(d, 0, y, 860, shown_text, tab=self.tab, first_line=first_line) + 8
         first = (shown.start or 0) + 1 if shown else 1
         visible = rows[shown] if shown else rows
         geometry = results(d, 0, y, headers, widths, visible, first=first)
         y += (len(visible) + 1) * ROW_H + 8
-        bottom = message(d, 0, y, 860, len(rows), text.split("\n")[0], line=line + 1)
+        start = line + comment.count("\n") + 1   # the statement starts after its comment
+        bottom = message(d, 0, y, 860, len(rows), text.split("\n")[0], line=start)
         return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
 
 

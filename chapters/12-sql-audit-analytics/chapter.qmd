@@ -8,20 +8,20 @@ title: "Audit Analytics in SQL"
 
 After completing this chapter, you will be able to:
 
-1. Reconcile a population to the general ledger in SQL before testing it, and explain why an audit test on an unreconciled population proves little.
-2. Trace ledger postings to their source documents and documents to the ledger with anti-joins, combine the tests into one list of exceptions, and test cutoff with document and posting dates.
+1. Reconcile a population to the general ledger in SQL before testing it, and explain what a reconciliation can and cannot show.
+2. Trace ledger postings to their source documents and documents to the ledger with anti-joins, combine the tests into one list of exceptions, and test cutoff with the dates of the events behind revenue and payroll.
 3. Perform a three-way match of purchase orders, goods receipts, and supplier invoices, summing quantities to the purchase order line and applying a price tolerance.
-4. Test approvals across a business process against each approver's limit, role, and employment dates.
-5. Test the time, labor, payroll, and payment records behind a cost as one chain, and judge what the exceptions mean for the cost.
+4. Test approvals across a business process against each approver's limit, role, and employment dates, and measure how concentrated they are.
+5. Test the time, labor, payroll, and payment records behind a cost as one reconciled chain, recognize patterns that the records cannot explain, and judge what the exceptions support.
 6. Organize audit queries into a documented library that can be rerun each period.
 :::
 
 
 ## Opening Scenario {.unnumbered}
 
-You are back on the internal audit team of Chapter 8. The audit committee has read the controller's analysis of the manufacturing variance. The plant recorded about half as many hours again as the standard hours of its output, more and more of them indirect time and overtime, while the standards stayed where they were. Before it accepts that explanation, the committee wants to know whether the records behind it can be trusted. Were the hours worked, approved, recorded against the right work, and paid to the right people? The chief audit executive has given you three assignments, all to be done in the database this time.
+In Chapters 9 to 11 you worked as the controller's staff accountant. This chapter puts you back on the internal audit team of Chapter 8, and because an auditor should not test their own work, the analysis you now examine is the staff accountant's, not yours. The audit committee has read it. The plant recorded about half as many hours again as the standard hours of its output. The change began in the middle of fiscal 2024, when indirect time appeared in the records and overtime on direct labor started to climb; since the middle of fiscal 2025 indirect time has been roughly flat, while direct hours and their overtime kept rising. Before it accepts that explanation, the committee wants to know whether the records behind it can be trusted. Were the hours worked, approved, recorded against the right operations, and paid correctly? And why does indirect time almost vanish from the records for four months of 2024? The chief audit executive has given you three assignments, all to be done in the database this time.
 
-The first is to confirm that the ledger and its populations can be relied on, by reconciling them and tracing postings to their documents. The second is to test the purchasing chain that supplies the plant, from order to receipt to invoice, and the approvals along it. The third is to test the time, labor, and payroll records behind the variance itself. The chief audit executive also wants the tests saved as a library of queries that the team can rerun every quarter. This chapter shows how to do all three, and how to turn the queries into a library.
+The first is to confirm that the ledger and its populations can be relied on, by reconciling them, tracing postings to their documents, and testing whether transactions were recorded in the right year. The second is to test the purchasing chain that supplies the plant, from order to receipt to invoice, and the approvals along it. The third is to test the time, labor, and payroll records behind the variance itself. The chief audit executive also wants the tests saved as a library of queries that the team can rerun every quarter. This chapter shows how to do all three, and how to turn the queries into a library.
 
 
 
@@ -29,7 +29,7 @@ The first is to confirm that the ledger and its populations can be relied on, by
 
 Chapter 8 tested Charles River's payments, receivables, and journal entries in Excel. Each test brought one population into a workbook, reconciled it, and examined every row. SQL does the same work without importing anything, and it removes the limits that a workbook sets on how many tables a test can touch. A test that follows a purchase from its order through its receipt to its invoice, or a labor hour from the time clock through the payroll to the payment, joins five or six tables at once. In a workbook, each of those tables would have to be imported and merged, and a test that reaches across the whole process is exactly the kind that shows whether a control worked.
 
-As Chapter 8 explained, testing an entire population rather than a sample changes what an exception means. A sample finds errors at a rate that the auditor projects to the population, while a population test finds the actual items, each of which needs a disposition. As Chapter 1 noted, the Public Company Accounting Oversight Board (PCAOB) amended its standards in 2024 to clarify the auditor's responsibilities when using technology-assisted analysis of this kind (PCAOB, 2024). The power of a full-population test also raises the stakes of its inputs. A query that runs against an incomplete table, or that joins on keys that do not match, can report a clean result that means nothing. That is why every test in this chapter begins with a reconciliation.
+As Chapter 8 explained, testing an entire population rather than a sample changes what an exception means. A sample finds errors at a rate that the auditor projects to the population, while a population test finds the actual items, each of which needs a disposition, the auditor's conclusion about it. As Chapter 1 noted, the Public Company Accounting Oversight Board (PCAOB) amended its standards in 2024 to clarify the auditor's responsibilities when using technology-assisted analysis of this kind (PCAOB, 2024). Those standards govern the external auditors of public companies; internal auditors, like the team in this chapter, follow the Global Internal Audit Standards of the Institute of Internal Auditors (IIA, 2024). The power of a full-population test also raises the stakes of its inputs. A query that runs against an incomplete table, or that joins on keys that do not match, can report a clean result that means nothing. That is why every test in this chapter begins with a reconciliation.
 
 
 ## Reconciling Before Testing
@@ -38,12 +38,19 @@ An audit test is only as complete as the population it runs on. Before testing j
 
 In SQL, a reconciliation is usually two aggregate queries, one on the document table and one on the ledger, or a single query that joins their totals. The result should agree to the cent. When it does not, the difference is itself the first finding, and it must be explained before the population is used. In Exercises 6.1 and 10.1, the invoice lines of fiscal 2026 differed from the ledger by three invoices posted in the year after their date. In Chapter 8, the receivables ledger held an opening balance that no invoice supported. Either difference, left unexplained, would have undermined every test built on the population.
 
+A reconciliation has a limit, though. It compares two records, so it cannot find what both of them left out. If the ledger and the payroll registers both record wages on the day they are paid, they agree to the cent even when the wages earned in the last weeks of a year are recorded in neither until the next. Tutorial 12.1 meets that limit.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Chapter 8's workflow (@fig-08-01) began every test by defining and reconciling its population, and Chapter 4's documentation worksheet recorded what an analysis rested on. In SQL, the population check becomes two aggregate queries, and the comment at the head of each test in the script plays the part of the documentation worksheet and of Chapter 8's audit workpaper: it states what the test covers and what a clean result would be.
+:::
+
 
 ## Tracing in Both Directions
 
-The ledger's source-document columns, which Chapter 3 introduced, allow a trace in two directions. From the ledger to the documents, the test asks whether every posting points to a document that exists. An anti-join from GLEntry to the document table on SourceDocumentID finds the postings that point to nothing. From the documents to the ledger, the test asks whether every document was posted. An anti-join from the document table to GLEntry finds the documents with no posting. The first test addresses the existence of what the ledger records, and the second its completeness, as @fig-12-01 shows.
+The ledger's source-document columns, which Chapter 3 introduced, allow a trace in two directions with the anti-joins of Chapter 10. From the ledger to the documents, the test asks whether every posting points to a document record that exists. An anti-join from GLEntry to the document table on SourceDocumentID finds the postings that point to nothing. From the documents to the ledger, the test asks whether every document was posted. An anti-join from the document table to GLEntry finds the documents with no posting. The first test addresses the existence of what the ledger records (for transactions, their occurrence), and the second its completeness, as @fig-12-01 shows. The completeness test can find only documents that were recorded but not posted: a transaction with no document at all escapes it.
 
-![Tracing in Both Directions Between the Ledger and Its Documents.](/visuals/svg/fig-12-01-two-way-trace.svg){#fig-12-01 fig-alt="The general ledger on the left and the source document tables on the right, linked by SourceDocumentType and SourceDocumentID. An arrow from the ledger to the documents is labeled existence: an anti-join finds postings whose document does not exist. An arrow from the documents to the ledger is labeled completeness: an anti-join finds documents that were never posted. A third test, cutoff, compares each document's date with the posting date of its ledger rows."}
+![Tracing in Both Directions Between the Ledger and Its Documents.](/visuals/svg/fig-12-01-two-way-trace.svg){#fig-12-01 fig-alt="The general ledger on the left and the source document tables on the right, linked by SourceDocumentType and SourceDocumentID. An arrow from the ledger to the documents is labeled existence: an anti-join finds postings whose document does not exist. An arrow from the documents to the ledger is labeled completeness: an anti-join finds documents that were never posted. A third test, cutoff, compares the posting date with the date of the event behind it: the delivery date of the goods a sales invoice bills, and the work dates of the pay period a payroll pays."}
 
 The two directions often need several queries, one for each kind of document. UNION ALL stacks the results of queries with the same columns into one result, so the exceptions of every test can be listed together, each labeled with the test that found it:
 
@@ -62,9 +69,19 @@ FROM SalesInvoice AS si
 WHERE gl.GLEntryID IS NULL;
 ```
 
-The queries joined by UNION ALL must return the same number of columns, in the same order, and the column names come from the first query. UNION without ALL also removes duplicate rows, which is rarely what an exceptions list should do.
+UNION without ALL also removes duplicate rows, which is rarely what an exceptions list should do.
 
-A third test uses the same columns to test cutoff. A document's own date says when the event happened, and the ledger's PostingDate says when it was recorded. A sales invoice dated in December and posted in January records revenue in the wrong fiscal year. Comparing the two dates, and especially their years, finds the documents recorded in a different period from the one in which they occurred.
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+UNION ALL matches the columns of its queries by position, not by name, and the result takes its column names from the first query. A second query whose columns are in a different order stacks its values under the wrong headings, and no error says so. An ORDER BY sorts the combined result, so it goes once, at the end, after the last query.
+:::
+
+A third test uses the same columns to test cutoff: whether each transaction was recorded in the period in which it happened. The ledger's PostingDate says when a transaction was recorded, and the event behind it has a date of its own. Revenue belongs to the period in which the goods were delivered, so a revenue cutoff test compares the posting date with the delivery date of the shipments that the invoice bills. The invoice date is a second check, because an invoice dated before its goods shipped is itself an error. Wages belong to the period in which the work was done, so a payroll cutoff test compares the dates of the pay period's work with the pay date on which the payroll was posted. A company that records transactions when it invoices or pays them, rather than when it earns or incurs them, needs an accrual at each period end for the difference; without one, each year-end is misstated by the transactions on either side of it.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Chapter 1 introduced source-to-ledger traceability, and Tutorial 3.2 followed one sale, SI-2025-007947, from its order to its ledger rows. The trace tests of this chapter do the same for every document at once, in both directions. Chapter 10's In Practice callout named them as anti-joins, and Exercise 10.5 found the six PayrollPayment postings that point to no payment; Tutorial 12.1 explains them.
+:::
 
 
 {{< include _tutorial-01.qmd >}}
@@ -74,18 +91,23 @@ A third test uses the same columns to test cutoff. A document's own date says wh
 
 A purchase leaves three documents: the purchase order that authorized it, the goods receipt that recorded what arrived, and the supplier invoice that billed for it. The three-way match compares them. A supplier should not be paid for more than was ordered and received, or at a price above the one the order approved. Chapter 1 named the three-way match as one of the tests that the Procure-to-Pay tables support (@tbl-01-03), and in SQL it becomes a comparison of totals at the level of the purchase order line.
 
-The level matters. A purchase order line may be received in several deliveries and invoiced on several invoices, so comparing a single receipt with a single invoice line, row by row, reports a mismatch wherever a delivery was split. The comparison must first sum the quantities received and the quantities invoiced for each purchase order line, in derived tables, and then compare the sums with the quantity ordered, as @fig-12-03 shows. A line is fully matched when the three quantities agree. Other outcomes include a line not yet received, a line partly received, and a line received but not yet fully invoiced. A line invoiced above what was received, or received above what was ordered, is an exception.
+The level matters. A purchase order line may be received in several deliveries and invoiced on several invoices, so comparing a single receipt with a single invoice line, row by row, reports a mismatch wherever a delivery was split. The comparison must first sum the quantities received and the quantities invoiced for each purchase order line, in CTEs, and then compare the sums with the quantity ordered, as @fig-12-04 shows. A line is fully matched when the three quantities agree. Other outcomes include a line not yet received, a line partly received, and a line received but not yet fully invoiced. A line invoiced above what was received, or received above what was ordered, is an exception. The quantities are REAL numbers, and a sum of fractional quantities can differ from the quantity ordered by a tiny rounding amount, so the match treats two quantities as equal when they differ by less than a small tolerance, 0.0001, rather than testing them for exact equality.
 
 Prices are compared the same way, with the invoice's unit cost against the order's. Some difference is normal: the purchase price variance of Exercise 9.2 records it. A tolerance, such as two or three percent, separates ordinary differences from exceptions to be investigated. The goods received but not yet invoiced at a year-end are not exceptions either. They are a liability that the company should have accrued, and their total should agree with the ledger account that records it.
 
-![The Three-Way Match at the Level of the Purchase Order Line.](/visuals/svg/fig-12-03-three-way-match.svg){#fig-12-03 fig-alt="A purchase order line from Charles River at the top, with its ordered quantity and unit cost. On the left, its two goods receipt lines are summed into a received quantity; on the right, its three supplier invoice lines are summed into an invoiced quantity, and each invoice price is compared with the order price. The three quantities agree, so the line is matched, although one receipt line was billed on two invoices. Below, a table lists the possible statuses: matched; not yet received; partly received; received but not yet fully invoiced, which is an accrual; and two exceptions, invoiced above received and received above ordered."}
+![The Three-Way Match at the Level of the Purchase Order Line.](/visuals/svg/fig-12-04-three-way-match.svg){#fig-12-04 fig-alt="A purchase order line from Charles River at the top, with its ordered quantity and unit cost. On the left, its two goods receipt lines are summed into a received quantity; on the right, its three supplier invoice lines are summed into an invoiced quantity, and each invoice price is compared with the order price. The three quantities agree, so the line is matched, although one receipt line was billed on two invoices. Below, a table lists the possible statuses: matched; not yet received; partly received; received but not yet fully invoiced, which is an accrual; and two exceptions, invoiced above received and received above ordered."}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Summing before comparing is Chapter 10's cure for fan-out. Joined directly, the two receipt lines and three invoice lines of the purchase order line in @fig-12-04 would produce six rows, and every received quantity would be counted three times. Summing each side to the purchase order line first leaves one row per line on each side, and the comparison is exact.
+:::
 
 
 ## Testing Approvals Across a Process
 
-An approval control works only if the approver was entitled to approve. SQL tests entitlement by joining each document to the Employee row of its approver and comparing the document with the approver's attributes. An amount above the approver's MaxApprovalAmount is an approval above authority. A document date after the approver's TerminationDate is an approval by someone who no longer worked for the company, and a creator who is also the approver breaks the segregation of duties. An approver whose job title has nothing to do with the process, such as a sales employee approving purchases, is not a violation in itself, but it is worth a question.
+An approval control works only if the approver was entitled to approve. SQL tests entitlement by joining each document to the Employee row of its approver and comparing the document with the approver's attributes. An amount above the approver's MaxApprovalAmount is an approval above authority. A document dated after the approver's TerminationDate is an approval by someone who no longer worked for the company; where a table records no approval date, as PurchaseOrder does not, the document's own date stands in for it. A creator who is also the approver breaks the segregation of duties. An approver whose job title has nothing to do with the process, such as a sales employee approving purchases, is not a violation in itself, but it is worth a question.
 
-These tests look for a small number of exceptions in a large population, and they return a clean result more often than not. A clean result is evidence too, provided the population was reconciled first. An approval test can also reveal concentration, which is not an exception but a risk. When one person approves nearly every document in a process, that person's approval is the whole control, and its failure would go unnoticed.
+These tests look for a small number of exceptions in a large population, and they return a clean result more often than not. A clean result is evidence too, provided the population was reconciled first. An approval test can also reveal concentration, which is not an exception but a risk. When one person approves nearly every document in a process, that person's approval is the whole control, and its failure would go unnoticed, which can indicate a weakness in the design of the control.
 
 
 {{< include _tutorial-02.qmd >}}
@@ -93,15 +115,15 @@ These tests look for a small number of exceptions in a large population, and the
 
 ## Testing the Records Behind a Cost
 
-The manufacturing variance is built from a chain of records, which @fig-12-06 traces. An employee clocks in and out, and the time clock entry records the hours, with an overtime approval when the overtime is long enough to need one. The hours are recorded against the operation of a work order, or as indirect time. The payroll register pays for the hours, and a payroll payment disburses the net pay. The ledger records the cost and the payment. An auditor tests each link: that the time was approved, that it was recorded against work that was still in progress, that the people paid were employed, that each approved register was paid once, and that each payment was approved before it was made.
+The manufacturing variance is built from a chain of records, which @fig-12-07 traces. An employee clocks in and out, and the time clock entry records the hours, with an overtime approval when the overtime is long enough to need one. The hours are recorded against the operation of a work order, or as indirect time. The payroll register pays for the hours, and a payroll payment disburses the net pay. The ledger records the cost and the payment. An auditor tests each link: that the hours clocked were the hours recorded and paid, to the employee who worked them; that overtime was approved; that the records look like records of individual work rather than entries made in bulk; that direct time was recorded against work still in progress; that the people paid were employed and were paid what they earned; and that each register was approved by someone independent of it and paid once, after its approval.
 
-![The Chain of Records Behind the Labor Cost.](/visuals/svg/fig-12-06-labor-record-chain.svg){#fig-12-06 fig-alt="A chain of five boxes from left to right: time clock entry, labor time entry, payroll register, payroll payment, and general ledger, each naming the key that links it to the record before it. The last link, a posting to the ledger, is dashed. Beneath each box, the test that checks it: overtime above half an hour has an approval; direct time is recorded on or before its operation ended; the employee was employed on the pay date; each approved register has one payment, made after approval; and every payroll payment posting traces to an existing payment."}
+![The Chain of Records Behind the Labor Cost.](/visuals/svg/fig-12-07-labor-record-chain.svg){#fig-12-07 fig-alt="A chain of five boxes from left to right: time clock entry, labor time entry, payroll register, payroll payment, and general ledger, each naming the key that links it to the record before it. The last link, a posting to the ledger, is dashed. Beneath each box, the test that checks it: overtime above half an hour is approved and no day shows everyone clocking the same hours; the labor hours equal the clock entry's and direct time is recorded while its operation was open; the register pays its own employee's approved time while employed and is not approved by that employee; each approved register has one payment, made after approval; and every payment posting traces to a payment, with unpaid wages accrued at the year-end."}
 
-Tests of a chain like this find two kinds of exception. Isolated exceptions, such as a single register paid to a terminated employee, are failures in the operation of a control, and each needs a disposition. Systematic patterns, such as a large share of hours recorded after the operations they belong to were finished, point to the design of a process. They do not necessarily mean that anyone was paid for time not worked, but they mean that the records cannot support some of the conclusions drawn from them. An auditor reports both kinds, and distinguishes them.
+Tests of a chain like this find two kinds of exception. An isolated exception, such as a single register paid to a terminated employee, usually shows a control that did not operate as designed. A systematic pattern, such as a large share of hours recorded after the operations they belong to had ended, more often shows a control that is missing or poorly designed. Chapter 8 called both control deficiencies, and which kind an exception is depends on its cause, which the auditor must find. A pattern does not necessarily mean that anyone was paid for time not worked, but it can mean that the records cannot support some of the conclusions drawn from them. An auditor reports both kinds, and distinguishes them.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Payroll is a common area for population testing, because the tables are large and the controls are well defined. The typical frauds also leave traces in the data: employees paid after they have left, hours that exceed what was clocked, overtime without approval, and payments made to the same bank account for different employees. Tests like these are often run every pay period, so that an exception is found while it can still be corrected, rather than at the year-end audit.
+Payroll is a common area for population testing, because the tables are large and the controls are well defined. The typical frauds also leave traces in the data: employees paid after they have left, hours paid that were never clocked, overtime without approval, and time entered in bulk rather than by the people who worked it. A test for different employees paid into the same bank account is a common red flag too, although the Charles River data holds no bank details. Tests like these are often run every pay period, so that an exception is found while it can still be corrected, rather than at the year-end audit.
 :::
 
 
@@ -110,7 +132,7 @@ Payroll is a common area for population testing, because the tables are large an
 
 ## Chapter 8's Tests in SQL
 
-The tests you ran in Excel in Chapter 8 translate directly into SQL, and in SQL they can join tables that the workbook kept apart. A duplicate payment test groups the payments by supplier and invoice number, or by supplier and check number, and keeps the groups with more than one row. A near-duplicate test joins the payments to themselves, a self-join, matching the same supplier and amount on different dates within a window of days:
+The tests you ran in Excel in Chapter 8 translate directly into SQL, and in SQL they can join tables that the workbook kept apart; Exercises 11.5 and 11.6 have already moved the journal entry and threshold tests. A duplicate invoice test groups the supplier invoices by supplier and invoice number, and a duplicate payment test groups the payments by supplier and check number, each keeping the groups with more than one row. A near-duplicate test joins the payments to themselves, a self-join, matching the same supplier and amount on different dates within a window of days. The query below uses a window of two weeks:
 
 ```sql
 SELECT a.PaymentNumber, b.PaymentNumber AS MatchNumber,
@@ -120,46 +142,58 @@ FROM DisbursementPayment AS a
         ON b.SupplierID = a.SupplierID AND b.Amount = a.Amount
             AND b.DisbursementID > a.DisbursementID
 WHERE a.PaymentDate <> b.PaymentDate
-    AND julianday(b.PaymentDate) - julianday(a.PaymentDate)
-        BETWEEN -30 AND 30
+    AND ABS(julianday(b.PaymentDate) - julianday(a.PaymentDate)) <= 14
     AND a.PaymentDate <= '2026-12-31' AND b.PaymentDate <= '2026-12-31';
 ```
 
-The condition `b.DisbursementID > a.DisbursementID` keeps each pair once, instead of twice in opposite orders. A sequence test uses LAG, partitioned by year, to compare each document number with the one before it and report any step greater than one. A first-digit test needs the first significant digit of each amount. `printf('%e', Amount)` writes an amount in scientific notation, as 6.884200e+02 for 688.42, so its first character is the first significant digit even for amounts below one dollar. `LOG10(1 + 1.0 / Digit)` gives the Benford expectation for each digit. Grouped and compared, they produce the same mean absolute deviation as the workbook of Tutorial 8.1. The exercises at the end of the chapter build these tests.
+ABS counts the gap in either direction, because payment IDs are not always in the order of their dates.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Without the condition `b.DisbursementID > a.DisbursementID`, a self-join pairs every payment with itself and lists every other pair twice, once in each order. Here the condition on the dates happens to remove the first problem, but only the condition on the IDs removes the second. Count the rows with and without it before you trust a self-join.
+:::
+
+A sequence test uses LAG to compare each document number with the one before it and report any step greater than one. A series that restarts each year, such as the journal entry numbers, is partitioned by year. A series that continues from one year to the next, such as the sales invoice numbers, is ordered across the years without a partition, so that a gap at the year boundary is not missed. A first-digit test needs the first significant digit of each amount. `printf('%e', Amount)` writes a positive amount in scientific notation, as 6.884200e+02 for 688.42, so its first character is the first significant digit even for amounts below one dollar; zero and negative amounts must be left out. `LOG10(1 + 1.0 / Digit)` gives the Benford expectation for each digit. LOG10 is one of SQLite's math functions, which DB Browser 3.13.1 includes; a build without them answers `no such function: LOG10`. Grouped and compared, they produce the same mean absolute deviation as the workbook of Tutorial 8.1. The exercises at the end of the chapter build these tests.
 
 
 ## A Library of Audit Queries
 
-A test that is saved, documented, and run again every period becomes part of the company's control environment. An audit query library is a set of such tests, usually one script for each area, with a consistent structure. Each test states its objective, the population it runs on and the reconciliation that proves the population complete, the query, the expected result, and the disposition of any exception. @tbl-12-01 shows the library that this chapter builds.
+A test that is saved, documented, and run again every period becomes part of the company's control environment. An audit query library is a set of such tests, usually one script for each area, with a consistent structure. Each test states its objective, the population it runs on and the reconciliation that proves the population complete, the query, the expected result, and the disposition of any exception. @tbl-12-01 indexes the library that the tutorials of this chapter build in Audit.sql.
 
-| Area | Test | Technique |
-|---|---|---|
-| Ledger | Journal entry population reconciliation | Aggregates on two tables |
-| Ledger | Postings with no document; documents with no posting | Anti-joins, UNION ALL |
-| Ledger | Cutoff: posting year against document year | Join, date comparison |
-| Purchasing | Three-way match by purchase order line | Derived tables, CASE |
-| Purchasing | Goods received not invoiced against the ledger | Left join, aggregates |
-| Purchasing | Approvals above limit, by terminated employees, and self-approved | Join to Employee |
-| Labor and payroll | Overtime above the threshold without approval | Join, CASE |
-| Labor and payroll | Labor recorded after the operation ended | Join, date comparison |
-| Labor and payroll | Registers paid to terminated employees, unpaid, or paid before approval | Joins, anti-join |
+| Tests | What they test | Technique | Expected result |
+|---|---|---|---|
+| L1–L2 | Journal entries and manufacturing payroll against the ledger | Aggregates, scalar subqueries | Agree to the cent |
+| L3–L4 | Postings and documents traced both ways; unpaid registers | Anti-joins, UNION ALL | No rows |
+| L5–L6 | Revenue outside the year of delivery; shipments never invoiced | CTEs, CASE, anti-join | No rows |
+| L7–L8 | Pay periods across a year-end; accrued payroll | Derived table, aggregates | Unpaid wages accrued |
+| P1–P3 | Three-way match, price tolerance, receipts not invoiced | CTEs, CASE, tolerances | No exceptions; equal to account 2020 |
+| P4–P6 | Purchase order approvals and their concentration | UNION ALL, joins to Employee | No rows; approval shared |
+| H1–H3 | Hours clocked, recorded, and paid; whose time was paid | CTEs, joins, UNION ALL | Equal; no rows |
+| H4–H6 | Overtime approvals; days on which everyone clocked the same hours | CASE, aggregates | Approved; no such days |
+| H7–H8 | Direct time recorded after its operation ended | Left join to a CTE | A small share |
+| H9–H11 | Pay after termination; approval of registers and payments | Correlated subquery, UNION ALL | Final pay only; independent approval |
 
 : The audit query library of this chapter {#tbl-12-01}
 
-@fig-12-08 shows the start of such a script, Audit.sql, as the tutorials of this chapter leave it. Views make the library easy to rerun: each test can be saved as a view, and a summary query can count the exceptions of every view in one result.
+@fig-12-10 shows the start of the script, Audit.sql, as the tutorials of this chapter leave it. Views make the library easy to rerun: each test can be saved as a view in the working copy, as in Tutorial 11.3, and a summary query can count the exceptions of every view in one result.
 
-![The Start of an Audit Query Library.](/visuals/svg/fig-12-08-audit-library.svg){#fig-12-08 fig-alt="A mock of the Execute SQL editor holding the script Audit.sql. A header comment names the engagement, the database, the preparer and reviewer, and the date. Below it, each test is a section that begins with a comment giving its number, its objective, its population and reconciliation, and its expected result, followed by the query. The first sections shown are the journal entry reconciliation and the combined trace of postings and documents."}
+![The Start of an Audit Query Library.](/visuals/svg/fig-12-10-audit-library.svg){#fig-12-10 fig-alt="A mock of the Execute SQL editor holding the script Audit.sql. A header comment names the script's purpose, the database, the preparer and reviewer, and the checks the tests passed. Below it, each test begins with a two-line comment that gives its tutorial and test number, its objective, its population, and its expected result, followed by the query. The lines shown are the header, the journal entry reconciliation, and the start of the payroll reconciliation."}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Chapter 11 saved the controller's measure as a view, which stores its query and runs it again on the current data. An audit test saved the same way runs again every quarter with a single line, and the library of views becomes the SQL counterpart of the workbook of Chapter 8, with one difference: nothing has to be imported, filtered, or refreshed by hand first.
+:::
 
 Whatever the form, the library itself needs the controls it tests. Changes to a test should be reviewed and recorded, and each run's results should be kept as a workpaper, with the date, the data it ran on, and the reviewer. A library that anyone can change without a record would undermine the evidence it produces.
 
 
 ## Looking Ahead
 
-This chapter has applied SQL to the work of an internal auditor. You reconciled populations to the ledger before testing them, traced postings to their documents and documents to their postings, combined the exceptions into one list with UNION ALL, and tested cutoff with dates. You performed a three-way match at the level of the purchase order line, reconciled the goods received but not invoiced to the ledger, and tested approvals against the approvers' limits, roles, and employment dates. You tested the chain of time, labor, payroll, and payment records behind the manufacturing variance, and you translated the tests of Chapter 8 into queries for a reusable library.
+This chapter has applied SQL to the work of an internal auditor. You reconciled populations to the ledger before testing them, traced postings to their documents and documents to their postings, combined the exceptions into one list with UNION ALL, and tested the cutoff of revenue and payroll with the dates of the events behind them. You performed a three-way match at the level of the purchase order line, reconciled the goods received but not invoiced to the ledger, and tested approvals against the approvers' limits, roles, and employment dates. You reconciled the chain of time, labor, payroll, and payment records behind the manufacturing variance, tested it link by link, and translated the tests of Chapter 8 into queries for a reusable library.
 
-The audit also answers the committee's question. The ledger and its populations reconcile, and the purchasing chain matches. The payroll behind the variance ties to the ledger to the cent, and its exceptions are few, specific, and isolated. The extra hours were clocked, approved where the policy requires it, and paid, so the variance is a real cost, not an artifact of false records. That also answers the question the controller asked at the start of Chapter 9: the variance grew because the plant used more paid hours for the same output, while the standards stayed where they were. Whether to bring the hours down or to revise the standards is now a decision for management. The audit also found a systematic pattern. A growing share of direct labor was recorded against operations that had already finished, most of it at Packing. That pattern does not change the cost, but it means the operation-level records cannot say where in the plant the extra hours were spent, and the controller's next analysis should not rely on them until the recording is fixed.
+The audit also answers the committee's questions. The ledger and its populations reconcile, and nearly every posting traces to a document and back, but the ledger records revenue and payroll when they are invoiced and paid, so each year-end is misstated by the transactions around it, and no accrual covers the wages of each December's last weeks. The purchasing chain matches, with approval exceptions and a single approver behind nearly every order. The hours behind the variance were clocked, recorded, and paid, and the four months of 2024 in which indirect time almost vanished are complete: the plant was busy building stock, and nearly every hour went to work orders. The payroll exceptions are few and small, but they include manufacturing, and one person approves every payroll register, the manager's own among them. The largest finding is the one the committee did not ask about. The growth in overtime sits on days on which every manufacturing employee clocked the same hours, all approved by one manager and mostly charged to operations that had already ended, and the records alone cannot show that those hours were worked as recorded. Until they are corroborated from outside the payroll system, the committee can accept that the variance is a cost the plant's records show it incurred, but not yet the explanation of where the hours went.
 
-This chapter completes Part III. SQL has let you ask questions of whole tables at once, from the first SELECT to a library of audit tests. Part IV turns from finding answers to communicating them, with reports and dashboards that let managers and audit committees explore the evidence for themselves.
+That also returns the question the controller asked at the start of Chapter 9. The variance grew because the plant paid for more hours, many of them overtime, for about the same output, measured against standards that stayed where they were. What to do about it is for management, once the cause is known: hours that bring nothing can be cut, and a standard is revised only if the work itself has changed, not to absorb inefficiency, whose cost belongs in the period's expense. The comprehensive case that closes Part III brings these threads together. This chapter completes the SQL chapters of Part III. SQL has let you ask questions of whole tables at once, from the first SELECT to a library of audit tests. Part IV turns from finding answers to communicating them, with reports and dashboards that let managers and audit committees explore the evidence for themselves.
 
 
 

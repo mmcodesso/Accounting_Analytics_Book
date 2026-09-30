@@ -7,129 +7,535 @@ from data import one, q
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, GRAY, GRAY_TINT, ROW_H, SMALL, Diagram,
                     esc)
 
-TRACE_SQL = """SELECT 'Posting with no payroll payment' AS Test,
-    gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,
-    gl.Debit + gl.Credit AS Amount
-FROM GLEntry AS gl
-    LEFT JOIN PayrollPayment AS pp
-        ON pp.PayrollPaymentID = gl.SourceDocumentID
-WHERE gl.SourceDocumentType = 'PayrollPayment'
-    AND pp.PayrollPaymentID IS NULL
-UNION ALL
-SELECT 'Posting with no supplier payment', gl.GLEntryID,
-    gl.PostingDate, gl.Debit + gl.Credit
-FROM GLEntry AS gl
-    LEFT JOIN DisbursementPayment AS dp
-        ON dp.DisbursementID = gl.SourceDocumentID
-WHERE gl.SourceDocumentType = 'DisbursementPayment'
-    AND dp.DisbursementID IS NULL
-UNION ALL
-SELECT 'Sales invoice never posted', si.SalesInvoiceID,
-    si.InvoiceDate, si.GrandTotal
-FROM SalesInvoice AS si
-    LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'
-        AND gl.SourceDocumentID = si.SalesInvoiceID
-WHERE gl.GLEntryID IS NULL
-UNION ALL
-SELECT 'Supplier invoice never posted', pi.PurchaseInvoiceID,
-    pi.InvoiceDate, pi.GrandTotal
-FROM PurchaseInvoice AS pi
-    LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'PurchaseInvoice'
-        AND gl.SourceDocumentID = pi.PurchaseInvoiceID
-WHERE gl.GLEntryID IS NULL;"""
-
-MATCH_CTES = """WITH Received AS (
-    SELECT POLineID, SUM(QuantityReceived) AS QtyReceived
-    FROM GoodsReceiptLine
-    GROUP BY POLineID
-),
-Invoiced AS (
-    SELECT POLineID, SUM(Quantity) AS QtyInvoiced
-    FROM PurchaseInvoiceLine
-    WHERE POLineID IS NOT NULL
-    GROUP BY POLineID
-),
-Matched AS (
-    SELECT pol.POLineID, pol.Quantity AS QtyOrdered,
-        COALESCE(r.QtyReceived, 0) AS QtyReceived,
-        COALESCE(i.QtyInvoiced, 0) AS QtyInvoiced
-    FROM PurchaseOrderLine AS pol
-        LEFT JOIN Received AS r ON r.POLineID = pol.POLineID
-        LEFT JOIN Invoiced AS i ON i.POLineID = pol.POLineID
+# Audit.sql as the three tutorials build it (see dbbrowser.Script): a header, then each test under a
+# two-line comment that names it and states its population and expected result. The tutorial text
+# must match these queries exactly.
+HEADER = (
+    "/* Audit.sql: tests of the records behind the manufacturing variance\n"
+    "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
+    "   Prepared by: your name, date; reviewed by: name, date\n"
+    "   Checks: populations tie to the ledger; exceptions listed by test */"
 )
-"""
+_APPROVAL_CTE = (
+    "WITH ApprovalExceptions AS (\n"
+    "    SELECT 'Self-approved' AS Test, po.PONumber, po.OrderTotal\n"
+    "    FROM PurchaseOrder AS po\n"
+    "    WHERE po.CreatedByEmployeeID = po.ApprovedByEmployeeID\n"
+    "    UNION ALL\n"
+    "    SELECT 'Above approver limit', po.PONumber, po.OrderTotal\n"
+    "    FROM PurchaseOrder AS po\n"
+    "        INNER JOIN Employee AS e\n"
+    "            ON e.EmployeeID = po.ApprovedByEmployeeID\n"
+    "    WHERE po.OrderTotal > e.MaxApprovalAmount\n"
+    "    UNION ALL\n"
+    "    SELECT 'Approved after termination', po.PONumber, po.OrderTotal\n"
+    "    FROM PurchaseOrder AS po\n"
+    "        INNER JOIN Employee AS e\n"
+    "            ON e.EmployeeID = po.ApprovedByEmployeeID\n"
+    "    WHERE e.TerminationDate IS NOT NULL\n"
+    "        AND po.OrderDate > e.TerminationDate\n"
+    ")")
+_PLANT_DAYS = ("    FROM TimeClockEntry AS tc\n"
+               "        INNER JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID\n"
+               "        INNER JOIN CostCenter AS cc ON cc.CostCenterID = e.CostCenterID\n"
+               "    WHERE cc.CostCenterName = 'Manufacturing'\n"
+               "    GROUP BY tc.WorkDate\n")
+_EARNINGS = ("FROM PayrollRegisterLine AS prl\n"
+             "    INNER JOIN PayrollRegister AS pr\n"
+             "        ON pr.PayrollRegisterID = prl.PayrollRegisterID\n"
+             "    INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID\n"
+             "    INNER JOIN LaborTimeEntry AS lt\n"
+             "        ON lt.LaborTimeEntryID = prl.LaborTimeEntryID\n")
+_AFTER_END = ("CASE WHEN lt.WorkDate > op.ActualEndDate\n"
+              "        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END")
 
-MATCH_SELECT = """SELECT
-    CASE
-        WHEN QtyInvoiced > QtyReceived + 0.0001
-            THEN 'Exception: invoiced above received'
-        WHEN QtyReceived > QtyOrdered + 0.0001
-            THEN 'Exception: received above ordered'
-        WHEN QtyReceived = 0 THEN 'Not yet received'
-        WHEN QtyInvoiced < QtyReceived - 0.0001
-            THEN 'Received, not fully invoiced'
-        WHEN QtyReceived < QtyOrdered - 0.0001 THEN 'Partly received'
-        ELSE 'Matched'
-    END AS MatchStatus,
-    COUNT(*) AS POLines
-FROM Matched
-GROUP BY MatchStatus
-ORDER BY POLines DESC;"""
+QUERIES = [
+    # Tutorial 12.1: the ledger
+    ("je_population",
+     "-- Tutorial 12.1, test L1: journal entries against the ledger\n"
+     "-- Population: all journal entries; expected: counts and totals agree",
+     "SELECT\n"
+     "    (SELECT COUNT(*) FROM JournalEntry) AS Entries,\n"
+     "    (SELECT ROUND(SUM(TotalAmount), 2) FROM JournalEntry) AS EntryTotal,\n"
+     "    (SELECT COUNT(DISTINCT SourceDocumentID) FROM GLEntry\n"
+     "        WHERE SourceDocumentType = 'JournalEntry') AS PostedEntries,\n"
+     "    (SELECT ROUND(SUM(Debit), 2) FROM GLEntry\n"
+     "        WHERE SourceDocumentType = 'JournalEntry') AS PostedDebits;"),
+    ("payroll_population",
+     "-- Tutorial 12.1, test L2: manufacturing payroll against the ledger\n"
+     "-- Population: Manufacturing registers; expected: no difference",
+     "SELECT reg.FiscalYear, reg.RegisterCost, gl.LedgerCost,\n"
+     "    ROUND(reg.RegisterCost - gl.LedgerCost, 2) AS Difference\n"
+     "FROM (\n"
+     "    SELECT pp.FiscalYear,\n"
+     "        ROUND(SUM(pr.GrossPay + pr.EmployerPayrollTax\n"
+     "            + pr.EmployerBenefits), 2) AS RegisterCost\n"
+     "    FROM PayrollRegister AS pr\n"
+     "        INNER JOIN PayrollPeriod AS pp\n"
+     "            ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "        INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID\n"
+     "    WHERE cc.CostCenterName = 'Manufacturing'\n"
+     "    GROUP BY pp.FiscalYear\n"
+     ") AS reg\n"
+     "    INNER JOIN (\n"
+     "        SELECT gl.FiscalYear, ROUND(SUM(gl.Debit), 2) AS LedgerCost\n"
+     "        FROM GLEntry AS gl\n"
+     "            INNER JOIN CostCenter AS cc\n"
+     "                ON cc.CostCenterID = gl.CostCenterID\n"
+     "        WHERE gl.SourceDocumentType = 'PayrollSummary'\n"
+     "            AND cc.CostCenterName = 'Manufacturing'\n"
+     "        GROUP BY gl.FiscalYear\n"
+     "    ) AS gl ON gl.FiscalYear = reg.FiscalYear\n"
+     "ORDER BY reg.FiscalYear;"),
+    ("trace",
+     "-- Tutorial 12.1, test L3: postings and documents traced both ways\n"
+     "-- Population: four document types; expected: no rows",
+     "SELECT 'Posting with no payroll payment' AS Test,\n"
+     "    gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,\n"
+     "    gl.Debit + gl.Credit AS Amount\n"
+     "FROM GLEntry AS gl\n"
+     "    LEFT JOIN PayrollPayment AS pp\n"
+     "        ON pp.PayrollPaymentID = gl.SourceDocumentID\n"
+     "WHERE gl.SourceDocumentType = 'PayrollPayment'\n"
+     "    AND pp.PayrollPaymentID IS NULL\n"
+     "UNION ALL\n"
+     "SELECT 'Posting with no supplier payment', gl.GLEntryID,\n"
+     "    gl.PostingDate, gl.Debit + gl.Credit\n"
+     "FROM GLEntry AS gl\n"
+     "    LEFT JOIN DisbursementPayment AS dp\n"
+     "        ON dp.DisbursementID = gl.SourceDocumentID\n"
+     "WHERE gl.SourceDocumentType = 'DisbursementPayment'\n"
+     "    AND dp.DisbursementID IS NULL\n"
+     "UNION ALL\n"
+     "SELECT 'Sales invoice never posted', si.SalesInvoiceID,\n"
+     "    si.InvoiceDate, si.GrandTotal\n"
+     "FROM SalesInvoice AS si\n"
+     "    LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'\n"
+     "        AND gl.SourceDocumentID = si.SalesInvoiceID\n"
+     "WHERE gl.GLEntryID IS NULL\n"
+     "UNION ALL\n"
+     "SELECT 'Supplier invoice never posted', pi.PurchaseInvoiceID,\n"
+     "    pi.InvoiceDate, pi.GrandTotal\n"
+     "FROM PurchaseInvoice AS pi\n"
+     "    LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'PurchaseInvoice'\n"
+     "        AND gl.SourceDocumentID = pi.PurchaseInvoiceID\n"
+     "WHERE gl.GLEntryID IS NULL;"),
+    ("unpaid_registers",
+     "-- Tutorial 12.1, test L4: approved registers with no payment\n"
+     "-- Population: all payroll registers; expected: no rows",
+     "SELECT pr.PayrollRegisterID, e.JobTitle,\n"
+     "    ec.CostCenterName AS EmployeeCenter,\n"
+     "    rc.CostCenterName AS RegisterCenter, e.TerminationDate,\n"
+     "    pp.PayDate, pr.GrossPay, pr.NetPay, pr.Status\n"
+     "FROM PayrollRegister AS pr\n"
+     "    INNER JOIN PayrollPeriod AS pp\n"
+     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "    INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID\n"
+     "    INNER JOIN CostCenter AS ec ON ec.CostCenterID = e.CostCenterID\n"
+     "    INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID\n"
+     "    LEFT JOIN PayrollPayment AS pay\n"
+     "        ON pay.PayrollRegisterID = pr.PayrollRegisterID\n"
+     "WHERE pay.PayrollPaymentID IS NULL;"),
+    ("revenue_cutoff",
+     "-- Tutorial 12.1, test L5: revenue posted in the year of delivery\n"
+     "-- Population: all sales invoices; expected: no rows",
+     "WITH Shipped AS (\n"
+     "    SELECT sil.SalesInvoiceID, MIN(s.ShipmentDate) AS ShipmentDate,\n"
+     "        MAX(s.DeliveryDate) AS DeliveryDate\n"
+     "    FROM SalesInvoiceLine AS sil\n"
+     "        INNER JOIN ShipmentLine AS sl\n"
+     "            ON sl.ShipmentLineID = sil.ShipmentLineID\n"
+     "        INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID\n"
+     "    GROUP BY sil.SalesInvoiceID\n"
+     "),\n"
+     "Posted AS (\n"
+     "    SELECT SourceDocumentID AS SalesInvoiceID,\n"
+     "        MIN(PostingDate) AS PostingDate\n"
+     "    FROM GLEntry\n"
+     "    WHERE SourceDocumentType = 'SalesInvoice'\n"
+     "    GROUP BY SourceDocumentID\n"
+     "),\n"
+     "Classified AS (\n"
+     "    SELECT si.SubTotal,\n"
+     "        strftime('%Y', sh.DeliveryDate) AS DeliveryYear,\n"
+     "        CASE\n"
+     "            WHEN strftime('%Y', p.PostingDate)\n"
+     "                    <> strftime('%Y', sh.DeliveryDate)\n"
+     "                THEN 'Revenue posted in another year'\n"
+     "            WHEN si.InvoiceDate < sh.ShipmentDate\n"
+     "                THEN 'Invoice dated before shipment'\n"
+     "            ELSE 'In the year of delivery'\n"
+     "        END AS Finding\n"
+     "    FROM SalesInvoice AS si\n"
+     "        INNER JOIN Shipped AS sh\n"
+     "            ON sh.SalesInvoiceID = si.SalesInvoiceID\n"
+     "        INNER JOIN Posted AS p ON p.SalesInvoiceID = si.SalesInvoiceID\n"
+     ")\n"
+     "SELECT Finding, DeliveryYear, COUNT(*) AS Invoices,\n"
+     "    ROUND(SUM(SubTotal), 2) AS SubTotal\n"
+     "FROM Classified\n"
+     "WHERE Finding <> 'In the year of delivery'\n"
+     "GROUP BY Finding, DeliveryYear\n"
+     "ORDER BY Finding, DeliveryYear;"),
+    ("unbilled_shipments",
+     "-- Tutorial 12.1, test L6: shipments never invoiced\n"
+     "-- Population: all shipment lines; expected: no rows",
+     "SELECT s.ShipmentNumber, s.ShipmentDate, s.DeliveryDate,\n"
+     "    ROUND(sl.ExtendedStandardCost, 2) AS StandardCost,\n"
+     "    ROUND(sl.QuantityShipped * sol.UnitPrice * (1 - sol.Discount), 2)\n"
+     "        AS SalesValue\n"
+     "FROM ShipmentLine AS sl\n"
+     "    INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID\n"
+     "    INNER JOIN SalesOrderLine AS sol\n"
+     "        ON sol.SalesOrderLineID = sl.SalesOrderLineID\n"
+     "    LEFT JOIN SalesInvoiceLine AS sil\n"
+     "        ON sil.ShipmentLineID = sl.ShipmentLineID\n"
+     "WHERE sil.SalesInvoiceLineID IS NULL\n"
+     "ORDER BY s.ShipmentDate;"),
+    ("payroll_cutoff",
+     "-- Tutorial 12.1, test L7: pay periods that cross a year-end\n"
+     "-- Population: all pay periods; expected: every period processed",
+     "SELECT pp.PeriodNumber, pp.PeriodStartDate, pp.PeriodEndDate,\n"
+     "    pp.PayDate, pp.Status, COALESCE(reg.Registers, 0) AS Registers,\n"
+     "    reg.PayrollCost\n"
+     "FROM PayrollPeriod AS pp\n"
+     "    LEFT JOIN (\n"
+     "        SELECT PayrollPeriodID, COUNT(*) AS Registers,\n"
+     "            ROUND(SUM(GrossPay + EmployerPayrollTax\n"
+     "                + EmployerBenefits), 2) AS PayrollCost\n"
+     "        FROM PayrollRegister\n"
+     "        GROUP BY PayrollPeriodID\n"
+     "    ) AS reg ON reg.PayrollPeriodID = pp.PayrollPeriodID\n"
+     "WHERE strftime('%Y', pp.PeriodStartDate) <> strftime('%Y', pp.PayDate)\n"
+     "ORDER BY pp.PeriodStartDate;"),
+    ("accrued_payroll",
+     "-- Tutorial 12.1, test L8: accrued payroll at the year-end\n"
+     "-- Population: account 2030 to 2026-12-31; expected: unpaid wages",
+     "SELECT gl.SourceDocumentType, COUNT(*) AS Postings,\n"
+     "    ROUND(SUM(gl.Credit) - SUM(gl.Debit), 2) AS Balance\n"
+     "FROM GLEntry AS gl\n"
+     "    INNER JOIN Account AS a ON a.AccountID = gl.AccountID\n"
+     "WHERE a.AccountNumber = 2030 AND gl.PostingDate <= '2026-12-31'\n"
+     "GROUP BY gl.SourceDocumentType;"),
+    # Tutorial 12.2: purchasing
+    ("match_status",
+     "-- Tutorial 12.2, test P1: three-way match by purchase order line\n"
+     "-- Population: all PO lines; expected: no exception statuses",
+     "WITH Received AS (\n"
+     "    SELECT POLineID, SUM(QuantityReceived) AS QtyReceived\n"
+     "    FROM GoodsReceiptLine\n"
+     "    GROUP BY POLineID\n"
+     "),\n"
+     "Invoiced AS (\n"
+     "    SELECT POLineID, SUM(Quantity) AS QtyInvoiced\n"
+     "    FROM PurchaseInvoiceLine\n"
+     "    WHERE POLineID IS NOT NULL\n"
+     "    GROUP BY POLineID\n"
+     "),\n"
+     "Matched AS (\n"
+     "    SELECT pol.POLineID, pol.Quantity AS QtyOrdered,\n"
+     "        COALESCE(r.QtyReceived, 0) AS QtyReceived,\n"
+     "        COALESCE(i.QtyInvoiced, 0) AS QtyInvoiced\n"
+     "    FROM PurchaseOrderLine AS pol\n"
+     "        LEFT JOIN Received AS r ON r.POLineID = pol.POLineID\n"
+     "        LEFT JOIN Invoiced AS i ON i.POLineID = pol.POLineID\n"
+     ")\n"
+     "SELECT\n"
+     "    CASE\n"
+     "        WHEN QtyInvoiced > QtyReceived + 0.0001\n"
+     "            THEN 'Exception: invoiced above received'\n"
+     "        WHEN QtyReceived > QtyOrdered + 0.0001\n"
+     "            THEN 'Exception: received above ordered'\n"
+     "        WHEN QtyReceived = 0 THEN 'Not yet received'\n"
+     "        WHEN QtyInvoiced < QtyReceived - 0.0001\n"
+     "            THEN 'Received, not fully invoiced'\n"
+     "        WHEN QtyReceived < QtyOrdered - 0.0001 THEN 'Partly received'\n"
+     "        ELSE 'Matched'\n"
+     "    END AS MatchStatus,\n"
+     "    COUNT(*) AS POLines\n"
+     "FROM Matched\n"
+     "GROUP BY MatchStatus\n"
+     "ORDER BY POLines DESC;"),
+    ("price_tolerance",
+     "-- Tutorial 12.2, test P2: invoice prices against order prices\n"
+     "-- Population: invoice lines with a PO line; expected: none above 3%",
+     "SELECT COUNT(*) AS InvoiceLines,\n"
+     "    SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost\n"
+     "        > 0.03 THEN 1 ELSE 0 END) AS AboveThreePercent,\n"
+     "    SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost\n"
+     "        > 0.02 THEN 1 ELSE 0 END) AS AboveTwoPercent,\n"
+     "    ROUND(MAX((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)\n"
+     "        AS LargestIncrease,\n"
+     "    ROUND(MIN((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)\n"
+     "        AS LargestDecrease\n"
+     "FROM PurchaseInvoiceLine AS pil\n"
+     "    INNER JOIN PurchaseOrderLine AS pol ON pol.POLineID = pil.POLineID;"),
+    ("grni",
+     "-- Tutorial 12.2, test P3: receipts not invoiced against account 2020\n"
+     "-- Population: open receipt lines; expected: equal to the ledger",
+     "WITH InvoicedByReceipt AS (\n"
+     "    SELECT GoodsReceiptLineID, SUM(Quantity) AS QtyInvoiced\n"
+     "    FROM PurchaseInvoiceLine\n"
+     "    GROUP BY GoodsReceiptLineID\n"
+     ")\n"
+     "SELECT\n"
+     "    (SELECT ROUND(SUM(grl.ExtendedStandardCost\n"
+     "        * (1 - COALESCE(ibr.QtyInvoiced, 0) / grl.QuantityReceived)), 2)\n"
+     "     FROM GoodsReceiptLine AS grl\n"
+     "        LEFT JOIN InvoicedByReceipt AS ibr\n"
+     "            ON ibr.GoodsReceiptLineID = grl.GoodsReceiptLineID\n"
+     "     WHERE COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001)\n"
+     "        AS NotInvoicedValue,\n"
+     "    (SELECT ROUND(SUM(gl.Credit) - SUM(gl.Debit), 2)\n"
+     "     FROM GLEntry AS gl\n"
+     "        INNER JOIN Account AS a ON a.AccountID = gl.AccountID\n"
+     "     WHERE a.AccountNumber = 2020 AND gl.PostingDate <= '2026-12-31')\n"
+     "        AS LedgerBalance;"),
+    ("approval_summary",
+     "-- Tutorial 12.2, test P4: purchase order approvals\n"
+     "-- Population: all purchase orders; expected: no rows",
+     _APPROVAL_CTE + "\n"
+     "SELECT Test, COUNT(*) AS Orders, ROUND(SUM(OrderTotal), 2) AS OrderValue\n"
+     "FROM ApprovalExceptions\n"
+     "GROUP BY Test\n"
+     "ORDER BY Orders DESC;"),
+    ("approval_detail",
+     "-- Tutorial 12.2, test P5: the orders behind the approval exceptions\n"
+     "-- Population: the orders flagged by test P4",
+     _APPROVAL_CTE + ",\n"
+     "Flagged AS (\n"
+     "    SELECT PONumber, GROUP_CONCAT(Test, '; ') AS Tests\n"
+     "    FROM ApprovalExceptions\n"
+     "    GROUP BY PONumber\n"
+     ")\n"
+     "SELECT f.PONumber, po.OrderDate, po.OrderTotal,\n"
+     "    c.JobTitle AS CreatedBy, a.JobTitle AS ApprovedBy,\n"
+     "    a.MaxApprovalAmount, a.TerminationDate, f.Tests\n"
+     "FROM Flagged AS f\n"
+     "    INNER JOIN PurchaseOrder AS po ON po.PONumber = f.PONumber\n"
+     "    INNER JOIN Employee AS c ON c.EmployeeID = po.CreatedByEmployeeID\n"
+     "    INNER JOIN Employee AS a ON a.EmployeeID = po.ApprovedByEmployeeID\n"
+     "ORDER BY po.OrderTotal DESC;"),
+    ("approvers",
+     "-- Tutorial 12.2, test P6: who approves the purchase orders\n"
+     "-- Population: all purchase orders; expected: approval shared",
+     "SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS OrdersApproved\n"
+     "FROM PurchaseOrder AS po\n"
+     "    INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID\n"
+     "GROUP BY e.EmployeeID, e.JobTitle\n"
+     "ORDER BY OrdersApproved DESC;"),
+    # Tutorial 12.3: the hours and the pay
+    ("hours_chain",
+     "-- Tutorial 12.3, test H1: clocked, recorded, and paid hours\n"
+     "-- Population: every pay period; expected: equal in every period",
+     "WITH Clocked AS (\n"
+     "    SELECT PayrollPeriodID, SUM(RegularHours + OvertimeHours) AS Hours\n"
+     "    FROM TimeClockEntry\n"
+     "    GROUP BY PayrollPeriodID\n"
+     "),\n"
+     "Recorded AS (\n"
+     "    SELECT PayrollPeriodID, SUM(RegularHours + OvertimeHours) AS Hours\n"
+     "    FROM LaborTimeEntry\n"
+     "    GROUP BY PayrollPeriodID\n"
+     "),\n"
+     "Paid AS (\n"
+     "    SELECT pr.PayrollPeriodID, SUM(prl.Hours) AS Hours\n"
+     "    FROM PayrollRegisterLine AS prl\n"
+     "        INNER JOIN PayrollRegister AS pr\n"
+     "            ON pr.PayrollRegisterID = prl.PayrollRegisterID\n"
+     "    WHERE prl.LineType IN ('Regular Earnings', 'Overtime Earnings')\n"
+     "    GROUP BY pr.PayrollPeriodID\n"
+     ")\n"
+     "SELECT COUNT(*) AS Periods,\n"
+     "    SUM(CASE WHEN ABS(c.Hours - r.Hours) > 0.001\n"
+     "        OR ABS(r.Hours - p.Hours) > 0.001 THEN 1 ELSE 0 END)\n"
+     "        AS PeriodsThatDiffer,\n"
+     "    ROUND(SUM(c.Hours), 1) AS Clocked,\n"
+     "    ROUND(SUM(r.Hours), 1) AS Recorded,\n"
+     "    ROUND(SUM(p.Hours), 1) AS Paid\n"
+     "FROM Clocked AS c\n"
+     "    INNER JOIN Recorded AS r ON r.PayrollPeriodID = c.PayrollPeriodID\n"
+     "    INNER JOIN Paid AS p ON p.PayrollPeriodID = c.PayrollPeriodID;"),
+    ("chain_2024",
+     "-- Tutorial 12.3, test H2: the manufacturing hours of 2024 by kind\n"
+     "-- Population: manufacturing labor time; expected: every period recorded",
+     "SELECT pp.PeriodNumber, pp.PeriodStartDate,\n"
+     "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS Hours,\n"
+     "    ROUND(SUM(CASE lt.LaborType WHEN 'Direct Manufacturing'\n"
+     "        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)\n"
+     "        AS DirectHours,\n"
+     "    ROUND(SUM(CASE lt.LaborType WHEN 'Indirect Manufacturing'\n"
+     "        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)\n"
+     "        AS IndirectHours\n"
+     "FROM LaborTimeEntry AS lt\n"
+     "    INNER JOIN PayrollPeriod AS pp\n"
+     "        ON pp.PayrollPeriodID = lt.PayrollPeriodID\n"
+     "WHERE lt.LaborType <> 'NonManufacturing' AND pp.FiscalYear = 2024\n"
+     "GROUP BY pp.PayrollPeriodID, pp.PeriodNumber, pp.PeriodStartDate\n"
+     "ORDER BY pp.PeriodStartDate;"),
+    ("chain_exceptions",
+     "-- Tutorial 12.3, test H3: time paid to another person or unapproved\n"
+     "-- Population: all earnings lines; expected: no rows",
+     "SELECT 'Time paid to another employee' AS Test,\n"
+     "    prl.PayrollRegisterLineID, pr.EmployeeID AS PaidEmployee,\n"
+     "    lt.EmployeeID AS WorkedEmployee, rc.CostCenterName, prl.Amount\n"
+     + _EARNINGS +
+     "WHERE lt.EmployeeID <> pr.EmployeeID\n"
+     "UNION ALL\n"
+     "SELECT 'Time paid on an unapproved clock entry',\n"
+     "    prl.PayrollRegisterLineID, pr.EmployeeID,\n"
+     "    lt.EmployeeID, rc.CostCenterName, prl.Amount\n"
+     + _EARNINGS +
+     "    INNER JOIN TimeClockEntry AS tc\n"
+     "        ON tc.TimeClockEntryID = lt.TimeClockEntryID\n"
+     "WHERE tc.ClockStatus <> 'Approved';"),
+    ("overtime_length",
+     "-- Tutorial 12.3, test H4: overtime and its approvals\n"
+     "-- Population: clock entries with overtime; expected: approved",
+     "SELECT\n"
+     "    CASE WHEN OvertimeHours <= 0.5 THEN 'Half an hour or less'\n"
+     "        ELSE 'More than half an hour' END AS OvertimeLength,\n"
+     "    COUNT(*) AS Entries,\n"
+     "    SUM(CASE WHEN OvertimeApprovalID IS NULL THEN 1 ELSE 0 END)\n"
+     "        AS WithoutApproval,\n"
+     "    ROUND(SUM(OvertimeHours), 1) AS OvertimeHours\n"
+     "FROM TimeClockEntry\n"
+     "WHERE OvertimeHours > 0\n"
+     "GROUP BY OvertimeLength;"),
+    ("overtime_unapproved",
+     "-- Tutorial 12.3, test H5: long overtime without an approval\n"
+     "-- Population: overtime above half an hour; expected: no rows",
+     "SELECT tc.TimeClockEntryID, tc.EmployeeID, e.JobTitle,\n"
+     "    e.TerminationDate, tc.WorkDate, tc.OvertimeHours, tc.ClockOutTime,\n"
+     "    tc.ClockStatus\n"
+     "FROM TimeClockEntry AS tc\n"
+     "    INNER JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID\n"
+     "WHERE tc.OvertimeHours > 0.5 AND tc.OvertimeApprovalID IS NULL;"),
+    ("surge_days",
+     "-- Tutorial 12.3, test H6: days when everyone clocked the same hours\n"
+     "-- Population: manufacturing clock entries; expected: no such days",
+     "WITH PlantDays AS (\n"
+     "    SELECT tc.WorkDate, COUNT(*) AS Employees,\n"
+     "        COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours)\n"
+     "            AS HourPatterns,\n"
+     "        SUM(tc.OvertimeHours) AS OvertimeHours\n"
+     + _PLANT_DAYS +
+     ")\n"
+     "SELECT strftime('%Y', WorkDate) AS WorkYear,\n"
+     "    SUM(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
+     "        THEN 1 ELSE 0 END) AS SurgeDays,\n"
+     "    MAX(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
+     "        THEN Employees END) AS EmployeesPerDay,\n"
+     "    ROUND(SUM(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
+     "        THEN OvertimeHours ELSE 0 END), 0) AS SurgeOvertime,\n"
+     "    ROUND(SUM(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
+     "        THEN OvertimeHours ELSE 0 END) / SUM(OvertimeHours), 3)\n"
+     "        AS SurgeShare\n"
+     "FROM PlantDays\n"
+     "GROUP BY WorkYear\n"
+     "ORDER BY WorkYear;"),
+    ("late_by_year",
+     "-- Tutorial 12.3, test H7: direct time recorded after its operation\n"
+     "-- Population: direct labor time; expected: a small share",
+     "WITH SurgeDays AS (\n"
+     "    SELECT tc.WorkDate\n"
+     + _PLANT_DAYS +
+     "    HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1\n"
+     "        AND COUNT(*) > 1\n"
+     ")\n"
+     "SELECT strftime('%Y', lt.WorkDate) AS WorkYear,\n"
+     "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,\n"
+     f"    ROUND(SUM({_AFTER_END}), 0)\n"
+     "        AS AfterEnd,\n"
+     f"    ROUND(SUM({_AFTER_END})\n"
+     "        / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS ShareAfterEnd,\n"
+     "    ROUND(SUM(CASE WHEN lt.WorkDate > op.ActualEndDate\n"
+     "        AND sd.WorkDate IS NOT NULL\n"
+     "        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)\n"
+     "        AS AfterEndOnSurgeDays\n"
+     "FROM LaborTimeEntry AS lt\n"
+     "    INNER JOIN WorkOrderOperation AS op\n"
+     "        ON op.WorkOrderOperationID = lt.WorkOrderOperationID\n"
+     "    LEFT JOIN SurgeDays AS sd ON sd.WorkDate = lt.WorkDate\n"
+     "WHERE lt.LaborType = 'Direct Manufacturing'\n"
+     "GROUP BY WorkYear\n"
+     "ORDER BY WorkYear;"),
+    ("late_by_center",
+     "-- Tutorial 12.3, test H8: late direct time by work center, 2026\n"
+     "-- Population: direct labor time of 2026; expected: a small share",
+     "SELECT wc.WorkCenterName,\n"
+     "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,\n"
+     f"    ROUND(SUM({_AFTER_END})\n"
+     "        / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS ShareAfterEnd\n"
+     "FROM LaborTimeEntry AS lt\n"
+     "    INNER JOIN WorkOrderOperation AS op\n"
+     "        ON op.WorkOrderOperationID = lt.WorkOrderOperationID\n"
+     "    INNER JOIN WorkCenter AS wc ON wc.WorkCenterID = op.WorkCenterID\n"
+     "WHERE lt.LaborType = 'Direct Manufacturing'\n"
+     "    AND lt.WorkDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "GROUP BY wc.WorkCenterID, wc.WorkCenterName\n"
+     "ORDER BY ShareAfterEnd DESC;"),
+    ("pay_after_termination",
+     "-- Tutorial 12.3, test H9: pay dated after the employee's termination\n"
+     "-- Population: registers of terminated employees; expected: final pay",
+     "SELECT pr.PayrollRegisterID, e.JobTitle,\n"
+     "    ec.CostCenterName AS EmployeeCenter,\n"
+     "    rc.CostCenterName AS RegisterCenter, e.TerminationDate,\n"
+     "    pp.PeriodStartDate, pp.PayDate, pr.GrossPay,\n"
+     "    (SELECT ROUND(AVG(p2.GrossPay), 2)\n"
+     "     FROM PayrollRegister AS p2\n"
+     "        INNER JOIN PayrollPeriod AS q2\n"
+     "            ON q2.PayrollPeriodID = p2.PayrollPeriodID\n"
+     "     WHERE p2.EmployeeID = pr.EmployeeID\n"
+     "        AND q2.PayDate <= e.TerminationDate AND p2.GrossPay > 0)\n"
+     "        AS UsualGrossPay\n"
+     "FROM PayrollRegister AS pr\n"
+     "    INNER JOIN PayrollPeriod AS pp\n"
+     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "    INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID\n"
+     "    INNER JOIN CostCenter AS ec ON ec.CostCenterID = e.CostCenterID\n"
+     "    INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID\n"
+     "WHERE e.TerminationDate IS NOT NULL\n"
+     "    AND pp.PayDate > e.TerminationDate;"),
+    ("register_approvers",
+     "-- Tutorial 12.3, test H10: who approves the payroll registers\n"
+     "-- Population: all payroll registers; expected: approval shared",
+     "SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS RegistersApproved,\n"
+     "    SUM(CASE WHEN pr.ApprovedDate = pp.PayDate THEN 1 ELSE 0 END)\n"
+     "        AS ApprovedOnPayDate\n"
+     "FROM PayrollRegister AS pr\n"
+     "    INNER JOIN PayrollPeriod AS pp\n"
+     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "    INNER JOIN Employee AS e ON e.EmployeeID = pr.ApprovedByEmployeeID\n"
+     "GROUP BY e.EmployeeID, e.JobTitle;"),
+    ("payroll_approval",
+     "-- Tutorial 12.3, test H11: registers and payments against approval\n"
+     "-- Population: all registers and payments; expected: no rows",
+     "SELECT 'Register approved by its own employee' AS Test,\n"
+     "    COUNT(*) AS Records, ROUND(SUM(pr.NetPay), 2) AS NetPay\n"
+     "FROM PayrollRegister AS pr\n"
+     "WHERE pr.EmployeeID = pr.ApprovedByEmployeeID\n"
+     "UNION ALL\n"
+     "SELECT 'Payment made before approval', COUNT(*),\n"
+     "    ROUND(SUM(pr.NetPay), 2)\n"
+     "FROM PayrollPayment AS pay\n"
+     "    INNER JOIN PayrollRegister AS pr\n"
+     "        ON pr.PayrollRegisterID = pay.PayrollRegisterID\n"
+     "WHERE pay.PaymentDate < pr.ApprovedDate;"),
+]
+CHAPTER12 = db.Script(HEADER, QUERIES, "Audit.sql")
 
-APPROVAL_SQL = """WITH ApprovalExceptions AS (
-    SELECT 'Self-approved' AS Test, po.PONumber, po.OrderTotal
-    FROM PurchaseOrder AS po
-    WHERE po.CreatedByEmployeeID = po.ApprovedByEmployeeID
-    UNION ALL
-    SELECT 'Above approver limit', po.PONumber, po.OrderTotal
-    FROM PurchaseOrder AS po
-        INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
-    WHERE po.OrderTotal > e.MaxApprovalAmount
-    UNION ALL
-    SELECT 'Approved after termination', po.PONumber, po.OrderTotal
-    FROM PurchaseOrder AS po
-        INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
-    WHERE e.TerminationDate IS NOT NULL
-        AND po.OrderDate > e.TerminationDate
-)
-SELECT Test, COUNT(*) AS Orders, ROUND(SUM(OrderTotal), 2) AS OrderValue
-FROM ApprovalExceptions
-GROUP BY Test
-ORDER BY Orders DESC;"""
 
-LATE_LABOR_SQL = """SELECT strftime('%Y', lt.WorkDate) AS WorkYear,
-    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,
-    ROUND(SUM(CASE WHEN lt.WorkDate > op.ActualEndDate
-        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
-        AS HoursAfterOperationEnded,
-    ROUND(SUM(CASE WHEN lt.WorkDate > op.ActualEndDate
-        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END)
-        / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS ShareAfterEnd
-FROM LaborTimeEntry AS lt
-    INNER JOIN WorkOrderOperation AS op
-        ON op.WorkOrderOperationID = lt.WorkOrderOperationID
-WHERE lt.LaborType = 'Direct Manufacturing'
-GROUP BY WorkYear
-ORDER BY WorkYear;"""
-
-JE_RECON_SQL = """SELECT
-    (SELECT COUNT(*) FROM JournalEntry) AS Entries,
-    (SELECT ROUND(SUM(TotalAmount), 2) FROM JournalEntry) AS EntryTotal,
-    (SELECT COUNT(DISTINCT SourceDocumentID) FROM GLEntry
-        WHERE SourceDocumentType = 'JournalEntry') AS PostedEntries,
-    (SELECT ROUND(SUM(Debit), 2) FROM GLEntry
-        WHERE SourceDocumentType = 'JournalEntry') AS PostedDebits;"""
+def sql(key: str) -> str:
+    return CHAPTER12.location(key)[1]
 
 
 def note(d: Diagram, text: str, y: float, h: float = 40) -> None:
     d.text(f"<i>{text}</i>", 0, y, 860, h, size=SMALL, color=GRAY)
 
 
-def trace_rows() -> list[tuple]:
-    rows = q(TRACE_SQL)
-    assert len(rows) == 6 and {r[0] for r in rows} == {"Posting with no payroll payment"}, rows
-    assert sorted({r[2][:7] for r in rows}) == ["2024-01", "2025-01", "2026-01"], rows
-    return rows
+def comment_lines(key: str) -> int:
+    return CHAPTER12.location(key)[0].count("\n") + 1
 
 
 def fig_12_01() -> Diagram:
@@ -143,6 +549,8 @@ def fig_12_01() -> Diagram:
         assert table in types
         columns = {r[1] for r in q(f"PRAGMA table_info({table})")}
         assert {key, date} <= columns, (table, key, date)
+    for table, column in [("Shipment", "DeliveryDate"), ("PayrollPeriod", "PeriodEndDate")]:
+        assert column in {r[1] for r in q(f"PRAGMA table_info({table})")}, (table, column)
     gl_columns = [("PK", "GLEntryID"), ("", "PostingDate"), ("FK", "AccountID"), ("", "Debit"),
                   ("", "Credit"), ("", "SourceDocumentType"), ("FK", "SourceDocumentID")]
     assert {c for _, c in gl_columns} <= {r[1] for r in q("PRAGMA table_info(GLEntry)")}
@@ -150,10 +558,8 @@ def fig_12_01() -> Diagram:
     gl = d.table("GLEntry", 0, 24, gl_columns, w=250)
     d.text("<b>Source document tables (four of many)</b>", 590, 0, 270, 20, size=SMALL)
     doc_y = 24
-    doc_tables = []
     for table, key, date in documents:
         t = d.table(table, 610, doc_y, [("PK", key), ("", date)], w=250)
-        doc_tables.append(t)
         doc_y += t.h + 18
     docs = d.container(610, 24, 250, doc_y - 18 - 24)
     docs_h = doc_y - 18 - 24
@@ -176,11 +582,12 @@ def fig_12_01() -> Diagram:
     d.arrow(complete, gl.id, color=AMBER, dashed=True, exit=(0, 0.5),
             entry=(1, round((co_mid - 24) / gl.h, 4)))
     cut_y = doc_y - 18 + 30
-    d.box("<b>Cutoff: the dates of both sides</b><br>Compare each document's own date (InvoiceDate, "
-          "PaymentDate) with the PostingDate of its ledger rows. A posting in a different fiscal "
-          "year from the document records the event in the wrong period.", 0, cut_y, 860, 70,
+    d.box("<b>Cutoff: when the event happened against when it was posted</b><br>Compare the PostingDate "
+          "of the ledger rows with the date of the event: the DeliveryDate of the goods a sales invoice "
+          "bills, and the work dates of the pay period a payroll pays. A posting in a different fiscal "
+          "year from the event records it in the wrong period.", 0, cut_y, 860, 86,
           fill=GRAY_TINT, stroke=GRAY, align="left", size=SMALL)
-    ly = cut_y + 90
+    ly = cut_y + 106
     d.line_sample(0, ly + 10, 50, color=AMBER, dashed=True, end="blockThin")
     d.text("the direction of a trace between the ledger and its documents, which link on "
            "SourceDocumentType and SourceDocumentID", 60, ly, 800, 22, size=SMALL)
@@ -189,34 +596,36 @@ def fig_12_01() -> Diagram:
 
 def fig_12_02() -> Diagram:
     d = Diagram("The Trace Exceptions in One List")
-    shown = ("SELECT 'Posting with no payroll payment' AS Test,\n"
-             "    gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,\n"
-             "    gl.Debit + gl.Credit AS Amount\n"
-             "FROM GLEntry AS gl\n"
-             "    LEFT JOIN PayrollPayment AS pp\n"
-             "        ON pp.PayrollPaymentID = gl.SourceDocumentID\n"
-             "WHERE gl.SourceDocumentType = 'PayrollPayment'\n"
-             "    AND pp.PayrollPaymentID IS NULL\n"
-             "UNION ALL\n"
-             "SELECT 'Posting with no supplier payment', ...\n"
-             "UNION ALL\n"
-             "SELECT 'Sales invoice never posted', ...\n"
-             "UNION ALL\n"
-             "SELECT 'Supplier invoice never posted', ...;")
-    rows = trace_rows()
-    headers = ["Test", "RecordID", "RecordDate", "Amount"]
-    y = db.window(d)
-    y = db.editor(d, 0, y, 860, shown, tab="Audit.sql") + 8
-    geometry = db.results(d, 0, y, headers, [320, 130, 150, 150], rows)
-    y += (len(rows) + 1) * ROW_H + 8
-    bottom = db.message(d, 0, y, 860, len(rows), shown.split("\n")[0])
-    db.emphasize_cells(d, geometry, [(-1, 0), (len(rows) - 1, 0)])
-    note(d, "The last three tests are shortened here; Tutorial 12.1 gives the full query. Outlined: "
-            "every row comes from the first test, and the other three return none.", bottom + 8, 40)
+    rows = db.run(sql("trace"))[1]
+    assert len(rows) == 6 and {r[0] for r in rows} == {"Posting with no payroll payment"}, rows
+    assert sorted({r[2][:7] for r in rows}) == ["2024-01", "2025-01", "2026-01"], rows
+    out = CHAPTER12.mock(d, "trace", [320, 130, 150, 150], lines=slice(0, 22))
+    db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 0)])
+    note(d, "The editor shows the first two of the four tests; the query continues below. Outlined: every "
+            "row comes from the first test, and the other three return none.", out["bottom"] + 8, 40)
     return d
 
 
 def fig_12_03() -> Diagram:
+    d = Diagram("Revenue Posted Outside the Year of Delivery")
+    rows = db.run(sql("revenue_cutoff"))[1]
+    found = {(r[0], r[1]): (r[2], r[3]) for r in rows}
+    assert found[("Revenue posted in another year", "2024")] == (15, 90138.93), found
+    assert found[("Revenue posted in another year", "2025")] == (8, 19540.86), found
+    assert sum(v[0] for k, v in found.items() if k[0] == "Invoice dated before shipment") == 8, found
+    # every shipment an invoice bills was delivered in the year it shipped
+    assert not q("SELECT 1 FROM Shipment WHERE strftime('%Y', DeliveryDate) <> strftime('%Y', ShipmentDate)")
+    cl = comment_lines("revenue_cutoff")
+    start = cl + sql("revenue_cutoff").split("\n").index("Classified AS (")
+    out = CHAPTER12.mock(d, "revenue_cutoff", [300, 130, 110, 150], lines=slice(start, None))
+    marks = [i for i, r in enumerate(rows) if r[0] == "Revenue posted in another year"]
+    db.emphasize_cells(d, out["geometry"], [(marks[0], 0), (marks[-1], 3)])
+    note(d, "The editor is scrolled past the two CTEs that find each invoice's shipment and posting dates. "
+            "Outlined: revenue for December deliveries posted in January of the next year.", out["bottom"] + 8, 40)
+    return d
+
+
+def fig_12_04() -> Diagram:
     d = Diagram("The Three-Way Match at the Level of the Purchase Order Line")
     line = 12834
     po, number, item, name, ordered, cost = one(
@@ -282,42 +691,39 @@ def fig_12_03() -> Diagram:
     return d
 
 
-def fig_12_04() -> Diagram:
+def fig_12_05() -> Diagram:
     d = Diagram("The Three-Way Match of Every Purchase Order Line")
-    headers, rows = db.run(MATCH_CTES + MATCH_SELECT)
+    rows = db.run(sql("match_status"))[1]
     status = dict(rows)
     assert not any(s.startswith("Exception") for s in status), status
     assert set(status) == {"Matched", "Received, not fully invoiced", "Not yet received",
                            "Partly received"}, status
     assert status["Matched"] > 0.9 * sum(status.values())
-    shown = ("WITH Received AS (...),   -- quantity received per POLineID\n"
-             "Invoiced AS (...),        -- quantity invoiced per POLineID\n"
-             "Matched AS (...)          -- ordered, received, invoiced per line\n"
-             + MATCH_SELECT)
-    y = db.window(d)
-    y = db.editor(d, 0, y, 860, shown, tab="Audit.sql") + 8
-    geometry = db.results(d, 0, y, headers, [360, 140], rows)
-    y += (len(rows) + 1) * ROW_H + 8
-    bottom = db.message(d, 0, y, 860, len(rows), shown.split("\n")[0])
-    db.emphasize_cells(d, geometry, [(-1, 0), (len(rows) - 1, 1)])
-    note(d, "The three CTEs are shortened here; Tutorial 12.2 gives them in full. Outlined: four statuses, "
-            "and neither exception status appears.", bottom + 8, 40)
-    return d
-
-
-def fig_12_05() -> Diagram:
-    d = Diagram("Approval Exceptions in the Purchase Orders")
-    headers, rows = db.run(APPROVAL_SQL)
-    counts = {r[0]: r[1] for r in rows}
-    assert counts == {"Above approver limit": 13, "Self-approved": 9, "Approved after termination": 3}, counts
-    out = db.execute_sql(d, APPROVAL_SQL, [300, 120, 160])
-    db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 2)])
-    note(d, "Outlined: the three tests, with the number of purchase orders each flags and their value. "
-            "Some orders fail more than one test.", out["bottom"] + 8, 40)
+    cl = comment_lines("match_status")
+    start = cl + sql("match_status").split("\n").index("SELECT")
+    out = CHAPTER12.mock(d, "match_status", [360, 140], lines=slice(start, None))
+    db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 1)])
+    note(d, "The editor is scrolled past the three CTEs, which sum the quantities received and invoiced for "
+            "each purchase order line. Outlined: four statuses, and neither exception status appears.",
+         out["bottom"] + 8, 40)
     return d
 
 
 def fig_12_06() -> Diagram:
+    d = Diagram("Approval Exceptions in the Purchase Orders")
+    rows = db.run(sql("approval_summary"))[1]
+    counts = {r[0]: r[1] for r in rows}
+    assert counts == {"Above approver limit": 13, "Self-approved": 9, "Approved after termination": 3}, counts
+    detail = db.run(sql("approval_detail"))[1]
+    assert len(detail) == 14 and sum(1 for r in detail if ";" in r[7]) == 11, detail
+    out = CHAPTER12.mock(d, "approval_summary", [300, 120, 160])
+    db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 2)])
+    note(d, "Outlined: the three tests, with the number of purchase orders each flags and their value. "
+            "Most of the fourteen orders fail two tests.", out["bottom"] + 8, 40)
+    return d
+
+
+def fig_12_07() -> Diagram:
     d = Diagram("The Chain of Records Behind the Labor Cost")
     records = [("TimeClockEntry", "the hours clocked each day, regular and overtime", None),
                ("LaborTimeEntry", "the hours charged to a work order operation, or indirect time",
@@ -330,12 +736,17 @@ def fig_12_06() -> Diagram:
         assert columns, table
         if key:
             assert {k.strip() for k in key.split(",")} <= columns, (table, key)
-    tests = [("Overtime above half an hour has an OvertimeApproval", "Tutorial 12.3, Steps 1 and 2"),
-             ("Direct time recorded on or before its operation's ActualEndDate", "Tutorial 12.3, Step 3"),
-             ("The employee was employed on the pay date (TerminationDate)", "Tutorial 12.3, Step 4"),
+    assert "LaborTimeEntryID" in {r[1] for r in q("PRAGMA table_info(PayrollRegisterLine)")}
+    tests = [("Overtime above half an hour is approved; no day on which everyone clocks the same hours",
+              "Tutorial 12.3, Steps 4 and 5"),
+             ("Its hours equal the clock entry's; direct time recorded while its operation was open",
+              "Tutorial 12.3, Steps 1, 6, and 7"),
+             ("Pays its own employee's approved time, while employed; not approved by that employee",
+              "Tutorial 12.3, Steps 3, 8, and 9"),
              ("One payment for each approved register, made after its ApprovedDate",
               "Tutorials 12.1 and 12.3"),
-             ("Every PayrollPayment posting traces to an existing payment", "Tutorial 12.1, Step 3")]
+             ("Every payment posting traces to a payment; unpaid wages accrued at the year-end",
+              "Tutorial 12.1, Steps 3 and 8")]
     w, gap = 148, 30
     boxes = []
     for i, (table, what, key) in enumerate(records):
@@ -344,7 +755,7 @@ def fig_12_06() -> Diagram:
         boxes.append(d.box(f"<b>{table}</b><br>{esc(what)}{via}", x, 24, w, 130, fill=BLUE_TINT,
                            stroke=BLUE, size=SMALL))
         test, where = tests[i]
-        d.box(f"<b>Test</b><br>{esc(test)}<br><i>{esc(where)}</i>", x, 190, w, 110, fill=GRAY_TINT,
+        d.box(f"<b>Test</b><br>{esc(test)}<br><i>{esc(where)}</i>", x, 190, w, 150, fill=GRAY_TINT,
               stroke=GRAY, size=SMALL, align="left", valign="top")
     d.text("<b>The records</b>", 0, 0, 300, 20, size=SMALL)
     d.text("<b>The test of each record</b>", 0, 166, 300, 20, size=SMALL)
@@ -352,7 +763,7 @@ def fig_12_06() -> Diagram:
         posting = i == len(boxes) - 2
         d.arrow(boxes[i], boxes[i + 1], color=AMBER if posting else GRAY, dashed=posting,
                 exit=(1, 0.5), entry=(0, 0.5))
-    ly = 320
+    ly = 360
     d.line_sample(0, ly + 10, 50, color=GRAY, end="blockThin")
     d.text("one record leads to the next, linked by the key named in the box", 60, ly, 380, 22, size=SMALL)
     d.line_sample(460, ly + 10, 50, color=AMBER, dashed=True, end="blockThin")
@@ -360,56 +771,73 @@ def fig_12_06() -> Diagram:
     return d
 
 
-def fig_12_07() -> Diagram:
-    d = Diagram("Direct Labor Recorded After Its Operation Ended")
-    headers, rows = db.run(LATE_LABOR_SQL)
-    shares = [r[3] for r in rows]
+def fig_12_08() -> Diagram:
+    d = Diagram("Days on Which Every Manufacturing Employee Clocked the Same Hours")
+    rows = db.run(sql("surge_days"))[1]
     assert [r[0] for r in rows] == ["2024", "2025", "2026"], rows
-    assert 0.17 < shares[0] < 0.23 and 0.45 < shares[1] < 0.55 and 0.6 < shares[2] < 0.7, shares
-    out = db.execute_sql(d, LATE_LABOR_SQL, [120, 140, 260, 160])
-    db.emphasize_cells(d, out["geometry"], [(-1, 3), (len(rows) - 1, 3)])
-    note(d, "Outlined: the share of direct hours recorded after the operation's actual end date, which grew "
-            "in each year.", out["bottom"] + 8, 40)
+    assert [r[1] for r in rows] == [12, 32, 49] and {r[2] for r in rows} == {64}, rows
+    shares = [r[4] for r in rows]
+    assert shares == sorted(shares) and shares[2] > 0.7, shares
+    other = q("SELECT substr(tc.WorkDate, 1, 4), SUM(tc.OvertimeHours) FROM TimeClockEntry tc "
+              "JOIN Employee e ON e.EmployeeID = tc.EmployeeID WHERE e.CostCenterID = 4 GROUP BY 1")
+    others = [total - r[3] for (_, total), r in zip(other, rows)]
+    assert max(others) - min(others) < 0.1 * max(others), others      # overtime on other days flat
+    approvers = q("SELECT DISTINCT oa.ApprovedByEmployeeID, oa.ApprovedDate = tc.WorkDate FROM TimeClockEntry tc "
+                  "JOIN Employee e ON e.EmployeeID = tc.EmployeeID LEFT JOIN OvertimeApproval oa "
+                  "ON oa.OvertimeApprovalID = tc.OvertimeApprovalID WHERE e.CostCenterID = 4 AND tc.WorkDate IN "
+                  "(SELECT tc2.WorkDate FROM TimeClockEntry tc2 JOIN Employee e2 ON e2.EmployeeID = tc2.EmployeeID "
+                  "WHERE e2.CostCenterID = 4 GROUP BY tc2.WorkDate "
+                  "HAVING COUNT(DISTINCT tc2.RegularHours + tc2.OvertimeHours) = 1 AND COUNT(*) > 1)")
+    assert approvers == [(4, 1)], approvers        # the Production Manager, on the work date
+    out = CHAPTER12.mock(d, "surge_days", [110, 110, 170, 150, 130])
+    db.emphasize_cells(d, out["geometry"], [(-1, 1), (len(rows) - 1, 1)])
+    db.emphasize_cells(d, out["geometry"], [(-1, 4), (len(rows) - 1, 4)])
+    note(d, "Outlined: the days on which every one of the 64 manufacturing employees clocked the same hours, and "
+            "their share of the year's manufacturing overtime.", out["bottom"] + 8, 40)
     return d
 
 
-def fig_12_08() -> Diagram:
+def fig_12_09() -> Diagram:
+    d = Diagram("Direct Labor Recorded After Its Operation Ended")
+    rows = db.run(sql("late_by_year"))[1]
+    shares = [r[3] for r in rows]
+    assert [r[0] for r in rows] == ["2024", "2025", "2026"], rows
+    assert 0.17 < shares[0] < 0.23 and 0.45 < shares[1] < 0.55 and 0.6 < shares[2] < 0.7, shares
+    on_surge = [r[4] / r[2] for r in rows]
+    assert on_surge == sorted(on_surge) and on_surge[0] > 0.7 and on_surge[2] > 0.85, on_surge
+    cl = comment_lines("late_by_year")
+    start = cl + sql("late_by_year").split("\n").index("SELECT strftime('%Y', lt.WorkDate) AS WorkYear,")
+    out = CHAPTER12.mock(d, "late_by_year", [100, 120, 100, 140, 200], lines=slice(start, None))
+    db.emphasize_cells(d, out["geometry"], [(-1, 3), (len(rows) - 1, 4)])
+    note(d, "The editor is scrolled past the CTE that lists the surge days of test H6. Outlined: the share of "
+            "direct hours recorded after the operation ended, and the part of them recorded on surge days.",
+         out["bottom"] + 8, 40)
+    return d
+
+
+def fig_12_10() -> Diagram:
     d = Diagram("The Start of an Audit Query Library")
-    entries, total, posted, debits = one(JE_RECON_SQL.rstrip(";"))
-    assert entries == posted and abs(total - debits) < 0.005
-    postings = len(trace_rows())
-    script = (
-        "/* Audit.sql: internal audit query library\n"
-        "   Engagement: records behind the manufacturing variance, fiscal 2026\n"
-        "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
-        "   Prepared by: your name, date; reviewed by: name, date */\n"
-        "\n"
-        "-- Test 1.1: journal entry population\n"
-        "-- Objective: JournalEntry holds every entry the ledger posted\n"
-        "-- Population: all journal entries; reconciled to GLEntry debits\n"
-        "-- Expected: counts and totals agree to the cent\n"
-        + JE_RECON_SQL + "\n"
-        "\n"
-        "-- Test 1.2: postings with no document, documents with no posting\n"
-        "-- Objective: existence and completeness of the ledger's postings\n"
-        "-- Population: GLEntry by SourceDocumentType; each document table\n"
-        f"-- Expected: no rows. Found {postings} PayrollPayment postings (finding 1)\n"
-        + "\n".join(TRACE_SQL.split("\n")[:10]))
+    for key, _, text in QUERIES:                 # every test of the script runs
+        db.run(text)
+    lines = CHAPTER12.text().split("\n")
+    shown = "\n".join(lines[:36])
     y = db.window(d)
-    bottom = db.editor(d, 0, y, 860, script, tab="Audit.sql")
-    note(d, "The header records the engagement, the data, and who prepared and reviewed the script. Each test "
-            "states its objective, population, and expected result. The script continues below the lines shown.",
-         bottom + 8, 40)
+    bottom = db.editor(d, 0, y, 860, shown, tab="Audit.sql")
+    note(d, "The header records the purpose, the data, and who prepared and reviewed the script. Each test "
+            "begins with a comment that names it and states its population and expected result. The script "
+            "continues below the lines shown.", bottom + 8, 40)
     return d
 
 
 FIGURES = {
     "fig-12-01-two-way-trace": fig_12_01,
     "fig-12-02-trace-exceptions": fig_12_02,
-    "fig-12-03-three-way-match": fig_12_03,
-    "fig-12-04-three-way-match-status": fig_12_04,
-    "fig-12-05-approval-exceptions": fig_12_05,
-    "fig-12-06-labor-record-chain": fig_12_06,
-    "fig-12-07-labor-after-operation-end": fig_12_07,
-    "fig-12-08-audit-library": fig_12_08,
+    "fig-12-03-revenue-cutoff": fig_12_03,
+    "fig-12-04-three-way-match": fig_12_04,
+    "fig-12-05-three-way-match-status": fig_12_05,
+    "fig-12-06-approval-exceptions": fig_12_06,
+    "fig-12-07-labor-record-chain": fig_12_07,
+    "fig-12-08-surge-days": fig_12_08,
+    "fig-12-09-labor-after-operation-end": fig_12_09,
+    "fig-12-10-audit-library": fig_12_10,
 }

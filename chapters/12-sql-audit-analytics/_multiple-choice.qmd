@@ -9,7 +9,7 @@ B.  To find the journal entries approved by the same employees who created them
 C.  Because a query cannot read the JournalEntry table without first reading GLEntry
 D.  To calculate the risk score that Chapter 8 assigned to each journal entry
 
-**2.** An anti-join from GLEntry to PayrollPayment on SourceDocumentID returns six rows. What do they show?
+**2.** An anti-join from the PayrollPayment postings in GLEntry to the PayrollPayment table, on SourceDocumentID, returns six rows. What do they show?
 
 A.  Six payroll payments that were made but never posted to the general ledger
 B.  Six employees who were each paid twice for the same pay period
@@ -23,26 +23,26 @@ B.  A comparison of each supplier invoice's price with the price on its purchase
 C.  An anti-join from a document table to GLEntry, finding documents never posted
 D.  A count of the journal entries that were created on a Saturday or a Sunday
 
-**4.** Two queries are combined with UNION ALL. What must be true of them?
+**4.** Two queries are combined with UNION ALL, and the second lists its columns in a different order from the first. What happens?
 
-A.  They must read from the same table and use the same table aliases
-B.  They must share the same WHERE clause, so that their rows are comparable
-C.  They must return the same number of columns, in a compatible order
-D.  They must return the same number of rows, so that the rows line up
+A.  SQLite sorts the columns of both queries by name before it stacks the rows
+B.  SQLite stops with an error, because the column names of the queries differ
+C.  The values are stacked by position, under the column names of the first query
+D.  The rows of the second query are left out, because their columns do not match
 
-**5.** A sales invoice dated December 3, 2025, was posted to the ledger on January 1, 2026. What does this indicate?
+**5.** Goods were shipped and delivered on December 6, 2025, and their invoice was posted to the ledger on January 1, 2026. What does this indicate?
 
 A.  The invoice was posted twice, once in each of the two fiscal years
 B.  Its revenue was recorded in the wrong fiscal year, a cutoff error
 C.  The invoice has no ledger posting and must be traced to its order
-D.  The customer paid the invoice before the invoice was issued
+D.  The customer paid the invoice before the goods were delivered
 
 **6.** A three-way match compares each goods receipt line with each invoice line, row by row, and reports thousands of mismatches. What is the most likely problem?
 
 A.  Quantities were not summed to the purchase order line before comparing
-B.  Every supplier has billed Charles River for more than it delivered
-C.  The goods receipts were recorded at the wrong unit cost for each item
-D.  SQLite cannot compare quantities that are stored in REAL columns
+B.  The invoices were matched to the receipts of a different fiscal year
+C.  The receipts were valued at standard cost instead of the order price
+D.  The comparison needed a price tolerance instead of a quantity tolerance
 
 **7.** At a price tolerance of 3 percent, no invoice line is an exception; at 2 percent, several thousand are. What should the auditor conclude?
 
@@ -51,26 +51,26 @@ B.  The 3 percent tolerance is correct, because a test with no exceptions is cle
 C.  Invoice prices cannot be tested against order prices, because prices change
 D.  The tolerance should come from the purchasing policy, set before the test is run
 
-**8.** Receipts not yet invoiced at year-end are valued at about $1.02 million, within a dollar of the balance of account 2020. What does this show?
+**8.** Receipts not yet invoiced at year-end are valued within a dollar of the balance of account 2020. What does the agreement show?
 
-A.  Suppliers have overbilled Charles River by about $1.02 million in total
-B.  The receipts were never paid, so the suppliers are owed interest on them
-C.  The liability for unbilled receipts is complete and correctly valued
-D.  The purchase orders behind the receipts were approved above their limits
+A.  Every liability to suppliers at the year-end has been recorded in the ledger
+B.  The suppliers have billed Charles River for every receipt of the year
+C.  The ledger's balance is supported by the detail of the open receipts
+D.  The purchase orders behind the receipts were approved within their limits
 
-**9.** A purchase order was approved by an employee on a date after the employee's TerminationDate. What kind of exception is it?
+**9.** On 49 days of fiscal 2026, every manufacturing employee clocked the same hours at the same minutes, and one manager approved all of the overtime. What should the auditor conclude?
 
-A.  An approval by someone no longer entitled to approve, a failure of operation
-B.  A cutoff error, because the order was recorded in the wrong period
-C.  A three-way match exception, because the order was never received
-D.  A concentration of approval, because one employee approved too many orders
+A.  The time may have been entered in bulk, so the hours need corroboration
+B.  The overtime is proven false and should be removed from the payroll cost
+C.  The pattern is a normal shift schedule and needs no further work
+D.  The approvals make the hours reliable, because each day was authorized
 
 **10.** One executive approved nearly all of Charles River's purchase orders over three years. What does this indicate?
 
 A.  The purchase orders were all approved above the executive's approval limit
 B.  The approvals were made after the executive's employment had ended
 C.  Nothing, because an approval by a senior executive is always sufficient
-D.  A concentration of approval, a weakness in the design of the control
+D.  A concentration that can indicate a weakness in the design of the control
 
 **11.** No time clock entry with half an hour of overtime or less has an approval, while nearly every longer one does. What should the auditor do?
 
@@ -82,22 +82,22 @@ D.  Ask the payroll department to remove the short entries from the payroll
 **12.** The share of direct labor recorded after its work order operation had ended rose to about two-thirds in fiscal 2026. What does this mean for the controller's analysis?
 
 A.  The manufacturing variance is overstated by about two-thirds of its amount
-B.  The cost is real, but the records cannot show where the hours were spent
+B.  The operation records cannot show which operations the direct time belongs to
 C.  The employees were paid for about two-thirds more time than they worked
 D.  The standard costs were set too high and should be reduced for fiscal 2027
 
-**13.** Which technique finds pairs of payments to the same supplier for the same amount on different dates?
+**13.** A self-join finds pairs of payments to the same supplier for the same amount. Why does it include the condition `b.DisbursementID > a.DisbursementID`?
 
-A.  A LEFT JOIN from DisbursementPayment to Supplier, keeping the unmatched rows
-B.  A self-join on SupplierID and Amount that keeps pairs with different dates
-C.  A GROUP BY on PaymentDate that keeps the dates with more than one payment
-D.  A UNION ALL of each supplier's payments, sorted by amount and date
+A.  It keeps only the payments that were made after the supplier's first invoice
+B.  It lists each pair once and never pairs a payment with itself
+C.  It makes the query faster by reading the payments in order of their IDs
+D.  It removes the payments whose amounts were entered more than once
 
 **14.** Why does the first-digit test use `printf('%e', Amount)` rather than the first character of the amount?
 
 A.  Scientific notation starts with the first significant digit, even below $1
 B.  `printf` rounds each amount to the nearest dollar before its first digit is read
-C.  The first character of every amount stored in SQLite is a currency symbol
+C.  The first character of an amount below $1 is its decimal point, not a digit
 D.  SQLite cannot read the first character of a number that is stored as REAL
 
 **15.** Why should an audit query library record every change to its tests and keep each run's results?
@@ -112,15 +112,15 @@ D.  Because a query returns different results each time it runs on the same data
      1 A: a test on an unreconciled population may miss items; reconcile first.
      2 D: postings whose SourceDocumentID matches no payment point to nothing.
      3 C: completeness asks whether every document was posted.
-     4 C: UNION ALL needs the same number of columns in a compatible order.
-     5 B: a December invoice posted in January records revenue in the next year.
+     4 C: UNION ALL matches columns by position and names them after the first query, without an error.
+     5 B: revenue belongs to the year of delivery; a December delivery posted in January is a cutoff error.
      6 A: quantities must be summed to the purchase order line before comparing.
      7 D: the tolerance comes from policy and is set and documented in advance.
-     8 C: agreement with the ledger shows the accrual is complete and valued correctly.
-     9 A: an approver past the termination date was not entitled to approve.
-     10 D: one approver for nearly everything is a design weakness.
+     8 C: two records agreeing supports the balance; completeness also needs a search for unrecorded liabilities.
+     9 A: identical times for a whole plant suggest bulk entry; the records cannot show the hours were worked.
+     10 D: one approver for nearly everything can indicate a design weakness.
      11 C: a pattern suggests a policy threshold, to be confirmed; test above it.
-     12 B: the cost is real, but time charged to finished operations misplaces it.
-     13 B: a self-join compares each payment with other payments of the same table.
+     12 B: time charged to finished operations cannot be placed at the operations that used it.
+     13 B: the condition keeps each pair once and excludes a payment paired with itself.
      14 A: scientific notation starts with the first significant digit.
      15 B: an uncontrolled library cannot support the evidence it produces. -->

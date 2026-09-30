@@ -47,8 +47,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
      17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020 5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030 3,278,211.11 vs
      Textiles, equal; 4040 1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080 1,213,344.00 vs Services, equal. The differences are
      SI-2026-013742 (Furniture, dated 2025-12-04), SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03),
-     posted 2026-01-01 with the next year's number; their orders shipped in early December 2025, so the sales belong to fiscal 2025, a
-     cutoff issue that overstates fiscal 2026 revenue by 4,582.37. Freight revenue (4050, 212,820.03) has no invoice line. -->
+     dated in 2025 with the next year's number and posted 2026-01-01. InvoiceLines assigns them to fiscal 2025 by their invoice dates,
+     the ledger to fiscal 2026. The date that determines the period is the delivery of the goods, not the invoice date or number (every
+     shipment is delivered in the year it ships). Only SI-2026-013742 shipped in 2025 (on 2025-12-06), so its 3,233.18 is a revenue cutoff error; the other
+     two shipped on 2026-01-01, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for
+     every invoice. Freight revenue (4050, 212,820.03) has no invoice line. -->
 
 
 **Exercise 6.2: Disaggregating Revenue by Segment and Product Line**

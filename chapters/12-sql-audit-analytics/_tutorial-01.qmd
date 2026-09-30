@@ -1,16 +1,25 @@
-## Guided Tutorial 12.1: Reconciling the Populations and Tracing the Ledger
+## Guided Tutorial 12.1: Reconciling the Populations, Tracing the Ledger, and Testing Cutoff
 
-**Context and objective.** Before testing any process, the audit team must know that the ledger and its populations can be relied on. In this tutorial, you will reconcile the journal entries and the manufacturing payroll to the ledger, trace postings to their documents and documents to their postings, combine the exceptions into one list, explain the ones you find, and test the cutoff of sales invoices.
+**Context and objective.** Before testing any process, the audit team must know that the ledger and its populations can be relied on. In this tutorial, you will reconcile the journal entries and the manufacturing payroll to the ledger, trace postings to their documents and documents to their postings, and explain the exceptions you find. You will then test the cutoff of revenue and of payroll at each year-end.
 
-**Prerequisites.** Complete the tutorials of the earlier Part III chapters, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script, `Audit.sql`, with a header comment that names the engagement, the database, the preparer, and the date. Each test in this chapter goes into this script, under a comment that states its objective.
+**Prerequisites.** Complete the tutorials of the earlier Part III chapters, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the audit query library with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Audit.sql` beside your working copy. As in Chapters 9 to 11, type each test at the end of the script, under its comment, and run it by selecting it. The first line of each comment names the test, and the second states its population and the result expected if the controls worked.
+
+```sql
+/* Audit.sql: tests of the records behind the manufacturing variance
+   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
+   Prepared by: your name, date; reviewed by: name, date
+   Checks: listed at the end of Tutorial 12.3 */
+```
 
 **Step-by-step instructions.**
 
-**Step 1. Reconcile the journal entries to the ledger.** Scalar subqueries in the SELECT list put the totals of two tables side by side.
+**Step 1. Reconcile the journal entries to the ledger.** Scalar subqueries in the SELECT list put the totals of two tables side by side, as in Tutorial 10.2.
 
-a. Type and run the query below.
+a. Type and run the test below.
 
    ```sql
+   -- Tutorial 12.1, test L1: journal entries against the ledger
+   -- Population: all journal entries; expected: counts and totals agree
    SELECT
        (SELECT COUNT(*) FROM JournalEntry) AS Entries,
        (SELECT ROUND(SUM(TotalAmount), 2) FROM JournalEntry) AS EntryTotal,
@@ -22,13 +31,15 @@ a. Type and run the query below.
 
 b. Compare the first two columns with the last two.
 
-The number of entries and their total agree with the entries and the debits posted to the ledger. Every journal entry was posted, at its full amount, and the ledger holds no journal entry postings beyond them, so the population that Chapter 8 tested in Excel was complete.
+The number of entries and their total agree with the entries and the debits posted to the ledger, as Tutorial 8.3 found in Excel. Agreement of counts and totals shows that the population is complete with respect to the ledger; the trace of Step 3 then tests the postings one by one.
 
 **Step 2. Reconcile the manufacturing payroll to the ledger.** The payroll registers state what each employee was paid and what the company paid on top, and GLEntry records the cost center of each posting.
 
-a. Type and run the query below.
+a. Type and run the test below.
 
    ```sql
+   -- Tutorial 12.1, test L2: manufacturing payroll against the ledger
+   -- Population: Manufacturing registers; expected: no difference
    SELECT reg.FiscalYear, reg.RegisterCost, gl.LedgerCost,
        ROUND(reg.RegisterCost - gl.LedgerCost, 2) AS Difference
    FROM (
@@ -45,7 +56,8 @@ a. Type and run the query below.
        INNER JOIN (
            SELECT gl.FiscalYear, ROUND(SUM(gl.Debit), 2) AS LedgerCost
            FROM GLEntry AS gl
-               INNER JOIN CostCenter AS cc ON cc.CostCenterID = gl.CostCenterID
+               INNER JOIN CostCenter AS cc
+                   ON cc.CostCenterID = gl.CostCenterID
            WHERE gl.SourceDocumentType = 'PayrollSummary'
                AND cc.CostCenterName = 'Manufacturing'
            GROUP BY gl.FiscalYear
@@ -55,13 +67,15 @@ a. Type and run the query below.
 
 b. Read the Difference column.
 
-The payroll registers of the manufacturing cost center agree with the ledger's payroll postings to the cent in each year. The population of registers is therefore complete, and the payroll tests of Tutorial 12.3 can rely on it.
+The registers of the manufacturing cost center agree with the ledger's payroll postings to the cent in each year. The ledger side counts the postings to every account, not only account 1090: the manufacturing part of the first payroll of 2024 was posted to the variance account, as Tutorial 11.2 noted, so a comparison with account 1090 alone would differ in that year. Both sides record payroll on its pay date, so the test shows that the registers are complete with respect to the ledger. It cannot show whether wages earned but not yet paid were recorded, the question of Steps 7 and 8.
 
 **Step 3. List the trace exceptions in both directions.** Each test is an anti-join, and UNION ALL stacks their results into one list, labeled by test.
 
-a. Type and run the query below.
+a. Type and run the test below.
 
    ```sql
+   -- Tutorial 12.1, test L3: postings and documents traced both ways
+   -- Population: four document types; expected: no rows
    SELECT 'Posting with no payroll payment' AS Test,
        gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,
        gl.Debit + gl.Credit AS Amount
@@ -96,56 +110,167 @@ a. Type and run the query below.
 
 b. Read the Test column of each row in the result.
 
-The result, shown in @fig-12-02, holds six rows, all from the first test. Six ledger rows record payroll payments that do not exist in the PayrollPayment table: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted.
+The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. Six ledger rows record payroll payments that do not exist in the PayrollPayment table, three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted.
 
-![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL tab. The script combines four anti-join tests with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
+![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
 
 **Step 4. Explain the six postings.** A payroll payment normally carries the same ID as the payroll register it pays, so the missing payments point to their registers.
 
-a. Type and run the query below.
+a. Type and run the test below.
 
    ```sql
-   SELECT pr.PayrollRegisterID, pr.EmployeeID, e.EmployeeName,
-       e.TerminationDate, pp.PayDate, pr.NetPay, pr.Status
+   -- Tutorial 12.1, test L4: approved registers with no payment
+   -- Population: all payroll registers; expected: no rows
+   SELECT pr.PayrollRegisterID, e.JobTitle,
+       ec.CostCenterName AS EmployeeCenter,
+       rc.CostCenterName AS RegisterCenter, e.TerminationDate,
+       pp.PayDate, pr.GrossPay, pr.NetPay, pr.Status
    FROM PayrollRegister AS pr
        INNER JOIN PayrollPeriod AS pp
            ON pp.PayrollPeriodID = pr.PayrollPeriodID
        INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID
+       INNER JOIN CostCenter AS ec ON ec.CostCenterID = e.CostCenterID
+       INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID
        LEFT JOIN PayrollPayment AS pay
            ON pay.PayrollRegisterID = pr.PayrollRegisterID
    WHERE pay.PayrollPaymentID IS NULL;
    ```
 
 b. Compare the register IDs and net pay with the SourceDocumentID and amounts of the six postings.
+c. Compare each register's cost center with its employee's.
 
-Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash paid, but the payment documents are missing. Two of the three registers belong to an employee whose TerminationDate is April 2024, and they pay the employee in January 2025 and January 2026. The cash left the company without a payment record, to someone who no longer worked there. These registers belong to the Executive cost center, not to manufacturing, and Tutorial 12.3 follows the employee further.
+Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash, but the payment documents are missing. The first register pays the chief executive officer. The other two pay an Account Executive of the Sales cost center, terminated in April 2024, in January 2025 and January 2026, and they are charged to the Executive cost center at the same gross pay as the chief executive's register. A credit to cash does not say who received the money, so the bank records must confirm the payee. Tutorial 12.3 follows the employee further.
 
-**Step 5. Test the cutoff of sales invoices.** A sales invoice should be posted on its own date, or at least in its own fiscal year.
+**Step 5. Test the cutoff of revenue.** Revenue belongs to the fiscal year in which the goods were delivered, so the test compares each invoice's posting date with the delivery date of the shipments it bills, and uses the invoice date as a second check.
 
-a. Type and run the query below.
+a. Type and run the test below.
 
    ```sql
-   SELECT DISTINCT si.InvoiceNumber, si.InvoiceDate, gl.PostingDate,
-       CASE WHEN strftime('%Y', si.InvoiceDate)
-               <> strftime('%Y', gl.PostingDate)
-           THEN 'Different fiscal year' ELSE 'Same fiscal year'
-       END AS Cutoff
-   FROM SalesInvoice AS si
-       INNER JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'
-           AND gl.SourceDocumentID = si.SalesInvoiceID
-   WHERE gl.PostingDate <> si.InvoiceDate
-   ORDER BY si.InvoiceNumber;
+   -- Tutorial 12.1, test L5: revenue posted in the year of delivery
+   -- Population: all sales invoices; expected: no rows
+   WITH Shipped AS (
+       SELECT sil.SalesInvoiceID, MIN(s.ShipmentDate) AS ShipmentDate,
+           MAX(s.DeliveryDate) AS DeliveryDate
+       FROM SalesInvoiceLine AS sil
+           INNER JOIN ShipmentLine AS sl
+               ON sl.ShipmentLineID = sil.ShipmentLineID
+           INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID
+       GROUP BY sil.SalesInvoiceID
+   ),
+   Posted AS (
+       SELECT SourceDocumentID AS SalesInvoiceID,
+           MIN(PostingDate) AS PostingDate
+       FROM GLEntry
+       WHERE SourceDocumentType = 'SalesInvoice'
+       GROUP BY SourceDocumentID
+   ),
+   Classified AS (
+       SELECT si.SubTotal,
+           strftime('%Y', sh.DeliveryDate) AS DeliveryYear,
+           CASE
+               WHEN strftime('%Y', p.PostingDate)
+                       <> strftime('%Y', sh.DeliveryDate)
+                   THEN 'Revenue posted in another year'
+               WHEN si.InvoiceDate < sh.ShipmentDate
+                   THEN 'Invoice dated before shipment'
+               ELSE 'In the year of delivery'
+           END AS Finding
+       FROM SalesInvoice AS si
+           INNER JOIN Shipped AS sh
+               ON sh.SalesInvoiceID = si.SalesInvoiceID
+           INNER JOIN Posted AS p ON p.SalesInvoiceID = si.SalesInvoiceID
+   )
+   SELECT Finding, DeliveryYear, COUNT(*) AS Invoices,
+       ROUND(SUM(SubTotal), 2) AS SubTotal
+   FROM Classified
+   WHERE Finding <> 'In the year of delivery'
+   GROUP BY Finding, DeliveryYear
+   ORDER BY Finding, DeliveryYear;
    ```
 
-b. Read the Cutoff column.
+b. Read the rows of each finding.
 
-Nine invoices were posted on a different date from their own, and six of them in a different fiscal year: invoices dated in November and December were posted on January 1 of the next year. These are the invoices of Tutorial 2.1 and Exercises 5.2 and 6.1, whose numbers carry the next year's prefix. Their revenue was recorded a year late, so each year-end's revenue is misstated by the invoices on either side of it.
+The result, shown in @fig-12-03, has two findings. More than twenty invoices for goods delivered in December were invoiced and posted in January, so their revenue was recorded in the next fiscal year, while the cost of the goods was recorded when they shipped. Eight invoices are dated before their shipment: the invoices of Tutorial 2.1 and Exercise 5.2, except SI-2026-013742, whose revenue is among those posted a year late. The eight were posted in the year of delivery, so they are failures in the dating of invoices, not in the posting of revenue.
+
+![Revenue Posted Outside the Year of Delivery.](/visuals/svg/fig-12-03-revenue-cutoff.svg){#fig-12-03 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, is scrolled to the part of a test that classifies each sales invoice with CASE: revenue posted in another year than the delivery of its goods, invoice dated before shipment, or in the year of delivery, and counts the exceptions by finding and delivery year. The result has five rows: invoices dated before shipment in each of the three years, and invoices whose revenue was posted in another year for deliveries of 2024 and 2025. The rows of revenue posted in another year are outlined."}
+
+**Step 6. Find the shipments never invoiced.** An anti-join from the shipment lines to the invoice lines finds the goods that were shipped but not billed.
+
+a. Type and run the test below.
+
+   ```sql
+   -- Tutorial 12.1, test L6: shipments never invoiced
+   -- Population: all shipment lines; expected: no rows
+   SELECT s.ShipmentNumber, s.ShipmentDate, s.DeliveryDate,
+       ROUND(sl.ExtendedStandardCost, 2) AS StandardCost,
+       ROUND(sl.QuantityShipped * sol.UnitPrice * (1 - sol.Discount), 2)
+           AS SalesValue
+   FROM ShipmentLine AS sl
+       INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID
+       INNER JOIN SalesOrderLine AS sol
+           ON sol.SalesOrderLineID = sl.SalesOrderLineID
+       LEFT JOIN SalesInvoiceLine AS sil
+           ON sil.ShipmentLineID = sl.ShipmentLineID
+   WHERE sil.SalesInvoiceLineID IS NULL
+   ORDER BY s.ShipmentDate;
+   ```
+
+b. Read the dates and the two values of each row.
+
+A handful of shipment lines of December 2026 have no invoice by the end of the data. Their cost is in the ledger at the year-end, and their revenue is not, the same timing as the invoices of Step 5. Exercise 12.1 measures the effect of both on each year.
+
+**Step 7. List the pay periods that cross a year-end.** Wages belong to the period in which the work was done, but Charles River records payroll on its pay date, so a period whose work begins in one fiscal year and is paid in the next moves cost between the years.
+
+a. Type and run the test below.
+
+   ```sql
+   -- Tutorial 12.1, test L7: pay periods that cross a year-end
+   -- Population: all pay periods; expected: every period processed
+   SELECT pp.PeriodNumber, pp.PeriodStartDate, pp.PeriodEndDate,
+       pp.PayDate, pp.Status, COALESCE(reg.Registers, 0) AS Registers,
+       reg.PayrollCost
+   FROM PayrollPeriod AS pp
+       LEFT JOIN (
+           SELECT PayrollPeriodID, COUNT(*) AS Registers,
+               ROUND(SUM(GrossPay + EmployerPayrollTax
+                   + EmployerBenefits), 2) AS PayrollCost
+           FROM PayrollRegister
+           GROUP BY PayrollPeriodID
+       ) AS reg ON reg.PayrollPeriodID = pp.PayrollPeriodID
+   WHERE strftime('%Y', pp.PeriodStartDate) <> strftime('%Y', pp.PayDate)
+   ORDER BY pp.PeriodStartDate;
+   ```
+
+b. Read the dates, the Status, and the PayrollCost of each period.
+
+At each year-end, the work of the last weeks of December was paid, and recorded, in January of the next fiscal year. At the end of fiscal 2026, the last two periods are still Open, with no registers, so the wages of late December 2026 are recorded nowhere.
+
+**Step 8. Look for an accrual of the unpaid wages.** An accrual at the year-end would record the wages earned but not yet paid in account 2030 Accrued Payroll.
+
+a. Type and run the test below.
+
+   ```sql
+   -- Tutorial 12.1, test L8: accrued payroll at the year-end
+   -- Population: account 2030 to 2026-12-31; expected: unpaid wages
+   SELECT gl.SourceDocumentType, COUNT(*) AS Postings,
+       ROUND(SUM(gl.Credit) - SUM(gl.Debit), 2) AS Balance
+   FROM GLEntry AS gl
+       INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+   WHERE a.AccountNumber = 2030 AND gl.PostingDate <= '2026-12-31'
+   GROUP BY gl.SourceDocumentType;
+   ```
+
+b. Read the Balance of each source.
+
+The balance of account 2030 is the opening entry of 2024, and the payroll summaries and payments net to zero, so no entry ever accrued the wages earned but not yet paid at a year-end. Each year's payroll cost follows its pay dates, and the liability at each year-end is understated by a little more than one pay period's payroll, a few hundred thousand dollars. Exercise 12.1 estimates the amounts.
 
 **Checkpoint.** Check that:
 
 - the journal entries and the manufacturing payroll reconcile to the ledger to the cent;
 - the combined trace returns six postings with no payroll payment and nothing else;
-- the six postings match three approved registers without payments, two of them for a terminated employee;
-- six sales invoices were posted in a later fiscal year than their date.
+- the six postings match three approved registers without payments, two of them for a terminated employee, charged to the Executive cost center;
+- the revenue of December deliveries invoiced in January was posted in the next fiscal year, and a few December 2026 shipments were never invoiced;
+- no entry accrues the wages of late December at any year-end;
+- Audit.sql holds the header and the eight tests of this tutorial, each under its comment.
 
-The ledger is reliable as a whole: its populations reconcile, and nearly every posting traces to a document and back. The exceptions are specific enough to name, and none of them lies in the manufacturing cost that the committee asked about.
+The ledger is reliable as a whole: its populations reconcile, and nearly every posting traces to a document and back. Its weakness is timing. Revenue and payroll are recorded when they are invoiced and paid, not when they are earned, so each year-end is misstated by the transactions on either side of it, and the wages of each December's last weeks, manufacturing wages among them, are charged to the next year.
