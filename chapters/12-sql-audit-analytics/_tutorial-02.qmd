@@ -1,0 +1,162 @@
+## Guided Tutorial 12.2: Matching Purchases and Testing Their Approvals
+
+**Context and objective.** The plant's materials and services come through the purchasing chain. In this tutorial, you will perform a three-way match of every purchase order line with its receipts and invoices, test invoice prices against order prices with a tolerance, and reconcile the goods received but not yet invoiced to the ledger. You will then test the approvals of the purchase orders against their approvers' limits, their employment dates, and the rule that no one approves their own order.
+
+**Prerequisites.** Complete Tutorial 12.1, and continue in Audit.sql.
+
+**Step-by-step instructions.**
+
+**Step 1. Match every purchase order line.** Two CTEs sum the quantities received and invoiced for each line, and a CASE expression classifies the line.
+
+a. Type and run the query below.
+
+   ```sql
+   WITH Received AS (
+       SELECT POLineID, SUM(QuantityReceived) AS QtyReceived
+       FROM GoodsReceiptLine
+       GROUP BY POLineID
+   ),
+   Invoiced AS (
+       SELECT POLineID, SUM(Quantity) AS QtyInvoiced
+       FROM PurchaseInvoiceLine
+       WHERE POLineID IS NOT NULL
+       GROUP BY POLineID
+   ),
+   Matched AS (
+       SELECT pol.POLineID, pol.Quantity AS QtyOrdered,
+           COALESCE(r.QtyReceived, 0) AS QtyReceived,
+           COALESCE(i.QtyInvoiced, 0) AS QtyInvoiced
+       FROM PurchaseOrderLine AS pol
+           LEFT JOIN Received AS r ON r.POLineID = pol.POLineID
+           LEFT JOIN Invoiced AS i ON i.POLineID = pol.POLineID
+   )
+   SELECT
+       CASE
+           WHEN QtyInvoiced > QtyReceived + 0.0001
+               THEN 'Exception: invoiced above received'
+           WHEN QtyReceived > QtyOrdered + 0.0001
+               THEN 'Exception: received above ordered'
+           WHEN QtyReceived = 0 THEN 'Not yet received'
+           WHEN QtyInvoiced < QtyReceived - 0.0001
+               THEN 'Received, not fully invoiced'
+           WHEN QtyReceived < QtyOrdered - 0.0001 THEN 'Partly received'
+           ELSE 'Matched'
+       END AS MatchStatus,
+       COUNT(*) AS POLines
+   FROM Matched
+   GROUP BY MatchStatus
+   ORDER BY POLines DESC;
+   ```
+
+b. Read the statuses and their counts.
+
+The result, shown in @fig-12-04, has no exception rows. No line was invoiced above what was received, and none was received above what was ordered. Nearly every line is matched. The others are lines not yet received, lines partly received, and lines received but not yet fully invoiced, all normal at a year-end. The small tolerance of 0.0001 in each comparison keeps a rounding difference in a fractional quantity from being reported as an exception. COALESCE turns the NULL of a line with no receipts or invoices into zero, so that the comparisons work.
+
+![The Three-Way Match of Every Purchase Order Line.](/visuals/svg/fig-12-04-three-way-match-status.svg){#fig-12-04 fig-alt="A mock of the Execute SQL tab. The query sums received and invoiced quantities for each purchase order line in two CTEs, joins them to the lines, and classifies each line with CASE. The result has four rows: Matched, with the great majority of lines; Received, not fully invoiced; Not yet received; and Partly received. No exception status appears, and the result is outlined."}
+
+**Step 2. Test prices against a tolerance.** An invoice price above the order price by more than the tolerance is an exception.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT COUNT(*) AS InvoiceLines,
+       SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost > 0.03
+           THEN 1 ELSE 0 END) AS AboveTolerance,
+       ROUND(MAX((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)
+           AS LargestIncrease,
+       ROUND(MIN((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)
+           AS LargestDecrease
+   FROM PurchaseInvoiceLine AS pil
+       INNER JOIN PurchaseOrderLine AS pol ON pol.POLineID = pil.POLineID;
+   ```
+
+b. Change 0.03 to 0.02, run the query again, and compare the two counts.
+
+At a tolerance of three percent, no invoice line is an exception: the largest increase over the order price is a little over two and a half percent. At two percent, several thousand lines would be flagged. The choice of tolerance decides how many items an auditor must follow up, so it should be set before the test is run, based on what the purchasing policy allows, and documented with the test.
+
+**Step 3. Reconcile the goods received but not invoiced.** Receipts that suppliers have not yet billed are a liability, which the ledger records in account 2020 Goods Received Not Invoiced.
+
+a. Type and run the query below.
+
+   ```sql
+   WITH InvoicedByReceipt AS (
+       SELECT GoodsReceiptLineID, SUM(Quantity) AS QtyInvoiced
+       FROM PurchaseInvoiceLine
+       GROUP BY GoodsReceiptLineID
+   )
+   SELECT
+       (SELECT ROUND(SUM(grl.ExtendedStandardCost
+           * (1 - COALESCE(ibr.QtyInvoiced, 0) / grl.QuantityReceived)), 2)
+        FROM GoodsReceiptLine AS grl
+           LEFT JOIN InvoicedByReceipt AS ibr
+               ON ibr.GoodsReceiptLineID = grl.GoodsReceiptLineID
+        WHERE COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001)
+           AS NotInvoicedValue,
+       (SELECT ROUND(SUM(gl.Credit) - SUM(gl.Debit), 2)
+        FROM GLEntry AS gl
+           INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+        WHERE a.AccountNumber = 2020 AND gl.PostingDate <= '2026-12-31')
+           AS LedgerBalance;
+   ```
+
+b. Compare the two columns.
+
+The value of the receipts not yet invoiced, at the value at which they were received, agrees with the balance of account 2020 to within a dollar, the effect of rounding each receipt line. Most of those receipts arrived in the last weeks of fiscal 2026. The accrual is complete and correctly valued.
+
+**Step 4. Test the approvals of the purchase orders.** Three tests, joined with UNION ALL in a CTE, are summarized in one result.
+
+a. Type and run the query below.
+
+   ```sql
+   WITH ApprovalExceptions AS (
+       SELECT 'Self-approved' AS Test, po.PONumber, po.OrderTotal
+       FROM PurchaseOrder AS po
+       WHERE po.CreatedByEmployeeID = po.ApprovedByEmployeeID
+       UNION ALL
+       SELECT 'Above approver limit', po.PONumber, po.OrderTotal
+       FROM PurchaseOrder AS po
+           INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
+       WHERE po.OrderTotal > e.MaxApprovalAmount
+       UNION ALL
+       SELECT 'Approved after termination', po.PONumber, po.OrderTotal
+       FROM PurchaseOrder AS po
+           INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
+       WHERE e.TerminationDate IS NOT NULL
+           AND po.OrderDate > e.TerminationDate
+   )
+   SELECT Test, COUNT(*) AS Orders, ROUND(SUM(OrderTotal), 2) AS OrderValue
+   FROM ApprovalExceptions
+   GROUP BY Test
+   ORDER BY Orders DESC;
+   ```
+
+b. Replace the final SELECT with `SELECT * FROM ApprovalExceptions ORDER BY PONumber;`, run the query again, and read the purchase orders behind each test.
+
+The summary, shown in @fig-12-05, reports a handful of orders for each test, and the detail shows that some orders fail more than one. Among them are two large orders for capital equipment, created and approved by the same purchasing manager, far above that manager's limit, and three orders approved by an employee after the date of that employee's termination, the same employee you met in Tutorial 12.1. Each is an exception in the operation of the approval control, and each needs a disposition.
+
+![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-05-approval-exceptions.svg){#fig-12-05 fig-alt="A mock of the Execute SQL tab. A CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and approved after the approver's termination. The summary grid shows each test with its number of orders and their total value, a handful of orders for each test. The grid is outlined."}
+
+**Step 5. Measure the concentration of approvals.** An approval control also depends on how many people share it.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT e.JobTitle, COUNT(*) AS OrdersApproved
+   FROM PurchaseOrder AS po
+       INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
+   GROUP BY e.JobTitle
+   ORDER BY OrdersApproved DESC;
+   ```
+
+b. Read the share of orders approved by the first job title.
+
+The chief financial officer approved nearly every purchase order in the three years, and the other titles approved only a few each. With one approver, the approval is effectively the whole purchasing control, and it would be hard for one person to review so many orders with care. That concentration is a finding about the design of the control, not an exception in any one order.
+
+**Checkpoint.** Check that:
+
+- the three-way match reports no line invoiced above received or received above ordered;
+- no invoice price exceeds its order price by more than three percent;
+- the receipts not yet invoiced agree with account 2020 to within a dollar;
+- the approval tests find a handful of self-approved orders, orders above the approver's limit, and orders approved after a termination, and one person approved almost all the others.
+
+The purchasing chain holds together. What it received it was billed for, at prices close to the orders, and its liability for unbilled receipts is in the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.

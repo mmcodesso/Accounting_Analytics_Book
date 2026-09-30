@@ -1,0 +1,189 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made in Tutorial 9.1. Save the queries of each exercise in a script of their own, named after the exercise (such as `Ex 9.1.sql`), with a header comment like the one in Tutorial 9.3 and a comment above each query. The queries in this chapter only read data, so the exercises cannot change the database, but never type into the Browse Data tab while you work.
+
+### Financial Accounting Exercises
+
+**Exercise 9.1: Reviewing the Chart of Accounts**
+
+**Table group:** Accounting Core
+
+**Scenario.** Before the fiscal 2026 financial statements are finalized, the controller asks you to review the chart of accounts in the database. She wants to know how it is organized, which accounts carry a balance opposite to their type, and which accounts are no longer in use.
+
+**Requirements.**
+
+(1) List every account with its AccountID, AccountNumber, AccountName, AccountType, AccountSubType, ParentAccountID, NormalBalance, and IsActive, sorted by AccountNumber.
+
+(2) Use DISTINCT to list the account types and, in a second query, the combinations of AccountType and AccountSubType. Describe how the subtypes divide each type.
+
+(3) List the header accounts, whose AccountSubType is Header. Identify the ones that have no ParentAccountID and the ones that do, and explain what the difference means for the structure of the chart.
+
+(4) List the accounts whose NormalBalance is Credit although their type is Asset or Expense, or Debit although their type is Liability, Equity, or Revenue. Use parentheses to group the conditions. Explain what kind of account each one is.
+
+(5) List the inactive accounts (IsActive is 0). Two of them are named for manufacturing salaries and factory overhead. Use LIKE to find the active accounts whose names mention manufacturing, and suggest which of them records those costs instead.
+
+(6) Write a short memo (one half page) to the controller summarizing the structure of the chart and anything that should be reviewed before year-end.
+
+**Deliverable.** A script with the six queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 9.1: 104 accounts: Asset 25, Liability 18, Equity 8, Revenue 13, Expense 40. Eighteen subtypes,
+     including Header (10), Current Asset (11), Fixed Asset (5), Contra Fixed Asset (4), Contra Current Asset (1), Current Liability
+     (13), Long-Term Liability (3), Operating Revenue (6), Contra Revenue (2), COGS (8), Operating Expense (29), Closing (1).
+     Header accounts: 10; eight top-level headers (1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000) have a NULL ParentAccountID, while
+     1100 Fixed Assets and 2100 Long-Term Liabilities are sub-headers under 1000 and 2000, so the chart has two levels of headers. No
+     header account has a posting. Opposite normal balances (8): 1030 Allowance for Doubtful Accounts, 1150/1160/1170/1186 accumulated
+     depreciation (contra assets, credit); 3040 Dividends or Owner Distributions (contra equity, debit); 4060 Sales Returns and Allowances
+     and 4070 Sales Discounts (contra revenue, debit). The query needs parentheses:
+     (AccountType IN ('Asset','Expense') AND NormalBalance = 'Credit') OR (AccountType IN ('Liability','Equity','Revenue') AND NormalBalance = 'Debit').
+     Inactive (8), none with any posting: 4070 Sales Discounts, 5070 Inventory Adjustments, 6170 Bad Debt Expense, 6260 Salaries Expense -
+     Manufacturing, 6270 Factory Overhead Expense, 7000 Other Income and Expense (header), 7010 Interest Income, 7040 Foreign Exchange Gain
+     or Loss. Manufacturing salaries and factory overhead are charged to 1090 Manufacturing Cost Clearing (AccountID 92) and reach cost of
+     goods sold through inventory and 5080 Manufacturing Variance. Memo points: 1030 has no postings, so no allowance has ever been recorded
+     (Chapter 8); 4070 is inactive, so discounts are netted in revenue (Part II case). -->
+
+
+**Exercise 9.2: The Purchase Price Variance in the Ledger**
+
+**Table group:** Accounting Core, Procure-to-Pay
+
+**Scenario.** Cost of goods sold includes a second variance account, 5060 Purchase Price Variance. The controller asks for a first look at its postings in fiscal 2026, to learn what the account records and how it compares with the manufacturing variance.
+
+**Requirements.**
+
+(1) Find the AccountID of account 5060.
+
+(2) List the distinct source document types of the account's postings in fiscal 2026, and identify the one that must be excluded from an analysis of the account. Explain why.
+
+(3) Use DISTINCT to list the descriptions of the remaining postings. Explain the two kinds of cost the account records.
+
+(4) List the postings of fiscal 2026 whose description records an unfavorable purchase variance, sorted by Debit from the largest down, and show the ten largest with their posting date and voucher number.
+
+(5) Using the message pane, count the postings of each description. Explain what a credit to this account means.
+
+(6) Write two or three sentences comparing how purchase price variance and manufacturing variance arise, based on the source documents that post to each account.
+
+**Deliverable.** A script with the queries and a short comparison.
+
+<!-- Instructor notes, Exercise 9.2: 5060 Purchase Price Variance is AccountID 55. Fiscal 2026 source types: PurchaseInvoice and
+     JournalEntry; the JournalEntry row is closing entry JE-2026-000296, a credit of 176,011.36, which clears the account. PurchaseInvoice
+     postings: 23,556 rows with three descriptions: "Record unfavorable purchase variance" 12,389 debits (167,063.83), "Record favorable
+     purchase variance" 7,270 credits (57,497.25), and "Record nonrecoverable purchase tax" 3,897 debits (66,444.78); the net, 176,011.36,
+     equals the close. The purchase variance is the invoice price against the purchase-order price at which the goods were received (the
+     invoice clears goods received not invoiced, account 2020, at the receipt value); a credit means the supplier billed below the order
+     price. The account also absorbs purchase tax that cannot be recovered. Largest unfavorable variance 796.29 (2026-01-31, voucher
+     V0101-2026-020853); next 783.75 and 752.40. Purchase variance is recorded when a supplier invoice is posted; manufacturing variance
+     when a work order closes, comparing actual with standard production cost. -->
+
+
+### Managerial Accounting Exercises
+
+**Exercise 9.3: Standard Cost Components of Manufactured Items**
+
+**Table group:** Master Data, Manufacturing
+
+**Scenario.** The manufacturing variance compares actual cost with standard cost, so the controller wants to understand how the standards are built before the variance is analyzed. She asks you for a review of the standard cost components of the items Charles River makes.
+
+**Requirements.**
+
+(1) List the items whose SupplyMode is Manufactured, with ItemCode, ItemName, ItemGroup, StandardCost, StandardLaborHoursPerUnit, StandardDirectLaborCost, StandardVariableOverheadCost, StandardFixedOverheadCost, and StandardConversionCost.
+
+(2) Add a calculated column for the standard material cost, the part of StandardCost that is not conversion cost, and round it to two decimals.
+
+(3) Write a query that returns any manufactured item whose direct labor, variable overhead, and fixed overhead do not add up to its standard conversion cost, after rounding to two decimals. Report the result.
+
+(4) Add a calculated column for the standard labor rate per hour, StandardDirectLaborCost divided by StandardLaborHoursPerUnit, rounded to two decimals, and sort the items by it. Describe the range of rates.
+
+(5) List the ten items with the highest standard conversion cost, and state which item groups they belong to.
+
+**Deliverable.** A script with the queries and a short description of how the standards are built.
+
+<!-- Instructor notes, Exercise 9.3: 88 manufactured items (Furniture 56, Lighting 26, Textiles 5, Accessories 1). Material cost =
+     StandardCost - StandardConversionCost, from 10.43 to 558.40. The component check returns no rows: labor + variable overhead + fixed
+     overhead = conversion for every item. Labor rate per standard hour ranges from 23.27 to 31.82, so rates are item-specific, not one plant
+     rate. Highest conversion cost: FUR-TBL-0017 Mason Dining Table Ash Natural 84 in (112.43), FUR-CON-0077 (106.38), FUR-CTB-0014 (105.58);
+     the top ten are Furniture. -->
+
+
+**Exercise 9.4: Open Work Orders at Year-End**
+
+**Table group:** Manufacturing
+
+**Scenario.** A work order's variance is recorded only when it closes, so the work orders still open at the end of fiscal 2026 hold variance that has not yet reached the ledger. The production manager and the controller want to know how many work orders are open, in what state, and how late they are.
+
+**Requirements.**
+
+(1) List the work orders with no ClosedDate, with their WorkOrderNumber, Status, ReleasedDate, DueDate, CompletedDate, and PlannedQuantity.
+
+(2) Use DISTINCT to list the statuses of the open work orders. For each status, count the work orders with a separate query and the message pane.
+
+(3) List the open work orders whose DueDate is on or before 2026-12-31, sorted by DueDate. Identify the oldest.
+
+(4) Among them, list the work orders whose Status is Released, meaning that work has not started. Describe what you find.
+
+(5) Write a short memo (one half page) to the production manager on the open work orders, and explain why their variance is not yet in the fiscal 2026 results.
+
+**Deliverable.** A script with the queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 9.4: 670 work orders have a NULL ClosedDate: Released 558, In Progress 27, Completed 85 (completed but not
+     closed). Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23
+     and due 2026-06-07, still Released at the end of the data; the next are WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due
+     2026-08-30). Hundreds of released work orders are past due without being started, a backlog worth raising with production. Their
+     variance will be recorded when they close, after the data ends. Counting needs one query per status (COUNT comes in Chapter 10). -->
+
+
+### Auditing Exercises
+
+**Exercise 9.5: Shipments That Need Follow-Up**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** In Tutorial 2.1 you found shipments with no tracking number and shipments still marked In Transit after their delivery date, working with filters in Excel. The audit senior asks you to repeat both tests with SQL, so that they can be saved and rerun at the next year-end.
+
+**Requirements.**
+
+(1) Use DISTINCT to list the values of Status and of ShippedBy in the Shipment table.
+
+(2) List the shipments with no TrackingNumber, with their ShipmentNumber, ShipmentDate, ShippedBy, and Status, sorted by ShipmentDate. Report the number of rows and the range of dates.
+
+(3) List the shipments whose Status is In Transit and whose DeliveryDate is before 2026-12-31, the last day of the data, sorted by DeliveryDate. Report the number of rows and the oldest DeliveryDate.
+
+(4) Compare your results with your findings from Tutorial 2.1, and explain why the SQL version of the tests is easier to rerun.
+
+(5) For each test, name the data quality dimension it addresses and suggest one question to ask the shipping team.
+
+**Deliverable.** A script with the queries and a short comparison with Tutorial 2.1.
+
+<!-- Instructor notes, Exercise 9.5: Status values Delivered (8,967) and In Transit (740); ShippedBy DHL Supply Chain, FedEx Freight,
+     Private Fleet, UPS Freight. No TrackingNumber (NULL): 392 shipments, dated 2024-01-16 to 2026-12-31. In Transit with DeliveryDate
+     before 2026-12-31: 739, the oldest delivered 2024-01-10 (one more In Transit shipment has a DeliveryDate on or after 2026-12-31). The
+     SQL results equal the Excel filters of Tutorial 2.1. Dimensions: completeness (tracking number) and consistency or timeliness (status
+     that contradicts the delivery date). The tests are saved as text and rerun with one click. -->
+
+
+**Exercise 9.6: Missing Values in Time and Labor Records**
+
+**Table group:** Manufacturing, Payroll
+
+**Scenario.** The manufacturing variance depends on the labor time recorded against work orders. Before the audit team relies on those records, the audit senior asks you to test them for missing values that could signal incomplete or unreliable time data.
+
+**Requirements.**
+
+(1) List the LaborTimeEntry rows whose LaborType is Direct Manufacturing and whose WorkOrderOperationID is missing. Show the employee, work order, work date, and hours.
+
+(2) Use DISTINCT to list the values of ClockStatus in the TimeClockEntry table, and list the time clock entries with no ClockOutTime.
+
+(3) List the employees with a TerminationDate, with their EmploymentStatus and IsActive flag, and check whether the three columns agree.
+
+(4) For each finding, explain why a missing value matters for the labor cost that reaches the manufacturing variance, and what you would ask the payroll or production team.
+
+**Deliverable.** A script with the queries and a short list of findings with follow-up questions.
+
+<!-- Instructor notes, Exercise 9.6: three Direct Manufacturing labor rows have no WorkOrderOperationID: LaborTimeEntryIDs 213 (employee
+     17, work order 1, 2024-01-17, 3.74 hours), 26171 (employee 17, work order 5328, 2025-01-02, 1.55 hours), and 48261 (employee 18, work
+     order 9897, 2026-01-02, 0.50 hours); employees 17 and 18 are assemblers. They are planted anomalies (invalid direct labor operation
+     link). ClockStatus values: Approved (52,962) and Pending (5). Three entries have no ClockOutTime, all for employee 85 (an Inventory
+     Specialist) on January 1 of 2024, 2025, and 2026, with Pending status (planted missing clock-out). Thirteen employees have a
+     TerminationDate; all are Terminated with IsActive 0, so the three columns agree. Missing links mean labor cost that cannot be traced
+     to an operation; missing clock-outs mean paid hours without a complete time record. -->

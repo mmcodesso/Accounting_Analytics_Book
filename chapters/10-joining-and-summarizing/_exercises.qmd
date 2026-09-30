@@ -1,0 +1,184 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of each exercise in a script of its own, named after the exercise (such as `Ex 10.1.sql`), with a header comment and a comment above each query. Test every join by comparing the number of rows it returns with the number it should return, and group by key rather than by name.
+
+### Financial Accounting Exercises
+
+**Exercise 10.1: Reconciling Invoice Lines to the Ledger in SQL**
+
+**Table group:** Order-to-Cash, Accounting Core
+
+**Scenario.** In Chapter 5 you built the InvoiceLines query in Power Query, and in Chapter 6 you tied its fiscal 2026 revenue to the ledger. The controller asks you to repeat the reconciliation with SQL, so that it can be rerun at every year-end without rebuilding a workbook.
+
+**Requirements.**
+
+(1) Join SalesInvoiceLine to SalesInvoice, Item, and Customer, and confirm that the join returns as many rows as SalesInvoiceLine holds.
+
+(2) Total the LineTotal of the invoices dated in fiscal 2026 by item group, and compare the total with the control total you used in Chapter 6.
+
+(3) Join GLEntry to Account, and total the credits less debits posted by SalesInvoice documents in fiscal 2026 to each revenue account, 4010 to 4040 and 4080.
+
+(4) Explain the difference between requirements (2) and (3). Find the invoices responsible for it by joining the fiscal 2026 SalesInvoice postings to SalesInvoice and keeping the invoices dated before 2026-01-01.
+
+(5) Explain why account 4050 Freight Revenue is not part of the reconciliation.
+
+**Deliverable.** A script with the reconciliation queries and a short explanation of the difference.
+
+<!-- Instructor notes, Exercise 10.1: the four-table join returns 27,933 rows, one per invoice line. Fiscal 2026 invoice lines by group:
+     Furniture 17,395,054.38, Lighting 5,997,536.93, Textiles 3,278,211.11, Accessories 1,872,273.66, Services 1,213,344.00; total
+     29,756,420.08, Chapter 6's control total. Ledger, SalesInvoice postings in fiscal 2026: 4010 17,398,287.56, 4020 5,998,649.16, 4030
+     3,278,211.11, 4040 1,872,510.62, 4080 1,213,344.00; total 29,761,002.45. The difference of 4,582.37 is three invoices dated in late 2025
+     and posted on 2026-01-01: SI-2026-013741 (dated 2025-11-29), SI-2026-013742 (2025-12-04), and SI-2026-013743 (2025-12-03), which add
+     3,233.18 to 4010, 1,112.23 to 4020, and 236.96 to 4040 (Exercise 6.1; Exercise 5.2's cutoff invoices). Freight is billed on the invoice
+     header, not on the lines, so it posts to 4050 without a line to match. -->
+
+
+**Exercise 10.2: Tracing a Sale from the Ledger to Its Documents**
+
+**Table group:** Accounting Core, Order-to-Cash
+
+**Scenario.** In Tutorial 3.2 you traced invoice SI-2025-007947 by filtering worksheets one at a time. The audit senior asks you to repeat the trace with joins, and then to extend it from one sale to every revenue posting of a year.
+
+**Requirements.**
+
+(1) List the ledger rows posted by SI-2025-007947, joining GLEntry to SalesInvoice on the source document and to Account for the account numbers and names. Explain what each row records and show that the debits equal the credits.
+
+(2) Join the invoice to its customer and its lines to their items, and identify the line whose SalesInvoiceLineID equals the SourceLineID of the revenue posting.
+
+(3) For every SalesInvoice posting of fiscal 2026 that carries a SourceLineID, use an anti-join to find the postings whose SourceLineID matches no invoice line. Report the number of postings tested and the number of exceptions.
+
+(4) Write a short memo (one half page) explaining how the source-document columns let an auditor move from the ledger to the documents and back, and what requirement (3) proves.
+
+**Deliverable.** A script with the trace queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 10.2: SI-2025-007947 (SalesInvoiceID 7947, dated 2025-03-05, customer 135 Sullivan-Mcdonald) posts four
+     rows on 2025-03-05: GLEntry 126311 debit 787.48 to 1020 Accounts Receivable; 126312 credit 688.42 to 4010 Sales Revenue - Furniture
+     with SourceLineID 10645; 126313 credit 51.00 to 4050 Freight Revenue; 126314 credit 48.06 to 2050 Sales Tax Payable. Debits 787.48 =
+     credits 787.48 = GrandTotal (SubTotal 688.42, freight 51.00, tax 48.06). Line 10645 is the Alder Desk Ash Whitewash 84 in, 2 units at
+     344.21. Requirement (3): 9,525 SalesInvoice postings of fiscal 2026 carry a SourceLineID, and none is orphaned (the anti-join returns no
+     rows); the header-level rows (receivable, freight, tax) have no SourceLineID. -->
+
+
+### Managerial Accounting Exercises
+
+**Exercise 10.3: Average Order Value by Customer**
+
+**Table group:** Order-to-Cash, Master Data
+
+**Scenario.** The sales manager wants to know which customers place the largest orders and whether order size differs by customer segment. The controller asks you to prepare the analysis from the sales orders.
+
+**Requirements.**
+
+(1) Join SalesOrder to Customer and calculate, for each customer, the number of orders, the total OrderTotal, and the average order value, grouped by CustomerID. Sort by average order value from the largest down.
+
+(2) Repeat requirement (1) grouped by CustomerName instead of CustomerID. Compare the number of rows, and find the customer names that appear in more than one row of requirement (1).
+
+(3) Use HAVING to keep only the customers with at least 20 orders, and list the ten with the highest average order value.
+
+(4) Calculate the number of orders and the average order value by CustomerSegment.
+
+(5) Write two or three sentences for the sales manager on how order size differs by segment, and explain why the grouping in requirement (1) is the right one.
+
+**Deliverable.** A script with the queries and a short note for the sales manager.
+
+<!-- Instructor notes, Exercise 10.3: 5,819 orders from 211 customers (9 customers have none); overall average order value 15,036.96.
+     Highest averages: customer 136 Glenn-Estrada (54 orders, 26,202.95), 169 Miller-Hernandez (50, 25,394.03), 78 Eaton, Robertson and
+     Grant (44, 25,350.26). Grouping by name returns one row fewer: the two Brown LLCs, customer 5 (Design Trade, 20 orders, average
+     10,258.01) and customer 173 (Strategic, 51 orders, 24,276.43), merge into one row of 71 orders averaging 20,327.58. (The two Smith Ltd
+     customers do not merge in this query, because only customer 170 has orders.) By segment: Strategic 1,136 orders, 23,386.13; Wholesale
+     2,771, 15,993.96; Design Services 239, 14,742.20; Design Trade 956, 10,062.99; Small Business 717, 4,840.43. -->
+
+
+**Exercise 10.4: Purchase Price Variance by Supplier**
+
+**Table group:** Procure-to-Pay, Accounting Core
+
+**Scenario.** Exercise 9.2 showed that account 5060 records the difference between supplier invoices and the purchase-order prices at which goods were received, together with purchase tax that cannot be recovered. The purchasing manager asks which suppliers bill above the order price, and whether the account grew because prices rose or because Charles River bought more.
+
+**Requirements.**
+
+(1) Join the fiscal 2026 postings to account 5060 whose description records a purchase variance to PurchaseInvoice, through the source document, and to Supplier. Total the variance by supplier and list the five largest.
+
+(2) Recalculate the variance from the documents: join PurchaseInvoiceLine to PurchaseInvoice and PurchaseOrderLine, and total the quantity times the difference between the invoice unit cost and the order unit cost, for the invoices dated in fiscal 2026. Compare the total with the ledger's.
+
+(3) Count the fiscal 2026 invoice lines billed above, below, and at the order price.
+
+(4) Calculate, for each year from 2024 to 2026, the total amount invoiced against purchase orders and the price variance, and express the variance as a percentage of the amount invoiced.
+
+(5) Write a short memo (one half page) to the purchasing manager answering both questions.
+
+**Deliverable.** A script with the queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 10.4: GL variance postings of fiscal 2026 (descriptions ending in "purchase variance") net 109,566.58.
+     Largest suppliers: 65 Bell, Pruitt and David 6,158.65; 56 Velasquez-Baxter 5,170.56; 100 Collins-Johnson 4,931.16; 17 Brooks, Johnson
+     and Olson 4,719.17; 16 Berger, Stanley and Cooper 4,410.07. The line-level recalculation for invoices dated in 2026 is 109,566.20,
+     0.38 from the ledger because each posting is rounded; by supplier the two agree to within cents. Of 19,866 fiscal 2026 invoice lines,
+     12,413 are billed above the order price, 7,286 below, and 167 at it; the differences range from 1.5% below to 2.6% above. Amount
+     invoiced against orders and variance: 2024 13,491,998 and 64,632 (0.48%); 2025 17,468,202 and 82,377 (0.47%); 2026 21,612,260 and
+     109,566 (0.51%). The rate is steady, so the account grew because purchases grew, not because suppliers raised their billing relative to
+     the order price. The rest of account 5060 is nonrecoverable purchase tax (66,444.78 in 2026). -->
+
+
+### Auditing Exercises
+
+**Exercise 10.5: Testing Referential Integrity with Anti-Joins**
+
+**Table group:** Accounting Core, Order-to-Cash, Manufacturing, Payroll
+
+**Scenario.** Chapter 3 explained that the Charles River database declares no foreign keys, so its relationships must be tested, and it mentioned ledger rows that point to payroll payments that do not exist. The audit senior asks you to run a set of integrity tests with anti-joins before the team relies on the joins in its other work.
+
+**Requirements.**
+
+(1) Find the GLEntry rows whose SourceDocumentType is PayrollPayment and whose SourceDocumentID matches no PayrollPayment. List them with their posting date, amounts, and description, and total their debits and credits.
+
+(2) Find the customers that have never placed a sales order, and check their IsActive flag.
+
+(3) Find the work orders that have no work order operations, and report their status.
+
+(4) Find the manufactured items that have never had a work order.
+
+(5) For each finding, state whether it is an integrity failure, a process exception, or an expected condition, and recommend a follow-up.
+
+**Deliverable.** A script with the anti-join tests and a table of findings with dispositions.
+
+<!-- Instructor notes, Exercise 10.5: (1) six GLEntry rows with SourceDocumentType PayrollPayment point to no payment: GLEntryIDs 7231 and
+     7232 (2024-01-19, SourceDocumentID 1), 12521 and 12522 (2025-01-03, SourceDocumentID 2646), 18069 and 18070 (2026-01-02,
+     SourceDocumentID 5420), each pair a 7,971.10 debit "Clear accrued payroll" and a 7,971.10 credit "Disburse payroll cash"; debits and
+     credits 23,913.30 each. They are ledger postings without a supporting document (planted missing payroll payment), an integrity failure
+     to investigate. (2) Nine customers have no orders, all with IsActive 0, an expected condition. (3) Three work orders have no
+     operations, WO-2024-000001, WO-2025-005504, and WO-2026-010075, all Closed (planted), a process exception: a closed work order should
+     have operations and labor. (4) Five manufactured items have never had a work order (LGT-TBL-0004, LGT-PND-0017, FUR-TBL-0031,
+     FUR-DSK-0051, ACC-CDL-0048), expected if they are made to order or new, but worth a question to production. -->
+
+
+**Exercise 10.6: Suppliers That Share an Employee's Address**
+
+**Table group:** Procure-to-Pay, Master Data
+
+**Scenario.** In Exercise 5.5 you matched supplier addresses against employee addresses in Excel and found suppliers that may be related parties. The audit senior asks you to repeat the test with a join, to measure how much Charles River paid those suppliers, and to add a test for customers that share a name.
+
+**Requirements.**
+
+(1) Join Supplier to Employee on Address, and list each matching supplier with the employee, the employee's job title, and the supplier's IsApproved flag.
+
+(2) For each matching supplier, total the number and amount of supplier invoices and of payments dated through 2026-12-31. Group by SupplierID.
+
+(3) Use GROUP BY and HAVING to find the customer names shared by more than one CustomerID, and list those customers with their segments.
+
+(4) Explain why the join in requirement (1) is a stronger test than a visual comparison of the two lists, and what it cannot tell you.
+
+(5) Write a short memo (one half page) to the audit senior with the findings and the next procedures you recommend.
+
+**Deliverable.** A script with the queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 10.6: six suppliers share an address with an employee (planted related-party matches): supplier 1
+     Anderson-Noble with employee 22 (Assembler), 2 Watson, Mitchell and Chen with 46 (Machine Operator), 3 Lucas, Green and Richardson
+     with 33 (Assembler), 4 Stokes, Mann and Keller with 119 (Designer), 5 Nelson-Rocha with 65 (Quality Technician), and 6 Wright,
+     Sanchez and Garza with 20 (Assembler); all six are approved. Supplier invoices (all years): 1 390 invoices 377,401.03; 2 327
+     467,847.58; 3 392 400,322.61; 4 208 703,106.56; 5 245 1,227,176.20; 6 373 388,893.73. Payments through 2026-12-31: 1 392 payments
+     354,958.21; 2 322, 431,269.26; 3 387, 366,307.32; 4 214, 690,304.23; 5 234, 563,122.42; 6 368, 340,084.99. No two employees share an
+     address, so each supplier matches one employee. Shared customer names: Brown LLC (customers 5, Design Trade, and 173, Strategic) and
+     Smith Ltd (170 and 220, both Small Business). An exact join misses addresses written differently (Chapter 2) and cannot prove a
+     relationship; the next steps are vendor setup records, conflict-of-interest declarations, and the employees' purchasing roles. -->

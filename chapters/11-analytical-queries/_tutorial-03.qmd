@@ -1,0 +1,171 @@
+## Guided Tutorial 11.3: Building the Monthly Measure and Saving It as a View
+
+**Context and objective.** The controller wants one measure she can track every month: labor hours per standard hour of output, with the share of overtime, smoothed over a trailing twelve months. In this tutorial, you will build it as a chain of common table expressions, checking each step as you go. You will then save it as a view in your working copy of the database, so that it can be run again with a single line.
+
+**Prerequisites.** Complete Tutorials 11.1 and 11.2, and continue in Chapter11.sql. The view is saved in CharlesRiver_Work.sqlite, never in the file you downloaded.
+
+**Step-by-step instructions.**
+
+**Step 1. Build the output step and check it.** The first CTE turns the production completions into standard hours by month.
+
+a. Type and run the query below.
+
+   ```sql
+   WITH MonthlyOutput AS (
+       SELECT strftime('%Y-%m', pc.CompletionDate) AS Month,
+           SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit)
+               AS StandardHours
+       FROM ProductionCompletionLine AS pcl
+           INNER JOIN ProductionCompletion AS pc
+               ON pc.ProductionCompletionID = pcl.ProductionCompletionID
+           INNER JOIN Item AS i ON i.ItemID = pcl.ItemID
+       GROUP BY Month
+   )
+   SELECT * FROM MonthlyOutput;
+   ```
+
+b. Read the first rows of the result.
+
+The step returns one row per month, with the standard hours of the units completed. January 2024 has very little output, because it is the month in which the data begins and the first work orders were only starting to complete.
+
+**Step 2. Add the hours step and check it.** A second CTE, separated from the first by a comma, summarizes the manufacturing labor time by month.
+
+a. Replace the last line, `SELECT * FROM MonthlyOutput;`, with the text below, so that the query defines both steps and shows the second.
+
+   <!-- sql-check: skip -->
+
+   ```sql
+   , MonthlyHours AS (
+       SELECT strftime('%Y-%m', WorkDate) AS Month,
+           SUM(RegularHours + OvertimeHours) AS LaborHours,
+           SUM(OvertimeHours) AS OvertimeHours
+       FROM LaborTimeEntry
+       WHERE LaborType <> 'NonManufacturing'
+       GROUP BY Month
+   )
+   SELECT * FROM MonthlyHours;
+   ```
+
+b. Run the query and read the first rows.
+
+The query now defines two steps and shows the second, one row per month with its labor hours and overtime hours. Checking each step on its own, before anything is joined to it, is the main advantage of a CTE.
+
+**Step 3. Join the steps and add the trailing twelve months.** The third step joins output and hours by month. The final SELECT calculates the monthly ratio and the trailing twelve-month figures with a window frame. It also counts the months in each window, so that windows shorter than a year can be left out.
+
+a. Replace the last line again, `SELECT * FROM MonthlyHours;`, with the text below, and run the whole query, which now reads from `WITH` to the final semicolon.
+
+   <!-- sql-check: skip -->
+
+   ```sql
+   , Monthly AS (
+       SELECT o.Month, o.StandardHours, h.LaborHours, h.OvertimeHours
+       FROM MonthlyOutput AS o
+           INNER JOIN MonthlyHours AS h ON h.Month = o.Month
+   ),
+   Trailing AS (
+       SELECT Month,
+           ROUND(LaborHours / StandardHours, 2) AS HoursPerStandardHour,
+           ROUND(SUM(LaborHours) OVER w / SUM(StandardHours) OVER w, 2)
+               AS TTMHoursPerStandardHour,
+           ROUND(SUM(OvertimeHours) OVER w / SUM(LaborHours) OVER w, 3)
+               AS TTMOvertimeShare,
+           COUNT(*) OVER w AS MonthsInWindow
+       FROM Monthly
+       WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)
+   )
+   SELECT Month, HoursPerStandardHour, TTMHoursPerStandardHour,
+       TTMOvertimeShare
+   FROM Trailing
+   WHERE MonthsInWindow = 12
+   ORDER BY Month;
+   ```
+
+b. Read the TTMHoursPerStandardHour and TTMOvertimeShare columns from the first row to the last.
+
+The WINDOW clause names the frame once, as w, so that the three window functions share it. The result starts in December 2024, the first month with a full year of history before it. The monthly ratio jumps around, but the trailing twelve-month figure climbs from under 1.2 at the end of fiscal 2024 to about 1.4 a year later and about 1.5 by the end of fiscal 2026. The overtime share climbs with it, from about a ninth of the hours to about a fifth. These hours come from the labor time records, dated by the day worked, while Tutorial 10.3 used the payroll, whose pay periods fall in the year they are paid. The yearly figures therefore differ a little from those of Chapter 10, but the trend is the same.
+
+@fig-11-06 summarizes the chain of steps you have built. Each step takes the result of the ones before it, and each can be checked on its own by selecting from it.
+
+![The Chain of Common Table Expressions in the Monthly Measure.](/visuals/svg/fig-11-06-cte-pipeline.svg){#fig-11-06 fig-alt="A flow diagram of the view MonthlyLaborEfficiency. Two steps at the top run side by side: MonthlyOutput, which summarizes production completion lines and items into standard hours by month, and MonthlyHours, which summarizes labor time entries into labor and overtime hours by month. Both feed a step named Monthly, which joins them by month. Monthly feeds Trailing, which calculates the monthly ratio and trailing twelve-month figures over a window of the current month and the eleven before it. The final SELECT keeps the months with a full twelve-month window."}
+
+**Step 4. Save the measure as a view.** A view stores the query under a name, and the name can then be queried like a table.
+
+a. Place `CREATE VIEW MonthlyLaborEfficiency AS` on a new line above `WITH`, so that the statement reads as below.
+
+   <!-- sql-check: view -->
+
+   ```sql
+   CREATE VIEW MonthlyLaborEfficiency AS
+   WITH MonthlyOutput AS (
+       SELECT strftime('%Y-%m', pc.CompletionDate) AS Month,
+           SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit)
+               AS StandardHours
+       FROM ProductionCompletionLine AS pcl
+           INNER JOIN ProductionCompletion AS pc
+               ON pc.ProductionCompletionID = pcl.ProductionCompletionID
+           INNER JOIN Item AS i ON i.ItemID = pcl.ItemID
+       GROUP BY Month
+   ),
+   MonthlyHours AS (
+       SELECT strftime('%Y-%m', WorkDate) AS Month,
+           SUM(RegularHours + OvertimeHours) AS LaborHours,
+           SUM(OvertimeHours) AS OvertimeHours
+       FROM LaborTimeEntry
+       WHERE LaborType <> 'NonManufacturing'
+       GROUP BY Month
+   ),
+   Monthly AS (
+       SELECT o.Month, o.StandardHours, h.LaborHours, h.OvertimeHours
+       FROM MonthlyOutput AS o
+           INNER JOIN MonthlyHours AS h ON h.Month = o.Month
+   ),
+   Trailing AS (
+       SELECT Month,
+           ROUND(LaborHours / StandardHours, 2) AS HoursPerStandardHour,
+           ROUND(SUM(LaborHours) OVER w / SUM(StandardHours) OVER w, 2)
+               AS TTMHoursPerStandardHour,
+           ROUND(SUM(OvertimeHours) OVER w / SUM(LaborHours) OVER w, 3)
+               AS TTMOvertimeShare,
+           COUNT(*) OVER w AS MonthsInWindow
+       FROM Monthly
+       WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)
+   )
+   SELECT Month, HoursPerStandardHour, TTMHoursPerStandardHour,
+       TTMOvertimeShare
+   FROM Trailing
+   WHERE MonthsInWindow = 12;
+   ```
+
+b. Run the statement. The message pane reports that it ran without errors, and no result grid appears, because creating a view returns no rows.
+c. Click **Write Changes** on the toolbar to save the view in CharlesRiver_Work.sqlite.
+d. On the **Database Structure** tab, find MonthlyLaborEfficiency under **Views**.
+
+The view is now part of your working copy, as @fig-11-07 shows. It holds the query, not its result, so it will reflect any change in the data. The ORDER BY has been left out of the view, because the order of the rows is set by the query that uses it.
+
+![The Saved View in the Database Structure Tab.](/visuals/svg/fig-11-07-view-in-structure.svg){#fig-11-07 fig-alt="A mock of the Database Structure tab of DB Browser for SQLite with CharlesRiver_Work.sqlite open. Below the list of tables, the Views group is expanded and shows MonthlyLaborEfficiency with its four columns, Month, HoursPerStandardHour, TTMHoursPerStandardHour, and TTMOvertimeShare. The view is outlined."}
+
+**Step 5. Query the view.** The whole chain of steps now runs from one short query.
+
+a. On the **Execute SQL** tab, type and run the query below.
+
+   ```sql
+   SELECT *
+   FROM MonthlyLaborEfficiency
+   WHERE Month >= '2026-01'
+   ORDER BY Month;
+   ```
+
+b. Compare the result with the fiscal 2026 rows of Step 3.
+
+The result, shown in @fig-11-08, holds the twelve months of fiscal 2026, with the same values as Step 3. The controller, or anyone else with the working copy, can run this line each month, after the new month's data arrives, and see at once whether the measure is still rising.
+
+![The Monthly Measure for Fiscal 2026, Queried from the View.](/visuals/svg/fig-11-08-monthly-measure.svg){#fig-11-08 fig-alt="A mock of the Execute SQL tab. The query selects every column of the view MonthlyLaborEfficiency for the months from 2026-01 onward. The result grid shows twelve months with the monthly hours per standard hour, which swings from month to month, the trailing twelve-month hours per standard hour, which stays around one and a half, and the trailing twelve-month overtime share, which rises toward one fifth. The trailing twelve-month columns are outlined."}
+
+**Checkpoint.** Check that:
+
+- each CTE returns what it should when you select from it on its own;
+- the trailing twelve-month hours per standard hour rise from under 1.2 at the end of fiscal 2024 to about 1.5 by the end of fiscal 2026;
+- the view MonthlyLaborEfficiency appears under Views on the Database Structure tab of your working copy, after you click Write Changes;
+- the query of the view for fiscal 2026 returns the same values as the full query.
+
+The controller now has a measure that is smoothed enough to show a trend and saved so that it runs again every month. Both of its parts point the same way: more labor for the same output, and more of it paid at overtime rates.

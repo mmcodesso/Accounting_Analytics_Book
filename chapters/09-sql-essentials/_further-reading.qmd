@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Beaulieu, A. (2020). *Learning SQL: Generate, manipulate, and retrieve data* (3rd ed.). O'Reilly Media. A widely used introduction to SQL that starts with single-table queries and builds to joins, grouping, and analytic functions. Its examples use MySQL, so it is also a practical way to see where another dialect differs from the SQLite you use in this book.
+
+Borthick, A. F., Schneider, G. P., & Viscelli, T. R. (2017). Analyzing data for decision making: Integrating spreadsheet modeling and database querying. *Issues in Accounting Education*, *32*(1), 59–66. <https://doi.org/10.2308/iace-51385> In this accounting case, students begin an analysis in a spreadsheet and find it unwieldy as the analysis draws on more attributes from more sheets. They then import the data into a database, join the tables, and complete the analysis with queries. The case mirrors the move from Part II to Part III of this book.
+
+Chamberlin, D. D. (2012). Early history of SQL. *IEEE Annals of the History of Computing*, *34*(4), 78–82. <https://doi.org/10.1109/MAHC.2012.61> A short account by one of the language's designers of how SQL was created at IBM in the 1970s to query relational databases, and of the design choices that shaped it. It explains why SQL reads more like a description of the result than a program.
+
+Lee, L. S., & Casterella, G. (2023). A mental model approach to teaching database querying skills with SQL and Alteryx. *Journal of Accounting Education*, *64*, Article 100858. <https://doi.org/10.1016/j.jaccedu.2023.100858> The authors position SQL as the mental model for the data preparation features of a newer analytics tool, and they have students solve the same problems in both. The paper shows why the concepts of this Part carry over to the tools you may meet in practice.
+
+Taipalus, T., & Seppänen, V. (2020). SQL education: A systematic mapping study and future research agenda. *ACM Transactions on Computing Education*, *20*(3), 1–33. <https://doi.org/10.1145/3398377> A review of three decades of research on teaching SQL, which identifies recurring topics such as the errors students make when writing queries and the design of the practice database. It is a useful starting point for anyone interested in how SQL is learned.
+
+Taipalus, T., Siponen, M., & Vartiainen, T. (2018). Errors and complications in SQL query formulation. *ACM Transactions on Computing Education*, *18*(3), 1–29. <https://doi.org/10.1145/3231712> Based on more than 33,000 queries written by students, this study classifies the errors people make in SQL, including logical errors that recur in similar ways from student to student. Reading its categories is a good way to learn which mistakes to look for in your own queries.

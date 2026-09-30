@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## References
+
+Borthick, A. F., Schneider, G. P., & Viscelli, T. R. (2017). Analyzing data for decision making: Integrating spreadsheet modeling and database querying. *Issues in Accounting Education*, *32*(1), 59–66. <https://doi.org/10.2308/iace-51385>
+
+Chamberlin, D. D. (2012). Early history of SQL. *IEEE Annals of the History of Computing*, *34*(4), 78–82. <https://doi.org/10.1109/MAHC.2012.61>
+
+Codd, E. F. (1970). A relational model of data for large shared data banks. *Communications of the ACM*, *13*(6), 377–387. <https://doi.org/10.1145/362384.362685>
+
+SQLite. (n.d.-a). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.org/quirks.html>
+
+SQLite. (n.d.-b). *SQL language expressions*. <https://www.sqlite.org/lang_expr.html>
+
+Taipalus, T., Siponen, M., & Vartiainen, T. (2018). Errors and complications in SQL query formulation. *ACM Transactions on Computing Education*, *18*(3), 1–29. <https://doi.org/10.1145/3231712>

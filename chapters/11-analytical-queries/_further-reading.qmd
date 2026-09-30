@@ -1,0 +1,13 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845> The chapters on flexible budgets and variances explain the efficiency variance, which compares the inputs actually used with the inputs allowed for the output produced. The monthly measure of this chapter, labor hours per standard hour, is the quantity behind that variance, and the text shows how managers use it.
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/> A free online textbook on forecasting. Its sections on moving averages and on seasonal patterns explain why a trailing average smooths out short-term swings, and why comparing a month with the same month of the previous year separates a trend from the season.
+
+Kimball, R., & Ross, M. (2013). *The data warehouse toolkit: The definitive guide to dimensional modeling* (3rd ed.). Wiley. The standard guide to organizing data for reporting and analysis. Its treatment of facts recorded at a chosen grain, such as a month, and of summaries built on top of them, is the background to building measures like the one in this chapter as repeatable objects rather than one-off queries.
+
+Loraas, T. M., & Searcy, D. L. (2010). Using queries to automate journal entry tests: Agile Machinery Group, Inc. *Issues in Accounting Education*, *25*(1), 155–174. <https://doi.org/10.2308/iace.2010.25.1.155> In this case, students act as an outsourced internal audit team and query nearly a million journal entry records of a real company. They compare the entries each module should produce with the entries actually made, and isolate entries for further study. It extends the journal entry tests of Exercise 11.5.
+
+Molinaro, A., & de Graaf, R. (2020). *SQL cookbook* (2nd ed.). O'Reilly Media. A collection of solutions to common query problems, written for several database systems. Its chapters on window functions, date arithmetic, and reporting show many variations on the techniques of this chapter, such as running totals, rankings, and pivoted reports.

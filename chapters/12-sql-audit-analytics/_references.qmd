@@ -1,0 +1,7 @@
+{{< pagebreak >}}
+
+## References
+
+American Institute of Certified Public Accountants. (2026). *Guide to audit data analytics*. <https://www.aicpa-cima.com/cpe-learning/publication/guide-to-audit-data-analytics>
+
+Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>

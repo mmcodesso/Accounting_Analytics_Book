@@ -73,13 +73,13 @@ def fig_01_03() -> Diagram:
     for a, b in zip(hids, hids[1:]):
         d.arrow(a, b, exit=(1, 0.5), entry=(0, 0.5))
     tools = [
-        ("SQL (Part III)", "Access and prepare data from databases", 1, BLUE, WHITE, BLUE),
-        ("Excel (Part II)", "Prepare, analyze, and model data", 2, TEAL, WHITE, TEAL),
-        ("Power BI (Part IV)", "Analyze, visualize, and communicate", 3, HIGHLIGHT, INK, AMBER),
+        ("SQL (Part III)", "Access, prepare, and analyze data from databases", 1, 3, BLUE, WHITE, BLUE),
+        ("Excel (Part II)", "Prepare, analyze, and model data", 2, 2, TEAL, WHITE, TEAL),
+        ("Power BI (Part IV)", "Analyze, visualize, and communicate", 3, 2, HIGHLIGHT, INK, AMBER),
     ]
-    for row, (name, role, col, fill, color, border) in enumerate(tools):
+    for row, (name, role, col, span, fill, color, border) in enumerate(tools):
         y = 70 + row * 82
-        bar = d.box(card(name, role, color), xs[col], y, xs[col + 1] + w - xs[col], 62,
+        bar = d.box(card(name, role, color), xs[col], y, xs[col + span - 1] + w - xs[col], 62,
                     fill=fill, stroke=fill, color=color)
         comm = d.box("Communicate", xs[5], y, w, 62, fill=WHITE, stroke=border, dashed=True,
                      stroke_width=1.5)

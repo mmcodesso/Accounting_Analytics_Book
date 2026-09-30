@@ -1,0 +1,140 @@
+## Guided Tutorial 10.3: Comparing Output with Paid Hours
+
+**Context and objective.** The controller's third question is whether the variance comes from volume: whether the plant made fewer units over which to spread its costs. In this tutorial, you will measure the plant's output and the standard hours it required, measure the hours the manufacturing payroll paid for and the people it paid, and combine the two with derived tables into one measure for each year. You will finish by finding the time that is not charged to any work order.
+
+**Prerequisites.** Complete Tutorials 10.1 and 10.2, and continue in Chapter10.sql.
+
+**Step-by-step instructions.**
+
+**Step 1. Measure the output and its standard hours.** A production completion line records the quantity completed, and the item records the standard labor hours each unit needs.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT SUBSTR(pc.CompletionDate, 1, 4) AS CompletionYear,
+       ROUND(SUM(pcl.QuantityCompleted), 0) AS UnitsCompleted,
+       ROUND(SUM(pcl.QuantityCompleted
+           * i.StandardLaborHoursPerUnit), 0) AS StandardHours
+   FROM ProductionCompletionLine AS pcl
+       INNER JOIN ProductionCompletion AS pc
+           ON pc.ProductionCompletionID = pcl.ProductionCompletionID
+       INNER JOIN Item AS i ON i.ItemID = pcl.ItemID
+   GROUP BY CompletionYear
+   ORDER BY CompletionYear;
+   ```
+
+b. Compare the three years of UnitsCompleted and StandardHours.
+
+Output did not fall. The plant completed about the same number of units in each year, with a dip in fiscal 2025, and the standard labor hours those units required moved with them.
+
+**Step 2. Measure the hours paid.** The payroll register records each employee's pay for a period, and its lines record the hours of regular and overtime earnings.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT pp.FiscalYear, prl.LineType,
+       ROUND(SUM(prl.Hours), 0) AS Hours,
+       ROUND(SUM(prl.Amount), 2) AS Amount
+   FROM PayrollRegisterLine AS prl
+       INNER JOIN PayrollRegister AS pr
+           ON pr.PayrollRegisterID = prl.PayrollRegisterID
+       INNER JOIN PayrollPeriod AS pp
+           ON pp.PayrollPeriodID = pr.PayrollPeriodID
+       INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+   WHERE cc.CostCenterName = 'Manufacturing'
+       AND prl.LineType IN ('Regular Earnings', 'Overtime Earnings')
+       AND pp.FiscalYear BETWEEN 2024 AND 2026
+   GROUP BY pp.FiscalYear, prl.LineType
+   ORDER BY pp.FiscalYear, prl.LineType;
+   ```
+
+b. Compare the hours of each line type across the three years.
+
+The regular hours paid to the manufacturing cost center rose in each year, and the overtime hours more than doubled from fiscal 2024 to fiscal 2026. The amounts rose with them, and overtime, paid at a premium, rose fastest.
+
+**Step 3. Count the people.** More hours could mean more people or more hours per person.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT pp.FiscalYear, COUNT(DISTINCT pr.EmployeeID) AS Employees
+   FROM PayrollRegister AS pr
+       INNER JOIN PayrollPeriod AS pp
+           ON pp.PayrollPeriodID = pr.PayrollPeriodID
+       INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+   WHERE cc.CostCenterName = 'Manufacturing'
+       AND pp.FiscalYear BETWEEN 2024 AND 2026
+   GROUP BY pp.FiscalYear;
+   ```
+
+b. Compare the three counts.
+
+The manufacturing payroll paid the same number of people in each year. The extra hours were worked by the same workforce, more of them as overtime.
+
+**Step 4. Combine output and hours into one measure.** The output and the hours come from different tables, summarized at the same level: the year. Each becomes a derived table, and the two are joined on the year.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT o.Yr, o.StandardHours, p.PaidHours,
+       ROUND(p.PaidHours / o.StandardHours, 2) AS PaidPerStandardHour
+   FROM (
+       SELECT CAST(SUBSTR(pc.CompletionDate, 1, 4) AS INTEGER) AS Yr,
+           ROUND(SUM(pcl.QuantityCompleted
+               * i.StandardLaborHoursPerUnit), 0) AS StandardHours
+       FROM ProductionCompletionLine AS pcl
+           INNER JOIN ProductionCompletion AS pc
+               ON pc.ProductionCompletionID = pcl.ProductionCompletionID
+           INNER JOIN Item AS i ON i.ItemID = pcl.ItemID
+       GROUP BY Yr
+   ) AS o
+       INNER JOIN (
+           SELECT pp.FiscalYear AS Yr, ROUND(SUM(prl.Hours), 0) AS PaidHours
+           FROM PayrollRegisterLine AS prl
+               INNER JOIN PayrollRegister AS pr
+                   ON pr.PayrollRegisterID = prl.PayrollRegisterID
+               INNER JOIN PayrollPeriod AS pp
+                   ON pp.PayrollPeriodID = pr.PayrollPeriodID
+               INNER JOIN CostCenter AS cc
+                   ON cc.CostCenterID = pr.CostCenterID
+           WHERE cc.CostCenterName = 'Manufacturing'
+               AND prl.LineType IN ('Regular Earnings', 'Overtime Earnings')
+           GROUP BY pp.FiscalYear
+       ) AS p ON p.Yr = o.Yr
+   ORDER BY o.Yr;
+   ```
+
+b. Read the PaidPerStandardHour column.
+
+The result, shown in @fig-10-08, has one row for each of the three years. CAST turns the text year from SUBSTR into a whole number, so that both sides of the join compare numbers with numbers. In fiscal 2024 the payroll paid for somewhat more hours than the output required. By fiscal 2026 it paid for about half as many hours again as the standard allowed, and the ratio rose in each year. The year 2027, which the payroll periods include, drops out of the result because the inner join finds no completions for it.
+
+![Paid Hours per Standard Hour by Year.](/visuals/svg/fig-10-08-paid-per-standard-hour.svg){#fig-10-08 fig-alt="A mock of the Execute SQL tab. The query joins two derived tables on the year: one with the standard labor hours of the units completed, and one with the regular and overtime hours paid to the manufacturing cost center. The result has three rows, for 2024, 2025, and 2026, and the PaidPerStandardHour column, which rises in each year, is outlined."}
+
+**Step 5. Find the time not charged to any work order.** Direct labor is recorded against a work order operation, and indirect time is not. A left join keeps both, and the anti-join isolates the indirect time.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT SUBSTR(lt.WorkDate, 1, 4) AS WorkYear,
+       ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS HoursNotOnWork
+   FROM LaborTimeEntry AS lt
+       LEFT JOIN WorkOrderOperation AS op
+           ON op.WorkOrderOperationID = lt.WorkOrderOperationID
+   WHERE op.WorkOrderOperationID IS NULL
+       AND lt.LaborType <> 'NonManufacturing'
+   GROUP BY WorkYear
+   ORDER BY WorkYear;
+   ```
+
+b. Compare the three years.
+
+The manufacturing time that no work order carries grew by about two-thirds from fiscal 2024 to fiscal 2026. Part of the extra paid time, therefore, was never spent on a work order at all.
+
+**Checkpoint.** Check that:
+
+- the units completed and their standard hours are nearly the same in each year;
+- the hours paid to the manufacturing cost center rose in each year, with overtime more than doubling, while the number of employees did not change;
+- paid hours per standard hour rose in each year, to about one and a half in fiscal 2026;
+- the manufacturing time not charged to a work order grew by about two-thirds.
+
+The answer to the volume question is no. The plant produced as much as before, but it took more paid hours to do so, a growing part of them overtime or time on no work order. The standard cost of production still assumed the hours of the past, so the gap became the variance.

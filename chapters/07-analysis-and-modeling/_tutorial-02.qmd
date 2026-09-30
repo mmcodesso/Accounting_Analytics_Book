@@ -38,7 +38,7 @@ d. Set the type of Month to **Whole Number**, the type of Month in PlannedPrices
 e. Choose **Home > Merge Queries**. In FlexLines, hold Ctrl and click FiscalYear, Month, and ItemID, in that order.
 f. Choose **PlannedPrices** in the lower list, click its FiscalYear, Month, and ItemID in the same order, keep **Left Outer**, and click **OK**.
 g. Expand PlannedPrice, without the prefix.
-h. Add a custom column `FlexRevenue` with the formula below. Power Query's `if … then … else` works like Excel's IF: it returns the value after `then` when the condition is true and the value after `else` otherwise.
+h. Add a custom column `FlexRevenue` with the formula below. Power Query's `if`, `then`, and `else` work like Excel's IF: it returns the value after `then` when the condition is true and the value after `else` otherwise.
 
    ```
    if [PlannedPrice] = null then [LineTotal] else [Quantity] * [PlannedPrice]

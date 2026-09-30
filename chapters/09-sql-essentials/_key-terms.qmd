@@ -1,0 +1,37 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Clause.** A part of a SQL statement that begins with a keyword and performs one task, such as SELECT, FROM, WHERE, ORDER BY, or LIMIT. The clauses of a query must be written in a fixed order.
+
+**Column alias.** A name given to a column in the result of a query with the keyword AS, such as `TotalVarianceAmount AS Total`. An alias changes only the heading of the result, not the column in the table.
+
+**Comment.** Text in a SQL script that explains the queries and is ignored when they run. Two dashes start a comment that runs to the end of the line, and `/*` and `*/` enclose a comment of several lines.
+
+**Declarative language.** A language in which you state the result you want rather than the steps for producing it. SQL is declarative: a query describes the rows and columns required, and the database decides how to find them.
+
+**DISTINCT.** A keyword that removes duplicate rows from the result of a query, so that each combination of the selected values appears once. It is the way to list the values a column actually holds before filtering on one of them.
+
+**Logical error.** A mistake that lets a query run without an error message but makes it answer a different question from the one intended, such as a missing comma or a missing pair of parentheses. Logical errors are found by comparing a result with what it should look like.
+
+**NULL.** The marker SQL uses for a missing value: a value that is unknown or does not exist. NULL is not zero or empty text, no comparison with it is true, and it is found with IS NULL and IS NOT NULL.
+
+**Operator precedence.** The order in which SQL evaluates the operators of an expression. AND is evaluated before OR, so a condition that mixes them needs parentheses to express the intended grouping.
+
+**Query.** A written request for data from a database. A query describes the data it wants, and the database returns the result without changing the tables it reads.
+
+**Result set.** The rows and columns that a query returns. It looks like a table but exists only as the answer to the query.
+
+**SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. It is a declarative language, and although database systems differ in details of their dialects, its core of SELECT, FROM, WHERE, and ORDER BY works the same way across them.
+
+**SQL dialect.** The version of SQL that a particular database system understands. Dialects share a common core but differ in details, such as LIMIT in SQLite and TOP in Microsoft SQL Server.
+
+**SQL script.** A plain text file, usually with the extension .sql, that holds one or more SQL statements and their comments. A documented script records what was asked of the database, so that the queries can be reviewed and run again.
+
+**SQLite.** A lightweight relational database system that stores the entire database in a single file. SQLite has no separate date type and treats column types as advisory, so dates are stored as text and queries must compare values of the same kind.
+
+**WHERE clause.** The clause of a query that keeps only the rows meeting a condition, built from comparison operators such as `=` and `>`, from BETWEEN, IN, LIKE, and IS NULL, and from the logical operators AND, OR, and NOT.
+
+**Wildcard.** A character that stands for other characters in a LIKE pattern. The percent sign matches any run of characters, including none, and the underscore matches exactly one.
+
+**Working copy.** A copy of a database file made for analysis, so that the original is never changed. The Part III tutorials work in CharlesRiver_Work.sqlite, a copy of the downloaded CharlesRiver.sqlite.

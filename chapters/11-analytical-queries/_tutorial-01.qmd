@@ -1,0 +1,125 @@
+## Guided Tutorial 11.1: Classifying the Payroll and Measuring the Hours by Month
+
+**Context and objective.** In this tutorial, you will classify the manufacturing payroll of fiscal 2026 with a CASE expression and tie the result to the ledger. You will then turn the manufacturing labor time into a month-by-month table of regular hours, overtime hours, and hours not charged to any work order, and measure how long work orders took from release to completion in each year.
+
+**Prerequisites.** Complete Chapter 10, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script, `Chapter11.sql`, with a header comment.
+
+**Step-by-step instructions.**
+
+**Step 1. Classify the manufacturing payroll.** The payroll register lines record pay, the employer's taxes and benefits, and the deductions withheld from employees' pay. Only some of these are a cost to Charles River.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT
+       CASE
+           WHEN prl.LineType IN ('Regular Earnings', 'Overtime Earnings')
+               THEN 'Hourly pay'
+           WHEN prl.LineType = 'Salary Earnings' THEN 'Salaries'
+           WHEN prl.LineType IN ('Employer Payroll Tax', 'Employer Benefits')
+               THEN 'Employer taxes and benefits'
+           ELSE 'Employee deductions'
+       END AS Category,
+       ROUND(SUM(prl.Amount), 2) AS Amount
+   FROM PayrollRegisterLine AS prl
+       INNER JOIN PayrollRegister AS pr
+           ON pr.PayrollRegisterID = prl.PayrollRegisterID
+       INNER JOIN PayrollPeriod AS pp
+           ON pp.PayrollPeriodID = pr.PayrollPeriodID
+       INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+   WHERE cc.CostCenterName = 'Manufacturing' AND pp.FiscalYear = 2026
+   GROUP BY Category
+   ORDER BY Amount DESC;
+   ```
+
+b. Run the query below, which totals the payroll that the ledger charged to account 1090 in fiscal 2026.
+
+   ```sql
+   SELECT ROUND(SUM(gl.Debit), 2) AS PayrollCharged
+   FROM GLEntry AS gl
+   WHERE gl.AccountID = 92 AND gl.FiscalYear = 2026
+       AND gl.SourceDocumentType = 'PayrollSummary';
+   ```
+
+c. Add up the three categories other than employee deductions, and compare the sum with the ledger.
+
+The three cost categories add up to the ledger's charge to the cent. Employee deductions are left out, because they are withheld from pay that is already counted, not an additional cost. The CASE expression has turned seven line types into the four categories the accounting needs.
+
+**Step 2. Pivot the labor time by month.** Conditional aggregation puts the hours of each category in a column of its own.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT strftime('%Y-%m', lt.WorkDate) AS WorkMonth,
+       ROUND(SUM(lt.RegularHours), 0) AS RegularHours,
+       ROUND(SUM(lt.OvertimeHours), 0) AS OvertimeHours,
+       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
+           AS NotOnWorkOrder
+   FROM LaborTimeEntry AS lt
+   WHERE lt.LaborType <> 'NonManufacturing'
+   GROUP BY WorkMonth
+   ORDER BY WorkMonth;
+   ```
+
+b. Read the number of rows, and look at the first and last few months.
+
+The result has one row for each month from January 2024 to December 2026, three years of months. Each row shows the regular hours, the overtime hours, and the hours not charged to a work order operation, which is the indirect time you found in Tutorial 10.3.
+
+**Step 3. Add the shares.** Hours on their own rise and fall with the number of working days in a month. Shares of the total can be compared from month to month.
+
+a. Add two columns to the SELECT list of the query in Step 2, after NotOnWorkOrder, so that it reads as below, and run it.
+
+   ```sql
+   SELECT strftime('%Y-%m', lt.WorkDate) AS WorkMonth,
+       ROUND(SUM(lt.RegularHours), 0) AS RegularHours,
+       ROUND(SUM(lt.OvertimeHours), 0) AS OvertimeHours,
+       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
+           AS NotOnWorkOrder,
+       ROUND(SUM(lt.OvertimeHours)
+           / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS OvertimeShare,
+       ROUND(SUM(CASE WHEN lt.WorkOrderOperationID IS NULL
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END)
+           / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS NotOnWorkOrderShare
+   FROM LaborTimeEntry AS lt
+   WHERE lt.LaborType <> 'NonManufacturing'
+   GROUP BY WorkMonth
+   ORDER BY WorkMonth;
+   ```
+
+b. Compare the OvertimeShare of the months of 2024 with those of 2026.
+
+The result for fiscal 2026 appears in @fig-11-02. In the first half of 2024, overtime was about a tenth of the hours worked or less. In most months of 2026, it was around a fifth. The share of time not charged to a work order swings widely from month to month, which is a warning that single months can mislead, and that the controller's measure will need a longer window.
+
+![Labor Hours by Category and Month.](/visuals/svg/fig-11-02-hours-by-month.svg){#fig-11-02 fig-alt="A mock of the Execute SQL tab. The query groups the manufacturing labor time by month with strftime and uses CASE inside SUM to put regular hours, overtime hours, and hours not on a work order in separate columns, with the overtime share and the share not on a work order. The result grid shows the twelve months of 2026, and the OvertimeShare column, mostly around one fifth, is outlined."}
+
+**Step 4. Measure how long work orders take.** julianday turns a date into a number of days, so the difference between two dates is a subtraction.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT strftime('%Y', ClosedDate) AS CloseYear,
+       COUNT(*) AS WorkOrders,
+       ROUND(AVG(julianday(CompletedDate) - julianday(ReleasedDate)), 1)
+           AS DaysReleaseToComplete,
+       ROUND(AVG(julianday(ClosedDate) - julianday(CompletedDate)), 1)
+           AS DaysCompleteToClose
+   FROM WorkOrder
+   WHERE ClosedDate IS NOT NULL
+   GROUP BY CloseYear
+   ORDER BY CloseYear;
+   ```
+
+b. Compare the two averages across the three years.
+
+The time from completion to close stayed at about the same number of days in each year. The time from release to completion more than doubled, from under three weeks for the work orders closed in fiscal 2024 to nearly six weeks for those closed in fiscal 2026. Work orders spent far longer on the plant floor, which fits a plant that needed more hours for the same output.
+
+**Checkpoint.** Check that:
+
+- the payroll categories other than employee deductions add up to the ledger's charge to account 1090 for fiscal 2026;
+- the monthly pivot has one row for each month of the three years, with the hours of each category in its own column;
+- the overtime share is about a tenth or less in the first half of 2024 and around a fifth in most months of 2026;
+- the average time from release to completion more than doubled from fiscal 2024 to fiscal 2026.
+
+CASE, conditional aggregation, and the date functions have given the controller three views of the same change: more overtime, more time off the work orders, and work orders that take longer to finish.

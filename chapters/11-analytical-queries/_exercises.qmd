@@ -1,0 +1,182 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of each exercise in a script of its own, named after the exercise (such as `Ex 11.1.sql`). Organize any query of more than one step as common table expressions, and check each step on its own before you rely on the result. If an exercise asks you to save a view, give it a name that begins with the exercise number, such as `Ex11_1_IncomeStatement`, and never change or drop the tutorial's view.
+
+### Financial Accounting Exercises
+
+**Exercise 11.1: The Financial Statements from the Ledger**
+
+**Table group:** Accounting Core
+
+**Scenario.** In Exercise 6.1 you turned the pre-closing trial balance of fiscal 2026 into a common-size income statement in Excel, and in Tutorial 10.2 you rebuilt the trial balance with SQL. The controller asks for both statements from a single query, so that they can be produced for any year-end by changing one date.
+
+**Requirements.**
+
+(1) Write a CTE that holds the as-of date and the two closing entries to leave out, and a second CTE that builds the pre-closing trial balance at that date, with each account's type and subtype and its balance expressed as credits less debits.
+
+(2) Use a CASE expression on AccountType and AccountSubType to assign each account to a statement line: operating revenue, contra revenue, cost of goods sold, operating expenses, other income and expense, current assets, fixed assets, contra fixed assets, current liabilities, long-term liabilities, and equity.
+
+(3) Total the lines, and calculate net revenue, gross margin, operating income, and net income. Show gross margin and operating income as percentages of net revenue.
+
+(4) Show that total assets equal total liabilities plus equity plus net income, and compare net income with the closing entry of fiscal 2026 that moves it to retained earnings.
+
+(5) Sort the statement lines in statement order with a CASE expression in ORDER BY, and save the query as a view.
+
+**Deliverable.** A script and a view that produce the income statement and the balance sheet check, with a short note comparing the results with Chapter 6.
+
+<!-- Instructor notes, Exercise 11.1: pre-closing balances at 2026-12-31 (PostingDate <= '2026-12-31', without JE-2026-000296 and
+     JE-2026-000297), credits less debits by subtype: Operating Revenue 29,973,822.48; Contra Revenue -242,764.56; COGS -18,634,303.63;
+     Operating Expense -6,471,696.58; Other Expense -28,946.47; Other Income or Expense -92,500.00. Net revenue 29,731,057.92; gross margin
+     11,096,754.29 (37.32%); operating income 4,625,057.71 (15.56%); net income 4,503,611.24, equal to the credit of JE-2026-000297 to
+     retained earnings (Chapter 6). Assets: Current 37,236,780.57 + Fixed 4,354,000.00 - Contra Fixed 2,262,256.46 = 39,328,524.11;
+     liabilities 13,507,123.75 + 389,304.68 and equity 20,928,484.44 plus net income 4,503,611.24 = 39,328,524.11. The Closing subtype
+     (8010 Income Summary) has a zero balance before the closes. A CTE such as `WITH Params AS (SELECT '2026-12-31' AS AsOfDate)` joined
+     to the ledger makes the date one parameter; the closing entry numbers change with the year. -->
+
+
+**Exercise 11.2: Monthly Revenue with Year-to-Date and Prior-Year Comparisons**
+
+**Table group:** Accounting Core
+
+**Scenario.** Chapter 1 promised that SQL would support the period-over-period comparisons behind a forecast. The controller asks for a monthly revenue report by product line for fiscal 2024 through 2026, taken from the ledger, with a year-to-date total and a comparison with the same month of the prior year.
+
+**Requirements.**
+
+(1) Total the credits less debits posted to the revenue accounts 4010 to 4040 and 4080 by fiscal year, fiscal period, and account, leaving out the year-end closing entries. Use CASE to name each account's product line.
+
+(2) Add a year-to-date running total for each product line, partitioned by product line and fiscal year.
+
+(3) Add the revenue of the same month of the previous year with LAG, partitioned by product line, and the percentage change.
+
+(4) Confirm that the December year-to-date figures of fiscal 2026 equal the revenue in the trial balance of Tutorial 10.2.
+
+(5) For Furniture, identify the months of fiscal 2026 with the largest decline and the largest increase against the prior year, and suggest what you would look at to explain them.
+
+**Deliverable.** A script with the monthly report and a short note on the Furniture comparison.
+
+<!-- Instructor notes, Exercise 11.2: the only journal entries that post to the revenue accounts are the year-end closes (JE-2024-000265,
+     JE-2025-000287, JE-2026-000296), so SourceDocumentType <> 'JournalEntry' removes exactly them. 180 rows (5 lines x 36 months). December
+     year-to-date, fiscal 2026: Furniture 17,398,287.56, Lighting 5,998,649.16, Textiles 3,278,211.11, Accessories 1,872,510.62, Services
+     1,213,344.00, total 29,761,002.45, equal to the trial balance and to the SalesInvoice postings of Exercise 10.1. Furniture, fiscal 2026
+     against 2025: largest decline October (1,314,620.10 against 1,700,781.60, -22.7%), largest increase November (1,425,903.01 against
+     1,264,497.48, +12.8%). October 2025 was unusually high; the fiscal 2026 promotion (Chapter 6) lowered prices in September and October
+     and its orders were invoiced into November and December, so the timing of invoicing and promotions is the first thing to examine. -->
+
+
+### Managerial Accounting Exercises
+
+**Exercise 11.3: Ranking Items by Unit Margin Within Each Product Line**
+
+**Table group:** Master Data
+
+**Scenario.** The product manager wants to know which items earn the most per unit at list price within each product line, and how wide the range is. The controller asks you for a ranking that can be refreshed when prices or standard costs change.
+
+**Requirements.**
+
+(1) For every item with a list price, calculate the unit margin at list price, ListPrice minus StandardCost, and the margin as a percentage of ListPrice, both rounded.
+
+(2) Rank the items within each item group by unit margin with RANK, and add DENSE_RANK and ROW_NUMBER beside it. Explain when the three would differ, and whether they differ here.
+
+(3) Keep the top three items of each item group, using a CTE and an outer filter.
+
+(4) For each item group, show the highest and lowest unit margins and the number of items, using window functions rather than GROUP BY, so that each item row keeps its detail.
+
+(5) Explain why the Services items show a margin equal to their price, and why this measure is a gross margin at list price rather than a contribution margin.
+
+**Deliverable.** A script with the ranking and a short note for the product manager.
+
+<!-- Instructor notes, Exercise 11.3: 223 items have a list price (Accessories 56, Furniture 85, Lighting 44, Services 4, Textiles 34). No
+     two items in a group share a unit margin, so RANK, DENSE_RANK, and ROW_NUMBER agree. Top items: Furniture FUR-CON-0032 Willow Console
+     Table Acacia Warm Walnut 48 in (974.49); Textiles TXT-THR-0009 Drift Throw Blanket Ivory Small (386.13); Lighting LGT-SCN-0026 Atlas
+     Wall Sconce Brushed Brass (329.60); Services DSV-SPC-0001 Specification Development (210.00); Accessories ACC-VAS-0032 Harbor Decor
+     Vase Ceramic Natural (151.60). Ranges: Furniture 135.71 to 974.49; Accessories 9.24 to 151.60; Lighting 32.29 to 329.60; Textiles
+     32.05 to 386.13; Services 145.00 to 210.00. Services carry a StandardCost of zero, because their cost is design staff payroll
+     (Chapter 6); StandardCost includes fixed overhead, so ListPrice minus StandardCost is not a contribution margin, and list price is
+     not the price charged. Unrounded differences may show binary fractions; ROUND fixes the display. -->
+
+
+**Exercise 11.4: Is Overtime Concentrated?**
+
+**Table group:** Manufacturing, Payroll
+
+**Scenario.** The plant manager's first response to the controller's finding is that overtime is a problem of a few people, not of the plant. The controller asks you to test that claim with the fiscal 2026 time records.
+
+**Requirements.**
+
+(1) Total the fiscal 2026 overtime hours of each employee from the manufacturing labor time, with the employee's job title.
+
+(2) Rank the employees by overtime hours, and add a running total of overtime as a share of the whole, ordered from the highest to the lowest.
+
+(3) Find how many employees account for half of the overtime.
+
+(4) Calculate the overtime hours and the average per employee by job title.
+
+(5) Write a short memo (one half page) to the controller answering the plant manager's claim.
+
+**Deliverable.** A script with the queries and a half-page memo.
+
+<!-- Instructor notes, Exercise 11.4: 64 employees recorded manufacturing overtime in fiscal 2026 (LaborType other than
+     NonManufacturing). The largest totals are close together: employee 48 (Machine Operator) 348.8 hours, 43 (Machine Operator) 338.2, 66
+     (Quality Technician) 336.7, 18 (Assembler) 333.5, 62 (Machine Operator) 333.0. Half of the overtime is reached at rank 32, half of the
+     employees, so overtime is spread evenly, about six hours a week each. By job title: Assemblers 24 employees, 7,483 hours (311.8 each);
+     Machine Operators 22, 6,931 (315.0); Quality Technicians 18, 5,616 (312.0). The claim is not supported: overtime is plant-wide. A
+     running share needs SUM(x) OVER (ORDER BY x DESC ROWS UNBOUNDED PRECEDING) divided by SUM(x) OVER (). -->
+
+
+### Auditing Exercises
+
+**Exercise 11.5: Journal Entry Tests in SQL**
+
+**Table group:** Accounting Core, Master Data
+
+**Scenario.** In Tutorial 8.3 you flagged journal entries with five tests in Excel and combined the flags into a risk score. The chief audit executive wants the tests in a saved query that can be rerun on next year's entries, and asks you to show that the SQL version gives the same results as the workbook.
+
+**Requirements.**
+
+(1) Join JournalEntry to Employee on the approver, and write a CTE with five flags. Each flag is a CASE expression that returns 1 or 0: Weekend (created on a Saturday or Sunday, using strftime on CreatedDate), Backdated (created on a later day than its posting date), SelfApproved, AboveLimit (TotalAmount above the approver's MaxApprovalAmount), and RoundAmount (TotalAmount in exact thousands).
+
+(2) Add a RiskScore that sums the five flags, and count the entries flagged by each test and the entries at each score.
+
+(3) Compare the counts with your results from Tutorial 8.3.
+
+(4) List the entries with a score of 2 or more, ranked by score and then by TotalAmount, with RANK.
+
+(5) Save the query as a view, and explain in two or three sentences why a saved query is stronger audit evidence than a workbook formula copied down a column.
+
+**Deliverable.** A script and a view with the journal entry tests, and a comparison with Chapter 8.
+
+<!-- Instructor notes, Exercise 11.5: 851 journal entries. Flags: Weekend 17, Backdated 6, SelfApproved 7, AboveLimit 9, RoundAmount 4;
+     scores 0: 818, 1: 25, 2: 7, 4: 1 (no entry scores 3, so that row does not appear), the same as Chapter 8. Working formulas: Weekend
+     strftime('%w', CreatedDate) IN ('0', '6'); Backdated date(CreatedDate) > PostingDate; RoundAmount TotalAmount = ROUND(TotalAmount /
+     1000, 0) * 1000 (the % operator truncates decimals in SQLite, so it is not safe on amounts); AboveLimit with a LEFT JOIN to Employee
+     on ApprovedByEmployeeID. The score-4 entry is JE-2024-000001, the opening balance entry created by the chief financial officer. -->
+
+
+**Exercise 11.6: Requisitions Just Under the Approval Threshold**
+
+**Table group:** Procure-to-Pay, Master Data
+
+**Scenario.** In Exercise 8.5 you counted purchase requisitions just below $5,000, the lowest nonzero approval limit in the Employee table. The audit senior asks you to repeat the test with window functions, which can also find requisitions that look split: several consecutive requisitions for the same amount.
+
+**Requirements.**
+
+(1) Calculate each requisition's amount as Quantity times EstimatedUnitCost, rounded, and count the requisitions in each $50 band from $4,700 to $5,250.
+
+(2) List the requisitions from $4,950.00 to $4,999.99 with their requester, approver, request date, and status.
+
+(3) Use LAG and LEAD, ordered by RequisitionID, to find requisitions whose amount equals both the one before and the one after. List each run of three.
+
+(4) For each run, report the requesters and approvers, and whether any requisition has no approver.
+
+(5) Write a short memo (one half page) to the audit senior on what the tests found and on the procedures you would perform next.
+
+**Deliverable.** A script with the tests and a half-page memo.
+
+<!-- Instructor notes, Exercise 11.6: bands of $50 from 4,700: 2, 7, 7, 8, 4, 18 (4,950-4,999.99), 9 (5,000-5,049.99), 4, 9, 4, 5. The
+     band just below 5,000 holds twice as many as its neighbors. Two runs of three consecutive requisitions of 4,990.92, each on January 1:
+     PR-2025-004714 to 004716 (2025-01-01, requesters 80, 76, 80) and PR-2026-013258 to 013260 (2026-01-01, requesters 21, 74, 78). In each
+     run, two requisitions have no approver (IDs 4714, 4715, 13258, 13259) and the third was approved by employee 2, the chief financial
+     officer; all six were converted to purchase orders. The unapproved ones are among the six of Exercise 2.5, and all six of those, the only requisitions without an approver, fall just below 5,000 (4,990.92 to 4,993.92). The approval limits in
+     Employee are 0, 5,000 (two production employees), 25,000, and 250,000. -->

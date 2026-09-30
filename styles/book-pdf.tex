@@ -11,10 +11,12 @@
 \usepackage{eso-pic}
 
 % Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,
-% instead of running into the margin. Deferred to \begin{document} because a package
-% loaded later in Quarto's template redefines the verbatim environment.
+% instead of running into the margin, and long lines of highlighted SQL (Highlighting) wrap at
+% spaces. Deferred to \begin{document} because a package loaded later in Quarto's template
+% redefines the verbatim environment.
 \usepackage{fvextra}
-\AtBeginDocument{\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakafter={,*},breakaftersymbolpre={}}}
+\AtBeginDocument{\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakafter={,*},breakaftersymbolpre={}}
+  \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},breaklines,breakaftersymbolpre={}}}
 
 \definecolor{PrimaryBlue}{HTML}{1A5276}
 \definecolor{Teal}{HTML}{17A589}

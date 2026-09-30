@@ -61,4 +61,4 @@ Most periods contain a similar volume of entries, but the first period and the f
 - **Consistency:** debits equal credits in the aggregate, and every GL account reference exists in the chart of accounts.
 - **Accuracy and timeliness:** you identified the zero-amount rows and the entries dated beyond the fiscal years under review.
 
-Your findings should be documented in a brief written summary that identifies each test performed, the result, and any issues discovered, including the tests that found no problems. This exercise previews the audit analytics work in Parts II and III, where you will use Excel and then SQL to automate these same tests across the entire population.
+Your findings should be documented in a brief written summary that identifies each test performed, the result, and any issues discovered, including the tests that found no problems. This exercise previews the audit analytics work in Parts II and III, where you will use Excel and then SQL to automate tests like these across the entire population.

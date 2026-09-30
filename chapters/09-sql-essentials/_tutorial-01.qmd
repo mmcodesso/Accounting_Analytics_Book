@@ -1,0 +1,88 @@
+## Guided Tutorial 9.1: Opening the Database and Writing Your First Queries
+
+**Context and objective.** In this tutorial, you will set up the environment that you will use for every SQL tutorial in Part III. You will make a working copy of the Charles River database, open it in DB Browser for SQLite, and read the structure of the tables that record the manufacturing variance. You will then write your first queries: one that shows a whole table, one that chooses its columns, and one that calculates a check on the variance records.
+
+**Prerequisites.** You need DB Browser for SQLite, which is free, installed on your computer (download it from <https://sqlitebrowser.org/dl/>; the tutorials use version 3.13, whose built-in SQLite runs every query in Part III), and the CharlesRiver.sqlite file from the [Downloads](#sec-downloads) page. The file is large, several hundred megabytes, so allow time for the download.
+
+**Step-by-step instructions.**
+
+**Step 1. Make a working copy of the database.** You will work in the copy, so that the file you downloaded is never changed.
+
+a. In File Explorer (Finder on a Mac), open the folder that holds CharlesRiver.sqlite.
+b. Copy the file and paste the copy into the same folder.
+c. Rename the copy `CharlesRiver_Work.sqlite`.
+
+The folder now holds two identical files. Every tutorial in Part III uses CharlesRiver_Work.sqlite.
+
+**Step 2. Open the working copy and read the structure of the ledger.** The Database Structure tab tells you the exact names of the tables and columns before you write a query.
+
+a. Start DB Browser for SQLite.
+b. Click **Open Database** on the toolbar, select CharlesRiver_Work.sqlite, and click **Open**.
+c. On the **Database Structure** tab, scroll down the list of tables to GLEntry, and click the arrow beside it to show its columns.
+d. Read the type of each column: AccountID and FiscalYear are INTEGER, Debit and Credit are REAL, and PostingDate and SourceDocumentType are TEXT.
+e. Expand the WorkOrderClose table in the same way, and note its columns for the parts of the variance: MaterialVarianceAmount, DirectLaborVarianceAmount, OverheadVarianceAmount, ConversionVarianceAmount, and TotalVarianceAmount.
+
+The tab should look like @fig-09-02. The name of the open file appears in the title bar, which is a quick way to confirm that you are working in the copy.
+
+**Step 3. Run your first query.** The Execute SQL tab has an editor for queries, a grid for the result, and a pane for messages.
+
+a. Click the **Execute SQL** tab.
+b. In the editor, type the query below.
+
+   ```sql
+   SELECT *
+   FROM Account;
+   ```
+
+c. Click **Execute all/selected SQL**, the button with a triangle pointing right, or press Ctrl+Return (Cmd+Return on a Mac).
+d. Read the message pane below the result.
+
+The grid shows every column of the Account table, one row for each account in the chart of accounts. The message pane reports that the query ran without errors and how many rows it returned, a little over a hundred. Scroll through the rows and notice the header accounts, such as 1000 Assets, which organize the chart but receive no postings.
+
+**Step 4. Choose the columns you need.** Most analyses need only a few columns, listed in the order you want them.
+
+a. Replace the query in the editor with the one below.
+
+   ```sql
+   SELECT AccountID, AccountNumber, AccountName,
+       AccountType, AccountSubType
+   FROM Account;
+   ```
+
+b. Run the query.
+c. Scroll down to account 5080 Manufacturing Variance and read its AccountID.
+d. Record the AccountID of account 1090 Manufacturing Cost Clearing as well.
+
+The result, shown in @fig-09-03, has five columns. AccountID and AccountNumber are different numbers: 5080 Manufacturing Variance has AccountID 93, and 1090 has AccountID 92. As Chapter 3 explained, AccountID is the surrogate key that the GLEntry table uses, so any query of the ledger must use it. Both accounts have the subtype you would expect: 5080 is part of cost of goods sold, and 1090 is a current asset.
+
+![Choosing Columns from the Account Table.](/visuals/svg/fig-09-03-account-columns.svg){#fig-09-03 fig-alt="A mock of the Execute SQL tab of DB Browser for SQLite. The editor holds a query that selects AccountID, AccountNumber, AccountName, AccountType, and AccountSubType from the Account table. The result grid shows the rows around the manufacturing accounts, including account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93, which are outlined. The message pane reports that the query ran without errors and the number of rows returned."}
+
+**Step 5. Calculate a check on the variance records.** A calculated column can test whether the parts of each variance add up to its total.
+
+a. Replace the query with the one below, which gives each column a short alias.
+
+   ```sql
+   SELECT WorkOrderCloseID, CloseDate,
+       MaterialVarianceAmount AS Material,
+       ConversionVarianceAmount AS Conversion,
+       TotalVarianceAmount AS Total,
+       ROUND(MaterialVarianceAmount + ConversionVarianceAmount
+           - TotalVarianceAmount, 2) AS CheckDifference
+   FROM WorkOrderClose;
+   ```
+
+b. Run the query and read the number of rows in the message pane.
+c. Scroll through the first rows and look at the CheckDifference column.
+
+The result, shown in @fig-09-04, has one row for each closed work order, many thousands of them, and the headings use the aliases. In every row you can see, CheckDifference is zero: the material part and the conversion part of each variance add up to its total. The conversion part is itself made up of the direct labor part and the overhead part. You cannot scroll through thousands of rows to confirm the check for all of them, but in Tutorial 9.2 you will filter for the rows where it fails.
+
+![A Calculated Check on the Variance Records.](/visuals/svg/fig-09-04-variance-check.svg){#fig-09-04 fig-alt="A mock of the Execute SQL tab. The query selects WorkOrderCloseID, CloseDate, and the material, conversion, and total variance of each work order close under the aliases Material, Conversion, and Total, and a calculated column CheckDifference that rounds material plus conversion minus total to two decimals. The first rows of the result show the aliases as headings and a CheckDifference of zero in every row, and that column is outlined. The message pane reports the number of rows returned."}
+
+**Checkpoint.** Check that:
+
+- the title bar shows CharlesRiver_Work.sqlite, not the file you downloaded;
+- you can find the GLEntry and WorkOrderClose tables and their columns on the Database Structure tab;
+- you have recorded AccountID 92 for account 1090 and AccountID 93 for account 5080;
+- the CheckDifference column is zero in the rows you can see.
+
+You now know where the variance is recorded: in the WorkOrderClose table, one row for each closed work order, and in the ledger, under an AccountID that differs from its account number.

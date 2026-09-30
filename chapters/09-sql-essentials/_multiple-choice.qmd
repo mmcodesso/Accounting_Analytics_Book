@@ -1,0 +1,126 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** An analyst needs the account number and account name of every account, and nothing else. Which query returns exactly that?
+
+A.  `SELECT * FROM Account;`
+B.  `SELECT AccountNumber, AccountName FROM Account;`
+C.  `SELECT AccountNumber AccountName FROM Account;`
+D.  `SELECT Account FROM AccountNumber, AccountName;`
+
+**2.** To list the ledger postings to account 5080 Manufacturing Variance, an analyst writes a condition on GLEntry.AccountID. Why does the condition use the value 93 instead of 5080?
+
+A.  SQLite stores account numbers as text, so the number 5080 cannot be compared with them
+B.  The value 5080 would select the postings of every account in the 5000 series
+C.  AccountID 93 is the only account that has postings in fiscal 2026
+D.  GLEntry stores the Account table's surrogate key, and account 5080 has AccountID 93
+
+**3.** The condition `SourceDocumentType = 'workorderclose'` returns no rows, although the ledger holds thousands of WorkOrderClose postings. What is the most likely reason?
+
+A.  `=` compares text exactly, so the capitals must match the stored value
+B.  Text values must be written in double quotes, not in single quotes as here
+C.  WHERE cannot filter on a column that is not also listed in the SELECT clause
+D.  SourceDocumentType is declared as INTEGER, so no text value can match it
+
+**4.** PostingDate is stored as text in the form year-month-day. Which condition selects every posting dated in fiscal 2026?
+
+A.  `PostingDate = 2026`
+B.  `PostingDate BETWEEN '1/1/2026' AND '12/31/2026'`
+C.  `PostingDate BETWEEN '2026-01-01' AND '2026-12-31'`
+D.  `PostingDate LIKE '12/31/2026'`
+
+**5.** An analyst wants the postings to AccountID 93 in fiscal 2025 and 2026 and writes `WHERE AccountID = 93 AND FiscalYear = 2025 OR FiscalYear = 2026`. What does the query return?
+
+A.  Only the postings to AccountID 93 in fiscal 2025 and 2026, as intended
+B.  No rows, because a single posting cannot belong to two fiscal years
+C.  The postings to AccountID 93 in 2025, plus every posting made in 2026
+D.  An error, because AND and OR cannot be combined in one WHERE clause
+
+**6.** The query `SELECT * FROM WorkOrder WHERE ClosedDate = NULL;` returns no rows, although hundreds of work orders are still open. Why?
+
+A.  A comparison with NULL is never true; open orders need IS NULL
+B.  NULL must be written in quotes, as `'NULL'`, to be compared with a date
+C.  Open work orders store the date 1900-01-01 in ClosedDate, not a missing value
+D.  WHERE cannot test whether a date column holds a missing value
+
+**7.** Before filtering the ledger on a source document type, an analyst runs `SELECT DISTINCT SourceDocumentType FROM GLEntry;`. What is the main benefit of this step?
+
+A.  It counts how many ledger rows carry each source document type
+B.  It removes the duplicate postings from the GLEntry table for good
+C.  It sorts the whole ledger by source document type before the filter
+D.  It shows which values occur, so a filter uses a value that exists
+
+**8.** A query ends with `ORDER BY TotalVarianceAmount DESC LIMIT 10;`. What does it return?
+
+A.  The ten smallest variances, from the smallest up
+B.  The ten largest variances, from the largest down
+C.  Ten variances chosen at random from the table
+D.  Every variance above the tenth percentile of the table
+
+**9.** An analyst selects "the first 25 journal entries" for review with `SELECT * FROM JournalEntry LIMIT 25;`. What is the problem with this selection?
+
+A.  Without ORDER BY, the rows are whichever the database reaches first
+B.  LIMIT can only be used together with a WHERE clause that filters the rows
+C.  The query returns the first 25 columns of the table rather than 25 rows
+D.  The query deletes all but 25 rows from the JournalEntry table
+
+**10.** Why do the Part III tutorials work in CharlesRiver_Work.sqlite rather than the downloaded CharlesRiver.sqlite?
+
+A.  DB Browser for SQLite cannot open a file downloaded from the internet
+B.  The working copy holds more tables than the file on the Downloads page
+C.  SELECT statements run faster in a database file that has been renamed
+D.  DB Browser can change a database, so the download stays safe
+
+**11.** An analyst runs `SELECT AccountNumber AccountName FROM Account;`, leaving out a comma. What happens?
+
+A.  The query fails with a syntax error that points to the missing comma
+B.  It returns one column, headed AccountName, holding the account numbers
+C.  It returns the AccountNumber and AccountName columns, exactly as intended
+D.  It returns only the account names, because the second column replaces the first
+
+**12.** A query written as `SELECT * FROM Account ORDER BY AccountNumber WHERE AccountType = 'Asset';` stops with the message near "WHERE": syntax error. What is the cause?
+
+A.  AccountType is not a column of the Account table, so it cannot be tested
+B.  Text values cannot be compared in a query that also sorts its rows
+C.  The clauses are out of order: WHERE must come before ORDER BY
+D.  The semicolon at the end of the statement is not allowed in SQLite
+
+**13.** Every revenue and expense account of Charles River totals zero for fiscal 2026 when all of its ledger rows are added up. What explains this?
+
+A.  A year-end closing entry clears each account at December 31, so its rows net to zero
+B.  SQLite stores debits as negative numbers, which cancel the credits
+C.  The ledger records every posting twice, once as a debit and once as a credit to the same account
+D.  Fiscal 2026 is not yet complete in the data
+
+**14.** A SQL script for an audit test begins with a comment that records its purpose, the database file, the preparer and date, and the checks its results should pass. What is the main purpose of this header?
+
+A.  It makes the queries in the script run faster when the file is opened again
+B.  It prevents the script from making any change to the database
+C.  SQLite requires such a comment before a script can be saved to a file
+D.  A reviewer can understand, rerun, and check the work without help
+
+**15.** SQL is described as a declarative language. What does that mean?
+
+A.  Every query must declare the data type of each column that it returns
+B.  A query states the result wanted; the database decides how to get it
+C.  Each query must be declared in a script before it can be run
+D.  The language can only read data, and it can never change any data
+
+<!-- Answer key, Chapter 9 (for instructors; HTML comments are removed from every rendered format):
+     1 B, 2 D, 3 A, 4 C, 5 C, 6 A, 7 D, 8 B, 9 A, 10 D, 11 B, 12 C, 13 A, 14 D, 15 B.
+     1 B: a column list separated by commas returns just those columns.
+     2 D: GLEntry.AccountID is the Account table's surrogate key; 5080 has AccountID 93.
+     3 A: = compares text exactly, including case; the stored value is WorkOrderClose.
+     4 C: dates stored as year-month-day text are compared with dates written the same way, in quotes.
+     5 C: AND is evaluated before OR, so the condition adds every 2026 posting of every account.
+     6 A: no comparison with NULL is true; IS NULL finds the missing values.
+     7 D: DISTINCT reveals the values in use, so a filter is not written for a value that does not exist.
+     8 B: DESC sorts from the largest, and LIMIT 10 keeps the first ten rows.
+     9 A: without ORDER BY, LIMIT returns an undefined selection of rows.
+     10 D: a working copy keeps the downloaded file safe from any change saved by mistake.
+     11 B: without the comma, AccountName becomes an alias for AccountNumber, a logical error.
+     12 C: the clauses must be written as SELECT, FROM, WHERE, ORDER BY, LIMIT.
+     13 A: the closing entry clears revenue and expense accounts at year-end.
+     14 D: documentation lets another person understand, rerun, and review the queries.
+     15 B: SQL describes the result, not the steps; SQL can also change data, so D is wrong. -->

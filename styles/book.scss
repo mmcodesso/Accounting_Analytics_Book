@@ -257,6 +257,18 @@ pre:not(.sourceCode) code {
   padding: 0;
 }
 
+/* SQL blocks (```sql) are highlighted, so Quarto marks them .sourceCode; give them the
+   same frame and tint as the formula blocks. */
+div.sourceCode {
+  background-color: var(--aa-soft);
+  border: 1px solid var(--aa-border);
+  border-radius: 0.3rem;
+}
+
+div.sourceCode pre.sourceCode {
+  background-color: transparent;
+}
+
 .callout .callout-body-container p,
 .callout .callout-body-container li,
 .callout .callout-body-container strong,

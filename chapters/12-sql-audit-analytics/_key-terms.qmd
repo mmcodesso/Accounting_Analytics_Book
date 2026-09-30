@@ -1,0 +1,23 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Audit query library.** A documented set of saved queries that perform an organization's recurring audit tests, each stating its objective, population, reconciliation, expected result, and the disposition of its exceptions, so that the tests can be rerun every period.
+
+**Concentration of approval.** A condition in which one person approves most or all of the documents in a process, so that the approval control depends on that person alone. It is a weakness in the design of a control rather than an exception in any one document.
+
+**Cutoff.** The recording of a transaction in the accounting period in which it occurred. A cutoff test compares each document's date with the posting date of its ledger rows and flags documents recorded in a different period.
+
+**Existence and completeness tests.** Tests that trace in opposite directions. An existence test starts from the ledger and asks whether each posting has a real document; a completeness test starts from the documents and asks whether each was posted.
+
+**Full-population testing.** An audit approach that applies a test to every item of a population rather than to a sample, so that it finds the actual exceptions instead of estimating an error rate.
+
+**Goods received not invoiced.** The liability for goods or services received from suppliers before their invoices have been recorded. Its balance should agree with the value of the receipts not yet invoiced.
+
+**Price tolerance.** The difference between an invoice price and an order price that a match accepts without investigation, set in advance from the purchasing policy. Differences above it are exceptions.
+
+**Self-join.** A join of a table to itself, under two aliases, used to compare each row with other rows of the same table, such as payments to the same supplier for the same amount on different dates.
+
+**Three-way match.** A comparison of the purchase order, the goods receipt, and the supplier invoice for the same purchase, testing that the company is billed only for what it ordered and received, at the price it approved.
+
+**UNION ALL.** An operator that stacks the results of two or more queries with the same number and order of columns into one result, keeping every row. UNION, without ALL, also removes duplicate rows.

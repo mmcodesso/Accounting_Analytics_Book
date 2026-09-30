@@ -1,0 +1,88 @@
+## Guided Tutorial 9.3: Ranking the Largest Work-Order Variances
+
+**Context and objective.** The ledger postings tell you how much variance was recorded, but not which work orders produced it or which part of the cost went over standard. In this tutorial, you will rank the work order closes of fiscal 2026 by their variance, look at the parts of the largest ones, examine the favorable end of the ranking, and save the chapter's queries in a documented script.
+
+**Prerequisites.** Complete Tutorials 9.1 and 9.2, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab.
+
+**Step-by-step instructions.**
+
+**Step 1. Rank the largest variances of fiscal 2026.** ORDER BY with DESC puts the largest values first, and LIMIT keeps the top of the ranking.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT WorkOrderCloseID, WorkOrderID, CloseDate,
+       MaterialVarianceAmount AS Material,
+       DirectLaborVarianceAmount AS Labor,
+       OverheadVarianceAmount AS Overhead,
+       TotalVarianceAmount AS Total
+   FROM WorkOrderClose
+   WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+   ORDER BY TotalVarianceAmount DESC
+   LIMIT 10;
+   ```
+
+b. Read the Total column from the top down.
+c. Compare the Overhead column with the Material and Labor columns in each row.
+
+The result, shown in @fig-09-06, lists the ten work order closes of fiscal 2026 with the largest unfavorable variances, each a few thousand dollars. In every one of them, the overhead part is far larger than the material and labor parts together.
+
+![The Ten Largest Work-Order Variances of Fiscal 2026.](/visuals/svg/fig-09-06-top-variances.svg){#fig-09-06 fig-alt="A mock of the Execute SQL tab. The query selects the work order closes of fiscal 2026 with their material, labor, overhead, and total variance, sorts them by total variance in descending order, and keeps ten rows. The result grid shows ten closes with total variances of a few thousand dollars each, and the Overhead column, which holds most of each total, is outlined. The message pane reports that ten rows were returned."}
+
+**Step 2. Measure the share of overhead.** A calculated column turns the comparison in Step 1 into a number.
+
+a. Add a comma after `AS Total` in the query from Step 1, and add a new column after it, so that the query reads as below.
+
+   ```sql
+   SELECT WorkOrderCloseID, WorkOrderID, CloseDate,
+       MaterialVarianceAmount AS Material,
+       DirectLaborVarianceAmount AS Labor,
+       OverheadVarianceAmount AS Overhead,
+       TotalVarianceAmount AS Total,
+       ROUND(OverheadVarianceAmount / TotalVarianceAmount, 2)
+           AS OverheadShare
+   FROM WorkOrderClose
+   WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+   ORDER BY TotalVarianceAmount DESC
+   LIMIT 10;
+   ```
+
+b. Run the query and read the OverheadShare column.
+
+Overhead makes up most of each of the ten largest variances, in several of them more than four-fifths. The variance amounts are stored as REAL numbers, so the division keeps its decimals.
+
+**Step 3. Look at the favorable end of the ranking.** A variance can be favorable as well as unfavorable, and the net variance of the year is the balance of the two.
+
+a. In the query from Step 1, remove DESC from the ORDER BY clause and run the query again.
+b. Read the Total column of the ten rows.
+c. Replace the ORDER BY and LIMIT clauses with the condition `AND TotalVarianceAmount < 0` at the end of the WHERE clause, run the query, and read the number of rows in the message pane.
+
+Sorted in ascending order, the ranking starts with negative totals, which are favorable variances of up to about two thousand dollars. The condition in item c returns several hundred favorable closes, a small minority of the year's closes. The variance of fiscal 2026 is therefore the result of many unfavorable closes, partly offset by a few hundred favorable ones.
+
+**Step 4. Save the queries in a documented script.** A script records what you asked the database and why, so that you or a reviewer can run it again.
+
+a. Clear the editor and type a header comment like the one below, with your own name and the date.
+
+   ```sql
+   /* Chapter 9: manufacturing variance, first look
+      Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
+      Prepared by: your name, date
+      Checks: the variance parts add up to the total in every close;
+              the 2026 ledger postings exclude closing entry JE-2026-000296 */
+   ```
+
+b. Below the header, paste the queries from Tutorials 9.1 to 9.3, each with a one-line comment above it that starts with two dashes and says what the query answers.
+c. Click **Save SQL file** on the toolbar of the Execute SQL tab, and save the script as `Chapter09.sql` in the folder that holds your working copy.
+d. Select one whole query with the mouse, from SELECT to its semicolon, and click **Execute all/selected SQL**.
+
+The editor now holds a script like the one in @fig-09-07. When text is selected, DB Browser runs only the selection, so one script can hold every query of the chapter and you can still run each one on its own.
+
+![A Documented Script of the Chapter's Queries.](/visuals/svg/fig-09-07-saved-script.svg){#fig-09-07 fig-alt="A mock of the Execute SQL editor holding the saved script Chapter09.sql. The script opens with a header comment that records the purpose, the database file, the preparer and date, and the checks the results should pass. Below it, each query from the chapter's tutorials is preceded by a one-line comment that begins with two dashes and says what the query answers. The comments are shown in gray and the SQL keywords in bold blue."}
+
+**Checkpoint.** Check that:
+
+- the ten largest variances of fiscal 2026 are each a few thousand dollars, and overhead makes up most of each one;
+- the favorable closes of fiscal 2026 number several hundred, and their totals are negative;
+- Chapter09.sql is saved beside your working copy, with a header comment and a comment above each query.
+
+The ranking points the controller toward overhead, which carries most of the conversion variance. It does not yet say which products those work orders made or how the variance changed from year to year, and those questions need the tables to be joined and summarized.

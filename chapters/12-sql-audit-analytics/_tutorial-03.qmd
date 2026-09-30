@@ -1,0 +1,119 @@
+## Guided Tutorial 12.3: Testing the Hours Behind the Variance
+
+**Context and objective.** The committee's question is whether the extra hours behind the manufacturing variance were real, approved, recorded against the right work, and paid to the right people. In this tutorial, you will test the overtime approvals, the time recorded after work was finished, and the payroll paid to people who no longer worked for Charles River. You will then decide what the exceptions mean for the variance.
+
+**Prerequisites.** Complete Tutorials 12.1 and 12.2, and continue in Audit.sql.
+
+**Step-by-step instructions.**
+
+**Step 1. Test overtime against its approvals.** A time clock entry with overtime links to an overtime approval. Classifying the entries by the length of their overtime shows where the policy draws the line.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT
+       CASE WHEN OvertimeHours <= 0.5 THEN 'Half an hour or less'
+           ELSE 'More than half an hour' END AS OvertimeLength,
+       COUNT(*) AS Entries,
+       SUM(CASE WHEN OvertimeApprovalID IS NULL THEN 1 ELSE 0 END)
+           AS WithoutApproval,
+       ROUND(SUM(OvertimeHours), 1) AS OvertimeHours
+   FROM TimeClockEntry
+   WHERE OvertimeHours > 0
+   GROUP BY OvertimeLength;
+   ```
+
+b. Compare the WithoutApproval column of the two rows.
+
+No entry with half an hour of overtime or less has an approval, while nearly every longer one does. The pattern suggests a policy that exempts short overtime from approval, which the team should confirm with the payroll department rather than assume. Above that threshold, only a handful of entries lack an approval.
+
+**Step 2. Identify the unapproved entries.** An exception list names the employee behind each exception, and joining the Employee table shows what is known about the employee.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT tc.TimeClockEntryID, tc.EmployeeID, e.JobTitle,
+       e.TerminationDate, tc.WorkDate, tc.OvertimeHours, tc.ClockOutTime,
+       tc.ClockStatus
+   FROM TimeClockEntry AS tc
+       INNER JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID
+   WHERE tc.OvertimeHours > 0.5 AND tc.OvertimeApprovalID IS NULL;
+   ```
+
+b. Read the columns of each row.
+
+All three entries belong to one warehouse employee, on New Year's Day of each year, and each is still Pending, with no clock-out time. The employee's TerminationDate is in 2024, before two of the three work dates. The entries are not manufacturing time, so they do not touch the variance, but together they record time for someone who had left the company, and they need a disposition.
+
+**Step 3. Test when direct labor was recorded.** Direct labor is recorded against a work order operation, and an operation has an actual end date. Time recorded after that date was charged to work that was already finished.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT strftime('%Y', lt.WorkDate) AS WorkYear,
+       ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,
+       ROUND(SUM(CASE WHEN lt.WorkDate > op.ActualEndDate
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
+           AS HoursAfterOperationEnded,
+       ROUND(SUM(CASE WHEN lt.WorkDate > op.ActualEndDate
+           THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END)
+           / SUM(lt.RegularHours + lt.OvertimeHours), 3) AS ShareAfterEnd
+   FROM LaborTimeEntry AS lt
+       INNER JOIN WorkOrderOperation AS op
+           ON op.WorkOrderOperationID = lt.WorkOrderOperationID
+   WHERE lt.LaborType = 'Direct Manufacturing'
+   GROUP BY WorkYear
+   ORDER BY WorkYear;
+   ```
+
+b. Add `wc.WorkCenterName` to the SELECT list and the GROUP BY clause, with a join to WorkCenter on WorkCenterID, and run the query again for fiscal 2026 alone, by adding `AND lt.WorkDate BETWEEN '2026-01-01' AND '2026-12-31'` to the WHERE clause.
+
+The first result, shown in @fig-12-07, is the most important finding of the audit. The share of direct labor recorded after its operation had ended rose from about a fifth in fiscal 2024 to half in fiscal 2025 and about two-thirds in fiscal 2026. The second result shows where: at Packing, the last operation of every routing, almost all the direct time of fiscal 2026 was recorded after the operation had ended, and at Quality Assurance most of it was. That explains the pattern of Tutorial 11.2. The hours above plan at the two work centers are largely time charged to operations that were already complete, not evidence that packing and inspection took several times their plan.
+
+![Direct Labor Recorded After Its Operation Ended.](/visuals/svg/fig-12-07-labor-after-operation-end.svg){#fig-12-07 fig-alt="A mock of the Execute SQL tab. The query joins direct labor time entries to their work order operations and compares each work date with the operation's actual end date. The result has one row for each year, with the direct hours, the hours recorded after the operation had ended, and their share, which rises from about a fifth in 2024 to about half in 2025 and about two-thirds in 2026. The share column is outlined."}
+
+**Step 4. Test the payroll paid to people who had left.** A payroll register dated after the employee's termination pays someone who no longer works for the company.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT pr.PayrollRegisterID, e.EmployeeName, e.JobTitle,
+       cc.CostCenterName, e.TerminationDate, pp.PayDate, pr.GrossPay,
+       (SELECT COUNT(*) FROM PayrollPayment AS pay
+           WHERE pay.PayrollRegisterID = pr.PayrollRegisterID) AS Payments
+   FROM PayrollRegister AS pr
+       INNER JOIN PayrollPeriod AS pp
+           ON pp.PayrollPeriodID = pr.PayrollPeriodID
+       INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID
+       INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+   WHERE e.TerminationDate IS NOT NULL AND pp.PayDate > e.TerminationDate;
+   ```
+
+b. Read the cost center, the pay dates, and the Payments column.
+
+Three registers pay the employee who approved purchase orders after leaving, in Tutorial 12.2, each at the same gross pay, in the Executive cost center. One was paid through a payment record, and two are the registers whose payments are missing from Tutorial 12.1, although the ledger recorded the cash. The employee's record shows a single person at the center of three separate exceptions: approvals after termination, pay after termination, and cash paid without a payment document.
+
+**Step 5. Test the timing of payroll payments.** A payment should be made only after its register is approved.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT pay.PayrollPaymentID, pay.PaymentDate, pr.ApprovedDate,
+       pr.EmployeeID, pr.ApprovedByEmployeeID, pr.NetPay
+   FROM PayrollPayment AS pay
+       INNER JOIN PayrollRegister AS pr
+           ON pr.PayrollRegisterID = pay.PayrollRegisterID
+   WHERE pay.PaymentDate < pr.ApprovedDate;
+   ```
+
+b. Read the dates and the employee.
+
+Three payments were made the day before their registers were approved, each in January, and all three pay employee 2, the chief financial officer. The amounts are ordinary, but a payment made before its approval means the approval did not control it.
+
+**Checkpoint.** Check that:
+
+- overtime of half an hour or less never has an approval, and only three longer entries lack one, all for one warehouse employee, who left the company in 2024;
+- the share of direct labor recorded after its operation ended rose to about two-thirds in fiscal 2026, most of it at Packing;
+- three registers in the Executive cost center pay an employee after termination, and two of them have no payment record;
+- three payments to the chief financial officer were made before their registers were approved.
+
+The tests support the controller's explanation. The manufacturing hours were clocked, their overtime was approved, and the manufacturing payroll ties to the ledger, so the variance is a real cost. The payroll exceptions are real but lie outside manufacturing. The systematic finding is different: time is being charged to finished operations, so the plant's records cannot say where the extra hours were spent. The chief audit executive will report the exceptions for correction, and the recording practice as a weakness in the design of the time-recording process.

@@ -1,0 +1,151 @@
+## Guided Tutorial 12.1: Reconciling the Populations and Tracing the Ledger
+
+**Context and objective.** Before testing any process, the audit team must know that the ledger and its populations can be relied on. In this tutorial, you will reconcile the journal entries and the manufacturing payroll to the ledger, trace postings to their documents and documents to their postings, combine the exceptions into one list, explain the ones you find, and test the cutoff of sales invoices.
+
+**Prerequisites.** Complete the tutorials of the earlier Part III chapters, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script, `Audit.sql`, with a header comment that names the engagement, the database, the preparer, and the date. Each test in this chapter goes into this script, under a comment that states its objective.
+
+**Step-by-step instructions.**
+
+**Step 1. Reconcile the journal entries to the ledger.** Scalar subqueries in the SELECT list put the totals of two tables side by side.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT
+       (SELECT COUNT(*) FROM JournalEntry) AS Entries,
+       (SELECT ROUND(SUM(TotalAmount), 2) FROM JournalEntry) AS EntryTotal,
+       (SELECT COUNT(DISTINCT SourceDocumentID) FROM GLEntry
+           WHERE SourceDocumentType = 'JournalEntry') AS PostedEntries,
+       (SELECT ROUND(SUM(Debit), 2) FROM GLEntry
+           WHERE SourceDocumentType = 'JournalEntry') AS PostedDebits;
+   ```
+
+b. Compare the first two columns with the last two.
+
+The number of entries and their total agree with the entries and the debits posted to the ledger. Every journal entry was posted, at its full amount, and the ledger holds no journal entry postings beyond them, so the population that Chapter 8 tested in Excel was complete.
+
+**Step 2. Reconcile the manufacturing payroll to the ledger.** The payroll registers state what each employee was paid and what the company paid on top, and GLEntry records the cost center of each posting.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT reg.FiscalYear, reg.RegisterCost, gl.LedgerCost,
+       ROUND(reg.RegisterCost - gl.LedgerCost, 2) AS Difference
+   FROM (
+       SELECT pp.FiscalYear,
+           ROUND(SUM(pr.GrossPay + pr.EmployerPayrollTax
+               + pr.EmployerBenefits), 2) AS RegisterCost
+       FROM PayrollRegister AS pr
+           INNER JOIN PayrollPeriod AS pp
+               ON pp.PayrollPeriodID = pr.PayrollPeriodID
+           INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+       WHERE cc.CostCenterName = 'Manufacturing'
+       GROUP BY pp.FiscalYear
+   ) AS reg
+       INNER JOIN (
+           SELECT gl.FiscalYear, ROUND(SUM(gl.Debit), 2) AS LedgerCost
+           FROM GLEntry AS gl
+               INNER JOIN CostCenter AS cc ON cc.CostCenterID = gl.CostCenterID
+           WHERE gl.SourceDocumentType = 'PayrollSummary'
+               AND cc.CostCenterName = 'Manufacturing'
+           GROUP BY gl.FiscalYear
+       ) AS gl ON gl.FiscalYear = reg.FiscalYear
+   ORDER BY reg.FiscalYear;
+   ```
+
+b. Read the Difference column.
+
+The payroll registers of the manufacturing cost center agree with the ledger's payroll postings to the cent in each year. The population of registers is therefore complete, and the payroll tests of Tutorial 12.3 can rely on it.
+
+**Step 3. List the trace exceptions in both directions.** Each test is an anti-join, and UNION ALL stacks their results into one list, labeled by test.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT 'Posting with no payroll payment' AS Test,
+       gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,
+       gl.Debit + gl.Credit AS Amount
+   FROM GLEntry AS gl
+       LEFT JOIN PayrollPayment AS pp
+           ON pp.PayrollPaymentID = gl.SourceDocumentID
+   WHERE gl.SourceDocumentType = 'PayrollPayment'
+       AND pp.PayrollPaymentID IS NULL
+   UNION ALL
+   SELECT 'Posting with no supplier payment', gl.GLEntryID,
+       gl.PostingDate, gl.Debit + gl.Credit
+   FROM GLEntry AS gl
+       LEFT JOIN DisbursementPayment AS dp
+           ON dp.DisbursementID = gl.SourceDocumentID
+   WHERE gl.SourceDocumentType = 'DisbursementPayment'
+       AND dp.DisbursementID IS NULL
+   UNION ALL
+   SELECT 'Sales invoice never posted', si.SalesInvoiceID,
+       si.InvoiceDate, si.GrandTotal
+   FROM SalesInvoice AS si
+       LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'
+           AND gl.SourceDocumentID = si.SalesInvoiceID
+   WHERE gl.GLEntryID IS NULL
+   UNION ALL
+   SELECT 'Supplier invoice never posted', pi.PurchaseInvoiceID,
+       pi.InvoiceDate, pi.GrandTotal
+   FROM PurchaseInvoice AS pi
+       LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'PurchaseInvoice'
+           AND gl.SourceDocumentID = pi.PurchaseInvoiceID
+   WHERE gl.GLEntryID IS NULL;
+   ```
+
+b. Read the Test column of each row in the result.
+
+The result, shown in @fig-12-02, holds six rows, all from the first test. Six ledger rows record payroll payments that do not exist in the PayrollPayment table: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted.
+
+![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL tab. The script combines four anti-join tests with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
+
+**Step 4. Explain the six postings.** A payroll payment normally carries the same ID as the payroll register it pays, so the missing payments point to their registers.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT pr.PayrollRegisterID, pr.EmployeeID, e.EmployeeName,
+       e.TerminationDate, pp.PayDate, pr.NetPay, pr.Status
+   FROM PayrollRegister AS pr
+       INNER JOIN PayrollPeriod AS pp
+           ON pp.PayrollPeriodID = pr.PayrollPeriodID
+       INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID
+       LEFT JOIN PayrollPayment AS pay
+           ON pay.PayrollRegisterID = pr.PayrollRegisterID
+   WHERE pay.PayrollPaymentID IS NULL;
+   ```
+
+b. Compare the register IDs and net pay with the SourceDocumentID and amounts of the six postings.
+
+Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash paid, but the payment documents are missing. Two of the three registers belong to an employee whose TerminationDate is April 2024, and they pay the employee in January 2025 and January 2026. The cash left the company without a payment record, to someone who no longer worked there. These registers belong to the Executive cost center, not to manufacturing, and Tutorial 12.3 follows the employee further.
+
+**Step 5. Test the cutoff of sales invoices.** A sales invoice should be posted on its own date, or at least in its own fiscal year.
+
+a. Type and run the query below.
+
+   ```sql
+   SELECT DISTINCT si.InvoiceNumber, si.InvoiceDate, gl.PostingDate,
+       CASE WHEN strftime('%Y', si.InvoiceDate)
+               <> strftime('%Y', gl.PostingDate)
+           THEN 'Different fiscal year' ELSE 'Same fiscal year'
+       END AS Cutoff
+   FROM SalesInvoice AS si
+       INNER JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'
+           AND gl.SourceDocumentID = si.SalesInvoiceID
+   WHERE gl.PostingDate <> si.InvoiceDate
+   ORDER BY si.InvoiceNumber;
+   ```
+
+b. Read the Cutoff column.
+
+Nine invoices were posted on a different date from their own, and six of them in a different fiscal year: invoices dated in November and December were posted on January 1 of the next year. These are the invoices of Tutorial 2.1 and Exercises 5.2 and 6.1, whose numbers carry the next year's prefix. Their revenue was recorded a year late, so each year-end's revenue is misstated by the invoices on either side of it.
+
+**Checkpoint.** Check that:
+
+- the journal entries and the manufacturing payroll reconcile to the ledger to the cent;
+- the combined trace returns six postings with no payroll payment and nothing else;
+- the six postings match three approved registers without payments, two of them for a terminated employee;
+- six sales invoices were posted in a later fiscal year than their date.
+
+The ledger is reliable as a whole: its populations reconcile, and nearly every posting traces to a document and back. The exceptions are specific enough to name, and none of them lies in the manufacturing cost that the committee asked about.

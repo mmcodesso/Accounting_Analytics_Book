@@ -1,0 +1,126 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A CASE expression classifies payroll lines into three categories and has no ELSE. What does it return for a line that meets none of the conditions?
+
+A.  The value of the last category listed
+B.  An error, so the query stops
+C.  The text of the LineType column unchanged
+D.  NULL
+
+**2.** A CASE expression tests `WHEN Amount > 1000 THEN 'Large'` before `WHEN Amount > 10000 THEN 'Very large'`. What happens to an amount of 25,000?
+
+A.  It is classified as Very large, because that condition is more specific
+B.  It is classified as Large, because the first true condition wins
+C.  It is classified in both categories
+D.  It is left unclassified, because two conditions are true
+
+**3.** Which expression totals only the overtime earnings in a query grouped by month?
+
+A.  `SUM(Amount) WHERE LineType = 'Overtime Earnings'`
+B.  `COUNT(LineType = 'Overtime Earnings')`
+C.  `SUM(CASE WHEN LineType = 'Overtime Earnings' THEN Amount ELSE 0 END)`
+D.  `CASE WHEN SUM(Amount) > 0 THEN 'Overtime Earnings' END`
+
+**4.** What does `strftime('%Y-%m', WorkDate)` return for a WorkDate of 2026-03-06?
+
+A.  The text 2026-03
+B.  The number 202603
+C.  The date 2026-03-01
+D.  The text March 2026
+
+**5.** How do you calculate the number of days between a work order's ReleasedDate and its CompletedDate in SQLite?
+
+A.  `CompletedDate - ReleasedDate`
+B.  `DATEDIFF(day, ReleasedDate, CompletedDate)`
+C.  `strftime('%d', CompletedDate) - strftime('%d', ReleasedDate)`
+D.  `julianday(CompletedDate) - julianday(ReleasedDate)`
+
+**6.** The condition `strftime('%Y', PostingDate) = 2026` returns no rows, although the ledger holds hundreds of thousands of postings in 2026. Why?
+
+A.  strftime cannot read dates that include a time
+B.  PostingDate is stored as a number, which strftime cannot read
+C.  strftime returns text, which does not equal the number 2026
+D.  The condition must be written in a HAVING clause
+
+**7.** What does `SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)` return on each monthly row?
+
+A.  The total of the year's gaps up to and including that month
+B.  The total gap of the whole fiscal year, repeated on every monthly row
+C.  The gap of the previous month in the same fiscal year
+D.  The total of all the gaps in the table, across every fiscal year
+
+**8.** Over rows ordered by fiscal year and period, what does `LAG(Gap, 12)` return?
+
+A.  The average gap of the last twelve months, including this one
+B.  The gap of the same month of the previous year
+C.  The gap of the month twelve months later, in the next year
+D.  The twelfth largest gap in the whole table
+
+**9.** Two work centers have the same ratio of recorded to planned hours. What is the difference between RANK and ROW_NUMBER for them?
+
+A.  RANK gives them different numbers, and ROW_NUMBER gives them the same number
+B.  RANK leaves them out of the result, and ROW_NUMBER keeps them
+C.  They give identical results whenever values are tied
+D.  RANK gives them the same number, and ROW_NUMBER gives them different numbers
+
+**10.** An analyst wants only the three largest months of each year from a query that ranks months with RANK() OVER (…). Why can the condition not go in that query's WHERE clause?
+
+A.  WHERE cannot compare the number a function returns with 3
+B.  WHERE runs before window functions, so no rank exists yet
+C.  RANK can only be used in an ORDER BY clause, not in a condition
+D.  A WHERE clause cannot appear in a query that also uses GROUP BY
+
+**11.** What does the frame `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` produce over rows ordered by month?
+
+A.  The current month and the eleven months before it
+B.  The current month and the eleven months after it
+C.  Every month in the table, from the first to the last
+D.  The same month in each of the last eleven years
+
+**12.** What is the main advantage of writing a long analysis as a chain of common table expressions?
+
+A.  CTEs always run faster than the same query written with derived tables
+B.  CTEs save their results in the database for use by later queries
+C.  Each step is named and can be checked on its own, from the top down
+D.  CTEs remove the need to join tables, because each step reads one table
+
+**13.** What does a view such as MonthlyLaborEfficiency store in the database?
+
+A.  A copy of the rows its query returned when the view was created
+B.  A summary table that must be refreshed by hand after each change
+C.  The result of its query as of the last time Write Changes was clicked
+D.  The query itself, which runs on the current data each time
+
+**14.** Why do the Part III tutorials create the view in CharlesRiver_Work.sqlite rather than in the downloaded file?
+
+A.  Only a file with a new name can hold a view that you create
+B.  A view changes the file, and the download stays unchanged
+C.  Views cannot be created in a database file of more than 100 MB
+D.  The downloaded file does not show a Database Structure tab
+
+**15.** The monthly ratio of labor hours to standard hours swings widely, while the trailing twelve-month ratio rises steadily over two years. What should the controller conclude?
+
+A.  The rise is a trend, since the trailing measure smooths single months
+B.  The monthly figures are wrong, because they differ from the trailing ones
+C.  Nothing, because a trailing twelve-month measure always rises over time
+D.  The swings show that the plant's efficiency improved in some months
+
+<!-- Answer key, Chapter 11 (for instructors; HTML comments are removed from every rendered format):
+     1 D, 2 B, 3 C, 4 A, 5 D, 6 C, 7 A, 8 B, 9 D, 10 B, 11 A, 12 C, 13 D, 14 B, 15 A.
+     1 D: a CASE without ELSE returns NULL for rows that meet no condition.
+     2 B: conditions are tested in order, and the first true one wins.
+     3 C: conditional aggregation passes the amounts of one category and zero for the others.
+     4 A: strftime returns text formatted by its pattern.
+     5 D: the difference of two julianday values is a number of days.
+     6 C: date functions return text; compare with '2026' or CAST.
+     7 A: an ordered aggregate window is a running total, restarting in each partition.
+     8 B: LAG with offset 12 over months returns the same month a year earlier.
+     9 D: RANK gives ties the same number; ROW_NUMBER numbers every row differently.
+     10 B: WHERE runs before window functions; filter in an outer query.
+     11 A: the frame covers the current row and the eleven before it.
+     12 C: named steps can be read and checked one at a time.
+     13 D: a view stores its query and runs it again each time.
+     14 B: the view changes the database, so it goes in the working copy.
+     15 A: a trailing measure separates a trend from single-month swings. -->

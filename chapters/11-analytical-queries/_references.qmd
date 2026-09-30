@@ -1,0 +1,7 @@
+{{< pagebreak >}}
+
+## References
+
+SQLite. (n.d.-a). *Date and time functions*. <https://www.sqlite.org/lang_datefunc.html>
+
+SQLite. (n.d.-b). *Window functions*. <https://www.sqlite.org/windowfunctions.html>
