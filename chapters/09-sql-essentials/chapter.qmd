@@ -10,32 +10,32 @@ After completing this chapter, you will be able to:
 
 1. Explain when querying a database directly serves an accounting analysis better than working in a spreadsheet, and how a saved query documents the work.
 2. Set up DB Browser for SQLite with a working copy of the Charles River database, and read a table's structure before querying it.
-3. Write SELECT statements that choose columns, rename them with aliases, calculate new values, and list the distinct values a column holds.
-4. Filter rows with WHERE, using comparison and logical operators, BETWEEN, IN, LIKE, and tests for missing values.
+3. Write SELECT statements that choose columns, rename them with aliases, calculate new values with arithmetic and functions, and list the distinct values a column holds.
+4. Filter rows with WHERE, using comparison and logical operators, BETWEEN, IN, LIKE, and tests for missing values, and compare values of the right type.
 5. Sort and limit query results to rank transactions and find the largest and smallest items.
-6. Save queries in documented script files that another person can review and run again.
+6. Save queries in documented scripts, move their results into Excel, and find and correct syntax and logical errors.
 :::
 
 
 ## Opening Scenario {.unnumbered}
 
-It is early 2027, and the controller has put the promotion question behind her. Her attention has moved down the income statement to cost of goods sold. One line in it, manufacturing variance, has grown in every year of the data and is now about three-quarters larger than in fiscal 2024, while sales grew by less than a tenth over the same period. Manufacturing variance is the difference between what production actually cost and the standard cost that Charles River assigns to the items it makes. A variance that grows year after year means either that production is becoming less efficient or that the standards no longer describe how the plant works. She wants to know which.
+It is early 2027, and the controller has put the promotion question behind her. You are still the staff accountant who worked through that question with her in Part II, and she brings you the next one. Her attention has moved down the income statement to cost of goods sold. One line in it, manufacturing variance, has grown in every year of the data. It is now about three-quarters larger than in fiscal 2024, while sales grew by less than a tenth. Manufacturing variance is the difference between what production actually cost and the standard cost that Charles River assigns to the items it makes. A variance that grows year after year means either that production is becoming less efficient or that the standards no longer describe how the plant works. She wants to know which.
 
-She also knows where the answer lives. The detail behind the variance sits in tables that the analysis workbook of Part II never imported. They hold the work orders and their closes, the time employees recorded against them, the payroll, and the manufacturing entries in the general ledger, which alone has more than 800,000 rows. "This one is a database question," she says. "Start with the database." This chapter teaches you to do that. You will set up a tool for querying the Charles River database and write your first queries in SQL. With them, you will find the variance in the ledger, separate it from the entry that closes the books, and rank the work orders that produced it.
+She also knows where the answer lives. The detail behind the variance sits in tables that the analysis workbook of Part II never imported. They hold the work orders and their closes, the time employees recorded against them, and the payroll. They also hold the manufacturing entries in the general ledger, which alone has more than 800,000 rows. "This one is a database question," she says. "Start with the database." This chapter teaches you to do that. You will set up a tool for querying the Charles River database and write your first queries in SQL. With them, you will find the variance in the ledger, separate it from the entry that closes the books, and rank the work orders that produced it.
 
 
 
 ## Why Query the Database Directly
 
-In Part II you brought data into Excel with Power Query. You chose the Tables an analysis needed, filtered them, and loaded the result into a workbook of your own. That approach works well when the data fits comfortably in a workbook and the analysis draws on a few tables. It becomes strained as the data grows and the questions reach across more tables. Every import copies rows into the workbook, a table the size of the general ledger slows the workbook down, and each new table must be merged with the others before a formula can use it. Borthick et al. (2017) built a teaching case around exactly this experience. An analysis that begins in a spreadsheet becomes hard to implement and hard to audit as it needs more attributes from more sheets. The case then moves the data into a database, where the tables are joined and the analysis is done with queries.
+In Part II you brought data into Excel with Power Query. You chose the Tables an analysis needed, filtered them, and loaded the result into a workbook of your own, and Power Query recorded every step so that the workbook could be refreshed. That approach works well when the data fits comfortably in a workbook and the analysis draws on a few tables. It becomes strained as the data grows and the questions reach across more tables. Every import still copies rows into the workbook, a table the size of the general ledger slows the workbook down, and each new table must be merged with the others before a formula can use it. Borthick et al. (2017) built a teaching case around exactly this experience. An analysis that begins in a spreadsheet becomes hard to implement and hard to audit as it needs more attributes from more sheets. The case then moves the data into a database, where the tables are joined and the analysis is done with queries.
 
 A query is a written request for data. You describe the rows and columns you want, the database finds them where they are stored, and it returns only the result. Nothing is copied until you ask for it, and the request itself is a record of exactly what was extracted and how. You can save it, send it to a reviewer, and run it again next quarter against new data. Queries are written in SQL, which stands for Structured Query Language. SQL was developed at IBM in the 1970s, soon after Codd (1970) proposed the relational model you studied in Chapter 3, and it became the standard language of relational databases (Chamberlin, 2012).
 
 SQL is a declarative language, which means that you state what you want rather than how to get it. A query that asks for the ledger rows of one account in one year says nothing about how to search the table. The database decides that for itself. This makes SQL quite different from the formulas you wrote in Excel, which calculate one cell at a time. A single query describes a whole result, whether it holds ten rows or a million.
 
-@fig-09-01 contrasts the two ways of getting data to an analysis. Neither replaces the other. As @tbl-01-02 in Chapter 1 summarized, Excel is strongest for ad hoc analysis, modeling, and workpapers a reviewer can trace, while SQL is strongest when data is large, when it spans related tables, and when a procedure must be repeated. Much professional work uses both, with SQL extracting and summarizing the data and Excel taking the result from there.
+@fig-09-01 contrasts the two ways of getting data to an analysis. Neither replaces the other. As @tbl-01-02 in Chapter 1 summarized, Excel is strongest for ad hoc analysis, modeling, and workpapers a reviewer can trace. SQL is strongest when data is large, when it spans related tables, and when a procedure must be repeated. Much professional work uses both, with SQL extracting and summarizing the data and Excel taking the result from there.
 
-![Exporting Data Compared with Querying It.](/visuals/svg/fig-09-01-export-vs-query.svg){#fig-09-01 fig-alt="Two paths from the Charles River database to an analysis. The upper path exports or imports whole tables into a workbook, where they are filtered, merged, and summarized by hand, and the steps live in the workbook. The lower path sends a saved SQL query to the database, which returns only the rows and columns requested. The query text documents the extraction and can be run again when the data changes."}
+![Importing Data Compared with Querying It.](/visuals/svg/fig-09-01-import-vs-query.svg){#fig-09-01 fig-alt="Two paths to an analysis. The upper path, from Part II, imports the chosen tables of CharlesRiver.xlsx into an analysis workbook with Power Query, whose steps are recorded and can be refreshed, and merges the copies before analyzing them. The lower path, from Part III, sends a saved SQL query to CharlesRiver.sqlite, which returns only the rows and columns requested. The query text documents the extraction and runs again when the data changes."}
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
@@ -47,30 +47,30 @@ The Charles River database holds the same data as CharlesRiver.xlsx, table for t
 
 SQL is a language, not a program. Many database systems understand it, including Microsoft SQL Server, Oracle, PostgreSQL, MySQL, and SQLite. This book uses SQLite, which keeps an entire database in a single file on your computer. There is no server to install, no account to create, and no network connection to configure. You open the file and query it. The core of SQL that this Part teaches works the same way in every major system. Each system also has its own dialect, with small differences in functions and syntax, and this Part points them out where they matter.
 
-To query the file, you will use DB Browser for SQLite, a free program for Windows, macOS, and Linux. Its main window has four tabs. Database Structure lists every table, with its columns and their data types. Browse Data shows the rows of one table at a time, much like a worksheet. Edit Pragmas holds technical settings that you will not need. Execute SQL is where you type queries, run them, and read the results.
+To query the file, you will use DB Browser for SQLite, a free program for Windows, macOS, and Linux. Its main window has four tabs. Database Structure lists the objects in the database in groups: the tables, with their columns and data types, and the indices, views, and triggers. Browse Data shows the rows of one table at a time, much like a worksheet. Edit Pragmas holds technical settings that you will not need. Execute SQL is where you type queries, run them, and read the results. Most of its buttons show only an icon, and hovering over one shows its name.
 
-Before you open the database, make a copy of it. DB Browser can change a database as well as read it: a value typed into Browse Data edits the table, and the Write Changes button saves the edit into the file. The queries in this chapter only read data, but a stray keystroke can still alter a record. So you will work in a copy named CharlesRiver_Work.sqlite and keep the downloaded file untouched, for the same reason that the Part II tutorials never edited CharlesRiver.xlsx. If the copy is ever damaged, you replace it with a fresh copy of the download.
+Before you open the database, make a copy of it. DB Browser can change a database as well as read it: a value typed into Browse Data edits the table, and the Write Changes button saves the edit into the file. The queries in this chapter only read data, but a stray keystroke can still alter a record. So you will work in a copy named CharlesRiver_Work.sqlite and keep the downloaded file untouched, for the same reason that the Part II tutorials never edited CharlesRiver.xlsx. If the copy is ever damaged, you replace it with a fresh copy of the download. When you only need to read a database, you can also open it with Open Database Read Only, from the arrow beside the Open Database button, and DB Browser then refuses any change. The working copy is still needed, because Chapter 11 saves queries in it.
 
 @fig-09-02 shows the working copy open in DB Browser, on the Database Structure tab. The tab is the first place to look when you plan a query, because it tells you the exact name of every table and column and the type of data each column holds. As Chapter 3 explained, SQLite stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in the form year-month-day.
 
-![The Database Structure Tab of DB Browser for SQLite.](/visuals/svg/fig-09-02-database-structure.svg){#fig-09-02 fig-alt="A mock of DB Browser for SQLite with CharlesRiver_Work.sqlite open on the Database Structure tab. The tab lists the database's tables in alphabetical order. The GLEntry table is expanded to show its columns with their declared types: GLEntryID, AccountID, SourceDocumentID and FiscalYear are INTEGER, Debit and Credit are REAL, and PostingDate, VoucherNumber, SourceDocumentType and Description are TEXT. The four main tabs, Database Structure, Browse Data, Edit Pragmas and Execute SQL, run across the top of the window."}
+![The Database Structure Tab of DB Browser for SQLite.](/visuals/svg/fig-09-02-database-structure.svg){#fig-09-02 fig-alt="A mock of DB Browser for SQLite with CharlesRiver_Work.sqlite open on the Database Structure tab. The title bar shows the path of the file, and Write Changes and Revert Changes are grayed out. The Tables group lists the tables in alphabetical order, shortened. The GLEntry table is expanded to show all sixteen of its columns with their declared types: INTEGER for the keys, the account, the cost center, the fiscal year and period, and the other identifiers; REAL for Debit and Credit; and TEXT for the posting and created dates, the voucher type and number, the source document type, and the description. Below the tables come the Indices, Views, and Triggers groups. The four main tabs, Database Structure, Browse Data, Edit Pragmas and Execute SQL, run across the top of the window."}
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-Do not type into the cells of the Browse Data tab unless you mean to change the data. An edit there changes the table in memory, and clicking Write Changes, or answering Save when DB Browser asks as you close it, saves the change into the file. If DB Browser asks whether to save changes you did not intend to make, choose not to save. Working in a copy of the database means that no mistake can reach the file you downloaded.
+Do not type into the cells of the Browse Data tab unless you mean to change the data. An edit there is held as a change that has not yet been saved, and the Write Changes and Revert Changes buttons, grayed out while nothing has changed, become available. Clicking Write Changes writes the edit into the file. If those buttons become available when you did not mean to change anything, click Revert Changes. If DB Browser asks as you close it whether to save changes you did not intend, click Discard (Don't Save on a Mac). Working in a copy of the database means that no mistake can reach the file you downloaded.
 :::
 
 
 ## The SELECT Statement
 
-Every query in this chapter is a SELECT statement. SELECT names the columns you want, and FROM names the table they come from. The simplest query asks for every column of a table:
+A statement is a complete instruction to the database, ended by a semicolon. Every statement in this chapter is a SELECT statement, which asks for data. A statement is built from clauses. Each clause begins with a keyword, a word with a fixed meaning in SQL, and does one job. SELECT names the columns you want, and FROM names the table they come from. The simplest query asks for every column of a table:
 
 ```sql
 SELECT *
 FROM Account;
 ```
 
-The asterisk means all columns, and the semicolon marks the end of the statement. When you run the query, DB Browser shows the result as a grid, with one column for each column of the table and one row for each account. This grid is called the result set. A message below it reports whether the query ran without errors and how many rows it returned. A query never changes the table it reads: the result set is a new view of the data, produced when you ask for it.
+The asterisk means all columns. When you run the query, DB Browser shows the result as a grid, with one column for each column of the table and one row for each account. This grid is called the result set. A message below it reports whether the query ran without errors, how many rows it returned, and how long it took. A query never changes the table it reads: the result set is a new answer, produced each time you ask. When the editor holds several queries and you run all of them, only the last result is shown, so you select the query you want and run the selection.
 
 Selecting every column is useful for a first look at a table, but an analysis usually needs only some of them. List the columns you want instead of the asterisk, separated by commas, in the order you want them to appear:
 
@@ -81,10 +81,24 @@ FROM Account;
 
 SQL keywords such as SELECT and FROM can be written in any case, and SQLite also ignores case in table and column names, so `select accountname from account` runs as well. The queries in this book follow a common convention that makes them easier to read: keywords in capitals, table and column names exactly as the database spells them, and each clause on its own line. The line breaks do not change what a query does. They make its parts easy to see, which matters more as queries grow.
 
-The column names must match the database, however. A query that asks for AccountNumbr or for a table called Accounts fails with an error message, and the Database Structure tab is the place to check the spelling.
+
+## When a Query Fails
+
+A mistake in the wording of a query is a syntax error. SQLite cannot run the statement, so it stops and says why. In DB Browser, the message pane turns red and reports that execution finished with errors. It gives SQLite's message and the line of the editor at which the statement starts. @tbl-09-01 lists the messages you are most likely to see and what usually causes them.
+
+| Message | Usual cause |
+|-----------|-----------------------|
+| `no such column: AccountNumbr` | A column name misspelled, or a text value written without quotes |
+| `no such table: Accounts` | A table name misspelled |
+| `near "WHERE": syntax error` | Clauses out of order, or a comma or keyword missing before the word named |
+| `unrecognized token: "'Asset"` | A quotation mark opened but never closed |
+
+: Common SQLite error messages and their usual causes {#tbl-09-01}
+
+A misspelled name is the most common cause. A query that asks for AccountNumbr, or for a table called Accounts, fails, and the Database Structure tab is the place to check the spelling. Syntax errors are easy to fix, because the message names the problem. A second kind of error runs without any complaint, and this chapter returns to it once you have written a few queries.
 
 
-## Aliases, Calculated Columns, and Distinct Values
+## Calculated Columns and Functions
 
 A column alias gives a column a different name in the result set. You write it after the column, with the keyword AS:
 
@@ -95,7 +109,9 @@ FROM Account;
 
 The alias changes only the heading of the result. The table keeps its own column names. An alias that contains a space must be enclosed in double quotes, as in `AS "Account Name"`, which is one reason to prefer aliases without spaces.
 
-A column in the result set does not have to exist in the table. A calculated column applies arithmetic to the columns of each row, with `+`, `-`, `*`, and `/`, and it usually has an alias so that its heading says what it is. Every closed work order in the WorkOrderClose table records its variance in several parts. The query below adds the material part and the conversion part and compares the sum with the recorded total:
+### Arithmetic
+
+A column in the result set does not have to exist in the table. A calculated column applies arithmetic to the columns of each row, with `+`, `-`, `*`, and `/`, and it usually has an alias so that its heading says what it is. Every closed work order in the WorkOrderClose table records its variance in parts: a material part, and a conversion part for the cost of turning materials into products, which is itself made up of direct labor and overhead. The query below adds the material part and the conversion part and compares the sum with the recorded total:
 
 ```sql
 SELECT WorkOrderCloseID,
@@ -104,7 +120,34 @@ SELECT WorkOrderCloseID,
 FROM WorkOrderClose;
 ```
 
-The result is calculated when the query runs and is not stored anywhere. Amounts are stored as REAL numbers, which a computer holds in binary, so the result of adding or multiplying two amounts can carry a tiny fraction of a cent. The ROUND function removes it: `ROUND(x, 2)` rounds x to two decimal places, which is the right precision for money. Two other operations are worth knowing from the start. The `||` operator joins text, so `AccountNumber || ' ' || AccountName` produces a single label such as 5080 Manufacturing Variance. Division of one whole number by another drops the remainder in SQLite, so `7 / 2` returns 3. When a division involves amounts stored as REAL, as most accounting divisions do, the result keeps its decimals.
+The result is calculated when the query runs and is not stored anywhere. Amounts are stored as REAL numbers, which a computer holds in binary, so adding or multiplying two amounts can leave a tiny fraction of a cent. The ROUND function removes it: `ROUND(x, 2)` rounds x to two decimal places, the right precision for money.
+
+Division needs one more precaution. When both numbers are whole, SQLite divides them as whole numbers and drops the remainder, so `7 / 2` returns 3. When either number has decimals, the result keeps them, so `7 / 2.0` returns 3.5. Amounts stored as REAL keep their decimals, but a ratio of two counts, or of two INTEGER columns, loses them unless you multiply one of them by 1.0 or convert it with CAST, described below. The `%` operator returns the remainder of a division, so `7 % 2` returns 1. Given a number with decimals, it drops the decimals first, which makes it unsuitable for amounts.
+
+### Functions
+
+A function takes one or more values and returns a result. A scalar function returns one result for each row it is applied to, as ROUND does. @tbl-09-02 lists the scalar functions you will use most often in this Part, and the SQLite documentation describes them all (SQLite, n.d.-a).
+
+| Function | Returns | Example | Result |
+|---------|---------------------|------------------|--------|
+| `ROUND(x, d)` | x rounded to d decimal places | `ROUND(1234.567, 2)` | 1234.57 |
+| `ABS(x)` | x without its sign | `ABS(-2011.14)` | 2011.14 |
+| `CAST(x AS type)` | x converted to INTEGER, REAL, or TEXT | `CAST('2026' AS INTEGER)` | 2026 |
+| `UPPER(x)` | x in capital letters | `UPPER('llc')` | LLC |
+| `TRIM(x)` | x without spaces at either end | `TRIM(' LLC ')` | LLC |
+| `REPLACE(x, a, b)` | x with every a replaced by b | `REPLACE('WO-2026', '-', '')` | WO2026 |
+| `LENGTH(x)` | the number of characters in x | `LENGTH('WO-2026')` | 7 |
+| `SUBSTR(x, s, n)` | n characters of x, from position s | `SUBSTR('WO-2026', 4, 4)` | 2026 |
+| `SUBSTR(x, s)` | the rest of x, from position s | `SUBSTR('JE-2026-000296', 9)` | 000296 |
+| `COALESCE(x, y)` | x, or y when x is NULL | `COALESCE(NULL, 'open')` | open |
+
+: Scalar functions used in this Part {#tbl-09-02}
+
+Text functions take codes apart and standardize text. Charles River's document numbers carry a year in a fixed place, counting positions from 1: in WO-2026-011512, the four characters from position 4 are the year the work order was released, and `SUBSTR(WorkOrderNumber, 4, 4)` extracts them. The result is text, so `CAST(SUBSTR(WorkOrderNumber, 4, 4) AS INTEGER)` turns it into a number when a calculation needs one. UPPER removes differences of case and TRIM removes stray spaces, so `UPPER(TRIM(x))` puts text that may have been entered inconsistently into one form before it is compared. REPLACE removes characters such as hyphens. Chapter 2 showed why such differences break matching. LOWER is the counterpart of UPPER, and the `||` operator joins text, so `AccountNumber || ' ' || AccountName` produces a single label such as 5080 Manufacturing Variance.
+
+Two differences from Excel are worth knowing. SQLite's ROUND treats a negative number of decimal places as zero, so `ROUND(1234.567, -2)` returns 1235.0, not the 1200 that Excel's ROUND would give. And a SELECT statement does not need a table at all: `SELECT 7 / 2, 7 / 2.0, SUBSTR('WO-2026', 4, 4);` returns one row of results. That makes it a quick way to test a function or an expression before you use it in a query.
+
+### Distinct Values
 
 The keyword DISTINCT removes duplicate rows from the result. `SELECT DISTINCT SourceDocumentType FROM GLEntry` returns each kind of source document that posts to the ledger once, however many rows carry it. DISTINCT is how you discover the values a column actually holds, and you should use it before you filter on a value. A filter written for a value that does not exist, such as a status the data never uses, returns no rows and no error. It is easy to mistake that empty result for a finding.
 
@@ -122,7 +165,7 @@ FROM Account
 WHERE AccountNumber = 5080;
 ```
 
-@tbl-09-01 lists the comparison and logical operators you will use most. Numbers are written without quotes. Text values are written in single quotes, and they must match the data exactly, including capitals: the condition `SourceDocumentType = 'WorkOrderClose'` finds the variance postings, but `SourceDocumentType = 'workorderclose'` finds nothing. When the capitals or spacing of stored text cannot be trusted, compare standardized values instead: `UPPER(TRIM(x))` removes the spaces at both ends and turns the text into capitals, and `REPLACE(x, '-', '')` removes every hyphen. Chapter 2 showed why such differences break matching.
+@tbl-09-03 lists the comparison and logical operators you will use most. Numbers are written without quotes. Text values are written in single quotes, and they must match the data exactly, including capitals: the condition `SourceDocumentType = 'WorkOrderClose'` finds the variance postings, but `SourceDocumentType = 'workorderclose'` finds nothing. When the capitals or spacing of stored text cannot be trusted, compare standardized values instead, as in `UPPER(TRIM(CustomerName)) = 'BROWN LLC'`.
 
 | Operator | Meaning | Example |
 |---|---|---|
@@ -134,13 +177,15 @@ WHERE AccountNumber = 5080;
 | `IS NULL`, `IS NOT NULL` | Has no value, has a value | `ClosedDate IS NULL` |
 | `AND`, `OR`, `NOT` | Combine or reverse conditions | `NOT Status = 'Closed'` |
 
-: Comparison and logical operators in a WHERE clause {#tbl-09-01}
+: Comparison and logical operators in a WHERE clause {#tbl-09-03}
 
-Dates need particular care in SQLite, which has no separate date type. The Charles River dates are stored as text in the form year-month-day, such as 2026-12-31, and text in that form sorts in the same order as the dates it represents. A date condition therefore compares the column with a date written the same way, in quotes: `PostingDate >= '2026-01-01'`. A date written in any other form, such as 12/31/2026, does not compare correctly, and SQLite gives no warning.
+The type of a value matters as well. When SQLite compares a column with a value of another type, it first converts the value to the column's type, so `AccountNumber = '5080'` finds account 5080 even though the number is written as text (SQLite, n.d.-b). It does not convert when neither side of the comparison is a column. SUBSTR returns text, so `SUBSTR(WorkOrderNumber, 4, 4) = 2026` compares text with a number and finds no rows at all, without any error. Write the value as text, `= '2026'`, or convert the text with CAST before you compare it with a number.
+
+Dates need particular care in SQLite, which has no separate date type. The Charles River dates are stored as text in the form year-month-day, such as 2026-12-31, and text in that form sorts in the same order as the dates it represents. A date condition therefore compares the column with a date written the same way, in quotes: `PostingDate >= '2026-01-01'`. A date written in any other form, such as 12/31/2026, does not compare correctly, and SQLite gives no warning. Charles River's fiscal year is the calendar year, so the postings of fiscal 2026 are those dated from 2026-01-01 to 2026-12-31, and GLEntry also records the year in its FiscalYear column.
 
 ### Combining Conditions
 
-AND requires both conditions to be true, OR requires at least one, and NOT reverses a condition. When a WHERE clause mixes AND and OR, SQL evaluates the ANDs first, the same way that arithmetic multiplies before it adds. That order can change the answer completely. Suppose you want the ledger rows of the manufacturing variance account, AccountID 93, in fiscal 2025 and 2026. This query looks right but is not:
+AND requires both conditions to be true, OR requires at least one, and NOT reverses a condition. When a WHERE clause mixes AND and OR, SQL evaluates the ANDs first, the same way that arithmetic multiplies before it adds. This order is called operator precedence, and it can change the answer completely. Suppose you want the ledger rows of the manufacturing variance account, AccountID 93, in fiscal 2025 and 2026. This query looks right but is not:
 
 ```sql
 SELECT GLEntryID, AccountID, FiscalYear, Debit, Credit
@@ -148,7 +193,7 @@ FROM GLEntry
 WHERE AccountID = 93 AND FiscalYear = 2025 OR FiscalYear = 2026;
 ```
 
-Because AND is evaluated first, the condition means the variance rows of 2025, or any ledger row of 2026, and the query returns hundreds of thousands of rows from every account. Parentheses make the intended grouping explicit:
+Because AND is evaluated first, the condition means the variance rows of 2025, or any ledger row of 2026. The query returns hundreds of thousands of rows, from every account with a posting in 2026. Parentheses make the intended grouping explicit:
 
 ```sql
 SELECT GLEntryID, AccountID, FiscalYear, Debit, Credit
@@ -162,14 +207,20 @@ Whenever a condition combines AND with OR, add parentheses, even when you believ
 
 ### BETWEEN, IN, and LIKE
 
-Three operators shorten conditions that would otherwise take several comparisons. BETWEEN selects a range and includes both ends, so `CloseDate BETWEEN '2026-01-01' AND '2026-12-31'` selects every date in fiscal 2026. IN selects any value in a list, so `AccountNumber IN (1090, 5080)` is shorter than two conditions joined by OR. LIKE compares text with a pattern in which `%` stands for any run of characters and `_` for exactly one. The pattern `'JE-2026-%'` matches every voucher number that begins with JE-2026-. In SQLite, LIKE ignores the difference between capital and small letters, unlike `=` (SQLite, n.d.-b). NOT reverses any of the three, as in `NOT IN` and `NOT LIKE`.
+Three operators shorten conditions that would otherwise take several comparisons. BETWEEN selects a range and includes both ends, so `CloseDate BETWEEN '2026-01-01' AND '2026-12-31'` selects every close dated in fiscal 2026. Take care with a column that stores a time as well as a date, such as the CreatedDate of a journal entry, which reads like 2024-01-06 10:00:00. Such a value on December 31 sorts after the text 2026-12-31, so BETWEEN leaves it out. For those columns, end the range with `< '2027-01-01'`.
+
+IN selects any value in a list, so `AccountNumber IN (1090, 5080)` is shorter than two conditions joined by OR. LIKE compares text with a pattern. In the pattern, a wildcard stands for other characters: `%` stands for any run of characters, including none, and `_` for exactly one. The pattern `'JE-2026-%'` matches every voucher number that begins with JE-2026-. In SQLite, LIKE ignores the difference between capital and small letters, unlike `=` (SQLite, n.d.-d). NOT reverses any of the three, as in `NOT IN` and `NOT LIKE`.
 
 
 ## Missing Values and NULL
 
-A column with no value holds NULL. NULL is not zero and it is not an empty piece of text. It means that the value is unknown or does not exist, as with the ClosedDate of a work order that has not yet closed. Chapter 2 discussed why missing values matter. SQL treats them in a way that surprises most new users: any comparison with NULL is itself unknown, so a condition such as `ClosedDate = NULL` is never true, and a query that uses it returns no rows at all.
+A column with no value holds NULL. NULL is not zero, and it is not an empty piece of text. It means that the value is unknown or does not exist, as with the ClosedDate of a work order that has not yet closed. Chapter 2 discussed why missing values matter. SQL treats them in a way that surprises most new users. Any comparison with NULL is itself unknown, so a condition such as `ClosedDate = NULL` is never true, and a query that uses it returns no rows at all.
 
-To find missing values, use IS NULL, and to exclude them, use IS NOT NULL (SQLite, n.d.-b). The condition `ClosedDate IS NULL` returns every work order that has not yet closed. NULL also spreads through calculations: an expression such as `ListPrice - StandardCost` is NULL for any row whose ListPrice is NULL. When a result has unexpected blank cells, look for a NULL in one of the columns it was calculated from.
+To find missing values, use IS NULL, and to exclude them, use IS NOT NULL (SQLite, n.d.-d). The condition `ClosedDate IS NULL` returns every work order that has not yet closed, as @fig-09-06 shows. NULL also spreads through calculations: an expression such as `ListPrice - StandardCost` is NULL for any row whose ListPrice is NULL. When a result has unexpected blank cells, look for a NULL in one of the columns it was calculated from.
+
+![How WHERE Treats a Missing Value.](/visuals/svg/fig-09-06-where-null.svg){#fig-09-06 fig-alt="A table of six Charles River work orders released in November 2026: two closed, with a ClosedDate, and four released or completed but not yet closed, whose ClosedDate is NULL. For each work order, three expressions are evaluated. ClosedDate = NULL is NULL for every row, so a WHERE clause that uses it keeps none of them. ClosedDate IS NULL is true for the four open work orders, which it keeps, and false for the two closed ones. COALESCE(ClosedDate, 'open') shows the date for the closed work orders and the word open for the others."}
+
+COALESCE replaces a missing value with one you choose. `COALESCE(ClosedDate, 'open')` returns the ClosedDate where there is one and the text open where there is not, and `COALESCE(Amount, 0)` lets a calculation treat a missing amount as zero. IFNULL does the same with exactly two values. Replacing a NULL is a decision, not a correction, so a zero in place of a missing amount should be one you can justify.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
@@ -190,7 +241,12 @@ FROM WorkOrderClose
 ORDER BY TotalVarianceAmount DESC;
 ```
 
-To sort on several columns, list them in order of priority, as in `ORDER BY CloseDate, TotalVarianceAmount DESC`. The first column decides the overall order, and each later column only breaks ties, as with the sort levels you used in Excel. You can sort by a calculated column or its alias, and by a column that the SELECT clause does not show. In an ascending sort, SQLite places NULLs first.
+To sort on several columns, list them in order of priority, as in `ORDER BY CloseDate, TotalVarianceAmount DESC`. The first column decides the overall order, and each later column only breaks ties. You can sort by a calculated column or its alias, and by a column that the SELECT clause does not show. You can also sort by an expression: `ORDER BY ABS(TotalVarianceAmount) DESC` ranks variances by their size, whatever their sign. In an ascending sort, SQLite places NULLs first.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+ORDER BY works like the sort levels of Excel's Sort dialog: the first column is the first level, and each later column breaks the ties that the levels before it leave. WHERE plays the part of a filter, with one difference that matters in audit work. The condition is written in the query, so a reviewer can see exactly which rows were kept.
+:::
 
 LIMIT keeps only the first rows of the result. Combined with ORDER BY, it answers ranking questions, such as the ten largest variances of the year or the five oldest open work orders. Without ORDER BY, LIMIT returns whichever rows the database happens to reach first. That is fine for a quick look at a table, but it should never be used to select rows for an analysis.
 
@@ -200,51 +256,51 @@ LIMIT is one of the places where SQL dialects differ. SQLite, PostgreSQL, and My
 :::
 
 
-## Saving and Documenting Queries
+## Saving, Documenting, and Sharing Queries
 
-A query is only useful as evidence if it can be found, understood, and run again. DB Browser saves the contents of an Execute SQL tab as a SQL script, a plain text file with the extension .sql, which you can reopen later or send to someone else. A script can hold many queries, each ending with a semicolon.
+A query is only useful as evidence if it can be found, understood, and run again. DB Browser saves the contents of an Execute SQL tab as a SQL script, a plain text file with the extension .sql, which you can reopen later or send to someone else. Save a script with the Save SQL file button. Ctrl+S is the shortcut for Write Changes, which saves changes to the database, not the script. A script can hold many queries, each ending with a semicolon. To run one of them, select it and click Execute all/selected SQL. Execute current line (Shift+F5) runs the statement on the line where the cursor sits.
 
-Comments explain a script to its reader and are ignored when it runs. Two dashes start a comment that runs to the end of the line, and `/*` and `*/` enclose a comment of several lines. Begin every script with a header comment that records what the documentation worksheet of Chapter 4 recorded for a workbook: the purpose of the queries, the database file they read, who prepared them and when, and what checks the results should pass. Then put a one-line comment above each query saying what it answers. A reviewer who opens the script can see what each query was meant to do, run it, and compare the result with what you reported.
+Comments explain a script to its reader and are ignored when it runs. Two dashes start a comment that runs to the end of the line, and `/*` and `*/` enclose a comment of several lines. Begin every script with a header comment that records the purpose of the queries, the database file they read, who prepared them and when, and what checks the results should pass. Then put a one-line comment above each query saying what it answers. A reviewer who opens the script can see what each query was meant to do, run it, and compare the result with what you reported.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+A script's header comment is the SQL counterpart of the Documentation worksheet you built in Chapter 4. Both record the purpose, the source, the preparer and date, and the checks, so that a reviewer can follow the work without having to ask.
+:::
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
 Audit teams and finance departments keep libraries of saved queries for tests they repeat, such as extracting a period's journal entries or listing unapproved documents. A saved, commented query turns a one-off extraction into a procedure. The next person, or the next year's engagement, can rerun it on new data and know that it does exactly what it did before.
 :::
 
+### Taking a Result to Excel
 
-{{< include _tutorial-03.qmd >}}
+A query result often ends up in a workbook, where Excel can chart it, model it, or format it for a report. In the Execute SQL tab, select the cells of the result, or click a cell and press Ctrl+A to select all of them. Then right-click the selection and choose Copy with Headers (Ctrl+Shift+C). The rows paste into Excel with their column headings, one value in each cell. DB Browser loads a large result in blocks of 50,000 rows, so selecting all of a larger one asks whether to load the rest first. For a result that large, or one you want to keep as a file, the Save the results view button on the Execute SQL toolbar offers Export to CSV, which writes a file that Excel opens. The query stays in the script, so the extraction can be repeated when the data changes.
 
 
 ## Reading and Correcting Queries
 
-The clauses of a query must be written in a fixed order: SELECT, FROM, WHERE, ORDER BY, and LIMIT, as @fig-09-08 shows. Only SELECT is always needed, and the others appear when a query uses them. A clause out of order stops the query with an error.
+The clauses of a query must be written in a fixed order: SELECT, FROM, WHERE, ORDER BY, and LIMIT, as @fig-09-08 shows. Only SELECT is always needed, and the others appear when a query uses them. A clause out of order stops the query with a syntax error, such as `near "WHERE": syntax error`.
 
 ![The Anatomy of a SQL Query.](/visuals/svg/fig-09-08-query-anatomy.svg){#fig-09-08 fig-alt="A query written clause by clause, each clause labeled with its role. SELECT lists the columns, including a calculated column with an alias. FROM names the WorkOrderClose table. WHERE keeps the closes of fiscal 2026 with BETWEEN. ORDER BY sorts the total variance in descending order, and LIMIT keeps the first ten rows. A note states that the clauses must be written in this order and that a comment line above the query explains what it answers."}
 
-Errors come in two kinds. A syntax error stops the query and produces a message. @tbl-09-02 lists the messages you are most likely to see and what usually causes them. These errors are easy to fix, because the message names the problem.
+Syntax errors stop a query and name the problem. A logical error is more dangerous. It lets the query run and return a result, but the result answers a different question from the one you asked. In an analysis of more than 33,000 queries written by database students, Taipalus et al. (2018) found that such errors recur in similar ways from student to student. Nothing flags them, so they are harder to catch than syntax errors.
 
-| Message | Usual cause |
-|---|---|
-| no such column: AccountNumbr | A column name misspelled, or text written without quotes |
-| no such table: Accounts | A table name misspelled |
-| near "WHERE": syntax error | Clauses out of order, or a missing comma or keyword |
-| unrecognized token | A quotation mark opened but never closed |
-
-: Common SQLite error messages and their usual causes {#tbl-09-02}
-
-The second kind is more dangerous. A logical error lets the query run and returns a result, but the result answers a different question from the one you asked. In an analysis of more than 33,000 queries written by database students, Taipalus et al. (2018) found that such logical errors recur in similar ways from student to student. They are harder to catch than syntax errors, because nothing flags them. You have already met several: a missing pair of parentheses around an OR condition, a comparison with NULL, and a text value in the wrong case. A missing comma is another. `SELECT AccountNumber AccountName FROM Account` runs without complaint, because SQL reads AccountName as an alias for AccountNumber and returns a single column.
+You have already met several. A missing pair of parentheses around an OR condition, a comparison with NULL, a text value in the wrong case, and a text value compared with a number each return a wrong result, or none, without complaint. A missing comma is another. `SELECT AccountNumber AccountName FROM Account` runs, because SQL reads AccountName as an alias for AccountNumber and returns a single column.
 
 The defense against logical errors is the same as in a workbook: know what the result should look like before you run the query. Check the row count against what you expect, and look at the first rows. When a total exists elsewhere, compare the result with it, as you did with the control totals of Chapter 4.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-SQLite is more forgiving than most database systems, and its tolerance can hide mistakes. It accepts text in double quotes as a value when no column has that name. It converts text to a number, or a number to text, to make a comparison work. It also treats column types as advisory rather than mandatory, so a column declared INTEGER can hold text (SQLite, n.d.-a). A query that relies on any of these habits may run in SQLite and fail, or return a different result, elsewhere. Write text values in single quotes, compare numbers with numbers and dates with dates written as text, and your queries will travel.
+SQLite is more forgiving than most database systems, and its tolerance can hide mistakes. It accepts a text value written in double quotes when no column has that name, so `SourceDocumentType = "JournalEntry"` works here but fails in most other systems (SQLite, n.d.-c). It treats a column's declared type as a preference rather than a rule, so a column declared INTEGER can hold text. And, as the section on WHERE explained, it converts values in some comparisons but not in others. A query that relies on any of these habits may run in SQLite and fail, or return a different result, elsewhere. Write text values in single quotes, compare numbers with numbers and dates with dates written as text, and your queries will travel.
 :::
+
+
+{{< include _tutorial-03.qmd >}}
 
 
 ## Looking Ahead
 
-This chapter has introduced SQL through the Charles River database. You set up DB Browser for SQLite with a working copy of the database and read the structure of its tables. You wrote SELECT statements that choose columns, rename them, calculate new ones, and list the distinct values a column holds. You filtered rows with WHERE, combined conditions with AND and OR, used BETWEEN, IN, and LIKE, and found missing values with IS NULL. You sorted and limited results to rank transactions, and you saved your queries in a documented script.
+This chapter has introduced SQL through the Charles River database. You set up DB Browser for SQLite with a working copy of the database and read the structure of its tables. You wrote SELECT statements that choose columns, rename them, calculate new ones with arithmetic and functions, and list the distinct values a column holds. You filtered rows with WHERE, combined conditions with AND and OR, used BETWEEN, IN, and LIKE, compared values of the right type, and found and replaced missing values with IS NULL and COALESCE. You sorted and limited results to rank transactions, copied a result into Excel, and saved your queries in a documented script. Along the way, you read the messages of syntax errors and learned to check a result against what it should be, the defense against logical errors.
 
 The queries have also given the controller a first look at her question. The manufacturing variance is recorded when a work order closes, and each close records the variance in parts. In the largest closes of fiscal 2026, most of the variance is overhead, not material. The ledger holds the same amounts, together with a closing entry that clears the account at year-end and must be left out of any analysis of it. A single table cannot say more. Which products carry the variance, how much of it arose in each year, and what drives the overhead are questions that span the work orders, the items, the payroll, and the ledger. Answering them requires joining tables and summarizing their rows, which is the work of Chapter 10.
 

@@ -1,8 +1,8 @@
 ## Guided Tutorial 9.1: Opening the Database and Writing Your First Queries
 
-**Context and objective.** In this tutorial, you will set up the environment that you will use for every SQL tutorial in Part III. You will make a working copy of the Charles River database, open it in DB Browser for SQLite, and read the structure of the tables that record the manufacturing variance. You will then write your first queries: one that shows a whole table, one that chooses its columns, and one that calculates a check on the variance records.
+**Context and objective.** In this tutorial, you will set up the environment that you will use for every SQL tutorial in Part III. You will make a working copy of the Charles River database, open it in DB Browser for SQLite, and read the structure of the tables that record the manufacturing variance. You will then start the script that holds the chapter's queries and write your first queries in it. You will also make a deliberate error, read its message, and calculate a check on the variance records.
 
-**Prerequisites.** You need DB Browser for SQLite, which is free, installed on your computer (download it from <https://sqlitebrowser.org/dl/>; the tutorials use version 3.13, whose built-in SQLite runs every query in Part III), and the CharlesRiver.sqlite file from the [Downloads](#sec-downloads) page. The file is large, several hundred megabytes, so allow time for the download.
+**Prerequisites.** You need DB Browser for SQLite, which is free, installed on your computer. Download it from <https://sqlitebrowser.org/dl/>. The tutorials use version 3.13.1, whose built-in SQLite runs every query in Part III. The About window, under the Help menu (under DB Browser for SQLite on a Mac), shows the version you have, and packages for Linux can be older. You also need the CharlesRiver.sqlite file from the [Downloads](#sec-downloads) page. The file is large, several hundred megabytes, so allow time for the download.
 
 **Step-by-step instructions.**
 
@@ -18,50 +18,81 @@ The folder now holds two identical files. Every tutorial in Part III uses Charle
 
 a. Start DB Browser for SQLite.
 b. Click **Open Database** on the toolbar, select CharlesRiver_Work.sqlite, and click **Open**.
-c. On the **Database Structure** tab, scroll down the list of tables to GLEntry, and click the arrow beside it to show its columns.
-d. Read the type of each column: AccountID and FiscalYear are INTEGER, Debit and Credit are REAL, and PostingDate and SourceDocumentType are TEXT.
-e. Expand the WorkOrderClose table in the same way, and note its columns for the parts of the variance: MaterialVarianceAmount, DirectLaborVarianceAmount, OverheadVarianceAmount, ConversionVarianceAmount, and TotalVarianceAmount.
+c. Check the title bar, which shows the path of the open file, ending in CharlesRiver_Work.sqlite.
+d. On the **Database Structure** tab, scroll down the Tables group to GLEntry, and click the arrow beside it to show its columns.
+e. Read the type of each column: AccountID and FiscalYear are INTEGER, Debit and Credit are REAL, and PostingDate and SourceDocumentType are TEXT.
+f. Expand the WorkOrderClose table in the same way, and note its columns for the parts of the variance: MaterialVarianceAmount, DirectLaborVarianceAmount, OverheadVarianceAmount, ConversionVarianceAmount, and TotalVarianceAmount.
 
-The tab should look like @fig-09-02. The name of the open file appears in the title bar, which is a quick way to confirm that you are working in the copy.
+The tab should look like @fig-09-02. The Write Changes and Revert Changes buttons are grayed out, because nothing in the database has changed. If they ever become available while you are only reading data, something was edited, and Revert Changes undoes it.
 
-**Step 3. Run your first query.** The Execute SQL tab has an editor for queries, a grid for the result, and a pane for messages.
+**Step 3. Start the chapter's script.** A script keeps the chapter's queries together, so that you or a reviewer can run any of them again.
 
-a. Click the **Execute SQL** tab.
-b. In the editor, type the query below.
+a. Click the **Execute SQL** tab. Its editor is empty, in a tab named **SQL 1**.
+b. Type the header comment below, with your own name and the date.
 
    ```sql
+   /* Chapter 9: manufacturing variance, first look
+      Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
+      Prepared by: your name, date
+      Checks: listed at the end of Tutorial 9.3 */
+   ```
+
+c. Click **Save SQL file** on the toolbar of the Execute SQL tab, and save the script as `Chapter09.sql` in the folder that holds your working copy.
+
+The editor's tab is renamed Chapter09.sql. The text between `/*` and `*/` is a comment, which DB Browser ignores when it runs a script. Each query you write in this chapter goes at the end of the script, under a one-line comment that begins with two dashes. Click **Save SQL file** again whenever you add to the script. Ctrl+S is the shortcut for Write Changes, which saves changes to the database, not the script.
+
+**Step 4. Run your first query.** The Execute SQL tab has an editor for queries, a grid for the result, and a pane for messages.
+
+a. Below the header, leave a blank line, and type the comment and query below.
+
+   ```sql
+   -- Tutorial 9.1: every column of the chart of accounts
    SELECT *
    FROM Account;
    ```
 
-c. Click **Execute all/selected SQL**, the button with a triangle pointing right, or press Ctrl+Return (Cmd+Return on a Mac).
+b. Select the two lines of the query, from SELECT to the semicolon.
+c. Click **Execute all/selected SQL**, the button with a triangle pointing right, or press Ctrl+Return (Cmd+Return on a Mac). F5 and Ctrl+R also run it.
 d. Read the message pane below the result.
 
-The grid shows every column of the Account table, one row for each account in the chart of accounts. The message pane reports that the query ran without errors and how many rows it returned, a little over a hundred. Scroll through the rows and notice the header accounts, such as 1000 Assets, which organize the chart but receive no postings.
+The grid shows every column of the Account table, one row for each account in the chart of accounts. The message pane reports that the query ran without errors, how many rows it returned, a little over a hundred, and how long it took. Scroll through the rows and notice the header accounts, such as 1000 Assets, which organize the chart. They receive no postings.
 
-**Step 4. Choose the columns you need.** Most analyses need only a few columns, listed in the order you want them.
+**Step 5. Choose the columns you need.** Most analyses need only a few columns, listed in the order you want them.
 
-a. Replace the query in the editor with the one below.
+a. Leave a blank line after the first query, and type the comment and query below.
 
    ```sql
+   -- Tutorial 9.1: the columns that identify each account
    SELECT AccountID, AccountNumber, AccountName,
        AccountType, AccountSubType
    FROM Account;
    ```
 
-b. Run the query.
+b. Select the new query and run it.
 c. Scroll down to account 5080 Manufacturing Variance and read its AccountID.
 d. Record the AccountID of account 1090 Manufacturing Cost Clearing as well.
 
 The result, shown in @fig-09-03, has five columns. AccountID and AccountNumber are different numbers: 5080 Manufacturing Variance has AccountID 93, and 1090 has AccountID 92. As Chapter 3 explained, AccountID is the surrogate key that the GLEntry table uses, so any query of the ledger must use it. Both accounts have the subtype you would expect: 5080 is part of cost of goods sold, and 1090 is a current asset.
 
-![Choosing Columns from the Account Table.](/visuals/svg/fig-09-03-account-columns.svg){#fig-09-03 fig-alt="A mock of the Execute SQL tab of DB Browser for SQLite. The editor holds a query that selects AccountID, AccountNumber, AccountName, AccountType, and AccountSubType from the Account table. The result grid shows the rows around the manufacturing accounts, including account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93, which are outlined. The message pane reports that the query ran without errors and the number of rows returned."}
+![Choosing Columns from the Account Table.](/visuals/svg/fig-09-03-account-columns.svg){#fig-09-03 fig-alt="A mock of the Execute SQL tab of DB Browser for SQLite. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects AccountID, AccountNumber, AccountName, AccountType, and AccountSubType from the Account table. The result grid shows the rows around the manufacturing accounts, including account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93, which are outlined. The message pane reports that the query ran without errors, the number of rows returned, and the line at which the query starts."}
 
-**Step 5. Calculate a check on the variance records.** A calculated column can test whether the parts of each variance add up to its total.
+**Step 6. Make and correct a deliberate error.** Every query writer meets error messages, and reading one is quicker than hunting for the mistake.
 
-a. Replace the query with the one below, which gives each column a short alias.
+a. In the query from Step 5, change AccountNumber on its first line to `AccountNumbr`.
+b. Select the query and run it.
+c. Read the message pane.
+d. Correct the spelling, and run the query again.
+
+The message pane turns red, as in @fig-09-04. It reports that execution finished with errors, names the column it cannot find, and gives the line of the editor at which the statement starts. After the correction, the query runs as before. @tbl-09-01 lists the other messages you are likely to meet.
+
+![A Syntax Error in the Message Pane.](/visuals/svg/fig-09-04-syntax-error.svg){#fig-09-04 fig-alt="A mock of the Execute SQL tab. The editor holds the query from Step 5 with AccountNumber misspelled as AccountNumbr. The message pane below it is red with white text: Execution finished with errors, Result: no such column: AccountNumbr, and the line at which the statement starts."}
+
+**Step 7. Calculate a check on the variance records.** A calculated column can test whether the parts of each variance add up to its total.
+
+a. At the end of the script, type the comment and query below, which give each column a short alias.
 
    ```sql
+   -- Tutorial 9.1: the parts of each variance and their check
    SELECT WorkOrderCloseID, CloseDate,
        MaterialVarianceAmount AS Material,
        ConversionVarianceAmount AS Conversion,
@@ -71,18 +102,20 @@ a. Replace the query with the one below, which gives each column a short alias.
    FROM WorkOrderClose;
    ```
 
-b. Run the query and read the number of rows in the message pane.
+b. Select the query, run it, and read the number of rows in the message pane.
 c. Scroll through the first rows and look at the CheckDifference column.
+d. Click **Save SQL file** to save the script.
 
-The result, shown in @fig-09-04, has one row for each closed work order, many thousands of them, and the headings use the aliases. In every row you can see, CheckDifference is zero: the material part and the conversion part of each variance add up to its total. The conversion part is itself made up of the direct labor part and the overhead part. You cannot scroll through thousands of rows to confirm the check for all of them, but in Tutorial 9.2 you will filter for the rows where it fails.
+The result, shown in @fig-09-05, has one row for each closed work order, many thousands of them, and the headings use the aliases. In every row you can see, CheckDifference is zero: the material part and the conversion part of each variance add up to its total. You cannot scroll through thousands of rows to confirm the check for all of them, but in Tutorial 9.2 you will filter for the rows where it fails.
 
-![A Calculated Check on the Variance Records.](/visuals/svg/fig-09-04-variance-check.svg){#fig-09-04 fig-alt="A mock of the Execute SQL tab. The query selects WorkOrderCloseID, CloseDate, and the material, conversion, and total variance of each work order close under the aliases Material, Conversion, and Total, and a calculated column CheckDifference that rounds material plus conversion minus total to two decimals. The first rows of the result show the aliases as headings and a CheckDifference of zero in every row, and that column is outlined. The message pane reports the number of rows returned."}
+![A Calculated Check on the Variance Records.](/visuals/svg/fig-09-05-variance-check.svg){#fig-09-05 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects WorkOrderCloseID, CloseDate, and the material, conversion, and total variance of each work order close under the aliases Material, Conversion, and Total, with a calculated column CheckDifference that rounds material plus conversion minus total to two decimals. The first rows of the result show the aliases as headings and a CheckDifference of zero in every row, and that column is outlined. The message pane reports the number of rows returned."}
 
 **Checkpoint.** Check that:
 
-- the title bar shows CharlesRiver_Work.sqlite, not the file you downloaded;
-- you can find the GLEntry and WorkOrderClose tables and their columns on the Database Structure tab;
+- the title bar shows the path of CharlesRiver_Work.sqlite, not the file you downloaded, and Write Changes is grayed out;
+- Chapter09.sql holds the header comment and three queries, each under a comment;
 - you have recorded AccountID 92 for account 1090 and AccountID 93 for account 5080;
+- the misspelled column produced a red message pane, and the corrected query ran;
 - the CheckDifference column is zero in the rows you can see.
 
 You now know where the variance is recorded: in the WorkOrderClose table, one row for each closed work order, and in the ledger, under an AccountID that differs from its account number.

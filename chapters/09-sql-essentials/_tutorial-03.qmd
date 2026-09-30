@@ -1,8 +1,8 @@
 ## Guided Tutorial 9.3: Ranking the Largest Work-Order Variances
 
-**Context and objective.** The ledger postings tell you how much variance was recorded, but not which work orders produced it or which part of the cost went over standard. In this tutorial, you will rank the work order closes of fiscal 2026 by their variance, look at the parts of the largest ones, examine the favorable end of the ranking, and save the chapter's queries in a documented script.
+**Context and objective.** The ledger postings tell you how much variance was recorded, but not which work orders produced it or which part of the cost went over standard. In this tutorial, you will rank the work order closes of fiscal 2026 by their variance, look at the parts of the largest ones, and examine the favorable end of the ranking. You will then list the closes above a review threshold in either direction, copy a result into Excel, and complete the chapter's script.
 
-**Prerequisites.** Complete Tutorials 9.1 and 9.2, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab.
+**Prerequisites.** Complete Tutorials 9.1 and 9.2, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. As before, type each query at the end of the script and run it by selecting it. You also need Excel for Step 5.
 
 **Step-by-step instructions.**
 
@@ -11,6 +11,7 @@
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 9.3: the ten largest variances of fiscal 2026
    SELECT WorkOrderCloseID, WorkOrderID, CloseDate,
        MaterialVarianceAmount AS Material,
        DirectLaborVarianceAmount AS Labor,
@@ -25,15 +26,16 @@ a. Type and run the query below.
 b. Read the Total column from the top down.
 c. Compare the Overhead column with the Material and Labor columns in each row.
 
-The result, shown in @fig-09-06, lists the ten work order closes of fiscal 2026 with the largest unfavorable variances, each a few thousand dollars. In every one of them, the overhead part is far larger than the material and labor parts together.
+The result, shown in @fig-09-09, lists the ten work order closes of fiscal 2026 with the largest unfavorable variances, each a few thousand dollars. In every one of them, the overhead part is far larger than the material and labor parts together.
 
-![The Ten Largest Work-Order Variances of Fiscal 2026.](/visuals/svg/fig-09-06-top-variances.svg){#fig-09-06 fig-alt="A mock of the Execute SQL tab. The query selects the work order closes of fiscal 2026 with their material, labor, overhead, and total variance, sorts them by total variance in descending order, and keeps ten rows. The result grid shows ten closes with total variances of a few thousand dollars each, and the Overhead column, which holds most of each total, is outlined. The message pane reports that ten rows were returned."}
+![The Ten Largest Work-Order Variances of Fiscal 2026.](/visuals/svg/fig-09-09-top-variances.svg){#fig-09-09 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects the work order closes of fiscal 2026 with their material, labor, overhead, and total variance, sorts them by total variance in descending order, and keeps ten rows. The result grid shows ten closes with total variances of a few thousand dollars each, and the Overhead column, which holds most of each total, is outlined. The message pane reports that ten rows were returned."}
 
 **Step 2. Measure the share of overhead.** A calculated column turns the comparison in Step 1 into a number.
 
 a. Add a comma after `AS Total` in the query from Step 1, and add a new column after it, so that the query reads as below.
 
    ```sql
+   -- Tutorial 9.3: the ten largest variances of fiscal 2026
    SELECT WorkOrderCloseID, WorkOrderID, CloseDate,
        MaterialVarianceAmount AS Material,
        DirectLaborVarianceAmount AS Labor,
@@ -49,40 +51,67 @@ a. Add a comma after `AS Total` in the query from Step 1, and add a new column a
 
 b. Run the query and read the OverheadShare column.
 
-Overhead makes up most of each of the ten largest variances, in several of them more than four-fifths. The variance amounts are stored as REAL numbers, so the division keeps its decimals.
+Overhead makes up most of each of the ten largest variances, in most of them more than four-fifths. The variance amounts are stored as REAL numbers, so the division keeps its decimals. Without the comma after `AS Total`, the query would fail with a syntax error, because a new column must be separated from the one before it.
 
 **Step 3. Look at the favorable end of the ranking.** A variance can be favorable as well as unfavorable, and the net variance of the year is the balance of the two.
 
-a. In the query from Step 1, remove DESC from the ORDER BY clause and run the query again.
+a. In the query from Step 2, remove DESC from the ORDER BY clause, and run the query again.
 b. Read the Total column of the ten rows.
-c. Replace the ORDER BY and LIMIT clauses with the condition `AND TotalVarianceAmount < 0` at the end of the WHERE clause, run the query, and read the number of rows in the message pane.
+c. Add DESC back, so that the script keeps the ranking of Step 2.
 
-Sorted in ascending order, the ranking starts with negative totals, which are favorable variances of up to about two thousand dollars. The condition in item c returns several hundred favorable closes, a small minority of the year's closes. The variance of fiscal 2026 is therefore the result of many unfavorable closes, partly offset by a few hundred favorable ones.
+Sorted in ascending order, the ranking starts with negative totals, which are favorable variances of up to about two thousand dollars. They are much smaller than the largest unfavorable ones.
 
-**Step 4. Save the queries in a documented script.** A script records what you asked the database and why, so that you or a reviewer can run it again.
+**Step 4. List the closes above a review threshold.** ABS removes the sign of a number, so one condition can find large variances in either direction.
 
-a. Clear the editor and type a header comment like the one below, with your own name and the date.
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 9.3: closes of 2026 above $1,000 either way
+   SELECT WorkOrderCloseID, CloseDate, TotalVarianceAmount
+   FROM WorkOrderClose
+   WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+       AND ABS(TotalVarianceAmount) > 1000
+   ORDER BY TotalVarianceAmount;
+   ```
+
+b. Read the number of rows in the message pane.
+c. Scroll through the first rows, which the ascending sort puts at the favorable end.
+
+The query keeps every close whose variance is more than a thousand dollars in either direction, the kind of threshold an analyst might set for review. It returns several hundred closes, about a quarter of the year's closes. Only about a tenth of them are favorable, at the top of the result. The variance of fiscal 2026 is therefore the result of many unfavorable closes, partly offset by fewer and smaller favorable ones.
+
+**Step 5. Copy a result into Excel.** A query result can move into a workbook to be charted or formatted for a report.
+
+a. Select the query from Step 2 and run it again, so that the grid shows the ten largest variances.
+b. Click any cell of the result grid, and press Ctrl+A to select all of its cells.
+c. Right-click the selection and choose **Copy with Headers**.
+d. Open a blank Excel workbook, click cell A1, and paste.
+
+The ten rows paste into the worksheet with their column headings, one value in each cell, ready to be formatted or charted. For a result too large to copy comfortably, **Save the results view** > **Export to CSV**, on the Execute SQL toolbar, writes the result to a file that Excel opens. Either way, the query remains in the script, so the same extraction can be produced again.
+
+**Step 6. Complete and save the script.** The header comment should record the checks that the queries passed.
+
+a. Replace the last line of the header comment, so that the header reads as below.
 
    ```sql
    /* Chapter 9: manufacturing variance, first look
       Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
       Prepared by: your name, date
-      Checks: the variance parts add up to the total in every close;
-              the 2026 ledger postings exclude closing entry JE-2026-000296 */
+      Checks: every close adds up; the 2026 postings exclude JE-2026-000296 */
    ```
 
-b. Below the header, paste the queries from Tutorials 9.1 to 9.3, each with a one-line comment above it that starts with two dashes and says what the query answers.
-c. Click **Save SQL file** on the toolbar of the Execute SQL tab, and save the script as `Chapter09.sql` in the folder that holds your working copy.
-d. Select one whole query with the mouse, from SELECT to its semicolon, and click **Execute all/selected SQL**.
+b. Click **Save SQL file**.
+c. Select any query in the script, from SELECT to its semicolon, and run it again.
 
-The editor now holds a script like the one in @fig-09-07. When text is selected, DB Browser runs only the selection, so one script can hold every query of the chapter and you can still run each one on its own.
+The script now looks like @fig-09-10. It holds every query of the chapter, each under a comment that says what it answers, and a header that records the purpose, source, preparer, and checks. When text is selected, DB Browser runs only the selection, so one script can hold every query and you can still run each one on its own. Running the whole script at once would run every query and show only the last result.
 
-![A Documented Script of the Chapter's Queries.](/visuals/svg/fig-09-07-saved-script.svg){#fig-09-07 fig-alt="A mock of the Execute SQL editor holding the saved script Chapter09.sql. The script opens with a header comment that records the purpose, the database file, the preparer and date, and the checks the results should pass. Below it, each query from the chapter's tutorials is preceded by a one-line comment that begins with two dashes and says what the query answers. The comments are shown in gray and the SQL keywords in bold blue."}
+![The Chapter's Script After Tutorial 9.3.](/visuals/svg/fig-09-10-saved-script.svg){#fig-09-10 fig-alt="A mock of the Execute SQL editor holding the saved script Chapter09.sql. The script opens with a header comment that records the purpose, the database file, the preparer and date, and the checks the results passed. Below it, the queries of the three tutorials follow in order, each preceded by a one-line comment that begins with two dashes and says what the query answers. The comments are shown in gray and the SQL keywords in bold blue, and a note says that the script continues below the lines shown."}
 
 **Checkpoint.** Check that:
 
 - the ten largest variances of fiscal 2026 are each a few thousand dollars, and overhead makes up most of each one;
-- the favorable closes of fiscal 2026 number several hundred, and their totals are negative;
-- Chapter09.sql is saved beside your working copy, with a header comment and a comment above each query.
+- sorted in ascending order, the ranking starts with favorable variances of up to about two thousand dollars;
+- the review threshold finds several hundred closes above a thousand dollars either way, only a small share of them favorable;
+- the ten rows pasted into Excel with their headings;
+- Chapter09.sql is saved beside your working copy, with a completed header and a comment above each query.
 
 The ranking points the controller toward overhead, which carries most of the conversion variance. It does not yet say which products those work orders made or how the variance changed from year to year, and those questions need the tables to be joined and summarized.

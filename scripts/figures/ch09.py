@@ -2,16 +2,110 @@
 
 from __future__ import annotations
 
+import sqlite3
 from functools import lru_cache
 
 import dbbrowser as db
 import excel as xl
-from data import one, q, require_columns
-from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, ROW_H,
-                    RULE, SMALL, TEAL, TEAL_TINT, WHITE, Diagram, esc)
+from data import connection, one, q
+from drawio import (BLUE, BLUE_TINT, GRAY, GRAY_TINT, INK, ROW_H, RULE, SMALL, Diagram, esc)
 
 VARIANCE_ACCOUNT = 5080
 CLEARING_ACCOUNT = 1090
+SCRIPT_TAB = "Chapter09.sql"
+
+# The chapter's script, Chapter09.sql, as the three tutorials build it: a header comment, then
+# each query at the end of the script under a one-line comment. The tutorial mocks show each
+# query at the line where it sits in this script, and fig-09-10 shows the top of the script.
+HEADER = (
+    "/* Chapter 9: manufacturing variance, first look\n"
+    "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
+    "   Prepared by: your name, date\n"
+    "   Checks: every close adds up; the 2026 postings exclude JE-2026-000296 */"
+)
+QUERIES = [
+    ("all_accounts", "-- Tutorial 9.1: every column of the chart of accounts",
+     "SELECT *\n"
+     "FROM Account;"),
+    ("account_columns", "-- Tutorial 9.1: the columns that identify each account",
+     "SELECT AccountID, AccountNumber, AccountName,\n"
+     "    AccountType, AccountSubType\n"
+     "FROM Account;"),
+    ("variance_check", "-- Tutorial 9.1: the parts of each variance and their check",
+     "SELECT WorkOrderCloseID, CloseDate,\n"
+     "    MaterialVarianceAmount AS Material,\n"
+     "    ConversionVarianceAmount AS Conversion,\n"
+     "    TotalVarianceAmount AS Total,\n"
+     "    ROUND(MaterialVarianceAmount + ConversionVarianceAmount\n"
+     "        - TotalVarianceAmount, 2) AS CheckDifference\n"
+     "FROM WorkOrderClose;"),
+    ("accounts_by_number", "-- Tutorial 9.2: the two manufacturing accounts by number",
+     "SELECT AccountID, AccountNumber, AccountName\n"
+     "FROM Account\n"
+     "WHERE AccountNumber IN (1090, 5080);"),
+    ("variance_postings", "-- Tutorial 9.2: the variance postings of fiscal 2026",
+     "SELECT GLEntryID, PostingDate, Debit, Credit,\n"
+     "    SourceDocumentType, VoucherNumber, Description\n"
+     "FROM GLEntry\n"
+     "WHERE AccountID = 93 AND FiscalYear = 2026;"),
+    ("source_types", "-- Tutorial 9.2: the source document types of those postings",
+     "SELECT DISTINCT SourceDocumentType\n"
+     "FROM GLEntry\n"
+     "WHERE AccountID = 93 AND FiscalYear = 2026;"),
+    ("closing_entry", "-- Tutorial 9.2: the closing entry, left out of any analysis",
+     "SELECT GLEntryID, PostingDate, Debit, Credit,\n"
+     "    VoucherNumber, Description\n"
+     "FROM GLEntry\n"
+     "WHERE AccountID = 93 AND FiscalYear = 2026\n"
+     "    AND SourceDocumentType = 'JournalEntry';"),
+    ("check_failures", "-- Tutorial 9.2: closes whose parts differ from their total",
+     "SELECT WorkOrderCloseID, TotalVarianceAmount\n"
+     "FROM WorkOrderClose\n"
+     "WHERE ROUND(MaterialVarianceAmount + ConversionVarianceAmount\n"
+     "    - TotalVarianceAmount, 2) <> 0;"),
+    ("open_work_orders", "-- Tutorial 9.2: work orders not yet closed",
+     "SELECT WorkOrderNumber, Status, ReleasedDate, DueDate,\n"
+     "    COALESCE(CompletedDate, 'not completed') AS Completed,\n"
+     "    CAST(SUBSTR(WorkOrderNumber, 4, 4) AS INTEGER) AS ReleaseYear\n"
+     "FROM WorkOrder\n"
+     "WHERE ClosedDate IS NULL;"),
+    ("top_ten", "-- Tutorial 9.3: the ten largest variances of fiscal 2026",
+     "SELECT WorkOrderCloseID, WorkOrderID, CloseDate,\n"
+     "    MaterialVarianceAmount AS Material,\n"
+     "    DirectLaborVarianceAmount AS Labor,\n"
+     "    OverheadVarianceAmount AS Overhead,\n"
+     "    TotalVarianceAmount AS Total,\n"
+     "    ROUND(OverheadVarianceAmount / TotalVarianceAmount, 2)\n"
+     "        AS OverheadShare\n"
+     "FROM WorkOrderClose\n"
+     "WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "ORDER BY TotalVarianceAmount DESC\n"
+     "LIMIT 10;"),
+    ("review_threshold", "-- Tutorial 9.3: closes of 2026 above $1,000 either way",
+     "SELECT WorkOrderCloseID, CloseDate, TotalVarianceAmount\n"
+     "FROM WorkOrderClose\n"
+     "WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "    AND ABS(TotalVarianceAmount) > 1000\n"
+     "ORDER BY TotalVarianceAmount;"),
+]
+
+
+def script() -> str:
+    """The whole of Chapter09.sql."""
+    parts = [HEADER]
+    for _, comment, sql in QUERIES:
+        parts.append(f"{comment}\n{sql}")
+    return "\n\n".join(parts)
+
+
+def location(key: str) -> tuple[str, str, int]:
+    """The comment, the query, and the editor line of the comment for one query."""
+    line = HEADER.count("\n") + 3            # the header, a blank line, then the first comment
+    for k, comment, sql in QUERIES:
+        if k == key:
+            return comment, sql, line
+        line += 1 + sql.count("\n") + 2     # comment, query lines, blank line
+    raise KeyError(key)
 
 
 def note(d: Diagram, text: str, y: float, h: float = 40) -> None:
@@ -27,38 +121,57 @@ def account_ids() -> dict[int, int]:
     return rows
 
 
+def tutorial_query(d: Diagram, key: str, widths: list[float], shown: slice | None = None,
+                   sql: str | None = None) -> dict:
+    """An Execute SQL mock of one script query, shown with its comment where it sits in
+    Chapter09.sql. sql replaces the saved query, for a step that shows an earlier version."""
+    comment, saved, line = location(key)
+    text = sql or saved
+    headers, rows = db.run(text)
+    y = db.window(d)
+    y = db.editor(d, 0, y, 860, f"{comment}\n{text}", tab=SCRIPT_TAB, first_line=line) + 8
+    first = (shown.start or 0) + 1 if shown else 1
+    visible = rows[shown] if shown else rows
+    geometry = db.results(d, 0, y, headers, widths, visible, first=first)
+    y += (len(visible) + 1) * ROW_H + 8
+    bottom = db.message(d, 0, y, 860, len(rows), text.split("\n")[0], line=line + 1)
+    return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
+
+
 # -- figures ----------------------------------------------------------------------------
 
 def fig_09_01() -> Diagram:
-    d = Diagram("Exporting Data Compared with Querying It")
+    d = Diagram("Importing Data Compared with Querying It")
     tables = one("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' "
                  "AND name NOT LIKE 'sqlite_%'")[0]
     assert tables > 50
     w, xs = 170, (0, 345, 690)
-    # Upper path: whole tables copied into a workbook.
-    d.text("<b>Exporting or importing tables</b>", 0, 0, 860, 22, size=14, color=INK)
-    src1 = d.box("<b>Charles River database</b><br>every table, every row", xs[0], 34, w, 70,
+    # Upper path: Part II's Power Query imports into a workbook.
+    d.text("<b>Importing tables into a workbook (Part II)</b>", 0, 0, 860, 22, size=14, color=INK)
+    src1 = d.box("<b>CharlesRiver.xlsx</b><br>every table, every row", xs[0], 34, w, 70,
                  fill=GRAY_TINT, stroke=GRAY)
-    wb = d.box("<b>Workbook</b><br>whole tables copied in", xs[1], 34, w, 70, fill=GRAY_TINT,
-               stroke=GRAY)
-    out1 = d.box("<b>Result</b><br>filtered, merged, and summarized by hand", xs[2], 34, w, 70,
+    wb = d.box("<b>Analysis workbook</b><br>the chosen tables copied in", xs[1], 34, w, 70,
+               fill=GRAY_TINT, stroke=GRAY)
+    out1 = d.box("<b>Result</b><br>merged and summarized from the copies", xs[2], 34, w, 70,
                  fill=GRAY_TINT, stroke=GRAY)
-    d.arrow(src1, wb, label="export or import")
-    d.arrow(wb, out1, label="work in the workbook")
-    d.text("The steps live in the workbook, and every table copied in must be refreshed.",
-           0, 112, 860, 22, size=SMALL, color=INK)
+    d.arrow(src1, wb, label="Power Query")
+    d.arrow(wb, out1, label="merge, then analyze")
+    d.text("The steps are recorded and can be refreshed, but every table is copied into the "
+           "workbook, and each question across tables needs a merge first.",
+           0, 112, 860, 40, size=SMALL, color=INK)
     # Lower path: a saved query.
-    d.text("<b>Querying the database</b>", 0, 158, 860, 22, size=14, color=INK)
-    sql = d.box("<b>Saved SQL query</b><br>SELECT … FROM … WHERE …", xs[0], 192, w, 70,
+    d.text("<b>Querying the database (Part III)</b>", 0, 170, 860, 22, size=14, color=INK)
+    sql = d.box("<b>Saved SQL query</b><br>SELECT … FROM … WHERE …", xs[0], 204, w, 70,
                 fill=BLUE_TINT, stroke=BLUE)
-    src2 = d.box("<b>Charles River database</b><br>the query runs where the data is", xs[1], 192,
+    src2 = d.box("<b>CharlesRiver.sqlite</b><br>the query runs where the data is", xs[1], 204,
                  w, 70, fill=BLUE_TINT, stroke=BLUE)
-    out2 = d.box("<b>Result</b><br>only the rows and columns asked for", xs[2], 192, w, 70,
+    out2 = d.box("<b>Result</b><br>only the rows and columns asked for", xs[2], 204, w, 70,
                  fill=BLUE_TINT, stroke=BLUE)
     d.arrow(sql, src2, label="sent to")
     d.arrow(src2, out2, label="returns")
-    d.text("The query text documents the extraction and runs again when the data changes.",
-           0, 270, 860, 22, size=SMALL, color=INK)
+    d.text("Nothing is copied until the query asks for it. The query text documents the "
+           "extraction and runs again when the data changes.", 0, 282, 860, 40, size=SMALL,
+           color=INK)
     return d
 
 
@@ -67,12 +180,14 @@ def fig_09_02() -> Diagram:
     columns = q("PRAGMA table_info(GLEntry)")
     names = [r[0] for r in q("SELECT name FROM sqlite_master WHERE type = 'table' "
                              "AND name NOT LIKE 'sqlite_%' ORDER BY name")]
+    counts = dict(q("SELECT type, COUNT(*) FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' "
+                    "GROUP BY type"))
     i = names.index("GLEntry")
     y = db.window(d, active="Database Structure")
     widths = [300, 120, 440]
     db.structure_row(d, 0, y, widths, ["Name", "Type", "Schema"], bold=True, fill=GRAY_TINT)
     y += ROW_H
-    db.structure_row(d, 0, y, widths, ["▾ Tables", "", ""], bold=True)
+    db.structure_row(d, 0, y, widths, [f"▾ Tables ({len(names)})", "", ""], bold=True)
     y += ROW_H
     for name in names[:3]:
         db.structure_row(d, 0, y, widths, [f"▸ {name}", "", f'CREATE TABLE "{name}" (…)'],
@@ -96,8 +211,15 @@ def fig_09_02() -> Diagram:
         db.structure_row(d, 0, y, widths, [f"▸ {name}", "", f'CREATE TABLE "{name}" (…)'],
                          indent=1)
         y += ROW_H
+    db.structure_row(d, 0, y, widths, ["…", "", ""], indent=1)
+    y += ROW_H
+    for label, kind in [("Indices", "index"), ("Views", "view"), ("Triggers", "trigger")]:
+        db.structure_row(d, 0, y, widths, [f"▸ {label} ({counts.get(kind, 0)})", "", ""],
+                         bold=True)
+        y += ROW_H
     types = {kind for _, _, kind, *_ in columns}
     assert types == {"INTEGER", "REAL", "TEXT"}, types
+    assert counts.get("view", 0) == 0 and counts.get("trigger", 0) == 0, counts
     note(d, "Outlined: the GLEntry table expanded to show its columns and their declared types. "
             "The list of tables is shortened.", y + 10, 22)
     return d
@@ -106,12 +228,11 @@ def fig_09_02() -> Diagram:
 def fig_09_03() -> Diagram:
     d = Diagram("Choosing Columns from the Account Table")
     ids = account_ids()
-    sql = ("SELECT AccountID, AccountNumber, AccountName,\n"
-           "    AccountType, AccountSubType\n"
-           "FROM Account;")
-    headers, rows = db.run(sql)
+    _, sql, _ = location("account_columns")
+    rows = db.run(sql)[1]
     start = [r[0] for r in rows].index(ids[1090]) - 4
-    out = db.execute_sql(d, sql, [90, 120, 290, 110, 210], shown=slice(start, start + 9))
+    out = tutorial_query(d, "account_columns", [90, 120, 290, 110, 210],
+                         shown=slice(start, start + 9))
     marked = [r for r, row in enumerate(out["rows"][start:start + 9]) if row[0] in ids.values()]
     db.emphasize_cells(d, out["geometry"], [(marked[0], 0), (marked[-1], 4)])
     note(d, "Outlined: accounts 1090 and 5080, whose AccountIDs differ from their account numbers. "
@@ -120,97 +241,81 @@ def fig_09_03() -> Diagram:
 
 
 def fig_09_04() -> Diagram:
+    d = Diagram("A Syntax Error in the Message Pane")
+    comment, sql, line = location("account_columns")
+    wrong = sql.replace("AccountNumber", "AccountNumbr", 1)
+    assert wrong != sql
+    try:
+        connection().execute(wrong)
+        raise AssertionError("the misspelled query should fail")
+    except sqlite3.OperationalError as exc:
+        error = str(exc)
+    assert error == "no such column: AccountNumbr", error
+    y = db.window(d)
+    y = db.editor(d, 0, y, 860, f"{comment}\n{wrong}", tab=SCRIPT_TAB, first_line=line) + 8
+    bottom = db.message(d, 0, y, 860, 0, wrong.split("\n")[0], line=line + 1, error=error)
+    note(d, "The message pane turns red and names the column it cannot find, at the line where "
+            "the statement starts. The result grid between the editor and the pane is not shown.",
+         bottom + 8, 40)
+    return d
+
+
+def fig_09_05() -> Diagram:
     d = Diagram("A Calculated Check on the Variance Records")
-    sql = ("SELECT WorkOrderCloseID, CloseDate,\n"
-           "    MaterialVarianceAmount AS Material,\n"
-           "    ConversionVarianceAmount AS Conversion,\n"
-           "    TotalVarianceAmount AS Total,\n"
-           "    ROUND(MaterialVarianceAmount + ConversionVarianceAmount\n"
-           "        - TotalVarianceAmount, 2) AS CheckDifference\n"
-           "FROM WorkOrderClose;")
-    headers, rows = db.run(sql)
+    _, sql, _ = location("variance_check")
+    rows = db.run(sql)[1]
     assert all(r[5] == 0 for r in rows), "every close's parts add up to its total"
-    out = db.execute_sql(d, sql, [150, 110, 110, 120, 110, 180], shown=slice(0, 8))
+    out = tutorial_query(d, "variance_check", [150, 110, 110, 120, 110, 180], shown=slice(0, 8))
     db.emphasize_cells(d, out["geometry"], [(-1, 5), (7, 5)])
     note(d, "Outlined: the calculated CheckDifference column, zero in every row shown. "
             "The first eight of the result's rows are shown.", out["bottom"] + 8, 40)
     return d
 
 
-def fig_09_05() -> Diagram:
-    d = Diagram("The Source Document Types Behind the Variance Account")
-    account_ids()
-    sql = ("SELECT DISTINCT SourceDocumentType\n"
-           "FROM GLEntry\n"
-           "WHERE AccountID = 93 AND FiscalYear = 2026;")
-    headers, rows = db.run(sql)
-    assert [r[0] for r in rows] == ["WorkOrderClose", "JournalEntry"], rows
-    out = db.execute_sql(d, sql, [260])
-    db.emphasize_cells(d, out["geometry"], [(1, 0)])
-    note(d, "Outlined: the JournalEntry row, which Step 4 examines.", out["bottom"] + 8, 22)
-    return d
-
-
 def fig_09_06() -> Diagram:
-    d = Diagram("The Ten Largest Work-Order Variances of Fiscal 2026")
-    sql = ("SELECT WorkOrderCloseID, WorkOrderID, CloseDate,\n"
-           "    MaterialVarianceAmount AS Material,\n"
-           "    DirectLaborVarianceAmount AS Labor,\n"
-           "    OverheadVarianceAmount AS Overhead,\n"
-           "    TotalVarianceAmount AS Total\n"
-           "FROM WorkOrderClose\n"
-           "WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
-           "ORDER BY TotalVarianceAmount DESC\n"
-           "LIMIT 10;")
-    headers, rows = db.run(sql)
-    assert len(rows) == 10 and all(r[5] > r[3] + r[4] for r in rows), \
-        "overhead is larger than material and labor together in each of the ten"
-    out = db.execute_sql(d, sql, [150, 110, 110, 100, 100, 110, 100])
-    db.emphasize_cells(d, out["geometry"], [(-1, 5), (9, 5)])
-    note(d, "Outlined: the Overhead column, which holds most of each total.", out["bottom"] + 8, 22)
+    d = Diagram("How WHERE Treats a Missing Value")
+    picks = []
+    for status, n in [("Closed", 2), ("Completed", 2), ("Released", 2)]:
+        picks += q("SELECT WorkOrderID, WorkOrderNumber, Status, ClosedDate FROM WorkOrder "
+                   "WHERE ReleasedDate BETWEEN '2026-11-01' AND '2026-11-30' AND Status = ? "
+                   "ORDER BY WorkOrderID LIMIT ?", status, n)
+    picks.sort()
+    assert len(picks) == 6
+    assert all((r[3] is None) == (r[2] != "Closed") for r in picks), picks
+    # Each test as SQLite evaluates it: = NULL is NULL for every row, IS NULL is 1 or 0.
+    tests = q("SELECT WorkOrderID, ClosedDate = NULL, ClosedDate IS NULL, "
+              "COALESCE(ClosedDate, 'open') FROM WorkOrder WHERE WorkOrderID IN "
+              f"({', '.join(str(r[0]) for r in picks)}) ORDER BY WorkOrderID")
+    assert all(t[1] is None for t in tests)
+    rows = []
+    for (_, number, status, closed), (_, _, isnull, coalesced) in zip(picks, tests):
+        rows.append((number, status, closed or "NULL",
+                     "NULL: not kept",
+                     "true: kept" if isnull else "false: not kept",
+                     coalesced))
+    headers = ["WorkOrderNumber", "Status", "ClosedDate", "ClosedDate = NULL",
+               "ClosedDate IS NULL", "COALESCE(ClosedDate, 'open')"]
+    widths = [140, 100, 100, 150, 150, 220]
+    d.text("<b>Six work orders released in November 2026, and three expressions evaluated for "
+           "each</b>", 0, 0, 860, 20, size=SMALL)
+    d.grid(0, 24, headers, widths, rows)
+    y = 24 + ROW_H * (len(rows) + 1) + 12
+    note(d, "A comparison with NULL is never true, so = NULL keeps no row, closed or open. IS NULL "
+            "is true for the work orders with no ClosedDate, and COALESCE shows a stand-in value "
+            "where the date is missing.", y, 40)
     return d
 
 
 def fig_09_07() -> Diagram:
-    d = Diagram("A Documented Script of the Chapter's Queries")
-    script = (
-        "/* Chapter 9: manufacturing variance, first look\n"
-        "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
-        "   Prepared by: your name, date\n"
-        "   Checks: the variance parts add up to the total in every close;\n"
-        "           the 2026 ledger postings exclude closing entry JE-2026-000296 */\n"
-        "\n"
-        "-- Tutorial 9.1: the manufacturing accounts and their AccountIDs\n"
-        "SELECT AccountID, AccountNumber, AccountName,\n"
-        "    AccountType, AccountSubType\n"
-        "FROM Account;\n"
-        "\n"
-        "-- Tutorial 9.2: the source document types of the 2026 variance postings\n"
-        "SELECT DISTINCT SourceDocumentType\n"
-        "FROM GLEntry\n"
-        "WHERE AccountID = 93 AND FiscalYear = 2026;\n"
-        "\n"
-        "-- Tutorial 9.2: work orders whose variance has not yet been recorded\n"
-        "SELECT WorkOrderNumber, Status, ReleasedDate, DueDate, CompletedDate\n"
-        "FROM WorkOrder\n"
-        "WHERE ClosedDate IS NULL;\n"
-        "\n"
-        "-- Tutorial 9.3: the ten largest variances of fiscal 2026\n"
-        "SELECT WorkOrderCloseID, WorkOrderID, CloseDate, TotalVarianceAmount\n"
-        "FROM WorkOrderClose\n"
-        "WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
-        "ORDER BY TotalVarianceAmount DESC\n"
-        "LIMIT 10;")
-    close = one("SELECT VoucherNumber FROM GLEntry WHERE AccountID = 93 AND FiscalYear = 2026 "
-                "AND SourceDocumentType = 'JournalEntry'")[0]
-    assert close == "JE-2026-000296"
-    for block in [b for b in script.split(";") if "SELECT" in b]:
-        db.run(block[block.index("SELECT"):])     # every query in the script runs
-    y = db.window(d)
-    bottom = db.editor(d, 0, y, 860, script, tab="Chapter09.sql")
-    note(d, "The header comment records the purpose, source, preparer, and checks, and a comment "
-            "above each query says what it answers. Only some of the chapter's queries are shown.",
-         bottom + 8, 40)
+    d = Diagram("The Source Document Types Behind the Variance Account")
+    account_ids()
+    _, sql, _ = location("source_types")
+    rows = db.run(sql)[1]
+    assert {r[0] for r in rows} == {"WorkOrderClose", "JournalEntry"}, rows
+    out = tutorial_query(d, "source_types", [260])
+    journal = [r for r, row in enumerate(out["rows"]) if row[0] == "JournalEntry"][0]
+    db.emphasize_cells(d, out["geometry"], [(journal, 0)])
+    note(d, "Outlined: the JournalEntry row, which Step 4 examines.", out["bottom"] + 8, 22)
     return d
 
 
@@ -235,8 +340,8 @@ def fig_09_08() -> Diagram:
     for i, (lines, label) in enumerate(parts):
         h = max(20 * len(lines) + 12, 44)
         code = "<br>".join(db.highlight(line)[0] for line in lines)
-        d.box(code, 0, y, 520, h, fill=GRAY_TINT if i == 0 else WHITE, stroke=RULE, size=SMALL,
-              align="left", valign="middle", rounded=False)
+        d.box(code, 0, y, 520, h, fill=GRAY_TINT if i == 0 else "#FFFFFF", stroke=RULE,
+              size=SMALL, align="left", valign="middle", rounded=False)
         d.box(esc(label), 540, y, 320, h, fill=BLUE_TINT, stroke=BLUE_TINT, size=SMALL,
               align="left", valign="middle", rounded=False)
         y += h + 6
@@ -245,13 +350,51 @@ def fig_09_08() -> Diagram:
     return d
 
 
+def fig_09_09() -> Diagram:
+    d = Diagram("The Ten Largest Work-Order Variances of Fiscal 2026")
+    _, saved, _ = location("top_ten")
+    # Step 1 of Tutorial 9.3 runs the query before Step 2 adds the OverheadShare column.
+    step1 = saved.replace("    TotalVarianceAmount AS Total,\n"
+                          "    ROUND(OverheadVarianceAmount / TotalVarianceAmount, 2)\n"
+                          "        AS OverheadShare\n", "    TotalVarianceAmount AS Total\n")
+    assert step1 != saved
+    rows = db.run(step1)[1]
+    assert len(rows) == 10 and all(r[5] > r[3] + r[4] for r in rows), \
+        "overhead is larger than material and labor together in each of the ten"
+    shares = [r[6] for r in db.run(saved)[1]]
+    assert sum(s > 0.8 for s in shares) >= 6, shares     # "most of them more than four-fifths"
+    out = tutorial_query(d, "top_ten", [150, 110, 110, 100, 100, 110, 100], sql=step1)
+    db.emphasize_cells(d, out["geometry"], [(-1, 5), (9, 5)])
+    note(d, "Outlined: the Overhead column, which holds most of each total.", out["bottom"] + 8, 22)
+    return d
+
+
+def fig_09_10() -> Diagram:
+    d = Diagram("The Chapter's Script After Tutorial 9.3")
+    close = one("SELECT VoucherNumber FROM GLEntry WHERE AccountID = 93 AND FiscalYear = 2026 "
+                "AND SourceDocumentType = 'JournalEntry'")[0]
+    assert close == "JE-2026-000296" and close in HEADER
+    for _, _, sql in QUERIES:
+        db.run(sql)                                     # every query in the script runs
+    lines = script().split("\n")
+    shown = "\n".join(lines[:36])
+    y = db.window(d)
+    bottom = db.editor(d, 0, y, 860, shown, tab=SCRIPT_TAB)
+    note(d, "The header comment records the purpose, the database, the preparer, and the checks, "
+            "and a comment above each query says what it answers. The script continues below the "
+            f"lines shown, {len(lines)} lines in all.", bottom + 8, 40)
+    return d
+
+
 FIGURES = {
-    "fig-09-01-export-vs-query": fig_09_01,
+    "fig-09-01-import-vs-query": fig_09_01,
     "fig-09-02-database-structure": fig_09_02,
     "fig-09-03-account-columns": fig_09_03,
-    "fig-09-04-variance-check": fig_09_04,
-    "fig-09-05-variance-sources": fig_09_05,
-    "fig-09-06-top-variances": fig_09_06,
-    "fig-09-07-saved-script": fig_09_07,
+    "fig-09-04-syntax-error": fig_09_04,
+    "fig-09-05-variance-check": fig_09_05,
+    "fig-09-06-where-null": fig_09_06,
+    "fig-09-07-variance-sources": fig_09_07,
     "fig-09-08-query-anatomy": fig_09_08,
+    "fig-09-09-top-variances": fig_09_09,
+    "fig-09-10-saved-script": fig_09_10,
 }

@@ -6,7 +6,7 @@
 
 A.  `SELECT * FROM Account;`
 B.  `SELECT AccountNumber, AccountName FROM Account;`
-C.  `SELECT AccountNumber AccountName FROM Account;`
+C.  `SELECT AccountNumber, AccountName WHERE Account;`
 D.  `SELECT Account FROM AccountNumber, AccountName;`
 
 **2.** To list the ledger postings to account 5080 Manufacturing Variance, an analyst writes a condition on GLEntry.AccountID. Why does the condition use the value 93 instead of 5080?
@@ -67,9 +67,9 @@ D.  The query deletes all but 25 rows from the JournalEntry table
 
 **10.** Why do the Part III tutorials work in CharlesRiver_Work.sqlite rather than the downloaded CharlesRiver.sqlite?
 
-A.  DB Browser for SQLite cannot open a file downloaded from the internet
-B.  The working copy holds more tables than the file on the Downloads page
-C.  SELECT statements run faster in a database file that has been renamed
+A.  DB Browser opens a downloaded file read-only, so no query can run on it
+B.  The copy is smaller, because DB Browser leaves out the indexes when copying
+C.  Write Changes saves every query result into the file it was run on
 D.  DB Browser can change a database, so the download stays safe
 
 **11.** An analyst runs `SELECT AccountNumber AccountName FROM Account;`, leaving out a comma. What happens?
@@ -86,12 +86,12 @@ B.  Text values cannot be compared in a query that also sorts its rows
 C.  The clauses are out of order: WHERE must come before ORDER BY
 D.  The semicolon at the end of the statement is not allowed in SQLite
 
-**13.** Every revenue and expense account of Charles River totals zero for fiscal 2026 when all of its ledger rows are added up. What explains this?
+**13.** Which condition finds every voucher number that begins with JE-2026-?
 
-A.  A year-end closing entry clears each account at December 31, so its rows net to zero
-B.  SQLite stores debits as negative numbers, which cancel the credits
-C.  The ledger records every posting twice, once as a debit and once as a credit to the same account
-D.  Fiscal 2026 is not yet complete in the data
+A.  `VoucherNumber LIKE 'JE-2026-%'`
+B.  `VoucherNumber = 'JE-2026-%'`
+C.  `VoucherNumber LIKE 'JE-2026-_'`
+D.  `VoucherNumber IN ('JE-2026-')`
 
 **14.** A SQL script for an audit test begins with a comment that records its purpose, the database file, the preparer and date, and the checks its results should pass. What is the main purpose of this header?
 
@@ -100,12 +100,12 @@ B.  It prevents the script from making any change to the database
 C.  SQLite requires such a comment before a script can be saved to a file
 D.  A reviewer can understand, rerun, and check the work without help
 
-**15.** SQL is described as a declarative language. What does that mean?
+**15.** What does `SELECT 7 / 2, 7 / 2.0, '2026' = 2026;` return in SQLite?
 
-A.  Every query must declare the data type of each column that it returns
-B.  A query states the result wanted; the database decides how to get it
-C.  Each query must be declared in a script before it can be run
-D.  The language can only read data, and it can never change any data
+A.  3.5, 3.5, and 1
+B.  3, 3.5, and 0
+C.  3, 3, and 1
+D.  An error, because the statement has no FROM clause
 
 <!-- Answer key, Chapter 9 (for instructors; HTML comments are removed from every rendered format):
      1 B, 2 D, 3 A, 4 C, 5 C, 6 A, 7 D, 8 B, 9 A, 10 D, 11 B, 12 C, 13 A, 14 D, 15 B.
@@ -118,9 +118,10 @@ D.  The language can only read data, and it can never change any data
      7 D: DISTINCT reveals the values in use, so a filter is not written for a value that does not exist.
      8 B: DESC sorts from the largest, and LIMIT 10 keeps the first ten rows.
      9 A: without ORDER BY, LIMIT returns an undefined selection of rows.
-     10 D: a working copy keeps the downloaded file safe from any change saved by mistake.
+     10 D: a working copy keeps the download safe; DB Browser opens files for writing unless opened read-only, and a SELECT never changes a file.
      11 B: without the comma, AccountName becomes an alias for AccountNumber, a logical error.
      12 C: the clauses must be written as SELECT, FROM, WHERE, ORDER BY, LIMIT.
-     13 A: the closing entry clears revenue and expense accounts at year-end.
+     13 A: % matches any run of characters; = compares the pattern literally, _ matches exactly one character, and IN needs an exact value.
      14 D: documentation lets another person understand, rerun, and review the queries.
-     15 B: SQL describes the result, not the steps; SQL can also change data, so D is wrong. -->
+     15 B: two whole numbers divide as whole numbers, a decimal keeps the fraction, and text never equals a number when
+     neither side is a column; SELECT needs no FROM. -->

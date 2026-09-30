@@ -14,10 +14,11 @@ from collections.abc import Callable
 import excel as xl
 from check_figures import text_width
 from data import q
-from drawio import (BLUE, BLUE_TINT, GRAY, GRAY_TINT, INK, ROW_H, RULE, SMALL, TEAL, WHITE,
-                    Diagram, esc)
+from drawio import (BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, ROW_H, RULE, SMALL, TEAL,
+                    WHITE, Diagram, esc)
 
 FILE = "CharlesRiver_Work.sqlite"
+PATH = "C:\\Users\\you\\Documents\\" + FILE   # the title bar shows the full path of the open file
 TABS = ["Database Structure", "Browse Data", "Edit Pragmas", "Execute SQL"]
 LINE_H = 20
 GUTTER = 34
@@ -54,12 +55,18 @@ def highlight(line: str, in_comment: bool = False) -> tuple[str, bool]:
 
 def window(d: Diagram, y: float = 0, active: str = "Execute SQL", w: float = 860) -> float:
     """Title bar, main toolbar, and main tabs. Returns the y below the tabs."""
-    xl.title_bar(d, 0, y, w, f"DB Browser for SQLite - {FILE}")
+    xl.title_bar(d, 0, y, w, f"DB Browser for SQLite - {PATH}")
     y += 34
     x = 0
-    for label, width in [("New Database", 116), ("Open Database", 122), ("Write Changes", 122),
-                         ("Revert Changes", 128)]:
-        xl.button(d, x, y, width, label)
+    # Write Changes and Revert Changes stay grayed out while no change is pending, which is
+    # always the case when only SELECT statements have run.
+    for label, width, enabled in [("New Database", 116, True), ("Open Database ▾", 132, True),
+                                  ("Write Changes", 122, False), ("Revert Changes", 128, False)]:
+        if enabled:
+            xl.button(d, x, y, width, label)
+        else:
+            d.box(esc(label), x, y, width, 26, fill=GRAY_TINT, stroke=RULE, color=GRAY,
+                  size=SMALL, rounded=True)
         x += width + 8
     y += 34
     x = 0
@@ -74,11 +81,14 @@ def window(d: Diagram, y: float = 0, active: str = "Execute SQL", w: float = 860
 
 
 def editor(d: Diagram, x: float, y: float, w: float, sql: str, tab: str = "SQL 1",
-           toolbar: bool = True) -> float:
-    """The SQL editor of the Execute SQL tab, with line numbers. Returns the bottom y."""
+           toolbar: bool = True, first_line: int = 1) -> float:
+    """The SQL editor of the Execute SQL tab, with line numbers starting at first_line (a
+    script scrolled to the query shown). Returns the bottom y. The real toolbar shows icons
+    whose names appear as tooltips; the mock writes the names on the buttons."""
     if toolbar:
         bx = x
-        for label, width, primary in [("Open SQL file", 112, False), ("Save SQL file", 112, False),
+        for label, width, primary in [("Open SQL file(s)", 124, False),
+                                      ("Save SQL file ▾", 124, False),
                                       ("▶ Execute all/selected SQL", 196, True)]:
             xl.button(d, bx, y, width, label, primary=primary)
             bx += width + 8
@@ -93,7 +103,7 @@ def editor(d: Diagram, x: float, y: float, w: float, sql: str, tab: str = "SQL 1
     in_comment = False
     for i, line in enumerate(lines):
         ly = y + 4 + i * LINE_H
-        d.text(str(i + 1), x, ly, GUTTER - 4, LINE_H, size=SMALL, color=GRAY, align="right",
+        d.text(str(first_line + i), x, ly, GUTTER - 4, LINE_H, size=SMALL, color=GRAY, align="right",
                valign="middle")
         label, in_comment = highlight(line, in_comment)
         needed = text_width(label, SMALL, False)
@@ -147,13 +157,23 @@ def results(d: Diagram, x: float, y: float, headers: list[str], widths: list[flo
     return geometry
 
 
-def message(d: Diagram, x: float, y: float, w: float, count: int, first_line: str) -> float:
-    """The message pane under the result. Returns the bottom y."""
-    rows = "row" if count == 1 else "rows"
-    text = (f"Execution finished without errors.<br>Result: {count:,} {rows} returned"
-            f"<br>At line 1:<br>{esc(first_line)}")
-    d.box(text, x, y, w, 84, fill=WHITE, stroke=RULE, size=SMALL, align="left", valign="top",
-          rounded=False)
+def message(d: Diagram, x: float, y: float, w: float, count: int, first_line: str,
+            line: int = 1, error: str | None = None) -> float:
+    """The message pane under the result, as DB Browser 3.13 words it: the row count without a
+    thousands separator, and always "rows". The real pane adds the time the query took ("in
+    9ms"), which the mock leaves out so that rebuilt figures stay stable. line is the editor
+    line where the statement starts. With error, the pane is drawn as DB Browser shows a failed
+    statement. Returns the bottom y."""
+    if error:
+        text = (f"Execution finished with errors.<br>Result: {esc(error)}"
+                f"<br>At line {line}:<br>{esc(first_line)}")
+        d.box(text, x, y, w, 84, fill=CORAL, stroke=CORAL, color=WHITE, size=SMALL,
+              align="left", valign="top", rounded=False)
+    else:
+        text = (f"Execution finished without errors.<br>Result: {count} rows returned"
+                f"<br>At line {line}:<br>{esc(first_line)}")
+        d.box(text, x, y, w, 84, fill=WHITE, stroke=RULE, size=SMALL, align="left",
+              valign="top", rounded=False)
     return y + 84
 
 
@@ -166,17 +186,19 @@ def run(sql: str) -> tuple[list[str], list[tuple]]:
 
 def execute_sql(d: Diagram, sql: str, widths: list[float], shown: slice | None = None,
                 style: Callable[[int, int, object], dict] | None = None,
-                y: float = 0) -> dict:
+                y: float = 0, tab: str = "SQL 1", first_line: int = 1) -> dict:
     """A whole Execute SQL tab: window, editor, result grid, and message pane.
-    shown selects the result rows to draw (all of them by default)."""
+    shown selects the result rows to draw (all of them by default); tab and first_line show
+    the query where it sits in a saved script."""
     headers, rows = run(sql)
     y = window(d, y)
-    y = editor(d, 0, y, 860, sql) + 8
+    y = editor(d, 0, y, 860, sql, tab=tab, first_line=first_line) + 8
     first = (shown.start or 0) + 1 if shown else 1
     visible = rows[shown] if shown else rows
     geometry = results(d, 0, y, headers, widths, visible, first=first, style=style)
     y += (len(visible) + 1) * ROW_H + 8
-    bottom = message(d, 0, y, 860, len(rows), sql.strip().split("\n")[0])
+    bottom = message(d, 0, y, 860, len(rows), sql.strip().split("\n")[0],
+                     line=first_line)
     return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
 
 
@@ -202,5 +224,5 @@ def structure_row(d: Diagram, x: float, y: float, widths: list[float], values: l
         cx += width
 
 
-__all__ = ["FILE", "TABS", "highlight", "window", "editor", "results", "message", "run",
+__all__ = ["FILE", "PATH", "TABS", "highlight", "window", "editor", "results", "message", "run",
            "execute_sql", "emphasize_cells", "structure_row", "BLUE_TINT", "q"]

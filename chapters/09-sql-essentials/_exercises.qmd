@@ -116,18 +116,21 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (1) List the work orders with no ClosedDate, with their WorkOrderNumber, Status, ReleasedDate, DueDate, CompletedDate, and PlannedQuantity.
 
-(2) Use DISTINCT to list the statuses of the open work orders. For each status, count the work orders with a separate query and the message pane.
+(2) Add two calculated columns: the year in each WorkOrderNumber, extracted with SUBSTR and converted with CAST, and the CompletedDate with the text not completed in place of a missing value, using COALESCE. Describe what the two columns show about the open work orders.
 
-(3) List the open work orders whose DueDate is on or before 2026-12-31, sorted by DueDate. Identify the oldest.
+(3) Use DISTINCT to list the statuses of the open work orders. For each status, count the work orders with a separate query and the message pane.
 
-(4) Among them, list the work orders whose Status is Released, meaning that work has not started. Describe what you find.
+(4) List the open work orders whose DueDate is on or before 2026-12-31, sorted by DueDate. Identify the oldest.
 
-(5) Write a short memo (one half page) to the production manager on the open work orders, and explain why their variance is not yet in the fiscal 2026 results.
+(5) Among them, list the work orders whose Status is Released, meaning that work has not started. Describe what you find.
+
+(6) Write a short memo (one half page) to the production manager on the open work orders, and explain why their variance is not yet in the fiscal 2026 results.
 
 **Deliverable.** A script with the queries and a half-page memo.
 
 <!-- Instructor notes, Exercise 9.4: 670 work orders have a NULL ClosedDate: Released 558, In Progress 27, Completed 85 (completed but not
-     closed). Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23
+     closed). Every WorkOrderNumber carries the year of its ReleasedDate, and every open work order is a 2026 work order (released
+     2026-05-23 to 2026-12-31); COALESCE shows not completed for the 585 released or in progress and a date for the 85 completed. Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23
      and due 2026-06-07, still Released at the end of the data; the next are WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due
      2026-08-30). Hundreds of released work orders are past due without being started, a backlog worth raising with production. Their
      variance will be recorded when they close, after the data ends. Counting needs one query per status (COUNT comes in Chapter 10). -->
@@ -172,7 +175,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (1) List the LaborTimeEntry rows whose LaborType is Direct Manufacturing and whose WorkOrderOperationID is missing. Show the employee, work order, work date, and hours.
 
-(2) Use DISTINCT to list the values of ClockStatus in the TimeClockEntry table, and list the time clock entries with no ClockOutTime.
+(2) Use DISTINCT to list the values of ClockStatus in the TimeClockEntry table, and list the time clock entries with no ClockOutTime, showing `COALESCE(ClockOutTime, 'missing')` in place of the empty value.
 
 (3) List the employees with a TerminationDate, with their EmploymentStatus and IsActive flag, and check whether the three columns agree.
 
