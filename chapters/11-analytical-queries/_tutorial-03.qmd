@@ -82,7 +82,7 @@ a. Replace the last line again, `SELECT * FROM MonthlyHours;`, with the text bel
 
 b. Read the TTMHoursPerStandardHour and TTMOvertimeShare columns from the first row to the last.
 
-The WINDOW clause names the frame once, as w, so that the three window functions share it. The result starts in December 2024, the first month with a full year of history before it. The monthly ratio jumps around, but the trailing twelve-month figure climbs from under 1.2 at the end of fiscal 2024 to about 1.4 a year later and about 1.5 by the end of fiscal 2026. The overtime share climbs with it, from about a ninth of the hours to about a fifth. These hours come from the labor time records, dated by the day worked, while Tutorial 10.3 used the payroll, whose pay periods fall in the year they are paid. The yearly figures therefore differ a little from those of Chapter 10, but the trend is the same.
+The WINDOW clause names the frame once, as w, so that the three window functions share it. The result starts in December 2024, the first month with a full year of history before it. The monthly ratio jumps around, but the trailing twelve-month figure climbs from under 1.2 at the end of fiscal 2024 to about 1.4 a year later and about 1.5 by the end of fiscal 2026. The overtime share climbs with it, from about a ninth of the hours to about a fifth. These hours come from the labor time records, dated by the day worked, the same basis as Tutorial 10.3, so each December's trailing figure equals that tutorial's ratio for the year.
 
 @fig-11-06 summarizes the chain of steps you have built. Each step takes the result of the ones before it, and each can be checked on its own by selecting from it.
 

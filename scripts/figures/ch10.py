@@ -11,6 +11,189 @@ from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY,
 SAMPLE_WORK_ORDERS = (13014, 13015, 13016, 13017)   # three closed, one released
 FAN_OUT_INVOICE = "SI-2026-019134"                   # a fiscal 2026 invoice with three lines
 
+# Chapter10.sql as the three tutorials build it (see dbbrowser.Script). The tutorial text must
+# match these queries exactly.
+HEADER = (
+    "/* Chapter 10: manufacturing variance, joined and summarized\n"
+    "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
+    "   Prepared by: your name, date\n"
+    "   Checks: 2026 closes equal the ledger; the trial balance nets to zero */"
+)
+_JOIN_ITEMS = ("FROM WorkOrderClose AS woc\n"
+               "    INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID\n"
+               "    INNER JOIN Item AS i ON i.ItemID = wo.ItemID\n")
+_TB_INNER = ("    SELECT gl.AccountID,\n"
+             "        ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS Balance\n"
+             "    FROM GLEntry AS gl\n"
+             "    WHERE gl.PostingDate <= '2026-12-31'\n"
+             "        AND gl.VoucherNumber NOT IN ('JE-2026-000296', 'JE-2026-000297')\n"
+             "    GROUP BY gl.AccountID\n")
+_OUTPUT = ("FROM ProductionCompletionLine AS pcl\n"
+           "    INNER JOIN ProductionCompletion AS pc\n"
+           "        ON pc.ProductionCompletionID = pcl.ProductionCompletionID\n"
+           "    INNER JOIN Item AS i ON i.ItemID = pcl.ItemID\n")
+_PAYROLL = ("FROM PayrollRegister AS pr\n"
+            "    INNER JOIN PayrollPeriod AS pp\n"
+            "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+            "    INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID\n")
+QUERIES = [
+    ("closes_to_work_orders", "-- Tutorial 10.1: the closes joined to their work orders",
+     "SELECT woc.WorkOrderCloseID, woc.CloseDate, wo.WorkOrderNumber,\n"
+     "    wo.ItemID, woc.TotalVarianceAmount\n"
+     "FROM WorkOrderClose AS woc\n"
+     "    INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID;"),
+    ("close_count", "-- Tutorial 10.1: the number of closes, to test the join",
+     "SELECT COUNT(*) AS Closes\n"
+     "FROM WorkOrderClose;"),
+    ("closes_with_items", "-- Tutorial 10.1: the closes with their items",
+     "SELECT woc.WorkOrderCloseID, woc.CloseDate, i.ItemCode,\n"
+     "    i.ItemName, i.ItemGroup, woc.TotalVarianceAmount\n"
+     + _JOIN_ITEMS.rstrip("\n") + ";"),
+    ("variance_by_group", "-- Tutorial 10.1: the variance of fiscal 2026 by item group",
+     "SELECT i.ItemGroup, COUNT(*) AS Closes,\n"
+     "    ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance\n"
+     + _JOIN_ITEMS +
+     "WHERE woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "GROUP BY i.ItemGroup\n"
+     "ORDER BY TotalVariance DESC;"),
+    ("ledger_variance", "-- Tutorial 10.1: the same variance in the ledger",
+     "SELECT ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS LedgerVariance\n"
+     "FROM GLEntry AS gl\n"
+     "WHERE gl.AccountID = 93 AND gl.FiscalYear = 2026\n"
+     "    AND gl.SourceDocumentType = 'WorkOrderClose';"),
+    ("variance_by_group_year", "-- Tutorial 10.1: the variance by item group and year",
+     "SELECT i.ItemGroup, SUBSTR(woc.CloseDate, 1, 4) AS CloseYear,\n"
+     "    COUNT(*) AS Closes,\n"
+     "    ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance,\n"
+     "    ROUND(SUM(woc.OverheadVarianceAmount), 2) AS OverheadVariance\n"
+     + _JOIN_ITEMS +
+     "GROUP BY i.ItemGroup, CloseYear\n"
+     "ORDER BY i.ItemGroup, CloseYear;"),
+    ("items_above_threshold", "-- Tutorial 10.1: items with more than $50,000 of variance in 2026",
+     "SELECT i.ItemID, i.ItemCode, i.ItemName, COUNT(*) AS Closes,\n"
+     "    ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance\n"
+     + _JOIN_ITEMS +
+     "WHERE woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "GROUP BY i.ItemID, i.ItemCode, i.ItemName\n"
+     "HAVING SUM(woc.TotalVarianceAmount) > 50000\n"
+     "ORDER BY TotalVariance DESC;"),
+    ("every_item", "-- Tutorial 10.1: every manufactured item with its closes of 2026",
+     "SELECT i.ItemCode, i.ItemName, i.LifecycleStatus,\n"
+     "    COUNT(woc.WorkOrderCloseID) AS Closes2026\n"
+     "FROM Item AS i\n"
+     "    LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID\n"
+     "    LEFT JOIN WorkOrderClose AS woc ON woc.WorkOrderID = wo.WorkOrderID\n"
+     "        AND woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
+     "WHERE i.SupplyMode = 'Manufactured'\n"
+     "GROUP BY i.ItemID, i.ItemCode, i.ItemName, i.LifecycleStatus\n"
+     "ORDER BY Closes2026, i.ItemCode;"),
+    ("side_by_side", "-- Tutorial 10.2: the closes and the ledger side by side",
+     "SELECT\n"
+     "    (SELECT ROUND(SUM(TotalVarianceAmount), 2)\n"
+     "     FROM WorkOrderClose\n"
+     "     WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31') AS Closes,\n"
+     "    (SELECT ROUND(SUM(Debit) - SUM(Credit), 2)\n"
+     "     FROM GLEntry\n"
+     "     WHERE AccountID = 93 AND FiscalYear = 2026\n"
+     "         AND SourceDocumentType = 'WorkOrderClose') AS Ledger;"),
+    ("trial_balance", "-- Tutorial 10.2: the pre-closing trial balance of fiscal 2026",
+     "SELECT a.AccountNumber, a.AccountName, a.AccountType,\n"
+     "    ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS Balance\n"
+     "FROM GLEntry AS gl\n"
+     "    INNER JOIN Account AS a ON a.AccountID = gl.AccountID\n"
+     "WHERE gl.PostingDate <= '2026-12-31'\n"
+     "    AND gl.VoucherNumber NOT IN ('JE-2026-000296', 'JE-2026-000297')\n"
+     "GROUP BY a.AccountID, a.AccountNumber, a.AccountName, a.AccountType\n"
+     "ORDER BY a.AccountNumber;"),
+    ("net_balance", "-- Tutorial 10.2: the net of all the balances",
+     "SELECT COUNT(*) AS Accounts, ROUND(SUM(tb.Balance), 2) AS NetBalance\n"
+     "FROM (\n" + _TB_INNER + ") AS tb;"),
+    ("debit_balances", "-- Tutorial 10.2: the total of the debit balances",
+     "SELECT COUNT(*) AS DebitAccounts,\n"
+     "    ROUND(SUM(tb.Balance), 2) AS DebitBalances\n"
+     "FROM (\n" + _TB_INNER + ") AS tb\n"
+     "WHERE tb.Balance > 0;"),
+    ("account_1090", "-- Tutorial 10.2: account 1090 by year and source",
+     "SELECT gl.FiscalYear, gl.SourceDocumentType,\n"
+     "    ROUND(SUM(gl.Debit), 2) AS Debits,\n"
+     "    ROUND(SUM(gl.Credit), 2) AS Credits\n"
+     "FROM GLEntry AS gl\n"
+     "WHERE gl.AccountID = 92 AND gl.FiscalYear BETWEEN 2024 AND 2026\n"
+     "GROUP BY gl.FiscalYear, gl.SourceDocumentType\n"
+     "ORDER BY gl.FiscalYear, gl.SourceDocumentType;"),
+    ("journal_entries", "-- Tutorial 10.2: the journal entries posted to account 1090",
+     "SELECT gl.FiscalYear, je.EntryType,\n"
+     "    ROUND(SUM(gl.Debit), 2) AS Debits\n"
+     "FROM GLEntry AS gl\n"
+     "    INNER JOIN JournalEntry AS je\n"
+     "        ON gl.SourceDocumentType = 'JournalEntry'\n"
+     "        AND je.JournalEntryID = gl.SourceDocumentID\n"
+     "WHERE gl.AccountID = 92\n"
+     "GROUP BY gl.FiscalYear, je.EntryType\n"
+     "ORDER BY gl.FiscalYear, je.EntryType;"),
+    ("output", "-- Tutorial 10.3: the output and its standard hours by year",
+     "SELECT SUBSTR(pc.CompletionDate, 1, 4) AS CompletionYear,\n"
+     "    ROUND(SUM(pcl.QuantityCompleted), 0) AS UnitsCompleted,\n"
+     "    ROUND(SUM(pcl.QuantityCompleted\n"
+     "        * i.StandardLaborHoursPerUnit), 0) AS StandardHours\n"
+     + _OUTPUT +
+     "GROUP BY CompletionYear\n"
+     "ORDER BY CompletionYear;"),
+    ("payroll_hours", "-- Tutorial 10.3: the hours and pay of the manufacturing payroll",
+     "SELECT pp.FiscalYear, prl.LineType,\n"
+     "    ROUND(SUM(prl.Hours), 0) AS Hours,\n"
+     "    ROUND(SUM(prl.Amount), 2) AS Amount\n"
+     "FROM PayrollRegisterLine AS prl\n"
+     "    INNER JOIN PayrollRegister AS pr\n"
+     "        ON pr.PayrollRegisterID = prl.PayrollRegisterID\n"
+     "    INNER JOIN PayrollPeriod AS pp\n"
+     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "    INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID\n"
+     "WHERE cc.CostCenterName = 'Manufacturing'\n"
+     "    AND prl.LineType IN ('Regular Earnings', 'Overtime Earnings')\n"
+     "    AND pp.FiscalYear BETWEEN 2024 AND 2026\n"
+     "GROUP BY pp.FiscalYear, prl.LineType\n"
+     "ORDER BY pp.FiscalYear, prl.LineType;"),
+    ("people", "-- Tutorial 10.3: the registers and the people they paid",
+     "SELECT pp.FiscalYear, COUNT(*) AS Registers,\n"
+     "    COUNT(DISTINCT pr.EmployeeID) AS Employees\n"
+     + _PAYROLL +
+     "WHERE cc.CostCenterName = 'Manufacturing'\n"
+     "    AND pp.FiscalYear BETWEEN 2024 AND 2026\n"
+     "GROUP BY pp.FiscalYear;"),
+    ("hours_by_type", "-- Tutorial 10.3: hours per standard hour, by labor type",
+     "SELECT h.WorkYear, h.LaborType, h.Hours, o.StandardHours,\n"
+     "    ROUND(h.Hours / o.StandardHours, 2) AS HoursPerStandardHour\n"
+     "FROM (\n"
+     "    SELECT SUBSTR(lt.WorkDate, 1, 4) AS WorkYear, lt.LaborType,\n"
+     "        ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS Hours\n"
+     "    FROM LaborTimeEntry AS lt\n"
+     "    WHERE lt.LaborType <> 'NonManufacturing'\n"
+     "    GROUP BY WorkYear, lt.LaborType\n"
+     ") AS h\n"
+     "    INNER JOIN (\n"
+     "        SELECT SUBSTR(pc.CompletionDate, 1, 4) AS WorkYear,\n"
+     "            ROUND(SUM(pcl.QuantityCompleted\n"
+     "                * i.StandardLaborHoursPerUnit), 0) AS StandardHours\n"
+     "        FROM ProductionCompletionLine AS pcl\n"
+     "            INNER JOIN ProductionCompletion AS pc\n"
+     "                ON pc.ProductionCompletionID = pcl.ProductionCompletionID\n"
+     "            INNER JOIN Item AS i ON i.ItemID = pcl.ItemID\n"
+     "        GROUP BY WorkYear\n"
+     "    ) AS o ON o.WorkYear = h.WorkYear\n"
+     "ORDER BY h.WorkYear, h.LaborType;"),
+    ("no_operation", "-- Tutorial 10.3: labor time with no work order operation",
+     "SELECT lt.LaborType, COUNT(*) AS Entries,\n"
+     "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS Hours\n"
+     "FROM LaborTimeEntry AS lt\n"
+     "    LEFT JOIN WorkOrderOperation AS op\n"
+     "        ON op.WorkOrderOperationID = lt.WorkOrderOperationID\n"
+     "WHERE op.WorkOrderOperationID IS NULL\n"
+     "GROUP BY lt.LaborType\n"
+     "ORDER BY lt.LaborType;"),
+]
+CHAPTER10 = db.Script(HEADER, QUERIES, "Chapter10.sql")
+
 
 def note(d: Diagram, text: str, y: float, h: float = 40) -> None:
     d.text(f"<i>{text}</i>", 0, y, 860, h, size=SMALL, color=GRAY)
@@ -81,22 +264,16 @@ def fig_10_02() -> Diagram:
 
 def fig_10_03() -> Diagram:
     d = Diagram("The Manufacturing Variance by Item Group and Year")
-    sql = ("SELECT i.ItemGroup, SUBSTR(woc.CloseDate, 1, 4) AS CloseYear,\n"
-           "    COUNT(*) AS Closes,\n"
-           "    ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance,\n"
-           "    ROUND(SUM(woc.OverheadVarianceAmount), 2) AS OverheadVariance\n"
-           "FROM WorkOrderClose AS woc\n"
-           "    INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID\n"
-           "    INNER JOIN Item AS i ON i.ItemID = wo.ItemID\n"
-           "GROUP BY i.ItemGroup, CloseYear\n"
-           "ORDER BY i.ItemGroup, CloseYear;")
+    _, sql, _ = CHAPTER10.location("variance_by_group_year")
     headers, rows = db.run(sql)
     furniture = [r for r in rows if r[0] == "Furniture"]
+    textiles = [r for r in rows if r[0] == "Textiles"]
     assert [r[1] for r in furniture] == ["2024", "2025", "2026"]
     assert furniture[0][3] < furniture[1][3] < furniture[2][3], "Furniture variance rises each year"
     assert furniture[0][2] > furniture[1][2] > furniture[2][2], "while its closes fall"
+    assert textiles[1][3] > textiles[2][3], "Textiles fell back in 2026"
     assert furniture[2][3] > 0.66 * sum(r[3] for r in rows if r[1] == "2026")
-    out = db.execute_sql(d, sql, [130, 110, 90, 170, 170])
+    out = CHAPTER10.mock(d, "variance_by_group_year", [130, 110, 90, 170, 170])
     db.emphasize_cells(d, out["geometry"], [(0, 0), (2, 4)])
     note(d, "Outlined: the Furniture rows, whose variance rises in each year while the number of closes falls.",
          out["bottom"] + 8, 22)
@@ -137,47 +314,43 @@ def fig_10_04() -> Diagram:
 
 def fig_10_05() -> Diagram:
     d = Diagram("The Order in Which a Query Is Written and Evaluated")
-    written = ["SELECT", "FROM and JOIN", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "LIMIT"]
-    evaluated = [("FROM and JOIN", "assemble the rows of the tables and their joins"),
-                 ("WHERE", "keep the rows that meet the condition"),
-                 ("GROUP BY", "form the groups"),
-                 ("HAVING", "keep the groups that meet the condition"),
-                 ("SELECT", "calculate the columns, aggregates, and aliases"),
-                 ("ORDER BY", "sort the result, and aliases can be used"),
-                 ("LIMIT", "keep the first rows")]
-    d.text("<b>Written</b>", 0, 0, 200, 20, size=SMALL)
-    d.text("<b>Evaluated</b>", 330, 0, 530, 20, size=SMALL)
-    left, right = {}, {}
+    steps = [("FROM and JOIN", "assemble the rows of the tables and their joins"),
+             ("WHERE", "keep the rows that meet the condition"),
+             ("GROUP BY", "form the groups"),
+             ("HAVING", "keep the groups that meet the condition"),
+             ("SELECT and DISTINCT", "calculate the columns and aliases, then drop duplicate rows"),
+             ("ORDER BY", "sort the result; the aliases of SELECT can be used"),
+             ("LIMIT", "keep the first rows")]
+    step_of = {name: i + 1 for i, (name, _) in enumerate(steps)}
+    written = ["SELECT and DISTINCT", "FROM and JOIN", "WHERE", "GROUP BY", "HAVING", "ORDER BY",
+               "LIMIT"]
+    d.text("<b>Written</b>", 0, 0, 280, 20, size=SMALL)
+    d.text("<b>Evaluated, logically</b>", 330, 0, 530, 20, size=SMALL)
     for i, name in enumerate(written):
-        left[name] = d.box(f"<b>{esc(name)}</b>", 0, 26 + i * 44, 200, 34, fill=GRAY_TINT,
-                           stroke=GRAY, size=SMALL)
-    for i, (name, what) in enumerate(evaluated):
-        right[name] = d.box(f"<b>{i + 1}. {esc(name)}</b>", 330, 26 + i * 44, 200, 34,
-                            fill=BLUE_TINT, stroke=BLUE, size=SMALL)
-        d.text(esc(what), 546, 26 + i * 44, 314, 34, size=SMALL, valign="middle")
-    for name in written:
-        d.edge(left[name], right[name], color=GRAY, exit=(1, 0.5), entry=(0, 0.5))
-    note(d, "WHERE runs before any group exists, so it cannot use an aggregate; HAVING runs after grouping, "
-            "and ORDER BY after SELECT.", 26 + 7 * 44 + 4, 40)
+        y = 26 + i * 44
+        label = name.replace(" and DISTINCT", " (DISTINCT)")
+        d.box(f"<b>{esc(label)}</b>", 0, y, 240, 34, fill=GRAY_TINT, stroke=GRAY, size=SMALL)
+        d.marker(str(step_of[name]), 250, y + 5)
+    for i, (name, what) in enumerate(steps):
+        y = 26 + i * 44
+        d.marker(str(i + 1), 330, y + 5)
+        d.box(f"<b>{esc(name)}</b>", 362, y, 190, 34, fill=BLUE_TINT, stroke=BLUE, size=SMALL)
+        d.text(esc(what), 562, y, 298, 34, size=SMALL, valign="middle")
+    note(d, "The number beside each written clause is the step at which it is evaluated. WHERE runs before any "
+            "group exists, so it cannot use an aggregate; HAVING runs after grouping, and ORDER BY after SELECT.",
+         26 + 7 * 44 + 4, 40)
     return d
 
 
 def fig_10_06() -> Diagram:
     d = Diagram("The Pre-Closing Trial Balance of Fiscal 2026")
-    sql = ("SELECT a.AccountNumber, a.AccountName, a.AccountType,\n"
-           "    ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS Balance\n"
-           "FROM GLEntry AS gl\n"
-           "    INNER JOIN Account AS a ON a.AccountID = gl.AccountID\n"
-           "WHERE gl.PostingDate <= '2026-12-31'\n"
-           "    AND gl.VoucherNumber NOT IN ('JE-2026-000296', 'JE-2026-000297')\n"
-           "GROUP BY a.AccountID, a.AccountNumber, a.AccountName, a.AccountType\n"
-           "ORDER BY a.AccountNumber;")
+    _, sql, _ = CHAPTER10.location("trial_balance")
     headers, rows = db.run(sql)
     assert len(rows) == 71
     debit = round(sum(r[3] for r in rows if r[3] > 0), 2)
     credit = round(-sum(r[3] for r in rows if r[3] < 0), 2)
     assert debit == credit == 67107722.36, (debit, credit)
-    out = db.execute_sql(d, sql, [130, 340, 110, 150], shown=slice(0, 12))
+    out = CHAPTER10.mock(d, "trial_balance", [130, 340, 110, 150], shown=slice(0, 12))
     note(d, "The first twelve of the accounts are shown. Positive balances are debit balances and negative "
             "balances credit balances.", out["bottom"] + 8, 40)
     return d
@@ -219,42 +392,26 @@ def fig_10_07() -> Diagram:
     d.arrow(acct, out2, color=GRAY, exit=(1, 0.7), entry=(0, 0.5))
     d.text("<b>Debits: actual cost in</b>", 0, 10, 260, 22, size=SMALL)
     d.text("<b>Credits: cost out</b>", 600, 10, 260, 22, size=SMALL)
-    note(d, f"Amounts are the postings of fiscal 2026. The cost in exceeds the cost out by {money(remainder)}, "
-            "which stays in the account for work not yet closed.", 320, 40)
+    note(d, f"Amounts are the postings of fiscal 2026. The debits exceed the credits by {money(remainder)}, "
+            "the year's net change in the account.", 320, 40)
     return d
 
 
 def fig_10_08() -> Diagram:
-    d = Diagram("Paid Hours per Standard Hour by Year")
-    sql = ("SELECT o.Yr, o.StandardHours, p.PaidHours,\n"
-           "    ROUND(p.PaidHours / o.StandardHours, 2) AS PaidPerStandardHour\n"
-           "FROM (SELECT CAST(SUBSTR(pc.CompletionDate, 1, 4) AS INTEGER) AS Yr, ...) AS o\n"
-           "    INNER JOIN (SELECT pp.FiscalYear AS Yr, ...) AS p ON p.Yr = o.Yr\n"
-           "ORDER BY o.Yr;")
-    full = (
-        "SELECT o.Yr, o.StandardHours, p.PaidHours, ROUND(p.PaidHours / o.StandardHours, 2) AS PaidPerStandardHour "
-        "FROM (SELECT CAST(SUBSTR(pc.CompletionDate, 1, 4) AS INTEGER) AS Yr, "
-        "ROUND(SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit), 0) AS StandardHours "
-        "FROM ProductionCompletionLine AS pcl INNER JOIN ProductionCompletion AS pc "
-        "ON pc.ProductionCompletionID = pcl.ProductionCompletionID INNER JOIN Item AS i ON i.ItemID = pcl.ItemID "
-        "GROUP BY Yr) AS o INNER JOIN (SELECT pp.FiscalYear AS Yr, ROUND(SUM(prl.Hours), 0) AS PaidHours "
-        "FROM PayrollRegisterLine AS prl INNER JOIN PayrollRegister AS pr ON pr.PayrollRegisterID = prl.PayrollRegisterID "
-        "INNER JOIN PayrollPeriod AS pp ON pp.PayrollPeriodID = pr.PayrollPeriodID "
-        "INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID "
-        "WHERE cc.CostCenterName = 'Manufacturing' AND prl.LineType IN ('Regular Earnings', 'Overtime Earnings') "
-        "GROUP BY pp.FiscalYear) AS p ON p.Yr = o.Yr ORDER BY o.Yr")
-    headers, rows = db.run(full)
-    ratios = [r[3] for r in rows]
-    assert [r[0] for r in rows] == [2024, 2025, 2026] and ratios == sorted(ratios)
-    assert ratios[0] < 1.2 and ratios[2] > 1.45, ratios
-    y = db.window(d)
-    y = db.editor(d, 0, y, 860, sql) + 8
-    geometry = db.results(d, 0, y, headers, [110, 180, 180, 220], rows)
-    y += (len(rows) + 1) * ROW_H + 8
-    bottom = db.message(d, 0, y, 860, len(rows), sql.split("\n")[0])
-    db.emphasize_cells(d, geometry, [(-1, 3), (2, 3)])
-    note(d, "The two derived tables are shortened here with an ellipsis; Tutorial 10.3 gives the full query. "
-            "Outlined: the ratio, which rises in each year.", bottom + 8, 40)
+    d = Diagram("Hours per Standard Hour by Labor Type and Year")
+    _, sql, _ = CHAPTER10.location("hours_by_type")
+    headers, rows = db.run(sql)
+    direct = [r[4] for r in rows if r[1] == "Direct Manufacturing"]
+    indirect = [r[4] for r in rows if r[1] == "Indirect Manufacturing"]
+    assert [r[0] for r in rows] == ["2024", "2024", "2025", "2025", "2026", "2026"], rows
+    assert all(0.8 < x < 1.0 for x in direct), direct            # direct time within standard
+    assert indirect == sorted(indirect) and indirect[2] > 1.5 * indirect[0], indirect
+    totals = [round(a + b, 2) for a, b in zip(direct, indirect)]
+    assert totals == sorted(totals) and 1.4 < totals[2] < 1.55, totals
+    out = CHAPTER10.mock(d, "hours_by_type", [110, 220, 120, 150, 210])
+    db.emphasize_cells(d, out["geometry"], [(-1, 4), (5, 4)])
+    note(d, "Outlined: hours recorded per standard hour of output. Direct time stays below the standard in each "
+            "year, while indirect time grows.", out["bottom"] + 8, 40)
     return d
 
 
@@ -266,5 +423,5 @@ FIGURES = {
     "fig-10-05-evaluation-order": fig_10_05,
     "fig-10-06-trial-balance": fig_10_06,
     "fig-10-07-conversion-cost-flow": fig_10_07,
-    "fig-10-08-paid-per-standard-hour": fig_10_08,
+    "fig-10-08-hours-per-standard-hour": fig_10_08,
 }

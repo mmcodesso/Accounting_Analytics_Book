@@ -8,20 +8,20 @@ title: "Joining and Summarizing Data in SQL"
 
 After completing this chapter, you will be able to:
 
-1. Join tables with INNER JOIN on their logical keys, using table aliases, and test that the keys match before relying on the result.
-2. Use LEFT JOIN to keep rows that have no match, and to find the records that have none.
-3. Summarize rows with aggregate functions, GROUP BY, and HAVING, grouping by key rather than by name.
+1. Join tables with INNER JOIN on their logical keys, qualifying every column, and test that the keys match before relying on the result.
+2. Use LEFT JOIN to keep rows that have no match, and find the records that have none with anti-joins and NOT EXISTS.
+3. Summarize rows with aggregate functions, GROUP BY, and HAVING, grouping by key rather than by name, and explain the order in which a query's clauses are evaluated.
 4. Recognize fan-out when a join repeats a header's amount on every line, and avoid the double counting it causes.
-5. Write subqueries in the WHERE and FROM clauses to answer questions that take more than one step.
-6. Build a trial balance from the general ledger and follow a cost through the ledger with joined and grouped queries.
+5. Write subqueries in the SELECT, WHERE, and FROM clauses, including correlated subqueries, to answer questions that take more than one step.
+6. Build a trial balance from the general ledger, tie a summary to the ledger, and compare the hours a plant records with the hours its standards allow.
 :::
 
 
 ## Opening Scenario {.unnumbered}
 
-Your queries in Chapter 9 gave the controller a first look at the manufacturing variance. It is recorded when a work order closes, and in the largest closes of fiscal 2026 most of it is overhead. She has three follow-up questions. Which products carry the variance? How much of it arose in each of the three years? And is it a matter of volume, with the plant making fewer units over which to spread its costs, or of the cost itself?
+Your queries in Chapter 9 gave the controller a first look at the manufacturing variance. It is recorded when a work order closes, and in the largest closes of fiscal 2026 most of it is overhead. She comes back to you, her staff accountant, with three follow-up questions. Which products carry the variance? How much of it arose in each of the three years? And is it a matter of volume, with the plant making fewer units over which to spread its costs, or of the cost itself?
 
-None of these questions can be answered from one table. The product is recorded on the work order, not on its close. The cost of labor is recorded in the payroll, and the output in the production completions. The ledger holds the amounts, but it identifies accounts only by their AccountID. Answering the controller means joining these tables on the keys you studied in Chapter 3 and summarizing thousands of their rows into a few totals. This chapter teaches both skills, and it ends with an answer to her third question.
+None of these questions can be answered from one table. The product is recorded on the work order, not on its close. The hours are recorded in the labor time entries and the payroll, and the output in the production completions. The ledger holds the amounts, but it identifies accounts only by their AccountID. Answering the controller means joining these tables on the keys you studied in Chapter 3 and summarizing thousands of their rows into a few totals. This chapter teaches both skills, and it ends with an answer to her third question.
 
 
 
@@ -33,10 +33,15 @@ You have met the idea twice already. Chapter 3 introduced primary keys, foreign 
 
 One point from Chapter 3 matters more here than anywhere else. The Charles River database declares no foreign keys, so nothing guarantees that every WorkOrderID in WorkOrderClose matches a work order. The relationships are logical and must be tested. A join on keys that do not match does not fail with an error. It simply returns fewer rows, or more, than you expected, so every join in this chapter is checked by comparing the number of rows it returns with the number it should return.
 
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Power Query's Merge offered several join kinds in Chapter 5. Inner keeps only the rows that match, Left Outer keeps every row of the first query, and Left Anti keeps the rows of the first query that have no match. They are the inner join, the left outer join, and the anti-join of this chapter. XLOOKUP, which returns one matching value for each row, behaves like a left join that brings back a single column.
+:::
+
 
 ## Inner Joins
 
-An inner join returns one row for each pair of rows, one from each table, whose keys match. You write it in the FROM clause, with INNER JOIN and an ON condition that names the matching columns:
+An inner join returns one row for each pair of rows, one from each table, whose keys match. You write it in the FROM clause, with INNER JOIN and an ON condition that names the matching columns. JOIN written alone means the same thing.
 
 ```sql
 SELECT woc.WorkOrderCloseID, woc.CloseDate, wo.WorkOrderNumber,
@@ -45,7 +50,7 @@ FROM WorkOrderClose AS woc
     INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID;
 ```
 
-The short names after AS are table aliases. Once a table has an alias, every column that comes from it is written with the alias and a period, as in `woc.CloseDate`. Aliases keep queries short, and they are required whenever a column name appears in both tables. WorkOrderID is a column of both WorkOrderClose and WorkOrder, so a query that asks for WorkOrderID without saying which table it comes from stops with the message ambiguous column name: WorkOrderID. The queries in this book qualify every column in a join, even when its name is unique, so that a reader can see where each one comes from.
+The short names after AS are table aliases, and a column written with an alias and a period, as in `woc.CloseDate`, is qualified: it names the table it comes from. A column whose name appears in both tables must be qualified. WorkOrderID is a column of both WorkOrderClose and WorkOrder, so a query that asks for WorkOrderID without saying which table it comes from stops with the message ambiguous column name: WorkOrderID. The full table name also qualifies a column, but an alias keeps the query short, and it is required when the same table appears twice in one query, a self-join that Chapter 12 uses. The queries in this book qualify every column in a join, even when its name is unique, so that a reader can see where each one comes from.
 
 A join can continue through several tables, one INNER JOIN at a time. Adding the Item table brings the item's code, name, and group onto each close:
 
@@ -59,14 +64,125 @@ FROM WorkOrderClose AS woc
 
 Because every close belongs to exactly one work order, and every work order to exactly one item, this query should return exactly as many rows as the WorkOrderClose table holds. If it returns fewer, some closes point to a work order or an item that does not exist, and the inner join has dropped them without a word. Comparing the row count with the table's is the test of the keys.
 
-@fig-10-01 shows how an inner join matches rows, using four work orders, three of them closed. The inner join returns the three that have a close. The fourth, which has not closed, has no match and does not appear. The lower half of the figure shows the left join, which the chapter turns to later.
+@fig-10-01 shows how an inner join matches rows, using four work orders, three of them closed. The inner join returns the three that have a close. The fourth, which has not closed, has no match and does not appear. The lower half of the figure shows the left join, which the chapter turns to shortly.
 
 ![How Inner and Left Joins Match Rows.](/visuals/svg/fig-10-01-join-matching.svg){#fig-10-01 fig-alt="Four Charles River work orders on the left and the work order closes on the right, three of the work orders with a close and one without. The upper result, an inner join on WorkOrderID, holds three rows, one for each work order with a close. The lower result, a left join from WorkOrder, holds all four work orders, and the one without a close shows NULL in the close columns."}
 
 
+## Following the Keys
+
+The questions of this Part reach beyond the sales and ledger tables of Part II, into the Procure-to-Pay and Manufacturing groups and the payroll. Chapter 3 described the Manufacturing group and introduced the others, and @fig-03-08 traced the tables of the manufacturing path, from the bill of materials to the close of a work order. @tbl-10-01 lists the joins you need to move through them. Each row names two tables and the key that links them, from the table that holds the foreign key to the table whose primary key it refers to.
+
+| From | To | Join on |
+|---|---|---|
+| PurchaseOrder | Supplier | SupplierID |
+| PurchaseOrder | Employee | CreatedByEmployeeID, ApprovedByEmployeeID |
+| PurchaseOrderLine | PurchaseOrder | PurchaseOrderID |
+| GoodsReceiptLine | PurchaseOrderLine | POLineID |
+| PurchaseInvoiceLine | PurchaseInvoice | PurchaseInvoiceID |
+| PurchaseInvoiceLine | PurchaseOrderLine | POLineID |
+| PurchaseInvoiceLine | GoodsReceiptLine | GoodsReceiptLineID |
+| PurchaseInvoice | Supplier | SupplierID |
+| DisbursementPayment | PurchaseInvoice | PurchaseInvoiceID |
+| DisbursementPayment | Supplier | SupplierID |
+| WorkOrder | Item | ItemID |
+| WorkOrderOperation | WorkOrder | WorkOrderID |
+| WorkOrderOperation | WorkCenter | WorkCenterID |
+| WorkOrderClose | WorkOrder | WorkOrderID |
+| ProductionCompletionLine | ProductionCompletion | ProductionCompletionID |
+| ProductionCompletionLine | Item | ItemID |
+| LaborTimeEntry | WorkOrderOperation | WorkOrderOperationID |
+| TimeClockEntry, LaborTimeEntry | Employee | EmployeeID |
+| PayrollRegisterLine | PayrollRegister | PayrollRegisterID |
+| PayrollRegister | PayrollPeriod | PayrollPeriodID |
+| PayrollRegister | Employee, CostCenter | EmployeeID, CostCenterID |
+| PayrollPayment | PayrollRegister | PayrollRegisterID |
+| GLEntry | Account, CostCenter | AccountID, CostCenterID |
+| GLEntry | Any source document | SourceDocumentType and SourceDocumentID |
+
+: Join paths through the purchasing, manufacturing, payroll, and ledger tables {#tbl-10-01}
+
+The last row is different from the others. As Chapter 3 explained, the ledger links to its documents through two columns: SourceDocumentType names the document table, and SourceDocumentID holds the key of the document in that table. The ID alone is not enough, because each document table numbers its own rows. The ledger rows whose SourceDocumentID is 7947, for example, come from several kinds of document, of which sales invoice 7947 is only one. A join to a document table therefore names the document type as part of its condition:
+
+```sql
+SELECT gl.GLEntryID, gl.PostingDate, je.EntryNumber, je.EntryType
+FROM GLEntry AS gl
+    INNER JOIN JournalEntry AS je
+        ON gl.SourceDocumentType = 'JournalEntry'
+        AND je.JournalEntryID = gl.SourceDocumentID
+WHERE gl.AccountID = 93 AND gl.FiscalYear = 2026;
+```
+
+The query returns the one journal entry posted to the variance account in fiscal 2026, the closing entry you met in Chapter 9. Without the condition on SourceDocumentType, the join would also pair ledger rows from other documents with whichever journal entry happens to share their number.
+
+
+## Keeping Unmatched Rows with LEFT JOIN
+
+An inner join keeps only matched rows. A left join, or left outer join, keeps every row of the first table, the one named in FROM, and adds the columns of the second table where a match exists. Where none exists, those columns are NULL, as the lower half of @fig-10-01 shows. Left joins answer two kinds of question. The first is a complete list, such as every manufactured item with the work orders it has, including the items that have none. The second is an exception list: the rows that have no match at all.
+
+The second kind is called an anti-join. You write a left join and keep only the rows where a column from the second table is NULL. The column must be one that is never NULL in a matched row, such as the second table's key:
+
+```sql
+SELECT i.ItemCode, i.ItemName, i.ItemGroup
+FROM Item AS i
+    LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID
+WHERE i.SupplyMode = 'Manufactured' AND wo.WorkOrderID IS NULL;
+```
+
+The query returns a handful of manufactured items for which no work order has ever been released, all of them discontinued. The same test can be written with NOT EXISTS, which keeps a row of the first table when a subquery finds no matching row in the second:
+
+```sql
+SELECT i.ItemCode, i.ItemName, i.ItemGroup
+FROM Item AS i
+WHERE i.SupplyMode = 'Manufactured'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM WorkOrder AS wo
+        WHERE wo.ItemID = i.ItemID);
+```
+
+The subquery refers to i.ItemID from the outer query, so it is evaluated for each item. That makes it a correlated subquery, a kind that the section on subqueries returns to.
+
+NOT IN looks like a third way to write the test, but it fails when its list contains a NULL. Only a few Charles River employees have ever approved a purchase requisition, and a few requisitions have no approver at all. The query below should count every employee who never approved one, yet it returns zero:
+
+```sql
+SELECT COUNT(*) AS NeverApproved
+FROM Employee
+WHERE EmployeeID NOT IN (
+    SELECT ApprovedByEmployeeID FROM PurchaseRequisition);
+```
+
+The list holds a NULL, and a comparison with NULL is never true, so no employee can be shown to be absent from the list. NOT EXISTS and the anti-join compare only the rows that match, and both find the employees who never approved a requisition, nearly all of them. Use either of them, not NOT IN, when the second table's column can hold a NULL.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A condition on the second table placed in the WHERE clause turns a left join into an inner join. The condition `wo.Status = 'Closed'` in WHERE removes every item without a work order, because a NULL Status never equals Closed. To keep those items, move the condition into the ON clause, where it limits which work orders are matched:
+
+```sql
+SELECT i.ItemCode, wo.WorkOrderNumber
+FROM Item AS i
+    LEFT JOIN WorkOrder AS wo
+        ON wo.ItemID = i.ItemID AND wo.Status = 'Closed'
+WHERE i.SupplyMode = 'Manufactured';
+```
+
+The rule applies to conditions that a NULL cannot satisfy. The IS NULL test of an anti-join is the exception, and it must stay in WHERE.
+:::
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Chapter 3 warned that a list of customers built by joining to their orders can silently leave out the customers who have never ordered. That is the difference between an inner join and a left join. When the question is about every member of a population, such as every customer, item, or account, start from the table that holds the whole population and left join the others to it.
+:::
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Anti-joins are among the most useful tests in accounting data, because they find what is missing. An existence test starts from the ledger and asks whether every posting points to a document; a completeness test starts from the documents and asks whether every one was posted. Invoices never posted, ledger rows that point to no document, and customers who have never ordered are all anti-join results, and Chapter 12 builds a library of such tests.
+:::
+
+
 ## Summarizing with Aggregate Functions
 
-An aggregate function calculates one value from many rows. @tbl-10-01 lists the five you will use most. Without a GROUP BY clause, an aggregate summarizes every row the query keeps, so `SELECT COUNT(*), SUM(TotalVarianceAmount) FROM WorkOrderClose` returns a single row with the number of closes and their total variance.
+An aggregate function calculates one value from many rows. @tbl-10-02 lists the five you will use most. Without a GROUP BY clause, an aggregate summarizes every row the query keeps, so the query `SELECT COUNT(*) FROM WorkOrderClose` returns a single row with the number of closes.
 
 | Function | Returns | Treatment of NULL |
 |---|---|---|
@@ -77,9 +193,9 @@ An aggregate function calculates one value from many rows. @tbl-10-01 lists the 
 | `AVG(column)` | The average | Skips NULLs, so they do not count as zero |
 | `MIN(column)`, `MAX(column)` | The smallest and largest values | Skip NULLs |
 
-: Aggregate functions and how they treat missing values {#tbl-10-01}
+: Aggregate functions and how they treat missing values {#tbl-10-02}
 
-GROUP BY divides the rows into groups that share the same values in the columns you name, and calculates each aggregate once per group. This query totals the variance of fiscal 2026 by item group:
+The GROUP BY clause divides the rows into groups that share the same values in the columns you name, and it calculates each aggregate once per group. This query totals the variance of fiscal 2026 by item group:
 
 ```sql
 SELECT i.ItemGroup, COUNT(*) AS Closes,
@@ -92,19 +208,23 @@ GROUP BY i.ItemGroup
 ORDER BY TotalVariance DESC;
 ```
 
-The result has one row for each item group, as @fig-10-02 illustrates. Every column in the SELECT list is either named in GROUP BY or wrapped in an aggregate function. A column that is neither has no single value for the group, and most database systems reject the query. SQLite does not: it accepts columns that are neither grouped nor aggregated and fills them with the value from one of the group's rows (SQLite, n.d.). That value says nothing about the group as a whole, so treat such a column as an error even though SQLite accepts it.
+The result has one row for each item group, as @fig-10-02 illustrates. Every column in the SELECT list is either named in GROUP BY or wrapped in an aggregate function. A column that is neither has no single value for the group, and most database systems reject the query. SQLite does not: it accepts such a bare column and fills it with the value from one of the group's rows (SQLite, n.d.-a, n.d.-b). That value says nothing about the group as a whole, so treat such a column as an error even though SQLite accepts it.
 
 ![GROUP BY Collapses Rows into One Row per Group.](/visuals/svg/fig-10-02-group-by.svg){#fig-10-02 fig-alt="On the left, several Charles River work order closes of fiscal 2026 with their item group and total variance, some from Furniture and some from Lighting. Arrows gather the rows of each group into one row of the result on the right, which shows each item group with the number of closes and the sum of their variances."}
 
-You can group by more than one column. `GROUP BY i.ItemGroup, CloseYear` produces one row for each combination of group and year. The year of a close is not stored in its own column. A date stored as text in the form year-month-day begins with the year, however, so the text function `SUBSTR(woc.CloseDate, 1, 4)`, which returns the first four characters, gives it. Chapter 11 introduces SQLite's date functions, which do this and much more.
+You can group by more than one column, and by a calculated value as well as a column. The year of a close is not stored in its own column, but `SUBSTR(woc.CloseDate, 1, 4)`, from @tbl-09-02, gives it. With the alias CloseYear in the SELECT list, `GROUP BY i.ItemGroup, CloseYear` produces one row for each combination of group and year, a use of an alias that the section on evaluation order explains. An aggregate can also total a calculation: `SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit)` multiplies the two columns in each row and then adds the products.
+
+Two details of aggregates matter after a left join. `COUNT(*)` counts one row for an unmatched item, because the item's row is still there, while `COUNT(wo.WorkOrderID)` counts only the matches and returns zero for an item without work orders, which is usually what you mean. And a SUM over rows that hold only NULLs is itself NULL, not zero, so a complete list with totals needs COALESCE, from Chapter 9, to show a zero: `COALESCE(SUM(x), 0)`.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+GROUP BY does what the Rows area of a PivotTable does, and what Power Query's Group By did in Chapter 6: each combination of the grouping columns becomes one row, and each aggregate becomes one column. One difference is worth noticing. A PivotTable's calculated field works on the sums of its fields, while an aggregate of an expression, such as the SUM above, calculates the expression in every row first and then adds the results.
+:::
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
 Group by the key, not by the name. Two different Charles River customers are called Brown LLC, and several items share their names with other items. A query that groups by CustomerName combines the orders of both Brown LLCs into one row, and nothing in the result shows that it has done so. Group by CustomerID, and include the name in the GROUP BY clause as well if you want to show it.
 :::
-
-
-{{< include _tutorial-01.qmd >}}
 
 
 ## Filtering Groups with HAVING
@@ -119,30 +239,10 @@ GROUP BY gl.AccountID
 HAVING ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) <> 0;
 ```
 
-An aggregate cannot appear in a WHERE clause, because WHERE runs before any group exists. A query that tries it, such as one with `WHERE COUNT(*) > 5`, stops with the message misuse of aggregate: COUNT(). When a condition concerns single rows, such as a date range, it belongs in WHERE. When it concerns a group's total, count, or average, it belongs in HAVING. Filtering rows in WHERE also makes a query faster, because fewer rows reach the grouping step.
+An aggregate cannot appear in a WHERE clause, because WHERE runs before any group exists. A query that tries it, such as one with `WHERE COUNT(*) > 5`, stops with an error such as misuse of aggregate: COUNT(). When a condition concerns single rows, such as a date range, it belongs in WHERE. When it concerns a group's total, count, or average, it belongs in HAVING. The two often work together: in Tutorial 10.1, WHERE keeps the closes of fiscal 2026, and HAVING then keeps the items whose total variance passes a threshold. Filtering rows in WHERE also makes a query faster, because fewer rows reach the grouping step.
 
 
-## Keeping Unmatched Rows with LEFT JOIN
-
-An inner join keeps only matched rows. A left join keeps every row of the first table, the one named in FROM, and adds the columns of the second table where a match exists. Where none exists, those columns are NULL, as the lower half of @fig-10-01 shows. Left joins answer two kinds of question. The first is a complete list, such as every manufactured item with the number of work orders it has, including the items that have none. The second is an exception list: the rows that have no match at all.
-
-The second kind is called an anti-join. You write a left join and keep only the rows where a column from the second table is NULL:
-
-```sql
-SELECT i.ItemCode, i.ItemName, i.ItemGroup
-FROM Item AS i
-    LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID
-WHERE i.SupplyMode = 'Manufactured' AND wo.WorkOrderID IS NULL;
-```
-
-The query returns a handful of manufactured items for which no work order has ever been released. Anti-joins are one of the most useful tests in accounting data, because they find what is missing: invoices never posted to the ledger, ledger rows that point to no document, and customers who have never ordered.
-
-Two details of left joins cause most of the mistakes made with them. First, after a left join, `COUNT(*)` counts one row for an unmatched item. The item's row is still there, even though it has no work order. `COUNT(wo.WorkOrderID)` counts only the matches, and it returns zero for an item with no work orders, which is usually what you mean. Second, a condition on the second table placed in the WHERE clause turns a left join into an inner join. The condition `wo.Status = 'Closed'` in WHERE removes every item without a work order, because their Status is NULL. To keep those items, move the condition into the ON clause, where it limits which work orders are matched: `LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID AND wo.Status = 'Closed'`.
-
-::: {.callout-note .connecting-dots icon=false}
-## Connecting the Dots
-Chapter 3 warned that a list of customers built by joining to their orders can silently leave out the customers who have never ordered. That is the difference between an inner join and a left join. When the question is about every member of a population, such as every customer, item, or account, start from the table that holds the whole population and left join the others to it.
-:::
+{{< include _tutorial-01.qmd >}}
 
 
 ## Fan-Out and Double Counting
@@ -151,14 +251,18 @@ A join between a header table and its lines returns one row per line, and it rep
 
 ![Fan-Out: A Header Amount Repeated on Every Line.](/visuals/svg/fig-10-04-fan-out.svg){#fig-10-04 fig-alt="A Charles River sales invoice of fiscal 2026 with three lines. Joined to its lines, the invoice's GrandTotal appears on all three rows, so summing GrandTotal over the join counts it three times, while summing the LineTotal of the lines counts each line once. A note states that across fiscal 2026 the sum of GrandTotal over the joined rows is nearly twice the true total of the invoices."}
 
-The same effect appears whenever a join reaches from one table into another that has several rows for each of its rows. Each work order has three or four operations, so a query that joins work order closes to their operations, perhaps to see the work centers, repeats each close's variance three or four times. A sum of the variance over that join is several times the real figure.
+The same effect appears whenever a join reaches from one table into another that has several rows for each of its rows. Most work orders have three or four operations, so a query that joins work order closes to their operations, perhaps to see the work centers, repeats each close's variance three or four times. A sum of the variance over that join is several times the real figure. Counting has the same trap: a count of the rows of a join counts lines, not headers, which is why COUNT(DISTINCT) exists.
 
-The rule is to add up each amount at the level of the table it belongs to. Sum GrandTotal over SalesInvoice alone, and LineTotal over SalesInvoiceLine. When a question needs amounts from both levels, summarize the many side first, in a subquery, and then join the result to the one side, so that each row being joined represents one header. The next section shows how.
+The rule is to add up each amount at the level of the table it belongs to. Sum GrandTotal over SalesInvoice alone, and LineTotal over SalesInvoiceLine. When a question needs amounts from both levels, summarize the many side first and then join the result to the one side, so that each row being joined represents one header. The derived tables of the next section show how.
 
 
 ## Subqueries
 
-A subquery is a query written inside another query, in parentheses. It lets you answer in one statement a question that takes two steps. A subquery in the WHERE clause usually supplies a value or a list for a condition. This query counts the closes of fiscal 2026 whose variance was above the year's average, which the subquery calculates first:
+A subquery is a query written inside another query, in parentheses. It lets you answer in one statement a question that takes two steps.
+
+### Scalar Subqueries
+
+A subquery that returns a single value is a scalar subquery, and it can stand wherever a single value can. This query counts the closes of fiscal 2026 whose variance was above the year's average, which the subquery calculates first:
 
 ```sql
 SELECT COUNT(*) AS AboveAverage
@@ -170,47 +274,79 @@ WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
         WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31');
 ```
 
-A subquery that returns a column can follow IN, as in `WHERE woc.WorkOrderID IN (SELECT wo.WorkOrderID FROM WorkOrder AS wo ...)`, which keeps the closes whose work order appears in the list.
+A scalar subquery can also stand in the SELECT list, where two of them can put totals from different tables side by side, as Tutorial 10.2 does to tie the closes to the ledger. It must return one row. If it returns several, SQLite quietly uses the first, while most other systems stop with an error.
 
-A subquery in the FROM clause produces a table of its own, called a derived table, which the outer query can join and summarize like any other. It must have an alias. Derived tables are the way to combine results that are calculated at different levels, such as output summarized by year from one set of tables and hours summarized by year from another. Each is aggregated in its own subquery, and the two results are joined on the year. You will use this pattern in Tutorial 10.3.
+### Subqueries in WHERE
+
+A subquery that returns a column can follow IN. This query totals the closes of fiscal 2026 whose work order made a Furniture item, with the list of those work orders supplied by the subquery:
+
+```sql
+SELECT COUNT(*) AS FurnitureCloses,
+    ROUND(SUM(TotalVarianceAmount), 2) AS Variance
+FROM WorkOrderClose
+WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+    AND WorkOrderID IN (
+        SELECT wo.WorkOrderID
+        FROM WorkOrder AS wo
+            INNER JOIN Item AS i ON i.ItemID = wo.ItemID
+        WHERE i.ItemGroup = 'Furniture');
+```
+
+The subqueries so far run once, and the outer query uses their result. A correlated subquery refers to a column of the outer query, so it runs again for each outer row. The NOT EXISTS test of the section on left joins is one. This query is another, a scalar subquery in the SELECT list that counts each account's postings of fiscal 2026:
+
+```sql
+SELECT a.AccountNumber, a.AccountName,
+    (SELECT COUNT(*)
+     FROM GLEntry AS gl
+     WHERE gl.AccountID = a.AccountID AND gl.FiscalYear = 2026)
+        AS Postings2026
+FROM Account AS a
+ORDER BY Postings2026 DESC;
+```
+
+The subquery runs once for each of the accounts, each time for a different AccountID. It is quick here because GLEntry has an index on AccountID and FiscalYear. A correlated subquery that must search a large table without an index, once for each of thousands of rows, can take minutes, and a join or a derived table is then the faster way to ask the same question.
+
+### Derived Tables
+
+A subquery in the FROM clause produces a table of its own, called a derived table, which the outer query can join and summarize like any other. Give it an alias: SQLite does not insist, but many systems do, and the outer query needs the alias to name its columns. Derived tables are the way to avoid fan-out, and to combine results calculated at different levels. This query sums the lines of each invoice in a derived table, one row per invoice, and joins the result to the invoice headers:
+
+```sql
+SELECT COUNT(*) AS Invoices,
+    ROUND(SUM(si.SubTotal), 2) AS SubTotals,
+    ROUND(SUM(l.LineSum), 2) AS LineSums
+FROM SalesInvoice AS si
+    INNER JOIN (
+        SELECT SalesInvoiceID, SUM(LineTotal) AS LineSum
+        FROM SalesInvoiceLine
+        GROUP BY SalesInvoiceID
+    ) AS l ON l.SalesInvoiceID = si.SalesInvoiceID
+WHERE si.InvoiceDate BETWEEN '2026-01-01' AND '2026-12-31';
+```
+
+Each invoice meets exactly one row of the derived table, so nothing is repeated, and the sum of the invoices' SubTotals equals the sum of their lines. The same pattern combines output summarized by year from one set of tables with hours summarized by year from another, which you will do in Tutorial 10.3.
 
 
 ## The Order in Which a Query Runs
 
-A query is written in one order and evaluated in another. @fig-10-05 shows both. The database first assembles the rows from the tables in FROM and their joins. It then keeps the rows that meet the WHERE condition, forms the groups, and keeps the groups that meet the HAVING condition. Only then does it calculate the columns of the SELECT list. Finally, it sorts the result with ORDER BY and applies LIMIT.
+A query is written in one order and evaluated, logically, in another. @fig-10-05 shows both. The database first assembles the rows from the tables in FROM and their joins. It then keeps the rows that meet the WHERE condition, forms the groups, and keeps the groups that meet the HAVING condition. Only then does it calculate the columns of the SELECT list, removing duplicate rows if DISTINCT asks it to. Finally, it sorts the result with ORDER BY and applies LIMIT. The database may take shortcuts that are faster, but the result is always the one this order describes, which is why it is called the logical evaluation order.
 
-![The Order in Which a Query Is Written and Evaluated.](/visuals/svg/fig-10-05-evaluation-order.svg){#fig-10-05 fig-alt="Two columns. The written order lists SELECT, FROM and JOIN, WHERE, GROUP BY, HAVING, ORDER BY, and LIMIT. The evaluation order lists FROM and JOIN first, then WHERE, GROUP BY, HAVING, SELECT, ORDER BY, and LIMIT, with a note beside each step on what it does, and lines connect each clause to its position in the other column."}
+![The Order in Which a Query Is Written and Evaluated.](/visuals/svg/fig-10-05-evaluation-order.svg){#fig-10-05 fig-alt="Two columns. The written order lists SELECT with DISTINCT, FROM and JOIN, WHERE, GROUP BY, HAVING, ORDER BY, and LIMIT, each with a numbered badge giving the step at which it is evaluated. The evaluated order lists the same clauses by step: 1 FROM and JOIN, 2 WHERE, 3 GROUP BY, 4 HAVING, 5 SELECT and DISTINCT, 6 ORDER BY, and 7 LIMIT, with a note beside each step on what it does."}
 
-The evaluation order explains several rules you have already met. WHERE cannot use an aggregate, because the groups do not yet exist when WHERE runs. HAVING can, because it runs after grouping. ORDER BY can sort by an alias defined in the SELECT list, because it runs after SELECT. By the same logic, WHERE should not be able to use a column alias, and in most database systems it cannot. SQLite allows it, which is another habit to avoid if you want your queries to run elsewhere.
+The evaluation order explains several rules you have already met. WHERE cannot use an aggregate, because the groups do not yet exist when WHERE runs. HAVING can, because it runs after grouping. ORDER BY can sort by an alias defined in the SELECT list, because it runs after SELECT.
+
+By the same logic, neither WHERE nor GROUP BY should be able to use a column alias, because both run before SELECT defines it. For WHERE, most database systems enforce the rule, and SQLite, which does not, invites a habit to avoid. For GROUP BY, SQLite, PostgreSQL, and MySQL all look up an alias from the SELECT list, and the queries in this book use it, because `GROUP BY CloseYear` is easier to read than repeating the expression. Microsoft SQL Server does not allow it, so in that system you would write `GROUP BY SUBSTR(woc.CloseDate, 1, 4)` instead.
 
 
 {{< include _tutorial-02.qmd >}}
 
 
-## The Purchasing, Manufacturing, and Payroll Tables
+## Measuring the Plant Against Its Standards
 
-The questions of this Part reach beyond the sales and ledger tables of Part II, into the Procure-to-Pay and Manufacturing groups and the payroll. Chapter 3 described the Manufacturing group and introduced the others, and @fig-03-08 traced the tables of the manufacturing path, from the bill of materials to the close of a work order. @tbl-10-02 summarizes the joins you need to move through them. Each row names two tables and the key that links them, from the table that holds the foreign key to the table whose primary key it refers to.
+The controller's third question is about the plant, and the tables of @tbl-10-01 let you measure it the way a standard cost system does. A standard cost system compares the inputs actually used with the inputs the standards allow for the output actually achieved (Datar & Rajan, 2021). For direct labor, the input allowed is the standard hours allowed: the units completed times the standard labor hours of each unit. The input used is the direct labor time recorded against the work, and comparing the two measures the efficiency of direct labor.
 
-| From | To | Join on |
-|---|---|---|
-| PurchaseOrderLine | PurchaseOrder | PurchaseOrderID |
-| GoodsReceiptLine | PurchaseOrderLine | POLineID |
-| PurchaseInvoiceLine | PurchaseOrderLine | POLineID |
-| PurchaseInvoice | Supplier | SupplierID |
-| DisbursementPayment | PurchaseInvoice | PurchaseInvoiceID |
-| WorkOrder | Item | ItemID |
-| WorkOrderOperation | WorkOrder | WorkOrderID |
-| WorkOrderClose | WorkOrder | WorkOrderID |
-| ProductionCompletionLine | ProductionCompletion | ProductionCompletionID |
-| LaborTimeEntry | WorkOrderOperation | WorkOrderOperationID |
-| PayrollRegisterLine | PayrollRegister | PayrollRegisterID |
-| PayrollRegister | PayrollPeriod | PayrollPeriodID |
+Not every hour of a plant is direct labor. Indirect labor, the time that no single work order carries, is part of manufacturing overhead, and a standard cost system does not compare it with the standard labor hours. It charges overhead to production at a standard amount for each unit, so more indirect time shows up in the overhead part of the variance, not the labor part. The fixed part of overhead is absorbed only by the units made, so a fall in output leaves some of it unabsorbed, an effect called the production-volume variance (Datar & Rajan, 2021).
 
-: Join paths through the purchasing, manufacturing, and payroll tables {#tbl-10-02}
-
-Two of these tables carry more than one kind of row. LaborTimeEntry records direct labor against a work order operation, but it also records indirect manufacturing time, which is not charged to any work order and has no operation. A left join from LaborTimeEntry to WorkOrderOperation keeps both kinds, and the rows with no match are the indirect time. PayrollRegisterLine records regular and overtime earnings with their hours, but also salaries, employer taxes, benefits, and deductions, which have no hours. A filter on its LineType column chooses the lines a question needs.
-
-These tables let you measure the plant the way a standard cost system does. A standard cost system compares the inputs actually used with the inputs the standards allow for the output actually achieved, such as the standard labor hours allowed for the units completed (Datar & Rajan, 2021). The hours paid come from the payroll, and the output and its standard hours come from the production completions and the Item table, so the comparison needs both sets of tables, summarized to the same period.
+The Charles River records keep these kinds of time apart. LaborTimeEntry records each employee's hours, dated by the day worked, with a LaborType. Direct Manufacturing time is recorded against a work order operation. Indirect Manufacturing time is plant time with no operation, and NonManufacturing time belongs to the rest of the company. PayrollRegisterLine records the pay, with regular and overtime earnings and their hours, together with salaries, employer taxes, benefits, and deductions, which have no hours. A payroll period belongs to the fiscal year of its pay date, so the period that ends in late December is paid, and counted, in the next year. Because the labor time entries follow the same calendar as the production completions, Tutorial 10.3 measures the hours with them, and uses the payroll for what the hours cost.
 
 
 {{< include _tutorial-03.qmd >}}
@@ -218,9 +354,9 @@ These tables let you measure the plant the way a standard cost system does. A st
 
 ## Looking Ahead
 
-This chapter has taught you to combine tables and summarize their rows. You joined tables with INNER JOIN on their logical keys and tested each join by its row count. You kept unmatched rows with LEFT JOIN and found missing records with anti-joins. You summarized with COUNT, SUM, AVG, MIN, and MAX, grouped by key, filtered groups with HAVING, and avoided the double counting of fan-out. You wrote subqueries in WHERE and FROM, and you learned the order in which a query is evaluated. Along the way, you rebuilt the pre-closing trial balance of fiscal 2026 and followed the conversion cost of production through the ledger.
+This chapter has taught you to combine tables and summarize their rows. You joined tables with INNER JOIN on their logical keys and tested each join by its row count. You kept unmatched rows with LEFT JOIN, listed whole populations, and found missing records with anti-joins and NOT EXISTS. You summarized with aggregate functions, grouped by key, filtered groups with HAVING, and avoided the double counting of fan-out. You wrote subqueries in SELECT, WHERE, and FROM, including correlated ones, and you learned the logical order in which a query is evaluated. Along the way, you tied the variance to the ledger, rebuilt the pre-closing trial balance of fiscal 2026, and followed the conversion cost of production through the ledger.
 
-The controller now has her answer to the volume question, and it is not the one she expected. Output did not fall. The plant completed about as many units in fiscal 2026 as in fiscal 2024, and those units needed about as many standard labor hours. The payroll of the same people, however, paid for many more hours, and a growing share of them was overtime or time not charged to any work order. The actual conversion cost charged to production rose, while the standard cost that production absorbed stayed flat, and the difference is the variance. What the controller needs next is a measure she can follow month by month, one that shows whether the gap between paid hours and standard hours is still widening. Building that measure requires classifying rows, calculating across months, and organizing a long query into steps, which is the work of Chapter 11.
+The controller now has her answer to the volume question, and it is mostly no. The plant completed about as many units in fiscal 2026 as in fiscal 2024, with a dip in fiscal 2025 that left some fixed overhead unabsorbed, and those units needed about as many standard labor hours. The direct labor recorded against the work stayed within those standard hours in every year. The extra hours were elsewhere. Indirect time, which no work order carries, grew by about two-thirds, and overtime more than doubled. Indirect labor is overhead, so its growth reached the variance through the overhead part, while the favorable labor part shrank as direct hours moved toward the standard and more of them were paid as overtime. What the controller needs next is a measure she can follow month by month, one that shows whether the gap between the hours recorded and the standard hours is still widening. Building that measure requires classifying rows, calculating across months, and organizing a long query into steps, which is the work of Chapter 11.
 
 
 

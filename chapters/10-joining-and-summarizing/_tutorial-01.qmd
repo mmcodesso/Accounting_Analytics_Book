@@ -1,16 +1,24 @@
 ## Guided Tutorial 10.1: Joining the Variance to Its Work Orders and Products
 
-**Context and objective.** The WorkOrderClose table records each variance but not the product that produced it. In this tutorial, you will join the closes to their work orders and items, test that every close finds its match, and summarize the variance by item group and year. You will also check the total against the ledger and rank the items that carry the most variance.
+**Context and objective.** The WorkOrderClose table records each variance but not the product that produced it. In this tutorial, you will join the closes to their work orders and items, test that every close finds its match, and summarize the variance by item group and year. You will check the total against the ledger, keep the items that carry the most variance with HAVING, and list every manufactured item with a left join, including the items with no closes.
 
-**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the chapter, with a header comment like the one in Tutorial 9.3, and save it as `Chapter10.sql`.
+**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter10.sql` beside your working copy. As in Chapter 9, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
+
+```sql
+/* Chapter 10: manufacturing variance, joined and summarized
+   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
+   Prepared by: your name, date
+   Checks: listed at the end of Tutorial 10.3 */
+```
 
 **Step-by-step instructions.**
 
-**Step 1. Join the closes to their work orders.** Each close carries the WorkOrderID of the work order it closes.
+**Step 1. Join the closes to their work orders, and test the join.** Each close carries the WorkOrderID of the work order it closes, and an inner join that finds every match returns one row for each close.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 10.1: the closes joined to their work orders
    SELECT woc.WorkOrderCloseID, woc.CloseDate, wo.WorkOrderNumber,
        wo.ItemID, woc.TotalVarianceAmount
    FROM WorkOrderClose AS woc
@@ -18,15 +26,22 @@ a. Type and run the query below.
    ```
 
 b. Read the number of rows in the message pane.
-c. Run `SELECT COUNT(*) FROM WorkOrderClose;` and compare the two numbers.
+c. Type and run the query below, and compare the two numbers.
+
+   ```sql
+   -- Tutorial 10.1: the number of closes, to test the join
+   SELECT COUNT(*) AS Closes
+   FROM WorkOrderClose;
+   ```
 
 The join returns exactly as many rows as the WorkOrderClose table holds, many thousands. Every close therefore matches one work order, and none has been dropped by the inner join.
 
 **Step 2. Add the items.** The work order's ItemID leads to the Item table.
 
-a. Add a second join and the item's columns, so that the query reads as below, and run it.
+a. Type and run the query below, which adds a second join and the item's columns.
 
    ```sql
+   -- Tutorial 10.1: the closes with their items
    SELECT woc.WorkOrderCloseID, woc.CloseDate, i.ItemCode,
        i.ItemName, i.ItemGroup, woc.TotalVarianceAmount
    FROM WorkOrderClose AS woc
@@ -34,15 +49,16 @@ a. Add a second join and the item's columns, so that the query reads as below, a
        INNER JOIN Item AS i ON i.ItemID = wo.ItemID;
    ```
 
-b. Confirm that the number of rows is unchanged.
+b. Confirm that the number of rows is the same as in Step 1.
 
-Each close now carries the code, name, and group of the item its work order made. The row count is the same as in Step 1, so every work order matches an item.
+Each close now carries the code, name, and group of the item its work order made. The row count is unchanged, so every work order matches an item.
 
 **Step 3. Total the variance of fiscal 2026 by item group, and check it against the ledger.** A summary is only useful if it agrees with the books.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 10.1: the variance of fiscal 2026 by item group
    SELECT i.ItemGroup, COUNT(*) AS Closes,
        ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance
    FROM WorkOrderClose AS woc
@@ -53,24 +69,26 @@ a. Type and run the query below.
    ORDER BY TotalVariance DESC;
    ```
 
-b. Run the query below, which totals the variance postings of fiscal 2026 in the ledger that Tutorial 9.2 isolated.
+b. Type and run the query below, which totals the variance postings of fiscal 2026 in the ledger that Tutorial 9.2 isolated.
 
    ```sql
+   -- Tutorial 10.1: the same variance in the ledger
    SELECT ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS LedgerVariance
    FROM GLEntry AS gl
    WHERE gl.AccountID = 93 AND gl.FiscalYear = 2026
        AND gl.SourceDocumentType = 'WorkOrderClose';
    ```
 
-c. Add up the TotalVariance column of item a and compare it with the ledger total.
+c. Add up the TotalVariance column of item a, and compare it with the ledger total.
 
-Three item groups carry the variance: Furniture, Lighting, and Textiles, the groups whose items Charles River makes. Furniture holds more than two-thirds of it. The three groups add up to the ledger total to the cent, so the work order records and the ledger tell the same story.
+Three item groups carry the variance: Furniture, Lighting, and Textiles, the groups whose items Charles River makes in quantity. Furniture holds more than two-thirds of it. The three groups add up to the ledger total to the cent, so the work order records and the ledger tell the same story.
 
-**Step 4. Compare the three years.** The year of a close is the first four characters of its CloseDate.
+**Step 4. Compare the three years.** The year of a close is the first four characters of its CloseDate, and GROUP BY can use the alias CloseYear that the SELECT list gives it.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 10.1: the variance by item group and year
    SELECT i.ItemGroup, SUBSTR(woc.CloseDate, 1, 4) AS CloseYear,
        COUNT(*) AS Closes,
        ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance,
@@ -84,15 +102,16 @@ a. Type and run the query below.
 
 b. For each item group, compare the three years of TotalVariance and of Closes.
 
-The result, shown in @fig-10-03, holds one row for each group and year. Furniture's variance rose in each year, to nearly twice its fiscal 2024 level, and Lighting's rose too, while Textiles rose and then fell back. In every group, the number of closes fell over the same period, so a larger variance was spread over fewer work orders. The overhead part moves with the total in each group.
+The result, shown in @fig-10-03, holds one row for each group and year. Furniture's variance rose in each year, to nearly twice its fiscal 2024 level, and Lighting's rose too, while Textiles rose and then fell back in fiscal 2026. In every group, the number of closes fell over the same period, so a larger variance was spread over fewer work orders. The overhead part moves with the total in each group.
 
-![The Manufacturing Variance by Item Group and Year.](/visuals/svg/fig-10-03-variance-by-group-year.svg){#fig-10-03 fig-alt="A mock of the Execute SQL tab. The query joins WorkOrderClose to WorkOrder and Item and groups the closes by item group and close year, with the number of closes, the total variance, and the overhead variance. The result holds nine rows, three years each for Furniture, Lighting, and Textiles. The Furniture rows, whose total variance rises in each year while the number of closes falls, are outlined."}
+![The Manufacturing Variance by Item Group and Year.](/visuals/svg/fig-10-03-variance-by-group-year.svg){#fig-10-03 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins WorkOrderClose to WorkOrder and Item and groups the closes by item group and close year, with the number of closes, the total variance, and the overhead variance. The result holds nine rows, three years each for Furniture, Lighting, and Textiles. The Furniture rows, whose total variance rises in each year while the number of closes falls, are outlined."}
 
-**Step 5. Rank the items.** Group by the item's key, and include its code and name so that the result is readable.
+**Step 5. Keep the items that carry the most variance.** WHERE keeps the closes of fiscal 2026, and HAVING then keeps the items whose total passes a threshold. Group by the item's key, and include its code and name so that the result is readable.
 
 a. Type and run the query below.
 
    ```sql
+   -- Tutorial 10.1: items with more than $50,000 of variance in 2026
    SELECT i.ItemID, i.ItemCode, i.ItemName, COUNT(*) AS Closes,
        ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance
    FROM WorkOrderClose AS woc
@@ -100,19 +119,46 @@ a. Type and run the query below.
        INNER JOIN Item AS i ON i.ItemID = wo.ItemID
    WHERE woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
    GROUP BY i.ItemID, i.ItemCode, i.ItemName
-   ORDER BY TotalVariance DESC
-   LIMIT 10;
+   HAVING SUM(woc.TotalVarianceAmount) > 50000
+   ORDER BY TotalVariance DESC;
    ```
 
 b. Read the items and their totals, and note the item groups they come from.
+c. Change 50000 to 30000, run the query again, and read the number of rows.
+d. Change the threshold back to 50000.
 
-The largest totals of fiscal 2026 belong to a mix of dining tables, sideboards, and a throw blanket, each with a few dozen closes. No single item stands out: the variance is spread across most of the items Charles River makes, which points to a cause that affects production as a whole rather than one product.
+Only a handful of items pass the threshold of item a, a mix of dining tables, sideboards, and a throw blanket, each with a few dozen closes. At the lower threshold, several times as many pass. No single item stands out, and the largest carries only a small share of the year's variance. The variance is spread across most of the items Charles River makes, which points to a cause that affects production as a whole rather than one product.
+
+**Step 6. List every manufactured item, including those with no closes.** A complete list starts from the table that holds the whole population, the items, and left joins the others to it.
+
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 10.1: every manufactured item with its closes of 2026
+   SELECT i.ItemCode, i.ItemName, i.LifecycleStatus,
+       COUNT(woc.WorkOrderCloseID) AS Closes2026
+   FROM Item AS i
+       LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID
+       LEFT JOIN WorkOrderClose AS woc ON woc.WorkOrderID = wo.WorkOrderID
+           AND woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+   WHERE i.SupplyMode = 'Manufactured'
+   GROUP BY i.ItemID, i.ItemCode, i.ItemName, i.LifecycleStatus
+   ORDER BY Closes2026, i.ItemCode;
+   ```
+
+b. Read the number of rows and the first rows of the result.
+c. Move the date condition from the ON clause to the WHERE clause, by deleting it from the second join and adding `AND woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'` to the WHERE clause, and run the query again.
+d. Compare the number of rows with item b, and then move the condition back into the ON clause.
+
+The query of item a returns one row for every manufactured item, and the first rows show a handful with no closes at all, each counted as zero by `COUNT(woc.WorkOrderCloseID)`. They are discontinued items. With the date condition in WHERE, those items disappear, because their close columns are NULL and a NULL CloseDate is not in any range. The left join has become an inner join, the trap of the section on left joins.
 
 **Checkpoint.** Check that:
 
 - the joins in Steps 1 and 2 return as many rows as the WorkOrderClose table holds;
 - the variance of fiscal 2026 by item group adds up to the ledger total of Step 3;
 - Furniture carries most of the variance, and its variance rose in each year while its number of closes fell;
-- the ten largest items are spread across several product types.
+- HAVING keeps only a handful of items above $50,000, spread across several product types;
+- the complete list of Step 6 keeps the items with no closes only while the date condition is in the ON clause;
+- Chapter10.sql holds the header and the queries of this tutorial, each under a comment.
 
-The variance is not a product problem. It rises across the groups the plant makes, while the number of work orders falls, and that pattern turns the question toward the cost of production itself.
+The variance is not a product problem. It rises in the groups the plant makes most, while the number of work orders falls, and that pattern turns the question toward the cost of production itself.

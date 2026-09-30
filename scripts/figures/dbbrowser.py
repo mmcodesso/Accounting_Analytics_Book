@@ -224,5 +224,44 @@ def structure_row(d: Diagram, x: float, y: float, widths: list[float], values: l
         cx += width
 
 
-__all__ = ["FILE", "PATH", "TABS", "highlight", "window", "editor", "results", "message", "run",
+class Script:
+    """A chapter's saved script as its tutorials build it: a header comment, then each query
+    at the end of the script under a one-line comment. queries holds (key, comment, sql)
+    tuples. The tutorial mocks show each query where it sits in the script, so the tutorial
+    text and these queries must stay identical."""
+
+    def __init__(self, header: str, queries: list[tuple[str, str, str]], tab: str):
+        self.header, self.queries, self.tab = header, queries, tab
+
+    def text(self) -> str:
+        """The whole script."""
+        return "\n\n".join([self.header] + [f"{c}\n{sql}" for _, c, sql in self.queries])
+
+    def location(self, key: str) -> tuple[str, str, int]:
+        """The comment, the query, and the editor line of the comment for one query."""
+        line = self.header.count("\n") + 3     # the header, a blank line, the first comment
+        for k, comment, sql in self.queries:
+            if k == key:
+                return comment, sql, line
+            line += 1 + sql.count("\n") + 2    # comment, query lines, blank line
+        raise KeyError(key)
+
+    def mock(self, d: Diagram, key: str, widths: list[float], shown: slice | None = None,
+             sql: str | None = None) -> dict:
+        """An Execute SQL mock of one query, shown with its comment where it sits in the
+        script. sql replaces the saved query, for a step that shows an earlier version."""
+        comment, saved, line = self.location(key)
+        text = sql or saved
+        headers, rows = run(text)
+        y = window(d)
+        y = editor(d, 0, y, 860, f"{comment}\n{text}", tab=self.tab, first_line=line) + 8
+        first = (shown.start or 0) + 1 if shown else 1
+        visible = rows[shown] if shown else rows
+        geometry = results(d, 0, y, headers, widths, visible, first=first)
+        y += (len(visible) + 1) * ROW_H + 8
+        bottom = message(d, 0, y, 860, len(rows), text.split("\n")[0], line=line + 1)
+        return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
+
+
+__all__ = ["FILE", "PATH", "TABS", "Script", "highlight", "window", "editor", "results", "message", "run",
            "execute_sql", "emphasize_cells", "structure_row", "BLUE_TINT", "q"]

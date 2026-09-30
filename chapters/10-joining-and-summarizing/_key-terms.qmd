@@ -4,28 +4,36 @@
 
 **Aggregate function.** A function that calculates one value from many rows, such as COUNT, SUM, AVG, MIN, or MAX. Except for `COUNT(*)`, aggregate functions skip NULLs.
 
-**Anti-join.** A query that finds the rows of one table with no match in another, written as a left outer join that keeps only the rows where a column of the second table is NULL. It is the standard test for missing records, such as ledger rows that point to no document.
+**Anti-join.** A query that finds the rows of one table with no match in another, written as a left outer join that keeps only the rows where a column of the second table is NULL. The column must be one that is never NULL in a matched row, such as the second table's key. It is the standard test for missing records, such as ledger rows that point to no document.
 
-**Derived table.** A subquery in the FROM clause, which produces a table that the outer query can join, filter, and summarize. A derived table must have an alias.
+**Correlated subquery.** A subquery that refers to a column of the outer query, so that it is evaluated again for each row of the outer query, as in a NOT EXISTS test or a count of each account's postings.
+
+**Derived table.** A subquery in the FROM clause, which produces a table that the outer query can join, filter, and summarize. It should have an alias, which most systems require and which the outer query needs to name its columns.
 
 **Fan-out.** The repetition of a row's values when it is joined to several rows of another table, such as an invoice's total repeated on each of its lines. Summing a repeated amount counts it more than once.
 
-**GROUP BY clause.** The clause that divides rows into groups sharing the same values in the named columns and calculates each aggregate once per group. Every other column in the SELECT list must be aggregated.
+**GROUP BY clause.** The clause that divides rows into groups sharing the same values in the named columns and calculates each aggregate once per group. Every other column in the SELECT list must be aggregated. It is the SQL counterpart of Power Query's Group By in Chapter 6.
 
 **HAVING.** The clause that filters groups after the aggregates are calculated, so that its condition can use them, such as keeping only the accounts whose balance is not zero.
 
-**Inner join.** A join that returns one row for each pair of rows, one from each table, whose key values match. Rows without a match in the other table do not appear.
+**Inner join.** A join that returns one row for each pair of rows, one from each table, whose key values match. Rows without a match in the other table do not appear. JOIN written alone means an inner join.
 
 **Join.** An operation that combines the rows of two tables whose key values are equal, following a relationship between the tables. A join is the SQL counterpart of a merge in Power Query.
 
 **Left outer join.** A join kind that keeps every row of the first table and adds the matching rows of the second, leaving the added columns empty where no match exists. In SQL it is written LEFT JOIN, and the added columns hold NULL where the second table has no match.
 
-**Logical evaluation order.** The order in which a database evaluates the clauses of a query: FROM and its joins, WHERE, GROUP BY, HAVING, SELECT, ORDER BY, and LIMIT. It differs from the order in which the clauses are written.
+**Logical evaluation order.** The order in which a database evaluates the clauses of a query: FROM and its joins, WHERE, GROUP BY, HAVING, SELECT and DISTINCT, ORDER BY, and LIMIT. It differs from the order in which the clauses are written.
 
-**Standard hours allowed.** The labor hours that the standards allow for the output actually produced, calculated as the units completed times the standard hours per unit. Comparing them with the hours actually worked or paid measures labor efficiency.
+**NOT EXISTS.** A condition that is true when its subquery returns no rows, used to find the rows of one table that have no match in another. Unlike NOT IN, it is not defeated by a NULL in the other table.
 
-**Subquery.** A query written inside another query, in parentheses. In WHERE, a subquery supplies a value or a list for a condition; in FROM, it forms a derived table.
+**Production-volume variance.** The part of an overhead variance that arises because output differs from the volume on which the fixed overhead rate was set. When output falls, some fixed overhead is left unabsorbed.
 
-**Table alias.** A short name given to a table in the FROM clause with AS, such as `WorkOrderClose AS woc`, used to qualify its columns. Aliases are required when a column name appears in more than one joined table.
+**Scalar subquery.** A subquery that returns a single value, which can stand wherever a value can, in the SELECT list or in a condition.
+
+**Standard hours allowed.** The labor hours that the standards allow for the output actually produced, calculated as the units completed times the standard hours per unit. The direct labor efficiency variance compares them with the direct labor hours actually used, priced at the standard rate.
+
+**Subquery.** A query written inside another query, in parentheses. In SELECT or WHERE, a subquery supplies a value or a list for a condition; in FROM, it forms a derived table.
+
+**Table alias.** A short name given to a table in the FROM clause with AS, such as `WorkOrderClose AS woc`, used to qualify its columns. An alias is required when the same table appears twice in one query.
 
 **Trial balance.** A listing of all general ledger account balances at a specific point in time, used to verify that total debits equal total credits and as the starting point for preparing financial statements. In SQL, it is the ledger rows grouped by account, with their debits and credits netted.

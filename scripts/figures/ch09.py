@@ -90,22 +90,7 @@ QUERIES = [
 ]
 
 
-def script() -> str:
-    """The whole of Chapter09.sql."""
-    parts = [HEADER]
-    for _, comment, sql in QUERIES:
-        parts.append(f"{comment}\n{sql}")
-    return "\n\n".join(parts)
-
-
-def location(key: str) -> tuple[str, str, int]:
-    """The comment, the query, and the editor line of the comment for one query."""
-    line = HEADER.count("\n") + 3            # the header, a blank line, then the first comment
-    for k, comment, sql in QUERIES:
-        if k == key:
-            return comment, sql, line
-        line += 1 + sql.count("\n") + 2     # comment, query lines, blank line
-    raise KeyError(key)
+CHAPTER09 = db.Script(HEADER, QUERIES, SCRIPT_TAB)
 
 
 def note(d: Diagram, text: str, y: float, h: float = 40) -> None:
@@ -119,23 +104,6 @@ def account_ids() -> dict[int, int]:
                                      VARIANCE_ACCOUNT))
     assert rows == {1090: 92, 5080: 93}, rows   # the text names both AccountIDs
     return rows
-
-
-def tutorial_query(d: Diagram, key: str, widths: list[float], shown: slice | None = None,
-                   sql: str | None = None) -> dict:
-    """An Execute SQL mock of one script query, shown with its comment where it sits in
-    Chapter09.sql. sql replaces the saved query, for a step that shows an earlier version."""
-    comment, saved, line = location(key)
-    text = sql or saved
-    headers, rows = db.run(text)
-    y = db.window(d)
-    y = db.editor(d, 0, y, 860, f"{comment}\n{text}", tab=SCRIPT_TAB, first_line=line) + 8
-    first = (shown.start or 0) + 1 if shown else 1
-    visible = rows[shown] if shown else rows
-    geometry = db.results(d, 0, y, headers, widths, visible, first=first)
-    y += (len(visible) + 1) * ROW_H + 8
-    bottom = db.message(d, 0, y, 860, len(rows), text.split("\n")[0], line=line + 1)
-    return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
 
 
 # -- figures ----------------------------------------------------------------------------
@@ -228,10 +196,10 @@ def fig_09_02() -> Diagram:
 def fig_09_03() -> Diagram:
     d = Diagram("Choosing Columns from the Account Table")
     ids = account_ids()
-    _, sql, _ = location("account_columns")
+    _, sql, _ = CHAPTER09.location("account_columns")
     rows = db.run(sql)[1]
     start = [r[0] for r in rows].index(ids[1090]) - 4
-    out = tutorial_query(d, "account_columns", [90, 120, 290, 110, 210],
+    out = CHAPTER09.mock(d, "account_columns", [90, 120, 290, 110, 210],
                          shown=slice(start, start + 9))
     marked = [r for r, row in enumerate(out["rows"][start:start + 9]) if row[0] in ids.values()]
     db.emphasize_cells(d, out["geometry"], [(marked[0], 0), (marked[-1], 4)])
@@ -242,7 +210,7 @@ def fig_09_03() -> Diagram:
 
 def fig_09_04() -> Diagram:
     d = Diagram("A Syntax Error in the Message Pane")
-    comment, sql, line = location("account_columns")
+    comment, sql, line = CHAPTER09.location("account_columns")
     wrong = sql.replace("AccountNumber", "AccountNumbr", 1)
     assert wrong != sql
     try:
@@ -262,10 +230,10 @@ def fig_09_04() -> Diagram:
 
 def fig_09_05() -> Diagram:
     d = Diagram("A Calculated Check on the Variance Records")
-    _, sql, _ = location("variance_check")
+    _, sql, _ = CHAPTER09.location("variance_check")
     rows = db.run(sql)[1]
     assert all(r[5] == 0 for r in rows), "every close's parts add up to its total"
-    out = tutorial_query(d, "variance_check", [150, 110, 110, 120, 110, 180], shown=slice(0, 8))
+    out = CHAPTER09.mock(d, "variance_check", [150, 110, 110, 120, 110, 180], shown=slice(0, 8))
     db.emphasize_cells(d, out["geometry"], [(-1, 5), (7, 5)])
     note(d, "Outlined: the calculated CheckDifference column, zero in every row shown. "
             "The first eight of the result's rows are shown.", out["bottom"] + 8, 40)
@@ -309,10 +277,10 @@ def fig_09_06() -> Diagram:
 def fig_09_07() -> Diagram:
     d = Diagram("The Source Document Types Behind the Variance Account")
     account_ids()
-    _, sql, _ = location("source_types")
+    _, sql, _ = CHAPTER09.location("source_types")
     rows = db.run(sql)[1]
     assert {r[0] for r in rows} == {"WorkOrderClose", "JournalEntry"}, rows
-    out = tutorial_query(d, "source_types", [260])
+    out = CHAPTER09.mock(d, "source_types", [260])
     journal = [r for r, row in enumerate(out["rows"]) if row[0] == "JournalEntry"][0]
     db.emphasize_cells(d, out["geometry"], [(journal, 0)])
     note(d, "Outlined: the JournalEntry row, which Step 4 examines.", out["bottom"] + 8, 22)
@@ -352,7 +320,7 @@ def fig_09_08() -> Diagram:
 
 def fig_09_09() -> Diagram:
     d = Diagram("The Ten Largest Work-Order Variances of Fiscal 2026")
-    _, saved, _ = location("top_ten")
+    _, saved, _ = CHAPTER09.location("top_ten")
     # Step 1 of Tutorial 9.3 runs the query before Step 2 adds the OverheadShare column.
     step1 = saved.replace("    TotalVarianceAmount AS Total,\n"
                           "    ROUND(OverheadVarianceAmount / TotalVarianceAmount, 2)\n"
@@ -363,7 +331,7 @@ def fig_09_09() -> Diagram:
         "overhead is larger than material and labor together in each of the ten"
     shares = [r[6] for r in db.run(saved)[1]]
     assert sum(s > 0.8 for s in shares) >= 6, shares     # "most of them more than four-fifths"
-    out = tutorial_query(d, "top_ten", [150, 110, 110, 100, 100, 110, 100], sql=step1)
+    out = CHAPTER09.mock(d, "top_ten", [150, 110, 110, 100, 100, 110, 100], sql=step1)
     db.emphasize_cells(d, out["geometry"], [(-1, 5), (9, 5)])
     note(d, "Outlined: the Overhead column, which holds most of each total.", out["bottom"] + 8, 22)
     return d
@@ -376,7 +344,7 @@ def fig_09_10() -> Diagram:
     assert close == "JE-2026-000296" and close in HEADER
     for _, _, sql in QUERIES:
         db.run(sql)                                     # every query in the script runs
-    lines = script().split("\n")
+    lines = CHAPTER09.text().split("\n")
     shown = "\n".join(lines[:36])
     y = db.window(d)
     bottom = db.editor(d, 0, y, 860, shown, tab=SCRIPT_TAB)

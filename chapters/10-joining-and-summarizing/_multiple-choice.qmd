@@ -11,10 +11,10 @@ D.  The query needs a GROUP BY clause before it can return every close
 
 **2.** A query joins WorkOrderClose and WorkOrder and asks for WorkOrderID without naming a table. It stops with the message ambiguous column name: WorkOrderID. What is the best fix?
 
-A.  Qualify the column with a table alias, such as `woc.WorkOrderID`
-B.  Remove WorkOrderID from the SELECT list of every query that joins tables
-C.  Change the inner join to a left join, so that each name is unique
-D.  Rename the WorkOrderID column in the WorkOrder table of the database
+A.  Qualify the column with its table's alias, as in `woc.WorkOrderID`
+B.  Add DISTINCT to the SELECT list, so that WorkOrderID appears only once
+C.  Change the inner join to a left join, so that one table supplies WorkOrderID
+D.  Give the column an alias in the SELECT list, such as `WorkOrderID AS ID`
 
 **3.** Which query returns the total variance of each item group, one row per group?
 
@@ -23,12 +23,12 @@ B.  `SELECT SUM(TotalVarianceAmount) FROM ... WHERE ItemGroup IS NOT NULL`
 C.  `SELECT ItemGroup, COUNT(ItemGroup) FROM ... GROUP BY TotalVarianceAmount`
 D.  `SELECT ItemGroup, SUM(TotalVarianceAmount) FROM ... GROUP BY ItemGroup`
 
-**4.** A column holds values in eight rows and NULL in two. What do `COUNT(*)` and `COUNT(column)` return?
+**4.** Every manufactured item is left joined to WorkOrder and grouped by item. For an item with no work orders, what do `COUNT(*)` and `COUNT(wo.WorkOrderID)` return?
 
-A.  8 and 10
-B.  10 and 8
-C.  10 and 10
-D.  8 and 8
+A.  0 and 0
+B.  1 and 0
+C.  1 and 1
+D.  NULL and 0
 
 **5.** An analyst wants the ledger accounts whose balance, the sum of debits minus credits, is not zero. Where does the condition on the balance belong?
 
@@ -37,10 +37,10 @@ B.  In a HAVING clause, because it tests an aggregate of each group
 C.  In the ON clause of the join from GLEntry to the Account table
 D.  In the ORDER BY clause, after the balance of each account is calculated
 
-**6.** An auditor writes `Item LEFT JOIN WorkOrder` and keeps only the rows where `WorkOrderID IS NULL`. What does the query find?
+**6.** An auditor left joins WorkOrder to Item on ItemID and keeps only the rows where `wo.WorkOrderID IS NULL`. What does the query find?
 
-A.  The work orders that have no item
-B.  The items whose WorkOrderID column is blank in the Item table
+A.  The work orders whose ItemID matches no item
+B.  The items that have exactly one work order
 C.  Every item, with the number of its work orders
 D.  The items for which no work order exists
 
@@ -54,9 +54,9 @@ D.  The duplicate customer is left out of the result
 **8.** A query joins SalesInvoice to SalesInvoiceLine and sums SalesInvoice.GrandTotal. The result is nearly twice the invoices' total. Why?
 
 A.  GrandTotal includes sales tax and freight, which the invoice lines do not
-B.  The join has dropped the invoices without lines, so the rest count double
+B.  The join also matched lines of other invoices that share a line number
 C.  Each GrandTotal repeats on every line of its invoice
-D.  SQLite rounds each GrandTotal up to the next dollar before adding it
+D.  An inner join returns each matched row twice, once for each of the tables
 
 **9.** Which query counts the fiscal 2026 closes whose variance was above the average variance of fiscal 2026?
 
@@ -65,19 +65,19 @@ B.  One that uses `HAVING TotalVarianceAmount > 0` after `GROUP BY CloseDate`
 C.  One that sorts the closes by variance and keeps the first half with LIMIT
 D.  One that compares each close with a subquery for the year's average
 
-**10.** Why can a WHERE clause not contain `SUM(Debit) > 1000`?
+**10.** A query keeps the employees whose EmployeeID is NOT IN the list of requisition approvers. It returns no rows, although most employees have never approved a requisition. What is the most likely cause?
 
-A.  SUM can only be used inside a subquery, never in the outer query
-B.  WHERE runs before rows are grouped, so no group total exists yet
-C.  Debit is stored as REAL, and SUM works only with INTEGER columns
-D.  A WHERE condition cannot compare a calculated value with a number
+A.  The subquery returns too many rows for NOT IN to compare them all
+B.  The list contains a NULL, and no comparison with NULL is true
+C.  NOT IN works only with text values, not with integer keys
+D.  The subquery must be joined to Employee before NOT IN can use it
 
 **11.** A query lists every manufactured item with its closed work orders, using `Item LEFT JOIN WorkOrder`, and adds `WHERE wo.Status = 'Closed'`. The items with no work orders disappear from the result. Why?
 
 A.  Their Status is NULL, so WHERE removes them, as an inner join would
-B.  A left join never keeps unmatched rows unless the query also groups them
-C.  Items with no work orders are not counted as manufactured items
-D.  The Status column exists only in the Item table, not in WorkOrder
+B.  The ON clause must also name every column that the WHERE clause uses
+C.  WHERE runs before the join, so the items are removed before matching
+D.  A left join keeps only the rows of the second table that have a match
 
 **12.** SQLite runs a query that selects ItemName and `SUM(TotalVarianceAmount)` but groups only by ItemGroup. What is true of the ItemName column in the result?
 
@@ -89,38 +89,38 @@ D.  It shows the name of the item with the largest variance in each group
 **13.** A trial balance query is wrapped in a derived table, and an outer query sums the Balance column of all the accounts. The result is zero. What does this show?
 
 A.  The debit balances equal the credit balances
-B.  Every account in the trial balance has a zero balance
+B.  The trial balance includes only the balance sheet accounts
 C.  The closing entries were included in the query by mistake
-D.  The ledger has no postings at all in the period
+D.  Each account's debits equal that account's own credits
 
-**14.** In Tutorial 10.3, the output and the paid hours are summarized in two derived tables and then joined on the year. Why are they not joined row by row first?
+**14.** In Tutorial 10.3, the hours recorded and the output are summarized in two derived tables and then joined on the year. Why are they not joined row by row first?
 
-A.  SQLite cannot join more than two tables in a single query
-B.  The payroll and production tables share no column to join on
+A.  A derived table is required whenever a query joins more than two tables
+B.  The labor time and production tables share no column to join on
 C.  A derived table runs faster than a join of the underlying tables
 D.  Each is recorded at its own level, so both are summarized first
 
-**15.** From fiscal 2024 to fiscal 2026, Charles River's units completed and their standard labor hours were nearly unchanged, while the hours paid to the manufacturing cost center rose. What does the rising ratio of paid hours to standard hours indicate?
+**15.** From fiscal 2024 to fiscal 2026, Charles River's output and its standard hours were nearly flat. The direct labor hours recorded stayed below the standard hours, while indirect hours grew by about two-thirds. Where does the cost of the extra indirect hours appear?
 
-A.  The plant produced fewer units, so fixed costs were spread over less output
-B.  The standard hours allowed per unit were raised in each year
-C.  More hours were paid for the same output, so efficiency fell
-D.  Overtime was replaced by regular hours paid at a lower rate
+A.  In the direct labor part, as an unfavorable labor efficiency variance
+B.  In the material part, because more material was used for each unit
+C.  In the overhead part, because indirect labor is part of overhead
+D.  Nowhere, because the standards for direct labor were met in every year
 
 <!-- Answer key, Chapter 10 (for instructors; HTML comments are removed from every rendered format):
      1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 A, 12 C, 13 A, 14 D, 15 C.
      1 C: an inner join drops rows whose key finds no match; the row count is the test of the keys.
-     2 A: a column name in two joined tables must be qualified with its table or alias.
+     2 A: a column name in two joined tables must be qualified; an alias in SELECT does not say which table it comes from.
      3 D: GROUP BY ItemGroup with SUM returns one total per group.
-     4 B: COUNT(*) counts rows; COUNT(column) skips NULLs.
+     4 B: the unmatched item keeps one row, which COUNT(*) counts; COUNT(wo.WorkOrderID) skips its NULL.
      5 B: a condition on an aggregate belongs in HAVING.
      6 D: the anti-join keeps the items with no matching work order.
      7 A: grouping by name merges different customers that share it; group by the key.
      8 C: fan-out repeats the header amount on each line.
      9 D: a subquery in WHERE supplies the average to compare with.
-     10 B: WHERE runs before GROUP BY, so aggregates are not yet available.
+     10 B: a NULL in the NOT IN list makes every comparison unknown, so no row qualifies; use NOT EXISTS or an anti-join.
      11 A: a condition on the second table in WHERE removes the NULL rows; put it in ON.
      12 C: SQLite allows a bare column in a grouped query but returns an arbitrary row's value.
      13 A: when all balances net to zero, the debits equal the credits.
-     14 D: amounts at different levels are summarized to a common level before joining.
-     15 C: paid hours rose against flat standard hours, so efficiency against standard fell; output did not fall. -->
+     14 D: amounts at different levels are summarized to a common level (the year) before joining.
+     15 C: indirect labor is overhead, applied at a standard rate per unit, so extra indirect time raises the overhead variance. -->
