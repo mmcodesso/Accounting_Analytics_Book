@@ -18,6 +18,10 @@
 
 **Self-join.** A join of a table to itself, under two aliases, used to compare each row with other rows of the same table, such as payments to the same supplier for the same amount on different dates. A condition such as `b.ID > a.ID` keeps each pair once.
 
+**Substantive analytical procedure.** An analytical procedure that an auditor uses as evidence about whether an amount is misstated, by comparing the recorded amount with an expectation developed from plausible relationships and investigating differences above a threshold set in advance. In SQL, the expectation can be calculated for every record of a population, as when the hours of each earnings line times the employee's rate of pay predict the amount paid.
+
 **Three-way match.** A comparison of the purchase order, the goods receipt, and the supplier invoice for the same purchase, testing that the company is billed only for what it ordered and received, at the price it approved.
 
 **UNION ALL.** An operator that stacks the results of two or more queries with the same number of columns into one result, matching the columns by position and keeping every row. UNION, without ALL, also removes duplicate rows.
+
+**Unrecorded liability.** An obligation that exists at the balance sheet date but is missing from the ledger, such as goods received but never recorded, or wages earned but not yet paid. A reconciliation cannot find it, because it is missing from both records; the auditor looks for it in the invoices and payments after the year-end and in the dates of the events behind them.

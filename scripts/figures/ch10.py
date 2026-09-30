@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import dbbrowser as db
 import excel as xl
-from data import one, q
+from ch03 import legend, table as er_table
+from data import one, q, relate
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, INK,
                     ROW_H, RULE, SMALL, TEAL, TEAL_TINT, WHITE, Diagram, esc, money)
 
@@ -121,6 +122,14 @@ QUERIES = [
      "WHERE gl.AccountID = 92 AND gl.FiscalYear BETWEEN 2024 AND 2026\n"
      "GROUP BY gl.FiscalYear, gl.SourceDocumentType\n"
      "ORDER BY gl.FiscalYear, gl.SourceDocumentType;"),
+    ("variance_parts", "-- Tutorial 10.2: the labor and overhead parts by year",
+     "SELECT SUBSTR(CloseDate, 1, 4) AS CloseYear,\n"
+     "    ROUND(SUM(DirectLaborVarianceAmount), 2) AS LaborVariance,\n"
+     "    ROUND(SUM(OverheadVarianceAmount), 2) AS OverheadVariance,\n"
+     "    ROUND(SUM(ConversionVarianceAmount), 2) AS ConversionVariance\n"
+     "FROM WorkOrderClose\n"
+     "GROUP BY CloseYear\n"
+     "ORDER BY CloseYear;"),
     ("journal_entries", "-- Tutorial 10.2: the journal entries posted to account 1090",
      "SELECT gl.FiscalYear, je.EntryType,\n"
      "    ROUND(SUM(gl.Debit), 2) AS Debits\n"
@@ -161,10 +170,17 @@ QUERIES = [
      "WHERE cc.CostCenterName = 'Manufacturing'\n"
      "    AND pp.FiscalYear BETWEEN 2024 AND 2026\n"
      "GROUP BY pp.FiscalYear;"),
-    ("record_ends", "-- Tutorial 10.3: the last day of the time records and of the output",
-     "SELECT (SELECT MAX(WorkDate) FROM LaborTimeEntry) AS LastWorkDate,\n"
-     "    (SELECT MAX(CompletionDate) FROM ProductionCompletion)\n"
-     "        AS LastCompletionDate;"),
+    ("profile_time", "-- Tutorial 10.3: a profile of the labor time entries",
+     "SELECT COUNT(*) AS Entries,\n"
+     "    COUNT(WorkOrderOperationID) AS WithOperation,\n"
+     "    COUNT(DISTINCT EmployeeID) AS Employees,\n"
+     "    MIN(WorkDate) AS FirstWorkDate, MAX(WorkDate) AS LastWorkDate\n"
+     "FROM LaborTimeEntry;"),
+    ("profile_output", "-- Tutorial 10.3: a profile of the production completions",
+     "SELECT COUNT(*) AS Completions,\n"
+     "    MIN(CompletionDate) AS FirstCompletionDate,\n"
+     "    MAX(CompletionDate) AS LastCompletionDate\n"
+     "FROM ProductionCompletion;"),
     ("last_periods", "-- Tutorial 10.3: the pay periods at the end of the data",
      "SELECT PeriodNumber, PeriodStartDate, PeriodEndDate, PayDate, Status\n"
      "FROM PayrollPeriod\n"
@@ -241,8 +257,16 @@ def fig_10_01() -> Diagram:
     left = [(str(w), n, str(closes[w][0]) if w in closes else "NULL",
              num(closes[w][1]) if w in closes else "NULL") for w, n, _ in orders]
     missing = [i + 1 for i, row in enumerate(left) if row[2] == "NULL"]
+    assert len(missing) == 1, missing
     d.grid(0, y + 22, ["WorkOrderID", "WorkOrderNumber", "WorkOrderCloseID", "TotalVariance"],
            [110, 170, 140, 130], left, highlight={(missing[0], 2), (missing[0], 3)})
+    y += 22 + ROW_H * (len(left) + 1) + 16
+    d.text("<b>Anti-join:</b> the left join, keeping only the rows where WorkOrderCloseID IS NULL",
+           0, y, 860, 20, size=SMALL)
+    d.grid(0, y + 22, ["WorkOrderID", "WorkOrderNumber", "WorkOrderCloseID", "TotalVariance"],
+           [110, 170, 140, 130], [left[missing[0] - 1]], highlight={(1, 2), (1, 3)})
+    note(d, "Highlighted: the NULLs that the left join supplies where no close exists. The anti-join keeps only "
+            "those rows.", y + 22 + ROW_H * 2 + 8, 40)
     return d
 
 
@@ -284,7 +308,7 @@ def fig_10_03() -> Diagram:
     assert furniture[0][2] > furniture[1][2] > furniture[2][2], "while its closes fall"
     assert textiles[1][3] > textiles[2][3], "Textiles fell back in 2026"
     assert furniture[2][3] > 0.66 * sum(r[3] for r in rows if r[1] == "2026")
-    out = CHAPTER10.mock(d, "variance_by_group_year", [130, 110, 90, 170, 170])
+    out = CHAPTER10.mock(d, "variance_by_group_year", [130, 110, 90, 170, 170], compact=True)
     db.emphasize_cells(d, out["geometry"], [(0, 0), (2, 4)])
     note(d, "Outlined: the Furniture rows, whose variance rises in each year while the number of closes falls.",
          out["bottom"] + 8, 22)
@@ -361,14 +385,14 @@ def fig_10_06() -> Diagram:
     debit = round(sum(r[3] for r in rows if r[3] > 0), 2)
     credit = round(-sum(r[3] for r in rows if r[3] < 0), 2)
     assert debit == credit == 67107722.36, (debit, credit)
-    out = CHAPTER10.mock(d, "trial_balance", [130, 340, 110, 150], shown=slice(0, 12))
+    out = CHAPTER10.mock(d, "trial_balance", [130, 340, 110, 150], shown=slice(0, 12), compact=True)
     note(d, "The first twelve of the accounts are shown. Positive balances are debit balances and negative "
             "balances credit balances.", out["bottom"] + 8, 40)
     return d
 
 
 def fig_10_07() -> Diagram:
-    d = Diagram("The Flow of Conversion Cost Through Account 1090 in Fiscal 2026")
+    d = Diagram("The Flow of Conversion Cost Through Account 1090")
     payroll = one("SELECT SUM(Debit) FROM GLEntry WHERE AccountID = 92 AND FiscalYear = 2026 "
                   "AND SourceDocumentType = 'PayrollSummary'")[0]
     je = dict(q("SELECT je.EntryType, SUM(gl.Debit) FROM GLEntry gl JOIN JournalEntry je "
@@ -405,25 +429,120 @@ def fig_10_07() -> Diagram:
     d.text("<b>Credits: cost out</b>", 600, 10, 260, 22, size=SMALL)
     note(d, f"Amounts are the postings of fiscal 2026. The debits exceed the credits by {money(remainder)}, "
             "the year's net change in the account.", 320, 40)
+
+    def by_year(sql: str) -> list[float]:
+        rows = dict(q(sql + " AND FiscalYear BETWEEN 2024 AND 2026 GROUP BY FiscalYear"))
+        assert sorted(rows) == [2024, 2025, 2026], rows
+        return [rows[y] for y in (2024, 2025, 2026)]
+
+    pay = by_year("SELECT FiscalYear, SUM(Debit) FROM GLEntry WHERE AccountID = 92 "
+                  "AND SourceDocumentType = 'PayrollSummary'")
+    jes = by_year("SELECT FiscalYear, SUM(Debit) FROM GLEntry WHERE AccountID = 92 "
+                  "AND SourceDocumentType = 'JournalEntry'")
+    std = by_year("SELECT FiscalYear, SUM(Credit) FROM GLEntry WHERE AccountID = 92 "
+                  "AND SourceDocumentType = 'ProductionCompletion'")
+    cleared = by_year("SELECT FiscalYear, SUM(Credit) - SUM(Debit) FROM GLEntry WHERE AccountID = 92 "
+                      "AND SourceDocumentType = 'WorkOrderClose'")
+    _, rows = db.run(CHAPTER10.location("variance_parts")[1])
+    assert [r[0] for r in rows] == ["2024", "2025", "2026"], rows
+    labor, overhead, conversion = ([r[i] for r in rows] for i in (1, 2, 3))
+    assert all(abs(a - b) < 0.01 for a, b in zip(cleared, conversion)), (cleared, conversion)
+    assert all(abs(a + b - c) < 0.02 for a, b, c in zip(labor, overhead, conversion))
+    assert labor[0] < labor[1] < labor[2] < 0, labor              # favorable and shrinking
+    assert overhead == sorted(overhead) and pay == sorted(pay)
+    assert max(std) / min(std) < 1.1, std                          # standard cost released nearly flat
+    y = 376
+    d.text("<b>Account 1090 by fiscal year</b>", 0, y, 860, 20, size=SMALL)
+    d.grid(0, y + 22, ["Postings", "2024", "2025", "2026"], [370, 160, 160, 170],
+           [("Debits: manufacturing payroll", *map(num, pay)),
+            ("Debits: factory overhead and depreciation", *map(num, jes)),
+            ("Credits: standard conversion cost of completions", *map(num, std)),
+            ("Credits: conversion variance cleared to 5080", *map(num, cleared)),
+            ("Of which the direct labor part", *map(num, labor)),
+            ("Of which the overhead part", *map(num, overhead))],
+           highlight={(6, 1), (6, 2), (6, 3)})
+    note(d, "The two parts of the variance come from the work order closes; a negative part is favorable. "
+            "Highlighted: the overhead part, which grew in each year while the labor part shrank.",
+         y + 22 + ROW_H * 7 + 8, 40)
     return d
 
 
 def fig_10_08() -> Diagram:
+    d = Diagram("The Payroll and Time Tables")
+    C0, C1, C2, W = 0, 300, 600, 240
+    BOTTOM, TOP, LEFT, RIGHT = (0.5, 1), (0.5, 0), (0, 0.5), (1, 0.5)
+    oa = er_table(d, "OvertimeApproval", C0, 20, [("PK", "OvertimeApprovalID"), ("", "WorkDate"),
+                  ("", "RequestedHours"), ("", "ApprovedHours"), ("", "ReasonCode"), ("", "Status")], w=W)
+    woo = er_table(d, "WorkOrderOperation", C1, 20, [("PK", "WorkOrderOperationID"), ("FK", "WorkOrderID"),
+                   ("", "PlannedLoadHours"), ("", "ActualEndDate")], w=W, focus=False,
+                   group="Manufacturing")
+    lte = er_table(d, "LaborTimeEntry", C1, 196, [("PK", "LaborTimeEntryID"), ("FK", "WorkOrderOperationID"),
+                   ("FK", "TimeClockEntryID"), ("FK", "EmployeeID"), ("", "WorkDate"), ("", "LaborType"),
+                   ("", "RegularHours"), ("", "OvertimeHours")], w=W)
+    # TimeClockEntry sits so that its key row lines up with LaborTimeEntry.TimeClockEntryID
+    tce_y = lte.cy("TimeClockEntryID") - 30 - ROW_H / 2
+    tce = er_table(d, "TimeClockEntry", C0, tce_y, [("PK", "TimeClockEntryID"), ("FK", "EmployeeID"),
+                   ("FK", "OvertimeApprovalID"), ("", "WorkDate"), ("", "ClockInTime"), ("", "ClockOutTime"),
+                   ("", "RegularHours"), ("", "OvertimeHours"), ("", "ClockStatus")], w=W)
+    assert tce_y >= oa.y + oa.h + 40, tce_y
+    emp = er_table(d, "Employee", C1, lte.y + lte.h + 60, [("PK", "EmployeeID"), ("", "EmployeeName"),
+                   ("", "JobTitle"), ("", "TerminationDate")], w=W, focus=False, group="Master Data")
+    cc = er_table(d, "CostCenter", C1, emp.y + emp.h + 60, [("PK", "CostCenterID"), ("", "CostCenterName")],
+                  w=W, focus=False, group="Organizational Planning")
+    pp = er_table(d, "PayrollPeriod", C2, 20, [("PK", "PayrollPeriodID"), ("", "PeriodNumber"),
+                  ("", "PeriodEndDate"), ("", "PayDate"), ("", "FiscalYear"), ("", "Status")], w=W)
+    pr = er_table(d, "PayrollRegister", C2, lte.y + 48, [("PK", "PayrollRegisterID"), ("FK", "PayrollPeriodID"),
+                  ("FK", "EmployeeID"), ("FK", "CostCenterID"), ("", "GrossPay"), ("", "Status")], w=W)
+    prl = er_table(d, "PayrollRegisterLine", C2, pr.y + pr.h + 50, [("PK", "PayrollRegisterLineID"),
+                   ("FK", "PayrollRegisterID"), ("", "LineType"), ("", "Hours"), ("", "Amount")], w=W)
+    pay = er_table(d, "PayrollPayment", C2, prl.y + prl.h + 50, [("PK", "PayrollPaymentID"),
+                   ("FK", "PayrollRegisterID"), ("", "PaymentDate")], w=W)
+    relate(d, "OvertimeApproval", "OvertimeApprovalID", "TimeClockEntry", "OvertimeApprovalID", oa.id, tce.id,
+           exit=BOTTOM, entry=TOP)
+    relate(d, "TimeClockEntry", "TimeClockEntryID", "LaborTimeEntry", "TimeClockEntryID",
+           tce.rows["TimeClockEntryID"], lte.rows["TimeClockEntryID"], exit=RIGHT, entry=LEFT)
+    relate(d, "WorkOrderOperation", "WorkOrderOperationID", "LaborTimeEntry", "WorkOrderOperationID",
+           woo.id, lte.id, color=AMBER, exit=BOTTOM, entry=TOP)
+    relate(d, "Employee", "EmployeeID", "LaborTimeEntry", "EmployeeID", emp.id, lte.id, color=AMBER,
+           exit=TOP, entry=BOTTOM)
+    relate(d, "Employee", "EmployeeID", "TimeClockEntry", "EmployeeID", emp.rows["EmployeeID"],
+           tce.rows["EmployeeID"], color=AMBER, exit=LEFT, entry=RIGHT,
+           points=[(C0 + W + 30, emp.cy("EmployeeID")), (C0 + W + 30, tce.cy("EmployeeID"))])
+    relate(d, "Employee", "EmployeeID", "PayrollRegister", "EmployeeID", emp.rows["EmployeeID"],
+           pr.rows["EmployeeID"], color=AMBER, exit=RIGHT, entry=LEFT,
+           points=[(C1 + W + 20, emp.cy("EmployeeID")), (C1 + W + 20, pr.cy("EmployeeID"))])
+    relate(d, "CostCenter", "CostCenterID", "PayrollRegister", "CostCenterID", cc.rows["CostCenterID"],
+           pr.rows["CostCenterID"], color=AMBER, exit=RIGHT, entry=LEFT,
+           points=[(C1 + W + 42, cc.cy("CostCenterID")), (C1 + W + 42, pr.cy("CostCenterID"))])
+    relate(d, "PayrollPeriod", "PayrollPeriodID", "PayrollRegister", "PayrollPeriodID", pp.id, pr.id,
+           exit=BOTTOM, entry=TOP)
+    relate(d, "PayrollRegister", "PayrollRegisterID", "PayrollRegisterLine", "PayrollRegisterID", pr.id,
+           prl.id, exit=BOTTOM, entry=TOP)
+    relate(d, "PayrollRegister", "PayrollRegisterID", "PayrollPayment", "PayrollRegisterID",
+           pr.rows["PayrollRegisterID"], pay.rows["PayrollRegisterID"], exit=RIGHT, entry=RIGHT,
+           points=[(C2 + W + 14, pr.cy("PayrollRegisterID")), (C2 + W + 14, pay.cy("PayrollRegisterID"))])
+    legend(d, C0, tce.y + tce.h + 50, W, stacked=True)
+    return d
+
+
+def fig_10_09() -> Diagram:
     d = Diagram("Hours per Standard Hour by Labor Type and Year")
     _, sql, _ = CHAPTER10.location("hours_by_type")
     headers, rows = db.run(sql)
     direct = [r[4] for r in rows if r[1] == "Direct Manufacturing"]
     indirect = [r[4] for r in rows if r[1] == "Indirect Manufacturing"]
     assert [r[0] for r in rows] == ["2024", "2024", "2025", "2025", "2026", "2026"], rows
-    last_work, last_completion = one(CHAPTER10.location("record_ends")[1])
-    assert last_work == "2026-12-11" and last_completion == "2026-12-31", (last_work, last_completion)
+    entries, with_op, _, first_work, last_work = db.run(CHAPTER10.location("profile_time")[1])[1][0]
+    assert 0.7 < with_op / entries < 0.8 and (first_work, last_work) == ("2024-01-01", "2026-12-11")
+    last_completion = db.run(CHAPTER10.location("profile_output")[1])[1][0][2]
+    assert last_completion == "2026-12-31", last_completion
     open_periods = [r[0] for r in db.run(CHAPTER10.location("last_periods")[1])[1] if r[4] == "Open"]
     assert open_periods == ["PP-2026-078", "PP-2026-079"], open_periods
     assert all(0.8 < x < 1.0 for x in direct), direct            # direct time within standard
     assert indirect == sorted(indirect) and indirect[2] > 1.5 * indirect[0], indirect
     totals = [round(a + b, 2) for a, b in zip(direct, indirect)]
     assert totals == sorted(totals) and 1.4 < totals[2] < 1.55, totals
-    out = CHAPTER10.mock(d, "hours_by_type", [110, 220, 120, 150, 210])
+    out = CHAPTER10.mock(d, "hours_by_type", [110, 220, 120, 150, 210], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 4), (5, 4)])
     note(d, "Outlined: hours recorded per standard hour of output. Direct time stays below the standard in each "
             "year, while indirect time grows.", out["bottom"] + 8, 40)
@@ -438,5 +557,6 @@ FIGURES = {
     "fig-10-05-evaluation-order": fig_10_05,
     "fig-10-06-trial-balance": fig_10_06,
     "fig-10-07-conversion-cost-flow": fig_10_07,
-    "fig-10-08-hours-per-standard-hour": fig_10_08,
+    "fig-10-08-payroll-time-er": fig_10_08,
+    "fig-10-09-hours-per-standard-hour": fig_10_09,
 }

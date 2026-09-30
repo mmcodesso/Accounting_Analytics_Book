@@ -2,7 +2,7 @@
 
 **Context and objective.** Before testing any process, the audit team must know that the ledger and its populations can be relied on. In this tutorial, you will reconcile the journal entries and the manufacturing payroll to the ledger, trace postings to their documents and documents to their postings, and explain the exceptions you find. You will then test the cutoff of revenue and of payroll at each year-end.
 
-**Prerequisites.** Complete the tutorials of the earlier Part III chapters, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the audit query library with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Audit.sql` beside your working copy. As in Chapters 9 to 11, type each test at the end of the script, under its comment, and run it by selecting it. The first line of each comment names the test, and the second states its population and the result expected if the controls worked.
+**Prerequisites.** Complete the tutorials of the earlier Part III chapters, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter11.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the audit query library with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Audit.sql` beside your working copy. As in Chapters 9 to 11, type each test at the end of the script, under its comment, and run it by selecting it. The first line of each comment names the test, and the second states its population and the result expected if the controls worked.
 
 ```sql
 /* Audit.sql: tests of the records behind the manufacturing variance
@@ -112,9 +112,9 @@ b. Read the Test column of each row in the result.
 
 The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. Six ledger rows record payroll payments that do not exist in the PayrollPayment table, three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted.
 
-![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
+![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
 
-**Step 4. Explain the six postings.** A payroll payment normally carries the same ID as the payroll register it pays, so the missing payments point to their registers.
+**Step 4. Explain the six postings.** A payroll payment normally carries the same ID as the payroll register it pays, so the missing payments point to their registers. CostCenter appears twice in the test, as ec for the employee's own cost center and as rc for the register's, so that each row can show both.
 
 a. Type and run the test below.
 
@@ -139,9 +139,9 @@ a. Type and run the test below.
 b. Compare the register IDs and net pay with the SourceDocumentID and amounts of the six postings.
 c. Compare each register's cost center with its employee's.
 
-Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash, but the payment documents are missing. The first register pays the chief executive officer. The other two pay an Account Executive of the Sales cost center, terminated in April 2024, in January 2025 and January 2026, and they are charged to the Executive cost center at the same gross pay as the chief executive's register. A credit to cash does not say who received the money, so the bank records must confirm the payee. Tutorial 12.3 follows the employee further.
+Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash, but the payment documents are missing. The first register pays the chief executive officer. The other two pay an Account Executive of the Sales cost center, terminated in April 2024, in January 2025 and January 2026, and they are charged to the Executive cost center at the same gross pay as the chief executive's register. A credit to cash does not say who received the money, so the bank records must confirm the payee. Exercise 12.5 follows the employee further.
 
-**Step 5. Test the cutoff of revenue.** Revenue belongs to the fiscal year in which the goods were delivered, so the test compares each invoice's posting date with the delivery date of the shipments it bills, and uses the invoice date as a second check.
+**Step 5. Test the cutoff of revenue.** Revenue belongs to the fiscal year in which the goods were delivered, so the test compares each invoice's posting date with the delivery date of the shipments it bills, and uses the invoice date as a second check. Read the test from the top: Shipped finds the first shipment date and the last delivery date of the goods each invoice bills, Posted finds the date on which each invoice was posted, Classified gives each invoice a finding with CASE, and the final query counts the exceptions.
 
 a. Type and run the test below.
 
@@ -190,9 +190,9 @@ a. Type and run the test below.
 
 b. Read the rows of each finding.
 
-The result, shown in @fig-12-03, has two findings. More than twenty invoices for goods delivered in December were invoiced and posted in January, so their revenue was recorded in the next fiscal year, while the cost of the goods was recorded when they shipped. Eight invoices are dated before their shipment: the invoices of Tutorial 2.1 and Exercise 5.2, except SI-2026-013742, whose revenue is among those posted a year late. The eight were posted in the year of delivery, so they are failures in the dating of invoices, not in the posting of revenue.
+The result, shown in @fig-12-03, has two findings. More than twenty invoices for goods delivered in December were invoiced and posted in January, so their revenue was recorded in the next fiscal year, while the cost of the goods was recorded when they shipped. Eight invoices are dated before their shipment, the kind of error that Tutorial 2.1 and Exercise 5.2 found; Exercise 12.1 lists them. The eight were posted in the year of delivery, so they are failures in the dating of invoices, not in the posting of revenue.
 
-![Revenue Posted Outside the Year of Delivery.](/visuals/svg/fig-12-03-revenue-cutoff.svg){#fig-12-03 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, is scrolled to the part of a test that classifies each sales invoice with CASE: revenue posted in another year than the delivery of its goods, invoice dated before shipment, or in the year of delivery, and counts the exceptions by finding and delivery year. The result has five rows: invoices dated before shipment in each of the three years, and invoices whose revenue was posted in another year for deliveries of 2024 and 2025. The rows of revenue posted in another year are outlined."}
+![Revenue Posted Outside the Year of Delivery.](/visuals/svg/fig-12-03-revenue-cutoff.svg){#fig-12-03 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, is scrolled to the part of a test that classifies each sales invoice with CASE: revenue posted in another year than the delivery of its goods, invoice dated before shipment, or in the year of delivery, and counts the exceptions by finding and delivery year. The result has five rows: invoices dated before shipment in each of the three years, and invoices whose revenue was posted in another year for deliveries of 2024 and 2025. The rows of revenue posted in another year are outlined."}
 
 **Step 6. Find the shipments never invoiced.** An anti-join from the shipment lines to the invoice lines finds the goods that were shipped but not billed.
 
@@ -219,7 +219,7 @@ b. Read the dates and the two values of each row.
 
 A handful of shipment lines of December 2026 have no invoice by the end of the data. Their cost is in the ledger at the year-end, and their revenue is not, the same timing as the invoices of Step 5. Exercise 12.1 measures the effect of both on each year.
 
-**Step 7. List the pay periods that cross a year-end.** Wages belong to the period in which the work was done, but Charles River records payroll on its pay date, so a period whose work begins in one fiscal year and is paid in the next moves cost between the years.
+**Step 7. List the pay periods that cross a year-end.** Wages belong to the period in which the work was done, but, as Tutorial 11.2 found, Charles River records payroll on its pay date, so a period whose work begins in one fiscal year and is paid in the next moves cost between the years.
 
 a. Type and run the test below.
 

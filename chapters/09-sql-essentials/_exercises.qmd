@@ -167,7 +167,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Exercise 9.6: Missing Values in Time and Labor Records**
 
-**Table group:** Manufacturing, Payroll
+**Table group:** Manufacturing, Payroll and Time
 
 **Scenario.** The manufacturing variance depends on the labor time recorded against work orders. Before the audit team relies on those records, the audit senior asks you to test them for missing values that could signal incomplete or unreliable time data.
 

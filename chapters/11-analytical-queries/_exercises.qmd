@@ -102,7 +102,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Exercise 11.4: Is Overtime Concentrated?**
 
-**Table group:** Manufacturing, Payroll
+**Table group:** Manufacturing, Payroll and Time
 
 **Scenario.** The plant manager's first response to the controller's finding is that overtime is a problem of a few people, not of the plant. The controller asks you to test that claim with the fiscal 2026 time records.
 

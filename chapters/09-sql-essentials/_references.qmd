@@ -2,6 +2,8 @@
 
 ## References
 
+Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
+
 Borthick, A. F., Schneider, G. P., & Viscelli, T. R. (2017). Analyzing data for decision making: Integrating spreadsheet modeling and database querying. *Issues in Accounting Education*, *32*(1), 59–66. <https://doi.org/10.2308/iace-51385>
 
 Chamberlin, D. D. (2012). Early history of SQL. *IEEE Annals of the History of Computing*, *34*(4), 78–82. <https://doi.org/10.1109/MAHC.2012.61>

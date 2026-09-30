@@ -84,10 +84,11 @@ def window(d: Diagram, y: float = 0, active: str = "Execute SQL", w: float = 860
 
 
 def editor(d: Diagram, x: float, y: float, w: float, sql: str, tab: str = "SQL 1",
-           toolbar: bool = True, first_line: int = 1) -> float:
+           toolbar: bool = True, first_line: int = 1, selection: slice | None = None) -> float:
     """The SQL editor of the Execute SQL tab, with line numbers starting at first_line (a
     script scrolled to the query shown). Returns the bottom y. The real toolbar shows icons
-    whose names appear as tooltips; the mock writes the names on the buttons."""
+    whose names appear as tooltips; the mock writes the names on the buttons. selection
+    marks the lines (counted from 0 in sql) that the reader has selected before running."""
     if toolbar:
         bx = x
         for label, width, primary in [("Open SQL file(s)", 124, False),
@@ -103,6 +104,10 @@ def editor(d: Diagram, x: float, y: float, w: float, sql: str, tab: str = "SQL 1
     height = len(lines) * LINE_H + 8
     d.box("", x, y, GUTTER, height, fill=GRAY_TINT, stroke=RULE, rounded=False)
     d.box("", x + GUTTER, y, w - GUTTER, height, fill=WHITE, stroke=RULE, rounded=False)
+    if selection:
+        first, last = selection.start or 0, (selection.stop or len(lines)) - 1
+        d.box("", x + GUTTER + 1, y + 4 + first * LINE_H, w - GUTTER - 2, (last - first + 1) * LINE_H,
+              fill=BLUE_TINT, stroke=BLUE_TINT, rounded=False)
     in_comment = False
     for i, line in enumerate(lines):
         ly = y + 4 + i * LINE_H
@@ -229,7 +234,7 @@ def structure_row(d: Diagram, x: float, y: float, widths: list[float], values: l
 
 class Script:
     """A chapter's saved script as its tutorials build it: a header comment, then each query
-    at the end of the script under a one-line comment. queries holds (key, comment, sql)
+    at the end of the script under a comment of one or two lines. queries holds (key, comment, sql)
     tuples. The tutorial mocks show each query where it sits in the script, so the tutorial
     text and these queries must stay identical."""
 
@@ -251,11 +256,14 @@ class Script:
         raise KeyError(key)
 
     def mock(self, d: Diagram, key: str, widths: list[float], shown: slice | None = None,
-             sql: str | None = None, lines: slice | None = None) -> dict:
+             sql: str | None = None, lines: slice | None = None, compact: bool = False,
+             selection: slice | None = None) -> dict:
         """An Execute SQL mock of one query, shown with its comment where it sits in the
         script. sql replaces the saved query, for a step that shows an earlier version.
         lines draws only those lines of the comment and query, as an editor scrolled
-        through a long query; the query still runs in full."""
+        through a long query; the query still runs in full. compact leaves out the title
+        bar, the main toolbar, the main tabs, and the editor toolbar, which the chapter 9
+        mocks have already shown, so the figure is the query and its result."""
         comment, saved, line = self.location(key)
         text = sql or saved
         headers, rows = run(text)
@@ -265,15 +273,18 @@ class Script:
             all_lines = shown_text.split("\n")
             shown_text = "\n".join(all_lines[lines])
             first_line = line + (lines.start or 0)
-        y = window(d)
-        y = editor(d, 0, y, 860, shown_text, tab=self.tab, first_line=first_line) + 8
+        editor_top = 0 if compact else window(d)
+        y = editor(d, 0, editor_top, 860, shown_text, tab=self.tab, first_line=first_line,
+                   toolbar=not compact, selection=selection) + 8
+        grid_top = y
         first = (shown.start or 0) + 1 if shown else 1
         visible = rows[shown] if shown else rows
         geometry = results(d, 0, y, headers, widths, visible, first=first)
         y += (len(visible) + 1) * ROW_H + 8
         start = line + comment.count("\n") + 1   # the statement starts after its comment
         bottom = message(d, 0, y, 860, len(rows), text.split("\n")[0], line=start)
-        return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom)
+        return dict(headers=headers, rows=rows, geometry=geometry, bottom=bottom,
+                    editor_top=editor_top, grid_top=grid_top, message_top=y)
 
 
 __all__ = ["FILE", "PATH", "TABS", "Script", "highlight", "window", "editor", "results", "message", "run",

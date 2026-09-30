@@ -200,11 +200,32 @@ def fig_09_03() -> Diagram:
     rows = db.run(sql)[1]
     start = [r[0] for r in rows].index(ids[1090]) - 4
     out = CHAPTER09.mock(d, "account_columns", [90, 120, 290, 110, 210],
-                         shown=slice(start, start + 9))
+                         shown=slice(start, start + 9), selection=slice(1, None))
     marked = [r for r, row in enumerate(out["rows"][start:start + 9]) if row[0] in ids.values()]
     db.emphasize_cells(d, out["geometry"], [(marked[0], 0), (marked[-1], 4)])
+    # Numbered labels for the parts of the Execute SQL tab, placed in empty space beside each part:
+    # the editor toolbar sits at editor_top, and the row below it holds only the editor tab.
+    top, tab_row = out["editor_top"], out["editor_top"] + 32
+    badges = [(116, tab_row + 2), (184, tab_row + 2), (352, tab_row + 2),
+              (830, tab_row + 24 + 4 + db.LINE_H), (830, out["grid_top"] + 2), (830, out["message_top"] + 6)]
+    assert top > 0
+    for k, (x, y) in enumerate(badges, 1):
+        d.marker(str(k), x, y, size=20)
+    y = out["bottom"] + 8
     note(d, "Outlined: accounts 1090 and 5080, whose AccountIDs differ from their account numbers. "
-            "The grid is scrolled to the manufacturing accounts.", out["bottom"] + 8, 40)
+            "The grid is scrolled to the manufacturing accounts.", y, 22)
+    legend = ["the editor tab, named after the saved script",
+              "Open SQL file(s) and Save SQL file, icons on the real toolbar",
+              "Execute all/selected SQL (Ctrl+Return): runs the selected lines",
+              "the query, selected before it is run",
+              "the result grid",
+              "the message pane: errors, rows returned, and the starting line"]
+    y += 30
+    for k, text in enumerate(legend):
+        col, row = divmod(k, 3)
+        x, ly = col * 430, y + row * 26
+        d.marker(str(k + 1), x, ly, size=20)
+        d.text(text, x + 26, ly - 1, 400, 22, size=SMALL, valign="middle")
     return d
 
 
@@ -345,7 +366,8 @@ def fig_09_10() -> Diagram:
     for _, _, sql in QUERIES:
         db.run(sql)                                     # every query in the script runs
     lines = CHAPTER09.text().split("\n")
-    shown = "\n".join(lines[:36])
+    cut = max(i for i, text in enumerate(lines) if text == "" and i <= 22)   # end at a whole query
+    shown = "\n".join(lines[:cut])
     y = db.window(d)
     bottom = db.editor(d, 0, y, 860, shown, tab=SCRIPT_TAB)
     note(d, "The header comment records the purpose, the database, the preparer, and the checks, "

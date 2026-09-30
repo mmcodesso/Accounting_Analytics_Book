@@ -8,6 +8,8 @@
 
 **Correlated subquery.** A subquery that refers to a column of the outer query, so that it is evaluated again for each row of the outer query, as in a NOT EXISTS test or a count of each account's postings.
 
+**Data profile.** A short set of queries that describes a table before it is used: the number of rows, how many fill in each column that matters, whether the keys are unique, the values of the code columns, and the dates covered. A profile applies the data quality tests of Chapter 2 to one table and records what can be relied on.
+
 **Derived table.** A subquery in the FROM clause, which produces a table that the outer query can join, filter, and summarize. It should have an alias, which most systems require and which the outer query needs to name its columns.
 
 **Fan-out.** The repetition of a row's values when it is joined to several rows of another table, such as an invoice's total repeated on each of its lines. Summing a repeated amount counts it more than once.

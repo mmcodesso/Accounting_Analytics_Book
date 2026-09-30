@@ -1,6 +1,6 @@
 ## Guided Tutorial 10.2: Building the Trial Balance and Following the Conversion Cost
 
-**Context and objective.** In Exercise 6.1 you built the pre-closing trial balance of fiscal 2026 with Power Query. In this tutorial, you will put two totals side by side with scalar subqueries, build the trial balance again with one query, and prove with derived tables that its debits equal its credits. You will then use the ledger to follow the cost of production through account 1090 Manufacturing Cost Clearing, the account where the manufacturing variance arises.
+**Context and objective.** Chapter 6 built the pre-closing trial balance of fiscal 2026 in Excel, with Power Query's Group By, and turned it into the income statement of @fig-06-07. In this tutorial, you will put two totals side by side with scalar subqueries, build the trial balance again with one query, and prove with derived tables that its debits equal its credits. You will then use the ledger to follow the cost of production through account 1090 Manufacturing Cost Clearing, the account where the manufacturing variance arises.
 
 **Prerequisites.** Complete Tutorial 10.1, and continue at the end of Chapter10.sql.
 
@@ -42,11 +42,11 @@ a. Type and run the query below.
    ORDER BY a.AccountNumber;
    ```
 
-b. Read the number of rows, and compare the balances of a few accounts with the trial balance you built in Exercise 6.1.
+b. Read the number of rows, and compare the balances of the first accounts with the trial balance in @fig-06-07.
 
-The result, shown in @fig-10-06, has one row for each account with postings, the same accounts as the trial balance of Exercise 6.1, with the same balances. A positive balance is a debit balance and a negative one a credit balance. As Chapter 6 explained, the revenue and expense accounts hold only fiscal 2026, because the closing entries of the earlier years brought them back to zero.
+The result, shown in @fig-10-06, has one row for each account with postings, the same accounts as Chapter 6's trial balance, with the same balances. A positive balance is a debit balance and a negative one a credit balance. As Chapter 6 explained, the revenue and expense accounts hold only fiscal 2026, because the closing entries of the earlier years brought them back to zero.
 
-![The Pre-Closing Trial Balance of Fiscal 2026.](/visuals/svg/fig-10-06-trial-balance.svg){#fig-10-06 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins GLEntry to Account, keeps the postings through 2026-12-31 without the two closing entries of fiscal 2026, and groups them by account. The first rows of the result show account numbers, names, types, and balances, positive for debit balances and negative for credit balances. The message pane reports the number of accounts returned."}
+![The Pre-Closing Trial Balance of Fiscal 2026.](/visuals/svg/fig-10-06-trial-balance.svg){#fig-10-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins GLEntry to Account, keeps the postings through 2026-12-31 without the two closing entries of fiscal 2026, and groups them by account. The first rows of the result show account numbers, names, types, and balances, positive for debit balances and negative for credit balances. The message pane reports the number of accounts returned."}
 
 **Step 3. Prove that debits equal credits.** The trial balance becomes a derived table, which an outer query can total.
 
@@ -65,7 +65,8 @@ a. Type and run the query below, which wraps the grouping of Step 2 in a subquer
    ) AS tb;
    ```
 
-b. Type and run the query below, which keeps only the debit balances of the same derived table.
+b. Copy the query of item a, with its comment, and paste the copy at the end of the script.
+c. Edit the copy until it reads as below: change the comment and the SELECT list, and add the WHERE clause after the alias of the derived table, so that only the debit balances are totaled. Run it.
 
    ```sql
    -- Tutorial 10.2: the total of the debit balances
@@ -82,7 +83,7 @@ b. Type and run the query below, which keeps only the debit balances of the same
    WHERE tb.Balance > 0;
    ```
 
-The net of all the balances is zero, which means that the debit balances equal the credit balances. The total of the debit balances in item b is the figure you found in Exercise 6.1. Two tools and two methods give the same trial balance, which is the evidence that both are right.
+The net of all the balances is zero, which means that the debit balances equal the credit balances. The total of the debit balances in item c is the control total of Chapter 6's trial balance. Two tools and two methods give the same trial balance, which is the evidence that both are right.
 
 **Step 4. Follow account 1090 by year and source.** Account 1090 collects the actual cost of converting materials into products and releases the standard cost of what is produced.
 
@@ -103,9 +104,26 @@ b. For each year, compare the debits from PayrollSummary and JournalEntry with t
 
 Four kinds of source document post to the account. PayrollSummary debits it with the manufacturing payroll, and journal entries debit it with other costs of the plant. ProductionCompletion credits it with the standard conversion cost of the units completed. WorkOrderClose clears the difference to the variance account. The payroll debits rose steeply from fiscal 2024 to fiscal 2026, while the standard cost released by completions stayed nearly flat.
 
-Each close splits its conversion variance in two. The direct labor part compares the direct labor charged to the work order with its standard. It was favorable in fiscal 2024 and shrank to nearly zero by fiscal 2026, which explains part of the variance's rise. The overhead part holds the rest of the conversion cost, including the time that no work order carries, and it grew in each year, so most of the extra payroll reached the variance as overhead.
+**Step 5. Split the conversion variance into labor and overhead.** Each close splits its conversion variance in two, and the close records hold both parts.
 
-**Step 5. Identify the journal entries.** GLEntry has no JournalEntryID, but a journal entry row's SourceDocumentID holds it, and the join names the document type as part of its condition, as the section on following the keys explained.
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 10.2: the labor and overhead parts by year
+   SELECT SUBSTR(CloseDate, 1, 4) AS CloseYear,
+       ROUND(SUM(DirectLaborVarianceAmount), 2) AS LaborVariance,
+       ROUND(SUM(OverheadVarianceAmount), 2) AS OverheadVariance,
+       ROUND(SUM(ConversionVarianceAmount), 2) AS ConversionVariance
+   FROM WorkOrderClose
+   GROUP BY CloseYear
+   ORDER BY CloseYear;
+   ```
+
+b. Compare the two parts across the three years, and compare the ConversionVariance of each year with the credits less the debits of WorkOrderClose in Step 4.
+
+The direct labor part compares the direct labor charged to the work orders with its standard. It is negative, that is favorable, in every year, and it shrank to nearly zero by fiscal 2026, which explains part of the variance's rise. The overhead part holds the rest of the conversion cost, including the time that no work order carries, and it grew in each year, so most of the extra payroll reached the variance as overhead. The two parts add up to the conversion variance, which equals what the closes cleared from account 1090 in each year.
+
+**Step 6. Identify the journal entries.** GLEntry has no JournalEntryID, but a journal entry row's SourceDocumentID holds it, and the join names the document type as part of its condition, as the section on following the keys explained.
 
 a. Type and run the query below.
 
@@ -124,16 +142,17 @@ a. Type and run the query below.
 
 b. Compare the amounts of each entry type across the three years.
 
-The journal entries are of two types, Factory Overhead and the Depreciation of the manufacturing equipment. Factory overhead stayed close to the same amount in each year, and depreciation grew a little. @fig-10-07 puts the pieces together for fiscal 2026. Of the costs that flow into account 1090, the payroll grew by far the most, and the standard cost that production released did not keep pace with it.
+The journal entries are of two types, Factory Overhead and the Depreciation of the manufacturing equipment. Factory overhead stayed close to the same amount in each year, and depreciation grew a little. @fig-10-07 puts the pieces together: the flow of fiscal 2026, and the three years side by side. Of the costs that flow into account 1090, the payroll grew by far the most, and the standard cost that production released did not keep pace with it.
 
-![The Flow of Conversion Cost Through Account 1090 in Fiscal 2026.](/visuals/svg/fig-10-07-conversion-cost-flow.svg){#fig-10-07 fig-alt="A flow diagram of account 1090 Manufacturing Cost Clearing in fiscal 2026. On the left, the manufacturing payroll, factory overhead, and depreciation of manufacturing equipment flow into the account as debits. On the right, the standard conversion cost of the units completed flows out to finished goods inventory, and the conversion variance flows out through work order closes to account 5080 Manufacturing Variance. The payroll is the largest inflow, and the amount sent to the variance account is a large part of the total. A note gives the year's small net change in the account."}
+![The Flow of Conversion Cost Through Account 1090.](/visuals/svg/fig-10-07-conversion-cost-flow.svg){#fig-10-07 fig-alt="A flow diagram of account 1090 Manufacturing Cost Clearing in fiscal 2026. On the left, the manufacturing payroll, factory overhead, and depreciation of manufacturing equipment flow into the account as debits. On the right, the standard conversion cost of the units completed flows out to finished goods inventory, and the conversion variance flows out through work order closes to account 5080 Manufacturing Variance. The payroll is the largest inflow, and the amount sent to the variance account is a large part of the total. A note gives the year's small net change in the account. Below, a table gives the same postings for fiscal 2024, 2025, and 2026, with the variance split into its direct labor and overhead parts: the payroll rises in each year, the standard cost released stays nearly flat, the favorable labor part shrinks, and the highlighted overhead part grows."}
 
 **Checkpoint.** Check that:
 
 - the scalar subqueries of Step 1 return the same total for the closes and the ledger;
-- the trial balance returns the same accounts and balances as the one you built in Exercise 6.1, and the net of all its balances is zero;
+- the trial balance returns the same accounts and balances as Chapter 6's, and the net of all its balances is zero;
 - account 1090 receives payroll and journal entries and releases the standard cost of completions;
 - the payroll charged to production rose in each year, while the standard cost released stayed nearly flat;
+- the labor part of the variance was favorable and shrank, while the overhead part grew;
 - Chapter10.sql holds this tutorial's queries under their comments.
 
 The ledger locates the variance precisely. It is the part of the actual conversion cost, mostly payroll, that the standard cost of what the plant produced did not absorb, and it arises mostly in overhead.

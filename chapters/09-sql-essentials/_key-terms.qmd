@@ -16,6 +16,8 @@
 
 **Logical error.** A mistake that lets a query run without an error message but makes it answer a different question from the one intended, such as a missing comma, a missing pair of parentheses, or a text value compared with a number. Logical errors are found by comparing a result with what it should look like.
 
+**Manufacturing variance.** The difference between what production actually cost and the standard cost of the items made. Charles River records it in account 5080 when a work order closes, in a material part and a conversion part, and reports it with cost of goods sold.
+
 **NULL.** The marker SQL uses for a missing value: a value that is unknown or does not exist. NULL is not zero or empty text, no comparison with it is true, and it is found with IS NULL and IS NOT NULL and replaced with COALESCE.
 
 **Operator precedence.** The order in which SQL evaluates the operators of an expression. AND is evaluated before OR, so a condition that mixes them needs parentheses to express the intended grouping.
@@ -33,6 +35,8 @@
 **SQL script.** A plain text file, usually with the extension .sql, that holds one or more SQL statements and their comments. A documented script records what was asked of the database, so that the queries can be reviewed and run again.
 
 **SQLite.** A lightweight relational database system that stores the entire database in a single file. SQLite has no separate date type, so dates are stored as text, and it treats column types as advisory, so queries must compare values of the same kind.
+
+**Standard cost.** The cost that one unit of an item should require in materials, direct labor, and overhead, at standard prices and rates. A standard cost system values inventory and cost of goods sold at standard cost and records the difference from actual cost as variances.
 
 **Syntax error.** A mistake in the wording of a query, such as a misspelled column or clauses out of order, that stops the query from running. SQLite reports it with a message that names the problem.
 

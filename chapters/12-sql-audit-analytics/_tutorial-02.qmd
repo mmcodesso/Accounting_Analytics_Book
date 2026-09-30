@@ -6,7 +6,7 @@
 
 **Step-by-step instructions.**
 
-**Step 1. Match every purchase order line.** Three CTEs sum the quantities received and invoiced for each line and join them to the line, and a CASE expression classifies it.
+**Step 1. Match every purchase order line.** Read the test from the top: Received and Invoiced sum the quantities received and invoiced for each purchase order line, Matched joins both sums to the line, and the final query classifies each line with CASE and counts the lines of each status.
 
 a. Type and run the test below.
 
@@ -54,7 +54,7 @@ b. Read the statuses and their counts.
 
 The result, shown in @fig-12-05, has no exception rows. No line was invoiced above what was received, and none was received above what was ordered. Nearly every line is matched, and the others are lines not yet received, partly received, or received but not yet fully invoiced, all normal at a year-end. The CASE gives each line the first status whose condition it meets, so a line that is partly received and also not fully invoiced counts as received, not fully invoiced, and the exception tests come first so that no exception can hide under a normal status. COALESCE turns the NULL of a line with no receipts or invoices into zero, as in Chapter 9, so that the comparisons work.
 
-![The Three-Way Match of Every Purchase Order Line.](/visuals/svg/fig-12-05-three-way-match-status.svg){#fig-12-05 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, is scrolled past the three CTEs that sum received and invoiced quantities for each purchase order line, to the CASE expression that classifies each line. The result has four rows: Matched, with the great majority of lines; Received, not fully invoiced; Not yet received; and Partly received. No exception status appears, and the result is outlined."}
+![The Three-Way Match of Every Purchase Order Line.](/visuals/svg/fig-12-05-three-way-match-status.svg){#fig-12-05 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, is scrolled past the three CTEs that sum received and invoiced quantities for each purchase order line, to the CASE expression that classifies each line. The result has four rows: Matched, with the great majority of lines; Received, not fully invoiced; Not yet received; and Partly received. No exception status appears, and the result is outlined."}
 
 **Step 2. Test prices against two tolerances.** An invoice price that differs from the order price by more than the tolerance is an exception, and counting at two tolerances shows how much the choice matters.
 
@@ -146,11 +146,12 @@ b. Read the number of orders and their value for each test.
 
 The summary, shown in @fig-12-06, flags between three and thirteen orders for each test, the exceptions that Exercise 8.5 found in Excel. Most of their value is in a few large orders.
 
-![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-06-approval-exceptions.svg){#fig-12-06 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Audit.sql, shows a test whose CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and approved after the approver's termination. The summary grid shows each test with its number of orders and their total value, between three and thirteen orders for each test. The grid is outlined."}
+![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-06-approval-exceptions.svg){#fig-12-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows a test whose CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and approved after the approver's termination. The summary grid shows each test with its number of orders and their total value, between three and thirteen orders for each test. The grid is outlined."}
 
-**Step 5. List the orders behind the exceptions.** A second CTE groups the exceptions by order, with GROUP_CONCAT joining the names of the tests each order fails into one text, and joins to Employee show who created and approved each order.
+**Step 5. List the orders behind the exceptions.** A second CTE groups the exceptions by order, with GROUP_CONCAT, the aggregate of @tbl-10-02 that joins text, listing the tests each order fails in one cell. Employee appears twice in the final query, as c for the employee who created the order and as a for the approver.
 
-a. Type and run the test below.
+a. Copy the test of Step 4, with its comment, and paste the copy at the end of the script.
+b. Edit the copy until it reads as below: change the comment, type a comma after the closing parenthesis of ApprovalExceptions, add the Flagged CTE, and replace the final query. Run it.
 
    ```sql
    -- Tutorial 12.2, test P5: the orders behind the approval exceptions
@@ -188,7 +189,7 @@ a. Type and run the test below.
    ORDER BY po.OrderTotal DESC;
    ```
 
-b. Read the job titles, the approval limit, and the tests of each order.
+c. Read the job titles, the approval limit, and the tests of each order.
 
 Fourteen orders are flagged, and most fail two tests. The two largest are the capital-equipment orders whose note-financed invoices you met in Exercise 8.2, created and approved by the Purchasing Manager, above that manager's limit and above even the chief financial officer's. Three orders were approved by an Account Executive, a sales employee with no approval authority, after the date of that employee's termination: the employee of Tutorial 12.1. Several small orders were approved by buyers and analysts whose approval limit is zero. Each is an exception in the operation of the approval control, and each needs a disposition.
 

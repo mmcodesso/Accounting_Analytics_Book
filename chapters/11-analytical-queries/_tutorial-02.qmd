@@ -26,9 +26,9 @@ a. Type and run the query below.
 
 b. Read the GapYearToDate column in the December row of each year.
 
-The result, shown in @fig-11-04, has one row for each month. The window function sums the monthly gaps within each fiscal year, in order of period, and starts again at zero each January. Each period appears once in its year, so the default window, which includes tied rows, gives a plain running total. The December figure is the year's total gap, and it grew in each year, to nearly twice its fiscal 2024 figure by fiscal 2026. The window works on the results of the grouping, because window functions are calculated after GROUP BY.
+The result, shown in @fig-11-05, has one row for each month. The window function sums the monthly gaps within each fiscal year, in order of period, and starts again at zero each January. Each period appears once in its year, so the default window, which includes tied rows, gives a plain running total. The December figure is the year's total gap, and it grew in each year, to nearly twice its fiscal 2024 figure by fiscal 2026. The window works on the results of the grouping, because window functions are calculated after GROUP BY.
 
-![The Monthly Gap in Account 1090 and Its Year-to-Date Total.](/visuals/svg/fig-11-04-gap-year-to-date.svg){#fig-11-04 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that groups the postings to account 1090, without the work order closes, by fiscal year and period, and calculates the monthly gap between actual and standard cost and a year-to-date total with SUM over a window partitioned by fiscal year. The grid shows the twelve months of fiscal 2026, and the GapYearToDate column, which accumulates through the year, is outlined."}
+![The Monthly Gap in Account 1090 and Its Year-to-Date Total.](/visuals/svg/fig-11-05-gap-year-to-date.svg){#fig-11-05 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, is scrolled to a query that groups the postings to account 1090, without the work order closes, by fiscal year and period, and calculates the monthly gap between actual and standard cost and a year-to-date total with SUM over a window partitioned by fiscal year. The grid shows the twelve months of fiscal 2026, and the GapYearToDate column, which accumulates through the year, is outlined."}
 
 **Step 2. Compare each month with the same month a year earlier.** LAG over a window partitioned by the fiscal period compares each month with the same month of the previous year.
 
@@ -79,7 +79,8 @@ The query returns nine rows, three for each year. The ranking cannot be filtered
 
 **Step 4. Count the pay dates of the largest months.** Payroll is the largest debit to account 1090, and a count of the distinct posting dates of the payroll summaries shows how many payrolls each month received.
 
-a. Type and run the query below, which adds a PayDates column to the ranking.
+a. Copy the query of Step 3, with its comment, and paste the copy at the end of the script.
+b. Edit the copy until it reads as below: change the comment, add PayDates to the outer SELECT list, and add the COUNT(DISTINCT ...) expression that calculates it to the inner one. Run it.
 
    ```sql
    -- Tutorial 11.2: the three largest months with their pay dates
@@ -100,23 +101,84 @@ a. Type and run the query below, which adds a PayDates column to the ranking.
    ORDER BY FiscalYear, GapRank;
    ```
 
-b. Compare the PayDates of the months ranked first with those of the others.
+c. Compare the PayDates of the months ranked first with those of the others.
 
-The result, shown in @fig-11-05, explains the largest months. Charles River pays every two weeks, so most months have two pay dates, but a few have three, and the largest month of every year is one of them. The ledger records payroll when it is paid, and no entry at a month's end records the wages that were earned but not yet paid, so a month with three pay dates carries three payrolls. That also explains the comparisons of Step 2: July 2026 had three pay dates and July 2025 two, while August 2025 had three. The months with three pay dates are not months of worse performance. Single months of this account are unreliable, but a year-to-date or trailing total is not, because over a year the pay dates even out. They do not quite even out between years: fiscal 2024 charged fewer payrolls to the account than the two later years, because the data begins in January and the manufacturing part of the first payroll of 2024 was posted to the variance account, so part of the growth from fiscal 2024 comes from the calendar.
+The result, shown in @fig-11-06, points to the cause of the largest months. Charles River pays every two weeks, so most months have two pay dates, but a few have three, and the largest month of every year is one of them. The ledger records payroll when it is paid, and no entry at a month's end records the wages that were earned but not yet paid, so a month with three pay dates carries three payrolls.
 
-![The Largest Months of the Gap and Their Pay Dates.](/visuals/svg/fig-11-05-gap-pay-dates.svg){#fig-11-05 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that ranks the months of each year by their gap in account 1090 in a derived table, counts the distinct pay dates of each month's payroll postings with COUNT DISTINCT over a CASE expression, and keeps the three largest months of each year. The grid shows nine rows, three for each of 2024, 2025, and 2026. The PayDates cells that show three pay dates are outlined, and they include the month ranked first in every year."}
+![The Largest Months of the Gap and Their Pay Dates.](/visuals/svg/fig-11-06-gap-pay-dates.svg){#fig-11-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, is scrolled to a query that ranks the months of each year by their gap in account 1090 in a derived table, counts the distinct pay dates of each month's payroll postings with COUNT DISTINCT over a CASE expression, and keeps the three largest months of each year. The grid shows nine rows, three for each of 2024, 2025, and 2026. The PayDates cells that show three pay dates are outlined, and they include the month ranked first in every year."}
+
+**Step 5. Count the pay dates of every month.** Conditional aggregation, from Tutorial 11.1, puts the pay dates of each year in a column of its own, so that every month can be compared with the same month of the other years.
+
+a. Type and run the query below.
+
+   ```sql
+   -- Tutorial 11.2: pay dates by month, one column per year
+   SELECT FiscalPeriod,
+       COUNT(DISTINCT CASE WHEN FiscalYear = 2024
+           THEN PostingDate END) AS Pay2024,
+       COUNT(DISTINCT CASE WHEN FiscalYear = 2025
+           THEN PostingDate END) AS Pay2025,
+       COUNT(DISTINCT CASE WHEN FiscalYear = 2026
+           THEN PostingDate END) AS Pay2026
+   FROM GLEntry
+   WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026
+       AND SourceDocumentType = 'PayrollSummary'
+   GROUP BY FiscalPeriod
+   ORDER BY FiscalPeriod;
+   ```
+
+b. Find the months with three pay dates in each year.
+c. Add up the pay dates of each year.
+
+Each year has two months with three pay dates. July 2026 had three and July 2025 two, while August 2025 had three and August 2026 two, which explains the two comparisons of Step 2 that stood out. The months with three pay dates are not months of worse performance. Single months of this account are unreliable, but a year-to-date or trailing total is not, because over a year the pay dates even out. They do not quite even out between years. January 2024 shows no pay date at all, because the data begins in January and the manufacturing part of the year's first payroll was posted to the variance account instead, so fiscal 2024 charged two payrolls fewer than the later years. Part of the growth from fiscal 2024 comes from the calendar.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
 Under accrual accounting, wages that employees have earned but not yet been paid at the end of a period are an expense of that period and a liability at its end. A company that closes its books every month usually records them with an accrual entry at the month's end, reversed when the payroll is paid. The Charles River ledger has no such entry for its wages, so its monthly payroll cost follows the pay calendar. An analyst who meets a lumpy monthly series should ask how its postings are timed before reading anything into a single month.
 :::
 
-**Step 5. Rank the work centers by the hours recorded against their plan.** Each work order operation records its planned hours and its work center, and the direct labor time is recorded against the operation. Only the operations that ended by the last day with time records are counted, so that no operation is compared with time that has not yet been recorded.
+**Step 6. Rank the work centers by the hours recorded against their plan.** Each work order operation records its planned hours and its work center, and the direct labor time is recorded against the operation. Only the operations that ended by the last day with time records are counted, so that no operation is compared with time that has not yet been recorded.
 
 a. Type and run the query below.
 
    ```sql
    -- Tutorial 11.2: work centers ranked by hours recorded against plan
+   SELECT EndYear, WorkCenterName,
+       RecordedHours - PlannedHours AS ExcessHours,
+       ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,
+       RANK() OVER (PARTITION BY EndYear
+           ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank
+   FROM (
+       SELECT strftime('%Y', op.ActualEndDate) AS EndYear,
+           wc.WorkCenterName,
+           ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,
+           ROUND(SUM(lab.Hours), 0) AS RecordedHours
+       FROM WorkOrderOperation AS op
+           INNER JOIN WorkCenter AS wc ON wc.WorkCenterID = op.WorkCenterID
+           LEFT JOIN (
+               SELECT WorkOrderOperationID,
+                   SUM(RegularHours + OvertimeHours) AS Hours
+               FROM LaborTimeEntry
+               WHERE LaborType = 'Direct Manufacturing'
+               GROUP BY WorkOrderOperationID
+           ) AS lab ON lab.WorkOrderOperationID = op.WorkOrderOperationID
+       WHERE op.ActualEndDate <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)
+       GROUP BY EndYear, wc.WorkCenterName
+   ) AS centers
+   ORDER BY EndYear, CenterRank;
+   ```
+
+b. Compare the RecordedPerPlanned column across the work centers and years.
+
+The result ranks the five work centers within each year. The condition on ActualEndDate also leaves out the operations that have not ended, because a comparison with NULL is never true. The pattern is lopsided. Packing and Quality Assurance record far more direct hours than their operations planned, several times more by fiscal 2026, while Assembly, Cutting, and Finishing record well under their plans. Quality Assurance plans so few hours that its ratio is high on a small base, and Packing holds nearly all the excess hours.
+
+**Step 7. Add the plant's total.** A window with PARTITION BY but no ORDER BY covers its whole partition, so it can put each year's total beside every work center.
+
+a. Copy the query of Step 6, with its comment, and paste the copy at the end of the script.
+b. Edit the copy until it reads as below: change the comment, type a comma after `AS CenterRank`, and add the PlantExcessHours column below it. Run it.
+
+   ```sql
+   -- Tutorial 11.2: the ranking with the plant's excess hours
    SELECT EndYear, WorkCenterName,
        RecordedHours - PlannedHours AS ExcessHours,
        ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,
@@ -144,19 +206,18 @@ a. Type and run the query below.
    ORDER BY EndYear, CenterRank;
    ```
 
-b. Compare the RecordedPerPlanned column across the work centers and years.
 c. Read the PlantExcessHours column of each year.
 
-The result, shown in @fig-11-06, ranks the five work centers within each year. The condition on ActualEndDate also leaves out the operations that have not ended, because a comparison with NULL is never true. The pattern is lopsided. Packing and Quality Assurance record far more direct hours than their operations planned, several times more by fiscal 2026, while Assembly, Cutting, and Finishing record well under their plans. Quality Assurance plans so few hours that its ratio is high on a small base, and Packing holds nearly all the excess hours. The window with no ORDER BY, `OVER (PARTITION BY EndYear)`, adds up the excess hours of all five work centers in each year, and the total is negative in every year: the plant as a whole recorded fewer direct hours than its operations planned. If Packing were simply slow, Assembly would not be recording less than its plan at the same time. Hours that move from the start of the routing, the sequence of operations each work order follows, to its end while the total stays within plan point instead to time recorded against the wrong operations. That is a finding to investigate, not yet an explanation.
+The result, shown in @fig-11-07, adds one column to the ranking of Step 6. The window `OVER (PARTITION BY EndYear)` adds up the excess hours of all five work centers in each year, and the total is negative in every year: the plant as a whole recorded fewer direct hours than its operations planned. If Packing were simply slow, Assembly would not be recording less than its plan at the same time. Hours that move from the start of the routing, the sequence of operations each work order follows, to its end while the total stays within plan point instead to time recorded against the wrong operations. That is a finding to investigate, not yet an explanation.
 
-![Work Centers Ranked by Hours Recorded Against Plan.](/visuals/svg/fig-11-06-work-center-rank.svg){#fig-11-06 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter11.sql, is scrolled to a query that compares the direct labor hours recorded against each work center's operations with their planned load hours, by the year in which the operations ended, in a derived table. The outer query calculates the excess hours and the ratio of recorded to planned hours, ranks the work centers with RANK over a window partitioned by year, and totals the excess hours of each year with SUM over the same partition. The grid is scrolled to the five work centers of 2026. Packing and Quality Assurance rank first and second with about four times their planned hours, and those rows are outlined, while the plant's total excess is negative."}
+![Work Centers Ranked by Hours Recorded Against Plan.](/visuals/svg/fig-11-07-work-center-rank.svg){#fig-11-07 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, shows the start of a query that compares the direct labor hours recorded against each work center's operations with their planned load hours, by the year in which the operations ended, in a derived table. The outer query calculates the excess hours and the ratio of recorded to planned hours, ranks the work centers with RANK over a window partitioned by year, and totals the excess hours of each year with SUM over the same partition. The grid is scrolled to the five work centers of 2026. Packing and Quality Assurance rank first and second with about four times their planned hours, and those rows are outlined, while the plant's total excess is negative."}
 
 **Checkpoint.** Check that:
 
 - the year-to-date gap restarts each January, and its December figure grew in each year;
 - the same-month comparison is NULL for fiscal 2024 and shows larger gaps in most months of fiscal 2026, with July and August 2026 far from the rest;
 - the ranking query returns the three largest months of each year, filtered in the outer query;
-- the largest month of each year has three pay dates;
+- the largest month of each year has three pay dates, each year has two such months, and fiscal 2024 has two pay dates fewer than the later years;
 - Packing and Quality Assurance record several times their planned hours, while the plant as a whole records fewer direct hours than planned;
 - Chapter11.sql holds this tutorial's queries under their comments.
 

@@ -128,33 +128,35 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Exercise 10.5: Testing Referential Integrity with Anti-Joins**
 
-**Table group:** Accounting Core, Order-to-Cash, Manufacturing, Payroll
+**Table group:** Accounting Core, Order-to-Cash, Manufacturing, Payroll and Time
 
 **Scenario.** Chapter 3 explained that the Charles River database declares no foreign keys, so its relationships must be tested, and it mentioned ledger rows that point to payroll payments that do not exist. The audit senior asks you to run a set of integrity tests with anti-joins before the team relies on the joins in its other work.
 
 **Requirements.**
 
-(1) Find the GLEntry rows whose SourceDocumentType is PayrollPayment and whose SourceDocumentID matches no PayrollPayment. List them with their posting date, amounts, and description, and total their debits and credits.
+(1) Before the tests, profile LaborTimeEntry with the tests of @tbl-10-03: by LaborType, count the entries, the entries with a WorkOrderOperationID, and the employees, and find the first and last WorkDate. State which results you expected and which you did not.
 
-(2) Find the customers that have never placed a sales order, and check their IsActive flag.
+(2) Find the GLEntry rows whose SourceDocumentType is PayrollPayment and whose SourceDocumentID matches no PayrollPayment. List them with their posting date, amounts, and description, and total their debits and credits.
 
-(3) Find the work orders that have no work order operations, and report their status.
+(3) Find the customers that have never placed a sales order, and check their IsActive flag.
 
-(4) Find the labor time entries whose WorkOrderOperationID is filled in but matches no work order operation, and identify their work orders and hours.
+(4) Find the work orders that have no work order operations, and report their status.
 
-(5) For each finding, state whether it is an integrity failure, a process exception, or an expected condition, and recommend a follow-up.
+(5) Find the labor time entries whose WorkOrderOperationID is filled in but matches no work order operation, and identify their work orders and hours.
 
-**Deliverable.** A script with the anti-join tests and a table of findings with dispositions.
+(6) For each finding, state whether it is an integrity failure, a process exception, or an expected condition, and recommend a follow-up.
 
-<!-- Instructor notes, Exercise 10.5: (1) six GLEntry rows with SourceDocumentType PayrollPayment point to no payment: GLEntryIDs 7231 and
+**Deliverable.** A script with the profile and the anti-join tests, and a table of findings with dispositions.
+
+<!-- Instructor notes, Exercise 10.5: (1) Profile by LaborType: Direct Manufacturing 51,117 entries, 51,114 with a WorkOrderOperationID, 64 employees, 2024-01-17 to 2026-12-11; Indirect Manufacturing 11,702, none with an operation, 65 employees, 2024-01-15 to 2026-12-04; NonManufacturing 6,040, none, 12 employees, 2024-01-01 to 2026-12-11. Expected: indirect and non-manufacturing time has no operation by design, and the manufacturing time starts in the January 2024 start-up month. Not expected: 3 direct entries without an operation (Exercise 9.6), and the end on 11 December 2026 (the open pay periods of Tutorial 10.3), a timeliness limit. Indirect time ends a week earlier: the last week of records holds only direct and non-manufacturing time. (2) six GLEntry rows with SourceDocumentType PayrollPayment point to no payment: GLEntryIDs 7231 and
      7232 (2024-01-19, SourceDocumentID 1), 12521 and 12522 (2025-01-03, SourceDocumentID 2646), 18069 and 18070 (2026-01-02,
      SourceDocumentID 5420), each pair a 7,971.10 debit "Clear accrued payroll" and a 7,971.10 credit "Disburse payroll cash"; debits and
      credits 23,913.30 each. They are ledger postings without a supporting document (planted missing payroll payment), an integrity failure
-     to investigate. (2) Nine customers have no orders, all with IsActive 0, an expected condition. (3) Three work orders have no
+     to investigate. (3) Nine customers have no orders, all with IsActive 0, an expected condition. (4) Three work orders have no
      operations, WO-2024-000001, WO-2025-005504, and WO-2026-010075, all Closed (planted), a process exception: a closed work order should
-     have operations. They do have labor: 18 direct time entries. (4) 17 Direct Manufacturing entries (42.1 hours) carry a
+     have operations. They do have labor: 18 direct time entries. (5) 17 Direct Manufacturing entries (42.1 hours) carry a
      WorkOrderOperationID that matches no operation: 4 on WO-2024-000001, 6 on WO-2025-005504, and 7 on WO-2026-010075, the work orders of
-     requirement (3). An orphaned key, not a missing one, so an IS NULL filter alone would miss them; an integrity failure to correct.
+     requirement (4). An orphaned key, not a missing one, so an IS NULL filter alone would miss them; an integrity failure to correct.
      (Three more direct entries have no WorkOrderOperationID at all, Exercise 9.6.) -->
 
 

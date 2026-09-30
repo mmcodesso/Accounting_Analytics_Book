@@ -58,7 +58,7 @@ B.  The suppliers have billed Charles River for every receipt of the year
 C.  The ledger's balance is supported by the detail of the open receipts
 D.  The purchase orders behind the receipts were approved within their limits
 
-**9.** On 49 days of fiscal 2026, every manufacturing employee clocked the same hours at the same minutes, and one manager approved all of the overtime. What should the auditor conclude?
+**9.** On dozens of days of fiscal 2026, every hourly manufacturing employee clocked the same hours at the same minutes, and one manager approved all of the overtime. What should the auditor conclude?
 
 A.  The time may have been entered in bulk, so the hours need corroboration
 B.  The overtime is proven false and should be removed from the payroll cost
@@ -100,12 +100,12 @@ B.  `printf` rounds each amount to the nearest dollar before its first digit is 
 C.  The first character of an amount below $1 is its decimal point, not a digit
 D.  SQLite cannot read the first character of a number that is stored as REAL
 
-**15.** Why should an audit query library record every change to its tests and keep each run's results?
+**15.** An auditor multiplies the hours of each hourly earnings line by the employee's base rate, and by 1.5 for overtime, and compares the result with the amount paid. The totals differ by a few dollars a year, and no line differs by more than a cent. What does the result support?
 
-A.  Because SQLite deletes any query that is not saved as a view before closing
-B.  Because an uncontrolled library would undermine the evidence it produces
-C.  Because each test must be rewritten from the beginning in every period
-D.  Because a query returns different results each time it runs on the same data
+A.  The hours paid were worked, because the pay agrees with the expectation
+B.  The pay is right for the hours recorded, so the question is the hours
+C.  The payroll registers are complete, because they agree with the ledger
+D.  The pay rates are wrong, because the totals do not agree to the cent
 
 <!-- Answer key, Chapter 12 (for instructors; HTML comments are removed from every rendered format):
      1 A, 2 D, 3 C, 4 C, 5 B, 6 A, 7 D, 8 C, 9 A, 10 D, 11 C, 12 B, 13 B, 14 A, 15 B.
@@ -123,4 +123,4 @@ D.  Because a query returns different results each time it runs on the same data
      12 B: time charged to finished operations cannot be placed at the operations that used it.
      13 B: the condition keeps each pair once and excludes a payment paired with itself.
      14 A: scientific notation starts with the first significant digit.
-     15 B: an uncontrolled library cannot support the evidence it produces. -->
+     15 B: an expectation from hours and rates tests the pay for the hours; it cannot show that the hours were worked. -->

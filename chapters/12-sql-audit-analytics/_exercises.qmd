@@ -8,7 +8,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Exercise 12.1: Cutoff at Each Year-End**
 
-**Table group:** Order-to-Cash, Procure-to-Pay, Payroll, Accounting Core
+**Table group:** Order-to-Cash, Procure-to-Pay, Payroll and Time, Accounting Core
 
 **Scenario.** Tutorial 12.1 found revenue and payroll recorded in a later fiscal year than the events behind them. The controller asks for the effect on each year's revenue, payroll cost, and year-end liabilities, and for the same test on the supplier side, before the fiscal 2026 statements are finalized.
 
@@ -44,33 +44,38 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      holds only the opening 95,000, so no year-end accrues the wages; each year-end's liability is understated by the amounts above. -->
 
 
-**Exercise 12.2: The Accrual for Goods Received Not Invoiced**
+**Exercise 12.2: Aging the Open Balances**
 
-**Table group:** Procure-to-Pay, Accounting Core
+**Table group:** Order-to-Cash, Procure-to-Pay, Accounting Core
 
-**Scenario.** Tutorial 12.2 reconciled the receipts not yet invoiced to account 2020 in total. The controller asks for the detail behind the balance at the end of fiscal 2026: which suppliers it is owed to, how old the receipts are, and which purchases are billed without a purchase order at all.
+**Scenario.** Tutorial 8.2 aged Charles River's receivables in Excel, and Tutorial 12.2 reconciled the receipts not yet invoiced to account 2020 in total. The controller asks for both open balances at the end of fiscal 2026 in SQL, so that they can be aged and reconciled at every year-end without a workbook: what customers owe Charles River, and what Charles River owes for goods received but not yet billed.
 
 **Requirements.**
 
-(1) List the goods receipt lines not fully invoiced at the end of fiscal 2026, valued at their receipt value for the part not yet invoiced, with the supplier and the receipt date. Bound the receipts and the invoices by date, so that the test could be rerun at another year-end.
+(1) Calculate the open balance of each sales invoice at 2026-12-31, as Tutorial 8.2 did: its GrandTotal, less the receipts applied and the credit memos dated by the as-of date. Keep the as-of date in a one-row CTE, as in Chapter 11, and keep the invoices with a balance above zero.
 
-(2) Total the value by supplier and list the five largest, and total it by receipt month.
+(2) Age the open balances by days past due with CASE, in the buckets of @tbl-08-02, and reconcile their total to account 1020 Accounts Receivable. Explain the difference, and what the invoices with a negative balance are.
 
-(3) Identify the receipts more than two months old at the year-end, received before 2026-11-01, and suggest why each might not yet be invoiced.
+(3) Total the open balance by customer, grouping by CustomerID, and stratify the customers at $1,000, $10,000, and $50,000. List the customers with $50,000 or more as the key items to confirm, with their share of the open balance.
 
-(4) Find the supplier invoice lines that have no purchase order line. Total them by item group, and check whether each is linked to an accrual journal entry. Explain how these purchases should be tested, since a three-way match cannot apply to them.
+(4) List the goods receipt lines not fully invoiced at the end of fiscal 2026, valued at their receipt value for the part not yet invoiced, with the supplier and the receipt date, and bound the receipts and the invoices by the as-of date. Total the value by receipt month, and list the five largest suppliers.
 
-(5) Write a short memo (one half page) to the controller on the accrual and the purchases without orders.
+(5) Write a short memo (one half page) to the controller on the two open balances: their aging, the difference in account 1020, and the receipts more than two months old.
 
-**Deliverable.** A script with the accrual detail and a half-page memo.
+**Deliverable.** A script with the aging tests and a half-page memo.
 
-<!-- Instructor notes, Exercise 12.2: 1,150 receipt lines are not fully invoiced, valued at 1,020,992.80 (the ledger's account 2020 is
-     1,020,992.06; the 0.74 is the rounding of each invoice line's clearing amount). Largest suppliers: 17 (59 lines, 64,236.70), 52 (30,
-     49,449.79), 27 (63, 47,596.03). By receipt month: 2026-12 804,428.99 (736 lines); 2026-11 188,895.56 (327); 2026-10 23,921.61 (75);
-     2026-09 2,836.29 (11); 2026-08 910.34 (1). Receipts from August to October are older than two months and need follow-up (disputed
-     invoices, lost invoices, or receipts recorded against the wrong order). 355 supplier invoice lines, 3,732,259.39 in all, have no
-     purchase order line; all are Services items, and each carries an AccrualJournalEntryID, so they are two-way matches of invoice to
-     accrual and should be tested against the service contract and the accrual entries. -->
+<!-- Instructor notes, Exercise 12.2: receivables at 2026-12-31 (days past due = julianday of the as-of date less julianday of DueDate;
+     Current is zero or less): 1,079 invoices with a positive open balance, 4,418,804.32, from 203 customers. Current 780 invoices,
+     3,655,971.50; 1-30 days 258, 745,674.84; 31-60 days 28, 16,711.26; 61-90 days 10, 405.41; over 90 days 3, 41.31, the aging of
+     Tutorial 8.2. Account 1020 (AccountID 3) at 2026-12-31 is 4,798,804.32; the 380,000.00 difference is the opening-balance line of
+     JE-2024-000001, which no invoice supports (Chapter 8's finding). 225 invoices have a negative balance (-220,131.88 in all):
+     credit memos on paid invoices, which post to account 2060 and are refunded, so they are not receivables. Strata by customer:
+     under 1,000, 32 customers, 11,266.04; 1,000-9,999, 65, 330,518.49; 10,000-49,999, 83, 2,206,317.97; 50,000 and over, 23,
+     1,870,701.82, 42.3% of the balance, the key items of Tutorial 8.2. Receipts not invoiced: 1,150 receipt lines, 1,020,992.80 (account
+     2020 is 1,020,992.06; the 0.74 is the rounding of each invoice line's clearing amount). By receipt month: 2026-12 804,428.99 (736
+     lines); 2026-11 188,895.56 (327); 2026-10 23,921.61 (75); 2026-09 2,836.29 (11); 2026-08 910.34 (1). Largest suppliers: 17 (59 lines,
+     64,236.70), 52 (30, 49,449.79), 27 (63, 47,596.03). Receipts from August to October are more than two months old and need follow-up
+     (disputed invoices, lost invoices, or receipts recorded against the wrong order). -->
 
 
 ### Managerial Accounting Exercises
@@ -110,9 +115,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Exercise 12.4: Is the Overtime Approval Doing Its Job?**
 
-**Table group:** Manufacturing, Payroll
+**Table group:** Manufacturing, Payroll and Time
 
-**Scenario.** Tutorial 12.3 found that overtime above half an hour is almost always approved, and that most of the growth in overtime sits on days on which every manufacturing employee clocked the same hours. The controller wants to know whether the approvals are a real control over the growth in overtime, or only a record that it happened.
+**Scenario.** Tutorial 12.3 found that overtime above half an hour is almost always approved, and that most of the growth in overtime sits on surge days, on which every hourly manufacturing employee clocked the same hours. The controller wants to know whether the approvals are a real control over the growth in overtime, or only a record that it happened.
 
 **Requirements.**
 
@@ -140,61 +145,71 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 ### Auditing Exercises
 
-**Exercise 12.5: Duplicate Payments in SQL**
+**Exercise 12.5: Who Was Paid, and Who Approved the Pay?**
 
-**Table group:** Procure-to-Pay
+**Table group:** Payroll and Time, Master Data
 
-**Scenario.** Chapter 2 promised that the duplicate payment analysis of Exercise 2.6 would be completed in SQL, and Exercise 8.5 ran the near-duplicate test in Excel. The chief audit executive asks you to confirm those results in SQL on the supplier payments and invoices of fiscal 2024 through 2026, and to add the tests to the query library.
+**Scenario.** Tutorial 12.1 found two approved payroll registers of an Account Executive who had left, with no payment record, and Tutorial 12.2 found the same employee approving purchase orders after leaving. The chief audit executive asks you to test the pay of everyone who had left, and the approval of every payroll register and payment, and to add the tests to the query library.
 
 **Requirements.**
 
-(1) Find the supplier invoice numbers that appear more than once for the same supplier, and list both invoices of each pair with their amounts and payments.
+(1) List the registers whose pay date is after the employee's termination date, with the job title, the employee's own cost center and the register's, the dates of the pay period, and the gross pay. Add the employee's usual gross pay before the termination with a correlated subquery in the SELECT list, and explain which registers could be a final paycheck.
 
-(2) Exercise 2.6 warned that the same invoice could be entered with a slightly different number. Repeat test (1) on standardized invoice numbers, using UPPER, TRIM, and REPLACE to remove differences of case, spaces, and hyphens, and report whether it finds any pair that the exact test missed.
+(2) Count the registers each employee approved, grouping by the approver's key, and how many were approved on their pay date.
 
-(3) Find the check numbers used more than once for the same supplier.
+(3) Count the registers approved by the employee they pay, and the payments made before their register was approved, with their net pay.
 
-(4) Use a self-join to find pairs of payments to the same supplier for the same amount on different dates within 30 days of each other, dated through 2026-12-31. Report whether any pair pays the same invoice.
+(4) For each result, state whether it is an isolated exception or a pattern, and what it says about the design of the payroll approval control.
 
-(5) For each test, record the number of exceptions and a disposition, and explain why a self-join is needed for the fourth test but not for the others.
+(5) Write a short list of findings and recommendations for the chief audit executive.
 
-**Deliverable.** A script with the four tests and a table of results and dispositions.
+**Deliverable.** A script with the tests and a list of findings.
 
-<!-- Instructor notes, Exercise 12.5: (1) six supplier invoice numbers each appear twice for the same supplier; each pair has different
-     amounts, and each invoice was paid once (Exercise 2.6). (2) Standardized numbers (UPPER, TRIM, and REPLACE of hyphens and spaces)
-     find the same six pairs and no others: the numbers are entered consistently. (3) Two check numbers are used twice, both for
-     supplier 1: CHK0006076 and CHK0019708 (the AnomalyLog lists six duplicate references, but only two have check numbers). (4) 113 pairs
-     share supplier and amount on different dates; 13 are within 30 days (the chapter's example, with 14 days, finds 6), and none pays the
-     same invoice, so they are recurring purchases rather than duplicates. Grouping finds identical values; comparing each payment with
-     other payments across a range of dates needs the table joined to itself. -->
+<!-- Instructor notes, Exercise 12.5: (1) three registers pay the Account Executive (employee 81, Sales cost center, terminated
+     2024-04-26) after the termination: 840 (period from 2024-04-22, paid 2024-05-10), 2646 (paid 2025-01-03), and 5420 (paid
+     2026-01-02), 9,424.91 gross each, about four times the employee's usual gross pay (2,217.25) and the amount of the chief
+     executive's register, all charged to the Executive cost center. Only 840, whose period includes the termination date, could be a
+     final paycheck, and even it pays four times the usual amount. 2646 and 5420 are the registers of Tutorial 12.1 with no payment
+     record. (2) One person, the Accounting Manager (employee 5), approved all 8,197 registers, each on its pay date. (3) 77 registers,
+     net pay 282,646.21, are the Accounting Manager's own; three payments (2, 2647, and 5421, 23,099.19 net) pay the chief financial
+     officer the day before the register was approved. (4) The unpaid and post-termination registers are isolated exceptions, to be
+     traced to the bank records; a single approver who approves their own pay is a weakness in the design of the control. Suggested
+     changes: a second approver for registers and for the approver's own pay, and payments released only after approval. -->
 
 
-**Exercise 12.6: Sequence and First-Digit Tests in SQL**
+**Exercise 12.6: Chapter 8's Tests in SQL**
 
 **Table group:** Order-to-Cash, Procure-to-Pay, Accounting Core
 
-**Scenario.** The chief audit executive wants the sequence and first-digit tests of Chapter 8 in the query library, so that they run on every document series each quarter without a workbook.
+**Scenario.** Chapter 2 promised that the duplicate payment analysis of Exercise 2.6 would be completed in SQL, and Chapter 8 ran the duplicate, near-duplicate, sequence, and first-digit tests in Excel. The chief audit executive asks you to confirm those results in SQL on the supplier invoices and payments and the document series of fiscal 2024 through 2026, so that they run every quarter without a workbook.
 
 **Requirements.**
 
-(1) For the sales invoice, purchase order, cash receipt, and journal entry numbers, extract the year and the sequence number with SUBSTR and CAST, and report the first and last number of each year.
+(1) Find the supplier invoice numbers that appear more than once for the same supplier, and list both invoices of each pair with their amounts and payments. Repeat the test on invoice numbers standardized with UPPER, TRIM, and REPLACE, as Exercise 2.6 warned, and report whether it finds any pair that the exact test missed.
 
-(2) Describe which series restart their numbering each year and which continue across years.
+(2) Find the check numbers used more than once for the same supplier.
 
-(3) Use LAG to find any step greater than one: partitioned by year for a series that restarts each year, and ordered across the years, without a partition, for a series that continues, so that a gap at a year boundary is not missed.
+(3) Use a self-join to find pairs of payments to the same supplier for the same amount on different dates within 30 days of each other, dated through 2026-12-31, and report whether any pair pays the same invoice.
 
-(4) Calculate the first significant digit of every supplier payment dated through 2026-12-31 with `printf('%e', Amount)`, and the actual and expected proportion of each digit, using `LOG10(1 + 1.0 / Digit)`.
+(4) For the sales invoice, purchase order, cash receipt, and journal entry numbers, extract the year and the sequence number with SUBSTR and CAST, and report the first and last number of each year. Use LAG to find any step greater than one: partitioned by year for a series that restarts each year, and ordered across the years, without a partition, for a series that continues.
 
-(5) Calculate the mean absolute deviation for all payments, for full payments (Amount equal to the invoice's GrandTotal), and for partial payments, and compare the results with Tutorial 8.1.
+(5) Calculate the first significant digit of every supplier payment dated through 2026-12-31 with `printf('%e', Amount)`, and the mean absolute deviation from the expected proportions of `LOG10(1 + 1.0 / Digit)`, for all payments, for full payments (Amount equal to the invoice's GrandTotal), and for partial payments. Compare the results with Tutorial 8.1.
 
-(6) Write a short note on the advantage of running these tests in SQL rather than in a workbook.
+(6) For each test, record the number of exceptions and a disposition, and write a short note on why the fourth test needs a self-join and on what running these tests in SQL gains over a workbook.
 
-**Deliverable.** A script with the sequence and first-digit tests and a short note.
+**Deliverable.** A script with the tests and a table of results and dispositions.
 
-<!-- Instructor notes, Exercise 12.6: no gaps in any series. Sales invoices and cash receipts continue across years (SI 1-6,732 in 2024,
+<!-- Instructor notes, Exercise 12.6: (1) six supplier invoice numbers each appear twice for the same supplier; each pair has different
+     amounts, and each invoice was paid once (Exercise 2.6). Standardized numbers (UPPER, TRIM, and REPLACE of hyphens and spaces)
+     find the same six pairs and no others: the numbers are entered consistently. (2) Two check numbers are used twice, both for
+     supplier 1: CHK0006076 and CHK0019708 (the AnomalyLog lists six duplicate references, but only two have check numbers). (3) 113
+     pairs share supplier and amount on different dates; 13 are within 30 days (the chapter's example, with 14 days, finds 6), and
+     none pays the same invoice, so they are recurring purchases rather than duplicates. Grouping finds identical values; comparing
+     each payment with other payments across a range of dates needs the table joined to itself.
+     (4) No gaps in any series. Sales invoices and cash receipts continue across years (SI 1-6,732 in 2024,
      6,733-13,740 in 2025, 13,741-20,914 in 2026; CR 1-2,274, 2,275-4,840, 4,841-7,409), as do purchase orders (1-3,921, 3,922-10,466,
      10,467-18,832); journal entries restart each year (1-266, 1-288, 1-297). A LAG partitioned by year on a continuing series would miss a
-     gap between the last number of one year and the first of the next. MAD: all payments 0.01295, full payments 0.00755, partial payments
+     gap between the last number of one year and the first of the next. (5) MAD: all payments 0.01295, full payments 0.00755, partial payments
      0.04496, exactly the values of Tutorial 8.1. printf writes 688.42 as 6.884200e+02 and 0.12 as 1.200000e-01, so the first character is
      the first significant digit for every positive amount (the smallest payment is 0.12); LOG10 needs SQLite's math functions, which DB
      Browser 3.13.1 includes. -->

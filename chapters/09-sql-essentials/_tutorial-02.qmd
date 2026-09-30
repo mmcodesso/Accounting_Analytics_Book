@@ -123,11 +123,16 @@ a. In the query from Step 6, replace the line that reads `CompletedDate` with tw
    ```
 
 b. Run the query, and read the Completed and ReleaseYear columns.
-c. Add the condition `AND SUBSTR(WorkOrderNumber, 4, 4) = 2026` at the end of the WHERE clause, run the query, and read the number of rows.
-d. Change `2026` in that condition to `'2026'`, with quotes, and run the query again.
-e. Remove the condition you added, so that the script keeps the query of item a.
 
-The Completed column shows not completed for the work orders that were released or in progress, and the date for those that were completed but not yet closed. ReleaseYear takes the year from the work order number, which carries the year in which the work order was released, and it is 2026 for every open work order. The condition in item c nevertheless returns no rows. SUBSTR returns text, and SQLite does not convert text to compare it with a number that no column holds. With the quotes, the same condition finds every open work order. The empty result in Step 5 was a finding, but this one is a logical error, and knowing what the result should be is how you tell the two apart.
+The Completed column shows not completed for the work orders that were released or in progress, and the date for those that were completed but not yet closed. ReleaseYear takes the year from the work order number, which carries the year in which the work order was released, and it is 2026 for every open work order.
+
+**Step 8. Test a year taken from the text.** A condition on the year that SUBSTR takes from the number looks as if it should keep every open work order.
+
+a. Add the condition `AND SUBSTR(WorkOrderNumber, 4, 4) = 2026` at the end of the WHERE clause, run the query, and read the number of rows.
+b. Change `2026` in that condition to `'2026'`, with quotes, and run the query again.
+c. Remove the condition you added, so that the script keeps the query of Step 7.
+
+The condition in item a returns no rows, although every open work order was released in 2026. SUBSTR returns text, and SQLite does not convert text to compare it with a number that no column holds. With the quotes, the same condition finds every open work order. The empty result in Step 5 was a finding, but this one is a logical error, and knowing what the result should be is how you tell the two apart.
 
 **Checkpoint.** Check that:
 

@@ -25,6 +25,17 @@ She also knows where the answer lives. The detail behind the variance sits in ta
 
 
 
+## Standard Costs in Brief
+
+The controller's question rests on standard costing, which you met in managerial accounting. A standard cost system values each item the plant makes at its standard cost: the materials, direct labor, and overhead that one unit should require, at standard prices and rates (Datar & Rajan, 2021). Charles River's ledger records production in three steps:
+
+- Materials issued to a work order are charged to work in process, and the actual cost of conversion, the manufacturing payroll and the factory overhead, is charged to account 1090 Manufacturing Cost Clearing as it is incurred.
+- When units are completed, finished goods inventory is charged with their standard cost, and work in process and account 1090 are relieved of the standard material and conversion cost of those units.
+- When a work order closes, whatever is left, actual cost less standard, is moved to account 5080 Manufacturing Variance: the material part from work in process, and the conversion part, which the close record splits into direct labor and overhead, from account 1090.
+
+Account 5080 is reported with cost of goods sold, so a larger variance means a lower gross margin. A cost accounting textbook would call its overhead part underapplied overhead: overhead incurred beyond what the standard rates charged to the units made. The closing entry at each year-end clears the account with the other income statement accounts. Chapter 10 follows the whole flow through the ledger.
+
+
 ## Why Query the Database Directly
 
 In Part II you brought data into Excel with Power Query. You chose the Tables an analysis needed, filtered them, and loaded the result into a workbook of your own, and Power Query recorded every step so that the workbook could be refreshed. That approach works well when the data fits comfortably in a workbook and the analysis draws on a few tables. It becomes strained as the data grows and the questions reach across more tables. Every import still copies rows into the workbook, a table the size of the general ledger slows the workbook down, and each new table must be merged with the others before a formula can use it. Borthick et al. (2017) built a teaching case around exactly this experience. An analysis that begins in a spreadsheet becomes hard to implement and hard to audit as it needs more attributes from more sheets. The case then moves the data into a database, where the tables are joined and the analysis is done with queries.
@@ -96,6 +107,11 @@ A mistake in the wording of a query is a syntax error. SQLite cannot run the sta
 : Common SQLite error messages and their usual causes {#tbl-09-01}
 
 A misspelled name is the most common cause. A query that asks for AccountNumbr, or for a table called Accounts, fails, and the Database Structure tab is the place to check the spelling. Syntax errors are easy to fix, because the message names the problem. A second kind of error runs without any complaint, and this chapter returns to it once you have written a few queries.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+When a query does not behave as the tutorial says, check these first. Was the whole query selected before you ran it? A partial selection runs only part of it, and running with nothing selected runs the whole script, so that only the result of its last statement appears. Does the title bar show CharlesRiver_Work.sqlite? Are the names spelled as on the Database Structure tab? Did you undo a change that a step asked you to make only for a moment? Finally, Save SQL file saves the script, while Ctrl+S is Write Changes, which saves the database.
+:::
 
 
 ## Calculated Columns and Functions
@@ -300,7 +316,7 @@ SQLite is more forgiving than most database systems, and its tolerance can hide 
 
 ## Looking Ahead
 
-This chapter has introduced SQL through the Charles River database. You set up DB Browser for SQLite with a working copy of the database and read the structure of its tables. You wrote SELECT statements that choose columns, rename them, calculate new ones with arithmetic and functions, and list the distinct values a column holds. You filtered rows with WHERE, combined conditions with AND and OR, used BETWEEN, IN, and LIKE, compared values of the right type, and found and replaced missing values with IS NULL and COALESCE. You sorted and limited results to rank transactions, copied a result into Excel, and saved your queries in a documented script. Along the way, you read the messages of syntax errors and learned to check a result against what it should be, the defense against logical errors.
+This chapter has introduced SQL through the Charles River database. You set up DB Browser for SQLite with a working copy of the database and read the structure of its tables. You wrote SELECT statements that choose columns, rename them, calculate new ones with arithmetic and functions, and list the distinct values a column holds. You filtered rows with WHERE, combined conditions with AND and OR, used BETWEEN, IN, and LIKE, compared values of the right type, and found and replaced missing values with IS NULL and COALESCE. You sorted and limited results to rank transactions, copied a result into Excel, and saved your queries in a documented script. Along the way, you read the messages of syntax errors and learned to check a result against what it should be, the defense against logical errors. Most of this work was descriptive analytics, in the terms of @tbl-01-01: finding, listing, and ranking what the records hold.
 
 The queries have also given the controller a first look at her question. The manufacturing variance is recorded when a work order closes, and each close records the variance in parts. In the largest closes of fiscal 2026, most of the variance is overhead, not material. The ledger holds the same amounts, together with a closing entry that clears the account at year-end and must be left out of any analysis of it. A single table cannot say more. Which products carry the variance, how much of it arose in each year, and what drives the overhead are questions that span the work orders, the items, the payroll, and the ledger. Answering them requires joining tables and summarizing their rows, which is the work of Chapter 10.
 

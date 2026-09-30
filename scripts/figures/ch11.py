@@ -34,6 +34,25 @@ _GAP_INNER = ("    FROM GLEntry\n"
               "    WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026\n"
               "        AND SourceDocumentType <> 'WorkOrderClose'\n"
               "    GROUP BY FiscalYear, FiscalPeriod\n")
+_CENTERS = (
+    "FROM (\n"
+    "    SELECT strftime('%Y', op.ActualEndDate) AS EndYear,\n"
+    "        wc.WorkCenterName,\n"
+    "        ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,\n"
+    "        ROUND(SUM(lab.Hours), 0) AS RecordedHours\n"
+    "    FROM WorkOrderOperation AS op\n"
+    "        INNER JOIN WorkCenter AS wc ON wc.WorkCenterID = op.WorkCenterID\n"
+    "        LEFT JOIN (\n"
+    "            SELECT WorkOrderOperationID,\n"
+    "                SUM(RegularHours + OvertimeHours) AS Hours\n"
+    "            FROM LaborTimeEntry\n"
+    "            WHERE LaborType = 'Direct Manufacturing'\n"
+    "            GROUP BY WorkOrderOperationID\n"
+    "        ) AS lab ON lab.WorkOrderOperationID = op.WorkOrderOperationID\n"
+    "    WHERE op.ActualEndDate <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)\n"
+    "    GROUP BY EndYear, wc.WorkCenterName\n"
+    ") AS centers\n"
+    "ORDER BY EndYear, CenterRank;")
 _OUTPUT_CTE = ("MonthlyOutput AS (\n"
                "    SELECT strftime('%Y-%m', pc.CompletionDate) AS Month,\n"
                "        SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit)\n"
@@ -193,7 +212,27 @@ QUERIES = [
      ") AS monthly\n"
      "WHERE GapRank <= 3\n"
      "ORDER BY FiscalYear, GapRank;"),
+    ("pay_dates", "-- Tutorial 11.2: pay dates by month, one column per year",
+     "SELECT FiscalPeriod,\n"
+     "    COUNT(DISTINCT CASE WHEN FiscalYear = 2024\n"
+     "        THEN PostingDate END) AS Pay2024,\n"
+     "    COUNT(DISTINCT CASE WHEN FiscalYear = 2025\n"
+     "        THEN PostingDate END) AS Pay2025,\n"
+     "    COUNT(DISTINCT CASE WHEN FiscalYear = 2026\n"
+     "        THEN PostingDate END) AS Pay2026\n"
+     "FROM GLEntry\n"
+     "WHERE AccountID = 92 AND FiscalYear BETWEEN 2024 AND 2026\n"
+     "    AND SourceDocumentType = 'PayrollSummary'\n"
+     "GROUP BY FiscalPeriod\n"
+     "ORDER BY FiscalPeriod;"),
     ("work_centers", "-- Tutorial 11.2: work centers ranked by hours recorded against plan",
+     "SELECT EndYear, WorkCenterName,\n"
+     "    RecordedHours - PlannedHours AS ExcessHours,\n"
+     "    ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,\n"
+     "    RANK() OVER (PARTITION BY EndYear\n"
+     "        ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank\n"
+     + _CENTERS),
+    ("work_centers_plant", "-- Tutorial 11.2: the ranking with the plant's excess hours",
      "SELECT EndYear, WorkCenterName,\n"
      "    RecordedHours - PlannedHours AS ExcessHours,\n"
      "    ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,\n"
@@ -201,24 +240,7 @@ QUERIES = [
      "        ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank,\n"
      "    SUM(RecordedHours - PlannedHours) OVER (PARTITION BY EndYear)\n"
      "        AS PlantExcessHours\n"
-     "FROM (\n"
-     "    SELECT strftime('%Y', op.ActualEndDate) AS EndYear,\n"
-     "        wc.WorkCenterName,\n"
-     "        ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,\n"
-     "        ROUND(SUM(lab.Hours), 0) AS RecordedHours\n"
-     "    FROM WorkOrderOperation AS op\n"
-     "        INNER JOIN WorkCenter AS wc ON wc.WorkCenterID = op.WorkCenterID\n"
-     "        LEFT JOIN (\n"
-     "            SELECT WorkOrderOperationID,\n"
-     "                SUM(RegularHours + OvertimeHours) AS Hours\n"
-     "            FROM LaborTimeEntry\n"
-     "            WHERE LaborType = 'Direct Manufacturing'\n"
-     "            GROUP BY WorkOrderOperationID\n"
-     "        ) AS lab ON lab.WorkOrderOperationID = op.WorkOrderOperationID\n"
-     "    WHERE op.ActualEndDate <= (SELECT MAX(WorkDate) FROM LaborTimeEntry)\n"
-     "    GROUP BY EndYear, wc.WorkCenterName\n"
-     ") AS centers\n"
-     "ORDER BY EndYear, CenterRank;"),
+     + _CENTERS),
     ("measure_output", "-- Tutorial 11.3: step 1, the standard hours of output by month",
      f"WITH {_OUTPUT_CTE}\n"
      "SELECT * FROM MonthlyOutput\n"
@@ -323,6 +345,20 @@ def fig_11_01() -> Diagram:
 
 
 def fig_11_02() -> Diagram:
+    d = Diagram("Manufacturing Labor Time in the First Months of 2024")
+    rows = db.run(sql("hours_by_month"))[1]
+    assert len(rows) == 36 and rows[0][0] == "2024-01", rows[:2]
+    assert rows[0][3] > rows[0][2], rows[0]                       # the start-up month: mostly indirect
+    assert all(r[3] < 0.02 * r[2] for r in rows[1:5]) and rows[2][3] == 0, rows[1:5]
+    assert all(r[3] > 1000 for r in rows[5:-1]) and rows[-1][3] > 0, "indirect time every month from June"
+    out = CHAPTER11.mock(d, "hours_by_month", [120, 150, 140, 150, 150], shown=slice(0, 8), compact=True)
+    db.emphasize_cells(d, out["geometry"], [(1, 3), (4, 3)])
+    note(d, "The grid shows the first eight of the 36 months. Outlined: February to May 2024, with almost no "
+            "indirect time.", out["bottom"] + 8, 40)
+    return d
+
+
+def fig_11_03() -> Diagram:
     d = Diagram("Overtime Shares by Kind of Labor and Month")
     rows = db.run(sql("overtime_shares"))[1]
     assert len(rows) == 36
@@ -332,14 +368,14 @@ def fig_11_02() -> Diagram:
     assert max(first_half_2024) < 0.12, first_half_2024
     assert sum(1 for s in direct_2026 if s >= 0.25) >= 9, direct_2026
     assert all(0.05 < s < 0.1 for s in indirect_2026), indirect_2026
-    out = CHAPTER11.mock(d, "overtime_shares", [110, 200, 210], shown=slice(24, 36))
+    out = CHAPTER11.mock(d, "overtime_shares", [110, 200, 210], shown=slice(24, 36), compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 1), (11, 1)])
     note(d, "The grid is scrolled to the twelve months of 2026. Outlined: the direct overtime share, a "
             "quarter or more in most months.", out["bottom"] + 8, 40)
     return d
 
 
-def fig_11_03() -> Diagram:
+def fig_11_04() -> Diagram:
     d = Diagram("Partitions and Frames in a Window Function")
     gaps = [(y, p, g) for y, p, g in q("SELECT FiscalYear, FiscalPeriod, SUM(Debit) - SUM(Credit) "
                                         "FROM GLEntry WHERE AccountID = 92 AND FiscalYear BETWEEN 2025 "
@@ -373,19 +409,19 @@ def fig_11_03() -> Diagram:
     return d
 
 
-def fig_11_04() -> Diagram:
+def fig_11_05() -> Diagram:
     d = Diagram("The Monthly Gap in Account 1090 and Its Year-to-Date Total")
     rows = db.run(sql("gap_ytd"))[1]
     decembers = [r[3] for r in rows if r[1] == 12]
     assert decembers == sorted(decembers) and decembers[2] > 1.9 * decembers[0], decembers
-    out = CHAPTER11.mock(d, "gap_ytd", [130, 130, 180, 200], shown=slice(24, 36))
+    out = CHAPTER11.mock(d, "gap_ytd", [130, 130, 180, 200], shown=slice(24, 36), compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 3), (11, 3)])
     note(d, "The grid is scrolled to fiscal 2026. Outlined: the year-to-date total, which accumulates through the year.",
          out["bottom"] + 8, 22)
     return d
 
 
-def fig_11_05() -> Diagram:
+def fig_11_06() -> Diagram:
     d = Diagram("The Largest Months of the Gap and Their Pay Dates")
     rows = db.run(sql("gap_pay_dates"))[1]
     assert len(rows) == 9
@@ -398,7 +434,7 @@ def fig_11_05() -> Diagram:
                  "'JournalEntry' AND gl.SourceDocumentID = je.JournalEntryID INNER JOIN Account a "
                  "ON a.AccountID = gl.AccountID WHERE a.AccountNumber = 2030 AND je.EntryType "
                  "LIKE 'Accrual%'"), "no month-end wage accrual"
-    out = CHAPTER11.mock(d, "gap_pay_dates", [120, 120, 160, 110, 110])
+    out = CHAPTER11.mock(d, "gap_pay_dates", [120, 120, 160, 110, 110], compact=True)
     for i, r in enumerate(rows):
         if r[3] == 3:
             db.emphasize_cells(d, out["geometry"], [(i, 3)])
@@ -407,23 +443,25 @@ def fig_11_05() -> Diagram:
     return d
 
 
-def fig_11_06() -> Diagram:
+def fig_11_07() -> Diagram:
     d = Diagram("Work Centers Ranked by Hours Recorded Against Plan")
-    rows = db.run(sql("work_centers"))[1]
+    rows = db.run(sql("work_centers_plant"))[1]
     assert len(rows) == 15
+    assert [r[:5] for r in rows] == db.run(sql("work_centers"))[1], "the plant total adds a column only"
     top = {r[1] for r in rows if r[4] <= 2}
     assert top == {"Packing Work Center", "Quality Assurance Work Center"}, top
     assert all(r[5] < 0 for r in rows), "the plant as a whole records less direct time than planned"
-    out = CHAPTER11.mock(d, "work_centers", [70, 230, 110, 140, 100, 150], shown=slice(10, 15))
+    out = CHAPTER11.mock(d, "work_centers_plant", [70, 230, 110, 140, 100, 150], shown=slice(10, 15),
+                         lines=slice(0, 8), compact=True)
     marks = [i for i, r in enumerate(rows[10:15]) if r[4] <= 2]
     for i in marks:
         db.emphasize_cells(d, out["geometry"], [(i, 0), (i, 4)])
-    note(d, "The grid is scrolled to the operations that ended in 2026. Outlined: the two work centers ranked first.",
-         out["bottom"] + 8, 22)
+    note(d, "The editor shows the start of the query, whose derived table follows. The grid is scrolled to the "
+            "operations that ended in 2026. Outlined: the two work centers ranked first.", out["bottom"] + 8, 40)
     return d
 
 
-def fig_11_07() -> Diagram:
+def fig_11_08() -> Diagram:
     d = Diagram("The Chain of Common Table Expressions in the Monthly Measure")
     rows = db.run(sql("measure_trailing"))[1]
     assert rows[0][0] == "2024-12" and rows[-1][0] == "2026-12" and len(rows) == 25
@@ -448,7 +486,7 @@ def fig_11_07() -> Diagram:
     return d
 
 
-def fig_11_08() -> Diagram:
+def fig_11_09() -> Diagram:
     d = Diagram("The Saved View in the Database Structure Tab")
     create_temp_view()
     columns = [r[1] for r in q("PRAGMA temp.table_info(MonthlyLaborEfficiency)")]
@@ -481,7 +519,7 @@ def fig_11_08() -> Diagram:
     return d
 
 
-def fig_11_09() -> Diagram:
+def fig_11_10() -> Diagram:
     d = Diagram("The Monthly Measure for Fiscal 2026, Queried from the View")
     create_temp_view()
     rows = db.run(sql("query_view"))[1]
@@ -492,7 +530,7 @@ def fig_11_09() -> Diagram:
     total = [r[4] for r in rows]
     assert max(indirect) - min(indirect) < 0.06, indirect                  # flat indirect time
     assert direct[-1] > direct[0] and max(total) == total[9] == 1.54, (direct, total)
-    out = CHAPTER11.mock(d, "query_view", [90, 180, 110, 120, 110, 160])
+    out = CHAPTER11.mock(d, "query_view", [90, 180, 110, 120, 110, 160], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 2), (11, 5)])
     note(d, "Outlined: the trailing twelve-month columns, which change slowly while the monthly ratio swings.",
          out["bottom"] + 8, 22)
@@ -501,12 +539,13 @@ def fig_11_09() -> Diagram:
 
 FIGURES = {
     "fig-11-01-conditional-aggregation": fig_11_01,
-    "fig-11-02-overtime-shares": fig_11_02,
-    "fig-11-03-window-frames": fig_11_03,
-    "fig-11-04-gap-year-to-date": fig_11_04,
-    "fig-11-05-gap-pay-dates": fig_11_05,
-    "fig-11-06-work-center-rank": fig_11_06,
-    "fig-11-07-cte-pipeline": fig_11_07,
-    "fig-11-08-view-in-structure": fig_11_08,
-    "fig-11-09-monthly-measure": fig_11_09,
+    "fig-11-02-early-months": fig_11_02,
+    "fig-11-03-overtime-shares": fig_11_03,
+    "fig-11-04-window-frames": fig_11_04,
+    "fig-11-05-gap-year-to-date": fig_11_05,
+    "fig-11-06-gap-pay-dates": fig_11_06,
+    "fig-11-07-work-center-rank": fig_11_07,
+    "fig-11-08-cte-pipeline": fig_11_08,
+    "fig-11-09-view-in-structure": fig_11_09,
+    "fig-11-10-monthly-measure": fig_11_10,
 }

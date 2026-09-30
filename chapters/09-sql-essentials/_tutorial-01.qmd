@@ -12,7 +12,7 @@ a. In File Explorer (Finder on a Mac), open the folder that holds CharlesRiver.s
 b. Copy the file and paste the copy into the same folder.
 c. Rename the copy `CharlesRiver_Work.sqlite`.
 
-The folder now holds two identical files. Every tutorial in Part III uses CharlesRiver_Work.sqlite.
+The folder now holds two identical files. If File Explorer hides file extensions, type the name without `.sqlite`, or the file becomes CharlesRiver_Work.sqlite.sqlite. Every tutorial in Part III uses CharlesRiver_Work.sqlite.
 
 **Step 2. Open the working copy and read the structure of the ledger.** The Database Structure tab tells you the exact names of the tables and columns before you write a query.
 
@@ -41,7 +41,7 @@ c. Click **Save SQL file** on the toolbar of the Execute SQL tab, and save the s
 
 The editor's tab is renamed Chapter09.sql. The text between `/*` and `*/` is a comment, which DB Browser ignores when it runs a script. Each query you write in this chapter goes at the end of the script, under a one-line comment that begins with two dashes. Click **Save SQL file** again whenever you add to the script. Ctrl+S is the shortcut for Write Changes, which saves changes to the database, not the script.
 
-**Step 4. Run your first query.** The Execute SQL tab has an editor for queries, a grid for the result, and a pane for messages.
+**Step 4. Run your first query.** The Execute SQL tab has an editor for queries, a grid for the result, and a pane for messages, which @fig-09-03, in the next step, labels.
 
 a. Below the header, leave a blank line, and type the comment and query below.
 
@@ -74,7 +74,7 @@ d. Record the AccountID of account 1090 Manufacturing Cost Clearing as well.
 
 The result, shown in @fig-09-03, has five columns. AccountID and AccountNumber are different numbers: 5080 Manufacturing Variance has AccountID 93, and 1090 has AccountID 92. As Chapter 3 explained, AccountID is the surrogate key that the GLEntry table uses, so any query of the ledger must use it. Both accounts have the subtype you would expect: 5080 is part of cost of goods sold, and 1090 is a current asset.
 
-![Choosing Columns from the Account Table.](/visuals/svg/fig-09-03-account-columns.svg){#fig-09-03 fig-alt="A mock of the Execute SQL tab of DB Browser for SQLite. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects AccountID, AccountNumber, AccountName, AccountType, and AccountSubType from the Account table. The result grid shows the rows around the manufacturing accounts, including account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93, which are outlined. The message pane reports that the query ran without errors, the number of rows returned, and the line at which the query starts."}
+![Choosing Columns from the Account Table.](/visuals/svg/fig-09-03-account-columns.svg){#fig-09-03 fig-alt="A mock of the Execute SQL tab of DB Browser for SQLite, with six numbered labels explained below it: the editor tab, the Open SQL file(s) and Save SQL file buttons, the Execute all/selected SQL button, the selected query, the result grid, and the message pane. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects AccountID, AccountNumber, AccountName, AccountType, and AccountSubType from the Account table. The result grid shows the rows around the manufacturing accounts, including account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93, which are outlined. The message pane reports that the query ran without errors, the number of rows returned, and the line at which the query starts."}
 
 **Step 6. Make and correct a deliberate error.** Every query writer meets error messages, and reading one is quicker than hunting for the mistake.
 

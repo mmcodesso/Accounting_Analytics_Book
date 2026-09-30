@@ -43,9 +43,10 @@ _PLANT_DAYS = ("    FROM TimeClockEntry AS tc\n"
 _EARNINGS = ("FROM PayrollRegisterLine AS prl\n"
              "    INNER JOIN PayrollRegister AS pr\n"
              "        ON pr.PayrollRegisterID = prl.PayrollRegisterID\n"
-             "    INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID\n"
              "    INNER JOIN LaborTimeEntry AS lt\n"
-             "        ON lt.LaborTimeEntryID = prl.LaborTimeEntryID\n")
+             "        ON lt.LaborTimeEntryID = prl.LaborTimeEntryID\n"
+             "    INNER JOIN Employee AS pe ON pe.EmployeeID = pr.EmployeeID\n"
+             "    INNER JOIN Employee AS we ON we.EmployeeID = lt.EmployeeID\n")
 _AFTER_END = ("CASE WHEN lt.WorkDate > op.ActualEndDate\n"
               "        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END")
 
@@ -325,8 +326,18 @@ QUERIES = [
      "GROUP BY e.EmployeeID, e.JobTitle\n"
      "ORDER BY OrdersApproved DESC;"),
     # Tutorial 12.3: the hours and the pay
+    ("time_profile",
+     "-- Tutorial 12.3, test H1: a profile of the time clock entries\n"
+     "-- Population: all clock entries; expected: approved and complete",
+     "SELECT COUNT(*) AS Entries,\n"
+     "    SUM(CASE WHEN ClockStatus <> 'Approved' THEN 1 ELSE 0 END)\n"
+     "        AS NotApproved,\n"
+     "    COUNT(*) - COUNT(ClockOutTime) AS NoClockOut,\n"
+     "    COUNT(DISTINCT EmployeeID) AS Employees,\n"
+     "    MIN(WorkDate) AS FirstWorkDate, MAX(WorkDate) AS LastWorkDate\n"
+     "FROM TimeClockEntry;"),
     ("hours_chain",
-     "-- Tutorial 12.3, test H1: clocked, recorded, and paid hours\n"
+     "-- Tutorial 12.3, test H2: clocked, recorded, and paid hours\n"
      "-- Population: every pay period; expected: equal in every period",
      "WITH Clocked AS (\n"
      "    SELECT PayrollPeriodID, SUM(RegularHours + OvertimeHours) AS Hours\n"
@@ -357,7 +368,7 @@ QUERIES = [
      "    INNER JOIN Recorded AS r ON r.PayrollPeriodID = c.PayrollPeriodID\n"
      "    INNER JOIN Paid AS p ON p.PayrollPeriodID = c.PayrollPeriodID;"),
     ("chain_2024",
-     "-- Tutorial 12.3, test H2: the manufacturing hours of 2024 by kind\n"
+     "-- Tutorial 12.3, test H3: the manufacturing hours of 2024 by kind\n"
      "-- Population: manufacturing labor time; expected: every period recorded",
      "SELECT pp.PeriodNumber, pp.PeriodStartDate,\n"
      "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS Hours,\n"
@@ -374,23 +385,48 @@ QUERIES = [
      "GROUP BY pp.PayrollPeriodID, pp.PeriodNumber, pp.PeriodStartDate\n"
      "ORDER BY pp.PeriodStartDate;"),
     ("chain_exceptions",
-     "-- Tutorial 12.3, test H3: time paid to another person or unapproved\n"
+     "-- Tutorial 12.3, test H4: time paid to another person or unapproved\n"
      "-- Population: all earnings lines; expected: no rows",
      "SELECT 'Time paid to another employee' AS Test,\n"
-     "    prl.PayrollRegisterLineID, pr.EmployeeID AS PaidEmployee,\n"
-     "    lt.EmployeeID AS WorkedEmployee, rc.CostCenterName, prl.Amount\n"
+     "    pr.EmployeeID AS PaidID, pe.JobTitle AS PaidTitle,\n"
+     "    lt.EmployeeID AS WorkedID, we.JobTitle AS WorkedTitle,\n"
+     "    we.TerminationDate AS WorkerLeft, prl.Amount\n"
      + _EARNINGS +
      "WHERE lt.EmployeeID <> pr.EmployeeID\n"
      "UNION ALL\n"
      "SELECT 'Time paid on an unapproved clock entry',\n"
-     "    prl.PayrollRegisterLineID, pr.EmployeeID,\n"
-     "    lt.EmployeeID, rc.CostCenterName, prl.Amount\n"
+     "    pr.EmployeeID, pe.JobTitle, lt.EmployeeID, we.JobTitle,\n"
+     "    we.TerminationDate, prl.Amount\n"
      + _EARNINGS +
      "    INNER JOIN TimeClockEntry AS tc\n"
      "        ON tc.TimeClockEntryID = lt.TimeClockEntryID\n"
      "WHERE tc.ClockStatus <> 'Approved';"),
+    ("pay_expectation",
+     "-- Tutorial 12.3, test H5: earnings paid against hours and pay rates\n"
+     "-- Population: hourly earnings lines; expected: within a cent a line",
+     "WITH Expected AS (\n"
+     "    SELECT pp.FiscalYear, prl.Amount,\n"
+     "        prl.Hours * e.BaseHourlyRate\n"
+     "            * CASE prl.LineType WHEN 'Overtime Earnings'\n"
+     "                THEN 1.5 ELSE 1 END AS ExpectedAmount\n"
+     "    FROM PayrollRegisterLine AS prl\n"
+     "        INNER JOIN PayrollRegister AS pr\n"
+     "            ON pr.PayrollRegisterID = prl.PayrollRegisterID\n"
+     "        INNER JOIN PayrollPeriod AS pp\n"
+     "            ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
+     "        INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID\n"
+     "    WHERE prl.LineType IN ('Regular Earnings', 'Overtime Earnings')\n"
+     ")\n"
+     "SELECT FiscalYear, ROUND(SUM(Amount), 2) AS EarningsPaid,\n"
+     "    ROUND(SUM(ExpectedAmount), 2) AS Expected,\n"
+     "    ROUND(SUM(Amount) - SUM(ExpectedAmount), 2) AS Difference,\n"
+     "    SUM(CASE WHEN ABS(Amount - ExpectedAmount) > 0.01 THEN 1 ELSE 0 END)\n"
+     "        AS LinesAboveOneCent\n"
+     "FROM Expected\n"
+     "GROUP BY FiscalYear\n"
+     "ORDER BY FiscalYear;"),
     ("overtime_length",
-     "-- Tutorial 12.3, test H4: overtime and its approvals\n"
+     "-- Tutorial 12.3, test H6: overtime and its approvals\n"
      "-- Population: clock entries with overtime; expected: approved",
      "SELECT\n"
      "    CASE WHEN OvertimeHours <= 0.5 THEN 'Half an hour or less'\n"
@@ -403,16 +439,20 @@ QUERIES = [
      "WHERE OvertimeHours > 0\n"
      "GROUP BY OvertimeLength;"),
     ("overtime_unapproved",
-     "-- Tutorial 12.3, test H5: long overtime without an approval\n"
+     "-- Tutorial 12.3, test H7: long overtime without an approval\n"
      "-- Population: overtime above half an hour; expected: no rows",
-     "SELECT tc.TimeClockEntryID, tc.EmployeeID, e.JobTitle,\n"
-     "    e.TerminationDate, tc.WorkDate, tc.OvertimeHours, tc.ClockOutTime,\n"
-     "    tc.ClockStatus\n"
+     "SELECT e.JobTitle, e.TerminationDate, tc.WorkDate,\n"
+     "    tc.OvertimeHours, tc.ClockOutTime, tc.ClockStatus,\n"
+     "    oa.OvertimeApprovalID AS UnlinkedApproval,\n"
+     "    ap.JobTitle AS ApprovedBy\n"
      "FROM TimeClockEntry AS tc\n"
      "    INNER JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID\n"
+     "    LEFT JOIN OvertimeApproval AS oa\n"
+     "        ON oa.EmployeeID = tc.EmployeeID AND oa.WorkDate = tc.WorkDate\n"
+     "    LEFT JOIN Employee AS ap ON ap.EmployeeID = oa.ApprovedByEmployeeID\n"
      "WHERE tc.OvertimeHours > 0.5 AND tc.OvertimeApprovalID IS NULL;"),
     ("surge_days",
-     "-- Tutorial 12.3, test H6: days when everyone clocked the same hours\n"
+     "-- Tutorial 12.3, test H8: days when everyone clocked the same hours\n"
      "-- Population: manufacturing clock entries; expected: no such days",
      "WITH PlantDays AS (\n"
      "    SELECT tc.WorkDate, COUNT(*) AS Employees,\n"
@@ -435,7 +475,7 @@ QUERIES = [
      "GROUP BY WorkYear\n"
      "ORDER BY WorkYear;"),
     ("late_by_year",
-     "-- Tutorial 12.3, test H7: direct time recorded after its operation\n"
+     "-- Tutorial 12.3, test H9: direct time recorded after its operation\n"
      "-- Population: direct labor time; expected: a small share",
      "WITH SurgeDays AS (\n"
      "    SELECT tc.WorkDate\n"
@@ -461,7 +501,7 @@ QUERIES = [
      "GROUP BY WorkYear\n"
      "ORDER BY WorkYear;"),
     ("late_by_center",
-     "-- Tutorial 12.3, test H8: late direct time by work center, 2026\n"
+     "-- Tutorial 12.3, test H10: late direct time by work center, 2026\n"
      "-- Population: direct labor time of 2026; expected: a small share",
      "SELECT wc.WorkCenterName,\n"
      "    ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,\n"
@@ -475,53 +515,6 @@ QUERIES = [
      "    AND lt.WorkDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
      "GROUP BY wc.WorkCenterID, wc.WorkCenterName\n"
      "ORDER BY ShareAfterEnd DESC;"),
-    ("pay_after_termination",
-     "-- Tutorial 12.3, test H9: pay dated after the employee's termination\n"
-     "-- Population: registers of terminated employees; expected: final pay",
-     "SELECT pr.PayrollRegisterID, e.JobTitle,\n"
-     "    ec.CostCenterName AS EmployeeCenter,\n"
-     "    rc.CostCenterName AS RegisterCenter, e.TerminationDate,\n"
-     "    pp.PeriodStartDate, pp.PayDate, pr.GrossPay,\n"
-     "    (SELECT ROUND(AVG(p2.GrossPay), 2)\n"
-     "     FROM PayrollRegister AS p2\n"
-     "        INNER JOIN PayrollPeriod AS q2\n"
-     "            ON q2.PayrollPeriodID = p2.PayrollPeriodID\n"
-     "     WHERE p2.EmployeeID = pr.EmployeeID\n"
-     "        AND q2.PayDate <= e.TerminationDate AND p2.GrossPay > 0)\n"
-     "        AS UsualGrossPay\n"
-     "FROM PayrollRegister AS pr\n"
-     "    INNER JOIN PayrollPeriod AS pp\n"
-     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
-     "    INNER JOIN Employee AS e ON e.EmployeeID = pr.EmployeeID\n"
-     "    INNER JOIN CostCenter AS ec ON ec.CostCenterID = e.CostCenterID\n"
-     "    INNER JOIN CostCenter AS rc ON rc.CostCenterID = pr.CostCenterID\n"
-     "WHERE e.TerminationDate IS NOT NULL\n"
-     "    AND pp.PayDate > e.TerminationDate;"),
-    ("register_approvers",
-     "-- Tutorial 12.3, test H10: who approves the payroll registers\n"
-     "-- Population: all payroll registers; expected: approval shared",
-     "SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS RegistersApproved,\n"
-     "    SUM(CASE WHEN pr.ApprovedDate = pp.PayDate THEN 1 ELSE 0 END)\n"
-     "        AS ApprovedOnPayDate\n"
-     "FROM PayrollRegister AS pr\n"
-     "    INNER JOIN PayrollPeriod AS pp\n"
-     "        ON pp.PayrollPeriodID = pr.PayrollPeriodID\n"
-     "    INNER JOIN Employee AS e ON e.EmployeeID = pr.ApprovedByEmployeeID\n"
-     "GROUP BY e.EmployeeID, e.JobTitle;"),
-    ("payroll_approval",
-     "-- Tutorial 12.3, test H11: registers and payments against approval\n"
-     "-- Population: all registers and payments; expected: no rows",
-     "SELECT 'Register approved by its own employee' AS Test,\n"
-     "    COUNT(*) AS Records, ROUND(SUM(pr.NetPay), 2) AS NetPay\n"
-     "FROM PayrollRegister AS pr\n"
-     "WHERE pr.EmployeeID = pr.ApprovedByEmployeeID\n"
-     "UNION ALL\n"
-     "SELECT 'Payment made before approval', COUNT(*),\n"
-     "    ROUND(SUM(pr.NetPay), 2)\n"
-     "FROM PayrollPayment AS pay\n"
-     "    INNER JOIN PayrollRegister AS pr\n"
-     "        ON pr.PayrollRegisterID = pay.PayrollRegisterID\n"
-     "WHERE pay.PaymentDate < pr.ApprovedDate;"),
 ]
 CHAPTER12 = db.Script(HEADER, QUERIES, "Audit.sql")
 
@@ -599,7 +592,7 @@ def fig_12_02() -> Diagram:
     rows = db.run(sql("trace"))[1]
     assert len(rows) == 6 and {r[0] for r in rows} == {"Posting with no payroll payment"}, rows
     assert sorted({r[2][:7] for r in rows}) == ["2024-01", "2025-01", "2026-01"], rows
-    out = CHAPTER12.mock(d, "trace", [320, 130, 150, 150], lines=slice(0, 22))
+    out = CHAPTER12.mock(d, "trace", [320, 130, 150, 150], lines=slice(0, 22), compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 0)])
     note(d, "The editor shows the first two of the four tests; the query continues below. Outlined: every "
             "row comes from the first test, and the other three return none.", out["bottom"] + 8, 40)
@@ -617,7 +610,7 @@ def fig_12_03() -> Diagram:
     assert not q("SELECT 1 FROM Shipment WHERE strftime('%Y', DeliveryDate) <> strftime('%Y', ShipmentDate)")
     cl = comment_lines("revenue_cutoff")
     start = cl + sql("revenue_cutoff").split("\n").index("Classified AS (")
-    out = CHAPTER12.mock(d, "revenue_cutoff", [300, 130, 110, 150], lines=slice(start, None))
+    out = CHAPTER12.mock(d, "revenue_cutoff", [300, 130, 110, 150], lines=slice(start, None), compact=True)
     marks = [i for i, r in enumerate(rows) if r[0] == "Revenue posted in another year"]
     db.emphasize_cells(d, out["geometry"], [(marks[0], 0), (marks[-1], 3)])
     note(d, "The editor is scrolled past the two CTEs that find each invoice's shipment and posting dates. "
@@ -672,15 +665,18 @@ def fig_12_04() -> Diagram:
     d.arrow(isum, result, exit=(0.5, 1), entry=(0.9, 0))
     oy = cy + 90
     d.text("<b>The status of a purchase order line after the comparison</b>", 0, oy, 860, 20, size=SMALL)
-    outcomes = [("Matched", "ordered = received = invoiced", "complete"),
+    # in the order the CASE of test P1 tests them, so that no exception hides under a normal status
+    outcomes = [("Exception: invoiced above received", "invoiced above received", "investigate"),
+                ("Exception: received above ordered", "received above ordered", "investigate"),
                 ("Not yet received", "nothing received", "an open order"),
-                ("Partly received", "received below ordered", "an open order"),
                 ("Received, not fully invoiced", "invoiced below received",
                  "an accrual: goods received not invoiced"),
-                ("Exception: invoiced above received", "invoiced above received", "investigate"),
-                ("Exception: received above ordered", "received above ordered", "investigate")]
-    d.grid(0, oy + 22, ["Status", "Condition", "Meaning"], [290, 250, 320], outcomes,
-           highlight={(5, 0), (6, 0)})
+                ("Partly received", "received below ordered", "an open order"),
+                ("Matched", "ordered = received = invoiced", "complete")]
+    case_order = [line.split("'")[1] for line in sql("match_status").split("\n") if "THEN '" in line]
+    assert [o[0] for o in outcomes] == case_order + ["Matched"], case_order
+    d.grid(0, oy + 22, ["Status, in the order tested", "Condition", "Meaning"], [290, 250, 320], outcomes,
+           highlight={(1, 0), (2, 0)})
     split_id = split[0][0]
     split_qty = split[0][2]
     parts = [i[2] for i in invoices if i[1] == split_id]
@@ -701,7 +697,7 @@ def fig_12_05() -> Diagram:
     assert status["Matched"] > 0.9 * sum(status.values())
     cl = comment_lines("match_status")
     start = cl + sql("match_status").split("\n").index("SELECT")
-    out = CHAPTER12.mock(d, "match_status", [360, 140], lines=slice(start, None))
+    out = CHAPTER12.mock(d, "match_status", [360, 140], lines=slice(start, None), compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 1)])
     note(d, "The editor is scrolled past the three CTEs, which sum the quantities received and invoiced for "
             "each purchase order line. Outlined: four statuses, and neither exception status appears.",
@@ -716,7 +712,7 @@ def fig_12_06() -> Diagram:
     assert counts == {"Above approver limit": 13, "Self-approved": 9, "Approved after termination": 3}, counts
     detail = db.run(sql("approval_detail"))[1]
     assert len(detail) == 14 and sum(1 for r in detail if ";" in r[7]) == 11, detail
-    out = CHAPTER12.mock(d, "approval_summary", [300, 120, 160])
+    out = CHAPTER12.mock(d, "approval_summary", [300, 120, 160], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 2)])
     note(d, "Outlined: the three tests, with the number of purchase orders each flags and their value. "
             "Most of the fourteen orders fail two tests.", out["bottom"] + 8, 40)
@@ -737,14 +733,14 @@ def fig_12_07() -> Diagram:
         if key:
             assert {k.strip() for k in key.split(",")} <= columns, (table, key)
     assert "LaborTimeEntryID" in {r[1] for r in q("PRAGMA table_info(PayrollRegisterLine)")}
-    tests = [("Overtime above half an hour is approved; no day on which everyone clocks the same hours",
-              "Tutorial 12.3, Steps 4 and 5"),
+    tests = [("Profiled; overtime above half an hour is approved; no day on which everyone clocks the "
+              "same hours", "Tutorial 12.3, Steps 1, 6, and 7"),
              ("Its hours equal the clock entry's; direct time recorded while its operation was open",
-              "Tutorial 12.3, Steps 1, 6, and 7"),
-             ("Pays its own employee's approved time, while employed; not approved by that employee",
-              "Tutorial 12.3, Steps 3, 8, and 9"),
+              "Tutorial 12.3, Steps 2, 8, and 9"),
+             ("Pays its own employee's approved time at the employee's rate; not approved by that employee",
+              "Tutorial 12.3, Steps 4 and 5; Exercise 12.5"),
              ("One payment for each approved register, made after its ApprovedDate",
-              "Tutorials 12.1 and 12.3"),
+              "Tutorial 12.1; Exercise 12.5"),
              ("Every payment posting traces to a payment; unpaid wages accrued at the year-end",
               "Tutorial 12.1, Steps 3 and 8")]
     w, gap = 148, 30
@@ -755,7 +751,7 @@ def fig_12_07() -> Diagram:
         boxes.append(d.box(f"<b>{table}</b><br>{esc(what)}{via}", x, 24, w, 130, fill=BLUE_TINT,
                            stroke=BLUE, size=SMALL))
         test, where = tests[i]
-        d.box(f"<b>Test</b><br>{esc(test)}<br><i>{esc(where)}</i>", x, 190, w, 150, fill=GRAY_TINT,
+        d.box(f"<b>Test</b><br>{esc(test)}<br><i>{esc(where)}</i>", x, 190, w, 170, fill=GRAY_TINT,
               stroke=GRAY, size=SMALL, align="left", valign="top")
     d.text("<b>The records</b>", 0, 0, 300, 20, size=SMALL)
     d.text("<b>The test of each record</b>", 0, 166, 300, 20, size=SMALL)
@@ -763,7 +759,7 @@ def fig_12_07() -> Diagram:
         posting = i == len(boxes) - 2
         d.arrow(boxes[i], boxes[i + 1], color=AMBER if posting else GRAY, dashed=posting,
                 exit=(1, 0.5), entry=(0, 0.5))
-    ly = 360
+    ly = 380
     d.line_sample(0, ly + 10, 50, color=GRAY, end="blockThin")
     d.text("one record leads to the next, linked by the key named in the box", 60, ly, 380, 22, size=SMALL)
     d.line_sample(460, ly + 10, 50, color=AMBER, dashed=True, end="blockThin")
@@ -772,7 +768,7 @@ def fig_12_07() -> Diagram:
 
 
 def fig_12_08() -> Diagram:
-    d = Diagram("Days on Which Every Manufacturing Employee Clocked the Same Hours")
+    d = Diagram("Days on Which Every Hourly Manufacturing Employee Clocked the Same Hours")
     rows = db.run(sql("surge_days"))[1]
     assert [r[0] for r in rows] == ["2024", "2025", "2026"], rows
     assert [r[1] for r in rows] == [12, 32, 49] and {r[2] for r in rows} == {64}, rows
@@ -789,15 +785,79 @@ def fig_12_08() -> Diagram:
                   "WHERE e2.CostCenterID = 4 GROUP BY tc2.WorkDate "
                   "HAVING COUNT(DISTINCT tc2.RegularHours + tc2.OvertimeHours) = 1 AND COUNT(*) > 1)")
     assert approvers == [(4, 1)], approvers        # the Production Manager, on the work date
-    out = CHAPTER12.mock(d, "surge_days", [110, 110, 170, 150, 130])
+    out = CHAPTER12.mock(d, "surge_days", [110, 110, 170, 150, 130], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 1), (len(rows) - 1, 1)])
     db.emphasize_cells(d, out["geometry"], [(-1, 4), (len(rows) - 1, 4)])
-    note(d, "Outlined: the days on which every one of the 64 manufacturing employees clocked the same hours, and "
-            "their share of the year's manufacturing overtime.", out["bottom"] + 8, 40)
+    hourly = one("SELECT COUNT(*) FROM Employee e JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID "
+                 "WHERE cc.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly'")[0]
+    assert hourly == 64, hourly
+    note(d, "Outlined: the days on which every one of the 64 hourly manufacturing employees clocked the same hours, "
+            "and their share of the year's manufacturing overtime.", out["bottom"] + 8, 40)
     return d
 
 
+NORMAL_DAY, SURGE_DAY = "2024-03-12", "2026-06-10"
+SAMPLE_EMPLOYEES = (17, 18, 19, 20, 21, 22)          # six hourly Assemblers
+
+
 def fig_12_09() -> Diagram:
+    d = Diagram("A Day Before the Surge Days and a Surge Day")
+    marks = ",".join("?" * len(SAMPLE_EMPLOYEES))
+    staff = q(f"SELECT DISTINCT e.JobTitle, e.PayClass, cc.CostCenterName FROM Employee e JOIN CostCenter cc "
+              f"ON cc.CostCenterID = e.CostCenterID WHERE e.EmployeeID IN ({marks})", *SAMPLE_EMPLOYEES)
+    assert staff == [("Assembler", "Hourly", "Manufacturing")], staff
+    first_surge = one("SELECT MIN(WorkDate) FROM (SELECT tc.WorkDate FROM TimeClockEntry tc JOIN Employee e "
+                      "ON e.EmployeeID = tc.EmployeeID WHERE e.CostCenterID = 4 GROUP BY tc.WorkDate HAVING "
+                      "COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(*) > 1)")[0]
+    assert NORMAL_DAY < first_surge, first_surge
+
+    def stats(day: str) -> tuple:
+        return one("SELECT COUNT(*), COUNT(DISTINCT tc.ClockInTime), "
+                   "COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours), "
+                   "SUM(CASE WHEN tc.OvertimeHours > 0 THEN 1 ELSE 0 END), SUM(tc.OvertimeHours) "
+                   "FROM TimeClockEntry tc JOIN Employee e ON e.EmployeeID = tc.EmployeeID "
+                   "JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID "
+                   "WHERE cc.CostCenterName = 'Manufacturing' AND tc.WorkDate = ?", day)
+
+    def rows(day: str) -> list[tuple]:
+        out = []
+        for emp, cin, cout, reg, ot, approver, when in q(
+                "SELECT tc.EmployeeID, substr(tc.ClockInTime, 12, 5), substr(tc.ClockOutTime, 12, 5), "
+                "tc.RegularHours, tc.OvertimeHours, ap.JobTitle, oa.ApprovedDate FROM TimeClockEntry tc "
+                "LEFT JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = tc.OvertimeApprovalID "
+                "LEFT JOIN Employee ap ON ap.EmployeeID = oa.ApprovedByEmployeeID "
+                f"WHERE tc.WorkDate = ? AND tc.EmployeeID IN ({marks}) ORDER BY tc.EmployeeID",
+                day, *SAMPLE_EMPLOYEES):
+            approval = ("no overtime" if not ot else
+                        f"{approver}, on the work date" if when == day else f"{approver}, {when}" if approver
+                        else "no approval")
+            out.append((str(emp), cin, cout, f"{reg:.2f}", f"{ot:.2f}", approval))
+        assert len(out) == len(SAMPLE_EMPLOYEES), (day, out)
+        return out
+
+    normal, surge = stats(NORMAL_DAY), stats(SURGE_DAY)
+    assert normal[0] == surge[0] == 64 and normal[2] > 20 and surge[2] == 1 and surge[3] == 64, (normal, surge)
+    heads = ["Employee", "Clock in", "Clock out", "Regular", "Overtime", "Overtime approved by"]
+    widths = [110, 110, 110, 110, 110, 310]
+    y = 0
+    for day, title, st, highlight in [
+            (NORMAL_DAY, "12 March 2024, before the first surge day", normal, None),
+            (SURGE_DAY, "10 June 2026, a surge day", surge, {(r, c) for r in range(1, 7) for c in (1, 2, 3, 4)})]:
+        d.text(f"<b>{title}</b>", 0, y, 860, 20, size=SMALL)
+        d.grid(0, y + 22, heads, widths, rows(day), highlight=highlight)
+        y += 22 + ROW_H * 7 + 6
+        clock_ins = f"{st[1]} different clock-in times" if st[1] > 1 else "one clock-in time"
+        hours = f"{st[2]} different numbers of hours" if st[2] > 1 else "one number of hours"
+        d.text(f"All {st[0]} hourly manufacturing employees: {clock_ins}, {hours}; {st[3]} worked overtime, "
+               f"{st[4]:,.1f} hours in all.", 0, y, 860, 22, size=SMALL)
+        y += 44
+    note(d, "The same six Assemblers on both days; a clock-out after midnight falls on the next day. Highlighted: "
+            "the identical times and hours of the surge day, when the two shifts clocked in at the same minutes.",
+         y, 40)
+    return d
+
+
+def fig_12_10() -> Diagram:
     d = Diagram("Direct Labor Recorded After Its Operation Ended")
     rows = db.run(sql("late_by_year"))[1]
     shares = [r[3] for r in rows]
@@ -807,25 +867,26 @@ def fig_12_09() -> Diagram:
     assert on_surge == sorted(on_surge) and on_surge[0] > 0.7 and on_surge[2] > 0.85, on_surge
     cl = comment_lines("late_by_year")
     start = cl + sql("late_by_year").split("\n").index("SELECT strftime('%Y', lt.WorkDate) AS WorkYear,")
-    out = CHAPTER12.mock(d, "late_by_year", [100, 120, 100, 140, 200], lines=slice(start, None))
+    out = CHAPTER12.mock(d, "late_by_year", [100, 120, 100, 140, 200], lines=slice(start, None),
+                         compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 3), (len(rows) - 1, 4)])
-    note(d, "The editor is scrolled past the CTE that lists the surge days of test H6. Outlined: the share of "
+    note(d, "The editor is scrolled past the CTE that lists the surge days of test H8. Outlined: the share of "
             "direct hours recorded after the operation ended, and the part of them recorded on surge days.",
          out["bottom"] + 8, 40)
     return d
 
 
-def fig_12_10() -> Diagram:
+def fig_12_11() -> Diagram:
     d = Diagram("The Start of an Audit Query Library")
     for key, _, text in QUERIES:                 # every test of the script runs
         db.run(text)
-    lines = CHAPTER12.text().split("\n")
-    shown = "\n".join(lines[:36])
-    y = db.window(d)
-    bottom = db.editor(d, 0, y, 860, shown, tab="Audit.sql")
+    comment, text, line = CHAPTER12.location("je_population")
+    end = line - 1 + comment.count("\n") + 1 + text.count("\n") + 1   # the header and test L1
+    shown = "\n".join(CHAPTER12.text().split("\n")[:end])
+    bottom = db.editor(d, 0, 0, 860, shown, tab="Audit.sql", toolbar=False)
     note(d, "The header records the purpose, the data, and who prepared and reviewed the script. Each test "
             "begins with a comment that names it and states its population and expected result. The script "
-            "continues below the lines shown.", bottom + 8, 40)
+            "continues with the other tests below the lines shown.", bottom + 8, 40)
     return d
 
 
@@ -838,6 +899,7 @@ FIGURES = {
     "fig-12-06-approval-exceptions": fig_12_06,
     "fig-12-07-labor-record-chain": fig_12_07,
     "fig-12-08-surge-days": fig_12_08,
-    "fig-12-09-labor-after-operation-end": fig_12_09,
-    "fig-12-10-audit-library": fig_12_10,
+    "fig-12-09-normal-and-surge-day": fig_12_09,
+    "fig-12-10-labor-after-operation-end": fig_12_10,
+    "fig-12-11-audit-library": fig_12_11,
 }

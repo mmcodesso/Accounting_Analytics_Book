@@ -2,7 +2,7 @@
 
 **Context and objective.** The WorkOrderClose table records each variance but not the product that produced it. In this tutorial, you will join the closes to their work orders and items, test that every close finds its match, and summarize the variance by item group and year. You will check the total against the ledger, keep the items that carry the most variance with HAVING, and list every manufactured item with a left join, including the items with no closes.
 
-**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter10.sql` beside your working copy. As in Chapter 9, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
+**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter09.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter10.sql` beside your working copy. As in Chapter 9, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
 
 ```sql
 /* Chapter 10: manufacturing variance, joined and summarized
@@ -104,7 +104,7 @@ b. For each item group, compare the three years of TotalVariance and of Closes.
 
 The result, shown in @fig-10-03, holds one row for each group and year. Furniture's variance rose in each year, to nearly twice its fiscal 2024 level, and Lighting's rose too, while Textiles rose and then fell back in fiscal 2026. In every group, the number of closes fell over the same period, so a larger variance was spread over fewer work orders. The overhead part moves with the total in each group.
 
-![The Manufacturing Variance by Item Group and Year.](/visuals/svg/fig-10-03-variance-by-group-year.svg){#fig-10-03 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins WorkOrderClose to WorkOrder and Item and groups the closes by item group and close year, with the number of closes, the total variance, and the overhead variance. The result holds nine rows, three years each for Furniture, Lighting, and Textiles. The Furniture rows, whose total variance rises in each year while the number of closes falls, are outlined."}
+![The Manufacturing Variance by Item Group and Year.](/visuals/svg/fig-10-03-variance-by-group-year.svg){#fig-10-03 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins WorkOrderClose to WorkOrder and Item and groups the closes by item group and close year, with the number of closes, the total variance, and the overhead variance. The result holds nine rows, three years each for Furniture, Lighting, and Textiles. The Furniture rows, whose total variance rises in each year while the number of closes falls, are outlined."}
 
 **Step 5. Keep the items that carry the most variance.** WHERE keeps the closes of fiscal 2026, and HAVING then keeps the items whose total passes a threshold. Group by the item's key, and include its code and name so that the result is readable.
 
@@ -150,7 +150,7 @@ b. Read the number of rows and the first rows of the result.
 c. Move the date condition from the ON clause to the WHERE clause, by deleting it from the second join and adding `AND woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'` to the WHERE clause, and run the query again.
 d. Compare the number of rows with item b, and then move the condition back into the ON clause.
 
-The query of item a returns one row for every manufactured item, and the first rows show a handful with no closes at all, each counted as zero by `COUNT(woc.WorkOrderCloseID)`. They are discontinued items. With the date condition in WHERE, those items disappear, because their close columns are NULL and a NULL CloseDate is not in any range. The left join has become an inner join, the trap of the section on left joins.
+The query of item a returns one row for every manufactured item, and the first rows show a handful with no closes at all, each counted as zero by `COUNT(woc.WorkOrderCloseID)`. They are discontinued items. With the date condition in WHERE, those items disappear, because their close columns are NULL, like the unmatched row of the left join in @fig-10-01, and a NULL CloseDate is not in any range. The left join has become an inner join, the trap of the section on left joins.
 
 **Checkpoint.** Check that:
 
