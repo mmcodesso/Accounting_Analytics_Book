@@ -39,6 +39,7 @@ book:
         - chapters/10-joining-and-summarizing/chapter.qmd
         - chapters/11-analytical-queries/chapter.qmd
         - chapters/12-sql-audit-analytics/chapter.qmd
+        - cases/part-3-case.qmd
     - part: "Data Visualization and Power BI"
     - part: "Integrated and Applied Topics"
 
