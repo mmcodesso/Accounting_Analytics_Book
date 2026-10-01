@@ -1,0 +1,35 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Alternative text.** A short description attached to a visual or image that a screen reader announces in its place. In Power BI it is set under General in a visual's format settings, and it should state what the visual shows and what it means.
+
+**Cognitive fit.** The match between the way information is presented and the task its reader performs. Graphs fit tasks that depend on patterns and relationships, and tables fit tasks that depend on exact values. Performance is best when the two match.
+
+**Column profiling.** Power Query's summaries of the values in each column, shown as column quality (valid, error, and empty values), column distribution (distinct and unique values), and column profile (statistics and a value distribution). By default they describe only the first 1,000 rows of a query.
+
+**Cross-filtering.** The way a selection in one visual filters, or highlights, the other visuals on a Power BI report page. Edit interactions sets, for each pair of visuals, whether one filters the other, highlights it, or leaves it alone.
+
+**Dashboard.** In Power BI, a single page in the Power BI service that holds tiles pinned from one or more reports, so that a reader can watch the main figures in one place. Dashboards cannot be built in Power BI Desktop.
+
+**Dual-axis chart.** A chart that draws two series against two value scales, one on each side. Because each scale fits its own series, the relative position of the two series reflects the choice of scales, and readers are invited to compare magnitudes that are not comparable.
+
+**Implicit measure.** A calculation that Power BI creates when a column is placed in the value well of a visual, such as Sum of LineTotal or Count of SalesInvoiceID. Its summary can be changed in the visual, but it cannot divide one total by another.
+
+**Impression management.** The selective presentation of information to create a favorable impression, for example by graphing only the figures that improved or by drawing a graph that exaggerates a favorable trend.
+
+**Matrix visual.** A Power BI visual that summarizes values by categories on its rows and columns, with subtotals and levels that expand, much like a PivotTable.
+
+**Power BI Desktop.** Microsoft's free Windows application for building Power BI reports: loading and preparing data, relating tables in a semantic model, writing calculations, and laying out visuals.
+
+**Power BI service.** The website at app.powerbi.com where Power BI reports are published, shared, and read in a browser, and where dashboards are built.
+
+**Relationship.** In a Power BI model, a link between a column of one table and the matching column of another, such as SalesInvoiceLine.ItemID and Item.ItemID. A relationship has a cardinality and a direction in which filters flow, and it lets a visual combine columns from both tables without merging them.
+
+**Report.** In Power BI, one or more pages of interactive visuals built on a single semantic model, created in Power BI Desktop or the Power BI service.
+
+**Semantic model.** The tables, relationships, and calculations that a Power BI report reads. Power BI formerly called it a dataset.
+
+**Summarization.** The default way Power BI summarizes a column placed in a visual, such as Sum for an amount. A key, code, or year column is set to Don't summarize so that it acts as a category.
+
+**Visual encoding.** The way a visual turns a value into something the eye can judge, such as the position of a point, the length of a bar, the angle of a slice, the area of a circle, or a shade of color. Some encodings are judged far more accurately than others.

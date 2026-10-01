@@ -1,0 +1,138 @@
+## Guided Tutorial 13.1: Loading, Relating, and Reconciling the Sales Tables
+
+**Context and objective.** In this tutorial, you will start the report that you will build on throughout the Power BI chapters. You will load four Charles River Tables with Power Query, add the same kinds of custom columns you added in Chapters 5 and 6, and profile the invoice lines over the entire data set. You will then relate the tables in the model and reconcile the result to the control totals of Chapter 6 on a page that stays in the report as its validation page. The workbook is never changed, and the report can be refreshed whenever the data is.
+
+**Prerequisites.** You need Power BI Desktop, which is free, installed on a Windows computer. Install it from the Microsoft Store or from the Power BI website. The tutorials in this Part use the September 2026 release (version 2.158), and **Help > About** shows the version you have. Later releases may move a button or rename a setting. You also need CharlesRiver.xlsx, which Power BI reads directly, so you do not need to open it.
+
+**Step-by-step instructions.**
+
+**Step 1. Start the report and turn off two defaults.** As this chapter explained, you will create the relationships and the date table yourself.
+
+a. Start Power BI Desktop, and choose **Blank report** on the start screen.
+b. Choose **File > Options and settings > Options**.
+c. Under **Current File**, select **Data Load**.
+d. Clear **Auto date/time** and **Autodetect new relationships after data is loaded**, and click **OK**.
+e. Choose **File > Save as**, and save the report as `Charles River Reports.pbix` in the folder that holds CharlesRiver.xlsx.
+
+The two settings now apply to this report. The **Global** section of the same dialog sets the defaults for every new report, so clearing **Auto date/time for new files** there saves you this step next time.
+
+**Step 2. Choose the Tables in the Navigator.**
+
+a. Choose **Home > Get data > Excel workbook**, select CharlesRiver.xlsx, and click **Open**.
+b. In the **Navigator**, select the check boxes of four Tables, not the worksheets of the same names: **T4_Customer**, **T16_SalesInvoice**, **T17_SalesInvoiceLine**, and **T44_Item**.
+c. Click **Transform Data**.
+
+The **Navigator** lists the worksheets and the Tables of the workbook, as Excel's did in Tutorial 4.1 (@fig-04-02). The Power Query Editor opens with one query for each Table you selected.
+
+**Step 3. Rename the queries and keep the columns the report needs.** A query's name becomes the name of its table in the model.
+
+a. In the **Queries** pane, rename the queries `Customer`, `SalesInvoice`, `SalesInvoiceLine`, and `Item` by double-clicking each name and typing the new one.
+b. Select **Customer**, choose **Home > Choose Columns**, and keep CustomerID, CustomerName, CustomerSegment, and Region.
+c. In **SalesInvoice**, keep SalesInvoiceID, InvoiceNumber, InvoiceDate, and CustomerID.
+d. In **SalesInvoiceLine**, keep SalesInvoiceLineID, SalesInvoiceID, ItemID, Quantity, BaseListPrice, UnitPrice, Discount, LineTotal, PromotionID, and PricingMethod.
+e. In **Item**, keep ItemID, ItemCode, ItemName, ItemGroup, StandardCost, and ListPrice.
+
+Each query now ends with a Removed Other Columns step in its **Applied Steps** list.
+
+**Step 4. Keep the items Charles River sells, and set the date type.** As in Tutorial 4.1, the items with a blank ListPrice are ones Charles River buys, not sells.
+
+a. Select the **Item** query, click the filter button on the ListPrice column header, clear **(null)**, and click **OK**.
+b. Select the **SalesInvoice** query and look at the icon on the InvoiceDate column header. If the column shows a time as well as a date, such as 12:00:00 AM, click the icon and choose **Date**.
+
+The Item preview now holds only items with a list price. Step 11 confirms that no invoice line refers to any of the items you removed.
+
+**Step 5. Add the custom columns.** The custom columns in @tbl-13-02 give each invoice its fiscal year, quarter, and month, each invoice line its amount at list price and its discount, and each item its product type, the same columns you calculated in Chapters 5 and 6.
+
+a. Select the query named in the first row of the table, and choose **Add Column > Custom Column**.
+b. Type the name in **New column name** and the formula in **Custom column formula**, and click **OK**.
+c. Repeat the two actions for each of the other rows.
+d. Set each new column's data type with the icon at the left of its header: **Whole Number** for FiscalYear and FiscalQuarter, **Text** for Period, Month, and ProductType, and **Decimal Number** for ListAmount and DiscountAmount.
+
+| Query | New column name | Custom column formula |
+|---------|---------------|-----------------------------|
+| SalesInvoice | `FiscalYear` | `Date.Year([InvoiceDate])` |
+| SalesInvoice | `FiscalQuarter` | `Date.QuarterOfYear([InvoiceDate])` |
+| SalesInvoice | `Period` | `Text.From([FiscalYear]) & "-Q" & Text.From([FiscalQuarter])` |
+| SalesInvoice | `Month` | `Date.ToText([InvoiceDate], "yyyy-MM")` |
+| SalesInvoiceLine | `ListAmount` | `[Quantity] * [BaseListPrice]` |
+| SalesInvoiceLine | `DiscountAmount` | `[Quantity] * [UnitPrice] * [Discount]` |
+| Item | `ProductType` | `Text.Middle([ItemCode], 4, 3)` |
+
+: Custom columns for the Charles River Reports queries {#tbl-13-02}
+
+`Date.ToText` writes the date in the format given, so Month reads like 2026-09, which sorts in calendar order as text. The amounts are left unrounded, as in Chapter 6, so that their totals match the analysis workbook.
+
+**Step 6. Profile the invoice lines over the entire data set.**
+
+a. Select the **SalesInvoiceLine** query.
+b. On the **View** tab, select **Column quality** and **Column distribution**.
+c. Read the bars under the PromotionID and Discount headers.
+d. Click **Column profiling based on top 1000 rows** in the status bar at the bottom of the editor, and choose **Column profiling based on entire data set**.
+e. Read the two columns again.
+f. Record the share of PromotionID that is empty and the number of distinct values of Discount, on both bases.
+
+On the first 1,000 rows, PromotionID is empty everywhere and Discount has a single value. On the entire data set, part of PromotionID is filled and Discount has four values, as @fig-13-03 shows. Profiling the whole population takes longer, but it is the profile you can rely on.
+
+**Step 7. Load the data.**
+
+a. Choose **Home > Close & Apply**. Loading takes a minute or more, because Power BI reads each Table from a large workbook.
+b. Select **Table view** in the bar on the left, and select **SalesInvoiceLine** in the **Data** pane.
+c. Read the number of rows in the status bar.
+
+The invoice lines appear in a grid, and the status bar reports the number of rows, the same number of invoice lines that the workbook's SalesInvoiceLine Table holds. If loading stops with an error, return to the Power Query Editor with **Home > Transform data** and look for a step that fails.
+
+**Step 8. Relate the tables in Model view.**
+
+a. Select **Model view** in the bar on the left.
+b. Drag SalesInvoiceID from the **SalesInvoiceLine** table onto SalesInvoiceID in the **SalesInvoice** table.
+c. Drag ItemID from **SalesInvoiceLine** onto ItemID in **Item**.
+d. Drag CustomerID from **SalesInvoice** onto CustomerID in **Customer**.
+
+Each drag creates a relationship, drawn as a line with 1 at the table that holds the key and an asterisk at the table that refers to it. If a dialog opens instead, check that **Cardinality** reads **Many to one (\*:1)** and **Cross filter direction** reads **Single**, and confirm it. Drag the tables into the arrangement of @fig-13-04, with SalesInvoiceLine in the middle, so that the relationships are easy to check.
+
+**Step 9. Set how the year and the amounts are shown.** Power BI would otherwise sum the years and show the amounts without separators.
+
+a. Select **Table view**, select **SalesInvoice** in the **Data** pane, and click the FiscalYear column header.
+b. On the **Column tools** tab, set **Summarization** to **Don't summarize**.
+c. Do the same for FiscalQuarter.
+d. Select **SalesInvoiceLine**, click the LineTotal header, and on **Column tools** select the thousands separator button and set the decimal places to 2.
+e. Format ListAmount and DiscountAmount in the same way.
+
+FiscalYear and FiscalQuarter now act as categories in every visual, and the three amounts appear as 1,234.56.
+
+**Step 10. Reconcile the model to Chapter 6.** A report is reconciled before anyone reads it.
+
+a. Select **Report view**, double-click the page tab at the bottom, and rename the page `Validation`.
+b. Select **Table** in the **Visualizations** pane, and drag FiscalYear, SalesInvoiceLineID, LineTotal, ListAmount, and DiscountAmount into its **Columns** well.
+c. Click the arrow beside SalesInvoiceLineID in the well and choose **Count**.
+d. Compare the fiscal 2026 row with the invoice line count and line total of fiscal 2026 in your Chapter 6 analysis workbook.
+
+The fiscal 2026 row should match Chapter 6 to the cent, and its list amount and discounts should match the gross-to-net figures of the Part II case.
+
+**Step 11. Check for a blank item group.** A blank category would mean that some invoice lines found no item.
+
+a. Add a second table visual with ItemGroup from Item and LineTotal.
+b. Look for a row labeled (Blank).
+c. Save the report.
+
+@fig-13-05 shows the finished page. The item group table should have five rows and no (Blank) row, which confirms that every invoice line found its item after the filter of Step 4.
+
+![The Validation Page of the Charles River Reports File.](/visuals/svg/fig-13-05-validation-page.svg){#fig-13-05 fig-alt="A mock of a report page named Validation in Power BI Desktop. A table visual lists fiscal years 2024, 2025, and 2026 with the count of invoice lines, the sum of LineTotal, the sum of ListAmount, and the sum of DiscountAmount for each, and a total row. The fiscal 2026 row is outlined. A second table lists the five item groups, Accessories, Furniture, Lighting, Services, and Textiles, with their line totals and no blank row."}
+
+<!-- Tutorial 13.1 expected values (read-only twin, pbi_ch13.py): rows loaded: SalesInvoiceLine 27,933; SalesInvoice 20,914;
+     Item 223 after the ListPrice filter (266 before); Customer 220. No invoice line refers to an item with a blank ListPrice,
+     and every line finds its invoice, item, and customer. Validation table: 2024 9,040 lines, 27,313,723.48, list 30,596,029.91,
+     discounts 126,607.64; 2025 9,371, 29,376,702.28, 33,030,575.85, 234,534.72; 2026 9,522, 29,756,420.08, 33,589,137.45,
+     362,110.75 (Chapter 6 control total and the Part II case gross to net); total 27,933, 86,446,845.84. Item groups (all years):
+     no (Blank) row. Profile (Step 6): first 1,000 lines (dated 2024-01-01 to 2024-02-29) PromotionID 100% empty, Discount 1
+     distinct value (0); entire data set: PromotionID empty on 25,825 of 27,933 lines (92%), Discount 4 distinct values
+     (0, 0.08, 0.10, 0.12). -->
+
+**Checkpoint.** Before you build on the model, confirm the following:
+
+- The model holds four tables, Customer, SalesInvoice, SalesInvoiceLine, and Item, joined by three one-to-many relationships whose filters flow toward the invoice lines.
+- The profile on the entire data set differs from the profile on the first 1,000 rows, and you recorded both.
+- The fiscal 2026 row of the Validation page matches the invoice line count and line total of Chapter 6.
+- No item group appears as (Blank), and FiscalYear is shown, not summed.
+
+A model that reproduces the totals you already trust is ready for its first report page. The Validation page stays in the file, so that anyone who opens the report later can see that it was reconciled, and to what.

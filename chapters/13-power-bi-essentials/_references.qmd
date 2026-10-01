@@ -1,0 +1,25 @@
+{{< pagebreak >}}
+
+## References
+
+Beattie, V., & Jones, M. J. (1992). The use and abuse of graphs in annual reports: Theoretical framework and empirical study. *Accounting and Business Research*, *22*(88), 291–303. <https://doi.org/10.1080/00014788.1992.9729446>
+
+Beattie, V., & Jones, M. J. (2002). Measurement distortion of graphs in corporate reports: An experimental study. *Accounting, Auditing & Accountability Journal*, *15*(4), 546–564. <https://doi.org/10.1108/09513570210440595>
+
+Cleveland, W. S., & McGill, R. (1984). Graphical perception: Theory, experimentation, and application to the development of graphical methods. *Journal of the American Statistical Association*, *79*(387), 531–554. <https://doi.org/10.1080/01621459.1984.10478080>
+
+Dilla, W., Janvrin, D. J., & Raschke, R. (2010). Interactive data visualization: New directions for accounting information systems research. *Journal of Information Systems*, *24*(2), 1–37. <https://doi.org/10.2308/jis.2010.24.2.1>
+
+Few, S. (2008, March). *Dual-scaled axes in graphs: Are they ever the best solution?* Visual Business Intelligence Newsletter. Perceptual Edge. <https://www.perceptualedge.com/articles/visual_business_intelligence/dual-scaled_axes.pdf>
+
+Microsoft. (2025a). *Combo chart in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-combo-chart>
+
+Microsoft. (2025b). *Intro to dashboards for Power BI designers*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards>
+
+Microsoft. (2025c). *Using the data profiling tools*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/data-profiling-tools>
+
+Microsoft. (2026). *Design Power BI reports for accessibility*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-accessibility-creating-reports>
+
+Vessey, I. (1991). Cognitive fit: A theory-based analysis of the graphs versus tables literature. *Decision Sciences*, *22*(2), 219–240. <https://doi.org/10.1111/j.1540-5915.1991.tb00344.x>
+
+World Wide Web Consortium. (2023). *Web content accessibility guidelines (WCAG) 2.2*. <https://www.w3.org/TR/WCAG22/>

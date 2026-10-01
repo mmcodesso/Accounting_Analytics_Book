@@ -1,0 +1,91 @@
+## Guided Tutorial 13.3: Correcting Three Misleading Charts
+
+**Context and objective.** Before the report goes to the managers, the controller asks you to review the charts a colleague drafted for the next sales meeting. Each one is built from correct numbers, and each one invites a wrong conclusion. In this tutorial, you will rebuild the three charts on a review page, see how each misleads, correct it, and make the corrected page accessible.
+
+**Prerequisites.** You need Charles River Reports.pbix from Tutorials 13.1 and 13.2.
+
+**Step-by-step instructions.**
+
+**Step 1. Chart fiscal 2026 revenue by month.** The first draft chart shows a month-by-month view of the year.
+
+a. Add a page and rename it `Review`.
+b. Add a **Line chart** with Month from SalesInvoice in **X-axis** and LineTotal in **Y-axis**.
+c. Drag FiscalYear into the **Filters on this visual** section of the **Filters** pane, and select **2026**.
+d. Read the value axis: the lowest and highest values it shows.
+
+The line swings from the bottom of the chart to the top and back again, as if revenue lurched from month to month. The axis begins just below the weakest month, so the chart's whole height covers the gap between the weakest and the strongest month, which is a small fraction of a month's revenue.
+
+**Step 2. Start the axis at zero.**
+
+a. With the chart selected, select **Format visual**, and expand **Y-axis** and then **Range**.
+b. Type `0` in **Minimum**.
+c. Set the title under **General > Title** to `Monthly revenue, fiscal 2026`.
+
+@fig-13-08 shows the chart before and after. From zero, the same line runs almost level across the year, which is a faithful picture of a year in which no month was far from the average.
+
+![The Same Monthly Revenue on Two Value Axes.](/visuals/svg/fig-13-08-value-axis.svg){#fig-13-08 fig-alt="Two mocks of a Power BI line chart of Charles River's monthly revenue in fiscal 2026. In the upper chart, the value axis starts just below the weakest month, and the line swings across the full height of the chart. In the lower chart, the value axis starts at zero, and the same line runs nearly level, with the monthly differences small against the level of revenue. The minimum of each axis is outlined."}
+
+**Step 3. Check the starting point of a growth claim.** The second draft chart states that revenue grew by almost 80% between January 2024 and December 2026.
+
+a. Add a **Table** visual with Month and LineTotal.
+b. Read the revenue of January 2024, February 2024, and December 2026.
+c. Record the increase from January 2024 to December 2026, and from February 2024 to December 2026.
+
+The draft's claim is arithmetically true. January 2024 was the company's first month of recorded sales, with about half the usual number of invoices, so any comparison that starts there shows growth that the business did not experience. Measured from February 2024, the increase is a small fraction of the draft's.
+
+**Step 4. Compare whole years instead.**
+
+a. Add a **Clustered column chart** with FiscalYear in **X-axis** and LineTotal in **Y-axis**.
+b. Turn on **Data labels** in **Format visual**.
+c. Record the change from fiscal 2025 to fiscal 2026.
+
+The three columns show growth from fiscal 2024 to fiscal 2025, which still includes the start-up month, and almost none from fiscal 2025 to fiscal 2026. A whole fiscal year against a whole fiscal year is the comparison the reader can rely on. Delete the table visual from Step 3 when you have recorded its values.
+
+**Step 5. Build the third draft chart: revenue and discounts on two axes.**
+
+a. Add a **Line and clustered column chart** with Month in **X-axis**, LineTotal in **Column y-axis**, and DiscountAmount in **Line y-axis**.
+b. Filter the visual to fiscal 2026, as in Step 1.
+c. Read the two value axes, on the left and on the right.
+
+Power BI gives the discounts their own axis on the right, which starts at zero and ends just above the largest month's discount. The discount line rises to the height of the revenue columns in September and October, as if discounts that autumn rivaled revenue, as in the upper half of @fig-13-09.
+
+**Step 6. Put both series on one axis.**
+
+a. With the chart selected, select **Line chart** in the **Visualizations** pane.
+b. Check the wells: both LineTotal and DiscountAmount must be in **Y-axis**. If DiscountAmount is in **Secondary y-axis**, drag it into **Y-axis**, below LineTotal.
+c. Set the title to `Revenue and promotional discounts by month, fiscal 2026`.
+
+On one axis, the discounts appear at their true size: a line close to the bottom of the chart, rising a little in the autumn. Even in October, the month of the largest discounts, they were a small fraction of revenue.
+
+**Step 7. Give the discounts a chart of their own.** A reader who needs to see the pattern of the discounts should see it on its own scale, labeled as such.
+
+a. Copy the line chart with Ctrl+C and paste it with Ctrl+V.
+b. In the copy, remove LineTotal from the **Y-axis** well.
+c. Set the copy's title to `Promotional discounts by month, fiscal 2026`, and turn on the **Y-axis** title.
+d. Place the copy directly below the chart from Step 6, at the same width.
+
+The lower half of @fig-13-09 shows the corrected pair: revenue and discounts at their true relative size above, and the pattern of the discounts on their own labeled scale below.
+
+![Revenue and Discounts on Two Axes and Corrected.](/visuals/svg/fig-13-09-dual-axis.svg){#fig-13-09 fig-alt="Mocks of three Power BI charts of fiscal 2026 by month. The upper chart, a line and clustered column chart, shows revenue as columns on the left axis and discounts as a line on a second axis on the right, and the discount line climbs to the top of the revenue columns in September and October. Below it, the corrected pair: a line chart with revenue and discounts on one shared axis, where the discount line stays close to the bottom, and a separate line chart of discounts alone on its own labeled scale, with the autumn peak in September and October."}
+
+**Step 8. Make the review page accessible.**
+
+a. Select each chart in turn, and under **Format visual > General**, type alternative text in **Alt text** that says what the chart shows and what it means, such as `Monthly revenue in fiscal 2026 on an axis from zero. Revenue varied little from month to month.`
+b. Check that every title says what the chart shows and over which period.
+c. Save the report.
+
+<!-- Tutorial 13.3 expected values (read-only twin): fiscal 2026 monthly revenue from 2,260,980.22 (February) to 2,688,918.15
+     (January), mean 2,479,701.67; the range is 17% of the mean. Revenue: January 2024 1,408,516.50; February 2024 2,170,765.25;
+     December 2026 2,519,722.16; increase from January 2024 +78.9%, from February 2024 +16.1%. Fiscal years 27,313,723.48,
+     29,376,702.28, 29,756,420.08: +7.6% then +1.3%. January 2024 had 279 invoices against 512-639 in other months. Discounts as a
+     share of revenue in 2026 peak in October at 6.0% (136,935.59 of 2,297,493.18), then September 3.8% and November 3.0%. The
+     secondary axis appears automatically because the two ranges barely overlap (Microsoft Learn, combo chart page). -->
+
+**Checkpoint.** The review page should now hold three corrected charts. Confirm the following:
+
+- The monthly revenue chart starts at zero, and its title names the period.
+- You recorded the growth from January 2024 and from February 2024, and the change from fiscal 2025 to fiscal 2026, and can explain why they differ.
+- Revenue and discounts share one axis, and the discounts also have a chart of their own on a labeled scale.
+- Every chart has alternative text that states what it shows.
+
+None of the draft charts contained a wrong number. Each misled through a choice its author made by default or by habit: an axis, a starting point, a second scale. Those are the choices a reviewer checks first.

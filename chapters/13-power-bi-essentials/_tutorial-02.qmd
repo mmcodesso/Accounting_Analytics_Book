@@ -1,0 +1,93 @@
+## Guided Tutorial 13.2: Building the Sales and Discounts Page
+
+**Context and objective.** In this tutorial, you will build the page the controller asked for: what Charles River billed, what it would have billed at list price, and what the promotions gave away, by period, item group, product type, customer segment, and region. You will add cards, a line chart, a bar chart, a matrix, and slicers, explore the page by clicking, and find the place where a filter stops.
+
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 13.1, with its four related tables and the Validation page.
+
+**Step-by-step instructions.**
+
+**Step 1. Add the page.**
+
+a. Click the plus sign beside the page tabs at the bottom of Report view to add a page.
+b. Double-click its tab and rename it `Sales and Discounts`.
+c. Drag the tab to the left of **Validation**, so that the report opens on it.
+
+The report now has two pages, and the new one is empty.
+
+**Step 2. Add a slicer for the fiscal year.** The year slicer comes first because every other visual on the page depends on it.
+
+a. Select **Slicer** in the **Visualizations** pane, and drag FiscalYear from the SalesInvoice table into its **Field** well.
+b. Select **Format visual**, and under **Slicer settings** set **Style** to **Tile** and turn on **Single select**.
+c. Click **2026** in the slicer, and place it across the top of the page.
+
+The slicer shows the three fiscal years as buttons, with 2026 selected, and every visual you add from now on shows fiscal 2026.
+
+**Step 3. Add the cards.** A card visual can show several values, one card for each.
+
+a. Select **Card**, and drag LineTotal, ListAmount, and DiscountAmount from SalesInvoiceLine into its **Values** well.
+b. Drag SalesInvoiceID from the SalesInvoiceLine table, not from SalesInvoice, into **Values**, and choose **Count (Distinct)** from the arrow beside it.
+c. Double-click each field in the well and rename it for this visual: `Revenue`, `At list price`, `Discounts`, and `Invoices`.
+d. In **Format visual**, expand **Callout values** and set **Display units** to **None**.
+
+The four cards show fiscal 2026 in full, rather than abbreviated as millions. Revenue and invoices match the Validation page, and the gap between the list amount and revenue is the price reduction that Chapter 6 analyzed.
+
+**Step 4. Chart the discounts by month and by item group.**
+
+a. Select **Line chart**, drag Month from SalesInvoice into **X-axis** and DiscountAmount into **Y-axis**, and place the chart below the cards on the left.
+b. Select **Clustered bar chart**, drag ItemGroup from Item into **Y-axis** and DiscountAmount into **X-axis**, and place it on the right.
+c. In **Format visual > General > Title** for each chart, type a title that says what it shows: `Promotional discounts by month` and `Promotional discounts by item group`.
+
+The line is close to zero through August, then rises sharply in September and October, the months of the Furniture Seasonal Promotion, before falling back. The bar chart shows that almost all of the year's discounts were on Furniture.
+
+**Step 5. Add the matrix of revenue by product type.**
+
+a. Select **Matrix**, drag ItemGroup and then ProductType from Item into **Rows**, Period from SalesInvoice into **Columns**, and LineTotal into **Values**.
+b. Click the plus sign beside **Furniture** in the matrix to show its product types.
+c. Place the matrix across the bottom of the page.
+
+The matrix shows each item group's revenue by quarter, with totals, and the Furniture rows expand into the eight product types of Chapter 5.
+
+**Step 6. Add slicers for segment and region.**
+
+a. Add a **Slicer** with CustomerSegment from Customer, and set its **Style** to **Dropdown**.
+b. Add a second **Slicer** with Region, also as a drop-down.
+c. Place both beside the year slicer.
+
+@fig-13-06 shows the finished page. The page now answers the controller's question at a glance and lets a manager narrow it to one segment or region.
+
+![The Sales and Discounts Page.](/visuals/svg/fig-13-06-sales-discounts-page.svg){#fig-13-06 fig-alt="A mock of the Sales and Discounts report page for fiscal 2026. A tile slicer for the fiscal year has 2026 selected, and drop-down slicers for customer segment and region show All. Four cards show revenue, the amount at list price, discounts, and the number of invoices. A line chart of promotional discounts by month stays near zero until a sharp rise in September and October, and a bar chart of discounts by item group is dominated by Furniture. A matrix below lists revenue by item group and quarter, with Furniture expanded into its product types."}
+
+**Step 7. Explore the page by clicking.**
+
+a. Click the **Furniture** bar in the bar chart, and read the cards, the line chart, and the matrix.
+b. Click the bar again to clear the selection.
+c. Choose **Design Trade** in the segment slicer, and read the bar chart, then set the slicer back to all segments.
+
+With Furniture selected, the cards show Furniture's revenue, list amount, discounts, and invoices, and the line follows almost the same path as before, because nearly all the discounts were on Furniture. With Design Trade selected, the discount line peaks in November, the month of the Design Trade Customer Promotion, while the Furniture promotion still shows in September and October.
+
+**Step 8. Find where a filter stops.** The direction of a relationship decides which tables a filter reaches.
+
+a. Drag SalesInvoiceID from the **SalesInvoice** table into the card's **Values** well, and choose **Count (Distinct)**.
+b. Click the **Furniture** bar again, and compare the two invoice counts.
+c. Remove the field you added in this step from the well, and clear the selection.
+
+The count taken from SalesInvoiceLine falls to the invoices that contain a Furniture line. The count taken from SalesInvoice does not change at all. The Furniture selection filters the Item table, and the filter flows from Item to the invoice lines, but not from the invoice lines back to the invoices. A count that ignores a filter on the page looks plausible and is wrong, which is why the card in Step 3 counts invoices from the lines. Chapter 14 explains the direction of filters in full.
+
+**Step 9. Save the report.**
+
+<!-- Tutorial 13.2 expected values (fiscal 2026, read-only twin): cards Revenue 29,756,420.08; At list price 33,589,137.45;
+     Discounts 362,110.75; Invoices 7,171. Furniture selected: 17,395,054.38; 19,878,268.16; 347,864.64; 3,093 invoices with a
+     Furniture line; the SalesInvoice count stays 7,171. Discounts by month 2026: Jan 6,602.69; Feb 844.80; Mar 7,670.52;
+     Apr 14,950.85; May 6,751.62; Jun 822.35; Jul 0.00; Aug 356.75; Sep 95,996.97; Oct 136,935.59; Nov 73,447.23; Dec 17,731.36
+     (Furniture: Sep 95,996.97, Oct 136,935.59, Nov 66,155.58, Dec 14,369.30). Discounts by group: Furniture 347,864.64;
+     Lighting 7,825.54; Textiles 4,098.06; Accessories 2,322.51; Services 0. Design Trade: Furniture 48,988.07, Lighting 6,296.95,
+     Textiles 2,598.82, Accessories 1,789.63; by month Sep 9,393.41, Oct 12,409.04, Nov 27,595.87 (promotion 9 21,482.20), Dec 8,692.03. Furniture revenue by quarter (product types BKC, BNH, CON, CTB, DSK, NGT, SDB, TBL):
+     Q1 4,354,122.83; Q2 4,600,820.85; Q3 4,283,322.86; Q4 4,156,787.84 (the Part I case totals). -->
+
+**Checkpoint.** Before you move on, confirm that your page does the following:
+
+- With 2026 selected, the cards match the Validation page: revenue, list amount, discounts, and the number of invoices.
+- The discount line rises sharply in September and October, and the bar chart shows Furniture far ahead of the other groups.
+- Selecting Furniture changes the invoice count taken from the invoice lines but not one taken from the SalesInvoice table.
+
+The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. What it cannot show is how much the discounts cost in margin, because margin is a ratio of totals and the report has no measure for it yet.

@@ -1,0 +1,216 @@
+---
+title: "Power BI Essentials for Accounting Analytics"
+---
+
+
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
+
+After completing this chapter, you will be able to:
+
+1. Explain what a reporting tool such as Power BI adds to the spreadsheet and the query, and distinguish Power BI Desktop, the Power BI service, a report, and a dashboard.
+2. Load Charles River tables into Power BI Desktop with Power Query, profile their columns over the entire data set, and relate the tables in the model.
+3. Build cards, charts, matrices, and slicers, and explain how a visual summarizes a column and how the visuals on a page filter one another.
+4. Reconcile a report to control totals before anyone relies on it.
+5. Match a visual to the task its reader performs, and recognize and correct visuals that mislead through their axes, their scales, or the period they show.
+6. Design report pages that every reader can use, with sufficient contrast, meaning that never rests on color alone, and alternative text.
+:::
+
+
+## Opening Scenario {.unnumbered}
+
+It is spring 2027, and the fiscal 2026 statements are final. You are still the controller's staff accountant, and the requests that reach you have taken on a pattern. Every month the sales manager asks for revenue by customer segment, the marketing manager asks what the promotions cost, and the product managers ask how their item groups are doing. Each request produces another workbook, built from the same data and copied, filtered, and charted a little differently. Last month two of those workbooks reached the same meeting with different totals for the Furniture discounts, and nobody could say at once which one was right.
+
+The controller wants to stop producing answers one at a time. She asks you for a single report that the managers can open and explore for themselves: revenue, list prices, and promotional discounts, by item group, product type, customer segment, region, and period. "Two things before anyone sees it," she says. "It has to tie to the numbers we reported, the ones in your Chapter 6 workbook. And it can't mislead anyone. A chart that makes a flat year look like a crisis is worse than no chart at all." This chapter teaches you to build that report in Microsoft Power BI. You will load the Charles River sales tables, relate them, reconcile them, and build a first report page. Then you will examine three charts that tell the truth in a misleading way and correct them.
+
+
+## Why a Reporting Tool
+
+Parts II and III gave you two ways to answer an accounting question. A workbook holds an analysis and its evidence together, and a reviewer can trace every number to its formula. A saved query extracts exactly the rows an analysis needs, from tables of any size, and runs again on new data. Both produce an answer to the question that was asked. Neither is built for a reader who wants to ask the next question: the sales manager who sees the Furniture discounts and wants them by region, then by month, then for one customer segment. Each of those questions would return to you as a new request.
+
+A business intelligence tool, which Chapter 1 introduced, closes that gap. It holds the data in a model of related tables, puts interactive visuals on top of the model, and lets the reader change what the visuals show by clicking. Microsoft Power BI is the business intelligence platform this book uses. Power BI Desktop is a free Windows application in which you build a report: you load and prepare the data, relate the tables, define calculations, and lay out the visuals. The Power BI service is the website, at app.powerbi.com, where reports are published, shared, and opened in a browser. A report built in Desktop can be published to the service, where readers explore it without needing Desktop or a copy of the data. Publishing and sharing are the subject of Chapter 16.
+
+Power BI uses two words that are easy to confuse. A report is one or more pages of interactive visuals built on one semantic model, the tables, relationships, and calculations that the report reads. A dashboard, in Power BI's sense, is a single page in the Power BI service that holds tiles pinned from one or more reports, so that a reader can watch the main figures in one place and click through to the report behind each (Microsoft, 2025b). Dashboards exist only in the service. Everything you build in this Part starts as a report, and in everyday speech many people call any report page with charts a dashboard.
+
+@fig-13-01 shows the path from the data to a published report, and which chapter of this Part covers each step. Much of it is familiar. You loaded and prepared data with Power Query in Part II, and Power BI uses the same Power Query, with the same editor, the same applied steps, and the same M formulas. You related tables through their keys in Chapter 3 and merged them in Chapter 5. And the questions a report answers are the descriptive and diagnostic questions of Chapter 6.
+
+![From the Data to a Published Report.](/visuals/svg/fig-13-01-power-bi-workflow.svg){#fig-13-01 fig-alt="A flow of five steps from left to right. CharlesRiver.xlsx feeds Power Query, which loads and prepares the tables. The tables form the semantic model, with relationships and measures. The model feeds a report of interactive pages, and the report is published to the Power BI service, where it is shared and where dashboards can pin its visuals. The first four steps happen in Power BI Desktop and the last in the service. Labels under the steps name the chapters of Part IV that cover them."}
+
+@tbl-13-01 maps the Excel features of Part II to their Power BI counterparts. Most of the ideas carry over, and the main change is where they live. In a workbook, you merged tables into one wide table and summarized it with a PivotTable. In Power BI, the tables stay separate, the relationships between them do the work of the merge, and every visual on a page summarizes the same model.
+
+| In Excel (Part II) | In Power BI (Part IV) | Chapter |
+|-------------------|-------------------|--------|
+| Get Data and the Power Query Editor | Get data and the same Power Query Editor | 13 |
+| Merging Tables, or XLOOKUP | A relationship between tables in the model | 13, 14 |
+| PivotTable | Matrix visual | 13 |
+| PivotChart | A chart that filters, and is filtered by, the rest of the page | 13 |
+| Slicer | Slicer, filtering every visual on a page | 13 |
+| Calculated field | Measure, written in DAX | 14 |
+| Documentation worksheet | An About page and a description on every measure | 13–16 |
+| Workbook shared as a file | Report published to the Power BI service | 16 |
+
+: Excel features of Part II and their Power BI counterparts {#tbl-13-01}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+@tbl-01-02 in Chapter 1 described Power BI as the tool for interactive reporting to audiences who explore the data themselves, and placed it in the analyze, visualize, and communicate stages of the workflow. That description sets the limits of this Part as well. Power BI is not where accounting judgments are made or documented in detail. That remains the work of the workbook and the query. It is where agreed results are shown to the people who use them, in a form they can explore without changing.
+:::
+
+
+## The Power BI Desktop Window
+
+@fig-13-02 shows the window of Power BI Desktop with a report open. The ribbon across the top holds the commands, grouped on tabs as in Excel. A narrow bar down the left side switches between the views of the file. Report view is where you build and arrange visuals on the canvas, the page in the middle of the window, with tabs for the report's pages below it. Table view shows the rows of the loaded tables, much like a worksheet. Model view draws the tables and the relationships between them. DAX query view, which Chapter 14 uses, is where you write and test calculations. TMDL view shows the model's definition as text, which you will not need.
+
+![The Power BI Desktop Window.](/visuals/svg/fig-13-02-desktop-window.svg){#fig-13-02 fig-alt="A mock of Power BI Desktop in Report view, with numbered markers keyed to a legend. Marker 1 is the ribbon. Marker 2 is the bar of views down the left side: Report, Table, Model, DAX query, and TMDL. Marker 3 is the canvas, holding a card and a bar chart of fiscal 2026 revenue by item group, with page tabs below it. Marker 4 is the Filters pane, marker 5 the Visualizations pane, with its gallery of visual types and the wells of the selected visual, and marker 6 the Data pane, listing the tables and their columns."}
+
+Three panes on the right side of Report view do most of the work. The Data pane lists the tables of the model and their columns. The Visualizations pane holds a gallery of visual types and, for the selected visual, the wells into which you drag columns, such as the axis of a chart and the values it shows, together with the visual's format settings. The Filters pane holds filters that apply to one visual, to a page, or to every page of the report. Each of them can be collapsed to give the canvas more room.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Power BI Desktop runs only on Windows. If you use a Mac, the Power BI chapters need a Windows environment, such as a campus computer lab or a virtual machine. Some institutions also let students build reports and edit their models in the Power BI service, in any browser, by signing in with their school account. Whether that is available depends on your institution's settings, and the tutorials are written for Desktop, so check with your instructor before you rely on it.
+:::
+
+
+## Getting the Data
+
+Power BI reads data from many kinds of sources, including workbooks, text files, databases, and online services. The tutorials in this Part read the same CharlesRiver.xlsx workbook that Part II used, whose worksheets each hold one Charles River table as an Excel Table named T*n*_*Table*, such as T17_SalesInvoiceLine. Get data on the Home tab opens the connector for a source, and for a workbook it opens the Navigator, which lists every worksheet and every Table in the file. You select the Tables a report needs, and Transform Data opens them in the Power Query Editor. There you keep the columns you need, filter the rows, set data types, and add custom columns, as you did in Chapters 4 and 5. Close & Apply runs the queries and loads their results into the model.
+
+Loading works differently from Excel in one respect. Power BI does not place the rows on worksheets. It stores them inside the report file in a compressed form designed for summarizing columns quickly, so a model of hundreds of thousands of rows stays responsive. The queries are kept with the file, and Refresh runs them again against the source, so a report built today can show next month's data without being rebuilt. The workbook itself is never changed. Like the Part II tutorials, these never edit CharlesRiver.xlsx.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+The Charles River data is also offered as a CSV package, one file per table, which loads faster than a large workbook. If you use it, check the numbers after loading. A text file stores numbers as characters, and Power Query reads them by the conventions of your computer's language and region. On a computer set to a region that writes decimals with a comma, an amount written as 688.42 can be read as 68,842 or rejected as an error. The workbook avoids this, because Excel stores numbers as numbers. The locale used for a file is set under the regional settings of Power BI's Options.
+:::
+
+### Profiling the Columns
+
+Before you rely on a table, you profile it, as Chapter 2 described and Chapter 10 did with queries. The Power Query Editor can profile every column for you. On its View tab, Column quality shows the share of each column's values that are valid, errors, and empty. Column distribution draws the count of distinct and unique values under each heading, and Column profile shows the statistics and value distribution of the selected column in a pane below the preview.
+
+These profiles come with one trap. By default, the editor profiles only the first 1,000 rows of each query, which keeps it fast (Microsoft, 2025c), and it says so in the status bar at the bottom of the window: "Column profiling based on top 1000 rows". Clicking that message lets you switch to the entire data set. The difference can change the conclusion entirely. The invoice lines are stored in the order they were billed, so the first 1,000 rows are the lines of the first two months of fiscal 2024, before Charles River ran any promotion. In those rows, PromotionID is empty on every line and Discount holds a single value, zero. Profiled over the entire table, both columns tell a different story: about two thousand lines carry a promotion, and Discount holds four rates. @fig-13-03 shows the two profiles side by side.
+
+![The Same Column Profiled on the First 1,000 Rows and on the Entire Data Set.](/visuals/svg/fig-13-03-column-profile.svg){#fig-13-03 fig-alt="A mock of two panels of the Power Query Editor showing the SalesInvoiceLine query with Column quality and Column distribution turned on. In the left panel, profiled on the top 1,000 rows, the PromotionID column is empty on every row and the Discount column shows one distinct value. In the right panel, profiled on the entire data set, PromotionID has values on part of the rows and Discount shows four distinct values. The status bar messages that name the basis of each profile are outlined."}
+
+A profile of a sample describes the sample. Before you draw a conclusion from one, switch to the entire data set, and remember that the setting applies to the editor and is easily forgotten. The control is the same one you have used throughout the book: know what a result describes before you rely on it.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Two of Power BI Desktop's default settings work against an analyst who wants to know exactly what the model contains. Auto date/time adds a hidden date table behind every date column, which you cannot see or control. Autodetect new relationships creates relationships by guessing from column names after data is loaded, and a guess between two columns that merely share a name produces wrong totals without any warning. Both are turned off in Tutorial 13.1, under File > Options and settings > Options > Current File > Data Load, so that you create the relationships yourself and, in Chapter 14, a single date table that every visual shares.
+:::
+
+
+## Relationships in Brief
+
+In Chapter 5, you merged the invoice, item, and customer details into the invoice lines and analyzed one wide table. Power BI works the other way. The tables stay as they are, and a relationship between two of them records which column of one matches which column of the other. Chapter 3 described these keys: SalesInvoiceLine.ItemID is a foreign key that refers to Item.ItemID, the primary key of the item table. A relationship on that pair lets a visual show the revenue of the invoice lines by the ItemGroup of the item table, without ItemGroup ever being copied onto the lines.
+
+Most relationships in an accounting model are one-to-many, the cardinality that Chapter 3 introduced: one item, many invoice lines. A relationship also has a direction, which is the direction in which a filter travels. By default, a filter flows from the one side to the many side. Selecting Furniture in the Item table keeps only the invoice lines of Furniture items, because each line can look up its item. The filter does not flow back from the lines to the items, a property that will matter in Tutorial 13.2. @fig-13-04 shows the four tables of this chapter in Model view. Power BI marks the one side of each relationship with 1 and the many side with an asterisk, and an arrow on the line shows the direction of the filter.
+
+![The Sales Tables in Model View.](/visuals/svg/fig-13-04-model-view.svg){#fig-13-04 fig-alt="A mock of Power BI's Model view with four tables: SalesInvoiceLine in the middle, Item to its left, SalesInvoice to its right, and Customer to the right of SalesInvoice. Each relationship line carries a 1 at the end of the table that holds the key and an asterisk at the end of the table that refers to it, with an arrow pointing from the one side toward the many side. Item and SalesInvoice relate to SalesInvoiceLine on ItemID and SalesInvoiceID, and Customer relates to SalesInvoice on CustomerID, so a filter on Customer reaches the invoice lines through SalesInvoice."}
+
+Because the Charles River database declares no foreign keys, Power BI cannot read the relationships from the source, and you define them yourself. You should then test them, as Chapter 3 recommended for any logical key. A line whose ItemID has no match in the item table does not disappear from a visual. Power BI shows its amount against a blank item group, labeled (Blank), so a blank category in a visual is a signal to investigate, not a category to explain away. Chapter 14 covers relationships in depth, including the settings this chapter leaves at their defaults.
+
+
+{{< include _tutorial-01.qmd >}}
+
+
+## Visuals and How They Summarize
+
+A visual is built by choosing its type in the Visualizations pane and dragging columns from the Data pane into its wells. Whatever you drag into a value well, Power BI summarizes. A numeric column is summed by default, so LineTotal in the values of a column chart becomes Sum of LineTotal, totaled for each column of the chart. The summary can be changed in the visual, from the arrow beside the field in its well, to an average, a minimum or maximum, a count, a distinct count, or another statistic. A summary chosen this way is called an implicit measure, because Power BI creates the calculation for you. Each column also has a default summarization, which you set once for the model on the Column tools tab.
+
+Defaults are convenient, and three of them mislead often enough that you should check every visual for them. The first is summing a number that is not a quantity. Chapter 3 warned that account numbers and keys are identifiers, not amounts, yet Power BI will sum a CustomerID or a FiscalYear as readily as an amount. Set the default summarization of every key, code, and year column to Don't summarize, and they then act as categories. The second is counting the wrong thing. Count on SalesInvoiceID in the invoice lines counts lines, one for each line that has an invoice number, while Count (Distinct) counts invoices. In fiscal 2026 the first is about a third larger than the second. The third is averaging a rate. Average of Discount averages the rate of each line, each line weighted equally whatever its size. The share of the price given up to discounts is a different number: discount dollars divided by the dollars before discount. For fiscal 2026, the average of the rate understates that share by more than a quarter. A ratio of totals needs a calculation of its own, a measure, which Chapter 14 teaches, just as Chapter 6's margins needed calculated fields. @tbl-13-03 lists these defaults and others that can mislead, with what to do about each.
+
+| Default | What can go wrong | What to do |
+|--------------|--------------------------|--------------------------|
+| A numeric column is summed | Keys, codes, and years are added up | Set their summarization to Don't summarize |
+| Count counts rows | Invoice lines are counted when invoices are meant | Use Count (Distinct) on the key of the invoices |
+| Average weights every row equally | A rate is averaged line by line | Divide totals with a measure (Chapter 14) |
+| A line chart's value axis fits the data | Small changes look large | Start the axis at zero, or say that it does not |
+| A combo chart's line gets an axis of its own | Two scales suggest a relationship | Use one axis, or two charts |
+| Filters pane entries are not on the canvas | Readers cannot see what was excluded | State the filter in the title or on the page |
+
+: Power BI defaults that can mislead {#tbl-13-03}
+
+### Choosing a Visual
+
+The choice of visual follows the question, as @tbl-06-01 in Chapter 6 set out, and Power BI offers the same charts under similar names. A card shows a single number, such as revenue for the year, in large type. Clustered column and clustered bar charts compare categories, line charts show change over time, and stacked charts show composition. A table visual lists rows and their values, and a matrix visual is Power BI's counterpart of a PivotTable, with categories on rows and columns, subtotals, and the ability to expand a level into the one below it. Matrices and tables suit readers who need exact values, and charts suit readers who need to see a pattern, a distinction the section on honest visuals returns to.
+
+A slicer filters the other visuals on its page, as the slicers of Chapter 4 filtered a Table. Power BI offers slicers as a list of values, as a drop-down list, or as a row of buttons, and a slicer on a date column can show a range to select. The reader can see every slicer's selection, which makes a slicer the right place for a filter the reader is expected to change.
+
+### How Visuals Filter One Another
+
+The visuals on a page are connected. Clicking a bar in one chart filters every other visual on the page to that bar's category, and clicking it again removes the filter. By default, a column or bar chart that is filtered this way highlights the selected part of each bar against the faded whole, which shows the part in relation to the total, while a card or a line chart simply shows the filtered value. This is called cross-filtering and cross-highlighting, and Edit interactions on the Format tab sets, for each pair of visuals, whether one filters the other, highlights it, or leaves it alone. A slicer for the fiscal year, for example, should filter every visual on the page, while a chart that compares the years should be left alone by it.
+
+The Filters pane adds filters that the reader does not see on the canvas, at the level of one visual, one page, or every page. They are useful for restrictions that belong to the report rather than to the reader's question, such as keeping only the sellable items. They are also a way to mislead, because a reader who does not open the pane cannot tell that anything was excluded. A filter that changes the meaning of a number belongs in a slicer the reader can see, or in the title of the visual.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Implicit measures are Power BI's version of a problem you met with PivotTables in Chapter 6. A PivotTable sums a column by default, and a calculated field is needed to divide one total by another, because the average of ratios is not the ratio of totals. The same reasoning applies to every visual in this Part. Before you read a number in a visual, check which summary produced it and over which rows.
+:::
+
+
+{{< include _tutorial-02.qmd >}}
+
+
+## Honest Visuals
+
+Chapter 6 gave the basic rules for an honest chart: bars that start at zero, sorted categories, titles that say what the chart shows, no decoration, and color that carries meaning only with a label. Those rules apply in Power BI too. This section adds what an interactive report needs: why some visuals are read more accurately than others, and three ways a chart can mislead while every number in it is correct.
+
+### Matching the Visual to the Task
+
+People read some visual encodings more accurately than others. In a series of experiments, Cleveland and McGill (1984) asked readers to judge the relative size of two values encoded in different ways. Readers judged values most accurately from position along a common scale, as in a bar or column chart whose bars share a baseline, and less accurately from length without a common baseline, from angle, as in a pie chart, and from area, as in a bubble chart. They judged color shading least accurately of all. The ranking explains why a bar chart is usually better than a pie chart. The same values that a bar chart makes easy to compare become a matter of guessing when they are drawn as slices. @fig-13-07 draws the revenue of the five item groups in fiscal 2026 in four of these encodings.
+
+![The Same Revenue in Four Visual Encodings.](/visuals/svg/fig-13-07-encodings.svg){#fig-13-07 fig-alt="Fiscal 2026 revenue of the five item groups drawn four ways: as bars sharing a baseline, as the segments of a single stacked bar, as slices of a pie, and as circles whose areas are proportional to revenue, each labeled with the group names. The bars make the order and the gaps between the groups easy to read. In the stacked bar, the pie, and the circles, the smaller groups are hard to compare. A note ranks the four encodings from the most to the least accurately read, after Cleveland and McGill."}
+
+The reader's task matters as much as the encoding. Vessey (1991) explained the long-standing mixed evidence on graphs against tables with the theory of cognitive fit. Graphs emphasize spatial information, such as trends and relationships, while tables emphasize symbolic information, the exact values. A reader performs best when the representation fits the task: a graph for a task such as seeing whether revenue is trending down, and a table for a task such as finding the discount on one invoice. A report for accountants needs both, often for the same number, and Power BI's tooltips, which show exact values when the pointer rests on a data point, and its table and matrix visuals are the way to give readers both. Dilla et al. (2010) reviewed the research on interactive visualization of accounting information, which extends these ideas to visuals the reader can filter and drill into. They organized it around the fit between the visualization and the task, the characteristics of the reader, and the effects on the reader's decisions.
+
+### Axes and Scales
+
+Power BI draws the value axis of a column or bar chart from zero, because the length of a bar represents its value. The value axis of a line chart is different. By default it fits the range of the data, so it starts just below the smallest value. That suits a line whose purpose is to show how a value moves within its range, but it also makes a small change look large. Charles River's monthly revenue stayed within a fairly narrow band through fiscal 2026. On the default axis, the ordinary ups and downs of that band fill the whole height of the chart and look like volatility. Starting the axis at zero puts them in proportion, as Tutorial 13.3 shows. If a chart needs a narrow axis to make a small change visible, as the bridge of Chapter 6 did, the chart should say so.
+
+### Two Axes on One Chart
+
+A combo chart, such as Power BI's line and clustered column chart, draws columns and a line on the same horizontal axis. When the values of the line and the columns lie in ranges that barely overlap, Power BI gives the line a second value axis on the right (Microsoft, 2025a). Each axis then fits its own series, so the line and the columns appear to move together, or apart, at whatever relative scale the two axes happen to produce. Charles River's promotional discounts are a small fraction of its revenue. Drawn on a second axis beside the revenue columns, the discount line of the autumn promotions rises to the height of the columns, and the chart suggests that discounts became comparable to revenue. On one shared axis, the discounts appear at their true size. Few (2008), after using such charts in earlier books, concluded that two scales on one axis invite readers to compare magnitudes that mean nothing, and recommended two charts placed close together, each with its own scale, or, for series over time, expressing each series as a percentage of its value at a common starting point.
+
+### Choosing the Period
+
+Every chart over time starts somewhere, and the starting point can carry the message. Charles River began recording sales in January 2024 with a start-up month of about half the usual invoices. Measured from that month, revenue in December 2026 is close to four-fifths higher, a true statement that suggests strong growth. Measured from February 2024, the first ordinary month, the increase is a small fraction of that, and fiscal 2026 as a whole was barely above fiscal 2025. A fair comparison uses complete and comparable periods: whole fiscal years against whole fiscal years, or the same months in each year, and a chart whose first period is unusual should say why it starts there. Choosing the period is also a matter of grain. Monthly revenue moves with the number of invoices billed each month, which a quarterly or yearly view averages out. A reader who needs the trend should be shown a grain at which the trend is visible.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Misleading graphs are not only a classroom concern. Beattie and Jones (1992) examined the annual reports of 240 large UK companies and found that companies with good performance were more likely to include graphs of their key financial figures, and that about 30% of those graphs distorted the underlying figures, exaggerating them by about 11% on average. In a later experiment, Beattie and Jones (2002) found that distortions larger than about 10% changed how readers perceived performance, and that readers with less financial knowledge were most at risk of being misled. A report built for managers deserves the same care as a published annual report, because its readers act on what they see.
+:::
+
+
+## Accessible Report Design
+
+A report has many readers, and some of them read it in ways its author does not. Some cannot tell certain colors apart, some use a screen reader or a keyboard instead of a mouse, and a report is often printed or viewed on a projector that washes out pale colors. The Web Content Accessibility Guidelines of the World Wide Web Consortium (W3C, 2023) set the standards most organizations follow, and Power BI includes the settings needed to meet them (Microsoft, 2026). Four practices cover most of what an accounting report needs:
+
+- **Contrast.** Text should stand out from its background with a contrast ratio of at least 4.5 to 1, the guideline's threshold for ordinary text. Pale gray labels on white and white labels on pale fills fall short.
+- **Color with a second cue.** A meaning carried by color, such as unfavorable variances in red, should also be carried by a label, a sign, a marker, or a position, so that a reader who cannot see the color does not lose it.
+- **Alternative text.** Every visual has an alternative text setting, under General in its format settings, which a screen reader announces. It should say what the visual shows and what it means, not merely its type.
+- **A consistent theme.** A report theme, chosen from the Themes gallery on the Design tab, sets the colors and fonts of every visual at once, so a report stays consistent as it grows. Some of Power BI's built-in themes and color palettes are designed for accessibility, but the result should still be checked against the threshold above.
+
+These practices also make a report clearer for every reader. A title that states the finding, a label on the series that matters, and a color used for one purpose only help the reader who sees perfectly as much as the one who does not. The figures in this book follow the same rules: every color pair meets the 4.5 to 1 threshold, and no meaning rests on color alone.
+
+
+{{< include _tutorial-03.qmd >}}
+
+
+## Looking Ahead
+
+This chapter has introduced Power BI through the report the controller asked for. You learned how Power BI Desktop, the Power BI service, reports, and dashboards fit together, and how the Excel features of Part II carry over. You loaded the Charles River sales tables with Power Query, profiled their columns over the entire data set rather than the first 1,000 rows, and related the tables in the model, defining by hand the keys that the database does not declare. You reconciled the model to the control totals of Chapter 6 before building anything on it. You built cards, charts, a matrix, and slicers, saw how a visual summarizes a column and how the visuals on a page filter one another, and corrected the defaults that sum keys, count lines as invoices, and average rates. Finally, you examined how encodings, axes, scales, and periods shape what a reader sees, and made a page that every reader can use. Most of this work was descriptive analytics, in the terms of @tbl-01-01, with the first step toward diagnosis that interaction allows: a reader who clicks Furniture sees where the discounts went.
+
+The report still cannot answer the controller's central question. It shows revenue, list prices, and discounts, all of them sums, but not margin, which is a ratio of totals, and not the share of the price given up to discounts, which Average of Discount misstates. Its periods come from columns added to the invoice table, so it can show a month beside the same month of the year before but cannot calculate the change between them. Answering those questions requires calculations written for the purpose and a model designed around them. Chapter 14 builds that model, with a date table that every visual shares, and introduces DAX, the language of Power BI's measures.
+
+
+
+{{< include _summary.qmd >}}
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

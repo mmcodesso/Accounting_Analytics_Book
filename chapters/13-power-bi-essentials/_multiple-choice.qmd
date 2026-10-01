@@ -1,0 +1,126 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** Each month, the sales manager asks for revenue by region, then by month, then for one customer segment, and each question becomes a new request. Which deliverable best fits this reader?
+
+A.  A SQL script that the manager runs against the database
+B.  A Power BI report that the manager can filter and explore
+C.  A monthly workbook with one worksheet for each question asked
+D.  A PivotTable pasted as values into the monthly management memo
+
+**2.** In Power BI's own terms, what is a dashboard?
+
+A.  Any report page that holds more than one chart and a slicer
+B.  The canvas of Power BI Desktop on which visuals are arranged
+C.  A report file that has been saved with the .pbix extension
+D.  A single service page of tiles pinned from reports
+
+**3.** In the Power Query Editor, Column quality shows that PromotionID is empty on every row of the SalesInvoiceLine query. What should you do before concluding that no invoice line carries a promotion?
+
+A.  Remove the column, because it holds no usable information
+B.  Change the column's data type from whole number to text
+C.  Profile the entire data set, not the first 1,000 rows
+D.  Merge the query with PromotionProgram and expand the promotion name
+
+**4.** Why does Tutorial 13.1 turn off Autodetect new relationships after data is loaded?
+
+A.  A guessed relationship can join the wrong columns and silently give wrong totals
+B.  Power BI cannot create relationships between Tables that come from an Excel workbook
+C.  Detected relationships are deleted and created again each time the report is refreshed
+D.  The option creates many-to-many relationships between every pair of tables
+
+**5.** A table visual shows one very large number in place of the fiscal years 2024, 2025, and 2026. What corrects it?
+
+A.  Formatting FiscalYear with a thousands separator and no decimals
+B.  Setting the summarization of FiscalYear to Don't summarize
+C.  Sorting the table visual by FiscalYear in ascending order
+D.  Moving FiscalYear from the SalesInvoice table to SalesInvoiceLine
+
+**6.** In the model of this chapter, Item filters SalesInvoiceLine, and SalesInvoice filters SalesInvoiceLine. A card shows Count (Distinct) of SalesInvoiceID taken from the SalesInvoice table. What happens to the card when Furniture is selected in an item group slicer?
+
+A.  It shows only the invoices that contain a Furniture line
+B.  It shows (Blank), because the two tables are not related
+C.  It shows an error until the relationship is set to Both
+D.  It does not change, as the filter stops at the lines
+
+**7.** For fiscal 2026, Average of Discount on the invoice lines is lower than discount dollars divided by the dollars before discount. Why do the two differ?
+
+A.  The average weights every line equally, whatever its size
+B.  Power BI rounds each rate to two decimals before averaging
+C.  Lines without a promotion are left out of the average
+D.  The discount dollars include the freight on each invoice
+
+**8.** According to Cleveland and McGill (1984), readers judge the relative size of two values most accurately when the values are encoded as which of the following?
+
+A.  The areas of two circles in a bubble chart
+B.  Two shades of one color
+C.  Positions along a common scale
+D.  The angles of two slices in a pie chart
+
+**9.** An auditor needs the discount given on one particular invoice. Under the theory of cognitive fit, which representation suits that task best?
+
+A.  A line chart of discounts by month for the year
+B.  A pie chart of discounts by item group for the year
+C.  A bar chart of discounts by promotion, sorted by value
+D.  A table that lists invoices and the discount on each
+
+**10.** A Power BI line chart of fiscal 2026 monthly revenue swings from the bottom of the chart to the top, although no month was far from the average. What is the most likely reason?
+
+A.  Power BI draws line charts on a logarithmic scale by default
+B.  The value axis fits the data instead of starting at zero
+C.  The chart sums the months of each quarter before drawing the line
+D.  Cross-highlighting fades the lower part of the line on the page
+
+**11.** A combo chart shows fiscal 2026 revenue as columns and promotional discounts as a line, and the discount line climbs as high as the revenue columns in October. Which correction is best?
+
+A.  Add data labels to the discount line and color it bright red
+B.  Sort the months by discount, from the largest to the smallest
+C.  Use one shared axis, or two charts with labeled scales
+D.  Replace the columns with a stacked area chart of the two series
+
+**12.** A draft states that revenue grew by almost 80% from January 2024 to December 2026. What makes the statement misleading?
+
+A.  January 2024 was a start-up month with about half the usual invoices
+B.  December is the largest month of every year because of the holidays
+C.  The statement leaves out the revenue of the design services lines
+D.  The growth is calculated from list prices rather than invoiced prices
+
+**13.** A variance report shows favorable variances in green and unfavorable ones in red. Which change makes it usable by a reader who cannot tell red from green?
+
+A.  Using brighter shades of the same red and green
+B.  Adding a legend that names the two colors used
+C.  Enlarging the visual so that the colors stand out
+D.  Adding a sign or label to each variance
+
+**14.** What did Beattie and Jones (1992) find in the annual reports of large UK companies?
+
+A.  Companies with poor results used more graphs, to explain the decline
+B.  Good performers graphed more, and many graphs exaggerated
+C.  Almost every graph was drawn to scale, with axes that started at zero
+D.  Auditors reviewed every graph against the financial statements
+
+**15.** Which of the following is most likely to mislead the reader of a published report?
+
+A.  A Filters pane filter that excludes one segment, mentioned nowhere on the page
+B.  A slicer for the fiscal year placed at the top of the page, with the current year selected
+C.  A filter applied by clicking a bar, which the other visuals on the page then reflect
+D.  A visual title that names the period, the measure, and the unit of the values shown
+
+<!-- Answer key, Chapter 13:
+     1 B, 2 D, 3 C, 4 A, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 C, 12 A, 13 D, 14 B, 15 A
+     1 B: a report serves readers who ask the next question themselves.
+     2 D: dashboards are single pages of pinned tiles in the Power BI service.
+     3 C: by default, profiling covers the first 1,000 rows, which predate every promotion.
+     4 A: a guessed relationship can join the wrong columns silently.
+     5 B: a whole-number year is summed unless its summarization is Don't summarize.
+     6 D: the filter flows from Item to the lines, not from the lines to SalesInvoice.
+     7 A: an average of rates weights each line equally; the ratio of totals weights by dollars.
+     8 C: position along a common scale ranks first in Cleveland and McGill's experiments.
+     9 D: a table fits a task that needs an exact value.
+     10 B: a line chart's default axis starts just below the smallest value.
+     11 C: one axis shows the true size; separate charts show each pattern on its own labeled scale.
+     12 A: the comparison starts at the start-up month; whole years show little growth.
+     13 D: meaning must not rest on color alone.
+     14 B: good performers graphed more, and about 30% of graphs distorted, exaggerating on average.
+     15 A: a hidden page filter changes the numbers without telling the reader. -->

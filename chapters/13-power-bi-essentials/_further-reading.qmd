@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Beattie, V., & Jones, M. J. (1992). The use and abuse of graphs in annual reports: Theoretical framework and empirical study. *Accounting and Business Research*, *22*(88), 291–303. <https://doi.org/10.1080/00014788.1992.9729446> A study of the graphs in the annual reports of 240 large UK companies. It shows that companies with good results were more likely to graph their key financial figures, and that many graphs distorted those figures in a favorable direction. It is the starting point of a long line of accounting research on graphs as a tool of impression management.
+
+Cleveland, W. S., & McGill, R. (1984). Graphical perception: Theory, experimentation, and application to the development of graphical methods. *Journal of the American Statistical Association*, *79*(387), 531–554. <https://doi.org/10.1080/01621459.1984.10478080> The experiments behind the ranking of visual encodings used in this chapter. Readers judged values most accurately from position along a common scale and least accurately from shading, which is why a sorted bar chart so often beats a pie chart.
+
+Dilla, W., Janvrin, D. J., & Raschke, R. (2010). Interactive data visualization: New directions for accounting information systems research. *Journal of Information Systems*, *24*(2), 1–37. <https://doi.org/10.2308/jis.2010.24.2.1> A review of research on interactive visualization of accounting information, organized around the task, the decision maker, and the effect on decisions. It places tools such as Power BI in the research on how the format of accounting information shapes judgment.
+
+Few, S. (2008, March). *Dual-scaled axes in graphs: Are they ever the best solution?* Visual Business Intelligence Newsletter. Perceptual Edge. <https://www.perceptualedge.com/articles/visual_business_intelligence/dual-scaled_axes.pdf> A short essay that works through the uses of a second value axis and rejects each in turn, then shows the alternatives this chapter recommends: separate charts placed close together, and series indexed to a common starting value.
+
+Janvrin, D. J., Raschke, R. L., & Dilla, W. N. (2014). Making sense of complex data using interactive data visualization. *Journal of Accounting Education*, *32*(4), 31–48. <https://doi.org/10.1016/j.jaccedu.2014.09.003> A teaching case in which you act as a division controller and build an interactive visualization to support the chief executive's decisions. It practices the same move as this chapter, from analysis to a report that a decision maker explores.
+
+Vessey, I. (1991). Cognitive fit: A theory-based analysis of the graphs versus tables literature. *Decision Sciences*, *22*(2), 219–240. <https://doi.org/10.1111/j.1540-5915.1991.tb00344.x> The theory of cognitive fit. It explains the mixed evidence on graphs and tables by the match between the representation and the task: graphs for spatial tasks such as trends, tables for symbolic tasks such as exact values.

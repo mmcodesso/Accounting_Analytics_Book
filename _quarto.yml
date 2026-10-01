@@ -41,6 +41,8 @@ book:
         - chapters/12-sql-audit-analytics/chapter.qmd
         - cases/part-3-case.qmd
     - part: "Data Visualization and Power BI"
+      chapters:
+        - chapters/13-power-bi-essentials/chapter.qmd
     - part: "Integrated and Applied Topics"
 
 
