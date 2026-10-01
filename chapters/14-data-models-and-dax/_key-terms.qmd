@@ -1,0 +1,39 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Calculated column.** A column of an Excel Table whose formula Excel applies to every row automatically, including rows added later. In a Power BI model, a calculated column is a column added to a table with a DAX formula, evaluated for each row when the model is refreshed and stored like any other column, so it can be used to filter, group, or sort.
+
+**Context transition.** The conversion of the current row of a row context into an equivalent filter context, which CALCULATE performs. It happens whenever CALCULATE is used, or a measure is referred to, inside a row context, such as a calculated column or an iterator.
+
+**Cross filter direction.** The setting of a Power BI relationship that decides which way filters travel along it. With Single, the default for a many-to-one relationship, a filter travels from the one side to the many side only; with Both, it travels in both directions.
+
+**DAX.** Data Analysis Expressions, the formula language of Power BI's measures, calculated columns, and calculated tables, and of the queries run in DAX query view.
+
+**DAX query view.** The view of Power BI Desktop in which DAX queries are written, run, and saved with the report, and in which their results appear in a grid without a visual being built.
+
+**Date table.** A dimension table with one row for every day of the period a model covers and columns for the ways the business groups days, such as year, quarter, and month. Marked as the model's date table, it is the calendar that time intelligence functions rely on.
+
+**Degenerate dimension.** An attribute, such as an invoice number, that is kept in a fact table and used to filter or group, without a dimension table of its own.
+
+**Dimension table.** A table of a star schema that describes one kind of thing, such as items, customers, or dates, one row for each, with the attributes a reader filters and groups by.
+
+**Fact table.** A table of a star schema that records events or transactions, one row for each event, with the keys of the dimensions involved and the amounts to be added up.
+
+**Filter context.** The set of filters in effect where a DAX formula is evaluated, such as the row and column of a matrix cell, the page's slicers, and the filters of the Filters pane. Relationships carry the filters from the dimension tables to the fact tables.
+
+**Grain.** The event that one row of a fact table represents, such as one line of one invoice or one posting to an account. The grain decides which questions a fact table can answer.
+
+**Inactive relationship.** A relationship that a model holds but does not use to filter, drawn as a dashed line in Model view. A measure switches it on for its own calculation with USERELATIONSHIP, which is how one date table can serve a second date.
+
+**Iterator.** A DAX function that evaluates an expression for each row of a table and combines the results, such as SUMX. It creates a row context for each row it evaluates.
+
+**Measure.** A named DAX calculation that is defined once in a model and evaluated for each cell of a visual from the rows that the cell's filter context keeps. Measures are never stored, and they can be used inside other measures.
+
+**Row context.** The current row of a table during a DAX evaluation that works through the table row by row, as in a calculated column or an iterator. A row context does not filter other tables by itself.
+
+**Snowflake schema.** An arrangement of tables in which a dimension reaches the fact table only through another table, as a customer reaches the invoice lines through the invoice header.
+
+**Star schema.** An arrangement of a model in which fact tables are related directly to the dimension tables that describe them, many to one, so that each fact table sits at the center of its dimensions.
+
+**Time intelligence.** The DAX functions that shift or extend the dates in the filter context, such as SAMEPERIODLASTYEAR and TOTALYTD, to compare periods or accumulate them. They rely on a marked date table.

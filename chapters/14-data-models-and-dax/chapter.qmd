@@ -1,0 +1,226 @@
+---
+title: "Data Models and DAX Measures"
+---
+
+
+::: {.learning-objectives}
+## Learning Objectives {.unnumbered}
+
+After completing this chapter, you will be able to:
+
+1. Design a star schema from the Charles River tables, naming its fact and dimension tables and its grain, and flatten a header-line pair into one fact table.
+2. Build and mark a date table, set the cardinality and cross filter direction of relationships, and use an inactive relationship for a second date.
+3. Write explicit measures with SUM, DIVIDE, SUMX, RELATED, and variables, and choose between a measure, a DAX calculated column, and a Power Query column.
+4. Explain filter context, row context, and context transition, and change the filter context with CALCULATE.
+5. Compare periods with time intelligence functions.
+6. Model the general ledger so that year-end closing entries and debit and credit signs are handled correctly, and test measures in DAX query view against control totals.
+:::
+
+
+## Opening Scenario {.unnumbered}
+
+The report you built in Chapter 13 has been in use for a few weeks, and the questions it raises have outgrown it. The sales manager wants to know what the autumn discounts cost in margin, not only in dollars. The marketing manager asks how each month compares with the same month last year. A product manager noticed that the invoice count on a draft page did not change when Furniture was selected and asked which number was right. Each of these is a calculation the report cannot yet make: a ratio of totals, a comparison across periods, and a count that depends on how the tables are joined.
+
+The controller has a request of her own. "If this report is where the managers look," she says, "the income statement should be there too, monthly, from the ledger, and it has to agree with the statements we closed." That means a second set of tables, the general ledger and its chart of accounts, in the same report, sharing the same calendar as the sales data. This chapter teaches you to design that model and to write its calculations in DAX, the formula language of Power BI. You will reshape the sales tables into a star schema, add a date table and the ledger, write measures for margin, discount rate, the prior year, and the income statement, and prove each measure against a total you already trust.
+
+
+## From Tables to a Model
+
+A semantic model, as Chapter 13 explained, is the set of tables, relationships, and calculations that a report reads. The way those tables are arranged decides how easy the model is to use and how reliably its numbers come out. The arrangement that Power BI is designed for, and that most business intelligence models use, is the star schema, the design that Kimball and Ross (2013) describe for data warehouses. A star schema separates two kinds of tables. A fact table records events or transactions, one row for each event, with the keys of the things involved and the numbers to be added up: an invoice line with its item, customer, date, quantity, and amount. A dimension table describes one kind of thing, one row for each, with the attributes a reader filters and groups by: an item with its group and product type, a customer with its segment and region, a date with its year and month (Microsoft, 2024d). Each dimension relates to the fact table on its key, so the diagram of the model looks like a star, with the fact table at the center.
+
+Every fact table has a grain, the event that one of its rows represents. Stating the grain is the first decision in a model, because it decides which questions the table can answer. The grain of SalesInvoiceLine is one line of one invoice, which can be totaled by item, customer, or day, but not split by shipment if a line shipped in parts. @tbl-14-01 lists the fact tables of the Charles River models in this Part, with their grain and their dimensions.
+
+| Fact table | Grain: one row for each | Dimensions | Chapter |
+|-------------|----------------------|-------------------------|-------|
+| SalesInvoiceLine | line of an invoice | Item, Customer, Date | 14 |
+| GLEntry | posting to an account | Account, CostCenter, Date | 14 |
+| LaborTimeEntry | time entry of an employee | Employee, WorkCenter, Date | 15 |
+
+: Fact tables of the Charles River reports, with their grain and dimensions {#tbl-14-01}
+
+The ER diagrams of Chapter 3 drew the same tables in a different arrangement, because a database is designed to record transactions without repeating any fact. A sale is split across a header and its lines, and the customer lives on the header, not on each line. Read through Power BI's eyes, that header-line pair is a snowflake: a dimension, Customer, reaches the fact table only through another table, SalesInvoice. The model of Chapter 13 worked because a filter can travel down a chain of one-to-many relationships, but it has two weaknesses. The header table splits the invoice's attributes from its lines, so a count taken from the header ignores a filter on the lines, as you saw in Tutorial 13.2. And a second date, such as the date a line shipped, has no clean place to go. The usual remedy is to flatten the pair: to merge the header's attributes into the lines, as you did with lookups and merges in Chapter 5, so that every dimension relates to the fact table directly. Kimball and Ross (2013) recommend this for every header-line pair: the header's dimension keys go on each line, and so does an attribute such as the invoice number, which becomes a degenerate dimension, a column of the fact table that filters and groups without a dimension table of its own. Microsoft's guidance makes the same choices for Power BI: it generally prefers one model table to a chain of normalized tables, and keeps an attribute such as an order number in the fact table (Microsoft, 2024d). O'Leary (1999) made a related point about accounting data in particular: a warehouse built from accounting records needs time as a dimension of its own, so that events can be rolled up from day to month to year.
+
+@fig-14-01 shows the sales tables of Chapter 13 in both arrangements.
+
+![The Sales Tables as a Snowflake and as a Star.](/visuals/svg/fig-14-01-star.svg){#fig-14-01 fig-alt="Two diagrams of the sales tables side by side. On the left, the model of Chapter 13: Customer relates to SalesInvoice, which relates to SalesInvoiceLine, and Item relates to SalesInvoiceLine, so Customer reaches the lines only through the invoice header. On the right, the star: SalesInvoiceLine at the center carries the invoice number, invoice date, and customer key, and Item, Customer, and Date each relate to it directly, many to one, with arrows pointing toward the lines."}
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Flattening the header into its lines is the merge of Tutorial 5.3, done for a different reason. In Chapter 5, the merge brought the customer's segment into the InvoiceLines Table so that a formula could use it. Here it brings the invoice's date and customer key into the fact table so that the date and customer dimensions can relate to the lines directly. Chapter 10 warned that joining a header to its lines repeats the header's amounts on every line. The same warning applies here: bring only keys and descriptive attributes from the header into the lines, never the header's totals.
+:::
+
+
+## Relationships
+
+Chapter 13 introduced relationships with their defaults. Two settings decide how a relationship behaves. Its cardinality says how many rows on each side can match: many to one, one to one, or many to many, in Power BI's terms, which correspond to the cardinalities of Chapter 3. A star schema is built almost entirely from many-to-one relationships, from the fact table to each dimension. A one-to-one relationship usually signals two tables that are really one. ProductionCompletion and its lines, for example, have exactly one line per completion in the Charles River data, and Power BI proposes a one-to-one relationship between them. A many-to-many relationship signals a missing table in between, such as the junction tables of Chapter 3. Both deserve a second look before you accept them.
+
+The second setting is the cross filter direction. With **Single**, the default for a many-to-one relationship, a filter travels from the one side to the many side: from Item to the invoice lines, never from the lines back to Item. With **Both**, it travels in both directions. Both can seem like a convenient fix, for example to make the invoice count of Tutorial 13.2 respond to an Item selection. Microsoft's guidance is to keep relationships single-directional whenever possible, because filters that travel both ways make a model slower, create paths between tables that the author did not intend, and produce results that readers find hard to predict (Microsoft, 2024b). The better remedy, which this chapter applies, is to put the attribute in the fact table and count there.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Setting a relationship to Both makes a number change when you click, which can look like a fix. Check what the number now means before you accept it. In a model with two fact tables sharing a dimension, a two-way filter can carry a selection from one fact table, through the dimension, into the other, so that selecting a product filters the ledger, or the reverse. Keep every relationship Single unless you can state in one sentence why a filter must flow the other way.
+:::
+
+Between two tables, only one path of relationships can be active at a time. A model may need a second relationship anyway: an invoice line has an invoice date and a shipment date, and both may be compared with the same calendar. Power BI allows the second relationship but makes it inactive, drawn as a dashed line in Model view. An inactive relationship filters nothing until a measure switches it on with the USERELATIONSHIP function. The date table then plays two roles, invoice date and ship date, and the measure decides which (Microsoft, 2024a). Finally, a reminder from Chapter 13: when a key on the many side finds no match, its rows are shown against a blank member, (Blank), of the dimension. In the ledger, about one posting in seven has no cost center, almost all of them postings to asset and liability accounts, and they appear under (Blank) in any visual grouped by cost center.
+
+
+## The Date Table
+
+Chapter 13's report took its years and months from columns added to the invoice table. That works for one table, but the ledger has dates of its own, and a model with two fact tables needs one calendar that both share. A date table is a dimension with one row for every day in the period the model covers, and columns for the year, quarter, month, and any other way the business groups days. It is also what DAX's time intelligence functions need in order to find the same period last year or the year to date (Microsoft, 2025b).
+
+Microsoft's guidance sets four requirements for a date table: a column of dates with unique values, no blanks, no missing days, and full years (Microsoft, 2024c). The Charles River ledger runs from January 1, 2024, into February 2027, so the date table runs from January 1, 2024, to December 31, 2027. Charles River's fiscal year is the calendar year, so the year of a date is its fiscal year. The table can be built in Power Query or in DAX. This chapter uses DAX, with the CALENDAR function, which returns one row for each day between two dates, wrapped in ADDCOLUMNS, which adds the other columns. Once the table exists, you mark it as the model's date table, which tells Power BI which column holds the dates and lets the time intelligence functions rely on it.
+
+One column needs care. A month name such as Jan sorts alphabetically, so April would come first and January in the middle. A column's sort order can be set to follow another column, here the month number, with Sort by column. The YearMonth column, which reads like 2026-01, sorts correctly as text, as Month did in Chapter 13.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Some names are reserved words in DAX, and a table with such a name must be written in single quotes in every formula. Date is one of them, so the date table is always 'Date', and so is Item, which must be written 'Item'. A formula with an unquoted reserved name fails with a syntax error, and because Power BI compiles the measures of a model together, one broken measure can stop every measure from showing a value. Choosing a name from the suggestion list as you type adds the quotes for you.
+:::
+
+
+{{< include _tutorial-01.qmd >}}
+
+
+## Measures and Calculated Columns
+
+Chapter 13's visuals summarized columns with implicit measures. An explicit measure is a named calculation written in DAX, short for Data Analysis Expressions, the formula language of Power BI. A measure is defined once in the model and can be used in any visual, where it is calculated for every cell from the rows that the cell's filters keep. Revenue, defined as `SUM ( SalesInvoiceLine[LineTotal] )`, is one sum in a card, twelve sums in a chart by month, and one sum for each item group and quarter in a matrix. A measure is the Power BI counterpart of Chapter 6's calculated field, which also works on totals. Explicit measures are preferred over implicit ones because they have names a reader understands, carry their own format, and can be used inside other measures, so the definition of revenue lives in one place. Power BI can even be set to discourage implicit measures for a model, which hides the summation sign from numeric columns.
+
+DAX can also add a calculated column to a table. A calculated column is evaluated once for each row when the model is refreshed and is stored like any other column, so it can be used to filter, group, or sort. A measure is evaluated when a visual asks for it and is never stored. The rule of thumb follows: if the value belongs to each row and you want to slice by it, it is a column; if it is a total, a ratio of totals, or anything that should change with the reader's selection, it is a measure. A column that can be computed from the row itself, such as the list amount of an invoice line, is usually better added in Power Query, where it is part of the documented preparation steps, as in Chapter 13. A DAX column is the tool for values that need the model, such as a value from a related table.
+
+A model with many measures needs order. A common practice is to keep the measures in a table of their own, created with Enter data and named Measures, so that they appear together at the top of the Data pane. Each measure should have a format, such as two decimals with a thousands separator or a percentage, and a description, which Power BI shows to anyone who points at the measure. Display folders group related measures within a table.
+
+
+## Evaluation Context
+
+Every DAX formula is evaluated in a context, and understanding the context is the key to reading DAX. The filter context is the set of filters in effect where a measure is evaluated. In a matrix of revenue by item group and quarter, the cell for Furniture in 2026-Q4 is evaluated with three filters: the item group is Furniture, the quarter is 2026-Q4, and anything selected in the page's slicers. Power BI applies those filters to the dimension tables, the relationships carry them to the fact table, and SUM adds up the invoice lines that remain. @fig-14-03 traces one such cell.
+
+![The Filter Context of One Matrix Cell.](/visuals/svg/fig-14-03-filter-context.svg){#fig-14-03 fig-alt="A matrix of revenue by item group and quarter with the Furniture 2026-Q4 cell outlined, and an arrow to the filters that cell carries: ItemGroup equals Furniture on the Item table and YearQuarter equals 2026-Q4 on the Date table. Arrows carry the two filters along the relationships to the SalesInvoiceLine table, where only the Furniture lines invoiced in the fourth quarter of 2026 remain, and SUM of LineTotal adds them to the value shown in the cell."}
+
+The row context is different: it is the current row of a table, which exists while DAX works through a table one row at a time. A calculated column has a row context, because it is evaluated for each row. So do the iterator functions, whose names end in X, such as SUMX, which evaluates an expression for each row of a table and adds up the results. Standard cost is an iterator's job. The invoice lines have a quantity but no cost, and the cost per unit lives on the Item table. `SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( 'Item'[StandardCost] ) )` multiplies each line's quantity by its item's standard cost and adds the products. RELATED, which works wherever there is a row context, follows the relationship from the current line to the one row of Item it belongs to, the DAX counterpart of the lookups of Chapter 5. Multiplying the totals instead, the sum of quantities by the sum of costs, would give a meaningless number, for the reason Chapter 6 gave for calculated fields.
+
+The two contexts meet in context transition. A row context does not filter anything by itself. In a calculated column on the Customer table, `SUM ( SalesInvoiceLine[LineTotal] )` returns the revenue of every invoice line for every customer, because nothing filters the lines. Wrapped in CALCULATE, the same expression returns each customer's own revenue: CALCULATE turns the current row into a filter on the Customer table, and the relationship carries it to the lines. This is context transition, and it happens automatically whenever a measure is referred to inside a row context, because every measure behaves as if it were wrapped in CALCULATE. @fig-14-04 shows the two columns side by side.
+
+![Row Context With and Without Context Transition.](/visuals/svg/fig-14-04-context-transition.svg){#fig-14-04 fig-alt="Two calculated columns on the Customer table for the three customers with the most revenue. The column defined with SUM alone shows the same grand total of all invoice lines on every row. The column defined with CALCULATE around the same SUM shows each customer's own revenue, because CALCULATE turned the current row into a filter on Customer that the relationship carried to the invoice lines."}
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Context transition filters on every column of the current row. On a dimension with a unique key, that picks out exactly one row, as intended. On a table with no unique key, such as a fact table whose rows can repeat, it picks out every identical row at once, and a formula that seems to calculate one row's value adds up all its duplicates. Use measures inside iterators over dimension tables, and over fact tables only when each row is unique.
+:::
+
+
+## CALCULATE
+
+CALCULATE evaluates an expression in a modified filter context, and it is the function that most DAX measures are built on. Its first argument is the expression, and each further argument is a filter. `CALCULATE ( [Revenue], 'Item'[ItemGroup] = "Furniture" )` returns Furniture's revenue. A filter argument replaces any existing filter on the same column, so the measure returns Furniture's revenue even in a visual or slicer filtered to Lighting. That is often what you want, for a column that should show one group's figure whatever the selection, but not always. The KEEPFILTERS function changes the behavior so that the new filter is combined with the existing one instead of replacing it (Microsoft, 2026).
+
+Removing filters is the other common use. A share of the total divides a value by the same value without some of its filters. `DIVIDE ( [Revenue], CALCULATE ( [Revenue], REMOVEFILTERS ( 'Item' ) ) )` divides each item group's revenue by the revenue of all items, while keeping the filters on year, customer, and anything else. The choice of what to remove is the substance of the measure. Removing the filters from the whole invoice line table instead, with `ALL ( SalesInvoiceLine )`, would remove the year as well, because the filters on the dimensions reach the fact table through it. Each item group's share of fiscal 2026 would then be divided by three years of revenue, and Furniture's share would read as about a fifth instead of more than half.
+
+@fig-14-05 compares the two measures in a table of item groups filtered to fiscal 2026.
+
+![A Filter That Replaces and a Filter That Is Removed.](/visuals/svg/fig-14-05-calculate.svg){#fig-14-05 fig-alt="A mock of a Power BI table visual with the item groups as rows and a year slicer set to 2026. The Revenue column shows each group's revenue. The Furniture Revenue column shows the same Furniture amount on every row, because its filter replaces the row's item group. The Share of Revenue column shows each group's share of fiscal 2026, adding up to 100 percent, with Furniture holding more than half. A note beside it shows that removing the filters from the whole invoice line table instead would reduce Furniture's share to about a fifth."}
+
+Two habits make measures reliable. The first is DIVIDE, which returns a blank instead of an error when the denominator is zero, as it is for a group with no sales in a period. The second is to filter on columns rather than on whole tables. A filter argument such as `GLEntry[Debit] > 10000` is evaluated quickly on one column, while the older form that iterates a whole fact table with FILTER is slower and can produce unexpected results. Microsoft's guidance is to use the column form whenever possible (Microsoft, 2021a). Variables, written with VAR and RETURN, make longer measures readable: a variable holds an intermediate result under a name, is evaluated once, and can be used several times (Microsoft, 2021b). @tbl-14-03 summarizes the functions this chapter uses.
+
+| Function | What it does | Example in this chapter |
+|-------------|-------------------------------|-------------------------|
+| `SUM` | Adds up a column over the rows in the filter context | Revenue |
+| `DISTINCTCOUNT` | Counts the different values of a column | Invoices |
+| `DIVIDE` | Divides, returning a blank when the denominator is zero | Margin % |
+| `SUMX` | Evaluates an expression row by row and adds the results | Standard Cost |
+| `RELATED` | Returns a value from the one side of a relationship | Standard Cost |
+| `CALCULATE` | Evaluates an expression in a modified filter context | Furniture Revenue |
+| `REMOVEFILTERS` | Removes filters from a table or column inside CALCULATE | Share of Revenue |
+| `USERELATIONSHIP` | Activates an inactive relationship inside CALCULATE | Revenue by ship date |
+| `VAR`, `RETURN` | Name an intermediate result and use it | Margin % |
+
+: DAX functions used in this chapter {#tbl-14-03}
+
+
+## Testing Measures in DAX Query View
+
+A measure that returns a number is not yet a measure that returns the right number. In a workbook, you checked a formula against a control total. In SQL, you compared a query's result with a total from another source. In Power BI, DAX query view is the place for the same check. It runs DAX queries against the model and shows the result in a grid, without building a visual. A query begins with EVALUATE, followed by an expression that returns a table, such as SUMMARIZECOLUMNS, which groups by columns and calculates measures for each group, much like a SQL query with GROUP BY:
+
+<!-- dax-check: query -->
+```
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year],
+    "Lines", COUNTROWS ( SalesInvoiceLine ),
+    "Revenue", ROUND ( [Revenue], 2 )
+)
+ORDER BY 'Date'[Year]
+```
+
+The result has one row for each year, with the number of invoice lines and the revenue. Its fiscal 2026 row must equal the control total of Chapter 6. The results grid shows values without the formats set for the measures, so a test rounds amounts to the cent with ROUND, as here, and they read as they do in the earlier chapters. A query can also define a measure for its own use, with DEFINE MEASURE, and test it before it is added to the model. Right-clicking a table or measure in the Data pane of DAX query view offers quick queries, such as Show top 100 rows and Define and evaluate, which write a query for you. The query tabs are saved with the report, so the tests stay with the measures they test (Microsoft, 2025a).
+
+Treat these queries as part of the model's documentation. A tab named Tests that holds one query per control total, each with a comment saying what it should return, is the Power BI counterpart of the control totals of Chapter 4 and the audit library of Chapter 12. Anyone who changes the model can run the tab again and see at once whether a number moved. @fig-14-06 shows the first test of Tutorial 14.2 after it has run.
+
+![A Test in DAX Query View.](/visuals/svg/fig-14-06-dax-query-view.svg){#fig-14-06 fig-alt="A mock of DAX query view in Power BI Desktop. A tab named Tests holds a query with a comment line, EVALUATE, and SUMMARIZECOLUMNS grouping by the year of the Date table with the number of invoice lines, revenue, gross margin, and margin percentage. Below the editor, the results grid shows one row for each of fiscal 2024, 2025, and 2026, and the fiscal 2026 revenue is outlined because it must equal Chapter 6's control total."}
+
+
+{{< include _tutorial-02.qmd >}}
+
+
+## Time Intelligence
+
+Comparisons across periods are among the first questions any accounting report must answer: this month against the same month last year, the year to date, the trend over the last few months. DAX's time intelligence functions build them by shifting or extending the dates in the filter context. They take the date column of the marked date table as their argument. @tbl-14-04 lists the ones this chapter uses.
+
+| Function | Returns, for the dates in the filter context | Example |
+|------------------|----------------------------------|--------------------|
+| `DATESYTD`, `TOTALYTD` | The year to date, from January 1 | Revenue YTD |
+| `SAMEPERIODLASTYEAR` | The same dates one year earlier | Revenue PY |
+| `DATEADD` | The dates shifted by a number of days, months, quarters, or years | A prior month |
+| `DATESINPERIOD` | A period of a given length ending on a date | A rolling quarter |
+| `DATESBETWEEN` | The dates between two dates, inclusive | The three months before |
+
+: Time intelligence functions used in this chapter {#tbl-14-04}
+
+`CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )` returns, for a cell filtered to October 2026, the revenue of October 2025, and the change against the prior year divides the difference by that value. For any period of fiscal 2024, the prior year is blank, because the data begins in January 2024, and the change is blank too, which DIVIDE handles without an error. A prior-year measure also returns values for the months of 2027 in the date table, the prior year of which is 2026. A visual that shows such a measure should be filtered to the years with data, or the reader sees a 2027 row with a prior year and no current year.
+
+These functions are the model-level counterpart of the window functions of Chapter 11, which compared each row with earlier rows in SQL. Power BI also offers visual calculations, which compute running sums and moving averages from the values a visual already shows, without adding a measure to the model. Chapter 15 uses them. Power BI's newer calendar-based time intelligence, which handles fiscal calendars that do not follow the calendar year, was still a preview feature in September 2026, so this book uses the classic functions, which work for Charles River's calendar year.
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+An expectation is only useful if it is independent of the amount it is compared with. A measure that compares each month's expense with the average of the three months before it, not including the month itself, is a simple analytical procedure of the kind Chapter 6 described: the month cannot hide a spike by raising its own expectation. Power BI recalculates such a measure every time the data is refreshed, which turns a one-time check into a monitoring tool.
+:::
+
+
+## Modeling the General Ledger
+
+The ledger forms a second star. GLEntry is a fact table with one row for each posting, and Account, CostCenter, and Date are its dimensions. Because Date is shared, a single year slicer filters the sales lines and the ledger together, and a page can place revenue from the invoices beside revenue from the ledger, as Chapter 6 reconciled them in a workbook. @fig-14-08 shows the two stars in one model.
+
+![Two Fact Tables Sharing One Date Table.](/visuals/svg/fig-14-08-two-stars.svg){#fig-14-08 fig-alt="A mock of Power BI's Model view with two stars. On the left, SalesInvoiceLine is related to Item and Customer. On the right, GLEntry is related to Account and CostCenter. The Date table sits between them and is related to both fact tables, to SalesInvoiceLine on InvoiceDate and to GLEntry on PostingDate. Each relationship shows 1 at the dimension and an asterisk at the fact table, with arrows pointing toward the fact tables."}
+
+Two accounting facts shape the measures. The first is the closing entries. As Chapter 6 explained, the entries that close each year move the balances of the revenue and expense accounts to retained earnings on December 31. In the ledger they are ordinary postings, so a measure that adds up all the postings to the revenue and expense accounts nets them to zero for every year, and an income statement built on it shows a net income of zero. @fig-14-09 shows the effect. The closing entries are journal entries whose type begins with "Year-End Close", and GLEntry's VoucherNumber holds the journal entry's number, so a merge with the JournalEntry table in Power Query brings the type onto each posting and a custom column flags the closes. The base measure of the ledger then excludes the flagged postings.
+
+![The Income Statement With and Without the Closing Entries.](/visuals/svg/fig-14-09-closes-trap.svg){#fig-14-09 fig-alt="Two matrices of net income by fiscal year, 2024 to 2026. In the first, built on all postings, net income is zero in every year, because the closing entries reverse each year's revenue and expenses on December 31. In the second, built on a measure that excludes the closing entries, each year shows its net income, which equals the amount the year's closing entry transferred to retained earnings."}
+
+The second is the sign. The ledger stores debits and credits in separate columns, and debits less credits is positive for assets and expenses and negative for liabilities, equity, and revenue, the accounts whose normal balance is a credit. An income statement reads best with revenue positive and expenses negative, so that the total of the column is net income. The P&L Amount measure of Tutorial 14.3 reverses the sign of debits less credits, which gives exactly that, and grouping it by the Account table's AccountType and AccountSubType reproduces the income statement of Chapter 6, now monthly and interactive. For a balance sheet, the sign follows each account's NormalBalance instead, and the balance is cumulative from the first posting to the date in the filter context, which one of this chapter's exercises builds.
+
+::: {.callout-note .connecting-dots icon=false}
+## Connecting the Dots
+Every report in this book that touches the ledger has had to answer the same two questions: which postings belong to the period, and what sign each account carries. Chapter 6 answered them with Power Query and a pre-closing trial balance, Chapter 10 with a WHERE clause that left out the closing entries, and Chapter 11 with CASE. In Power BI the answers become a column in the model and a measure that every visual inherits, which is what makes a model a control as well as a convenience.
+:::
+
+
+{{< include _tutorial-03.qmd >}}
+
+
+## Looking Ahead
+
+This chapter has turned the report of Chapter 13 into a model. You designed a star schema, named the grain of its fact tables, and flattened the invoice header into its lines, so that every dimension relates to the fact table directly. You set relationships to filter in one direction, learned why a second date needs an inactive relationship, and built and marked a date table that the sales lines and the ledger share. You wrote explicit measures with SUM, DIVIDE, SUMX, and RELATED, and learned to read them in their filter and row contexts, including the context transition that happens whenever a measure is used inside a row. You changed the filter context with CALCULATE, compared periods with time intelligence, and modeled the ledger so that the closing entries and the signs of the accounts are handled once for every visual. Each measure was tested in DAX query view against a total you already trusted. Most of this work was descriptive analytics, in the terms of @tbl-01-01, but the comparisons it makes possible, a margin against the same quarter last year and an expense against its own recent history, are the first steps of diagnosis.
+
+The model now holds every number the managers asked for, and the controller's monthly income statement ties to the ledger. What it does not yet have is reports designed for the people who read them. Chapter 15 builds those reports on this model, with the visual calculations this chapter left aside.
+
+
+
+{{< include _summary.qmd >}}
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _further-reading.qmd >}}
+
+{{< include _references.qmd >}}

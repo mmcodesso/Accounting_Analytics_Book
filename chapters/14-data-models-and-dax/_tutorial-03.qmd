@@ -1,0 +1,189 @@
+## Guided Tutorial 14.3: Modeling the Ledger and the Income Statement
+
+**Context and objective.** In this tutorial, you will add the general ledger to the model as a second star that shares the Date table. You will flag the year-end closing entries in Power Query, write the ledger's measures, and build an income statement by year that ties to the net income of each closing entry. Then you will use time intelligence to compare each month's operating expenses with the months before it, and add a trial-balance test to the Tests tab.
+
+**Prerequisites.** You need Charles River Reports.pbix from Tutorials 14.1 and 14.2. GLEntry holds hundreds of thousands of rows, so loading it takes several minutes.
+
+**Step-by-step instructions.**
+
+**Step 1. Choose the ledger's Tables.**
+
+a. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select **T3_GLEntry**, **T1_Account**, **T75_CostCenter**, and **T2_JournalEntry**, and click **Transform Data**.
+c. Rename the queries `GLEntry`, `Account`, `CostCenter`, and `JournalEntry`.
+
+As in Part II, the ledger is opened with Transform Data, never Load, so that it is shaped before any of its rows reach the model.
+
+**Step 2. Keep the columns the model needs.**
+
+a. In **GLEntry**, choose **Home > Choose Columns** and keep GLEntryID, PostingDate, AccountID, Debit, Credit, VoucherNumber, SourceDocumentType, and CostCenterID, and set PostingDate's data type to **Date** if it shows a time.
+b. In **Account**, keep AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and NormalBalance.
+c. In **CostCenter**, keep CostCenterID and CostCenterName.
+d. In **JournalEntry**, keep EntryNumber and EntryType.
+
+**Step 3. Flag the closing entries.**
+
+a. Select **GLEntry**, choose **Home > Merge Queries**, and merge it with **JournalEntry** on VoucherNumber and EntryNumber, with a left outer join.
+b. Expand only EntryType, without the prefix.
+c. Choose **Add Column > Custom Column**, name the column `IsYearEndClose`, enter the formula below, and set the column's type to **True/False**.
+d. Right-click **JournalEntry** and clear **Enable load**, and choose **Home > Close & Apply**.
+
+```
+[EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close")
+```
+
+Only journal entries have a VoucherNumber equal to an EntryNumber, so every other posting finds no match and gets a null EntryType and a false flag. The postings of six journal entries are flagged, two closing entries for each fiscal year.
+
+**Step 4. Relate the ledger to its dimensions.**
+
+a. In **Model view**, drag AccountID from **GLEntry** onto AccountID in **Account**.
+b. Drag CostCenterID from **GLEntry** onto CostCenterID in **CostCenter**.
+c. Drag PostingDate from **GLEntry** onto Date in the **Date** table.
+d. Hide the three keys of GLEntry, as in Tutorial 14.1.
+
+The Date table now filters two fact tables, the invoice lines and the ledger, as in @fig-14-08.
+
+**Step 5. Write the ledger's measures.**
+
+a. Add the measures below to the Measures table, and format each as an amount.
+
+<!-- dax-check: measure -->
+```
+GL Amount =
+CALCULATE (
+    SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ),
+    GLEntry[IsYearEndClose] = FALSE ()
+)
+```
+
+<!-- dax-check: measure -->
+```
+P&L Amount = - [GL Amount]
+```
+
+<!-- dax-check: measure -->
+```
+Net Income =
+CALCULATE ( [P&L Amount], Account[AccountType] IN { "Revenue", "Expense" } )
+```
+
+GL Amount is debits less credits without the closing entries. P&L Amount reverses its sign, so revenue reads positive and expenses negative, and Net Income adds it up over the revenue and expense accounts.
+
+**Step 6. Build the income statement by year.**
+
+a. On a new page named `Income Statement`, add a matrix with AccountType and then AccountSubType from Account on **Rows**, Year from Date on **Columns**, and P&L Amount as **Values**.
+b. In **Filters on this visual**, keep the AccountType values Revenue and Expense, and the years 2024 to 2026.
+c. Add a card with Net Income, and in **Filters on this visual** keep the year 2026 for the card.
+d. Read each year's total in the matrix, and compare the 2026 total with the card.
+
+@fig-14-10 shows the matrix. Each year's total is that year's net income, and it equals the amount the year's closing entry transferred to retained earnings. To see why the flag matters, add the temporary measure below, which adds up all the postings, and place it in the matrix. It shows zero for every year, as in @fig-14-09. Delete it afterward.
+
+<!-- dax-check: measure -->
+```
+Net Income with Closes =
+CALCULATE (
+    SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] ),
+    Account[AccountType] IN { "Revenue", "Expense" }
+)
+```
+
+![The Income Statement by Year.](/visuals/svg/fig-14-10-income-statement.svg){#fig-14-10 fig-alt="A mock of a Power BI matrix with the account types Revenue and Expense and their subtypes as rows, and fiscal years 2024, 2025, and 2026 as columns. Operating revenue shows positive amounts, and the expenses, the contra revenue, and the other charges negative ones, and each year's total row, outlined, is that year's net income. A card above the matrix, filtered to fiscal 2026, shows that year's net income, equal to the matrix's 2026 total."}
+
+**Step 7. Write the expectation.** An expectation built from the three months before a month, not including it, cannot hide a spike in the month itself.
+
+a. Add the measures below to the Measures table.
+b. Format the first two as amounts and the third as a percentage with one decimal.
+
+<!-- dax-check: measure -->
+```
+Operating Expense =
+CALCULATE ( [GL Amount], Account[AccountSubType] = "Operating Expense" )
+```
+
+<!-- dax-check: measure -->
+```
+Expected Operating Expense =
+VAR MonthStart = MIN ( 'Date'[Date] )
+VAR PriorMonths =
+    DATESBETWEEN ( 'Date'[Date], EDATE ( MonthStart, -3 ), MonthStart - 1 )
+VAR MonthsInWindow =
+    COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), PriorMonths ) )
+RETURN
+    IF (
+        HASONEVALUE ( 'Date'[YearMonth] )
+            && NOT ISBLANK ( [Operating Expense] )
+            && MonthsInWindow > 0,
+        DIVIDE ( CALCULATE ( [Operating Expense], PriorMonths ), MonthsInWindow )
+    )
+```
+
+<!-- dax-check: measure -->
+```
+Operating Expense Deviation =
+DIVIDE (
+    [Operating Expense] - [Expected Operating Expense],
+    [Expected Operating Expense]
+)
+```
+
+The second measure is worth reading slowly. MonthStart is the first day of the month in the filter context. PriorMonths is the set of dates in the three months before it, which DATESBETWEEN takes from the date table, so for the first months of 2024 the window holds fewer than three months, or none. MonthsInWindow counts the months the window actually holds, and the result divides the expense of those months by their number. The condition makes the measure blank unless the filter context is a single month (HASONEVALUE tests that), so a total row never compares a year with one month, and blank as well when there is no expense to compare or no earlier month.
+
+**Step 8. Chart the expense against its expectation.**
+
+a. Add a line chart with YearMonth from Date on the axis and Operating Expense and Expected Operating Expense as values, filtered to the years 2024 to 2026.
+b. Add a table visual with YearMonth and Operating Expense Deviation, sorted from the largest deviation.
+c. Record the months whose deviation exceeds 20%.
+
+@fig-14-11 shows the line chart. Outside the start-up months of early 2024, the months well above their expectation are the ones with three pay dates, which Chapter 11 traced to payroll recorded when paid rather than accrued.
+
+![Monthly Operating Expense Against the Average of the Three Months Before.](/visuals/svg/fig-14-11-expense-expectation.svg){#fig-14-11 fig-alt="A mock of a Power BI line chart of operating expense by month from January 2024 to December 2026, with a second line for the expected operating expense, the average of the three months before each month. The actual line runs close to the expectation except for regular spikes about a quarter above it, in the months with three pay dates, and for the start-up months of early 2024. The spike months are marked."}
+
+**Step 9. Add the trial-balance test.**
+
+a. In DAX query view, open the **Tests** tab, and add the query below at the end.
+b. Run it, and compare its result with Chapter 6's pre-closing trial balance.
+c. Save the report.
+
+<!-- dax-check: query -->
+```
+// Test 3: the pre-closing trial balance at 2026-12-31 must balance at Chapter 6's total
+EVALUATE
+VAR Balances =
+    CALCULATETABLE (
+        ADDCOLUMNS (
+            VALUES ( Account[AccountID] ),
+            "Balance", CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ) )
+        ),
+        'Date'[Date] <= DATE ( 2026, 12, 31 ),
+        NOT GLEntry[VoucherNumber] IN { "JE-2026-000296", "JE-2026-000297" }
+    )
+RETURN
+    ROW (
+        "Accounts", COUNTROWS ( FILTER ( Balances, NOT ISBLANK ( [Balance] ) ) ),
+        "Debit balances", ROUND ( SUMX ( FILTER ( Balances, [Balance] > 0 ), [Balance] ), 2 ),
+        "Credit balances", ROUND ( -SUMX ( FILTER ( Balances, [Balance] < 0 ), [Balance] ), 2 )
+    )
+```
+
+The query keeps every posting through December 31, 2026, except the two closing entries of 2026, as Chapter 6's pre-closing trial balance did. It calculates each account's balance and adds up the debit balances and the credit balances separately. The two totals must be equal, and equal to Chapter 6's.
+
+<!-- Tutorial 14.3 expected values (Desktop 2.158 reference model through the local engine, and SQL): GLEntry 815,921 rows;
+     closes flagged: JE-2024-000265 (42 postings), -000266 (2), JE-2025-000287 (43), -000288 (2), JE-2026-000296 (43), -000297 (2);
+     VoucherNumber equals an EntryNumber only on the 2,821 JournalEntry postings. Net Income 2024 5,110,308.27, 2025 5,134,354.71,
+     2026 4,503,611.24 (each equal to its Income Summary to Retained Earnings close); with the closes included 0.00 in every year.
+     2026 by subtype (credit-positive): Operating Revenue 29,973,822.48; Contra Revenue -242,764.56; COGS -18,634,303.63;
+     Operating Expense -6,471,696.58; Other Expense -28,946.47; Other Income or Expense -92,500.00. Operating expense by year
+     6,033,733.49, 6,355,491.55, 6,471,696.58. Deviations above 20%: 2024-02 +44.8% and 2024-03 +51.4% (start-up), 2024-08 +29.6%,
+     2025-01 +28.1%, 2025-08 +26.7%, 2026-01 +30.3%, 2026-07 +25.4% (the three-pay-date months); every other month within
+     -10.5% to +1.9%; 2024-01 blank. Test 3: 71 accounts, debit and credit balances 67,107,722.36. The first version of the
+     expectation used DATESINPERIOD ending on the last day of the prior month; for January 2024 that window lies before the date
+     table, and the function returned a stray date, giving a false expectation, so the text uses DATESBETWEEN with a guard. -->
+
+**Checkpoint.** Before you build reports on the model, confirm the following:
+
+- The model has two fact tables, SalesInvoiceLine and GLEntry, sharing the Date table, and the closing entries are flagged.
+- The income statement's total for each fiscal year equals that year's net income, and a measure that keeps the closing entries shows zero.
+- The months whose operating expense deviates most from its expectation are the start-up months and the months with three pay dates.
+- Test 3 returns equal debit and credit balances, equal to Chapter 6's pre-closing trial balance.
+
+The model now answers both the sales questions and the controller's. Its two stars share one calendar, its measures exclude the closing entries once for every visual, and its tests show that it agrees with the workbook and the queries of the earlier Parts.

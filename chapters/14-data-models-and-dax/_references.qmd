@@ -1,0 +1,25 @@
+{{< pagebreak >}}
+
+## References
+
+Kimball, R., & Ross, M. (2013). *The data warehouse toolkit: The definitive guide to dimensional modeling* (3rd ed.). Wiley.
+
+Microsoft. (2021a). *Avoid using FILTER as a filter argument in DAX*. Microsoft Learn. <https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-avoid-filter-as-filter-argument>
+
+Microsoft. (2021b). *Use variables to improve your DAX formulas*. Microsoft Learn. <https://learn.microsoft.com/en-us/dax/best-practices/dax-variables>
+
+Microsoft. (2024a). *Active vs inactive relationship guidance*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/relationships-active-inactive>
+
+Microsoft. (2024b). *Bi-directional relationship guidance*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering>
+
+Microsoft. (2024c). *Design guidance for date tables in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables>
+
+Microsoft. (2024d). *Understand star schema and the importance for Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/star-schema>
+
+Microsoft. (2025a). *DAX query view*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view>
+
+Microsoft. (2025b). *Set and use date tables in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-date-tables>
+
+Microsoft. (2026). *CALCULATE function (DAX)*. Microsoft Learn. <https://learn.microsoft.com/en-us/dax/calculate-function-dax>
+
+O'Leary, D. E. (1999). REAL-D: A schema for data warehouses. *Journal of Information Systems*, *13*(1), 49–62. <https://doi.org/10.2308/jis.1999.13.1.49>

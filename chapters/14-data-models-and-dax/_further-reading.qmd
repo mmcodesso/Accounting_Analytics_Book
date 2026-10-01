@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Ferrari, A., & Russo, M. (2026). *The definitive guide to DAX: Mastering the semantic model expression language for Microsoft Power BI, Fabric, and Excel* (3rd ed.). Microsoft Press. The standard reference on DAX, by the authors who did most to explain it. Its chapters on evaluation contexts, CALCULATE, and context transition take the ideas of this chapter much further, and the third edition adds the calendar-based time intelligence that this book only names.
+
+Libby, T., Schwebke, J. M., & Goldwater, P. M. (2022). Using data analytics to evaluate the drivers of revenue: An introductory case study using Microsoft Power Pivot and Power BI. *Issues in Accounting Education*, *37*(4), 97–105. <https://doi.org/10.2308/issues-2021-057> A teaching case in which you act as a data analyst for a chain of home improvement stores, model ten years of data in Power Pivot or Power BI, and build a dashboard that lets the chief financial officer compare stores and managers by date and by state. It practices the same steps as this chapter on a different business.
+
+Microsoft. (2024b). *Bi-directional relationship guidance*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering> Microsoft's explanation of when a relationship should filter in both directions and when it should not, with the alternatives this chapter uses: a measure that counts on the fact table, and a direction changed inside one calculation rather than in the model.
+
+Microsoft. (2024d). *Understand star schema and the importance for Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/star-schema> The design guidance behind the first half of this chapter. It defines fact and dimension tables, explains why Power BI models work best as stars, and covers three cases this chapter met in the Charles River data: a snowflake dimension, which it recommends flattening into one table, a degenerate dimension, and a role-playing date.
+
+Microsoft. (2025a). *DAX query view*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view> The reference for the view in which this chapter's tests run. It describes the quick queries that write a query for a table or measure, how a measure defined in a query is added to the model, and how query tabs are saved with the report.
+
+O'Leary, D. E. (1999). REAL-D: A schema for data warehouses. *Journal of Information Systems*, *13*(1), 49–62. <https://doi.org/10.2308/jis.1999.13.1.49> An accounting information systems view of the star schema. It combines the resources-events-agents model of accounting events with the design of data warehouses, adding time as a dimension so that events roll up from day to month to year, and compares the result with star and snowflake schemas.

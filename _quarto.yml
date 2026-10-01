@@ -43,6 +43,7 @@ book:
     - part: "Data Visualization and Power BI"
       chapters:
         - chapters/13-power-bi-essentials/chapter.qmd
+        - chapters/14-data-models-and-dax/chapter.qmd
     - part: "Integrated and Applied Topics"
 
 

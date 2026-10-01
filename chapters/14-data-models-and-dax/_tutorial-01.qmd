@@ -1,0 +1,115 @@
+## Guided Tutorial 14.1: Building the Sales Star and the Date Table
+
+**Context and objective.** In this tutorial, you will turn the model of Chapter 13 into a star schema. You will merge the invoice header's date, number, and customer into the invoice lines, add a date table, connect the dimensions directly to the lines, and point the report's visuals at the date table. Then you will stop loading the invoice header and confirm on the Validation page that no total has changed. Restructuring a model is a common task, and the order of the steps matters: each visual must stop using a table before the table leaves the model.
+
+**Prerequisites.** You need Charles River Reports.pbix from the tutorials of Chapter 13, with its Sales and Discounts, Validation, and Review pages.
+
+**Step-by-step instructions.**
+
+**Step 1. Merge the invoice header into the lines.** The lines become the fact table, so they need the invoice's date, number, and customer.
+
+a. Choose **Home > Transform data** to open the Power Query Editor.
+b. Select the **SalesInvoiceLine** query, and choose **Home > Merge Queries**.
+c. In the **Merge** dialog, click SalesInvoiceID in the upper table, choose **SalesInvoice** in the lower list, click its SalesInvoiceID, leave **Join Kind** at **Left Outer**, and click **OK**.
+d. Click the expand button on the new column, select only InvoiceNumber, InvoiceDate, and CustomerID, clear **Use original column name as prefix**, and click **OK**.
+e. Choose **Home > Close & Apply**.
+
+The invoice lines now carry the three columns, and the match message of the merge reported that every line found its invoice, as in Tutorial 5.3. The SalesInvoice query still loads, for now, because the report's visuals still use its year and period columns.
+
+**Step 2. Create the date table.** A DAX table covers every day of the ledger's years.
+
+a. In Report view, choose **Modeling > New table**.
+b. Replace the text in the formula bar with the formula below, and press Enter.
+
+<!-- dax-check: table -->
+```
+Date =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2024, 1, 1 ), DATE ( 2027, 12, 31 ) ),
+    "Year", YEAR ( [Date] ),
+    "Quarter", "Q" & QUARTER ( [Date] ),
+    "YearQuarter", YEAR ( [Date] ) & "-Q" & QUARTER ( [Date] ),
+    "YearMonth", FORMAT ( [Date], "yyyy-mm" ),
+    "MonthNumber", MONTH ( [Date] ),
+    "MonthName", FORMAT ( [Date], "mmm" )
+)
+```
+
+The Data pane now lists a table named Date with seven columns. CALENDAR supplies the Date column, and each pair in ADDCOLUMNS adds one column: a name in quotes and the formula that fills it.
+
+**Step 3. Sort the month names and mark the date table.**
+
+a. Select the Date column of the Date table in the Data pane, and on the **Column tools** tab set **Data type** to **Date**, so that the dates show without a time.
+b. Select the MonthName column, and on the **Column tools** tab choose **Sort by column > MonthNumber**.
+c. Right-click the **Date** table in the Data pane, and choose **Mark as date table**.
+d. Choose Date as the date column, and confirm.
+e. Select **Table view**, select the **Date** table, and read the number of rows in the status bar.
+
+The table has one row for each day from January 1, 2024, to December 31, 2027, four full years, as @fig-14-02 shows. Marking it lets the time intelligence functions of Tutorial 14.3 rely on it.
+
+![The Date Table in Table View.](/visuals/svg/fig-14-02-date-table.svg){#fig-14-02 fig-alt="A mock of Power BI's Table view showing the first rows of the Date table: one row per day from January 1, 2024, with the columns Date, Year, Quarter, YearQuarter, YearMonth, MonthNumber, and MonthName. The status bar reports the table's name and number of rows, one for every day of four full years, and outlines it."}
+
+**Step 4. Replace the relationships.** Two relationships of the header-line chain give way to direct ones.
+
+a. Select **Model view**.
+b. Select the line between SalesInvoice and SalesInvoiceLine, press Delete, and confirm.
+c. Delete the line between Customer and SalesInvoice in the same way.
+d. Drag InvoiceDate from **SalesInvoiceLine** onto Date in the **Date** table.
+e. Drag CustomerID from **SalesInvoiceLine** onto CustomerID in **Customer**.
+
+If a relationship window opens for a drag, check that it reads many to one, with a single cross filter direction, and save it. The lines now sit at the center of three dimensions: Item, Customer, and Date. SalesInvoice is left unrelated, and its year slicer has stopped filtering anything, which the next step corrects.
+
+**Step 5. Point the visuals at the date table.** @tbl-14-02 lists each field to replace. To replace a field, drag its replacement from the Data pane onto the field in the visual's well, or onto its filter in the Filters pane.
+
+a. On the **Sales and Discounts** page, replace the fields of the year slicer, the line chart's axis, and the matrix's columns.
+b. On the **Validation** page, replace FiscalYear in the table of totals.
+c. On the **Review** page, replace the fields and the visual filters of the four charts.
+d. Set the year slicer on Sales and Discounts back to 2026, and the Review page's visual filters to 2026.
+
+| Field from SalesInvoice | Replace with, from Date |
+|----------------------|----------------------|
+| FiscalYear | Year |
+| Period | YearQuarter |
+| Month | YearMonth |
+
+: Fields replaced in Tutorial 14.1 {#tbl-14-02}
+
+Each visual now takes its periods from the date table. The values do not change, because each invoice date has the same year, quarter, and month in both tables.
+
+**Step 6. Stop loading SalesInvoice.**
+
+a. Choose **Home > Transform data**.
+b. Right-click the **SalesInvoice** query, and clear **Enable load**.
+c. Choose **Home > Close & Apply**.
+
+SalesInvoice disappears from the Data pane but stays in the Power Query Editor, where SalesInvoiceLine still uses it for the merge. If any visual now shows an error instead of a value, it still uses a SalesInvoice field: replace the field as in Step 5.
+
+**Step 7. Hide the keys.** Keys connect the tables, but a reader has no use for them.
+
+a. In **Model view**, select SalesInvoiceLineID, SalesInvoiceID, ItemID, and CustomerID in SalesInvoiceLine, together with ItemID in Item and CustomerID in Customer, holding Ctrl to select several.
+b. In the **Properties** pane, turn on **Is hidden** and set **Summarize by** to **None**.
+
+The keys no longer appear in the Data pane of Report view, so no one can sum them by mistake.
+
+**Step 8. Reconcile the restructured model.**
+
+a. Open the **Validation** page.
+b. Compare each row of the table of totals with the values you recorded in Tutorial 13.1.
+c. Save the report.
+
+Every year's line count, line total, list amount, and discounts should be unchanged, which proves that the restructuring lost no invoice line and moved none to another year. @fig-14-01 compares the model before and after.
+
+<!-- Tutorial 14.1 expected values (Desktop 2.158 reference model, run through the local engine on 2026-10-01, and SQL):
+     Date: 1,461 rows (2024-01-01 to 2027-12-31), YearMonth "2026-01" etc. Merge: 27,933 lines, every SalesInvoiceID matched.
+     Validation table after re-pointing: 2024 9,040 / 27,313,723.48 / 30,596,029.91 / 126,607.64; 2025 9,371 / 29,376,702.28 /
+     33,030,575.85 / 234,534.72; 2026 9,522 / 29,756,420.08 / 33,589,137.45 / 362,110.75 (unchanged). Invoices (DISTINCTCOUNT of
+     SalesInvoiceLine[SalesInvoiceID]) 6,735, 7,008, 7,171. Unquoted Item or Date in a formula fails ("The syntax for 'Item' is
+     incorrect"), and one broken measure stops every measure from evaluating. -->
+
+**Checkpoint.** Before you write measures on the new model, confirm the following:
+
+- The model view shows SalesInvoiceLine related to Item, Customer, and Date, each many to one with a single direction, and SalesInvoice is no longer a table of the model.
+- The Date table is marked as the date table and has one row per day for four full years, with MonthName sorted by MonthNumber.
+- No visual shows an error, and the Validation page's totals equal those of Tutorial 13.1.
+
+A model is restructured safely only when the totals it reports are the same before and after. With the star in place, every dimension filters the lines directly, which the measures of Tutorial 14.2 rely on.

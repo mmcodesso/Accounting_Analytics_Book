@@ -1,0 +1,126 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** Which statement gives the grain of the SalesInvoiceLine fact table?
+
+A.  One line of one invoice
+B.  One invoice with its total
+C.  One item in one fiscal quarter
+D.  One customer in one month
+
+**2.** In the model of Chapter 13, Customer filters SalesInvoice, and SalesInvoice filters SalesInvoiceLine. In the terms of this chapter, what is this arrangement?
+
+A.  A star with two fact tables that share the Customer dimension
+B.  A many-to-many relationship that runs through a junction table
+C.  A snowflake, with Customer reached through the header
+D.  A degenerate dimension stored inside the invoice line fact table
+
+**3.** After the header is flattened into the lines, InvoiceNumber stays in SalesInvoiceLine and is used to filter and group, with no table of its own. What is it called?
+
+A.  A role-playing dimension
+B.  A degenerate dimension
+C.  A calculated table
+D.  A surrogate key
+
+**4.** A colleague sets the relationship between Date and SalesInvoiceLine to Both, so that a date slicer lists only the days with sales. In the model of this chapter, what is the main risk?
+
+A.  The Date table can no longer be marked as the model's date table
+B.  The relationship becomes inactive until a measure switches it on
+C.  Every measure that uses DIVIDE begins to return an error
+D.  A selection on Item can then filter the ledger through Date
+
+**5.** SalesInvoiceLine has an InvoiceDate and a ShipmentDate, and the Date table is related to both. How does a measure calculate revenue by ship date?
+
+A.  By setting the ship-date relationship to Both
+B.  By adding a second date table filtered with FILTER
+C.  By using USERELATIONSHIP inside CALCULATE
+D.  By sorting Date by the ShipmentDate column
+
+**6.** The Charles River ledger runs from January 1, 2024, into February 2027. Which date table follows Microsoft's guidance?
+
+A.  One row for each day from January 1, 2024, to December 31, 2027
+B.  One row for each invoice date that appears in the invoice lines
+C.  One row for each month from January 2024 to February 2027
+D.  One row for each day from January 1, 2024, through February 23, 2027
+
+**7.** Which of the following belongs in a measure rather than in a calculated column?
+
+A.  The product type taken from the code of each item
+B.  The margin percentage of each cell in a matrix
+C.  The list amount of each invoice line
+D.  A flag on each posting of a closing entry
+
+**8.** The invoice lines hold the quantity, and the Item table holds the standard cost per unit. How should a measure calculate the standard cost of the lines in the filter context?
+
+A.  Multiply the total quantity by the total of the items' standard costs
+B.  Multiply the total quantity by the average standard cost of all items
+C.  Use RELATED in the measure itself, without an iterator around it
+D.  Iterate the lines with SUMX, multiplying quantity by RELATED cost
+
+**9.** A matrix shows revenue by item group on rows and by quarter on columns, and a slicer on the page is set to the Wholesale segment. Which filters make up the filter context of the Furniture cell for 2026-Q4?
+
+A.  Only the item group and the quarter of the cell's row and column
+B.  The item group, the quarter, and the Wholesale segment
+C.  Only the slicer, because rows and columns group without filtering
+D.  None, because measures ignore filters unless CALCULATE is used
+
+**10.** In a calculated column on the Customer table, `SUM ( SalesInvoiceLine[LineTotal] )` returns the same large amount on every row. Why?
+
+A.  The relationship from Customer to the invoice lines is inactive
+B.  Calculated columns are evaluated before relationships exist
+C.  SUM ignores relationships unless its column is hidden
+D.  The row context does not filter the lines without CALCULATE
+
+**11.** A table visual by item group shows the measure `CALCULATE ( [Revenue], 'Item'[ItemGroup] = "Furniture" )`. What does the Lighting row show?
+
+A.  Furniture's revenue, because the filter replaces Lighting
+B.  Lighting's revenue, because the row's filter takes priority
+C.  A blank, because the two item groups cannot both apply
+D.  Zero, because the two filters on ItemGroup intersect
+
+**12.** A share measure divides the revenue of each item group by `CALCULATE ( [Revenue], ALL ( SalesInvoiceLine ) )`. With a year slicer set to 2026, Furniture's share reads about a fifth. What is wrong?
+
+A.  ALL ignores the relationship between Item and the invoice lines
+B.  DIVIDE rounds its result down whenever a slicer is applied
+C.  Removing the filters from the fact table also removes the year
+D.  A share should be calculated with AVERAGE instead of DIVIDE
+
+**13.** What makes a query in the Tests tab of DAX query view a useful test of the model?
+
+A.  It runs faster than the visuals that show the same measures on a page
+B.  Its result is compared with a control total from another source
+C.  It is saved in a separate file that the report cannot change
+D.  It replaces the measure in every visual of the report
+
+**14.** A matrix by year shows `CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )` next to Revenue. Which year shows a prior-year value but no revenue?
+
+A.  2024, because the data begins in January 2024
+B.  2025, because 2024 was a start-up year
+C.  2027, because the date table runs through 2027
+D.  None, because the function skips years without data
+
+**15.** An income statement built on all the postings to the revenue and expense accounts shows a net income of zero in every year. What explains it?
+
+A.  The year-end closes reverse each year's revenue and expenses
+B.  Revenue is stored as credits, which cancel the debits of the expenses
+C.  The Date table is not marked, so the years are not kept apart
+D.  The relationship between GLEntry and Account is set to Both
+
+<!-- Answer key, Chapter 14:
+     1 A, 2 C, 3 B, 4 D, 5 C, 6 A, 7 B, 8 D, 9 B, 10 D, 11 A, 12 C, 13 B, 14 C, 15 A
+     1 A: the grain is the event one row represents, one line of one invoice.
+     2 C: a dimension that reaches the facts only through another table is a snowflake.
+     3 B: an attribute kept in the fact table without a dimension table is a degenerate dimension.
+     4 D: with Both, a filter on Item reaches Date through the lines and then the ledger (in 2026, Services leaves 12 days of operating expense).
+     5 C: the ship-date relationship is inactive; USERELATIONSHIP switches it on inside CALCULATE.
+     6 A: unique, contiguous days covering full years.
+     7 B: a ratio of totals that changes with the cell is a measure; the others belong to each row.
+     8 D: the cost is multiplied line by line and then added; totals multiplied give a meaningless number.
+     9 B: the row, the column, and the slicer all filter the cell.
+     10 D: a row context does not filter other tables; CALCULATE's context transition would.
+     11 A: a filter argument replaces the existing filter on the same column.
+     12 C: ALL on the fact table removes the filters that reach it from Date as well (Furniture 20.12% instead of 58.46%).
+     13 B: a test compares the model's result with a total trusted from elsewhere.
+     14 C: the 2027 rows of the date table have 2026 as their prior year.
+     15 A: the closes move each year's revenue and expenses to retained earnings, netting them to zero. -->

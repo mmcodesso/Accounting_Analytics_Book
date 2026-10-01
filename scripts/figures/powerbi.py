@@ -16,14 +16,18 @@ from dataclasses import dataclass, field
 
 import excel as xl
 from check_figures import text_width
-from drawio import (AMBER, BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, RULE, SMALL, TEAL, WHITE,
-                    Diagram, esc)
+import re
+
+from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, RULE, SMALL,
+                    TEAL, WHITE, Diagram, esc)
 
 FILE = "Charles River Reports"
 VIEWS = ["Report", "Table", "Model", "DAX query", "TMDL"]
-# The position of the Design tab, added in September 2026, is not documented; the author
-# checks it against the installed release.
+# Report view's ribbon tabs, read from Desktop 2.158 through UI Automation on 2026-10-01. Table
+# view shows File, Home, Help and Table tools; DAX query view shows File, Home and Help.
 TABS = ["File", "Home", "Insert", "Modeling", "Design", "View", "Optimize", "Help"]
+TABLE_TABS = ["File", "Home", "Help", "Table tools"]
+QUERY_TABS = ["File", "Home", "Help"]
 SERIES = [BLUE, AMBER, TEAL, CORAL, GRAY]   # data colors, in order; each pairs with a label
 RAIL_W = 72
 TAB_H = 26
@@ -74,10 +78,11 @@ class Window:
     extra: dict = field(default_factory=dict)
 
 
-def ribbon(d: Diagram, x: float, y: float, w: float, tab: str, buttons: list[str]) -> float:
+def ribbon(d: Diagram, x: float, y: float, w: float, tab: str, buttons: list[str],
+           tabs: list[str] | None = None) -> float:
     """The ribbon tabs and the buttons of the active tab. Returns the bottom y."""
     cx = x
-    for name in TABS:
+    for name in tabs or TABS:
         width = text_width(esc(name), SMALL, name == tab) + 18
         on = name == tab
         d.box(f"<b>{esc(name)}</b>" if on else esc(name), cx, y, width, TAB_H, fill=WHITE,
@@ -103,7 +108,12 @@ def rail(d: Diagram, x: float, y: float, h: float, active: str) -> None:
     d.box("", x, y, RAIL_W, h, fill=GRAY_TINT, stroke=RULE, rounded=False)
     for i, name in enumerate(VIEWS):
         on = name == active
-        d.box(f"<b>{esc(name)}</b>" if on else esc(name), x + 3, y + 6 + i * 34, RAIL_W - 6, 28,
+        # The active view is bold where the label fits; its blue border marks it either way.
+        bold = on and text_width(esc(name), SMALL, True) <= RAIL_W - 18
+        # An active label that wraps to two lines gets a taller box, so the border clears the text.
+        tall = on and not bold
+        d.box(f"<b>{esc(name)}</b>" if bold else esc(name), x + 3, y + 6 + i * 34 - (3 if tall else 0),
+              RAIL_W - 6, 34 if tall else 28,
               fill=WHITE if on else GRAY_TINT, stroke=BLUE if on else GRAY_TINT,
               stroke_width=2 if on else 1, color=BLUE if on else INK, size=SMALL, rounded=True)
 
@@ -124,14 +134,14 @@ def page_tabs(d: Diagram, x: float, y: float, pages: list[str], active: str) -> 
 
 def window(d: Diagram, height: float, view: str = "Report", tab: str = "Home",
            buttons: list[str] | None = None, panes: list[str] | None = None,
-           pane_w: float = 128, y: float = 0) -> Window:
+           pane_w: float = 128, y: float = 0, tabs: list[str] | None = None) -> Window:
     """Title bar, ribbon, left rail, and the frames of the right-hand panes. Returns the
     geometry of the canvas area; the caller draws the canvas, the pane contents, and the
     page tabs."""
     xl.title_bar(d, 0, y, 860, f"{FILE} - Power BI Desktop")
     top = ribbon(d, 0, y + 30, 860, tab, buttons or [
         "Get data ▾", "Transform data", "Refresh", "New visual", "Text box", "New measure",
-        "Publish"])
+        "Publish"], tabs)
     bottom = y + height
     rail(d, 0, top, bottom - top, view)
     panes = panes or []
@@ -196,7 +206,8 @@ def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | 
                ticks: list[float], every: int = 1, legend: bool = False,
                selected: bool = False) -> dict:
     """A line chart: series are (name, values, color); ticks set the value axis, whose first
-    tick is where the axis starts. Returns the plot geometry and the y mapping."""
+    tick is where the axis starts. A value of None is a blank, which Power BI leaves as a gap in
+    the line. Returns the plot geometry and the y mapping."""
     ix, iy, iw, ih = frame(d, x, y, w, h, title, selected)
     if legend:
         lx = ix
@@ -212,12 +223,14 @@ def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | 
     step = plot_w / len(categories)
     xs = [left + step * (i + 0.5) for i in range(len(categories))]
     for name, values, color in series:
-        anchors = [d.anchor(cx, y_of(v)) for cx, v in zip(xs, values)]
+        anchors = [d.anchor(cx, y_of(v)) if v is not None else None for cx, v in zip(xs, values)]
         for a, b in zip(anchors, anchors[1:]):
-            d.edge(a, b, color=color, width=2.5, meta="edgeStyle=none;")
+            if a and b:
+                d.edge(a, b, color=color, width=2.5, meta="edgeStyle=none;")
         for cx, v in zip(xs, values):
-            d.vertex("", f"ellipse;html=1;fillColor={color};strokeColor={color};", cx - 3,
-                     y_of(v) - 3, 6, 6)
+            if v is not None:
+                d.vertex("", f"ellipse;html=1;fillColor={color};strokeColor={color};", cx - 3,
+                         y_of(v) - 3, 6, 6)
     _category_labels(d, xs, categories, top + plot_h + 4, every, step * every)
     return dict(left=left, top=top, width=plot_w, height=plot_h, xs=xs, y_of=y_of,
                 axis_box=(ix, top - 10, 46, plot_h + 20))
@@ -411,15 +424,16 @@ class ModelTable:
 
 
 def model_table(d: Diagram, name: str, x: float, y: float, columns: list[str],
-                w: float = 170) -> ModelTable:
-    """A table card of Model view: the table name and its columns, without key markers."""
+                w: float = 170, marked: tuple[str, ...] = ()) -> ModelTable:
+    """A table card of Model view: the table name and its columns, without key markers.
+    Columns in marked get an amber tint, which the figure's legend explains."""
     d.box(f"<b>{esc(name)}</b>", x, y, w, 28, fill=BLUE_TINT, stroke=BLUE, size=SMALL,
           align="left", rounded=False)
     rows = {}
     for i, column in enumerate(columns):
         ry = y + 28 + i * ROW
-        d.box(esc(column), x, ry, w, ROW, fill=WHITE, stroke=RULE, size=SMALL, align="left",
-              rounded=False)
+        d.box(esc(column), x, ry, w, ROW, fill=AMBER_TINT if column in marked else WHITE,
+              stroke=RULE, size=SMALL, align="left", rounded=False)
         rows[column] = ry + ROW / 2
     h = 28 + len(columns) * ROW
     d.box("", x, y, w, h, fill="none", stroke=BLUE, rounded=False)
@@ -454,7 +468,125 @@ def relationship(d: Diagram, one: tuple[float, float], many: tuple[float, float]
     tag(many, path[-2], "*")
 
 
+# -- Table view -----------------------------------------------------------------------------
+
+def table_view(d: Diagram, x: float, y: float, table: str, headers: list[str], widths: list[float],
+               rows: list[list[str]], count: int) -> dict:
+    """The data grid of Table view with the first rows of a table, and the status bar, which
+    reads "Table: <name> (<n> rows)" in 2.158. Returns the geometry of the status text."""
+    cx = x
+    for head, width in zip(headers, widths):
+        d.box(f"<b>{esc(head)}</b>", cx, y, width, ROW + 2, fill=GRAY_TINT, stroke=RULE, size=SMALL,
+              align="left", rounded=False)
+        cx += width
+    for r, row in enumerate(rows):
+        cx = x
+        for value, width in zip(row, widths):
+            numeric = bool(re.fullmatch(r"-?[\d,./]+", value))   # numbers and dates
+            d.box(esc(value), cx, y + ROW + 2 + r * ROW, width, ROW, fill=WHITE, stroke=RULE,
+                  size=SMALL, align="right" if numeric else "left", rounded=False)
+            cx += width
+    status_y = y + ROW + 2 + len(rows) * ROW + 6
+    status = f"Table: {table} ({count:,} rows)"
+    sw = text_width(esc(status), SMALL, False) + 16
+    d.box(esc(status), x, status_y, sum(widths), 24, fill=GRAY_TINT, stroke=RULE, size=SMALL,
+          align="left", rounded=False)
+    return dict(status=(x, status_y, sw, 24), bottom=status_y + 24)
+
+
+# -- DAX query view -------------------------------------------------------------------------
+
+DAX_KEYWORDS = {
+    "EVALUATE", "DEFINE", "MEASURE", "VAR", "RETURN", "ORDER", "BY", "ASC", "DESC", "IN", "NOT",
+    "SUMMARIZECOLUMNS", "CALCULATE", "CALCULATETABLE", "TREATAS", "SUM", "SUMX", "DIVIDE",
+    "ROUND", "COUNTROWS", "DISTINCTCOUNT", "RELATED", "REMOVEFILTERS", "ALL", "FILTER", "ROW",
+    "ADDCOLUMNS", "VALUES", "DATE", "TOPN", "UNION", "IF", "ABS",
+}
+_DAX_TOKEN = re.compile(r"""(//.*$)|("(?:[^"]|"")*")|('[^']*')|(\b[A-Za-z_]+\b)|(\s+)|(.)""")
+
+
+def highlight_dax(line: str) -> str:
+    """HTML for one line of DAX: keywords and functions in bold blue, text in teal, comments
+    in italic gray. A name in single quotes is a table, not text, so it stays ink."""
+    out = []
+    for comment, string, table, word, space, other in _DAX_TOKEN.findall(line):
+        if comment:
+            out.append(f'<i><font color="{GRAY}">{esc(comment)}</font></i>')
+        elif string:
+            out.append(f'<font color="{TEAL}">{esc(string)}</font>')
+        elif table:
+            out.append(esc(table))
+        elif word:
+            out.append(f'<b><font color="{BLUE}">{word}</font></b>' if word in DAX_KEYWORDS
+                       else esc(word))
+        else:
+            out.append(space.replace(" ", "&nbsp;") if space else esc(other))
+    return "".join(out)
+
+
+def dax_query_editor(d: Diagram, x: float, y: float, w: float, query: str,
+                     tabs: list[str], active: str) -> float:
+    """The Run button, the query tabs and the editor of DAX query view. The real Run button
+    carries the tooltip "Run the selected portion of the DAX query or the whole thing if nothing
+    is selected (F5 or CTRL + SHIFT + E)". Returns the bottom y of the editor."""
+    xl.button(d, x, y, 70, "▶ Run", primary=True)
+    xl.button(d, x + 78, y, 214, "Update model with changes (0)")
+    y += 32
+    cx = x
+    for name in tabs:
+        on = name == active
+        width = text_width(esc(name), SMALL, on) + 24
+        d.box(f"<b>{esc(name)}</b>" if on else esc(name), cx, y, width, 24, fill=WHITE,
+              stroke=BLUE if on else RULE, stroke_width=2 if on else 1, color=BLUE if on else INK,
+              size=SMALL, rounded=False)
+        cx += width + 2
+    d.box("<b>+</b>", cx, y, 26, 24, fill=WHITE, stroke=RULE, size=SMALL, rounded=False)
+    y += 24
+    lines = query.strip("\n").split("\n")
+    gutter, line_h = 34, 20
+    height = len(lines) * line_h + 8
+    d.box("", x, y, gutter, height, fill=GRAY_TINT, stroke=RULE, rounded=False)
+    d.box("", x + gutter, y, w - gutter, height, fill=WHITE, stroke=RULE, rounded=False)
+    for i, line in enumerate(lines):
+        ly = y + 4 + i * line_h
+        d.text(str(i + 1), x, ly, gutter - 4, line_h, size=SMALL, color=GRAY, align="right",
+               valign="middle")
+        label = highlight_dax(line)
+        assert text_width(label, SMALL, False) <= w - gutter - 12, f"{d.name}: DAX line too wide: {line}"
+        d.text(label or " ", x + gutter + 4, ly, w - gutter - 8, line_h, size=SMALL, valign="middle")
+    return y + height
+
+
+def dax_results(d: Diagram, x: float, y: float, headers: list[str], widths: list[float],
+                rows: list[list[str]]) -> dict:
+    """The Results grid of DAX query view and its status, such as "5 columns, 3 rows". The grid
+    shows values without the measures' format strings (a documented limitation), so the mock
+    writes them as the query returns them. Returns the geometry of every cell."""
+    d.text("<b>Results</b>", x, y, 120, 22, size=SMALL)
+    y += 24
+    geometry = {}
+    cx = x
+    for c, (head, width) in enumerate(zip(headers, widths)):
+        d.box(f"<b>{esc(head)}</b>", cx, y, width, ROW + 2, fill=GRAY_TINT, stroke=RULE, size=SMALL,
+              align="left", rounded=False)
+        geometry[(-1, c)] = (cx, y, width, ROW + 2)
+        cx += width
+    for r, row in enumerate(rows):
+        cx = x
+        for c, (value, width) in enumerate(zip(row, widths)):
+            ry = y + ROW + 2 + r * ROW
+            d.box(esc(value), cx, ry, width, ROW, fill=WHITE, stroke=RULE, size=SMALL,
+                  align="left", rounded=False)
+            geometry[(r, c)] = (cx, ry, width, ROW)
+            cx += width
+    status_y = y + ROW + 2 + len(rows) * ROW + 6
+    d.text(esc(f"{len(headers)} columns, {len(rows)} rows"), x, status_y, 220, 20, size=SMALL,
+           color=GRAY)
+    return dict(geometry=geometry, bottom=status_y + 20)
+
 __all__ = ["FILE", "VIEWS", "TABS", "SERIES", "Window", "amount", "units", "nice_ticks", "ribbon",
            "rail", "page_tabs", "window", "canvas", "frame", "card", "line_chart", "column_chart",
            "bar_chart", "combo_chart", "table_visual", "matrix_visual", "slicer_tiles",
-           "slicer_dropdown", "ModelTable", "model_table", "relationship", "ROW", "RAIL_W"]
+           "slicer_dropdown", "ModelTable", "model_table", "relationship", "ROW", "RAIL_W",
+           "TABLE_TABS", "QUERY_TABS", "table_view", "highlight_dax", "dax_query_editor",
+           "dax_results"]
