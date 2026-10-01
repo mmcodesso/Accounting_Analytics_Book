@@ -1,0 +1,126 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** Which of the following is a key performance indicator in the sense of this chapter?
+
+A.  The operating expense of fiscal 2026
+B.  Every measure stored in the Measures table
+C.  A line chart that shows more than one series
+D.  A cost center's spending against its budget
+
+**2.** In the study by Lipe and Salterio (2000), superiors evaluated two business units whose scorecards held some measures common to both units and some unique to each. Which measures affected their evaluations?
+
+A.  Only the measures unique to each unit
+B.  Only the measures common to both units
+C.  Only the nonfinancial measures of each unit
+D.  All of the measures, weighted equally
+
+**3.** A reader right-clicks the bar of one promotion and opens a page that shows only that promotion's terms and invoice lines. Which feature is the reader using?
+
+A.  Drill-through
+B.  Drill-down
+C.  A report-page tooltip
+D.  A bookmark
+
+**4.** Why should a report never place information the reader must have only in a report-page tooltip?
+
+A.  Tooltip pages cannot show measures
+B.  Tooltips appear only in the Power BI service
+C.  Screen readers cannot read the tooltip's content
+D.  Tooltip pages are removed when the report is published
+
+**5.** The Steps table of Tutorial 15.1 has no relationship to any other table. How does the waterfall chart show a different value for each step?
+
+A.  Power BI relates Steps to the invoice lines on the Order column
+B.  The measure tests the step in context with SELECTEDVALUE
+C.  Each step is a separate measure placed on the Y-axis
+D.  The waterfall adds up the Order column of each step
+
+**6.** BudgetLine records a month but no day. How does Microsoft's guidance relate such a fact table to the date table?
+
+A.  Relate the month names in a many-to-many relationship
+B.  Copy each month's budget to every day of the month
+C.  Leave it unrelated and filter it with its own slicer
+D.  Store each month's first day and relate that date
+
+**7.** Computed as actual less budget, a cost center's operating expense variance is +26.9 percent. What does the variance say?
+
+A.  The cost center spent less than its budget
+B.  The cost center's revenue exceeded its budget
+C.  The cost center spent more than its budget
+D.  The budget was raised during the year
+
+**8.** In fiscal 2026, the Sales cost center spent far less than its operating expense budget. What explains most of the difference?
+
+A.  The commission budget assumed the budget's sales volume
+B.  The salaries of the sales staff were reduced during the year
+C.  The Sales depreciation was recorded in the Warehouse instead
+D.  The salaries paid in the months with three pay dates
+
+**9.** Depreciation was budgeted entirely in Administration and recorded partly in the Warehouse. Which statement about this classification effect is true?
+
+A.  It explains most of the company's total variance
+B.  It adds up to zero across the cost centers
+C.  It is a timing difference that reverses the next year
+D.  It shows that the Warehouse overspent its budget
+
+**10.** A twelve-month moving average is written as a visual calculation on a chart whose axis is filtered to start in January 2025. What does it return for January 2025?
+
+A.  The same value as a measure that uses DATESINPERIOD
+B.  A blank, because twelve months are not available
+C.  An error, because the window reaches before the start of the axis
+D.  The average of the months on the chart, January alone
+
+**11.** Which calculation belongs in a measure in the model rather than in a visual calculation?
+
+A.  A KPI that readers export and compare across pages
+B.  A running total that appears on one chart of one page
+C.  The difference from the previous row of one table
+D.  A percent of parent within one matrix visual
+
+**12.** In Tutorial 15.3, Direct Hours filters LaborType to direct time inside CALCULATE, yet it returned every manufacturing hour until KEEPFILTERS was added to Manufacturing Hours. Why?
+
+A.  The relationship from LaborTimeEntry to Employee was inactive
+B.  LaborType was hidden from the Data pane in Model view
+C.  The filter inside Manufacturing Hours replaced the outer one
+D.  DIVIDE ignored the filter on LaborType in the ratio
+
+**13.** Why does this chapter build page navigation with a page navigator rather than with bookmarks?
+
+A.  Bookmarks cannot be used in Power BI Desktop
+B.  A navigator works without Ctrl in Power BI Desktop
+C.  The navigator updates itself as pages change
+D.  Bookmarks cannot capture filters or slicers
+
+**14.** What does Modeling > New parameter > Numeric range create?
+
+A.  A calculated column on the fact table
+B.  A table of values and a measure of the selected value
+C.  A bookmark for each value in the range
+D.  A relationship from the parameter table to the date table
+
+**15.** Before showing a manager a forecast from the Analytics pane, what should you do first?
+
+A.  Test it on data ending before a known quarter
+B.  Widen its confidence interval to 99 percent
+C.  Delete the start-up month from the source data
+D.  Rebuild it as a visual calculation on the chart
+
+<!-- Answer key, Chapter 15:
+     1 D, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 B, 10 D, 11 A, 12 C, 13 C, 14 B, 15 A
+     1 D: a KPI is a measure shown with the comparison that gives it meaning.
+     2 B: only the common measures affected the evaluations (Lipe & Salterio, 2000).
+     3 A: drill-through opens another page filtered to the selected item.
+     4 C: tooltips are not interactive and screen readers cannot read them (Learn).
+     5 B: a disconnected table supplies categories; the measure reads the selected step.
+     6 D: store the first day of the period and relate it one-to-many to the date table.
+     7 C: actual less budget, positive for an expense, is spending above budget, unfavorable.
+     8 A: the commission budget was calculated on the budget's revenue volume, several times actual.
+     9 B: a classification difference moves cost between cost centers; the total is unchanged.
+     10 D: a visual calculation sees only the rows on its visual (1.375 against the measure's 1.121).
+     11 A: visual calculations cannot be reused or exported; KPIs belong in measures.
+     12 C: a filter argument on the same column replaces the existing filter unless KEEPFILTERS is used.
+     13 C: the page navigator syncs with pages; bookmarks capture a page as it was.
+     14 B: a GENERATESERIES-style table and a measure with SELECTEDVALUE, and optionally a slider.
+     15 A: judge a forecast by a hindcast against known periods and simple benchmarks (Chapter 7). -->

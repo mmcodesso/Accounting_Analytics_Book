@@ -47,6 +47,8 @@ def units(value: float, unit: str) -> str:
         return f"{value / 1e6:.1f}M"
     if unit == "K":
         return f"{value / 1e3:.0f}K"
+    if unit == "ratio":
+        return f"{value:.2f}"
     return f"{value:,.0f}"
 
 
@@ -268,8 +270,8 @@ def bar_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | N
     x_of = lambda v: left + (v - ticks[0]) * plot_w / (ticks[-1] - ticks[0])
     for t in ticks:
         d.box("", x_of(t), top, 1, plot_h, fill=RULE, stroke=RULE, rounded=False)
-        d.text(units(t, unit), x_of(t) - 24, top + plot_h + 4, 48, 20, size=SMALL, color=GRAY,
-               align="center")
+        d.text(units(t, unit), min(x_of(t) - 24, 860 - 48), top + plot_h + 4, 48, 20, size=SMALL,
+               color=GRAY, align="center")
     slot = plot_h / len(categories)
     for i, (name, v) in enumerate(zip(categories, values)):
         by = top + slot * i + slot * 0.2
@@ -500,7 +502,8 @@ DAX_KEYWORDS = {
     "EVALUATE", "DEFINE", "MEASURE", "VAR", "RETURN", "ORDER", "BY", "ASC", "DESC", "IN", "NOT",
     "SUMMARIZECOLUMNS", "CALCULATE", "CALCULATETABLE", "TREATAS", "SUM", "SUMX", "DIVIDE",
     "ROUND", "COUNTROWS", "DISTINCTCOUNT", "RELATED", "REMOVEFILTERS", "ALL", "FILTER", "ROW",
-    "ADDCOLUMNS", "VALUES", "DATE", "TOPN", "UNION", "IF", "ABS",
+    "ADDCOLUMNS", "VALUES", "DATE", "TOPN", "UNION", "IF", "ABS", "SWITCH", "SELECTEDVALUE",
+    "KEEPFILTERS", "RUNNINGSUM", "MOVINGAVERAGE", "PREVIOUS", "DATESINPERIOD", "MAX", "ISBLANK",
 }
 _DAX_TOKEN = re.compile(r"""(//.*$)|("(?:[^"]|"")*")|('[^']*')|(\b[A-Za-z_]+\b)|(\s+)|(.)""")
 
@@ -584,9 +587,110 @@ def dax_results(d: Diagram, x: float, y: float, headers: list[str], widths: list
            color=GRAY)
     return dict(geometry=geometry, bottom=status_y + 20)
 
+# -- Report pages (Chapter 15) ----------------------------------------------------------------
+
+def waterfall_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | None,
+                    categories: list[str], values: list[float], unit: str, ticks: list[float],
+                    total_label: str = "Total") -> dict:
+    """A waterfall chart: each category floats from the running total, and Power BI adds the
+    total column. Increases are teal, decreases coral and the total blue, and every column
+    carries a signed data label, so the meaning does not rest on color."""
+    ix, iy, iw, ih = frame(d, x, y, w, h, title)
+    left, plot_w = ix + 48, iw - 56
+    top, plot_h = iy + 24, ih - 58
+    y_of = _value_axis(d, left, top, plot_h, ticks, unit, ix, grid_w=plot_w)
+    names = categories + [total_label]
+    step = plot_w / len(names)
+    running = 0.0
+    xs = []
+    for i, name in enumerate(names):
+        is_total = i == len(categories)
+        v = running if is_total else values[i]
+        low, high = (min(0, running), max(0, running)) if is_total else (min(running, running + v),
+                                                                         max(running, running + v))
+        color = BLUE if is_total else TEAL if v >= 0 else CORAL
+        cx = left + step * i + step * 0.18
+        xs.append(cx + step * 0.32)
+        d.box("", cx, y_of(high), step * 0.64, max(y_of(low) - y_of(high), 1), fill=color, stroke=color,
+              rounded=False)
+        sign = "" if is_total else ("+" if v >= 0 else "−")
+        d.text(sign + units(abs(v), unit), cx - 10, y_of(high) - 20, step * 0.64 + 20, 20, size=SMALL,
+               align="center")
+        if not is_total:
+            running += v
+    _category_labels(d, xs, names, top + plot_h + 4, 1, step)
+    return dict(left=left, top=top, width=plot_w, height=plot_h, xs=xs, y_of=y_of, step=step)
+
+
+def variance_icon(d: Diagram, x: float, y: float, kind: str, size: float = 12) -> None:
+    """A conditional-formatting icon: an arrow up (over budget), an arrow down (under budget),
+    or a circle (within the band). The shapes differ, so the icon reads without color."""
+    if kind == "up":
+        d.vertex("", f"triangle;direction=north;html=1;fillColor={CORAL};strokeColor={CORAL};", x, y, size, size)
+    elif kind == "down":
+        d.vertex("", f"triangle;direction=south;html=1;fillColor={TEAL};strokeColor={TEAL};", x, y, size, size)
+    else:
+        d.vertex("", f"ellipse;html=1;fillColor={GRAY};strokeColor={GRAY};", x + 1, y + 1, size - 2, size - 2)
+
+
+def back_button(d: Diagram, x: float, y: float) -> str:
+    """The back button Power BI adds to a drill-through page; the real button is an arrow icon."""
+    return d.box("◀ Back", x, y, 70, 26, fill=WHITE, stroke=GRAY, size=SMALL, rounded=True)
+
+
+def page_navigator(d: Diagram, x: float, y: float, pages: list[str], active: str,
+                   width: float | None = None) -> float:
+    """A page navigator: one button per visible page, the current page filled. Returns the
+    right edge."""
+    cx = x
+    for name in pages:
+        on = name == active
+        bw = text_width(esc(name), SMALL, on) + 20
+        d.box(f"<b>{esc(name)}</b>" if on else esc(name), cx, y, bw, 28, fill=BLUE if on else WHITE,
+              stroke=BLUE, color=WHITE if on else BLUE, size=SMALL, rounded=True)
+        cx += bw + 6
+    return cx
+
+
+def visual_calc_editor(d: Diagram, x: float, y: float, w: float, formula: str,
+                       preview: callable, preview_h: float, headers: list[str],
+                       widths: list[float], rows: list[list[str]]) -> dict:
+    """The edit mode of a visual calculation: the Back to report button, a preview of the visual,
+    the formula bar, and the visual matrix. preview(d, x, y, w, h) draws the preview."""
+    xl.button(d, x, y, 130, "◀ Back to report")
+    d.text("<i>Visual calculations edit mode</i>", x + 140, y + 4, 300, 22, size=SMALL, color=GRAY)
+    y += 34
+    d.box("", x, y, w, preview_h, fill=GRAY_TINT, stroke=RULE, rounded=False)
+    preview(d, x + 8, y + 8, w - 16, preview_h - 16)
+    y += preview_h + 8
+    d.box("<i>fx</i>", x, y, 30, 28, fill=WHITE, stroke=WHITE, color=GRAY, size=SMALL, rounded=False)
+    label = highlight_dax(formula)
+    assert text_width(label, SMALL, False) <= w - 50, f"{d.name}: formula too wide"
+    d.box(label, x + 34, y, w - 34, 28, fill=WHITE, stroke=RULE, size=SMALL, align="left", rounded=False)
+    y += 36
+    d.text("<b>Visual matrix</b>", x, y, 200, 20, size=SMALL)
+    y += 22
+    cx = x
+    for head, width in zip(headers, widths):
+        d.box(f"<b>{esc(head)}</b>", cx, y, width, ROW + 2, fill=GRAY_TINT, stroke=RULE, size=SMALL,
+              align="left", rounded=False)
+        cx += width
+    geometry = {}
+    for r, row in enumerate(rows):
+        cx = x
+        for c, (value, width) in enumerate(zip(row, widths)):
+            ry = y + ROW + 2 + r * ROW
+            numeric = bool(re.fullmatch(r"[-−]?[\d,.]+", value))
+            d.box(esc(value), cx, ry, width, ROW, fill=WHITE, stroke=RULE, size=SMALL,
+                  align="right" if numeric else "left", rounded=False)
+            geometry[(r, c)] = (cx, ry, width, ROW)
+            cx += width
+    return dict(geometry=geometry, bottom=y + ROW + 2 + len(rows) * ROW)
+
 __all__ = ["FILE", "VIEWS", "TABS", "SERIES", "Window", "amount", "units", "nice_ticks", "ribbon",
            "rail", "page_tabs", "window", "canvas", "frame", "card", "line_chart", "column_chart",
            "bar_chart", "combo_chart", "table_visual", "matrix_visual", "slicer_tiles",
            "slicer_dropdown", "ModelTable", "model_table", "relationship", "ROW", "RAIL_W",
            "TABLE_TABS", "QUERY_TABS", "table_view", "highlight_dax", "dax_query_editor",
-           "dax_results"]
+           "dax_results", "waterfall_chart", "variance_icon", "back_button", "page_navigator",
+           "visual_calc_editor"]

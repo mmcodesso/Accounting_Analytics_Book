@@ -1,0 +1,185 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on these exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch15 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 15.1`), and put the measures it asks for in a display folder of the Measures table with the same name. Do not change the queries, relationships, measures, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
+
+### Financial Accounting Exercises
+
+**Exercise 15.1: From the Income Statement to the Entry**
+
+**Table group:** Accounting Core
+
+**Scenario.** On the Income Statement page of Tutorial 14.3, the controller notices a line of other income or expense that appears in fiscal 2025 and 2026 and in no other year, and asks what it is. The answer is one drill-through away.
+
+**Requirements.**
+
+(1) Add a page named `Ledger Detail` with AccountSubType from Account in its drill-through well. Add a table visual with PostingDate, VoucherNumber, SourceDocumentType, AccountNumber, AccountName, and the P&L Amount measure.
+
+(2) On the Income Statement page, drill through from the Other Income or Expense row of fiscal 2026, and then of fiscal 2025. Record the entries you find, their dates, and their amounts.
+
+(3) In DAX query view, write a query that lists every posting of the 2026 entry with its account number, account name, debit, and credit. Use RELATED to bring the account columns onto the postings.
+
+(4) Explain from the accounts in the entry how the amount was calculated, and why the same calculation gives a different result for the 2025 entry.
+
+(5) Explain why the drill-through page also needed the year from the matrix's column, and what the page would have shown if the year had not been passed to it.
+
+**Deliverable.** The Ledger Detail page, the query, and a short note answering requirements (2), (4), and (5).
+
+<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds 7020 Gain or Loss on Asset
+     Disposal and 7040 Foreign Exchange Gain or Loss (no postings); only 7020 has entries. 2026: JE-2026-000115, 2026-06-05, "Recognize loss on asset disposal": Dr 7020 92,500.00, Dr 1186
+     Accumulated Depreciation - Manufacturing Equipment 117,500.00, Cr 1185 Manufacturing Equipment 210,000.00; FixedAssetEvent 20,
+     asset 4, "Retirement Of Obsolete Packing Line Conveyor", proceeds 0; loss = cost 210,000 - accumulated depreciation 117,500 -
+     proceeds 0. 2025: JE-2025-000028, 2025-02-12: Dr 7020 42,000.00, Dr 1010 Cash 28,000.00, Dr 1160 98,000.00, Cr 1120 Warehouse
+     Equipment 168,000.00 (asset 6, "Disposal Of Replaced Forklift A"); loss = 168,000 - 98,000 - 28,000 proceeds. The closes
+     JE-2026-000296 and JE-2025-000287 credit 7020 but are excluded by GL Amount, so the drill-through shows only the loss entries.
+     (5) Drill-through passes the filters of the selected data point, the row (AccountSubType) and the column (Year); without the year
+     the page would list both years' entries. -->
+
+**Exercise 15.2: Month and Year to Date With Visual Calculations**
+
+**Table group:** Accounting Core
+
+**Scenario.** The controller wants a table of fiscal 2026 net income by month, with the change from the previous month and the year to date, and asks whether visual calculations can produce it without new measures.
+
+**Requirements.**
+
+(1) Add a table visual with YearMonth and Net Income, filtered to 2026. Add two visual calculations: the year to date with RUNNINGSUM, and the change from the previous month with PREVIOUS.
+
+(2) Add a measure, Net Income YTD, that uses TOTALYTD, and place it in the same table. Confirm that it equals the visual calculation in every month, and that both reach the net income of Tutorial 14.3 in December.
+
+(3) Filter the table to the months July to December. Compare the two year-to-date columns, and explain the difference.
+
+(4) Identify the two months with the lowest net income, and explain at least one of them using an earlier chapter's finding.
+
+(5) Recommend which of the two year-to-date columns the monthly package should show, and why.
+
+**Deliverable.** The table, the measure, and a note answering requirements (3) to (5).
+
+<!-- Instructor notes, Exercise 15.2 (CR15 reference model): 2026 net income by month: Jan 310,849.93; Feb 341,046.27; Mar
+     447,271.03; Apr 442,726.36; May 485,708.78; Jun 325,069.56; Jul 114,521.97; Aug 403,445.66; Sep 468,714.44; Oct 255,812.14;
+     Nov 405,751.40; Dec 502,693.70; YTD at June 2,352,671.93, December 4,503,611.24 (equal to JE-2026-000297). Visual calculations:
+     YTD = RUNNINGSUM ( [Net Income] ); Change = [Net Income] - PREVIOUS ( [Net Income] ). (3) Filtered to July-December, the running
+     sum starts at July and reaches 2,150,939.31 in December, while TOTALYTD still shows 2,467,193.90 in July and 4,503,611.24 in
+     December, because the measure reads the model and the visual calculation only the visual's rows. (4) July is the month with three
+     pay dates (Chapters 11 and 14) and the low point; October has Furniture revenue 22.7% below October 2025 (Chapter 11) at the peak
+     of the promotion's discounts. (5) The measure, which is right whatever the visual shows and can be exported. -->
+
+### Managerial Accounting Exercises
+
+**Exercise 15.3: One Chart, Three Measures**
+
+**Table group:** Payroll and Time, with Manufacturing
+
+**Scenario.** The production manager wants the plant page to show, in one chart, either hours per standard hour, the overtime share, or the labor cost per standard hour, chosen from a slicer.
+
+**Requirements.**
+
+(1) Write a measure, Labor Cost per Standard Hour, that divides the extended labor cost of manufacturing time by Standard Hours to Cut-off. Use KEEPFILTERS as Manufacturing Hours does.
+
+(2) Choose **Modeling > New parameter > Fields**, name the parameter `Plant Measure`, and add Hours per Standard Hour, Overtime Share, and Labor Cost per Standard Hour.
+
+(3) Add a clustered column chart with Year on the **X-axis** and the Plant Measure parameter on the **Y-axis**, filtered to 2024 to 2026, and the slicer that Power BI adds. Record the three measures for each year.
+
+(4) Explain why the labor cost per standard hour rose faster than the hours per standard hour.
+
+(5) Try to use the field parameter as the field of a drill-through page, and explain what Power BI allows instead.
+
+**Deliverable.** The chart and its slicer, and a short note answering requirements (3) to (5).
+
+<!-- Instructor notes, Exercise 15.3 (CR15 reference model): Labor Cost per Standard Hour = DIVIDE ( CALCULATE ( SUM (
+     LaborTimeEntry[ExtendedLaborCost] ), KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" ) ), [Standard Hours to Cut-off] ).
+     By year: hours per standard hour 1.18, 1.41, 1.51; overtime share 0.116, 0.167, 0.198; labor cost per standard hour 33.18,
+     40.71, 44.21 (manufacturing labor cost 2,351,220.56; 2,691,548.63; 2,961,742.51). (4) Cost per standard hour = hours per standard
+     hour x cost per hour; overtime hours cost a premium, and the overtime share grew, so the cost per hour rose too (rates also rose).
+     (5) Learn: field parameters cannot be the linked fields of a drill-through or tooltip page; link the underlying fields instead. -->
+
+**Exercise 15.4: What Would the Design Trade Promotion Need?**
+
+**Table group:** Order-to-Cash, with Item and the promotions
+
+**Scenario.** The sales manager is considering the Design Trade Customer Promotion again for 2027 and asks how much additional volume it would need, at different discounts, to pay for itself. The Part II case answered this once with Goal Seek; the report should let the manager try discounts directly.
+
+**Requirements.**
+
+(1) Choose **Modeling > New parameter > Numeric range**, name it `Discount`, with a minimum of 0, a maximum of 0.2, an increment of 0.01, and a default of 0.12, and add its slider to the page.
+
+(2) Write measures, filtered to the Design Trade Customer Promotion's 2026 lines, for the units, the price before discount per unit, and the standard cost per unit.
+
+(3) Write a measure for the break-even lift, the increase in volume at which the contribution with the discount equals the contribution without it, using Chapter 7's model with the commission rate of the Part II case (1.903 percent). The lift is the contribution per unit without the discount divided by the contribution per unit with it, less one.
+
+(4) Record the break-even lift at discounts of 5, 8, 10, 12, and 15 percent, and compare the 12 percent result with the Part II case.
+
+(5) Using the Part II case's evidence about volume in the promotion months, advise the sales manager on whether, and at what discount, to repeat the promotion.
+
+**Deliverable.** The page with the slider and the measures, and a short recommendation.
+
+<!-- Instructor notes, Exercise 15.4 (CR15 reference model and Python): promotion 9 2026 lines: 561.74 units, price before discount
+     416.23 per unit, standard cost 215.99 per unit (the Part II case's inputs). Break-even lift = (p (1 - 0.01903) - c) / (p (1 - d)
+     (1 - 0.01903) - c) - 1: 5% 11.9%, 8% 20.5%, 10% 27.0%, 12% 34.2% (the Part II case), 15% 46.7%. The case found no lift in any
+     promotion's months (from -20.7% to +11.9% against the other months of the year), so even a 5% discount needs about the largest
+     increase ever measured; a defensible answer is not to repeat it, or to test a small discount on a defined group first. -->
+
+### Auditing Exercises
+
+**Exercise 15.5: Testing the Forecast Before Trusting It**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** A manager has seen the forecast in the Analytics pane and wants to use it for the 2027 plan. Before the internal auditor accepts it, the auditor tests it the way Chapter 7 tested its forecasts: on a quarter whose results are already known.
+
+**Requirements.**
+
+(1) Add a calculated column MonthStart to the Date table, `DATE ( YEAR ( 'Date'[Date] ), MONTH ( 'Date'[Date] ), 1 )`, formatted as a date. A forecast needs a continuous date axis, which the text column YearMonth cannot provide.
+
+(2) Add a line chart with MonthStart on the **X-axis** and Revenue on the **Y-axis**, filtered to the months from January 2024 to September 2026. In the **Analytics** pane, add a forecast of three months with a 95 percent confidence interval.
+
+(3) Record the forecast for October, November, and December 2026 and its interval, and add the three months to a quarter total.
+
+(4) Compare the forecast with the actual revenue of fiscal 2026's fourth quarter and with the three benchmarks of Chapter 7: the trend, the mean, and the same quarter of the previous year.
+
+(5) Change the start of the chart to February 2024, leaving out the start-up month, and repeat requirement (3). Report how much the forecast changed.
+
+(6) Write a short audit note on whether the forecast is fit for the 2027 plan and what the manager should disclose with it.
+
+**Deliverable.** The chart, a table of the comparisons, and the audit note.
+
+<!-- Instructor notes, Exercise 15.5: actual fiscal 2026 Q4 revenue 7,287,187.68 (invoice lines; 33 months from January 2024 to
+     September 2026 fit the forecast). Chapter 7's backtest for the same quarter: trend +4.72% error, mean +0.03% (monthly error
+     3.65%), same quarter last year +0.32% (11.48% monthly). Power BI's forecast is computed in the visual (exponential smoothing,
+     Microsoft 2014) and its values cannot be read from the model; students read them from the forecast's tooltip. A good answer
+     reports the forecast's quarter error beside the benchmarks, notes that a seasonal pattern needs more than three years to detect
+     reliably, and checks the effect of the half-size January 2024 on the fit (requirement 5). The note should require any forecast
+     shown to managers to carry its hindcast error and the benchmark it beat or did not beat. -->
+
+**Exercise 15.6: Which Work Center Did the Time Belong To?**
+
+**Table group:** Payroll and Time, with Manufacturing
+
+**Scenario.** The plant page assigns each direct labor line to the work center of the operation it was recorded against. The time clock records a work center too. Before the production manager acts on the work-center chart, the internal auditor compares the two.
+
+**Requirements.**
+
+(1) Import T52_WorkOrderOperation again as `OperationPaths`, keeping WorkOrderOperationID, WorkCenterID, and ActualEndDate, and T66_TimeClockEntry as `ClockPaths`, keeping TimeClockEntryID and WorkCenterID. Clear **Enable load** on both.
+
+(2) Import T60_LaborTimeEntry again as `LaborPaths`, keeping LaborTimeEntryID, TimeClockEntryID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, and OvertimeHours. Merge it with OperationPaths and with ClockPaths, and bring each path's work-center name from the WorkCenter query, as OperationWorkCenter and ClockWorkCenter.
+
+(3) Add custom columns that test whether the two work centers agree and whether the work date falls after the operation's actual end date.
+
+(4) For direct manufacturing time, count the lines on which the two paths disagree in each year, and build a matrix of 2026 hours with OperationWorkCenter on the rows and ClockWorkCenter on the columns.
+
+(5) Compare the share of lines recorded after their operation ended among the lines that disagree and among all direct lines of 2026, and relate the result to Chapter 12's finding about direct time recorded after operations ended.
+
+(6) Show where the time clock places the indirect manufacturing hours of 2026, which the operation path leaves in (Blank), and conclude which path should feed which question on the plant page.
+
+**Deliverable.** The queries, the matrix, and an audit note answering requirements (4) to (6).
+
+<!-- Instructor notes, Exercise 15.6 (SQL): direct lines that join both an operation and a clock entry: 51,097. Disagreements by year
+     (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.5; 15,522 in
+     all. 2026 matrix (hours): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9,
+     Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8; Finishing operations at Finishing 8,101.6, at Assembly
+     1,354.8; Cutting at Cutting 3,696.8; QA at QA 674.9, at Assembly 420.8. After the operation's end: 2,243 of the 3,137 disagreeing
+     lines (72%) against 5,823 of 13,905 direct lines (42%), so the disagreement concentrates in the late time of Chapter 12. Indirect
+     2026 by clock work center: Assembly 16,830.0, Finishing and Test 9,561.6, Cutting 7,477.9, Packing 3,354.4, QA 1,249.0. Conclusion:
+     the operation path answers "what work was the time charged to"; the clock path "where the employee was"; neither alone supports
+     the Packing finding, which needs corroboration (Chapter 12). -->

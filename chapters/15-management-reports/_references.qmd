@@ -1,0 +1,35 @@
+{{< pagebreak >}}
+
+## References
+
+Cardinaels, E., & van Veen-Dirks, P. M. G. (2010). Financial versus non-financial information: The impact of information organization and presentation in a Balanced Scorecard. *Accounting, Organizations and Society*, *35*(6), 565–578. <https://doi.org/10.1016/j.aos.2010.05.003>
+
+Few, S. (2013). *Information dashboard design: Displaying data for at-a-glance monitoring* (2nd ed.). Analytics Press.
+
+Lipe, M. G., & Salterio, S. E. (2000). The balanced scorecard: Judgmental effects of common and unique performance measures. *The Accounting Review*, *75*(3), 283–298. <https://doi.org/10.2308/accr.2000.75.3.283>
+
+Microsoft. (2014, May 8). *Introducing new forecasting capabilities in Power View for Office 365* [Blog post]. Microsoft Power BI Blog. <https://powerbi.microsoft.com/en-us/blog/introducing-new-forecasting-capabilities-in-power-view-for-office-365/>
+
+Microsoft. (2025a). *Apply conditional table formatting in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-conditional-table-formatting>
+
+Microsoft. (2025b). *Create report bookmarks in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-bookmarks>
+
+Microsoft. (2025c). *Many-to-many relationship guidance*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many>
+
+Microsoft. (2025d). *Use parameters to visualize variables*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-what-if>
+
+Microsoft. (2025e). *Use the Analytics pane in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-analytics-pane>
+
+Microsoft. (2025f). *Waterfall charts in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-waterfall-charts>
+
+Microsoft. (2026a). *Add and edit visual calculations*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-create>
+
+Microsoft. (2026b). *Create page and bookmark navigators*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/button-navigators>
+
+Microsoft. (2026c). *Create report tooltips in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tooltips>
+
+Microsoft. (2026d). *Drillthrough in Power BI reports: Navigate to detailed insights*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough>
+
+Microsoft. (2026e). *Use field parameters in Power BI reports*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters>
+
+Microsoft. (2026f). *Visual calculations overview*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview>

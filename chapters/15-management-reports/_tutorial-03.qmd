@@ -1,0 +1,226 @@
+## Guided Tutorial 15.3: The Plant Page and the Package
+
+**Context and objective.** In this tutorial, you will build the production manager's page and finish the package. You will add the labor time and the production completions as two more fact tables, with the employee, the work center, the item, and the date as their dimensions, the cross-group model that Chapter 1 promised. You will measure the plant's hours per standard hour over a trailing twelve months, as Chapter 11 did in SQL, and compare the measure with a visual calculation that looks simpler but answers a different question when the chart is filtered. Then you will add an About page and a page navigator, and test the plant measures against Chapter 11.
+
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 15.2. The labor and production Tables hold tens of thousands of rows each, so the refresh at the end of Step 3 takes several minutes.
+
+**Step-by-step instructions.**
+
+**Step 1. Choose the plant's Tables.**
+
+a. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select **T60_LaborTimeEntry**, **T52_WorkOrderOperation**, **T56_ProductionCompletion**, **T57_ProductionCompletionLine**, **T74_Employee**, and **T47_WorkCenter**, and click **Transform Data**.
+c. Rename the queries `LaborTimeEntry`, `WorkOrderOperation`, `ProductionCompletion`, `ProductionCompletionLine`, `Employee`, and `WorkCenter`.
+
+**Step 2. Keep the columns the model needs.**
+
+a. In **LaborTimeEntry**, keep LaborTimeEntryID, EmployeeID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, OvertimeHours, and ExtendedLaborCost, and set WorkDate's type to **Date**.
+b. In **WorkOrderOperation**, keep WorkOrderOperationID and WorkCenterID.
+c. In **ProductionCompletion**, keep ProductionCompletionID and CompletionDate, and set CompletionDate's type to **Date**.
+d. In **ProductionCompletionLine**, keep ProductionCompletionLineID, ProductionCompletionID, ItemID, and QuantityCompleted.
+e. In **Employee**, keep EmployeeID, EmployeeName, JobTitle, and PayClass, and in **WorkCenter**, keep WorkCenterID, WorkCenterCode, and WorkCenterName.
+
+**Step 3. Merge the headers into the facts.** As in Tutorial 14.1, each fact table needs its date and its dimension keys on its own rows.
+
+a. Select **LaborTimeEntry**, merge it with **WorkOrderOperation** on WorkOrderOperationID with a left outer join, and expand only WorkCenterID, without the prefix.
+b. Select **ProductionCompletionLine**, merge it with **ProductionCompletion** on ProductionCompletionID, and expand only CompletionDate, without the prefix.
+c. Clear **Enable load** on WorkOrderOperation and ProductionCompletion.
+d. Select the **Item** query, choose **Home > Choose Columns**, and add StandardLaborHoursPerUnit.
+e. Choose **Home > Close & Apply**.
+
+A labor line takes the work center of the operation it was recorded against. Only direct manufacturing time is recorded against an operation, so indirect time, and the handful of direct lines that Chapter 10 found without a matching operation, have no work center. In a visual grouped by work center they appear under (Blank), another meaningful blank.
+
+**Step 4. Relate the plant tables.**
+
+a. In **Model view**, relate LaborTimeEntry to **Employee** on EmployeeID, to **WorkCenter** on WorkCenterID, and to the **Date** table on WorkDate.
+b. Relate ProductionCompletionLine to **Item** on ItemID and to the **Date** table on CompletionDate.
+c. Hide the keys of the two fact tables.
+
+The Date table now filters five fact tables: the invoice lines, the ledger, the budget, the labor time, and the completions. Item filters both the invoice lines and the completions, so a selection of Furniture limits the sales and the output together.
+
+**Step 5. Write the hours measures.**
+
+a. Add the measures below to the Measures table, formatting the hours as whole numbers.
+
+<!-- dax-check: measure -->
+```
+Manufacturing Hours =
+CALCULATE (
+    SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
+)
+```
+
+<!-- dax-check: measure -->
+```
+Direct Hours =
+CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Direct Manufacturing" )
+Indirect Hours =
+CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Indirect Manufacturing" )
+```
+
+<!-- dax-check: measure -->
+```
+Overtime Hours =
+CALCULATE (
+    SUM ( LaborTimeEntry[OvertimeHours] ),
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
+)
+```
+
+Manufacturing hours are the regular and overtime hours of direct and indirect manufacturing time, the hours Chapter 11 compared with output. Time recorded outside manufacturing is left out. KEEPFILTERS matters here. Without it, the filter on LaborType inside Manufacturing Hours would replace any filter already on that column, as Chapter 14 explained, and Direct Hours, which filters LaborType to direct time, would return all manufacturing hours. With it, the two filters combine, and Direct Hours returns direct time only.
+
+**Step 6. Measure the output and the ratio.**
+
+a. Add the measures below, formatting Standard Hours and Standard Hours to Cut-off as whole numbers and the ratio with two decimals.
+
+<!-- dax-check: measure -->
+```
+Standard Hours =
+SUMX (
+    ProductionCompletionLine,
+    ProductionCompletionLine[QuantityCompleted] * RELATED ( 'Item'[StandardLaborHoursPerUnit] )
+)
+```
+
+<!-- dax-check: measure -->
+```
+Standard Hours to Cut-off =
+VAR LastTimeRecord =
+    CALCULATE ( MAX ( LaborTimeEntry[WorkDate] ), REMOVEFILTERS () )
+RETURN
+    CALCULATE ( [Standard Hours], KEEPFILTERS ( 'Date'[Date] <= LastTimeRecord ) )
+```
+
+<!-- dax-check: measure -->
+```
+Hours per Standard Hour = DIVIDE ( [Manufacturing Hours], [Standard Hours to Cut-off] )
+```
+
+Standard hours are the hours the standards allow for the units completed, Chapter 10's standard hours allowed. The time records end in December 2026, before the end of the month, because the last pay periods are still open, while the completions run to the year's last day. The cut-off keeps only the output completed up to the last day with time records, so that hours and output cover the same days, as Chapters 10 and 11 did. REMOVEFILTERS inside the variable finds that last day in the whole table, whatever the visual is filtered to.
+
+**Step 7. Measure the trailing twelve months.**
+
+a. Add the measure below, with two decimals.
+b. Add a page named `Plant`, and add a line chart with YearMonth on the **X-axis** and Hours per Standard Hour TTM on the **Y-axis**, filtered to the years 2024 to 2026.
+
+<!-- dax-check: measure -->
+```
+Hours per Standard Hour TTM =
+VAR Window =
+    DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH )
+VAR MonthsInWindow =
+    COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), Window ) )
+RETURN
+    IF (
+        MonthsInWindow = 12 && NOT ISBLANK ( [Manufacturing Hours] ),
+        DIVIDE (
+            CALCULATE ( [Manufacturing Hours], Window ),
+            CALCULATE ( [Standard Hours to Cut-off], Window )
+        )
+    )
+```
+
+The window is the twelve months that end with the last day of the current month. The measure is blank until a full twelve months of data exist, as the view of Chapter 11 began in December 2024, and blank for the months of 2027, which have no time records. The line rises from the level of 2024 through 2025 and keeps rising through most of 2026: the plant used more hours for each standard hour of output in every successive year, the trend Part III explained.
+
+**Step 8. Add the trailing ratio as a visual calculation.**
+
+a. Add a table visual with YearMonth, Manufacturing Hours, Standard Hours to Cut-off, and Hours per Standard Hour TTM, filtered to the years 2024 to 2026.
+b. Choose **Home > New visual calculation**, type the formula below, and click **Back to report**.
+c. Compare the two trailing columns from December 2024 to December 2026.
+
+<!-- dax-check: skip -->
+```
+TTM (visual) = DIVIDE (
+    MOVINGAVERAGE ( [Manufacturing Hours], 12 ),
+    MOVINGAVERAGE ( [Standard Hours to Cut-off], 12 )
+)
+```
+
+The ratio of two twelve-month averages equals the ratio of the twelve-month totals, so while the table starts in January 2024, the visual calculation agrees with the measure from December 2024 on.
+
+**Step 9. Filter the table's axis.** Change the visual's year filter to 2025 and 2026 only, and compare the two trailing columns for 2025 again.
+
+Once the table starts in January 2025, the visual calculation has only the months on the table to work with: in January 2025 it averages a single month, in February two, and it agrees with the measure again only in December 2025, as @fig-15-10 shows. The measure is unaffected, because its window reaches into the model. The trailing figure the production manager will rely on is therefore the measure.
+
+![The Trailing Ratio as a Measure and as a Visual Calculation.](/visuals/svg/fig-15-10-measure-vs-visual-calc.svg){#fig-15-10 fig-alt="A mock of a Power BI line chart of the trailing twelve-month hours per standard hour for the months of 2025, with two lines. The measure, drawn as a solid line, rises gradually through the year. The visual calculation, on a chart filtered to start in January 2025, starts much higher, swings in the first months because its window holds only the months on the chart, and meets the measure in December 2025. The months where they differ are inside a dashed frame."}
+
+**Step 10. Add the KPI card.**
+
+a. Delete the table of Steps 8 and 9, which served only for the comparison.
+b. Add a card visual with Hours per Standard Hour TTM and a second measure, written below, that holds the 2024 level for comparison.
+c. Filter the card to the years 2024 to 2026, like the line chart.
+
+<!-- dax-check: measure -->
+```
+Hours per Standard Hour 2024 =
+CALCULATE ( [Hours per Standard Hour], REMOVEFILTERS ( 'Date' ), 'Date'[Year] = 2024 )
+```
+
+The card sets the latest trailing figure beside the 2024 level, the KPI with its comparison. Without the year filter, the card is blank: its window would end in December 2027, the last month of the Date table, which has no time records.
+
+**Step 11. Chart the work centers and the overtime share.**
+
+a. Add a clustered bar chart of Direct Hours by WorkCenterName, with a visual filter on 2026.
+b. Add a clustered column chart with JobTitle on the **X-axis**, Year on **Legend**, and the Overtime Share measure below on the **Y-axis**, filtered to the years 2024 to 2026 and to the job titles Assembler, Machine Operator, and Quality Technician.
+
+<!-- dax-check: measure -->
+```
+Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
+```
+
+@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share roughly doubled from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+
+![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
+
+**Step 12. Add the About page and the navigation.**
+
+a. Add a page named `About`, and drag its tab to the first position.
+b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
+c. Choose **Insert > Buttons > Navigator > Page navigator**, and place the navigator below the text.
+d. Right-click the tabs of Promotion Detail, Promotion Tooltip, and Cost Center Detail, and choose **Hide Page**.
+e. Copy the navigator to the top of each visible page, and test it by holding Ctrl and clicking its buttons.
+
+@fig-15-12 shows the About page. The navigator lists the visible pages in order and updates itself as pages change, and the hidden detail pages are reached only from the pages they serve.
+
+![The About Page With Its Page Navigator.](/visuals/svg/fig-15-12-about-page.svg){#fig-15-12 fig-alt="A mock of a Power BI report page named About. A text box states the report's purpose, its three readers, its source, the period it covers, and where its measures are defined and tested. Below it, a page navigator shows one button for each visible page: About, Sales and Discounts, Validation, Review, Margins, Income Statement, Promotions, Budget, and Plant, with About selected. The page tabs below the canvas list the same pages; the three hidden detail pages are not among them."}
+
+**Step 13. Add the plant test.**
+
+a. In DAX query view, open the **Tests** tab, add the query below, and run it.
+b. Save the report.
+
+<!-- dax-check: query -->
+```
+// Test 5: hours per standard hour by year must equal Chapter 11's December figures
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year],
+    TREATAS ( { 2024, 2025, 2026 }, 'Date'[Year] ),
+    "Hours", ROUND ( [Manufacturing Hours], 0 ),
+    "Standard Hours", ROUND ( [Standard Hours to Cut-off], 0 ),
+    "Hours per Standard Hour", ROUND ( [Hours per Standard Hour], 2 )
+)
+```
+
+The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, which shows that the model, the visuals, and the queries of Part III agree.
+
+<!-- Tutorial 15.3 expected values (SQL twins; checked in Desktop 2.158's engine on the CR15 reference model): LaborTimeEntry
+     68,859 rows (Direct 51,117, Indirect 11,702, NonManufacturing 6,040), last WorkDate 2026-12-11; 51,097 direct rows match an
+     operation; ProductionCompletionLine 17,352 rows, 83 items. Test 5: 2024 83,637 / 70,871 / 1.18; 2025 93,391 / 66,109 / 1.41;
+     2026 101,237 / 66,998 / 1.51. TTM (measure) from 2024-12: 1.180, 1.121, 1.195, 1.269, 1.345, 1.392, 1.435, 1.407, 1.412, 1.396,
+     1.399, 1.360, 1.413 (2025-12), 1.440, 1.441, 1.457, 1.464, 1.447, 1.470, 1.508, 1.492, 1.494, 1.544, 1.528, 1.511 (2026-12).
+     Visual calculation on an axis starting 2025-01: 1.375, 1.554, 1.611, 1.592, 1.604, 1.495, 1.463, 1.494, 1.498, 1.470, 1.418,
+     1.413 (equal to the measure from 2025-12). 2026 direct hours by work center: Packing 33,026.9; Assembly 12,777.0; Finishing and
+     Test 10,480.1; Cutting 4,856.0; Quality Assurance 1,602.0; (Blank) 22.1 (direct lines without an operation). Overtime share by
+     job title, 2024 to 2026: Assembler 11.9% to 20.1%; Machine Operator 11.8% to 19.6%; Quality Technician 11.1% to 19.5%; plant
+     0.116, 0.167, 0.198. The card without a year filter is (Blank): its window ends 2027-12, past the time records; filtered to
+     2024-2026 or to 2026 it shows 1.51, and the 2024 measure 1.18. -->
+
+**Checkpoint.** Before you hand the package to its readers, confirm the following:
+
+- LaborTimeEntry and ProductionCompletionLine relate to their dimensions, and Test 5 returns Chapter 11's yearly ratios.
+- The trailing measure and the visual calculation agree on the full axis and differ on the filtered one, for the reason Step 9 gave.
+- The About page opens the report, the navigator reaches every visible page, and the detail pages are hidden.
+
+The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Every number on it ties to a test, which is what makes it fit to be sent every month.

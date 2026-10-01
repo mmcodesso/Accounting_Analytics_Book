@@ -1,0 +1,118 @@
+## Guided Tutorial 15.1: The Promotions Page
+
+**Context and objective.** In this tutorial, you will build the sales manager's page. A waterfall chart will take fiscal 2026 revenue from list price to net, step by step, and a bar chart will show which promotions gave away the most. A drill-through page will show any one promotion in detail, and a tooltip page will show its discounts month by month when the reader points at it. Along the way, you will add the promotions as a dimension of the invoice lines and build your first disconnected table, a table the model uses without relating it to anything.
+
+**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Chapter 14, with the Measures table and the Tests tab.
+
+**Step-by-step instructions.**
+
+**Step 1. Import the promotions.**
+
+a. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select **T7_PromotionProgram**, and click **Transform Data**.
+c. Rename the query `PromotionProgram`, and choose **Home > Choose Columns** to keep PromotionID, PromotionCode, PromotionName, ScopeType, DiscountPct, EffectiveStartDate, and EffectiveEndDate.
+d. Set the data type of the two date columns to **Date**, and choose **Home > Close & Apply**.
+
+The table holds one row for each promotion, nine in all, three a year.
+
+**Step 2. Relate the promotions to the invoice lines.**
+
+a. Select **Model view**, and drag PromotionID from **SalesInvoiceLine** onto PromotionID in **PromotionProgram**.
+b. Check that the relationship reads many to one, with a single cross filter direction.
+c. Hide PromotionID in both tables, as you hid the other keys in Tutorial 14.1.
+
+Most invoice lines carry no promotion, so their PromotionID is blank. In a visual grouped by promotion, they appear under (Blank), the meaningful blank of Chapter 13: lines sold without a promotion.
+
+**Step 3. Build a table of the steps from list price to net.** The waterfall needs one category for each step, and no table in the model holds them, so you will type them in.
+
+a. Choose **Home > Enter data**.
+b. In the **Create Table** dialog, name the first column `Step` and add a second column named `Order`, by double-clicking the column headers.
+c. Type three rows: `At list price` and `1`, `Price lists and overrides` and `2`, `Promotions` and `3`.
+d. Type `Steps` as the table's name, and click **Load**.
+e. Select the Step column in the Data pane, and on the **Column tools** tab choose **Sort by column > Order**.
+
+Steps is a disconnected table: it has no relationship to any other table. Its rows exist only to give a visual its categories, and a measure decides what each category shows.
+
+**Step 4. Write the gross-to-net measure.**
+
+a. Select the **Measures** table, and choose **Modeling > New measure**.
+b. Type the measure below, and format it as an amount.
+
+<!-- dax-check: measure -->
+```
+Gross to Net =
+SWITCH (
+    SELECTEDVALUE ( Steps[Step] ),
+    "At list price", [List Amount],
+    "Price lists and overrides", [Price Before Discount] - [List Amount],
+    "Promotions", [Revenue] - [Price Before Discount],
+    [Revenue]
+)
+```
+
+SELECTEDVALUE returns the step of the current bar, or a blank when the filter context holds more than one step, as it does for a total. SWITCH compares that step with each name in turn and returns the matching expression. The last argument is the value when no single step is selected, revenue itself. The three steps add up to revenue: the list amount, less what the price lists and approved overrides took off, less what the promotions took off. The promotions step is taken as the price before discount less revenue rather than the Discounts measure, so that the steps add up to the cent; the two differ only by the rounding of each line's total.
+
+**Step 5. Chart the steps as a waterfall.**
+
+a. Add a page named `Promotions`.
+b. Add a slicer with Year from the Date table, and select 2026.
+c. Add a **Waterfall chart** with Step on **Category** and Gross to Net on **Y-axis**.
+d. Give the chart the title `Revenue from list price to net, fiscal 2026`.
+
+The waterfall starts with a column for the list amount, steps down twice, and ends with a total column that Power BI adds itself (Microsoft, 2025f). The total equals the fiscal 2026 revenue of Chapter 6. The price lists and approved overrides take far more off the list amount than the promotions do: most of what Charles River gives away is in its everyday prices, not in its promotions, as the Part II case found.
+
+**Step 6. Show the discounts by promotion.**
+
+a. Add a **Clustered bar chart** with PromotionName on **Y-axis** and Discounts on **X-axis**.
+b. In **Filters on this visual**, exclude the (Blank) promotion, and sort the bars by Discounts, largest first.
+c. Give the chart the title `Promotional discounts by promotion`.
+
+@fig-15-03 shows the page. The Furniture Seasonal Promotion gave away several times as much as any other promotion invoiced in 2026, and two promotions of fiscal 2025 still appear, because their last orders were invoiced early in 2026.
+
+![The Promotions Page.](/visuals/svg/fig-15-03-promotions-page.svg){#fig-15-03 fig-alt="A mock of a Power BI report page named Promotions, with a year slicer set to 2026. On the left, a waterfall chart starts with a tall column for revenue at list price, steps down for price lists and overrides and then by a much smaller amount for promotions, and ends with a total column for net revenue. On the right, a bar chart of promotional discounts by promotion, sorted from largest, in which the Furniture Seasonal Promotion is far larger than the Harbor Collection, Design Trade Customer, and two fiscal 2025 promotions below it."}
+
+**Step 7. Build the drill-through page.**
+
+a. Add a page named `Promotion Detail`.
+b. With no visual selected, drag PromotionName from the Data pane into the **Drillthrough** section of the **Visualizations** pane, where it says **Add drillthrough fields here**.
+c. Add a table visual with PromotionName, ScopeType, DiscountPct, EffectiveStartDate, and EffectiveEndDate.
+d. Add a **Clustered column chart** with YearMonth from Date on **X-axis** and Discounts on **Y-axis**.
+e. Add a card visual with Invoice Lines and Discounts.
+
+Power BI adds a back button to the page as soon as the drill-through field is in place. The page shows nothing useful on its own: it is designed to be reached from another page, with one promotion selected.
+
+**Step 8. Build the tooltip page.**
+
+a. Add a page named `Promotion Tooltip`.
+b. In the **Format** pane of the page, open **Canvas settings** and set **Type** to **Tooltip**, and in **Page information** turn **Tooltip** on.
+c. Add a **Clustered column chart** with YearMonth on **X-axis** and Discounts on **Y-axis**, sized to fill the small page.
+d. Return to the Promotions page, select the bar chart, and in **Format visual > General > Tooltips** set **Page** to **Promotion Tooltip**.
+
+**Step 9. Use the detail pages.**
+
+a. On the Promotions page, point at the bar of the Furniture Seasonal Promotion, and read the tooltip.
+b. Right-click the same bar, and choose **Drillthrough > Promotion Detail**.
+c. Read the promotion's dates and its discounts by month, and return with the back button, holding Ctrl as you click it.
+d. Drill through on the Harbor Collection Promotion, and compare its effective dates.
+
+@fig-15-04 and @fig-15-05 show the two detail views. The Furniture Seasonal Promotion ran in September and October, but its discounts continue into November and December: Chapter 5 found that those lines were ordered within the promotion's dates and invoiced later. The Harbor Collection Promotion shows an end date before its start date, the master-data error the Part II case found in every collection promotion. A summary page could not have shown either finding; the detail pages show them in two clicks.
+
+![The Promotion Detail Drill-Through Page.](/visuals/svg/fig-15-04-promotion-detail.svg){#fig-15-04 fig-alt="A mock of a Power BI drill-through page for the Furniture Seasonal Promotion, with a back button at the top left. A table gives the promotion's scope, a ten percent discount, and its effective dates in September and October 2026. A card shows its invoice lines and discounts. A column chart of discounts by month shows columns for September, October, November, and December 2026, the last two after the promotion's end date, outlined."}
+
+![A Report-Page Tooltip.](/visuals/svg/fig-15-05-promotion-tooltip.svg){#fig-15-05 fig-alt="A mock of the promotions bar chart with the pointer on the Furniture Seasonal Promotion bar. A small tooltip page floats beside the pointer, showing the promotion's discounts by month as a column chart, from September to December 2026."}
+
+<!-- Tutorial 15.1 expected values (SQL twins; the measures checked in Desktop 2.158's engine on the CR15 reference model):
+     PromotionProgram 9 rows; 25,825 of 27,933 lines have no promotion. Fiscal 2026 gross to net: List Amount 33,589,137.45;
+     price lists and overrides -3,470,607.31; promotions -362,110.06 (Discounts 362,110.75; 0.69 of line rounding); total 29,756,420.08.
+     2026 discounts by promotion: 8 Furniture Seasonal 296,053.58 (576 lines); 7 Harbor Collection 30,478.57 (68); 9 Design Trade
+     Customer 28,057.57 (88); 6 Wholesale Customer (2025) 6,858.14 (54); 5 Textiles Seasonal (2025) 662.89 (10). Promotion 8 by
+     invoice month: 2026-09 95,996.97 (167 lines); 10 136,935.59 (249); 11 51,965.03 (119); 12 11,155.99 (41); 160 lines after
+     2026-10-31. Promotion 7 effective 2026-03-01 to 2026-02-28, invoiced 2026-03-07 to 2026-08-08. -->
+
+**Checkpoint.** Before you move on, confirm the following:
+
+- The waterfall's total equals fiscal 2026 revenue, and its steps are the list amount, the price lists and overrides, and the promotions.
+- PromotionProgram is related to the invoice lines, and Steps is related to nothing.
+- Pointing at a promotion shows its tooltip page, and right-clicking it opens Promotion Detail filtered to that promotion.
+
+The sales manager's question now has a one-page answer and two levels of detail behind it. The page also shows something the question did not ask: the promotions are the smaller of the two reductions from list price.

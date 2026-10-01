@@ -1,0 +1,27 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Bookmark.** A saved state of a Power BI report page, including its filters, slicer selections, and the visibility of its visuals, that a reader can return to. Bookmarks suit saved views; page navigation is better built with a page navigator.
+
+**Budget variance.** The difference between an actual amount and its budget, computed in this book as actual less budget. For an expense a positive variance is unfavorable and a negative one favorable; for revenue the reverse. A variance measures a difference; its causes, such as volume, classification, timing, rate, and spending, must be found separately.
+
+**Conditional formatting.** An Excel feature that changes the appearance of cells that meet a rule, such as values above a threshold, the top items in a range, or rows for which a formula returns TRUE. In Power BI it formats the values of a table or matrix by color scale, rules, or field value, and can add data bars or icons, which carry meaning in their shape as well as their color.
+
+**Disconnected table.** A table in a model that has no relationship to any other table, used to supply the categories of a visual or the values of a parameter. A measure reads the selected value, typically with SELECTEDVALUE, and decides what to return.
+
+**Drill-through.** Moving from a visual on one report page to another page filtered to the item selected, such as a promotion or a cost center. The target page holds the drill-through field, and Power BI adds a back button to it.
+
+**Exponential smoothing.** A family of forecasting methods that weight recent observations more heavily than older ones, with variants that also model a trend and a seasonal pattern. Power BI's line-chart forecast uses it.
+
+**Field parameter.** A small table, created in Power BI with Modeling > New parameter > Fields, that lists measures or columns so that a reader can choose from a slicer which of them a visual shows.
+
+**Key performance indicator (KPI).** A measure chosen because it tracks progress toward an objective, shown with the comparison that gives it meaning, such as a budget, the same period last year, or a target.
+
+**Page navigator.** A group of buttons, one for each page of a Power BI report, that Power BI keeps in step with the pages as they are added, removed, renamed, or reordered.
+
+**Report-page tooltip.** A small report page that Power BI shows when the reader points at a data point, filtered to that data point. It replaces the default tooltip with chosen visuals, but it is not interactive and screen readers cannot read it.
+
+**Visual calculation.** A DAX calculation defined on a single Power BI visual, which works on the rows and columns the visual shows and is stored with the visual rather than in the model. Functions such as RUNNINGSUM, MOVINGAVERAGE, and PREVIOUS make running totals, moving averages, and comparisons with the previous row short formulas.
+
+**What-if parameter.** A numeric range parameter, created with Modeling > New parameter > Numeric range, that adds a table of allowed values, a measure returning the value the reader selects, and optionally a slider, so that measures using it recalculate as the reader changes an assumption.

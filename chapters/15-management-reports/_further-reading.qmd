@@ -1,0 +1,15 @@
+{{< pagebreak >}}
+
+## Further Reading
+
+Cardinaels, E., & van Veen-Dirks, P. M. G. (2010). Financial versus non-financial information: The impact of information organization and presentation in a Balanced Scorecard. *Accounting, Organizations and Society*, *35*(6), 565–578. <https://doi.org/10.1016/j.aos.2010.05.003> Two experiments in which participants evaluated business-unit managers from scorecards. Organizing the measures into categories shifted the weight evaluators gave to financial measures, and adding plus, minus, and equal markers for performance against target changed it again. The study is a direct test of the choices this chapter makes with conditional formatting.
+
+Few, S. (2013). *Information dashboard design: Displaying data for at-a-glance monitoring* (2nd ed.). Analytics Press. A practical guide to designing single-screen displays for monitoring, with chapters on choosing measures, giving each its context, and the graphs that suit them, including the bullet graph. Few uses the word dashboard for any such display; read his advice as advice about report pages.
+
+Kokina, J., Pachamanova, D., & Corbett, A. (2017). The role of data visualization and analytics in performance management: Guiding entrepreneurial growth decisions. *Journal of Accounting Education*, *38*, 50–62. <https://doi.org/10.1016/j.jaccedu.2016.12.005> A teaching case in which you act as an accountant designing a performance management system for a growing online retailer, building visualizations from its customer and order data and matching its business questions to analytical techniques. It practices the move of this chapter, from data to measures that serve a decision, on a different company and tool.
+
+Lipe, M. G., & Salterio, S. E. (2000). The balanced scorecard: Judgmental effects of common and unique performance measures. *The Accounting Review*, *75*(3), 283–298. <https://doi.org/10.2308/accr.2000.75.3.283> An experiment showing that superiors evaluating two business units relied only on the measures the units had in common, ignoring the measures unique to each. It is the reason a package that compares departments gives them the same KPIs.
+
+Microsoft. (2025c). *Many-to-many relationship guidance*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many> Microsoft's guidance on facts recorded at a coarser grain than the dimensions, such as a monthly budget beside a daily ledger. It explains why the first day of each period is stored, and how measures can avoid showing a monthly figure as if it belonged to a single day.
+
+Microsoft. (2026f). *Visual calculations overview*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview> The reference for the functions, templates, and parameters of visual calculations, with the list of what they cannot do. Read its section on the Axis and Reset parameters before writing a visual calculation on a matrix with more than one level.
