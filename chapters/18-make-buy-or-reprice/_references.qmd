@@ -1,0 +1,13 @@
+{{< pagebreak >}}
+
+## References
+
+Balakrishnan, R., Labro, E., & Sivaramakrishnan, K. (2012a). Product costs as decision aids: An analysis of alternative approaches (Part 1). *Accounting Horizons*, *26*(1), 1–20. <https://doi.org/10.2308/acch-50086>
+
+Cooper, R., & Kaplan, R. S. (1992). Activity-based systems: Measuring the costs of resource usage. *Accounting Horizons*, *6*(3), 1–13. <https://doi.org/10.2308/ah-9604083361>
+
+Kaplan, R. S., & Anderson, S. R. (2004). Time-driven activity-based costing. *Harvard Business Review*, *82*(11), 131–138. <https://hbr.org/2004/11/time-driven-activity-based-costing>
+
+Marn, M. V., & Rosiello, R. L. (1992). Managing price, gaining profit. *Harvard Business Review*, *70*(5), 84–93. <https://hbr.org/1992/09/managing-price-gaining-profit>
+
+Noreen, E. (1991). Conditions under which activity-based cost systems provide relevant costs. *Journal of Management Accounting Research*, *3*, 159–168. <https://doi.org/10.2308/jmar-9701273049>

@@ -360,7 +360,7 @@ The statements must account for what happened after 31 December 2026, up to the 
 
 **Requirement 9: Assemble the package and write the memo to the CFO.**
 
-Assemble the statements and notes, and write a memorandum of no more than two pages to the CFO. For each matter that the records cannot settle, state what the records show, the evidence that would settle it, its possible effect where the ledger allows you to measure it, and the treatment you propose. The matters include at least the company's tax status, its leases, the sales tax collected, and the balances that no document supports. Add the passed adjustments for the CFO's approval, the changes to the year-end close that would prevent this year's adjustments from recurring, and your recommendation on whether the package should go to the bank as it stands.
+Assemble the statements and notes, and write a memorandum of no more than two pages to the CFO. For each matter that the records cannot settle, state what the records show, the evidence that would settle it, its possible effect where the ledger allows you to measure it, and the treatment you propose. The matters include at least the company's tax status, its leases, the sales tax collected, the balances that no document supports, and whether standard costs unchanged for three years still measure the finished goods at cost. Add the passed adjustments for the CFO's approval, the changes to the year-end close that would prevent this year's adjustments from recurring, and your recommendation on whether the package should go to the bank as it stands.
 
 <!-- Instructor notes, Requirement 9: (1) Tax status (ASC Topic 740): no tax account and no tax recorded in three years; equity is common
      stock with no distributions. Evidence: the entity's legal form or tax election, its returns, and its payments. If it is a C
@@ -376,7 +376,8 @@ Assemble the statements and notes, and write a memorandum of no more than two pa
      if none is real, equity rises by 1,836,371.12 (assets -440,000.00, liabilities -2,276,371.12); if the payables are real, they are
      three years past due. (5) Cash: no interest income and no bank reconciliation in the records; confirm the balance with the bank. (6)
      Inventories (ASC Topic 330): a physical count and a net realizable value review are needed; stock by item cannot be rebuilt because
-     the opening inventory has no item detail. (7) Subsequent events and going concern, as in Requirement 8. (8) Passed items P1-P3, for
+     the opening inventory has no item detail. Whether standards unchanged since 2024 still approximate cost on normal capacity is the
+     question of August's cost study (Chapter 18), which measures it; in July a strong memo names it and does not estimate it. (7) Subsequent events and going concern, as in Requirement 8. (8) Passed items P1-P3, for
      approval. Recommendation: record A1-A4 and R1-R2, and do not release the package until items 1 to 4 are settled. Close-process
      changes: a year-end payroll accrual, a monthly review of open accruals, revenue cutoff by delivery date, and an interest accrual. -->
 

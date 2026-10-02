@@ -50,6 +50,7 @@ book:
     - part: "Integrated and Applied Topics"
       chapters:
         - chapters/17-statements-for-a-lender/chapter.qmd
+        - chapters/18-make-buy-or-reprice/chapter.qmd
   appendices:
     - appendices/a-publishing-security/appendix.qmd
 
