@@ -21,7 +21,7 @@ After completing this chapter, you will be able to:
 
 It is July 2027. In June the controller showed the audit committee where fiscal 2026's cash had gone: into inventories, materials above all, while growing payables and sales tax with no recorded remittance held the cash balance up. The CFO has since applied to the company's bank for a revolving line of credit to carry the working capital until the materials are used. The bank's relationship manager has replied with what its credit committee needs before it can consider the request: complete financial statements for fiscal 2026, prepared under U.S. generally accepted accounting principles (GAAP), with fiscal 2025 for comparison and full notes. The credit committee meets in mid-August, so the package is due at the end of July.
 
-Charles River has never given financial statements to a lender. Its shareholders received statements for fiscal 2025 that were prepared straight from the ledger, and the adjustments that the [Part III Comprehensive Case](#sec-case-part-3) and the [Part IV Comprehensive Case](#sec-case-part-4) proposed were never recorded, so the ledger is the one you have worked with since Part I. The controller asks you, the staff accountant of Chapters 13 to 15, to prepare the package and a memo to the CFO on what the package required and what remains open.
+Charles River has never given financial statements to a lender. Its shareholders received statements for fiscal 2025 that were prepared straight from the ledger, and no adjustment has been recorded since, so the ledger is the one you have worked with since Part I. The controller asks you, the staff accountant of Chapters 13 to 15, to prepare the package and a memo to the CFO on what the package required and what remains open.
 
 This chapter is a case, and it has no tutorials. Each requirement states what the controller needs and names the earlier chapters it draws on, and you decide how to produce it with the tools and techniques of the earlier Parts. Some steps are work for a query, some for a workbook, and some for a report. Where the choice is clear, the requirement says why; where it is not, part of the task is to choose and to explain your choice in your documentation.
 
@@ -37,7 +37,7 @@ The controller has set out what she needs to know before the package goes to the
 - what the notes must say, with each note tied to the statements;
 - what the data cannot settle, which goes to the CFO before the package leaves the company.
 
-She adds four conditions. First, nothing is posted to the ledger: every adjustment lives in the workbook as a numbered entry with its evidence, the query and the document numbers behind it, so that the CFO can approve it before anyone posts it. Second, materiality is 5% of income before income taxes for the year in question, and every adjustment is listed, however small. Third, findings are worded as what the records show, not as what anyone did, as in the Part III and Part IV cases. Fourth, the package states the date through which its data run.
+She adds four conditions. First, nothing is posted to the ledger: every adjustment lives in the workbook as a numbered entry with its evidence, the query and the document numbers behind it, so that the CFO can approve it before anyone posts it. Second, materiality is 5% of income before income taxes for the year in question, as the ledger records it, and every adjustment is listed, however small. Third, findings are worded as what the records show, not as what anyone did. Fourth, the package states the date through which its data run.
 
 Her outline of the package is in @tbl-17-01, with the topic of the Financial Accounting Standards Board (FASB) Accounting Standards Codification (ASC) that governs each component. The outline covers what the ledger records. Part of Requirement 2 is to find what the ledger leaves out.
 
@@ -65,7 +65,7 @@ Lenders use financial statements to monitor borrowers as well as to decide wheth
 
 ## The Data You Will Use
 
-The case builds on files you already have. Audit.sql from Chapter 12 holds the cutoff tests L5 to L8, and Case.sql from the Part III case holds its estimate of the payroll accrual at the end of fiscal 2026. Charles River Cash Case.pbix from the Part IV case holds the ledger star, the Balance measure of Exercise 14.1, drill-through to postings, and its Findings table. Chapter 6 built the mapping from accounts to statement lines, and Exercise 11.1 wrote the same statements in SQL.
+The case builds on what the chapters taught. Chapter 6 built the mapping from accounts to statement lines, and Exercise 11.1 wrote the same statements in SQL. Chapter 12's audit query library, Audit.sql, holds tests of cutoff at the year-end. Tutorial 14.3 built a ledger model in Power BI, and Chapter 15 drilled through from a statement line to its postings. If you completed the Part III and Part IV comprehensive cases, their files give you a head start on the payroll accrual and on a ledger model, but this case does not require them.
 
 The case also draws on tables that the chapters used little or not at all: DebtAgreement and DebtScheduleLine for the notes payable, FixedAsset and FixedAssetEvent for property and equipment, the AccrualJournalEntryID of PurchaseInvoiceLine and the ReversesJournalEntryID of JournalEntry for accrued expenses, ServiceEngagement, ServiceTimeEntry, and ServiceBillingLine for the design services, and SalesReturn, SalesReturnLine, CreditMemo, and CustomerRefund for returns and customer credits. Profile each before you rely on it, as Chapter 10 profiled WorkOrder.
 
@@ -75,7 +75,7 @@ You will keep three files of your own, listed in @tbl-17-02. Each tool hands its
 |--------|------------------------|--------------------------|------------------------|
 | SQL | LenderPackage.sql, run on CharlesRiver_Work.sqlite | Trial balances, open accruals, cutoff populations, note schedules | Copy with Headers or Export to CSV |
 | Excel | Charles River Lender Package.xlsx | Documentation, trial balances, adjustments, statements, notes | A Table of adjustment lines |
-| Power BI | Charles River Lender Review.pbix, a copy of the Part IV case file | Review of balances and changes, drill-through, tests of the package | Reads CharlesRiver.xlsx and the package workbook |
+| Power BI | Charles River Lender Review.pbix, a ledger model of your own | Review of balances and changes, drill-through, tests of the package | Reads CharlesRiver.xlsx and the package workbook |
 
 : Tools and files {#tbl-17-02}
 
@@ -90,6 +90,37 @@ The ledger and its documents do not always measure the same thing. A supplier in
 :::
 
 
+## Getting Started
+
+Set up your files before you begin. Make a working copy of the downloaded CharlesRiver.sqlite named CharlesRiver_Work.sqlite, and open the copy in DB Browser for SQLite, so that the download is never changed. Start LenderPackage.sql with a header comment that states its purpose, the database file, the preparer and the date, and the checks it performs, and write two comment lines above every query: what it tests, and its population and expected result. Create Charles River Lender Package.xlsx with a Documentation worksheet that states the purpose, the sources, and the date through which the data run, and create Charles River Lender Review.pbix. You need DB Browser for SQLite, Excel for Microsoft 365, and Power BI Desktop, which runs only on Windows; if you work on a Mac, plan to use a Windows computer for Requirements 2 and 6.
+
+The case is long, so work in four milestones, one for each phase of the requirements. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the case.
+
+1. **The ledger as it stands** (Requirements 1 and 2): the three trial balances, the recorded statements, and the Questions table.
+2. **The adjustments** (Requirements 3 to 5): the rebuilt accrued expenses, the cutoff measurements, and the schedule of adjustments with its evidence and its materiality judgment.
+3. **The statements and notes** (Requirements 6 and 7): the adjusted statements, the required notes, and the tests in the Review file.
+4. **What the data cannot settle** (Requirements 8 and 9): the review of later events and the memo to the CFO.
+
+<!-- Instructor notes, Milestone 1 checkpoints: trial balances at the 2024 / 2025 / 2026 year-ends 69 / 71 / 71 accounts, debit and
+     credit balances 47,565,211.56 / 58,143,212.29 / 67,107,722.36; recorded net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24;
+     recorded total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; 23 accounts never posted, and no income tax account. -->
+
+<!-- Instructor notes, Milestone 2 checkpoints: 2040 = 85,000 + freight 48,797.21 / 47,290.49 / 44,423.87 + young accruals 152,347.13 /
+     168,648.64 / 193,781.70 + old accruals 39,028.43 / 96,049.58 / 157,346.79 = 325,172.77 / 396,988.71 / 480,552.36; revenue cutoff
+     90,138.93 / 19,540.86 / 44,481.11; payroll 302,568.90 / 365,921.19 / 383,044.82; interest 1,838.58 / 1,369.27 / 2,007.26;
+     adjustments A1-A4 retained earnings at 1 January 2025 -175,240.12, 2025 income -76,459.90, 2026 income +68,475.84; materiality
+     225,180.56 (2026) and 256,717.74 (2025). -->
+
+<!-- Instructor notes, Milestone 3 checkpoints: adjusted net income 5,057,894.81 (2025) and 4,572,087.08 (2026); total assets
+     39,373,005.22 / 31,858,224.86; current ratio 2.69 / 2.66; retained earnings at 1 January 2025 15,294,129.73 restated to 15,118,889.61,
+     24,748,871.50 at 2026; cash flows 2026 operating -807,189.75, investing 0, financing -134,120.55; property and equipment cost
+     4,354,000 and accumulated depreciation 2,262,256.46 at 2026; notes 389,304.68, current portion 147,503.76. -->
+
+<!-- Instructor notes, Milestone 4 checkpoints: the 2027 records hold 263 supplier payments (271,327.17) and no unrecorded liability;
+     the memo's required matters are tax status, leases, sales tax payable 5,620,840.66, and the unsupported opening balances (equity
+     +1,836,371.12 if none is real). -->
+
+
 ## Requirements
 
 The requirements fall into four phases: the ledger as it stands, the adjustments, the statements and notes, and what the data cannot settle. Work through them in order, because each phase uses what the one before it found.
@@ -100,8 +131,8 @@ The requirements fall into four phases: the ledger as it stands, the adjustments
 
 Three trial balances that differ only in their date are one query, rerun with a parameter, as Chapter 11's Params CTE showed. Mapping accounts to statement lines and laying out the statements are workbook work, as in Chapter 6, and the workbook is where the adjustments will go.
 
-- Start LenderPackage.sql with a header like Audit.sql's, and write one trial-balance query whose as-of date sits in a Params CTE and that leaves out only the closing entries dated on that date. Run it for 31 December 2024, 2025, and 2026.
-- Copy each result into its own worksheet of the package workbook, map the accounts to statement lines by AccountSubType and account number, and build the recorded balance sheets and statements of income. Validate them against control totals you already trust.
+- In LenderPackage.sql, write one trial-balance query whose as-of date sits in a Params CTE and that leaves out only the closing entries dated on that date. Run it for 31 December 2024, 2025, and 2026.
+- Copy each result into its own worksheet of the package workbook, map the accounts to statement lines by AccountSubType and account number, and build the recorded balance sheets and statements of income. Validate them against control totals you can trace: Chapter 6's pre-closing trial balance at the end of fiscal 2026 and its net income.
 - List the accounts that have never been posted with an anti-join (Chapter 10), and note any account that a company like Charles River would need and the chart does not have.
 
 <!-- Instructor notes, Requirement 1: WITH Params AS (SELECT '2026-12-31' AS AsOfDate); PostingDate <= AsOfDate; leave out a posting
@@ -122,13 +153,13 @@ Three trial balances that differ only in their date are one query, rerun with a 
      chart has no income tax account at all, neither an expense nor a payable; the accounts named for taxes are sales tax and payroll
      taxes. The unused 2080, 2120, 1140, 1030, and 7010 each lead to a later requirement. -->
 
-**Requirement 2: Review the recorded statements before adjusting them (Chapters 14 to 16 and the Part IV case).**
+**Requirement 2: Review the recorded statements before adjusting them (Chapters 14 and 15).**
 
-The Part IV case file already holds the ledger star, the Balance measure, and drill-through to postings, so a review that moves from a statement line down to the entries behind it is quickest there. Save it as Charles River Lender Review.pbix, so that the audit committee's report stays as it is.
+A review that moves from a statement line down to the entries behind it is quickest in a report with a ledger model and drill-through. Build Charles River Lender Review.pbix from CharlesRiver.xlsx as Tutorial 14.3 built its ledger star, with the closing entries flagged, and write a Balance measure that adds debits less credits up to a date and leaves out only the closing entries dated on that date.
 
 - Build a matrix of statement lines and accounts with each year-end balance and the change from 2025 to 2026, and flag the changes above a threshold that a what-if parameter sets at the controller's materiality, as in Exercise 15.4.
-- Drill through from the flagged lines to their postings. With the matrix of balances by account and SourceDocumentType of the Part IV case, find the balances that rest on journal entries alone and those that have not moved since the opening entry.
-- Record each question the review raises in a Questions table entered with Enter data, as the Part IV case kept its findings, with the requirement that will answer it.
+- Drill through from the flagged lines to their postings. With a matrix of balances by account and SourceDocumentType, find the balances that rest on journal entries alone and those that have not moved since the opening entry.
+- Record each question the review raises in a Questions table entered with Enter data, as Chapter 16 kept its dispositions, with the requirement that will answer it.
 
 <!-- Instructor notes, Requirement 2: materiality, 5% of recorded income before income taxes: 225,180.56 (2026) and 256,717.74 (2025).
      At a year-end the Balance measure shows a revenue or expense account's activity for that year, because the prior close zeroed it,
@@ -179,12 +210,12 @@ Account 2040 Accrued Expenses has grown every year. Apart from its opening line,
      (68,844.44 / 32,795.49 / 55,706.86) is acceptable if argued, but it uses hindsight on the November and December items of 2024 and
      2025 that it cannot apply to 2026. Keep the 193,781.70 of young 2026 accruals, and leave the 85,000.00 to Requirement 9. -->
 
-**Requirement 4: Test cutoff at each year-end (Chapters 6 and 12 and the Part III case).**
+**Requirement 4: Test cutoff at each year-end (Chapters 6 and 12).**
 
-Exercise 12.1 measured revenue and payroll cutoff at each year-end, and the Part III case estimated the payroll that the work of December 2026 left unrecorded. The statements need those measurements as entries with their accounts, made by one method at every year-end they present and at the one before, because an error at the end of 2024 reverses in 2025. Queries find the populations; prorating a pay period or an interest payment is a formula that a reviewer should be able to see, so it belongs in the workbook.
+Chapter 12 tested revenue and payroll cutoff, and Exercise 12.1 measured it at each year-end. The statements need those measurements as entries with their accounts, made by one method at every year-end they present and at the one before, because an error at the end of 2024 reverses in 2025. Queries find the populations; prorating a pay period or an interest payment is a formula that a reviewer should be able to see, so it belongs in the workbook.
 
-- Revenue: rerun tests L5 and L6 of Audit.sql at the end of 2024, 2025, and 2026, recognizing revenue in the year of delivery, and find the shipments never invoiced.
-- Payroll: rerun tests L7 and L8, and measure the cost of the work done in the last days of each December and paid in January from the registers of the pay periods that cross each year-end, prorated by the working days in WorkCenterCalendar. For 2026, use the Part III case's estimate, and compare your results with Exercise 12.1's. Split manufacturing from the other cost centers, and explain where each part ends up.
+- Revenue: at the end of 2024, 2025, and 2026, find the invoices whose revenue was posted in a different year from the delivery of the goods they bill, and the shipments never invoiced, as tests L5 and L6 of Audit.sql do. Recognize revenue in the year of delivery, and value the unbilled shipments at their order price less discount.
+- Payroll: measure the cost of the work done in the last days of each December and paid in the next year, with one working-day method (tests L7 and L8 of Audit.sql list the pay periods that cross each year-end). For 2024 and 2025, take the registers of those pay periods, prorated by the working days in WorkCenterCalendar. For 2026, whose last pay periods have no registers, multiply the cost per working day of the last eight processed pay periods by the working days left in the year. Split manufacturing from the other cost centers, and explain where each part ends up.
 - Interest: from DebtScheduleLine, measure the interest that each note had accrued between its last payment and each year-end, and state your day-count convention.
 
 <!-- Instructor notes, Requirement 4: revenue, by the latest DeliveryDate of each invoice's shipments against the year of its posting
@@ -198,8 +229,8 @@ Exercise 12.1 measured revenue and payroll cutoff at each year-end, and the Part
      days identical in every work center): end of 2024, period 26 (2024-12-16 to 12-29, paid 2025-01-03) in full, 242,165.92, plus 2 of
      the 9 working days of period 27, 60,402.98: 302,568.90 (gross 265,750.45, employer taxes 20,329.93, benefits 16,488.52;
      manufacturing 132,849.90, other 169,719.00). End of 2025: period 52 in full, 263,426.72, plus 3/9 of period 53, 102,494.47:
-     365,921.19 (gross 321,409.38, taxes 24,587.79, benefits 19,924.02; manufacturing 180,675.14, other 185,246.05). End of 2026, the Part
-     III estimate: periods 70-77 cost 2,298,268.90 over 78 working days, 29,464.99 a day, times 13 working days: 383,044.82 (gross
+     365,921.19 (gross 321,409.38, taxes 24,587.79, benefits 19,924.02; manufacturing 180,675.14, other 185,246.05). End of 2026:
+     periods 70-77 cost 2,298,268.90 over 78 working days, 29,464.99 a day, times 13 working days: 383,044.82 (gross
      336,456.34, taxes 25,738.93, benefits 20,849.55; manufacturing 197,970.68, other 185,074.14). The manufacturing part goes to 1090
      and, with no completion to absorb it, ends in 5080 and cost of goods sold; the rest goes to the cost centers' salary accounts and
      6060. Exercise 12.1 allocated hourly labor by the hours worked and got about 296,000 (2024) and 335,000 (2025); either method is
@@ -214,7 +245,7 @@ A working trial balance, with the recorded balances, the adjustments, and the ad
 
 - Number each adjustment and write its entries for the 31 December 2025 and 2026 trial balances, with the accounts and the queries or document numbers that support it. Keep the entry lines in an Excel Table, one row per account, so that the Review file can load them.
 - Classify each as the correction of an error, a change in estimate, or a reclassification, and assign it to a period. @fig-17-02 shows how an item missed at each year-end moves across the periods presented.
-- Compute the controller's materiality for each year, and decide what to record and what to pass, individually and in aggregate. Consider also an allowance for credit losses at Chapter 8's rates, the returns expected after the year-end on the year's deliveries, and the condition of returned goods put back into stock at full cost.
+- Compute the controller's materiality for each year, and decide what to record and what to pass, individually and in aggregate. Consider also an allowance for credit losses at the rates of Exercise 8.1 (0.5%, 2%, 5%, 15%, and 40% of the balances current, 1 to 30, 31 to 60, 61 to 90, and more than 90 days past due), the returns expected after the year-end on the year's deliveries, and the condition of returned goods put back into stock at full cost.
 - Show that every adjusted trial balance balances and that no adjustment touches cash. Decide how the 2025 column and the statement of changes in equity present the corrections, under the guidance on accounting changes and error corrections (ASC Topic 250).
 
 | Column | What it holds |
@@ -243,13 +274,13 @@ An estimate that later proves wrong is not an error. If the facts available at t
      sold +17,295.54, operating expense -171.91); A2 revenue cutoff +90,138.93 / -70,598.07 / +24,940.25 (4010 +22,504.23, 4020 -633.05,
      4030 +1,709.84, 4040 +1,359.23); A3 old accruals +39,028.43 / +57,021.15 / +61,297.21; A4 interest -1,838.58 / +469.31 / -637.99.
      Totals -175,240.12 / -76,459.90 / +68,475.84; equity effect at 2025 / 2026 year-ends -251,700.02 / -183,224.18. Adjusted net income
-     2025 5,057,894.81, 2026 4,572,087.08 (the Part III case's 4,511,427.86 + 61,297.21 - 637.99). Entries at 2026-12-31 (debits =
+     2025 5,057,894.81, 2026 4,572,087.08 (recorded 4,503,611.24 + 68,475.84). Entries at 2026-12-31 (debits =
      credits): A1 Dr retained earnings 365,921.19, Dr 5080 17,295.54, Cr operating expense 171.91, Cr 2030 336,456.34, Cr 2032
      25,738.93, Cr 2033 20,849.55; A2 Dr 1020 44,481.11, Cr retained earnings 19,540.86, Cr revenue 24,940.25; A3 Dr 2040 157,346.79, Cr
      retained earnings 96,049.58, Cr operating expense 61,297.21; A4 Dr retained earnings 1,369.27, Dr 7030 637.99, Cr 2080 2,007.26.
      Reclassifications: R1 the current portion of the notes, 89,243.61 at 2025 (note 1 only; note 2 began in 2026) and 147,503.76 at
      2026; R2 the credit balance of 1090 (-49,102.81 / -46,730.55) netted into work in process (1046 63,392.97 / 61,095.34). Materiality
-     225,180.56 (2026; 228,604.35 on adjusted income, so state the base) and 256,717.74 (2025). Judgment: 2026's income effect is 30% of
+     225,180.56 (2026, on recorded income as the controller set it) and 256,717.74 (2025). Judgment: 2026's income effect is 30% of
      materiality, but the payroll liability (383,044.82) exceeds it; current liabilities at 2026 rise by 227,705.29 before the
      reclassification and working capital falls by 330,727.94 after it; at 2025 current liabilities were understated by 271,240.88, above
      2025 materiality, and the missing payroll accrual recurs every year. Record A1-A4, R1, and R2, and present 2025 as restated, with
@@ -262,14 +293,14 @@ An estimate that later proves wrong is not an error. If the facts available at t
 
 ### Phase 3: The Statements and Notes
 
-**Requirement 6: Prepare the statements (Chapter 6 and the Part IV case).**
+**Requirement 6: Prepare the statements (Chapter 6).**
 
-The statements come from the adjusted trial balances in the workbook, and the Review file tests them against the ledger.
+The statements come from the adjusted trial balances in the workbook, and the Review file tests them against the ledger. A statement of changes in equity carries each component of equity from its opening balance to its closing one; when an error of an earlier year is corrected, the opening retained earnings are adjusted and the earlier year's columns are labeled as restated (ASC Topic 250).
 
 - Prepare classified balance sheets at both year-ends, and statements of income by function with a line for income before income taxes.
 - Prepare a statement of changes in stockholders' equity from 1 January 2025 that shows the correction of the opening balance.
-- Prepare statements of cash flows by the indirect method. Start from the sections that the Part IV case restated, and show that the adjustments change only the lines of the reconciliation, never the totals. Add the supplemental information: interest paid, income taxes paid, and investing and financing activities that involved no cash.
-- In the Review file, load the adjustment lines from the package workbook beside the ledger, and add tests to its Tests tab: each entry balances, no entry touches cash, adjusted net income agrees with the workbook, and recorded total assets agree with the Part IV case's Validation page.
+- Prepare statements of cash flows by the indirect method: start from net income, add back depreciation and the loss on disposals, adjust for the change in each working-capital balance, and classify the rest as investing or financing. Find the entries that moved no cash, such as equipment financed by a note and a disposal with no proceeds, and disclose them instead of reporting them as cash flows. Show that the adjustments change only the lines of the reconciliation, never the totals. Add the supplemental information: interest paid, income taxes paid, and investing and financing activities that involved no cash.
+- In the Review file, load the adjustment lines from the package workbook beside the ledger, and add tests to its Tests tab: each entry balances, no entry touches cash, adjusted net income agrees with the workbook, and recorded total assets agree with your trial balances of Requirement 1.
 
 <!-- Instructor notes, Requirement 6: balance sheets, 2026 / 2025: cash 8,442,255.80 / 9,383,566.10; receivables 4,843,285.43 /
      4,755,337.09; inventories 23,935,720.45 / 15,178,832.94; prepaid 60,000.00 / 60,000.00; current assets 37,281,261.68 /
@@ -289,9 +320,9 @@ The statements come from the adjusted trial balances in the workbook, and the Re
      receivables -87,948.34 / +324,845.74; inventories, with 1090, -8,756,887.51 / -5,043,043.30; payables (2010, 2020) +821,074.85 /
      +1,087,218.19; sales tax +1,932,519.29 / +1,910,036.22; accrued and other +43,219.69 / +53,650.68; operating -807,189.75 /
      3,975,026.14; investing 0.00 / -397,000.00 (425,000.00 paid, 28,000.00 of proceeds); financing -134,120.55 / -83,434.28; change in
-     cash -941,310.30 / +3,494,591.86, unchanged from the Part IV case. Interest paid 28,946.47 / 19,513.12; income taxes paid: none
+     cash -941,310.30 / +3,494,591.86, which no adjustment changes. Interest paid 28,946.47 / 19,513.12; income taxes paid: none
      recorded (a matter for the CFO); noncash: 280,000.00 of equipment financed by a note in 2026. Review tests: every entry nets to zero,
-     none posts to 1010, adjusted net income equals the workbook's, and recorded total assets equal the Part IV Validation figures. -->
+     none posts to 1010, adjusted net income equals the workbook's, and recorded total assets equal Requirement 1's. -->
 
 **Requirement 7: Build the note schedules from the records (Chapters 6, 10, 11, and 14).**
 
@@ -300,8 +331,8 @@ Each note is a schedule that the records can produce and that must agree with a 
 - Property and equipment: roll cost and accumulated depreciation forward by class from FixedAsset and FixedAssetEvent, reconcile the roll-forward to the ledger, and state the method and the lives.
 - Notes payable: the terms of each note, the asset the records link it to, the principal due in each of the next five years, the current portion, and the interest paid.
 - Revenue: disaggregate revenue on the adjusted basis by product line, customer segment, and timing of transfer, and show the contract balances that ASC Topic 606 requires: receivables, contract assets, and contract liabilities. Test whether any service work was done and not billed at a year-end.
-- Inventories by component and basis, and accrued liabilities by component.
-- Write the text of each note, of the accounting policies note, and of the note on the correction of the 2025 statements.
+- Accrued liabilities by component; for a fuller package, inventories by component and basis.
+- Write the text of the notes on property and equipment, notes payable, revenue, and accrued liabilities, and of the note on the correction of the 2025 statements. The policies note and the others are optional.
 
 <!-- Instructor notes, Requirement 7: property and equipment, cost 4,027,000 at 1 January 2025; 2025 additions 425,000 (1120 360,000,
      WH-0005 and WH-0006; 1130 65,000, OFF-0005) and disposal of WH-0001 (cost 168,000, accumulated depreciation 98,000, proceeds 28,000,
@@ -335,7 +366,7 @@ Each note is a schedule that the records can produce and that must agree with a 
 
 ### Phase 4: What the Data Cannot Settle
 
-**Requirement 8: Look past the balance-sheet date and at the year ahead (Chapters 8 and 12 and the Part IV case).**
+**Requirement 8: Look past the balance-sheet date and at the year ahead (Chapters 8 and 12).**
 
 The statements must account for what happened after 31 December 2026, up to the date they are available to be issued (ASC Topic 855), and management must evaluate whether conditions raise substantial doubt about the company's ability to continue as a going concern for a year after that date (ASC Subtopic 205-40). The database can contribute to both, but it cannot complete either.
 
@@ -358,9 +389,9 @@ The statements must account for what happened after 31 December 2026, up to the 
      389,304.68. Conclusion: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could
      change that, so the CFO's evaluation needs evidence from outside the database. -->
 
-**Requirement 9: Assemble the package and write the memo to the CFO.**
+**Requirement 9: Assemble the package and write the memo to the CFO (Chapter 8).**
 
-Assemble the statements and notes, and write a memorandum of no more than two pages to the CFO. For each matter that the records cannot settle, state what the records show, the evidence that would settle it, its possible effect where the ledger allows you to measure it, and the treatment you propose. The matters include at least the company's tax status, its leases, the sales tax collected, the balances that no document supports, and whether standard costs unchanged for three years still measure the finished goods at cost. Add the passed adjustments for the CFO's approval, the changes to the year-end close that would prevent this year's adjustments from recurring, and your recommendation on whether the package should go to the bank as it stands.
+Assemble the statements and notes as a PDF produced from the workbook, and write a memorandum of no more than two pages to the CFO, with an appendix of exhibits of no more than three pages. For each matter that the records cannot settle, state what the records show, the evidence that would settle it, its possible effect where the ledger allows you to measure it, and the treatment you propose. The memo must cover the company's tax status, its leases, the sales tax collected, and the balances that no document supports; it may also raise other matters the records point to, such as whether standard costs unchanged for three years still measure the finished goods at cost. Add the passed adjustments for the CFO's approval, the changes to the year-end close that would prevent this year's adjustments from recurring, and your recommendation on whether the package should go to the bank as it stands.
 
 <!-- Instructor notes, Requirement 9: (1) Tax status (ASC Topic 740): no tax account and no tax recorded in three years; equity is common
      stock with no distributions. Evidence: the entity's legal form or tax election, its returns, and its payments. If it is a C
@@ -376,20 +407,22 @@ Assemble the statements and notes, and write a memorandum of no more than two pa
      if none is real, equity rises by 1,836,371.12 (assets -440,000.00, liabilities -2,276,371.12); if the payables are real, they are
      three years past due. (5) Cash: no interest income and no bank reconciliation in the records; confirm the balance with the bank. (6)
      Inventories (ASC Topic 330): a physical count and a net realizable value review are needed; stock by item cannot be rebuilt because
-     the opening inventory has no item detail. Whether standards unchanged since 2024 still approximate cost on normal capacity is the
-     question of August's cost study (Chapter 18), which measures it; in July a strong memo names it and does not estimate it. (7) Subsequent events and going concern, as in Requirement 8. (8) Passed items P1-P3, for
+     the opening inventory has no item detail. Whether standards unchanged since 2024 still approximate cost on normal capacity needs a
+     cost study; at a standard rebuilt on normal capacity, manufactured finished goods would be about 471,000 higher at the end of 2026
+     and 370,000 higher at the end of 2025, so a strong memo names it and recommends the study. (7) Subsequent events and going concern, as in Requirement 8. (8) Passed items P1-P3, for
      approval. Recommendation: record A1-A4 and R1-R2, and do not release the package until items 1 to 4 are settled. Close-process
      changes: a year-end payroll accrual, a monthly review of open accruals, revenue cutoff by delivery date, and an interest accrual. -->
 
 
-## Deliverables
+## Deliverables and Checklist
 
-Submit the following:
+Before you submit, check that you have each of these:
 
-- Charles River Lender Package.xlsx, with a Documentation worksheet that states the purpose, the sources, and the date through which the data run; the three trial balances; the schedule of adjustments with its evidence; the adjusted trial balances; the statements; and the notes.
-- LenderPackage.sql, with its header complete and a comment above every query that states its purpose, its population, and its expected result.
-- Charles River Lender Review.pbix, with its Questions table and its Tests tab.
-- The memorandum to the CFO, of no more than two pages.
+1. LenderPackage.sql, with its header complete and two comment lines above every query.
+2. Charles River Lender Package.xlsx, with the Documentation worksheet and the date through which the data run; the three trial balances; the schedule of adjustments with its evidence; the adjusted trial balances; the statements; and the required notes.
+3. The package for the bank: a PDF of the statements and the required notes, produced from the workbook.
+4. Charles River Lender Review.pbix, with its Questions table and its Tests tab.
+5. The memorandum to the CFO, of no more than two pages, with an appendix of exhibits of no more than three pages.
 
 
 ## What a Strong Submission Includes
@@ -403,7 +436,7 @@ Submit the following:
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-This case reused work from across the book: the trial balance and statement mapping of Chapter 6, the anti-join of Chapter 10, the Params CTE of Chapter 11 and the statements of Exercise 11.1, the cutoff tests of Chapter 12, the payroll accrual of the Part III case, the cash bridge and findings of the Part IV case, and the drill-through of Chapter 15. Few of its techniques were new. What was new was deciding which tool each step needed and keeping the evidence of every step where the next reader could find it.
+This case reused work from across the book: the trial balance and statement mapping of Chapter 6, the anti-join of Chapter 10, the Params CTE of Chapter 11 and the statements of Exercise 11.1, the cutoff tests of Chapter 12, and the ledger model and drill-through of Chapters 14 and 15. Few of its techniques were new. What was new was deciding which tool each step needed and keeping the evidence of every step where the next reader could find it.
 :::
 
 
@@ -411,7 +444,7 @@ This case reused work from across the book: the trial balance and statement mapp
 
 This case turned a ledger into statements that a lender can rely on, and found along the way what a ledger alone cannot support. Most of the work was descriptive and diagnostic analytics, in the terms of @tbl-01-01: the statements and the notes describe the company, and the rebuilt accruals, the cutoff tests, and the review of the opening balances diagnose where the ledger and its documents part. The estimates were small predictive models, of the payroll owed at a cost per working day, of the accruals that invoices would clear, and of the returns still to come. The recommendations to the CFO, on what to record, what to pass, and what to settle before the package leaves, are prescriptive.
 
-The statements now show what each product line earned, at the cost the ledger assigns to it. In August, the CFO and the production manager turn to whether that cost is right, whether the plant should go on making everything it makes, and what its products should sell for. That is the subject of the next chapter.
+Work like this rarely ends when the package leaves. A lender reads the statements and the notes, asks questions, and comes back each quarter to test the terms of the loan, and an outside accountant, if the bank asks for one, starts from the same trial balances and adjustments. The reconciliations and the documentation you built are what make those conversations short, and the matters you raised for the CFO are the ones that will decide whether the package can be relied on.
 
 
 {{< include _further-reading.qmd >}}

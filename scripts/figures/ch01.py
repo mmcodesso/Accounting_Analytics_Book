@@ -294,9 +294,8 @@ def fig_01_08() -> Diagram:
               "Expands into Procure-to-Pay and Manufacturing")
     p4 = part(225, 250, 200, 64, card("Part IV", "Power BI", INK), HIGHLIGHT,
               "Data models that span table groups")
-    p5 = part(500, 100, 360, 130, card("Part V", "Integrated and Applied Topics<br>Comprehensive "
-                                        "cases in financial reporting,<br>managerial accounting, and "
-                                        "auditing", WHITE), GRAY,
+    p5 = part(500, 100, 360, 130, card("Part V", "Capstone Cases<br>Three independent cases in financial "
+                                        "reporting,<br>managerial accounting, and auditing", WHITE), GRAY,
               "All three tools, each where it fits, and all table groups")
     for p in (p2, p3, p4):
         d.arrow(p1, p, exit=(1, 0.5), entry=(0, 0.5))

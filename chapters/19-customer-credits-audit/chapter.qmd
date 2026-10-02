@@ -19,16 +19,16 @@ After completing this chapter, you will be able to:
 
 ## Opening Scenario {.unnumbered}
 
-It is September 2027. Twice this summer the controller's team netted customer returns against sales without looking at them closely. The statements for the bank in July (Chapter 17) passed two small adjustments for returns, and the cost study in August (Chapter 18) set returns aside to concentrate on the plant. Yet the ledger shows why someone should look: returns and allowances have grown faster than sales for three years, Furniture above all.
+It is September 2027. Customer returns rarely get a second look at Charles River: the controller's team nets them against sales at every close and moves on. Yet the ledger shows why someone should look: returns and allowances have grown faster than sales for three years, Furniture above all.
 
 At its September meeting, the audit committee asked the chief audit executive for an audit of the customer credits cycle: the returns customers send back, the credit memos that reverse their sales, the refunds paid to customers who had already paid, the commission taken back from the sales representatives, and the cash application that decides whether a customer has paid at all. A refund is cash that leaves the company on the strength of a record, and the committee wants assurance on both the controls and the balances, not a review.
 
-You are back on the internal audit team of Chapters 8, 12, and 16. Those chapters aged the receivables and set aside, as credits on paid invoices that were refunded, the few hundred invoices whose balances had turned negative. Nobody has audited those credits and refunds since. This chapter is the last case of the book, and it works like the two before it: each requirement states what the audit needs and names the chapters it draws on, and you decide how to produce it, choosing among the tools you have learned and explaining your choices.
+You are back on the internal audit team of Chapters 8, 12, and 16. Those chapters aged the receivables and set aside, as credits on paid invoices that were refunded, the few hundred invoices whose balances had turned negative. Nobody has audited those credits and refunds since. This chapter is a case, and it has no tutorials. Each requirement states what the audit needs and names the chapters it draws on, and you decide how to produce it, choosing among the tools you have learned and explaining your choices.
 
 
 ## The Engagement
 
-The chief audit executive sets the scope. The analytics cover fiscal 2024 to 2026, so that a pattern can be seen as it grows; the conclusions on controls are drawn for fiscal 2026. Fieldwork runs through September, and the report goes to the committee's November meeting. The owners of the cycle, who will respond to the findings, are the controller, the customer service manager, and the accounting manager.
+The chief audit executive sets the scope. The analytics and the tests of controls cover fiscal 2024 to 2026, so that a pattern can be seen as it grows, and the conclusions on controls are stated as at the end of fiscal 2026. Fieldwork runs through September, and the report goes to the committee's November meeting. The owners of the cycle, who will respond to the findings, are the controller, the customer service manager, and the accounting manager.
 
 The chief audit executive wants five questions answered:
 
@@ -38,7 +38,7 @@ The chief audit executive wants five questions answered:
 - why returns grow faster than sales, and what that means for revenue and inventory;
 - what the committee should hear, how severe each finding is, and what should be monitored from now on.
 
-Three conditions come with them. Magnitude is judged against 5% of fiscal 2026 income before income taxes as the July package reported it. Every finding is worded as what the records show, such as "a refund dated before the customer's payment was received", and never as what someone did, until evidence from outside the database settles the question. And the substance of management's responses belongs to the owners, but you draft the action plans you will ask them to accept.
+Three conditions come with them. Magnitude is judged against 5% of fiscal 2026 income before income taxes as the ledger records it. Every finding is worded as what the records show, such as "a refund dated before the customer's payment was received", and never as what someone did, until evidence from outside the database settles the question. And the substance of management's responses belongs to the owners, but you draft the action plans you will ask them to accept.
 
 
 ## The Credits Cycle and Its Risks
@@ -47,7 +47,7 @@ An integrated audit tests controls and balances together, so that the evidence o
 
 @fig-19-01 maps the cycle as its records show it. Each document is recorded by one department: the warehouse receives the goods back, customer service records receipts, applies cash, approves credits, and approves the commission clawbacks, and accounting approves refunds. The control points C1 to C9 are what a well-designed cycle would check at each step. The ledger meets the cycle at account 2060 Customer Deposits and Unapplied Cash: every receipt passes through it on the way to the receivable, a credit on an invoice that has been paid lands in it, and every refund is paid out of it.
 
-![The customer credits cycle.](/visuals/svg/fig-19-01-credits-cycle.svg){#fig-19-01 fig-alt="A diagram of the customer credits cycle. Five documents run left to right, each with the department that records it: cash receipts and their applications (customer service), sales returns (warehouse), credit memos (customer service), sales commission adjustments (customer service), and customer refunds (accounting). Solid arrows show the flow from return to credit memo, from credit memo to clawback and to refund, and from cash application to the credit memo, labeled has the invoice been paid. Dashed amber arrows lead to each document's postings, and account 2060 appears in the postings of receipts, credit memos, and refunds. Numbered badges mark nine control points, listed below the diagram."}
+![The customer credits cycle.](/visuals/svg/fig-19-01-credits-cycle.svg){#fig-19-01 fig-alt="A diagram of the customer credits cycle. Five documents run left to right, each with the department that records it: cash receipts and their applications (customer service), sales returns (warehouse), credit memos (customer service), sales commission adjustments (customer service), and customer refunds (accounting). Solid arrows show the flow from return to credit memo, from credit memo to clawback and to refund, and from cash application to the credit memo, labeled has the invoice been paid. Dashed amber arrows lead to each document's postings, and account 2060 appears in the postings of receipts, credit memos, and refunds. Numbered badges mark nine control points, listed below the diagram: C1, every credit rests on a return received outside customer service; C2, credits approved within the approver's authority; C3, credits at the invoice price for no more than was shipped; C4, the credit approver does not handle that customer's cash; C5, a clawback for every credit line at the accrual's rate; C6, refunds approved within authority, outside customer service; C7, a refund only of a credit balance the customer has paid; C8, refunds to the payer's own method or account, net of open balances; C9, cash applied promptly to the remitting customer's invoices."}
 
 Fraud in a cycle like this is more often theft than misreporting. Asset misappropriation appeared in 90% of the occupational fraud cases studied by the Association of Certified Fraud Examiners (ACFE, 2026), far more often than financial statement fraud. In receivables and refunds it takes a few recognizable forms, listed in @tbl-19-01, each of which leaves traces that a query can look for. The fraud standard for public company audits, AS 2401 (PCAOB, n.d.-c), frames the brainstorming you will do in Requirement 3 around three conditions that are usually present when fraud occurs: an incentive or pressure, an opportunity, and an attitude or rationalization.
 
@@ -69,7 +69,7 @@ The ACFE's latest study found that anti-fraud controls are associated with lower
 
 ## The Data You Will Use
 
-You will reuse the audit files of the earlier chapters: Audit.sql from Chapter 12, with its approval and trace tests; Chapter 8's sampling and disposition methods; and Audit Monitoring.pbix from Chapter 16, with its exception register and the dispositions that survive each refresh. The cycle's tables are mostly new to your tests: SalesReturn and SalesReturnLine; CreditMemo and CreditMemoLine; CustomerRefund; and the commission tables SalesCommissionRate, SalesCommissionAccrual, SalesCommissionAdjustment, SalesCommissionPayment, and SalesCommissionPaymentLine. CashReceipt and CashReceiptApplication, SalesInvoice, Shipment, Employee, and the ledger are familiar.
+You will reuse what the audit chapters built: Audit.sql from Chapter 12, with its approval and trace tests; Chapter 8's sampling and disposition methods; and, if you built it, Audit Monitoring.pbix from Chapter 16, with its exception register and the dispositions that survive each refresh. The cycle's tables are mostly new to your tests: SalesReturn and SalesReturnLine; CreditMemo and CreditMemoLine; CustomerRefund; and the commission tables SalesCommissionRate, SalesCommissionAccrual, SalesCommissionAdjustment, SalesCommissionPayment, and SalesCommissionPaymentLine. CashReceipt and CashReceiptApplication, SalesInvoice, Shipment, Employee, and the ledger are familiar.
 
 You will keep the files in @tbl-19-02. Requirement 4's query flags each refund, and Requirement 5's report loads those flags as a CSV file: the query decides, and the report lets the committee see and drill into what it decided.
 
@@ -97,6 +97,30 @@ Some of what an audit needs is not in the database. MaxApprovalAmount in Employe
 :::
 
 
+## Getting Started
+
+Set up your files before you begin. Make a working copy of the downloaded CharlesRiver.sqlite named CharlesRiver_Work.sqlite, and open the copy in DB Browser for SQLite, so that the download is never changed. Start Credits.sql with a header comment that states its purpose, the database file, the preparer and the date, and the checks it performs, and write two comment lines above every query: what it tests, and its population and expected result. Create Credits Audit.xlsx with a Documentation worksheet that states the purpose, the sources, and the date through which the data run, and create Credits Analytics.pbix. You need DB Browser for SQLite, Excel for Microsoft 365 (for RANDARRAY, SORTBY, and BETA.INV), and Power BI Desktop, which runs only on Windows; if you work on a Mac, plan to use a Windows computer for Requirements 5 and 10.
+
+Work in three milestones, one for each phase of the requirements. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the audit.
+
+1. **Plan the audit** (Requirements 1 to 3): the map of the cycle, the reconciliations, materiality, and the risk-and-control matrix.
+2. **Test controls and balances** (Requirements 4 to 7): the control tests, the analytics report, the sampling plan with its frozen selection, and the substantive tests and timeline.
+3. **Evaluate and report** (Requirements 8 to 10): the evaluation of deficiencies, the report to the committee, and the continuing tests.
+
+<!-- Instructor notes, Milestone 1 checkpoints: 612 returns, 612 credit memos (632,245.91), 222 refunds (216,718.42), 637 clawbacks
+     (10,832.09); credit SubTotal equals 4060 in every year (145,655.35 / 201,104.38 / 242,764.56); 2060 at the year-ends 3,105.75 /
+     1,008.67 / 3,413.46; materiality 225,180.56, performance 168,885.42, clearly trivial 11,259.03; 2026 expectation at the 2025 rate
+     203,762.47 against 242,764.56. -->
+
+<!-- Instructor notes, Milestone 2 checkpoints: credits above the approver's limit 414 (421,606.55); credit approver also applied cash to
+     the invoice 206; refunds above limit 163 (145,938.94); refunds dated before the customer's payment 58 (71,306.30); key items 7
+     refunds (31,628.48), sample of 59 from the remaining 215; the largest refund RF-2025-000097, 17,745.96, paid while 13,081.41 was
+     unpaid. -->
+
+<!-- Instructor notes, Milestone 3 checkpoints: two significant deficiencies (credits; refunds), the Accounting Manager's concentration a
+     deficiency, no material weakness; register additions 414, 206, 163, and 58 exceptions. -->
+
+
 ## Requirements
 
 The requirements fall into three phases: planning the audit, testing controls and balances, and evaluating and reporting. Each phase uses what the one before it established.
@@ -107,7 +131,7 @@ The requirements fall into three phases: planning the audit, testing controls an
 
 The map comes from the records, not from a description of how the process should work. That takes joins, anti-joins, and counts over the cycle's tables and the ledger, which is work for a query.
 
-- Start Credits.sql with a header like Audit.sql's, and profile each of the cycle's tables with the tests of Chapter 10's data profile.
+- In Credits.sql, profile each of the cycle's tables with the tests of Chapter 10's data profile.
 - Test every link with anti-joins: return lines to shipment lines, credits to returns and invoices, credit lines to return lines, refunds to credits, and clawbacks to credit lines and accruals. Test the document numbers for gaps, as Chapter 8 did.
 - Build a matrix of the ledger's postings by source document and account, and list who records each document, by job title.
 - Mark on @fig-19-01 what the records can evidence at each control point and what they cannot.
@@ -155,18 +179,16 @@ Every later test assumes that the populations are complete. Two-sided totals by 
 
 A planning workbook keeps its parameters in cells that every later test refers to, which is what Excel is for.
 
-- Compute overall materiality under the chief audit executive's condition, performance materiality at 75% of it, and a clearly trivial threshold at 5% of it, and choose tolerable deviation rates for the controls you will test.
-- Build an analytical expectation of fiscal 2026 returns from the 2024 return rate, and compare it with the ledger.
+- Compute overall materiality under the chief audit executive's condition, performance materiality at 75% of it, and a clearly trivial threshold at 5% of it.
+- Build an analytical expectation of fiscal 2026 returns from the 2025 return rate (the debits to account 4060 over the revenue that sales invoices posted to the product and service accounts), and compare it with the ledger. Explain why the 2024 rate would make a poorer expectation.
 - Brainstorm the fraud risks with @tbl-19-01 and AS 2401's three conditions, mapped to the people and documents of @fig-19-01.
 - Build a risk-and-control matrix: risk, assertion, control point, test, tool, and whether the evidence lies in the database or outside it.
 
-<!-- Instructor notes, Requirement 3: income before income taxes in the July package (Chapter 17, adjusted) 4,572,087.08: materiality
-     228,604.35, performance materiality 171,453.27, clearly trivial 11,430.22 (on the ledger's 4,503,611.24: 225,180.56, 168,885.42,
-     11,259.03; if the CFO revised the package for Chapter 18's inventory finding, materiality rises by about 5,000; no conclusion
-     changes). Tolerable deviation rate 5% for refund and credit authority (cash out), 10% elsewhere. Return rate on revenue (SalesInvoice
-     postings to 4010-4040 and 4080: 27,313,074.43 / 29,372,768.96 / 29,761,002.45): 0.533% / 0.685% / 0.816%; 2026 expectation at the
-     2024 rate 158,709.68 against 242,764.56, a difference of +84,054.88 (+53.0%), above clearly trivial and below performance
-     materiality: investigate (Requirement 5). Risk ratings: refunds high (cash leaves; a small team approves); credits high (revenue
+<!-- Instructor notes, Requirement 3: income before income taxes as recorded, 4,503,611.24: materiality 225,180.56, performance
+     materiality 168,885.42, clearly trivial 11,259.03. Return rate on revenue (SalesInvoice postings to 4010-4040 and 4080:
+     27,313,074.43 / 29,372,768.96 / 29,761,002.45): 0.533% / 0.685% / 0.816%; 2026 expectation at the 2025 rate 203,762.47 against
+     242,764.56, a difference of +39,002.09 (+19.1%), above clearly trivial and below performance materiality: investigate (Requirement 5).
+     The 2024 rate (expectation 158,709.68, +53.0%) understates, because fiscal 2024 had no earlier sales to return. Risk ratings: refunds high (cash leaves; a small team approves); credits high (revenue
      reduction and concealment); cash application moderate (lapping); clawbacks low in amount but part of employees' pay. A strong matrix
      sees that customer service records receipts, applies cash, approves credits, and approves clawbacks: incompatible duties. -->
 
@@ -205,10 +227,10 @@ Each test joins a document to the people who handled it and to the cash on the i
 
 The committee will want to see where returns grow and which refunds deserve a second look, and to move from a pattern to the documents behind it. That is a report.
 
-- Build Credits Analytics.pbix: credit lines with their reason, customer, approver, shipment date, and carrier; revenue from the invoice lines; Item, Customer, and Date; and the refunds with the flags of RefundFlags.csv. Add a Tests tab that ties credits to account 4060 by year.
+- Build Credits Analytics.pbix: credit lines with their reason, customer, approver, shipment date, and carrier; revenue from the invoice lines; Item, Customer, and Date; GLEntry and Account for the Tests tab; and the refunds with the flags of RefundFlags.csv. Add a Tests tab that ties credits to account 4060 by year.
 - Show return rates by year, item group, product family, and reason, and compare rates by the month of the credit with rates by the month of the shipment. Explain why the last months and fiscal 2024 mislead.
 - Look for concentration by carrier, warehouse, and customer, as a share of each customer's sales.
-- Score each refund on its flags, and let a reviewer drill through from the score to the refund, its credit, and its invoice.
+- Score each refund on its flags, one point for each, and let a reviewer drill through from the score to the refund, its credit, and its invoice.
 
 <!-- Instructor notes, Requirement 5: credits by group 2024 / 2025 / 2026: Furniture 73,312.97 / 129,872.44 / 161,086.15 (0.468% /
      0.743% / 0.926% of 4010); Lighting 33,062.08 / 32,578.56 / 48,813.77; Textiles 26,889.07 / 24,090.73 / 22,396.32; Accessories
@@ -238,11 +260,12 @@ Sampling still has a place when the evidence lies outside the database. The reco
 
 The selection and its evaluation are worksheet work, with the random selection Chapter 8 taught.
 
-- Define three attributes that need evidence outside the database: a written request from the customer, a payee checked against the customer master by someone independent, and an inspection record for returns coded Damaged.
+- Define three attributes that need evidence outside the database: a written request from the customer, a payee checked against the customer master by someone independent, and, for refunds of returns coded Damaged, an inspection record of the goods.
 - Choose the confidence level, tolerable deviation rate, and expected deviation rate, and take the sample size from @tbl-19-03.
-- Take the key items in full: every refund of $5,000 or more, and every refund to a customer whose refunds over the three years exceed $10,000. Select the rest with RANDARRAY and SORTBY, freeze the selection with Paste Values, and record the date and parameters.
+- From the refunds of fiscal 2024 to 2026, take the key items in full: every refund of $5,000 or more, and every refund to a customer whose refunds over the three years exceed $10,000. Select the rest with RANDARRAY and SORTBY, freeze the selection with Paste Values, and record the date and parameters.
 - Write the evaluation rule before you test: the upper deviation limit for zero to three deviations.
 - Apply the same sample to one attribute the data can test, the refund dated before the customer's payment, and compare the sample's conclusion with Requirement 4's result for the whole population.
+- The database holds no documents, so you cannot complete the three attributes here. Deliver the sampling plan, the frozen selection, and the rule for evaluating it, and do not invent results.
 
 <!-- Instructor notes, Requirement 6: key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134,
      RF-2026-000158, -000218); remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population
@@ -265,7 +288,7 @@ The selection and its evaluation are worksheet work, with the random selection C
      ROUND(Q x P x (1 - D), 2) except a half-cent on credit line 84; 612 credits on 612 distinct invoices, none above its invoice; SubTotal
      = the lines; tax = 6.5% of (SubTotal + freight credit) on all 612 (a test on SubTotal alone falsely flags the 99 credits with freight);
      no freight credit above the invoice's freight. Restocked at full standard cost: Damaged 77,248.17 (11,606.17 / 25,617.84 / 40,024.16)
-     and Damaged plus Quality Concern 137,606.43 (2026: 61,146.00, Chapter 17's passed item P3): a valuation follow-up. Lapping clean: no
+     and Damaged plus Quality Concern 137,606.43 (2026: 61,146.00): a valuation follow-up. Lapping clean: no
      application to another customer's invoice; deposits 0-2 days after receipt; every application within 2 days of the later of receipt
      and invoice date; every receipt fully applied; 491 receipts (526 applications, 395,196.29) were applied to invoices dated after the
      receipt, deposits held in 2060, not lapping. First digits: 612 credits and 222 refunds are too few, and their amounts are prices times
@@ -304,7 +327,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 - Report the clean results with the same care as the exceptions.
 
 <!-- Instructor notes, Requirement 8 (expected; reasoned alternatives accepted): D1 credit authority (414; 2026 exposure 172,307.40,
-     above performance materiality 171,453.27 and below materiality; all 2026 credits 260,457.72, above it). D2 segregation in customer
+     above performance materiality 168,885.42 and below materiality; all 2026 credits 260,457.72, above it). D2 segregation in customer
      service (receipts, applications, credits, clawbacks; 206 overlaps): a design deficiency, mitigated but not removed by every credit
      tracing to a return received in the warehouse at invoice prices, refunds approved in accounting, and the absence of any lapping or
      false-credit trace. D1 and D2 combined: a SIGNIFICANT DEFICIENCY over credits and receivables (occurrence of credits, completeness of
@@ -318,7 +341,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
      damaged goods restocked at full cost: a valuation follow-up. No material weakness. Clean: the reconciliations, clawbacks, the
      substantive tests, and the lapping tests. -->
 
-**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree.
+**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. Managers often resist a finding of a weakness when no error has been detected (Cohen et al., 2020), so prepare the evidence for each compensating control they may point to.
 
 <!-- Instructor notes, Requirement 9: the conclusion describes rather than accuses: the records reconcile and the balances tested are
      right; the controls over who may grant credits and refunds are not designed to prevent an unauthorized one; two significant
@@ -336,7 +359,8 @@ The register in Audit Monitoring.pbix already runs the rule tests of Chapters 8 
 
 - Add four rule tests to the Tests table: credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment. Add the processes Credit memos and Refunds to the populations.
 - Keep the refund method and the missing offset as anomaly tests, outside the register of rules.
-- Give the historical exceptions of the new tests one design-finding treatment with a remediation date, as Chapter 16 treated the payroll registers' self-approval, so that they do not flood the review.
+- Give the historical exceptions of the new tests one design-finding treatment, as Chapter 16 treated the payroll registers' self-approval: record them once, as a single finding about the control's design with the date by which it will be fixed, and review only the exceptions dated after that date, so that they do not flood the review.
+- If you did not build Audit Monitoring.pbix in Chapter 16, build a small register in Credits Analytics.pbix instead: a Tests table entered with Enter data, and an exceptions table that appends the documents each of the four tests flags.
 - Recheck the date through which the register's data run, and record the change.
 
 <!-- Instructor notes, Requirement 10: exceptions and rates per 1,000 (2024 / 2025 / 2026; three years): CM AboveLimit 414 (104 / 157 /
@@ -348,14 +372,14 @@ The register in Audit Monitoring.pbix already runs the rule tests of Chapters 8 
      After remediation, the two authority tests should fall to zero; the other two are the ones that would catch the next case. -->
 
 
-## Deliverables
+## Deliverables and Checklist
 
-Submit the following:
+Before you submit, check that you have each of these:
 
-- Credits.sql, with its header complete and two comment lines above every test that state its population and its expected result.
-- Credits Audit.xlsx, with worksheets for materiality, the risk-and-control matrix, the sample, and the evaluation of deficiencies, and a Documentation sheet.
-- Credits Analytics.pbix, with its Tests tab, and Audit Monitoring.pbix updated, with a record of the change.
-- The report to the audit committee, of no more than three pages, with its appendix: the map of the cycle with what the records evidence at each control point, the reconciliation by year, the test results, the sample plan, the evaluation of deficiencies, and the action plans.
+1. Credits.sql, with its header complete and two comment lines above every test that state its population and its expected result.
+2. Credits Audit.xlsx, with worksheets for materiality, the risk-and-control matrix, the sample, and the evaluation of deficiencies, and the Documentation sheet with the date through which the data run.
+3. Credits Analytics.pbix, with its Tests tab, and the continuing tests, in Audit Monitoring.pbix with a record of the change or in a register of your own.
+4. The report to the audit committee, of no more than three pages, with an appendix of no more than three pages: the map of the cycle with what the records evidence at each control point, the reconciliation by year, the test results, the sample plan, the evaluation of deficiencies, and the action plans.
 
 
 ## What a Strong Submission Includes
@@ -370,17 +394,15 @@ Submit the following:
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-This audit reused Chapter 8's random selection and dispositions, Chapter 12's approval and trace tests and its query library, and Chapter 16's exception register and change control. Across Part V the same ledger served three readers: a bank, which needed statements it could rely on; managers, who needed costs that answered their question; and an audit committee, which needed assurance that the records, and the people who keep them, can be trusted.
+This audit reused Chapter 8's random selection and dispositions, Chapter 12's approval and trace tests and its query library, and Chapter 16's exception register and change control. The audit also leaned on the rest of the book: the reconciliations of Chapter 6, the joins and anti-joins of Chapter 10, and the as-of measures of Chapter 11 decided what each test could trust.
 :::
 
 
 ## Looking Ahead
 
-This book began with a question from a controller about why a product line's margin had fallen, and it ends with an audit committee asking whether a cycle's records can be trusted. Between the two you learned to see accounting data as a system of tables linked by keys, to prepare and analyze it in a workbook, to query it directly with SQL, and to model it and present it in Power BI, and then, in the cases of Part V, to choose among those tools for each step of a problem. You used all four types of analytics in @tbl-01-01: describing what happened, diagnosing why, predicting what would follow, and prescribing what to do. And you worked from all three perspectives, financial accounting, managerial accounting, and auditing, often on the same data.
+This audit tested a cycle's controls and balances on whole populations, and kept sampling for the evidence the records cannot hold. Most of the work was descriptive and diagnostic analytics, in the terms of @tbl-01-01: the map, the reconciliations, and the tests describe what the records show, and the analytics of returns and the timeline of the largest refund diagnose where the risks sit. The expectation of returns and the upper deviation limits are small predictive models, and the recommendations and action plans are prescriptive.
 
-Some of what you practiced will not change, whatever tools you use. Define the population before you test it. Reconcile it to the ledger before you rely on it. Profile it before you analyze it, because the records always hold surprises. Document every step so that someone else can rerun it. And word a finding as what the records show, and say what evidence would settle it, until that evidence is in hand.
-
-Much else is changing. As this book has shown, testing whole populations, and testing them every time the data refresh, is now within reach of an accountant with ordinary tools. The PCAOB has amended its standards to address audit procedures that use technology-assisted analysis of information in electronic form (PCAOB, 2024), and internal auditors now work under the IIA's Global Internal Audit Standards, in effect since 2025. Tools that draft queries, formulas, and measures from a sentence are already common, and more will come. They make the habits of this book more important, not less, because a tool that writes the query does not know whether the population is complete, whether the closing entries are in it, or whether the result means what it seems to mean. You do. The tools will keep changing; the habits are what you take with you.
+An audit like this does not end with the report. The owners agree on actions and dates, the committee asks for their status at its next meetings, and the tests you added to the register show, every month, whether the actions worked. Findings that are worded carefully and rest on evidence are the ones management accepts and fixes.
 
 
 {{< include _further-reading.qmd >}}

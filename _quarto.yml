@@ -47,11 +47,12 @@ book:
         - chapters/15-management-reports/chapter.qmd
         - chapters/16-audit-monitoring/chapter.qmd
         - cases/part-4-case.qmd
-    - part: "Integrated and Applied Topics"
+    - part: "Capstone Cases"
       chapters:
         - chapters/17-statements-for-a-lender/chapter.qmd
         - chapters/18-make-buy-or-reprice/chapter.qmd
         - chapters/19-customer-credits-audit/chapter.qmd
+    - back-matter/closing.qmd
   appendices:
     - appendices/a-publishing-security/appendix.qmd
 

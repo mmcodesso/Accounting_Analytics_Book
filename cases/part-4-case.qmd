@@ -237,5 +237,5 @@ Close the memo with your recommendation.
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-Much of this case reconciled one view of the company with another: profit with cash, the ledger with its subledgers, the purchases made with the plan they were meant to follow, and a report with its own tests. Each Part of this book has done that work with one tool, the workbook, the query, and the report. Part V turns to integrated and applied topics that draw on every tool of the book.
+Much of this case reconciled one view of the company with another: profit with cash, the ledger with its subledgers, the purchases made with the plan they were meant to follow, and a report with its own tests. Each Part of this book has done that work with one tool, the workbook, the query, and the report. Part V offers three capstone cases that draw on every tool of the book.
 :::

@@ -1,0 +1,20 @@
+---
+format:
+  html:
+    number-sections: false
+---
+
+# Closing Thoughts {#sec-closing .unnumbered}
+
+This book began with a question from a controller about why a product line's margin had fallen. Answering questions like it took you through four kinds of work: seeing accounting data as a system of tables linked by keys, preparing and analyzing it in a workbook, querying it directly with SQL, and modeling and presenting it in Power BI. A capstone case then asked you to choose among those tools for each step of a larger problem. Along the way you used all four types of analytics in @tbl-01-01, describing what happened, diagnosing why, predicting what would follow, and prescribing what to do, and you worked from the three perspectives of financial accounting, managerial accounting, and auditing, often on the same data.
+
+Some of what you practiced will not change, whatever tools you use. Define the population before you test it. Reconcile it to the ledger before you rely on it. Profile it before you analyze it, because the records always hold surprises. Document every step so that someone else can rerun it. And word a finding as what the records show, and say what evidence would settle it, until that evidence is in hand.
+
+Much else is changing. As this book has shown, testing whole populations, and testing them every time the data refresh, is now within reach of an accountant with ordinary tools. The Public Company Accounting Oversight Board (PCAOB) has amended its standards to address audit procedures that use technology-assisted analysis of information in electronic form (PCAOB, 2024), and internal auditors now work under the Global Internal Audit Standards of the Institute of Internal Auditors (IIA, 2024), in effect since 2025. Tools that draft queries, formulas, and measures from a sentence are already common, and more will come. They make the habits of this book more important, not less, because a tool that writes the query does not know whether the population is complete, whether the closing entries are in it, or whether the result means what it seems to mean. You do. The tools will keep changing; the habits are what you take with you.
+
+
+## References {.unnumbered}
+
+Institute of Internal Auditors. (2024). *Global internal audit standards*. <https://www.theiia.org/en/standards/2024-standards/global-internal-audit-standards/>
+
+Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>

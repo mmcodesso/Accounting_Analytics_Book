@@ -19,11 +19,11 @@ After completing this chapter, you will be able to:
 
 ## Opening Scenario {.unnumbered}
 
-It is August 2027. The statements you prepared in July went to the bank, and while the CFO was preparing for the credit committee's questions, one comparison stood out. Once the manufacturing variance is charged, the furniture Charles River makes earns about ten points less than its standard margin, while the furniture it buys earns about what its standards say. The CFO's reading is blunt. The plant applies overhead at little more than a third of what it costs, and neither list prices nor standard costs have changed in three years, so the standards understate what every manufactured product costs. Is Charles River selling below cost, and should it be making these products at all?
+It is August 2027. Reviewing the fiscal 2026 results, the CFO found one comparison that would not go away. Once the manufacturing variance is charged, the furniture Charles River makes earns about ten points less than its standard margin, while the furniture it buys earns about what its standards say. The CFO's reading is blunt. The plant applies overhead at little more than a third of what it costs, and neither list prices nor standard costs have changed in three years, so the standards understate what every manufactured product costs. Is Charles River selling below cost, and should it be making these products at all?
 
 The production manager disagrees. The plant has room to spare, and idle capacity, in the production manager's words, is not the products' fault. To test the CFO's question, the purchasing manager asked a contract manufacturer to quote six of the families the plant makes, and the quote has arrived. It expires on 15 September, because the supplier needs the autumn to tool up for January deliveries, and the 2028 price list must go to customers on 1 October. The CFO and the production manager meet on 31 August to decide.
 
-The controller asks you, the staff accountant, for the analysis and a decision memo. Like Chapter 17, this chapter is a case. Each requirement states what the decision needs and names the chapters it draws on, and you decide how to produce it. Where a tool is the clear choice, the requirement says why; elsewhere, choose and explain your choice in your documentation.
+The controller asks you, the staff accountant, for the analysis and a decision memo. This chapter is a case, and it has no tutorials. Each requirement states what the decision needs and names the chapters it draws on, and you decide how to produce it. Where a tool is the clear choice, the requirement says why; elsewhere, choose and explain your choice in your documentation.
 
 
 ## The Situation
@@ -39,7 +39,7 @@ The production manager adds two:
 - what happens to the plant's hours, its crew, and the costs that stay;
 - whether the standards should change, and to what.
 
-The controller sets five conditions. First, everyone works from the same assumptions, which she lists in @tbl-18-02. Second, every figure reconciles to the ledger: the manufacturing variance in account 5080 and the costs that flow into account 1090 Manufacturing Cost Clearing, which Part III traced. Third, fiscal 2026 is the base year, because the records end there. Fourth, the decision is made family by family; the products Charles River buys in the same families are different products, not substitutes for the ones it makes. Fifth, decisions about positions belong to the production manager, so the memo states what a change in the crew would save and what it would cost, and leaves the decision there.
+The controller sets five conditions. First, everyone works from the same assumptions, which she lists in @tbl-18-02. Second, every figure reconciles to the ledger: the manufacturing variance in account 5080 and the costs that flow into account 1090 Manufacturing Cost Clearing, which are the payroll, the Factory Overhead entries, and the depreciation charged to it, not the debits that favorable closes post back to it. Third, fiscal 2026 is the base year, because the records end there. Fourth, the decision is made family by family; the products Charles River buys in the same families are different products, not substitutes for the ones it makes. Fifth, decisions about positions belong to the production manager, so the memo states what a change in the crew would save and what it would cost, and leaves the decision there.
 
 The quote is in @tbl-18-01. Its prices are averages per unit at the 2026 mix of items in each family. They are the case's assumption, set to resemble what Charles River pays for the products it already buys in those families, and they are not part of the dataset.
 
@@ -60,10 +60,14 @@ The terms come with the prices. Prices are fixed for 2028 and 2029, and Charles 
 |-------------------------------|------------------------------------------|
 | Base year | Fiscal 2026 |
 | Practical capacity | 80% of the available hours in WorkCenterCalendar |
-| Labor rate and burden | The Part III plan's straight-time rate and burden |
-| Hours per standard hour at plan | The Part III plan's middle scenario |
+| Straight-time labor rate and burden | 26.62 an hour; burden 14.14% of pay |
+| Hours per standard hour at plan | 1.18, of which 0.18 indirect |
+| Plan volume, the normal capacity | 68,912.79 standard hours a year |
+| Salaried production staff at plan | 263,191.24 a year, before burden |
+| Depreciation at plan | 293,499.96 a year |
 | Practical hours of one position | 80% × 8 hours × the 2026 working days |
-| Severance per position | Eight weeks of straight-time pay with burden |
+| Severance per position | Eight 40-hour weeks of straight-time pay with burden |
+| Materiality for the statements | 5% of income before income taxes as recorded |
 | Margin floor for pricing | 40% gross margin on time-driven cost, before unused capacity |
 | Demand-growth test (optional) | Volume 40% and 50% above 2026 |
 
@@ -72,7 +76,7 @@ The terms come with the prices. Prices are fixed for 2028 and 2029, and Charles 
 
 ## The Data You Will Use
 
-Much of what you need you have already built. Chapter10.sql and Chapter11.sql measured the plant's hours against standard, and the Part III case's Case.sql holds the plan for 2027 that @tbl-18-02 refers to. Chapter 7 taught regression, Goal Seek, Data Tables, and Solver, and Chapter 15 built a disconnected table that switches a measure, which you will use again. Exercise 8.6 and the Part II case tested the price lists and the promotions.
+Much of what you need you have already built. Chapter10.sql and Chapter11.sql measured the plant's hours against standard, and the plan figures in @tbl-18-02 are the plant's plan for 2027, which the Part III case built if you completed it. Chapter 7 taught regression, Goal Seek, Data Tables, and Solver, and Chapter 15 built a disconnected table that switches a measure, which you will use again. Exercise 8.6 tested the price lists, and Chapter 7 asked whether a promotion raised volume.
 
 The case also draws on tables the chapters used little or not at all. Item carries each product's standard cost and its parts: labor, variable and fixed overhead, conversion cost, standard labor hours, and whether it is manufactured or purchased (SupplyMode); material is standard cost less conversion cost. Routing and RoutingOperation give each product's setup hours per work order and run hours per unit at each work center, and WorkCenter and WorkCenterCalendar give the hours each work center had available. ProductionCompletionLine carries the standard cost released by each completion, part by part. PayrollRegisterLine tells regular, overtime, and salary earnings apart, and Employee.PayClass tells hourly from salaried staff. PriceList and PriceListLine hold the price lists, and PurchaseOrderLine what Charles River pays for the products it buys.
 
@@ -97,6 +101,34 @@ Some records cannot carry this analysis. Part III found that direct time recorde
 :::
 
 
+## Getting Started
+
+Set up your files before you begin. Make a working copy of the downloaded CharlesRiver.sqlite named CharlesRiver_Work.sqlite, and open the copy in DB Browser for SQLite, so that the download is never changed. Start MakeBuy.sql with a header comment that states its purpose, the database file, the preparer and the date, and the checks it performs, and write two comment lines above every query: what it tests, and its population and expected result. Create Make Buy Reprice.xlsx with an Assumptions sheet that holds @tbl-18-01 and @tbl-18-02 and a Documentation sheet that states the purpose, the sources, and the date through which the data run, and create Product Costs.pbix. You need DB Browser for SQLite, Excel for Microsoft 365 with the Solver add-in if you take the optional part of Requirement 7, and Power BI Desktop, which runs only on Windows; if you work on a Mac, plan to use a Windows computer for Requirement 5.
+
+Work in four milestones, one for each phase of the requirements. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the case.
+
+1. **What the records show** (Requirements 1 to 3): the family results, the inputs to 1090 with their behavior tests, and the capacity table.
+2. **What a product costs** (Requirements 4 and 5): the three costs for each family, the unused capacity reconciled to 1090, and the explorer.
+3. **Make, buy, or reprice** (Requirements 6 to 8): the decision for each quoted family, the value of freed capacity, and the price increases.
+4. **Standards and the memo** (Requirements 9 and 10): the revised standard, its effect on the statements, and the memo.
+
+<!-- Instructor notes, Milestone 1 checkpoints: Furniture margin 42.33% at standard, 32.56% after the variance per unit completed, 31.64%
+     with the year's variance (Lighting 46.96 / 37.96 / 36.96; Textiles 50.96 / 42.99 / 43.02); family variances 2,265,636.88; inputs to
+     1090 5,427,932.83 against 3,266,422.54 released; Factory Overhead r 0.975, payroll r 0.066; the plant uses 71.6% of its practical
+     capacity. -->
+
+<!-- Instructor notes, Milestone 2 checkpoints: committed cost 4,119,063.77; 39.97 an hour (crew 34.11); unused capacity 29,243.7 hours,
+     1,168,726; time-driven group margins Furniture 38.23%, Lighting 41.23%, Textiles 45.96%; explorer margins 12,739,803.20 (standard),
+     10,661,488.02 (absorption), 11,731,216.94 (time-driven) on revenue of 28,543,076.08. -->
+
+<!-- Instructor notes, Milestone 3 checkpoints: buy BNH, NGT, and TBL only with the crew reduced, +255,481 a year (10.56 positions, a
+     two-year net of about 338,302); with the crew kept buying costs 334,636 a year; SDB, SCN, and PIL lose either way; seven families below
+     the floor, +556,535 of revenue if volume holds. -->
+
+<!-- Instructor notes, Milestone 4 checkpoints: 63.46 per standard hour (57.99 at 1.0 hours) against 47.40; revaluation +257,435 /
+     +369,596 / +471,117 at the 2024 / 2025 / 2026 year-ends; income +112,161 (2025) and +101,521 (2026). -->
+
+
 ## Requirements
 
 The requirements fall into four phases: what the records show, what a product costs, whether to make, buy, or reprice, and how the standards should change. Each phase uses what the one before it found.
@@ -107,7 +139,7 @@ The requirements fall into four phases: what the records show, what a product co
 
 The CFO's comparison joins invoice lines, items, work orders, their closes, and completions, and every one of those joins can fan out. It is a query, written once and reconciled to the ledger before anyone reads a margin from it.
 
-- Start MakeBuy.sql with a header like Case.sql's. For each manufactured family in fiscal 2026, return the units sold, revenue, list value, and standard cost; the variance of the year's closes, by material, labor, and overhead, and as a share of the standard cost completed; and the variance per unit completed.
+- In MakeBuy.sql, for each manufactured family in fiscal 2026, return the units sold, revenue, list value, and standard cost; the variance of the year's closes, by material, labor, and overhead, and as a share of the standard cost completed; and the variance per unit completed.
 - Compute three margins for each family: at standard, after the variance per unit completed, and with the year's whole variance charged, as the ledger charges it. Set the purchased products of the same family beside them.
 - Test the CFO's second premise: whether list prices and standard costs changed at any time in the three years.
 - Reconcile the families' variances to account 5080.
@@ -180,7 +212,7 @@ What each family uses of the plant comes from the routings, multiplied by what w
 
 ### Phase 2: What a Product Costs
 
-Three costing views answer different questions, as @fig-18-01 shows. Standard costing charges each product a rate per standard hour and sends everything else to the variance account. Actual absorption spreads the year's whole cost over the units made, so a product's cost rises whenever the plant runs below capacity. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, and reports the capacity left unused as a cost of the plant.
+Three costing views answer different questions, as @fig-18-01 shows. Standard costing charges each product a rate per standard hour and sends everything else to the variance account. Actual absorption spreads the year's whole cost over the units made, so a product's cost rises whenever the plant runs below capacity. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, and reports the capacity left unused as a cost of the plant. If supplying an hour of practical capacity costs 40 and a product's routing takes 1.5 hours a unit, setup included, the product carries 60 of conversion cost, however much of its capacity the plant uses that year.
 
 ![Three ways to cost the plant's time.](/visuals/svg/fig-18-01-costing-views.svg){#fig-18-01 fig-alt="A diagram of three costing views fed by what the plant paid for in a year: crew, supervision, equipment, and factory overhead. Standard costing charges products the standard rate times standard hours and leaves a variance, charged to cost of goods sold. Actual absorption charges products all of the year's cost divided by the units made and leaves nothing out, so idle time is spread into every unit. Time-driven costing charges products a capacity cost rate times the routing time used, plus factory overhead, and reports unused capacity as a cost of the plant."}
 
@@ -193,7 +225,7 @@ Time-driven activity-based costing asks two questions: what each unit of capacit
 
 Each cost is a formula over a handful of inputs that the decision makers will want to change, which makes this workbook work: one Assumptions sheet, every cost a formula, and every assumption a cell.
 
-- Compute each manufactured item's cost under the three views. Standard is the item's standard cost. Actual absorption adds its family's variance per unit completed. Time-driven costs material, with the 2026 material variance as a rate; the Factory Overhead entries per standard hour; and the committed costs of the crew, supervision, and equipment per hour of practical capacity, times the item's routing time per unit, with setup spread over the family's average batch.
+- Compute each manufactured item's cost under the three views. Standard is the item's standard cost. Actual absorption adds its family's variance per unit completed. Time-driven costs material, with the 2026 material variance as a rate; the Factory Overhead entries per standard hour; and the committed costs of the crew (every hourly manufacturing employee), supervision, and equipment per hour of practical capacity, times the item's routing time per unit, with setup spread over the family's average batch.
 - Show the unused capacity as its own line, and reconcile the products' costs plus the unused capacity to the inputs to 1090.
 - Summarize by family at the 2026 mix of items sold, with the margin under each view, and find the share of margin the top fifth of items earns under each.
 - Add a Data Table of practical capacity from 75% to 90% of available hours, and explain what moves and what barely moves.
@@ -244,13 +276,13 @@ The test for one family is in @fig-18-02. What matters is which costs stop if Ch
 
 ![The make-or-buy test for one family.](/visuals/svg/fig-18-02-make-or-buy-test.svg){#fig-18-02 fig-alt="A flowchart for one family. If the delivered quote, price plus inbound freight, is below materials plus factory overhead, buy if the terms, quality, and minimum volume are acceptable. If not, but it is below that cost plus the crew time the family uses, buy only if the crew will be reduced in step with the hours freed, weighing tooling and severance over the quote's two years; if the crew stays, keep making. If the quote is above both, keep making and test the price against the margin floor, repricing if it falls below."}
 
-**Requirement 6: Decide make or buy, family by family.**
+**Requirement 6: Decide make or buy, family by family (Chapter 7).**
 
 The comparison is a few lines per family, with two assumptions that the decision turns on: the quote and what happens to the crew. A workbook lets the decision makers change both and watch the answer move.
 
 - For each quoted family, compute the relevant cost per unit with the crew kept, which is materials and the overhead that varies, and with the crew reduced in step with the hours freed, which adds the crew's cost of the routing time. Compare each with the delivered quote, and compute the annual effect at the 2026 volume.
 - Add the one-time costs for the families you would buy: tooling, and severance for the positions no longer needed under @tbl-18-02. Show the effect over the two years the prices are fixed.
-- Use Goal Seek for the quote at which each family breaks even under each crew case, and build a two-way Data Table of the quote, 10% either side, against the share of the freed crew time actually removed.
+- Use Goal Seek for the quote at which each family breaks even under each crew case, and build a two-way Data Table of the quote, 10% either side, against the share of the freed crew time actually removed, for the families you would buy taken together.
 - Set the CFO's absorption view beside your answer, and explain in two sentences why the two disagree.
 - List the terms that the numbers leave out.
 
@@ -292,10 +324,10 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
      cost): +40%, Finishing binds (shadow price about 6.01 an hour), buy about 151 BNH, extra cost about 391; +50%, Assembly binds (about
      49.98), buy all 2,182 BNH and about 2,311 NGT, extra cost about 86,177. -->
 
-**Requirement 8: Reprice the families below the floor (Chapter 7 and the Part II case).**
+**Requirement 8: Reprice the families below the floor (Chapter 7).**
 
-- Use Goal Seek for the price at which each family reaches the margin floor of @tbl-18-02 on its time-driven cost, and compute the increase and the share of volume the increase could lose before the family earns less contribution than it does now.
-- Set those figures against the evidence on how Charles River's customers respond to price: the Part II case's promotions, which did not raise volume, the price lists and overrides that Exercise 8.6 tested, and the date on which every price list ended. Recommend increases, and how the lists should be rebuilt.
+- Use Goal Seek for the price at which each family reaches the margin floor of @tbl-18-02 on its time-driven cost, and compute the increase and the share of volume the increase could lose before the family earns less contribution than it does now, measuring contribution over the relevant cost with the crew kept.
+- Set those figures against the evidence on how Charles River's customers respond to price: test whether order volume rose in the months of past promotions, and check the dates and use of the price lists, as Exercise 8.6 did. Recommend increases, and how the lists should be rebuilt.
 - Show how the answer changes for any family you would buy in Requirement 6.
 
 ::: {.callout-tip .in-practice icon=false}
@@ -313,13 +345,13 @@ Price is the most powerful lever on profit, and often the least managed. In a st
 
 ### Phase 4: Standards and the Memo
 
-**Requirement 9: Revise the standards, and measure what they mean for July (Chapter 17 and the Part III case).**
+**Requirement 9: Revise the standards, and measure what they mean for the statements (Chapter 9).**
 
-Standards serve inventory as well as decisions. The inventory standard of U.S. generally accepted accounting principles (Financial Accounting Standards Board Accounting Standards Codification Topic 330) allocates fixed production overhead on the normal capacity of the facilities and charges abnormal costs, such as idle facility expense, to the period. The workbook can rebuild a standard from the Part III plan and revalue the stock it applies to.
+Standards serve inventory as well as decisions. The inventory standard of U.S. generally accepted accounting principles (Financial Accounting Standards Board Accounting Standards Codification Topic 330) allocates fixed production overhead on the normal capacity of the facilities and charges abnormal costs, such as idle facility expense, to the period. The workbook can rebuild a standard from the plan in @tbl-18-02 and revalue the stock it applies to.
 
-- Propose a standard conversion rate per standard hour on normal capacity, from the Part III plan's labor rate, burden, and hours per standard hour, the overhead that varies, and the plan's supervision and depreciation. Compare it with the current rate, the time-driven rate, and 2026's actual cost, and explain why a standard built on 2026's actual cost would carry idle capacity into inventory.
-- Revalue the manufactured finished goods made since the ledger opened and still on hand at each year-end of the July statements, and measure the effect on opening retained earnings, on 2025 and 2026 income, and on each balance sheet, against Chapter 17's materiality. Show how the answer depends on what you treat as normal capacity.
-- Recommend what the CFO should tell the bank, and whether the correction belongs in the next statements or in a revised package.
+- Propose a standard conversion rate per standard hour on normal capacity, the plan volume of @tbl-18-02 at its hours per standard hour: the labor rate with burden for the direct and the normal indirect hours, the overhead that varies, and the plan's supervision and depreciation spread over the plan volume. Compare it with the current rate, the time-driven rate, and 2026's actual cost, and explain why a standard built on 2026's actual cost would carry idle capacity into inventory.
+- Revalue the manufactured finished goods made since the ledger opened and still on hand at the end of fiscal 2024, 2025, and 2026, and measure the effect on retained earnings at the start of fiscal 2025, on 2025 and 2026 income, and on each balance sheet, against the materiality of @tbl-18-02. Show how the answer depends on what you treat as normal capacity.
+- The company issued its fiscal 2025 and 2026 statements to its shareholders. Recommend whether the correction belongs in the next statements or calls for revised ones, and what the CFO should tell the shareholders.
 
 <!-- Instructor notes, Requirement 9: proposed rate per standard hour on the Part III plan (68,912.79 standard hours, 1.18 hours per
      standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47;
@@ -331,33 +363,33 @@ Standards serve inventory as well as decisions. The inventory standard of U.S. g
      2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.2, 23,116.1, 1,097,455.36; 2026
      21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117; at 1.0 hours
      (57.99): +167,288 / +243,171 / +309,655; time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle
-     capacity). Effect on the July statements at 63.46: retained earnings at 1 January 2025 +257,435, 2025 income +112,161, 2026 income
-     +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above Chapter 17's materiality (256,717.74 and 225,180.56), while
+     capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at 1 January 2025 +257,435, 2025 income +112,161, 2026 income
+     +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the materiality of tbl-18-02 (256,717.74 and 225,180.56), while
      the income effects are below it; at 1.0 hours the 2025 balance (243,171) falls below materiality and 2026's (309,655) stays above.
      The rates are 2027's plan applied to 2024-2026 stock, an approximation a strong answer names. A strong answer judges the balance
-     sheet effect material on the plan's definition of normal capacity, recommends that the CFO tell the bank promptly and provide a
-     revised package (inventories, retained earnings, and income corrected, with the correction disclosed), or, if the CFO judges it
-     immaterial on a narrower definition, correct it in the next statements with disclosure; the decision is the CFO's. The opening
+     sheet effect material on the plan's definition of normal capacity, recommends revised statements for the shareholders
+     (inventories, retained earnings, and income corrected, with the correction disclosed), or, if the CFO judges it immaterial on a
+     narrower definition, a correction in the next statements with disclosure; the decision is the CFO's. The opening
      4,111,795.76 of finished goods has no item detail and is left out. -->
 
-**Requirement 10: Write the decision memo.** Write a memorandum of no more than two pages to the CFO and the production manager, with a decision table that gives, for each quoted family and each family below the floor, what to do, the annual effect, the one-time cost, and what the decision depends on. Close with the standards you propose, what the July statements need, and the one decision that only the production manager can make.
+**Requirement 10: Write the decision memo.** Write a memorandum of no more than two pages to the CFO and the production manager, with an appendix of exhibits of no more than three pages and a decision table that gives, for each quoted family and each family below the floor, what to do, the annual effect, the one-time cost, and what the decision depends on. Close with the standards you propose, what the fiscal 2026 statements need, and the one decision that only the production manager can make.
 
 <!-- Instructor notes, Requirement 10: a strong memo makes SDB, SCN, and PIL; buys BNH, NGT, and TBL only with a committed plan to
      reduce the crew in step (about 10.6 positions; otherwise keep making them and reprice); says first that the plant already pays for
      about 17.9 positions of unused capacity, so fitting the crew to the work is worth more than outsourcing; raises BKC, CTB, SDB, and
      CHD to the floor (and BNH, NGT, TBL if kept) through new, approved price lists with end dates; adopts standards on normal capacity for
-     inventory and time-driven costs for decisions; and raises the July inventory question with the CFO. It explains the disagreement
+     inventory and time-driven costs for decisions; and raises the question of the fiscal 2026 inventory with the CFO. It explains the disagreement
      between the CFO and the production manager in their own terms: both are right about part of the cost. -->
 
 
-## Deliverables
+## Deliverables and Checklist
 
-Submit the following:
+Before you submit, check that you have each of these:
 
-- Make Buy Reprice.xlsx, with an Assumptions sheet that holds every assumption in @tbl-18-02 and the quote, sheets for cost behavior, costs, make or buy, capacity, prices, and standards, and a Documentation sheet that states the purpose, the sources, and the date through which the data run.
-- MakeBuy.sql, with its header complete and a comment above every query that states its purpose, its population, and its expected result.
-- Product Costs.pbix, with its About and Validation pages and its Tests tab.
-- The memorandum, of no more than two pages, with a one-page appendix of exhibits.
+1. MakeBuy.sql, with its header complete and two comment lines above every query.
+2. Make Buy Reprice.xlsx, with the Assumptions sheet holding the quote and every assumption in @tbl-18-02; sheets for cost behavior, costs, make or buy, capacity, prices, and standards; and the Documentation sheet with the date through which the data run.
+3. Product Costs.pbix, with its About and Validation pages and its Tests tab.
+4. The memorandum, of no more than two pages, with its decision table and an appendix of exhibits of no more than three pages.
 
 
 ## What a Strong Submission Includes
@@ -367,12 +399,12 @@ Submit the following:
 - A different cost for each question: absorption for neither decision, relevant costs for make or buy, time-driven costs for pricing, and standards on normal capacity for inventory (Noreen, 1991; Balakrishnan et al., 2012a).
 - The crew assumption made explicit, with the break-even quotes and the one-time costs.
 - Price increases set beside the volume they can afford to lose and the evidence on how customers respond.
-- Standards proposed on a stated capacity, with their effect on the July statements measured and reported to the CFO.
+- Standards proposed on a stated capacity, with their effect on the fiscal 2026 statements measured and reported to the CFO.
 - Files that someone else could rerun, and a memo that two people who disagree can act on.
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-This case brought back three earlier answers. Part III found that the plant pays for hours beyond its work; here those hours became the unused capacity that no product should carry, and the Part III plan became the normal capacity for the standards. Part IV found the cash tied up in materials, and the families that might be bought draw on the same materials, so buying them would slow the stock's return to cash. And the Part II case found that promotions did not raise volume, which is the evidence the price increases rest on. The July statements of Chapter 17 come back too, because a cost study can change what the statements should have said.
+This case brought back earlier answers. Chapters 10 to 12 found that the plant pays for hours beyond its work; here those hours became the unused capacity that no product should carry. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the fiscal 2026 statements come back too, because a cost study can change what the statements should have said.
 :::
 
 
@@ -380,7 +412,7 @@ This case brought back three earlier answers. Part III found that the plant pays
 
 This case asked what the plant's products cost, and found that the answer depends on the question. Requirements 1 and 3 were descriptive analytics, in the terms of @tbl-01-01: what the families earned and what they used of the plant. Requirements 2 and 4 were diagnostic: why the variance grew and where the cost really sits. Requirements 7 and 8 were predictive, estimating what freed capacity, growth, and higher prices would do. And the recommendations on making, buying, repricing, and the standards were prescriptive, as decisions usually are.
 
-The analyses of July and August both passed over one part of revenue: the returns, credits, and refunds that reduce it. In September, internal audit turns to that cycle. That is the subject of the next chapter.
+Decisions like these are rarely made once. Quotes expire, crews change, and prices move, so the workbook and the explorer you built are tools for the next round as much as answers to this one. A plant that measures its costs on practical capacity every year sees idle capacity while it is still small, and a company that reviews its standards every year never has to explain three years of stale ones at once.
 
 
 {{< include _further-reading.qmd >}}
