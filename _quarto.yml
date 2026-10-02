@@ -48,6 +48,8 @@ book:
         - chapters/16-audit-monitoring/chapter.qmd
         - cases/part-4-case.qmd
     - part: "Integrated and Applied Topics"
+      chapters:
+        - chapters/17-statements-for-a-lender/chapter.qmd
   appendices:
     - appendices/a-publishing-security/appendix.qmd
 

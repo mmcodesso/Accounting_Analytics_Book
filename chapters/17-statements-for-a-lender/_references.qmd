@@ -1,0 +1,11 @@
+{{< pagebreak >}}
+
+## References
+
+Acito, A. A., Burks, J. J., & Johnson, W. B. (2009). Materiality decisions and the correction of accounting errors. *The Accounting Review*, *84*(3), 659–688. <https://doi.org/10.2308/accr.2009.84.3.659>
+
+Choudhary, P., Merkley, K. J., & Schipper, K. (2021). Immaterial error corrections and financial reporting reliability. *Contemporary Accounting Research*, *38*(4), 2423–2460. <https://doi.org/10.1111/1911-3846.12713>
+
+Minnis, M. (2011). The value of financial statement verification in debt financing: Evidence from private U.S. firms. *Journal of Accounting Research*, *49*(2), 457–506. <https://doi.org/10.1111/j.1475-679X.2011.00411.x>
+
+Minnis, M., & Sutherland, A. (2017). Financial statements as monitoring mechanisms: Evidence from small commercial loans. *Journal of Accounting Research*, *55*(1), 197–233. <https://doi.org/10.1111/1475-679X.12127>

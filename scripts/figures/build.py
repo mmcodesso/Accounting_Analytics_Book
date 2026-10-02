@@ -36,6 +36,9 @@ import ch13  # noqa: E402
 import ch14  # noqa: E402
 import ch15  # noqa: E402
 import ch16  # noqa: E402
+import ch17  # noqa: E402
+import ch18  # noqa: E402
+import ch19  # noqa: E402
 import appendix_a  # noqa: E402
 from data import REPO_ROOT  # noqa: E402
 
@@ -44,7 +47,7 @@ CHAPTERS = {1: ch01.FIGURES, 2: ch02.FIGURES, 3: ch03.FIGURES, 4: ch04.FIGURES, 
             6: ch06.FIGURES, 7: ch07.FIGURES, 8: ch08.FIGURES, 9: ch09.FIGURES,
             10: ch10.FIGURES, 11: ch11.FIGURES, 12: ch12.FIGURES,
             13: ch13.FIGURES, 14: ch14.FIGURES, 15: ch15.FIGURES,
-            16: ch16.FIGURES}
+            16: ch16.FIGURES, 17: ch17.FIGURES, 18: ch18.FIGURES, 19: ch19.FIGURES}
 APPENDICES = {"A": appendix_a.FIGURES}
 
 

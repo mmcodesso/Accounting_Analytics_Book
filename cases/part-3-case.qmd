@@ -179,7 +179,7 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 
 <!-- Instructor notes, Requirement 5: the last eight processed periods (70-77, 2026-08-24 to 2026-12-13) cost 2,298,268.90 over 78 working
      days, 29,464.99 a day; 14-31 December 2026 has 13 working days (25 December is a holiday), so the accrual is 383,044.82: gross pay
-     336,456.35, employer payroll taxes 25,738.93, benefits 20,849.55. By cost center: Manufacturing 197,970.68 (gross 173,440.12), Executive
+     336,456.34, employer payroll taxes 25,738.93, benefits 20,849.55. By cost center: Manufacturing 197,970.68 (gross 173,440.12), Executive
      42,080.32, Design Services 27,818.05, Sales 23,206.37, Administration 19,301.65, Purchasing 18,982.21, Warehouse 17,730.79, Marketing
      14,333.19, Customer Service 11,338.71, Research and Development 10,282.84. Entries: debit 1090 for Manufacturing and the salary accounts
      of the other cost centers (6010-6050, 6230, 6240, 6250, 6280) for gross pay and 6060 Payroll Taxes and Benefits for the employer costs;
@@ -201,8 +201,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
      revenue is +24,940.25, with receivables +44,481.11 and opening retained earnings +19,540.86. Adjusted 2026 net income: 4,503,611.24 -
      17,123.63 + 24,940.25 = 4,511,427.86 (the ledger records no income tax). Materiality: the effect on income is under 0.2% and
      immaterial, but the unrecorded liability of about 383,000 recurs every year, and the absence of any year-end payroll accrual is a
-     deficiency in the close; the supplier invoice ASV0050-2025-040073 (3,266.27, received 2026-01-01) is a small cutoff item on the payables
-     side. -->
+     deficiency in the close; the supplier invoice ASV0050-2025-040073 (3,266.27, received 2026-01-01) is not a payables cutoff item: its
+     October 2025 accrual, JE-2025-000188, carried the liability at the year-end. -->
 
 **Requirement 6: Write the decision memo.** Write a memorandum of no more than two pages to the controller, organized in the order of her questions:
 

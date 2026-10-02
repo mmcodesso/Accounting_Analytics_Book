@@ -59,7 +59,7 @@ front-matter/
 index.qmd
 ```
 
-Each Part closes with a comprehensive case in `cases/part-N-case.qmd`, registered in `_quarto.yml` after the Part's last chapter. Its requirements build on every chapter in the Part, and the expected answers for instructors sit in hidden comments after each requirement.
+Parts I to IV each close with a comprehensive case in `cases/part-N-case.qmd`, registered in `_quarto.yml` after the Part's last chapter. Its requirements build on every chapter in the Part, and the expected answers for instructors sit in hidden comments after each requirement. The chapters of Part V are themselves case chapters: each folder holds `chapter.qmd`, `_further-reading.qmd`, and `_references.qmd`, with no tutorials, summary, key terms, questions, or exercises.
 
 Edit the homepage content and metadata directly in the root `index.qmd`, and
 edit the downloads page in `front-matter/downloads.qmd`. The root `index.qmd` is

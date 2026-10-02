@@ -286,24 +286,24 @@ def fig_01_08() -> Diagram:
             d.text(f"<i>{caption}</i>", x, y + h + 4, w, 36, size=SMALL, color=GRAY, align="center")
         return pid
 
-    p1 = part(0, 120, 140, 90, card("Part I", "Foundations", INK), GRAY_TINT,
+    p1 = part(0, 120, 150, 90, card("Part I", "Foundations", INK), GRAY_TINT,
               "All table groups, at overview level")
-    p2 = part(205, 0, 190, 64, card("Part II", "Excel", WHITE), TEAL,
+    p2 = part(225, 0, 200, 64, card("Part II", "Excel", WHITE), TEAL,
               "Sales and ledger, then planning and purchasing")
-    p3 = part(205, 125, 190, 64, card("Part III", "SQL", WHITE), BLUE,
+    p3 = part(225, 125, 200, 64, card("Part III", "SQL", WHITE), BLUE,
               "Expands into Procure-to-Pay and Manufacturing")
-    p4 = part(205, 250, 190, 64, card("Part IV", "Power BI", INK), HIGHLIGHT,
+    p4 = part(225, 250, 200, 64, card("Part IV", "Power BI", INK), HIGHLIGHT,
               "Data models that span table groups")
-    p5 = part(452, 105, 196, 120, card("Part V", "Integrated and Applied Topics<br>All three tools",
-                                        WHITE), GRAY, "All table groups")
-    case = d.box("One comprehensive case closes each part", 690, 135, 170, 60, stroke=GRAY,
-                 dashed=True, stroke_width=1.5)
+    p5 = part(500, 100, 360, 130, card("Part V", "Integrated and Applied Topics<br>Comprehensive "
+                                        "cases in financial reporting,<br>managerial accounting, and "
+                                        "auditing", WHITE), GRAY,
+              "All three tools, each where it fits, and all table groups")
     for p in (p2, p3, p4):
         d.arrow(p1, p, exit=(1, 0.5), entry=(0, 0.5))
         d.arrow(p, p5, exit=(1, 0.5), entry=(0, 0.5))
-    d.arrow(p5, case, dashed=True, exit=(1, 0.5), entry=(0, 0.5))
-    d.text("All parts use the <b>Charles River Accounting Dataset</b>. Table groups are introduced "
-           "progressively.", 0, 364, 860, 22, align="center")
+    d.text("All parts use the <b>Charles River Accounting Dataset</b>, and table groups are introduced "
+           "progressively.<br>A comprehensive case closes each of Parts I to IV.", 0, 364, 860, 40,
+           align="center")
     return d
 
 
