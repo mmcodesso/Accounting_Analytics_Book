@@ -46,6 +46,7 @@ book:
         - chapters/14-data-models-and-dax/chapter.qmd
         - chapters/15-management-reports/chapter.qmd
         - chapters/16-audit-monitoring/chapter.qmd
+        - cases/part-4-case.qmd
     - part: "Integrated and Applied Topics"
   appendices:
     - appendices/a-publishing-security/appendix.qmd
