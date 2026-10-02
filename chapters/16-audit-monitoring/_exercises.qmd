@@ -1,0 +1,179 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch16 Exercises.pbix`, and on Exercise 16.4 in a copy of Charles River Reports.pbix saved the same way. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 16.1`). Do not change the queries, relationships, measures, roles, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
+
+### Financial Accounting Exercises
+
+**Exercise 16.1: Monitoring the Receivables**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** Chapter 8 aged the receivables once, at the end of fiscal 2026, and found that the detail did not agree with the ledger. The audit committee wants the aging and its reconciliation on the monitoring report, so that the difference is followed every time the report is refreshed.
+
+**Requirements.**
+
+(1) Import T16_SalesInvoice as `ARInvoices`, keeping SalesInvoiceID, InvoiceNumber, CustomerID, InvoiceDate, DueDate, and GrandTotal; T20_CashReceiptApplication as `ARApplications`, keeping SalesInvoiceID, ApplicationDate, and AppliedAmount; and T23_CreditMemo as `ARCredits`, keeping OriginalSalesInvoiceID, CreditMemoDate, and GrandTotal.
+
+(2) In Power Query, keep the applications and credit memos dated on or before 2026-12-31, group each by invoice with **Group By**, and merge the totals into ARInvoices. Add `OpenBalance` as GrandTotal less the applications and credits, rounded to two decimals, and keep the invoices dated on or before 2026-12-31 with an open balance above zero.
+
+(3) Add an aging column with the days past due at 2026-12-31, in Chapter 8's buckets: Current, 1–30, 31–60, 61–90, and over 90 days. Show the open balance and the number of invoices by bucket.
+
+(4) Import T3_GLEntry as `ARLedger` with **Transform Data**, keep the postings to account 1020 dated on or before 2026-12-31, and compare their balance with the open balances. Explain the difference with Chapter 8's finding.
+
+(5) The open balances leave out invoices whose credits and applications exceed their total. Count them, total them, and explain where Chapter 8 found that they belong.
+
+**Deliverable.** The aging page, the reconciliation, and a short note answering requirements (4) and (5).
+
+<!-- Instructor notes, Exercise 16.1 (SQL; Chapter 8 and Exercise 12.2): open balance = GrandTotal - applications - credit memos
+     (on OriginalSalesInvoiceID), both dated <= 2026-12-31, rounded, kept if > 0: 1,079 invoices, 4,418,804.32 (203 customers).
+     Buckets by DueDate at 2026-12-31: Current 3,655,971.50; 1-30 745,674.84; 31-60 16,711.26; 61-90 405.41; over 90 41.31
+     (mostly cent residuals). GL 1020 at 2026-12-31: 4,798,804.32; the difference, 380,000.00, is the receivables line of the
+     opening entry JE-2024-000001, unsupported by any invoice (the author's decision: an audit finding). (5) 225 invoices have a
+     negative balance, -220,131.88: credit memos on paid invoices, credited to 2060 and refunded (Chapter 8). -->
+
+**Exercise 16.2: Cutoff as a Monthly Test**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** Chapter 12 found sales invoices for December deliveries recorded in January, and December shipments never invoiced at all. A test of revenue cutoff run every month would show these exceptions in the month they arise, not a year later.
+
+**Requirements.**
+
+(1) Import T14_Shipment as `CutoffShipments`, keeping ShipmentID and DeliveryDate, and T15_ShipmentLine as `CutoffShipmentLines`, keeping ShipmentLineID and ShipmentID. Merge the delivery date onto the shipment lines.
+
+(2) Import T17_SalesInvoiceLine as `CutoffInvoiceLines`, keeping ShipmentLineID and SalesInvoiceID, and merge InvoiceNumber and InvoiceDate from the ARInvoices query of Exercise 16.1 (or import T16_SalesInvoice again as `CutoffInvoices`).
+
+(3) Build two exception queries with the register's columns: `SI DeliveredPriorYear`, one row per invoice whose lines were all delivered in a year before the year of the invoice, dated by the invoice; and `SL NotInvoiced`, one row per shipment line with no invoice line, dated by its delivery.
+
+(4) Append them to a copy of the register named `Exceptions 16.2`, add the two tests to a copy of the Tests table, and show the new tests by month.
+
+(5) Chapter 12 counted the invoices for December deliveries by the date they were posted in the ledger, and found one more in January 2026 than your test finds. Find that invoice in the ledger and explain the difference.
+
+**Deliverable.** The two exception queries, the page, and a short note answering requirement (5).
+
+<!-- Instructor notes, Exercise 16.2 (SQL; Chapter 12 L5-L6): by InvoiceDate, 22 invoices were delivered in the prior year: 15
+     invoiced in January 2025 for December 2024 deliveries and 7 in January 2026 for December 2025 deliveries (SubTotal 106,446.61
+     together). Chapter 12, by GL posting date, counts 15 and 8: SI-2026-013742 is dated in December 2025 but posted 2026-01-01,
+     and it shipped on 2025-12-06, so by posting date it joins January 2026 (the revenue cutoff error of Chapter 6). The 9
+     shipment lines never invoiced are all December 2026 deliveries (standard cost 22,895.78). Five invoices are dated in a year
+     before their delivery (SI-2025-006733 to 006735, SI-2026-013741, SI-2026-013743), a different direction, not asked here. -->
+
+### Managerial Accounting Exercises
+
+**Exercise 16.3: Surge Days by Month**
+
+**Table group:** Time and Payroll
+
+**Scenario.** Part III traced the growth of the plant's overtime to surge days, days on which every hourly manufacturing employee clocked exactly the same hours. The production manager wants to see each month whether surge days continue, and internal audit wants the same view for its monitoring.
+
+**Requirements.**
+
+(1) Import T66_TimeClockEntry as `ClockEntries`, keeping EmployeeID, WorkDate, RegularHours, and OvertimeHours, and merge the employee's CostCenterID from the Employee query. Keep the entries of cost center 4, Manufacturing.
+
+(2) Add a column of total hours, regular plus overtime. Group the entries by WorkDate with **Group By** in its advanced mode, counting the employees and the distinct values of total hours, and summing the overtime hours.
+
+(3) Keep the days with more than one employee and a single distinct value of total hours, Chapter 12's test H8, as `SurgeDays`, and load it.
+
+(4) Show the surge days and their overtime hours by month, with a line of the share of the plant's overtime they account for.
+
+(5) Describe when surge days began, how often they occur, and how their share of overtime has changed. Explain why this is a monitoring measure for the production manager as well as a test for internal audit.
+
+**Deliverable.** The SurgeDays query, the page, and a short note answering requirement (5).
+
+<!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the
+     first is 2024-05-31, then several a month from July 2024, up to 7 in October 2026; every surge day has all 64 hourly
+     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589,
+     and 0.705 of the year's manufacturing overtime; overtime on other days is flat (6,273, 6,426, 5,918). All 5,952 surge entries
+     were approved by the Production Manager on the work date. Distinct values of total hours: Group By with "Count Distinct Rows"
+     on the hours column; one value means everyone clocked the same hours. -->
+
+**Exercise 16.4: Securing Pay Data**
+
+**Table group:** Time and Payroll
+
+**Scenario.** After Tutorial 16.3, the controller asks whether department managers could still see what individual employees are paid. LaborTimeEntry carries the cost of each line of labor time, and the Plant page of the production manager, who does see the plant's employees, should show hours but not pay.
+
+**Requirements.**
+
+(1) In the copy of Charles River Reports.pbix, find the visuals and measures that use LaborTimeEntry[ExtendedLaborCost], including any from Exercise 15.3.
+
+(2) In **TMDL view**, script the Cost Center Managers role by dragging it from the **Model** tab of the Data pane into a new script tab. Add a column permission that sets the metadata permission of ExtendedLaborCost to none, keep the role's existing rules, and choose **Preview** and then **Apply**.
+
+(3) View the report as the Production Manager with **View as**, and record what happens to the Plant page and to the visuals that use ExtendedLaborCost. View it with the Finance role and compare.
+
+(4) On the Optimize tab, open **Performance analyzer**, record the visuals of the Budget page without a role and then with View as, and compare the durations.
+
+(5) Explain why object-level security, not row-level security, is the right tool for this requirement, and what the controller should do about visuals that fail for the role.
+
+**Deliverable.** The role's script, the comparison, and a short note answering requirement (5).
+
+<!-- Instructor notes, Exercise 16.4 (Learn, OLS 2026-06-30; RLS guidance 2024): TMDL view scripts a role with createOrReplace;
+     starting from the scripted role keeps its tablePermission filters, and adding
+         tablePermission LaborTimeEntry
+             columnPermission ExtendedLaborCost
+                 metadataPermission: none
+     hides the column from the role. A visual or measure that uses the column fails for the role ("the field can't be found"),
+     while hours visuals still work; the Finance role sees everything. A role written from scratch with createOrReplace would
+     replace the role and lose its row filters, which is why the exercise starts from the scripted role. Row-level security
+     restricts rows, not columns; the controller should keep cost measures off the managers' pages or in the finance report.
+     Performance analyzer durations vary by machine; expect slightly longer durations under View as. -->
+
+### Auditing Exercises
+
+**Exercise 16.5: Benford's Law in DAX**
+
+**Table group:** Procure-to-Pay
+
+**Scenario.** Chapter 8 tested the first digits of supplier payments in a workbook and found that partial payments, not the payments as a whole, departed from Benford's Law. Nickell et al. (2023) show the same test built in Power BI. The audit committee wants it on the monitoring report as the anomaly layer beside the rule tests.
+
+**Requirements.**
+
+(1) Import T39_DisbursementPayment as `Payments`, keeping DisbursementID, PaymentDate, SupplierID, PurchaseInvoiceID, and Amount, with the payments dated on or before 2026-12-31. Merge GrandTotal from T37_PurchaseInvoice, imported as `PaymentInvoices` with load cleared, and add a column `PaymentKind`, Full when the amount equals the invoice total and Partial when it is less.
+
+(2) Add a calculated column `FirstDigit` that takes the first digit of the amount from its scientific notation, as Chapter 8 did, so that amounts below one dollar are classified correctly. Explain why taking the first character of the amount as text would fail.
+
+(3) Build a disconnected table of the digits 1 to 9, with Benford's expected share for each digit, `LOG10 ( 1 + 1 / [Digit] )`. Write measures for the observed share of each digit and for the mean absolute deviation across the nine digits.
+
+(4) Show the observed and expected shares by digit, with a slicer of PaymentKind, and record the mean absolute deviation for all payments, full payments, and partial payments.
+
+(5) Classify each result with Chapter 8's ranges, and explain why a departure in the partial payments is an anomaly that calls for a look rather than an exception.
+
+**Deliverable.** The page, the measures, and a short note answering requirements (2) and (5).
+
+<!-- Instructor notes, Exercise 16.5 (SQL; Chapters 8 and 12): 39,864 payments dated through 2026-12-31; MAD 0.01295 (marginally
+     acceptable conformity); full payments 34,115, MAD 0.00755 (acceptable); partial payments 5,749, MAD 0.04496
+     (nonconformity), because only invoices of $1,000 or more are paid in parts. A DAX first digit: VALUE ( LEFT ( FORMAT (
+     Payments[Amount], "0.00000000E+00" ), 1 ) ). Taking the first character of the amount as text fails on the 121 payments below
+     $1, whose text begins with 0. The observed share is a count of the payments with the digit divided by the count of all
+     payments in the filter context; MAD = AVERAGEX of the nine absolute differences. Nickell, Schwebke, and Goldwater (2023) is a
+     Power BI and Benford teaching case. -->
+
+**Exercise 16.6: Near-Duplicate Payments and Their Dispositions**
+
+**Table group:** Procure-to-Pay
+
+**Scenario.** A monitoring report that runs every month must remember what the reviewers concluded, or the same exceptions cost the same time every month. The chief audit executive asks you to add the near-duplicate payments of Chapter 8 as a second anomaly test and to record a disposition for every exception of the register.
+
+**Requirements.**
+
+(1) In Power Query, reference the Payments query of Exercise 16.5 as `PaymentPairs`, and merge it with itself on SupplierID and Amount. Keep the pairs of two different payments on different dates, each pair once.
+
+(2) Add the number of days between the two payments, and show the pairs by that number. Count the pairs within 30 days, and check whether any pair pays the same invoice.
+
+(3) Add a column `ExceptionKey` to the register, TestID and DocumentNumber joined by a separator. Create a table `Dispositions` with **Enter data**, with the columns ExceptionKey, Disposition, and Note, and record a disposition for at least the exceptions of January 2026, using Chapter 8's three dispositions.
+
+(4) Relate Dispositions to the register, and write a measure `Open Exceptions` that counts the exceptions without a disposition. Add it to the monitoring page by test and month.
+
+(5) Explain how the Dispositions table should be kept from month to month, who should be allowed to change it, and why a near-duplicate pair on different invoices is an anomaly to look at rather than a duplicate payment.
+
+**Deliverable.** The PaymentPairs query, the Dispositions table, the Open Exceptions measure on the monitoring page, and a short note answering requirement (5).
+
+<!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6): 113 supplier-and-amount pairs on different dates among
+     the payments through 2026-12-31, 13 within 30 days, none paying the same invoice (Chapter 8: near-duplicates, not
+     duplicates). ExceptionKey is unique in the register (151 exceptions, one per test and document). January 2026 holds 22
+     exceptions (JE: Weekend 3, Backdated 2, SelfApproved 2, AboveLimit 1, RoundAmount 1; PO: SelfApproved 3, AboveLimit 4,
+     AfterTermination 1; PR: PaidBeforeApproval 1, AfterTermination 1, SelfApproved 3); January holds 17, 17, and 22 a year.
+     The Dispositions table is internal audit's record: kept in the monitoring file or in a workbook the audit team maintains,
+     changed only by the reviewers, and itself reviewed by the chief audit executive. -->

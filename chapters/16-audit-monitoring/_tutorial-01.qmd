@@ -1,0 +1,181 @@
+## Guided Tutorial 16.1: Journal Entry Monitoring
+
+**Context and objective.** In this tutorial, you will start internal audit's monitoring report, a new file of its own. You will rebuild Chapter 8's five journal entry tests as flag columns in Power Query, add up each entry's risk score, and look at the entries with the highest scores together with the ledger lines behind them. Then you will turn the flags into a table of exceptions, the first part of the exception register, and reconcile the population of entries to the ledger before relying on any test.
+
+**Prerequisites.** You need Power BI Desktop and CharlesRiver.xlsx. Tutorial 14.1 created the Date table and Tutorial 14.2 the Measures table; this tutorial repeats both briefly in a new file.
+
+**Step-by-step instructions.**
+
+**Step 1. Start the monitoring file.**
+
+a. Start a new report in Power BI Desktop, and save it as `Audit Monitoring.pbix`.
+b. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+c. In the **Navigator**, select **T2_JournalEntry** and **T74_Employee**, and click **Transform Data**.
+d. Rename the queries `JournalEntry` and `Employee`.
+
+**Step 2. Keep the columns the tests need.**
+
+a. In **Employee**, keep EmployeeID, EmployeeName, JobTitle, CostCenterID, EmploymentStatus, TerminationDate, and MaxApprovalAmount, and set TerminationDate's type to **Date**.
+b. In **JournalEntry**, keep JournalEntryID, EntryNumber, PostingDate, EntryType, TotalAmount, CreatedByEmployeeID, CreatedDate, and ApprovedByEmployeeID.
+c. Set PostingDate's type to **Date** and CreatedDate's type to **Date/Time**.
+
+CreatedDate records when an entry was keyed, with its time; PostingDate is the date it affects the ledger. Two of the tests compare them.
+
+**Step 3. Bring in the approver's limit.**
+
+a. Select **JournalEntry**, choose **Home > Merge Queries**, and merge it with **Employee** on ApprovedByEmployeeID and EmployeeID, with a left outer join.
+b. Expand only MaxApprovalAmount, without the prefix.
+c. Rename the new column `ApproverLimit`.
+
+Each entry now carries the limit of the person who approved it, the column Chapter 8 added with a lookup.
+
+**Step 4. Add the first three flags.** Each flag is 1 when the entry fails the test and 0 when it passes, so the flags of an entry add up to its risk score.
+
+a. Choose **Add Column > Custom Column**, name the column `Weekend`, and enter the first formula below.
+b. Add `Backdated` with the second formula, in the same way.
+c. Add `SelfApproved` with the third formula.
+
+```
+if Date.DayOfWeek([CreatedDate], Day.Monday) >= 5 then 1 else 0
+```
+
+```
+if Date.From([CreatedDate]) > [PostingDate] then 1 else 0
+```
+
+```
+if [CreatedByEmployeeID] = [ApprovedByEmployeeID] then 1 else 0
+```
+
+Date.DayOfWeek counts from the day named in its second argument, so with Monday as day 0, Saturday is 5 and Sunday 6, the same test as Chapter 8's `WEEKDAY` with return type 2. Date.From drops the time from CreatedDate before comparing it with the posting date.
+
+**Step 5. Add the last two flags and the score.**
+
+a. Add `AboveLimit` and `RoundAmount` with the first two formulas below.
+b. Add `RiskScore` with the third formula.
+c. Select the six new columns and set their type to **Whole Number**.
+
+```
+if [TotalAmount] > [ApproverLimit] then 1 else 0
+```
+
+```
+if Number.Mod([TotalAmount], 1000) = 0 then 1 else 0
+```
+
+```
+[Weekend] + [Backdated] + [SelfApproved] + [AboveLimit] + [RoundAmount]
+```
+
+@fig-16-03 shows the query with its flags. Most entries carry five zeros. The flags are the rules of @tbl-16-01, written once in the query, so every refresh applies them to whatever entries the workbook holds.
+
+![The Journal Entry Flags in Power Query.](/visuals/svg/fig-16-03-je-flags.svg){#fig-16-03 fig-alt="A mock of the Power Query editor showing the JournalEntry query after the flag columns are added. Each row is a journal entry, shown by its number, followed by the columns Weekend, Backdated, SelfApproved, AboveLimit, RoundAmount, and RiskScore; the other columns of the query are scrolled out of view. Most rows show zeros; a few rows of January entries show ones, and their risk score is outlined. The Applied Steps pane lists the merge, the expansion, and one step for each added column."}
+
+**Step 6. Load the entries and give them a calendar.**
+
+a. Choose **Home > Close & Apply**.
+b. Choose **Modeling > New table**, and create the Date table with the formula below, as in Tutorial 14.1.
+c. Set the Date column's type to **Date**, sort MonthName by MonthNumber, and mark the table as a date table.
+d. In **Model view**, relate JournalEntry to the **Date** table on PostingDate, and to **Employee** on ApprovedByEmployeeID.
+
+<!-- dax-check: table -->
+```
+Date =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2024, 1, 1 ), DATE ( 2027, 12, 31 ) ),
+    "Year", YEAR ( [Date] ),
+    "Quarter", "Q" & QUARTER ( [Date] ),
+    "YearQuarter", YEAR ( [Date] ) & "-Q" & QUARTER ( [Date] ),
+    "YearMonth", FORMAT ( [Date], "yyyy-mm" ),
+    "MonthNumber", MONTH ( [Date] ),
+    "MonthName", FORMAT ( [Date], "mmm" )
+)
+```
+
+The relationship to Employee runs through the approver, so a visual of entries by employee name shows who approved them.
+
+**Step 7. Score the entries.**
+
+a. Create a Measures table with **Home > Enter data**, as in Tutorial 14.2, and add the two measures below.
+b. On a page named `Journal Entries`, add a matrix with RiskScore on **Rows** and Entries and Entry Amount as **Values**.
+
+<!-- dax-check: measure -->
+```
+Entries = COUNTROWS ( JournalEntry )
+Entry Amount = SUM ( JournalEntry[TotalAmount] )
+```
+
+The matrix reproduces Chapter 8's distribution: most entries score 0, a couple of dozen score 1, a handful score 2, none score 3, and one scores 4.
+
+**Step 8. List the riskiest entries.** Add a table visual with EntryNumber, PostingDate, EntryType, and RiskScore, filtered to RiskScore greater than or equal to 2, and sort it by RiskScore, descending.
+
+The table lists the entries that failed two tests or more. At the top is the opening balance entry of January 2024, which failed four. Five of the others were posted on the first day of a year and keyed on the first Saturday after it, and two are the round debt reclassifications above every approver's limit that Chapter 8 traced.
+
+**Step 9. Bring in the entries' ledger lines.**
+
+a. Choose **Home > Get data > Excel workbook**, select **T3_GLEntry** and **T1_Account**, and click **Transform Data**.
+b. Rename the queries `JournalLines` and `Account`.
+c. In **JournalLines**, filter SourceDocumentType to JournalEntry first, then keep GLEntryID, PostingDate, AccountID, Debit, Credit, and SourceDocumentID.
+d. In **Account**, keep AccountID, AccountNumber, and AccountName.
+e. Merge **JournalLines** with **Account** on AccountID, expand AccountNumber and AccountName without the prefix, and clear **Enable load** on Account.
+f. Choose **Home > Close & Apply**, and in **Model view** relate JournalLines to **JournalEntry** on SourceDocumentID and JournalEntryID.
+
+As in Chapter 14, the ledger is filtered before anything else, so only the journal entry postings, a few thousand of its hundreds of thousands of rows, reach the model. For these postings, SourceDocumentID holds the JournalEntryID, Chapter 10's source-document join.
+
+**Step 10. Drill through to an entry's lines.**
+
+a. Add a page named `Entry Lines`, and with no visual selected, drag EntryNumber from JournalEntry into the **Drillthrough** section of the **Visualizations** pane, where it says **Add drillthrough fields here**.
+b. Add a table visual with AccountNumber, AccountName, Debit, and Credit.
+c. On the Journal Entries page, right-click the opening balance entry in the table, and choose **Drillthrough > Entry Lines**.
+
+@fig-16-04 shows the result. The opening balance entry has many lines, and its debits equal its credits. Tutorial 16.2 uses the same move, from a test to the documents behind it, for every test of the register.
+
+![The Risk Scores and an Entry's Ledger Lines.](/visuals/svg/fig-16-04-entry-lines.svg){#fig-16-04 fig-alt="Two mocks of Power BI report pages. On the left, the Journal Entries page: a matrix of risk scores with the number of entries and their amount for each score, most entries at zero and one entry at four, and a table of the entries that failed two tests or more, with the opening balance entry at the top. On the right, the Entry Lines page reached by drill-through, with a back button, listing that entry's ledger lines by account with their debits and credits, which total the same amount."}
+
+**Step 11. Turn the flags into exceptions.**
+
+a. Choose **Home > Transform data**, right-click **JournalEntry**, and choose **Reference**. Rename the new query `JE Exceptions`.
+b. Select the five flag columns from Weekend to RoundAmount, right-click one of them, and choose **Unpivot Only Selected Columns**.
+c. Filter the Value column to 1.
+d. Add a custom column named `TestID` with the formula `"JE " & [Attribute]`.
+e. Keep TestID, EntryNumber, PostingDate, TotalAmount, and ApprovedByEmployeeID, and rename the last four `DocumentNumber`, `EventDate`, `Amount`, and `EmployeeID`.
+f. Clear **Enable load** on JE Exceptions, and read the number of rows in the status bar.
+
+Each entry is now one row per test it failed, labeled with the test, and its columns carry the register's names from @tbl-16-02. The query is not loaded, because Tutorial 16.2 appends it to the exceptions of the other processes. The row count equals the sum of the five flags, a few dozen exceptions.
+
+**Step 12. Reconcile the population.**
+
+a. Add a page named `Validation` with cards for Entries, Entry Amount, and the sum of Debit in JournalLines.
+b. In DAX query view, rename the first query tab `Tests`, enter the query below, and run it.
+c. Save the file.
+
+<!-- dax-check: query -->
+```
+// Test 1: the journal entries equal their postings in the ledger
+EVALUATE
+ROW (
+    "Entries", [Entries],
+    "Entry amount", ROUND ( [Entry Amount], 2 ),
+    "Line debits", ROUND ( SUM ( JournalLines[Debit] ), 2 ),
+    "Line credits", ROUND ( SUM ( JournalLines[Credit] ), 2 )
+)
+```
+
+The entries' totals equal the debits and the credits of their postings, the reconciliation Chapter 8 performed before its tests and Chapter 12 performed in SQL. The population the tests run on is complete, so an entry that escapes them does so because of the rules, not because it is missing.
+
+<!-- Tutorial 16.1 expected values (SQL twins; checked in Desktop 2.158's engine on the AM16 reference model): JournalEntry 851
+     rows; flags Weekend 17, Backdated 6, SelfApproved 7, AboveLimit 9, RoundAmount 4 (43 exceptions in JE Exceptions); RiskScore
+     0: 818 entries (12,566,063.49), 1: 25 (102,803,775.20), 2: 7 (673,579.00), 3: none, 4: 1 (13,817,192.58, JE-2024-000001,
+     Opening). Score 2: JE-2024-000002 Rent, JE-2024-000103 Debt Reclass, JE-2025-000001 Debt Principal Payment, JE-2025-000002
+     Interest Payment, JE-2026-000001 Debt Reclass, JE-2026-000002 Debt Principal Payment, JE-2026-000003 Interest Payment.
+     JournalLines 2,821 rows; JE-2024-000001 has 18 lines, debits = credits = 13,817,192.58. Test 1: 851 / 129,860,610.27 /
+     129,860,610.27 / 129,860,610.27. No approver has a null MaxApprovalAmount. -->
+
+**Checkpoint.** Before you add the other processes, confirm the following:
+
+- The five flags and the risk score reproduce Chapter 8's counts and distribution.
+- The opening balance entry drills through to its ledger lines, and they balance.
+- JE Exceptions has one row per failed test, with the register's column names, and is not loaded.
+- Test 1 shows the entries equal to their ledger postings.
+
+The tests of Chapter 8, which took an afternoon in a workbook, now run again with every refresh, on a population that has been reconciled.

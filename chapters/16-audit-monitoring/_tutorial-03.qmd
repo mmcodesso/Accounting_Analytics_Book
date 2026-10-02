@@ -1,0 +1,172 @@
+## Guided Tutorial 16.3: Securing the Reporting Package
+
+**Context and objective.** In this tutorial, you will review and test the access the controller plans for Charles River Reports. You will start with an access review in the monitoring file, comparing the managers recorded for each cost center with the employee records. Then you will add a security table and a dynamic role to the package, test the role as several managers would see it, and write internal audit's findings. Internal auditors do not build the controls they audit, so in practice the controller's staff adds the roles and internal audit tests them; in this tutorial you take both parts in turn.
+
+**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.2 and Charles River Reports.pbix as you left it at the end of Chapter 15. Publishing, in Step 10, is optional and needs a Power BI Pro or Premium Per User license.
+
+**Step-by-step instructions.**
+
+**Step 1. Review the managers of record.**
+
+a. In Audit Monitoring.pbix, choose **Home > Get data > Excel workbook**, select **T75_CostCenter**, click **Transform Data**, and rename the query `CostCenterReview`.
+b. Keep CostCenterID, CostCenterName, and ManagerID.
+c. Merge it with **Employee** on ManagerID and EmployeeID, and expand EmployeeName, JobTitle, EmploymentStatus, and TerminationDate without the prefix.
+d. Choose **Home > Close & Apply**, and add a page named `Access Review` with a table visual of the merged columns.
+
+@fig-16-09 shows the review. Three of the ten cost centers name a terminated employee as their manager, none of whom held a manager's job, and the department managers who now run two of them are not named anywhere. A fourth cost center names an analyst. Access built on this column would go to the wrong people, so the package needs a list of its own.
+
+![The Access Review.](/visuals/svg/fig-16-09-access-review.svg){#fig-16-09 fig-alt="A mock of a Power BI table visual on a page named Access Review. Each row is a cost center with its manager of record, that person's job title, employment status, and termination date. Three rows, for Executive, Sales, and Warehouse, are outlined: their managers of record are terminated employees whose job titles are not managerial. The Research and Development row names an analyst. A note lists the Sales Manager and the Warehouse Manager, who appear in the employee records but not as managers of record."}
+
+**Step 2. Give each employee a cost center in the package.**
+
+a. Open Charles River Reports.pbix, choose **Home > Transform data**, and select the **Employee** query.
+b. Choose **Home > Choose Columns**, add CostCenterID, and choose **Home > Close & Apply**.
+
+The Plant page's labor time is related to Employee, so a rule on the employee's cost center can reach it.
+
+**Step 3. Build the security table.**
+
+a. Choose **Home > Enter data**, and in the **Create Table** dialog name two columns `UserPrincipalName` and `CostCenterID`.
+b. Type the nine rows of @tbl-16-06, leaving out its Cost center column, which is there for you to read.
+c. Type `Security` as the table's name, and click **Load**.
+d. In **Model view**, right-click **Security**, and choose **Hide in report view**.
+
+| UserPrincipalName | CostCenterID | Cost center |
+|--------------------------------------|------|----------------|
+| `employee001@charlesriver.example` | 1 | Executive |
+| `employee006@charlesriver.example` | 2 | Sales |
+| `employee007@charlesriver.example` | 3 | Warehouse |
+| `employee004@charlesriver.example` | 4 | Manufacturing |
+| `employee010@charlesriver.example` | 5 | Purchasing |
+| `employee005@charlesriver.example` | 6 | Administration |
+| `employee011@charlesriver.example` | 7 | Customer Service |
+| `employee012@charlesriver.example` | 9 | Marketing |
+| `employee014@charlesriver.example` | 10 | Design Services |
+
+: The security table, as approved by the controller {#tbl-16-06}
+
+**Step 4. Check the list against the access review.**
+
+a. Compare each address with the Access Review page of Step 1 and the employee records, and confirm that it belongs to the manager the controller named.
+b. Record the cost center the list leaves out, and who approved the list.
+
+The addresses are the Email column of the employee records, which serves here as each user's sign-in name. The list names the managers who actually run each department, as the controller confirmed them, and Research and Development is left out until the controller names its manager, so for now no one sees it. The table is not related to anything: the rules read it.
+
+**Step 5. Create the role and its first two rules.**
+
+a. Choose **Modeling > Manage roles**, click **New role**, and name the role `Cost Center Managers`.
+b. Under **Tables**, select **CostCenter**, click **Switch to DAX editor**, and enter the first rule below.
+c. Select **Employee**, and enter the same rule.
+
+<!-- dax-check: skip -->
+```
+[CostCenterID] IN CALCULATETABLE (
+    VALUES ( Security[CostCenterID] ),
+    Security[UserPrincipalName] = USERPRINCIPALNAME ()
+)
+```
+
+The rule keeps a cost center if it is among the cost centers the security table lists for the person viewing the report. On CostCenter it filters the ledger and the budget lines; on Employee it filters the labor time of the Plant page to the employees of those cost centers. @fig-16-10 shows the editor with the rule on CostCenter; the tables that carry a rule are marked in the list.
+
+![The Manage Security Roles Dialog.](/visuals/svg/fig-16-10-manage-roles.svg){#fig-16-10 fig-alt="A mock of Power BI's Manage security roles dialog. The Roles list holds Cost Center Managers and Finance, with a New role button. The Tables list marks CostCenter, Employee, Item, and Security as having a filter. The rules area, switched to the DAX editor, shows the rule on CostCenter, which keeps the cost centers listed in the Security table for the user principal name of the viewer. Save and Close buttons sit at the bottom."}
+
+**Step 6. Deny everyone else, and add a role for finance.**
+
+a. Select **Item**, and enter the first rule below.
+b. Select **Security**, and enter the second rule below.
+c. Click **New role**, name it `Finance`, and leave it without rules.
+d. Click **Save**.
+
+<!-- dax-check: skip -->
+```
+USERPRINCIPALNAME () IN VALUES ( Security[UserPrincipalName] )
+```
+
+<!-- dax-check: skip -->
+```
+[UserPrincipalName] = USERPRINCIPALNAME ()
+```
+
+The invoice lines and the completions are not related to CostCenter, so without the Item rule anyone in the role would see every sale. The rule returns true for every item when the viewer is in the security table and false when the viewer is not, so a person added to the role by mistake sees no sales and no cost centers at all. The rule on Security keeps each user from reading the other users' rows. The Finance role, for the controller and her staff, filters nothing.
+
+**Step 7. View the report as the Sales Manager.**
+
+a. Choose **Modeling > View as**.
+b. Select **Other user**, type `employee006@charlesriver.example`, and select **Cost Center Managers**.
+c. Click **OK**, and open the Budget page, the Income Statement page, the Plant page, and the Sales and Discounts page in turn.
+
+A bar above the page names the role and the user while you view as them. The Budget page now holds one row, Sales, with the same budget, actual, and flexed budget as before, because the commission budget and the revenue budget it is flexed with both sit in the Sales cost center. The Plant page is empty. The Sales and Discounts page shows every sale, as the controller intends for listed managers. The Income Statement shows a net income many times the company's, because it adds Sales' revenue to Sales' costs only, and nothing on the page says so, as @fig-16-11 shows.
+
+**Step 8. View the report as three more people.**
+
+a. Repeat Step 7 for `employee007@charlesriver.example`, the Warehouse Manager, and record what the Budget and Income Statement pages show.
+b. Repeat it for `employee004@charlesriver.example`, the Production Manager, and record what the Budget and Plant pages show.
+c. Repeat it for `employee083@charlesriver.example`, the terminated employee recorded as manager of Sales.
+d. Choose **Stop viewing** to return to your own view.
+
+The Warehouse Manager sees the Warehouse budget and an income statement that is a loss. The Production Manager sees the whole Plant page but an empty Budget page, because Manufacturing's costs are budgeted as cost of goods sold, not operating expense, so the page meant for department managers does not serve this one. The former employee, absent from the security table, sees nothing at all, which is the deny-by-default design working.
+
+![The Package Viewed as Two Managers.](/visuals/svg/fig-16-11-view-as.svg){#fig-16-11 fig-alt="Two mocks of report pages viewed through View as, each with a bar at the top naming the role Cost Center Managers and the user. On the left, the Budget page viewed as the Sales Manager shows a single row for Sales and a card reading Cost centers shown: Sales. On the right, the Income Statement viewed as the Warehouse Manager shows only Warehouse expenses and a net loss, with a card reading Cost centers shown: Warehouse, the only sign on the page that the statement is partial."}
+
+**Step 9. Tell readers what they are seeing.**
+
+a. Add the two measures below to the Measures table.
+b. Add a card of Cost Centers Shown to the Budget page and the Income Statement page, titled `Cost centers shown`.
+c. Add a card of Who Am I to the About page.
+
+<!-- dax-check: measure -->
+```
+Cost Centers Shown =
+CONCATENATEX (
+    DISTINCT ( CostCenter[CostCenterName] ),
+    CostCenter[CostCenterName], ", ",
+    CostCenter[CostCenterName], ASC
+)
+```
+
+<!-- dax-check: measure -->
+```
+Who Am I = USERPRINCIPALNAME ()
+```
+
+DISTINCT leaves out the blank row that the ledger lines without a cost center would add to VALUES. Viewed as a manager, the card names that manager's cost centers; viewed by finance, it lists them all. Who Am I shows the name the rules compare: in Desktop your own sign-in, or the user you typed in View as; in the service, the reader's sign-in name. A reader who sees an unexpected name, or none of the expected cost centers, knows to ask before relying on the page.
+
+**Step 10. Publish, if you have a license (optional).**
+
+a. Choose **Home > Publish**, sign in, and select a workspace you can publish to.
+b. In the service, open the semantic model's **More options (...)** menu, choose **Security**, and add a colleague to **Cost Center Managers**.
+c. Choose **More options (...)** next to the role, and then **Test as role**.
+
+If you publish to My workspace with a free license, the report works for you, but you cannot share it, so the roles have no one to apply to. Remember that row-level security applies only to readers: a colleague you make a Member of the workspace sees every row.
+
+**Step 11. Write the findings.** Write a short memo from internal audit to the controller that sets out what the review found and what you recommend.
+
+a. Describe the managers of record, and recommend who should maintain and who should approve the security table, and how often it is reviewed.
+b. Describe what each manager sees, including the pages that become partial and the Budget page that does not serve the Production Manager.
+c. Recommend how the package should be shared: managers as Viewers or app readers, the Income Statement and Validation pages in a separate report for finance, and Publish to web turned off.
+
+<!-- Tutorial 16.3 expected values (SQL twins; CR16 reference model in Desktop 2.158, roles tested through ADOMD.NET with
+     Roles= and literal-UPN test roles; the rule with USERPRINCIPALNAME returned no rows for the Windows identity, as expected):
+     Access review: Executive 81 Daniel Diaz, Account Executive, Terminated 2024-04-26; Sales 83 Cassandra Cardenas, Sales
+     Representative, Terminated 2024-06-21; Warehouse 85 Dean Cook, Inventory Specialist, Terminated 2024-09-13; Research and
+     Development 13 Melinda Murphy, Product Analyst, Active; the other six are their departments' managers (4, 10, 5, 11, 12, 14).
+     Actual Sales Manager employee 6 (Carrie Schultz), Warehouse Manager employee 7 (Robert Fisher). 2026, Operating Expense:
+     Sales Manager sees Sales only, budget 2,734,179.05, actual 1,018,872.21, flexed 1,090,985.80 (unchanged); Income Statement net
+     income 11,306,186.32 (Sales revenue 28,517,713.92 less Sales expenses 17,211,527.60); Revenue measure 29,756,420.08 (all sales);
+     Plant blank. Warehouse Manager: 353,015.28 / 447,856.23; net income -447,856.23; Plant hours blank (standard hours still
+     66,997.8, completions unrelated to CostCenter). Production Manager: Budget page empty (Manufacturing has COGS budget lines
+     only); Plant 101,237 hours / 66,997.8 standard / 1.511; net income -2,412,332.31; 67 employees. employee083: nothing (no cost
+     centers, no employees, no items, Revenue blank); the Customer table still lists 220 customers. Finance (no rules) and no role:
+     everything (net income 4,503,611.24; Cost Centers Shown lists all ten). Who Am I in Desktop without View as returned the
+     Windows identity (machine\user on a local account). Labels to confirm in 2.158: the View as roles dialog (Other user, role
+     check boxes, OK), the bar shown while viewing as, and Stop viewing; UI Automation reads Manage security roles (New role,
+     Tables, Switch to DAX editor, Save, Close) and Modeling > Security (Manage roles, View as). -->
+
+**Checkpoint.** Before you report to the controller, confirm the following:
+
+- The access review lists the managers of record against the employee records, with the terminated managers visible.
+- Viewed as the Sales Manager, the Budget page shows only Sales, and the card says so.
+- Viewed as the terminated manager of record, the report shows nothing.
+- Your memo names the pages that a role leaves partial and recommends how the package is shared.
+
+Row-level security is only as good as the list behind it and the pages it is applied to, and both are things an auditor can test before any manager opens the report.

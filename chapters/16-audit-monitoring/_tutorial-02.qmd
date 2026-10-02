@@ -1,0 +1,203 @@
+## Guided Tutorial 16.2: The Exception Register and the Monitoring Page
+
+**Context and objective.** In this tutorial, you will add the purchasing and payroll tests of Chapter 12 to the monitoring file, append the exceptions of all three processes into one register, and build the page the audit committee asked for: a heat map of exceptions by test and month, the rates behind it, the approvers who account for them, and a drill-through to the documents. Then you will test the register against the counts of Chapters 8 and 12.
+
+**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.1, with the JE Exceptions query.
+
+**Step-by-step instructions.**
+
+**Step 1. Choose the purchasing and payroll Tables.**
+
+a. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+b. In the **Navigator**, select **T33_PurchaseOrder**, **T69_PayrollRegister**, **T71_PayrollPayment**, and **T59_PayrollPeriod**, and click **Transform Data**.
+c. Rename the queries `PurchaseOrder`, `PayrollRegister`, `PayrollPayment`, and `PayrollPeriod`.
+
+**Step 2. Keep the columns the tests need.**
+
+a. In **PurchaseOrder**, keep PurchaseOrderID, PONumber, OrderDate, OrderTotal, CreatedByEmployeeID, and ApprovedByEmployeeID.
+b. In **PayrollRegister**, keep PayrollRegisterID, PayrollPeriodID, EmployeeID, NetPay, ApprovedByEmployeeID, and ApprovedDate.
+c. In **PayrollPayment**, keep PayrollRegisterID and PaymentDate, and in **PayrollPeriod**, keep PayrollPeriodID, PeriodEndDate, and PayDate.
+d. Set the type of every date column to **Date**.
+
+**Step 3. Flag the purchase orders.**
+
+a. Merge **PurchaseOrder** with **Employee** on ApprovedByEmployeeID and EmployeeID, with a left outer join.
+b. Expand MaxApprovalAmount and TerminationDate without the prefix, and rename them `ApproverLimit` and `ApproverTermination`.
+c. Add the custom columns `SelfApproved`, `AboveLimit`, and `AfterTermination` with the three formulas below, and set their type to **Whole Number**.
+
+```
+if [CreatedByEmployeeID] = [ApprovedByEmployeeID] then 1 else 0
+```
+
+```
+if [OrderTotal] > [ApproverLimit] then 1 else 0
+```
+
+```
+if [ApproverTermination] <> null and [OrderDate] > [ApproverTermination] then 1 else 0
+```
+
+Only a terminated employee has a TerminationDate, so the third flag first checks that there is one. A comparison with null returns null in Power Query, not false, and the `if` would fail on it.
+
+**Step 4. Bring the payment, the period, and the payee onto each register.**
+
+a. Merge **PayrollRegister** with **PayrollPayment** on PayrollRegisterID, and expand PaymentDate.
+b. Merge it with **PayrollPeriod** on PayrollPeriodID, and expand PeriodEndDate and PayDate.
+c. Merge it with **Employee** on EmployeeID, and expand TerminationDate.
+d. Clear **Enable load** on PayrollPayment and PayrollPeriod.
+
+Every merge is a left outer join and every expansion is without the prefix. Each register now carries the date it was paid, the period it covers, and whether the employee it pays had left.
+
+**Step 5. Flag the payroll registers.**
+
+a. Add the custom columns `PaidBeforeApproval`, `AfterTermination`, and `SelfApproved` with the three formulas below.
+b. Set their type to **Whole Number**.
+
+```
+if [PaymentDate] <> null and [PaymentDate] < [ApprovedDate] then 1 else 0
+```
+
+```
+if [TerminationDate] <> null and [PeriodEndDate] > [TerminationDate] then 1 else 0
+```
+
+```
+if [EmployeeID] = [ApprovedByEmployeeID] then 1 else 0
+```
+
+The last test compares the employee being paid with the person who approved the pay. It is Chapter 12's question of who approved the payroll, asked of every register.
+
+**Step 6. Turn the new flags into exceptions.**
+
+a. Reference **PurchaseOrder** as `PO Exceptions`, unpivot only its three flag columns, and filter Value to 1, as in Tutorial 16.1, Step 11.
+b. Add `TestID` with the formula `"PO " & [Attribute]`, keep TestID, PONumber, OrderDate, OrderTotal, and ApprovedByEmployeeID, and rename the last four as in @tbl-16-02.
+c. Repeat the same moves for **PayrollRegister** as `Payroll Exceptions`, with `"PR " & [Attribute]`, and add a column `DocumentNumber` with the formula `"Register " & Text.From([PayrollRegisterID])`.
+d. In Payroll Exceptions, keep TestID, DocumentNumber, PayDate, NetPay, and ApprovedByEmployeeID, and rename the last three `EventDate`, `Amount`, and `EmployeeID`.
+e. Clear **Enable load** on both queries.
+
+A register has no document number of its own, so the custom column gives it one. Every exception query now has the same five columns, with the same names.
+
+**Step 7. Append the register.**
+
+a. Choose **Home > Append Queries > Append Queries as New**.
+b. Select **Three or more tables**, add **JE Exceptions**, **PO Exceptions**, and **Payroll Exceptions** to **Tables to append**, and click **OK**.
+c. Rename the new query `Exceptions`, set EventDate's type to **Date**, and read its number of rows.
+d. Choose **Home > Close & Apply**.
+
+The register holds a little over a hundred and fifty exceptions, the three exception queries stacked. Because Append matches columns by name, the renaming in Step 6 is what puts each process's dates under EventDate. A query that kept OrderDate would add a column of its own, empty for the other processes, and leave EventDate empty for its rows.
+
+**Step 8. Describe the tests.**
+
+a. Choose **Home > Enter data**, and in the **Create Table** dialog name four columns `TestID`, `Test`, `Process`, and `Chapter`, by double-clicking the column headers.
+b. Type the eleven rows of @tbl-16-01.
+c. Type `Tests` as the table's name, and click **Load**.
+
+The Tests table is the register's dimension: one row per test, with the process whose population the test runs on.
+
+**Step 9. Relate the register and the populations.**
+
+a. In **Model view**, relate Exceptions to **Tests** on TestID, to the **Date** table on EventDate, and to **Employee** on EmployeeID.
+b. Relate PurchaseOrder to the **Date** table on OrderDate, and PayrollRegister to the **Date** table on PayDate.
+c. Hide the keys and the flag columns of the three population tables.
+
+@fig-16-02 showed this model. The populations stay loaded, related to Date, so that a measure can count the documents of any month.
+
+**Step 10. Measure the exceptions and their rates.**
+
+a. Add the measures below to the Measures table, and format Rate per 1,000 with one decimal.
+
+<!-- dax-check: measure -->
+```
+Exceptions = COUNTROWS ( Exceptions )
+```
+
+<!-- dax-check: measure -->
+```
+Population =
+SWITCH (
+    SELECTEDVALUE ( Tests[Process] ),
+    "Journal entries", COUNTROWS ( JournalEntry ),
+    "Purchase orders", COUNTROWS ( PurchaseOrder ),
+    "Payroll", COUNTROWS ( PayrollRegister )
+)
+```
+
+<!-- dax-check: measure -->
+```
+Rate per 1,000 = DIVIDE ( [Exceptions], [Population] ) * 1000
+```
+
+Population counts the documents of the test's process in the filter context, so in a visual by test and year it is the number of entries, orders, or registers of that year. With no single process selected, as in a total row, SELECTEDVALUE returns blank and so does Population, because a rate across processes would mix populations.
+
+**Step 11. Build the heat map.**
+
+a. Add a page named `Monitoring`, with a slicer of Year.
+b. Add a matrix with TestID on **Rows**, MonthName on **Columns**, and Exceptions as **Values**.
+c. In the **Values** well, open the menu of Exceptions, choose **Conditional formatting > Background color**, select **Rules** as the format style, and add two rules: a light fill from 1 up to 5, and a darker fill for 5 and more.
+
+The number stays in every cell, and the fill only adds emphasis, so the matrix reads the same in grayscale.
+
+**Step 12. Add the approvers and the rates.**
+
+a. Add a clustered bar chart of Exceptions by EmployeeName.
+b. Add a table of Exceptions, Population, and Rate per 1,000 by TestID.
+
+@fig-16-05 shows the page for all three years. The January column is the darkest: most of the journal entry, purchase order, and payroll exceptions fall in the first month of a year, in every year. December's cell for journal entries above the approver's limit holds the year-end closing entries, which exceed every approver's limit, the approval policy gap Chapter 8 noted, and so are expected. One row is shaded in every month: registers approved by the employee they pay. The bar chart shows why, with one approver far ahead of everyone else.
+
+![The Monitoring Page.](/visuals/svg/fig-16-05-monitoring-page.svg){#fig-16-05 fig-alt="A mock of a Power BI report page named Monitoring. A matrix lists the eleven tests as rows and the months January to December as columns, with the number of exceptions in each cell and darker shading for larger numbers. The January column is the darkest; the row for registers approved by their own employee has a shaded cell in every month. A bar chart beside it ranks approvers by their exceptions, with the Accounting Manager far ahead. A table lists each test's exceptions, population, and rate per thousand documents."}
+
+**Step 13. Drill through to the documents.**
+
+a. Add a page named `Exception Detail`, and drag TestID from Tests into the **Drillthrough** section of the **Visualizations** pane.
+b. Add a table visual with DocumentNumber, EventDate, Amount, EmployeeName, and JobTitle.
+c. On the Monitoring page, right-click the January cell of PO AfterTermination, and choose **Drillthrough > Exception Detail**.
+
+The detail page shows the orders behind that cell, as @fig-16-06 shows: orders approved by an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows the test's exceptions of January only. A reviewer can start from any cell of the heat map and reach the documents that need a disposition.
+
+![The Exception Detail Page.](/visuals/svg/fig-16-06-exception-detail.svg){#fig-16-06 fig-alt="A mock of a Power BI drill-through page named Exception Detail, with a back button and a note of its drill-through filters: the test of orders approved after the approver left, and the month of January. A table lists the orders behind that cell, with their numbers, order dates, amounts, and their approver, an account executive whose employment had ended in 2024."}
+
+**Step 14. Test the register.**
+
+a. In DAX query view, open the **Tests** tab, add the query below, and run it.
+b. Save the file.
+
+<!-- dax-check: query -->
+```
+// Test 2: each test's exceptions must equal the counts of Chapters 8 and 12
+EVALUATE
+SUMMARIZECOLUMNS (
+    Tests[TestID],
+    "Exceptions", [Exceptions],
+    "Population", [Population],
+    "Rate per 1,000", ROUND ( [Rate per 1,000], 2 )
+)
+ORDER BY Tests[TestID]
+```
+
+Each count equals the count of the test in Chapter 8 or Chapter 12. The register is complete, and every refresh will run the same tests on the new data.
+
+<!-- Tutorial 16.2 expected values (SQL twins; AM16 reference model in Desktop 2.158): PurchaseOrder 18,832 rows (3,921 /
+     6,545 / 8,366 by year); PayrollRegister 8,197 (2,645 / 2,774 / 2,778 by PayDate year); PayrollPayment 8,194 rows (registers
+     1, 2646, 5420 unpaid). Exceptions 151 rows: JE 43 (Weekend 17, Backdated 6, SelfApproved 7, AboveLimit 9, RoundAmount 4), PO 25
+     (SelfApproved 9, AboveLimit 13, AfterTermination 3; 14 distinct orders), PR 83 (PaidBeforeApproval 3: registers 2, 2647,
+     5421, the CFO, paid 2024-01-18, 2025-01-02, 2026-01-01, one day before approval; AfterTermination 3: registers 840, 2646, 5420,
+     employee 81; SelfApproved 77, employee 5, the Accounting Manager). Rates per 1,000: JE Weekend 19.98, Backdated 7.05,
+     SelfApproved 8.23, AboveLimit 10.58, RoundAmount 4.70; PO SelfApproved 0.48, AboveLimit 0.69, AfterTermination 0.16; PR
+     PaidBeforeApproval 0.37, AfterTermination 0.37, SelfApproved 9.39. By month name (all years): Jan 56, Feb 8, Mar 8, Apr 8,
+     May 9, Jun 8, Jul 11, Aug 10, Sep 6, Oct 7, Nov 8, Dec 12. January by test: JE AboveLimit 2, Backdated 6, RoundAmount 1,
+     SelfApproved 7, Weekend 7; PO AboveLimit 11, AfterTermination 2, SelfApproved 8; PR AfterTermination 2, PaidBeforeApproval 3,
+     SelfApproved 7. December JE AboveLimit 6 = the six year-end closes. PR SelfApproved 6 to 8 every month. By approver: Tasha Todd
+     (Accounting Manager) 89, Cynthia Reyes (CFO) 21, David Roth (Controller) 16, Daniel Diaz (Account Executive, terminated
+     2024-04-26) 6, Jennifer Cole (Purchasing Manager) 5, Procurement Analysts 4 and 4, Buyers 2 and 2, Production Supervisor 1,
+     Production Manager 1. PO AfterTermination: PO-2024-000474 (April 2024), PO-2025-003922 (January 2025), PO-2026-010467 (January
+     2026), all approved by employee 81 (also above the limit of 0). By year and process: JE 16 / 12 / 15 (rates 60.15, 41.67,
+     50.51), PR 27 / 28 / 28, PO 11 / 6 / 8. -->
+
+**Checkpoint.** Before you turn to security, confirm the following:
+
+- Exceptions holds the three processes, with every date under EventDate and every number under DocumentNumber.
+- Test 2 returns the counts of Chapters 8 and 12 for each of the eleven tests.
+- The heat map shows the January cluster and one row shaded in every month, and the bar chart shows the approver behind that row.
+- A cell of the heat map drills through to its documents.
+
+The monitoring page separates two kinds of problem that a once-a-year test would have reported the same way: exceptions that cluster at one time of year, which call for a look at how the controls work then, and an exception that recurs every month, which calls for a change in the design of the control.

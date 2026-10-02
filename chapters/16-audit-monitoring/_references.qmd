@@ -1,0 +1,57 @@
+{{< pagebreak >}}
+
+## References
+
+Alles, M., Brennan, G., Kogan, A., & Vasarhelyi, M. A. (2006). Continuous monitoring of business process controls: A pilot implementation of a continuous auditing system at Siemens. *International Journal of Accounting Information Systems*, *7*(2), 137–161. <https://doi.org/10.1016/j.accinf.2005.10.004>
+
+Alles, M. G., Kogan, A., & Vasarhelyi, M. A. (2008). Putting continuous auditing theory into practice: Lessons from two pilot implementations. *Journal of Information Systems*, *22*(2), 195–214. <https://doi.org/10.2308/jis.2008.22.2.195>
+
+Baaske, B. N., Eulerich, M., & Wood, D. A. (2025). Improving audit quality with data analytic visualizations: The importance of spatial abilities and feedback in anomaly identification. *Accounting Horizons*, *39*(3), 85–97. <https://doi.org/10.2308/horizons-2023-073>
+
+Gonzalez, G. C., & Hoffman, V. B. (2018). Continuous auditing's effectiveness as a fraud deterrent. *Auditing: A Journal of Practice & Theory*, *37*(2), 225–247. <https://doi.org/10.2308/ajpt-51828>
+
+Hardy, C. A., & Laslett, G. (2015). Continuous auditing and monitoring in practice: Lessons from Metcash's Business Assurance Group. *Journal of Information Systems*, *29*(2), 183–194. <https://doi.org/10.2308/isys-50969>
+
+Institute of Internal Auditors. (2025). *GTAG: Continuous auditing and monitoring* (3rd ed.). <https://www.theiia.org/en/content/guidance/recommended/supplemental/gtags/continuous-auditing-and-monitoring>
+
+Kobelsky, K. W. (2014). A conceptual model for segregation of duties: Integrating theory and practice for manual and IT-supported processes. *International Journal of Accounting Information Systems*, *15*(4), 304–322. <https://doi.org/10.1016/j.accinf.2014.05.003>
+
+Kogan, A., Alles, M. G., Vasarhelyi, M. A., & Wu, J. (2014). Design and evaluation of a continuous data level auditing system. *Auditing: A Journal of Practice & Theory*, *33*(4), 221–245. <https://doi.org/10.2308/ajpt-50844>
+
+Li, P., Chan, D. Y., & Kogan, A. (2016). Exception prioritization in the continuous auditing environment: A framework and experimental evaluation. *Journal of Information Systems*, *30*(2), 135–157. <https://doi.org/10.2308/isys-51220>
+
+Microsoft. (2024). *Row-level security (RLS) guidance in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/rls-guidance>
+
+Microsoft. (2025a). *How to apply sensitivity labels in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-security-apply-data-sensitivity-labels>
+
+Microsoft. (2025b). *Publish an app in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-create-distribute-apps>
+
+Microsoft. (2025c). *Publish from Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-upload-desktop-files>
+
+Microsoft. (2025d). *Publish to web from Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-publish-to-web>
+
+Microsoft. (2025e). *Refresh a semantic model created from an Excel workbook - cloud*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/connect-data/refresh-excel-file-onedrive>
+
+Microsoft. (2025f). *Roles in workspaces in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-roles-new-workspaces>
+
+Microsoft. (2025g). *Sensitivity labels in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-security-sensitivity-label-overview>
+
+Microsoft. (2025h). *Unpivot columns*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/unpivot-column>
+
+Microsoft. (2026a). *Append queries*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/append-queries>
+
+Microsoft. (2026b). *Export data from a Power BI visualization*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-export-data>
+
+Microsoft. (2026c). *Object-level security (OLS) with Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/security/service-admin-object-level-security>
+
+Microsoft. (2026d). *Power BI Desktop projects (PBIP)*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview>
+
+Microsoft. (2026e). *Power BI service features by license type*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/fundamentals/service-features-license-type>
+
+Microsoft. (2026f). *Row-level security (RLS) with Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/security/service-admin-row-level-security>
+
+Nickell, E. B., Schwebke, J. M., & Goldwater, P. M. (2023). An introductory audit data analytics case study: Using Microsoft Power BI and Benford's Law to detect accounting irregularities. *Journal of Accounting Education*, *64*, 100855. <https://doi.org/10.1016/j.jaccedu.2023.100855>
+
+Tronto, S., & Killingsworth, B. L. (2021). How internal audit can champion continuous monitoring in a business operation via visual reporting and overcome barriers to success. *The International Journal of Digital Accounting Research*, *21*, 23–59. <https://doi.org/10.4192/1577-8517-v21_2>
+
+Vasarhelyi, M. A., & Halper, F. B. (1991). The continuous audit of online systems. *Auditing: A Journal of Practice & Theory*, *10*(1), 110–125. <https://doi.org/10.2308/ajpt-9703192366>
