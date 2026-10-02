@@ -169,14 +169,14 @@ b. Add a clustered column chart with JobTitle on the **X-axis**, Year on **Legen
 Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 ```
 
-@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share roughly doubled from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
 
 ![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
 
 **Step 12. Add the About page and the navigation.**
 
 a. Add a page named `About`, and drag its tab to the first position.
-b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
+b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period and the last date of its time records, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
 c. Choose **Insert > Buttons > Navigator > Page navigator**, and place the navigator below the text.
 d. Right-click the tabs of Promotion Detail, Promotion Tooltip, and Cost Center Detail, and choose **Hide Page**.
 e. Copy the navigator to the top of each visible page, and test it by holding Ctrl and clicking its buttons.

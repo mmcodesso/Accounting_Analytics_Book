@@ -21,6 +21,8 @@ b. In **Account**, keep AccountID, AccountNumber, AccountName, AccountType, Acco
 c. In **CostCenter**, keep CostCenterID and CostCenterName.
 d. In **JournalEntry**, keep EntryNumber and EntryType.
 
+The ledger keeps every posting, the closing entries included. Step 3 marks the closing entries rather than removing them, so that each measure can decide whether to leave them out.
+
 **Step 3. Flag the closing entries.**
 
 a. Select **GLEntry**, choose **Home > Merge Queries**, and merge it with **JournalEntry** on VoucherNumber and EntryNumber, with a left outer join.
@@ -134,9 +136,9 @@ a. Add a line chart with YearMonth from Date on the axis and Operating Expense a
 b. Add a table visual with YearMonth and Operating Expense Deviation, sorted from the largest deviation.
 c. Record the months whose deviation exceeds 20%.
 
-@fig-14-11 shows the line chart. Outside the start-up months of early 2024, the months well above their expectation are the ones with three pay dates, which Chapter 11 traced to payroll recorded when paid rather than accrued.
+@fig-14-11 shows the line chart. Apart from February 2024, whose expectation rests on the start-up month alone, the months well above their expectation are the six with three pay dates, from March 2024 on, which Chapter 11 traced to payroll recorded when paid rather than accrued.
 
-![Monthly Operating Expense Against the Average of the Three Months Before.](/visuals/svg/fig-14-11-expense-expectation.svg){#fig-14-11 fig-alt="A mock of a Power BI line chart of operating expense by month from January 2024 to December 2026, with a second line for the expected operating expense, the average of the three months before each month. The actual line runs close to the expectation except for regular spikes about a quarter above it, in the months with three pay dates, and for the start-up months of early 2024. The spike months are marked."}
+![Monthly Operating Expense Against the Average of the Three Months Before.](/visuals/svg/fig-14-11-expense-expectation.svg){#fig-14-11 fig-alt="A mock of a Power BI line chart of operating expense by month from January 2024 to December 2026, with a second line for the expected operating expense, the average of the three months before each month. The actual line runs close to the expectation except for regular spikes about a quarter above it, in the months with three pay dates, and for February 2024, just after the start-up month. The spike months are marked."}
 
 **Step 9. Add the trial-balance test.**
 
@@ -173,8 +175,9 @@ The query keeps every posting through December 31, 2026, except the two closing 
      2026 4,503,611.24 (each equal to its Income Summary to Retained Earnings close); with the closes included 0.00 in every year.
      2026 by subtype (credit-positive): Operating Revenue 29,973,822.48; Contra Revenue -242,764.56; COGS -18,634,303.63;
      Operating Expense -6,471,696.58; Other Expense -28,946.47; Other Income or Expense -92,500.00. Operating expense by year
-     6,033,733.49, 6,355,491.55, 6,471,696.58. Deviations above 20%: 2024-02 +44.8% and 2024-03 +51.4% (start-up), 2024-08 +29.6%,
-     2025-01 +28.1%, 2025-08 +26.7%, 2026-01 +30.3%, 2026-07 +25.4% (the three-pay-date months); every other month within
+     6,033,733.49, 6,355,491.55, 6,471,696.58. Deviations above 20%: 2024-02 +44.8% (its expectation is January 2024 alone, the start-up
+     month), and the six three-pay-date months 2024-03 +51.4%, 2024-08 +29.6%, 2025-01 +28.1%, 2025-08 +26.7%, 2026-01 +30.3%,
+     2026-07 +25.4%; every other month within
      -10.5% to +1.9%; 2024-01 blank. Test 3: 71 accounts, debit and credit balances 67,107,722.36. The first version of the
      expectation used DATESINPERIOD ending on the last day of the prior month; for January 2024 that window lies before the date
      table, and the function returned a stray date, giving a false expectation, so the text uses DATESBETWEEN with a guard. -->
@@ -183,7 +186,7 @@ The query keeps every posting through December 31, 2026, except the two closing 
 
 - The model has two fact tables, SalesInvoiceLine and GLEntry, sharing the Date table, and the closing entries are flagged.
 - The income statement's total for each fiscal year equals that year's net income, and a measure that keeps the closing entries shows zero.
-- The months whose operating expense deviates most from its expectation are the start-up months and the months with three pay dates.
+- The months whose operating expense deviates most from its expectation are February 2024 and the six months with three pay dates.
 - Test 3 returns equal debit and credit balances, equal to Chapter 6's pre-closing trial balance.
 
 The model now answers both the sales questions and the controller's. Its two stars share one calendar, its measures exclude the closing entries once for every visual, and its tests show that it agrees with the workbook and the queries of the earlier Parts.

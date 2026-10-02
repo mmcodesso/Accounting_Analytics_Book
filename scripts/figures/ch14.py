@@ -506,8 +506,8 @@ def fig_14_11() -> Diagram:
             d.outline(px - 8, py - 8, 16, 16, CORAL, width=2.5, front=True)
     d.text("<i>The expectation is blank for January 2024, which has no earlier month, so its line starts in "
            "February. Outlined: the months whose expense exceeds the expectation by more than a fifth, "
-           "February and March 2024 at the start-up and every later month with three pay dates. The value "
-           "axis starts at zero.</i>", 0, 372, 860, 56, size=SMALL, color=GRAY)
+           "February 2024, whose expectation rests on the start-up month alone, and the six months with three "
+           "pay dates, from March 2024 on. The value axis starts at zero.</i>", 0, 372, 860, 56, size=SMALL, color=GRAY)
     return d
 
 

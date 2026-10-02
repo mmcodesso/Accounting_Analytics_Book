@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch16 Exercises.pbix`, and on Exercise 16.4 in a copy of Charles River Reports.pbix saved the same way. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 16.1`). Do not change the queries, relationships, measures, roles, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
+Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch16 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 16.1`). Do not change the queries, relationships, measures, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
 
 ### Financial Accounting Exercises
 
@@ -64,9 +64,9 @@ Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring
 
 **Exercise 16.3: Surge Days by Month**
 
-**Table group:** Time and Payroll
+**Table group:** Payroll and Time
 
-**Scenario.** Part III traced the growth of the plant's overtime to surge days, days on which every hourly manufacturing employee clocked exactly the same hours. The production manager wants to see each month whether surge days continue, and internal audit wants the same view for its monitoring.
+**Scenario.** Part III traced the growth of the plant's overtime to surge days, days on which every hourly manufacturing employee clocked exactly the same hours, and Chapter 12 found that the production manager approved every surge-day entry. The audit committee wants to know each month whether surge days continue, and asks internal audit to add them to its monitoring report.
 
 **Requirements.**
 
@@ -78,7 +78,7 @@ Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring
 
 (4) Show the surge days and their overtime hours by month, with a line of the share of the plant's overtime they account for.
 
-(5) Describe when surge days began, how often they occur, and how their share of overtime has changed. Explain why this is a monitoring measure for the production manager as well as a test for internal audit.
+(5) Describe when surge days began, how often they occur, and how their share of overtime has changed. Explain why the test belongs in internal audit's monitoring report rather than on the Plant page of the package, which the production manager reads.
 
 **Deliverable.** The SurgeDays query, the page, and a short note answering requirement (5).
 
@@ -87,38 +87,44 @@ Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring
      manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589,
      and 0.705 of the year's manufacturing overtime; overtime on other days is flat (6,273, 6,426, 5,918). All 5,952 surge entries
      were approved by the Production Manager on the work date. Distinct values of total hours: Group By with "Count Distinct Rows"
-     on the hours column; one value means everyone clocked the same hours. -->
+     on the hours column; one value means everyone clocked the same hours. (5) The production manager approved every entry the
+     test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found
+     can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The
+     Plant page's overtime share is a management measure; the surge-day test is an audit test. -->
 
-**Exercise 16.4: Securing Pay Data**
+**Exercise 16.4: Exception Rates over Time**
 
-**Table group:** Time and Payroll
+**Table group:** Accounting Core, Procure-to-Pay, Payroll and Time
 
-**Scenario.** After Tutorial 16.3, the controller asks whether department managers could still see what individual employees are paid. LaborTimeEntry carries the cost of each line of labor time, and the Plant page of the production manager, who does see the plant's employees, should show hours but not pay.
+**Scenario.** The audit committee asks whether the controls behind the monitoring tests are getting better or worse. Counts cannot answer that when the number of documents changes from year to year, and the exceptions already explained, the year-end closes and the recurring payroll test, hide what changes in the rest.
 
 **Requirements.**
 
-(1) In the copy of Charles River Reports.pbix, find the visuals and measures that use LaborTimeEntry[ExtendedLaborCost], including any from Exercise 15.3.
+(1) On a page named `Ex 16.4`, add a matrix with Process from the Tests table on **Rows**, Year on **Columns**, and Exceptions, Population, and Rate per 1,000 as **Values**. Explain why each process shows a rate while the total row does not.
 
-(2) In **TMDL view**, script the Cost Center Managers role by dragging it from the **Model** tab of the Data pane into a new script tab. Add a column permission that sets the metadata permission of ExtendedLaborCost to none, keep the role's existing rules, and choose **Preview** and then **Apply**.
+(2) Write a measure `Unexplained Rate per 1,000` that divides the exceptions, leaving out those with the disposition Expected and those of the test PR SelfApproved, by the population, and add it to the matrix.
 
-(3) View the report as the Production Manager with **View as**, and record what happens to the Plant page and to the visuals that use ExtendedLaborCost. View it with the Finance role and compare.
+(3) Add a line chart of Rate per 1,000 by Year, with Process as the **Legend**, and a second chart of Unexplained Rate per 1,000.
 
-(4) On the Optimize tab, open **Performance analyzer**, record the visuals of the Budget page without a role and then with View as, and compare the durations.
+(4) Compare the purchase orders' exceptions and their rate from 2025 to 2026, and explain why the count and the rate tell different stories.
 
-(5) Explain why object-level security, not row-level security, is the right tool for this requirement, and what the controller should do about visuals that fail for the role.
+(5) Write a short note for the audit committee: whether each process is improving, and what the unexplained rate adds to the rate of all exceptions.
 
-**Deliverable.** The role's script, the comparison, and a short note answering requirement (5).
+**Deliverable.** The page, the measure, and the note.
 
-<!-- Instructor notes, Exercise 16.4 (Learn, OLS 2026-06-30; RLS guidance 2024): TMDL view scripts a role with createOrReplace;
-     starting from the scripted role keeps its tablePermission filters, and adding
-         tablePermission LaborTimeEntry
-             columnPermission ExtendedLaborCost
-                 metadataPermission: none
-     hides the column from the role. A visual or measure that uses the column fails for the role ("the field can't be found"),
-     while hours visuals still work; the Finance role sees everything. A role written from scratch with createOrReplace would
-     replace the role and lose its row filters, which is why the exercise starts from the scripted role. Row-level security
-     restricts rows, not columns; the controller should keep cost measures off the managers' pages or in the finance report.
-     Performance analyzer durations vary by machine; expect slightly longer durations under View as. -->
+<!-- Instructor notes, Exercise 16.4 (AM16 reference model, checked in Desktop 2.158's engine): exceptions / population / rate per
+     1,000 by year: journal entries 16 / 266 / 60.15, 12 / 288 / 41.67, 15 / 297 / 50.51; purchase orders 11 / 3,921 / 2.81,
+     6 / 6,545 / 0.92, 8 / 8,366 / 0.96; payroll 27 / 2,645 / 10.21, 28 / 2,774 / 10.09, 28 / 2,778 / 10.08. (1) Population
+     uses SELECTEDVALUE ( Tests[Process] ), blank when several processes are in context, so a rate across processes, which
+     would mix populations, is never shown. (2) CALCULATE ( [Exceptions], Exceptions[Disposition] <> "Expected", Tests[TestID]
+     <> "PR SelfApproved" ) divided by [Population], times 1,000 (a blank Disposition is not equal to "Expected", so open
+     exceptions stay in): journal entries 52.63, 34.72, 43.77 (the two closes a year removed); payroll 0.76, 0.72, 0.72;
+     purchase orders unchanged. (4) the count rose by a third (6 to 8) while the rate barely moved (0.92 to 0.96), because the
+     number of orders grew by about 28%; from 2024 the rate fell by two-thirds while orders more than doubled. (5) Journal
+     entries are the process to watch: their unexplained rate fell in 2025 and rose in 2026, mostly because of single
+     documents that fail several tests (the opening entry's four in 2024, the debt reclassifications' two each in 2024 and
+     2026), while Weekend (6, 5, 6), Backdated (2, 2, 2), and SelfApproved (3, 2, 2) barely move; payroll's unexplained
+     exceptions are two a year, so its rate is almost entirely the design finding. -->
 
 ### Auditing Exercises
 
@@ -150,11 +156,11 @@ Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring
      payments in the filter context; MAD = AVERAGEX of the nine absolute differences. Nickell, Schwebke, and Goldwater (2023) is a
      Power BI and Benford teaching case. -->
 
-**Exercise 16.6: Near-Duplicate Payments and Their Dispositions**
+**Exercise 16.6: Near-Duplicates and the Concentration of Approval**
 
-**Table group:** Procure-to-Pay
+**Table group:** Procure-to-Pay, with the Employee table from Master Data
 
-**Scenario.** A monitoring report that runs every month must remember what the reviewers concluded, or the same exceptions cost the same time every month. The chief audit executive asks you to add the near-duplicate payments of Chapter 8 as a second anomaly test and to record a disposition for every exception of the register.
+**Scenario.** The chief audit executive asks for two additions to the monitoring report: the near-duplicate payments of Chapter 8, as a second anomaly test beside Benford's Law, and a measure of how much of each process rests on one approver, which the exceptions by approver do not show.
 
 **Requirements.**
 
@@ -162,18 +168,24 @@ Work on Exercises 16.1, 16.2, 16.3, 16.5, and 16.6 in a copy of Audit Monitoring
 
 (2) Add the number of days between the two payments, and show the pairs by that number. Count the pairs within 30 days, and check whether any pair pays the same invoice.
 
-(3) Add a column `ExceptionKey` to the register, TestID and DocumentNumber joined by a separator. Create a table `Dispositions` with **Enter data**, with the columns ExceptionKey, Disposition, and Note, and record a disposition for at least the exceptions of January 2026, using Chapter 8's three dispositions.
+(3) Write three measures, `Entries Approved`, `Orders Approved`, and `Registers Approved`, that count the documents each employee approved. JournalEntry is related to Employee through its approver; PurchaseOrder and PayrollRegister are not, so apply the employees in the filter context to their ApprovedByEmployeeID with TREATAS, which Test 2 of Tutorial 14.2 used to apply a list of values as a filter.
 
-(4) Relate Dispositions to the register, and write a measure `Open Exceptions` that counts the exceptions without a disposition. Add it to the monitoring page by test and month.
+(4) Add a measure for each count's share of its process's documents, and show a table by EmployeeName and JobTitle with the three counts and shares. Compare it with the bar chart of exceptions by approver on the Monitoring page.
 
-(5) Explain how the Dispositions table should be kept from month to month, who should be allowed to change it, and why a near-duplicate pair on different invoices is an anomaly to look at rather than a duplicate payment.
+(5) Explain why a near-duplicate pair on different invoices is an anomaly to look at rather than a duplicate payment, and what the shares of approval say about the design of the purchasing and payroll approvals that no exception shows.
 
-**Deliverable.** The PaymentPairs query, the Dispositions table, the Open Exceptions measure on the monitoring page, and a short note answering requirement (5).
+**Deliverable.** The PaymentPairs query, the table of approval shares, and a short note answering requirement (5).
 
-<!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6): 113 supplier-and-amount pairs on different dates among
-     the payments through 2026-12-31, 13 within 30 days, none paying the same invoice (Chapter 8: near-duplicates, not
-     duplicates). ExceptionKey is unique in the register (151 exceptions, one per test and document). January 2026 holds 22
-     exceptions (JE: Weekend 3, Backdated 2, SelfApproved 2, AboveLimit 1, RoundAmount 1; PO: SelfApproved 3, AboveLimit 4,
-     AfterTermination 1; PR: PaidBeforeApproval 1, AfterTermination 1, SelfApproved 3); January holds 17, 17, and 22 a year.
-     The Dispositions table is internal audit's record: kept in the monitoring file or in a workbook the audit team maintains,
-     changed only by the reviewers, and itself reviewed by the chief audit executive. -->
+<!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6; the measures checked in Desktop 2.158's engine on the AM16
+     reference model): 113 supplier-and-amount pairs on different dates among the payments through 2026-12-31, 13 within 30
+     days, none paying the same invoice (Chapter 8: near-duplicates, not duplicates). Orders Approved = CALCULATE ( COUNTROWS (
+     PurchaseOrder ), TREATAS ( VALUES ( Employee[EmployeeID] ), PurchaseOrder[ApprovedByEmployeeID] ) ); Registers Approved the
+     same on PayrollRegister; Entries Approved = COUNTROWS ( JournalEntry ); the entries' share divides by CALCULATE ( COUNTROWS (
+     JournalEntry ), REMOVEFILTERS ( Employee ) ), while the other two divide by COUNTROWS of their table, which Employee does not
+     filter. Shares: Cynthia Reyes (Chief Financial Officer) 18,817 orders, 99.92%, and 43 entries, 5.05%; David Roth
+     (Controller) 802 entries, 94.24%; Tasha Todd (Accounting Manager) 8,197 registers, 100%, and 6 entries, 0.71%; the other
+     15 orders spread over eight employees (buyers, procurement analysts, the Purchasing Manager, the Production Manager and a
+     Production Supervisor, and the departed Account Executive, 3). The exceptions by approver put the Accounting Manager first
+     (89) and the CFO second (21), but the shares show that each of three processes rests on one person, a design question for
+     segregation of duties and for absences (who approves when that person is away, and who approves that person's own
+     documents). -->

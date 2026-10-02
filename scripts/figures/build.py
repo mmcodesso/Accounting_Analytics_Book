@@ -4,6 +4,7 @@
 Usage:
     python scripts/figures/build.py                    # every figure
     python scripts/figures/build.py --chapter 3        # one chapter
+    python scripts/figures/build.py --appendix A       # one appendix
     python scripts/figures/build.py --figure fig-03-07 # figures whose name starts with this
 
 The .drawio files stay the editable sources: the pre-render hook exports them
@@ -35,6 +36,7 @@ import ch13  # noqa: E402
 import ch14  # noqa: E402
 import ch15  # noqa: E402
 import ch16  # noqa: E402
+import appendix_a  # noqa: E402
 from data import REPO_ROOT  # noqa: E402
 
 SRC_DIR = REPO_ROOT / "visuals" / "src"
@@ -43,18 +45,24 @@ CHAPTERS = {1: ch01.FIGURES, 2: ch02.FIGURES, 3: ch03.FIGURES, 4: ch04.FIGURES, 
             10: ch10.FIGURES, 11: ch11.FIGURES, 12: ch12.FIGURES,
             13: ch13.FIGURES, 14: ch14.FIGURES, 15: ch15.FIGURES,
             16: ch16.FIGURES}
+APPENDICES = {"A": appendix_a.FIGURES}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--chapter", type=int, action="append", choices=sorted(CHAPTERS))
+    parser.add_argument("--appendix", action="append", choices=sorted(APPENDICES))
     parser.add_argument("--figure", action="append", help="Name prefix, such as fig-03-07.")
     args = parser.parse_args()
 
     selected = 0
-    for chapter, figures in CHAPTERS.items():
-        if args.chapter and chapter not in args.chapter:
-            continue
+    groups = [(("chapter", key), figures) for key, figures in CHAPTERS.items()]
+    groups += [(("appendix", key), figures) for key, figures in APPENDICES.items()]
+    for (kind, key), figures in groups:
+        if args.chapter or args.appendix:
+            chosen = args.chapter if kind == "chapter" else args.appendix
+            if not chosen or key not in chosen:
+                continue
         for name, build in figures.items():
             if args.figure and not any(name.startswith(prefix) for prefix in args.figure):
                 continue

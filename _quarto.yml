@@ -47,6 +47,8 @@ book:
         - chapters/15-management-reports/chapter.qmd
         - chapters/16-audit-monitoring/chapter.qmd
     - part: "Integrated and Applied Topics"
+  appendices:
+    - appendices/a-publishing-security/appendix.qmd
 
 
 format:

@@ -136,11 +136,12 @@ def page_tabs(d: Diagram, x: float, y: float, pages: list[str], active: str) -> 
 
 def window(d: Diagram, height: float, view: str = "Report", tab: str = "Home",
            buttons: list[str] | None = None, panes: list[str] | None = None,
-           pane_w: float = 128, y: float = 0, tabs: list[str] | None = None) -> Window:
+           pane_w: float = 128, y: float = 0, tabs: list[str] | None = None,
+           file: str = FILE) -> Window:
     """Title bar, ribbon, left rail, and the frames of the right-hand panes. Returns the
     geometry of the canvas area; the caller draws the canvas, the pane contents, and the
     page tabs."""
-    xl.title_bar(d, 0, y, 860, f"{FILE} - Power BI Desktop")
+    xl.title_bar(d, 0, y, 860, f"{file} - Power BI Desktop")
     top = ribbon(d, 0, y + 30, 860, tab, buttons or [
         "Get data ▾", "Transform data", "Refresh", "New visual", "Text box", "New measure",
         "Publish"], tabs)

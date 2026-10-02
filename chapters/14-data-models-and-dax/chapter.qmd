@@ -21,20 +21,24 @@ After completing this chapter, you will be able to:
 
 The report you built in Chapter 13 has been in use for a few weeks, and the questions it raises have outgrown it. The sales manager wants to know what the autumn discounts cost in margin, not only in dollars. The marketing manager asks how each month compares with the same month last year. A product manager noticed that the invoice count on a draft page did not change when Furniture was selected and asked which number was right. Each of these is a calculation the report cannot yet make: a ratio of totals, a comparison across periods, and a count that depends on how the tables are joined.
 
-The controller has a request of her own. "If this report is where the managers look," she says, "the income statement should be there too, monthly, from the ledger, and it has to agree with the statements we closed." That means a second set of tables, the general ledger and its chart of accounts, in the same report, sharing the same calendar as the sales data. This chapter teaches you to design that model and to write its calculations in DAX, the formula language of Power BI. You will reshape the sales tables into a star schema, add a date table and the ledger, write measures for margin, discount rate, the prior year, and the income statement, and prove each measure against a total you already trust.
+The controller has a request of her own. "If this report is where the managers look," she says, "the income statement should be there too, monthly, from the ledger, and it has to agree with the statements we closed." That means a second set of tables, the general ledger and its chart of accounts, in the same report, sharing the same calendar as the sales data. This chapter teaches you to design that model and to write its calculations in DAX, the formula language of Power BI. You will reshape the sales tables into a star schema, add a date table and the ledger, write measures for margin, discount rate, and the income statement, compare periods with time intelligence, and prove each measure against a total you already trust.
 
 
 ## From Tables to a Model
 
 A semantic model, as Chapter 13 explained, is the set of tables, relationships, and calculations that a report reads. The way those tables are arranged decides how easy the model is to use and how reliably its numbers come out. The arrangement that Power BI is designed for, and that most business intelligence models use, is the star schema, the design that Kimball and Ross (2013) describe for data warehouses. A star schema separates two kinds of tables. A fact table records events or transactions, one row for each event, with the keys of the things involved and the numbers to be added up: an invoice line with its item, customer, date, quantity, and amount. A dimension table describes one kind of thing, one row for each, with the attributes a reader filters and groups by: an item with its group and product type, a customer with its segment and region, a date with its year and month (Microsoft, 2024d). Each dimension relates to the fact table on its key, so the diagram of the model looks like a star, with the fact table at the center.
 
-Every fact table has a grain, the event that one of its rows represents. Stating the grain is the first decision in a model, because it decides which questions the table can answer. The grain of SalesInvoiceLine is one line of one invoice, which can be totaled by item, customer, or day, but not split by shipment if a line shipped in parts. @tbl-14-01 lists the fact tables of the Charles River models in this Part, with their grain and their dimensions.
+Every fact table has a grain, the event that one of its rows represents. Stating the grain is the first decision in a model, because it decides which questions the table can answer. The grain of SalesInvoiceLine is one line of one invoice, which can be totaled by item, customer, or day, but not split by shipment if a line shipped in parts. @tbl-14-01 lists the fact tables of the Charles River models in this Part, with their grain, their dimensions, and the chapter that adds them.
 
 | Fact table | Grain: one row for each | Dimensions | Chapter |
 |-------------|----------------------|-------------------------|-------|
-| SalesInvoiceLine | line of an invoice | Item, Customer, Date | 14 |
+| SalesInvoiceLine | line of an invoice | Item, Customer, Date | 13, 14 |
 | GLEntry | posting to an account | Account, CostCenter, Date | 14 |
+| BudgetLine | budgeted amount of a month | Account, CostCenter, Date | 15 |
 | LaborTimeEntry | time entry of an employee | Employee, WorkCenter, Date | 15 |
+| ProductionCompletionLine | completion of an item | Item, Date | 15 |
+| JournalEntry, PurchaseOrder, PayrollRegister | document tested for exceptions | Employee, Date | 16 |
+| Exceptions | exception of one test on one document | Tests, Employee, Date | 16 |
 
 : Fact tables of the Charles River reports, with their grain and dimensions {#tbl-14-01}
 
@@ -152,7 +156,7 @@ ORDER BY 'Date'[Year]
 
 The result has one row for each year, with the number of invoice lines and the revenue. Its fiscal 2026 row must equal the control total of Chapter 6. The results grid shows values without the formats set for the measures, so a test rounds amounts to the cent with ROUND, as here, and they read as they do in the earlier chapters. A query can also define a measure for its own use, with DEFINE MEASURE, and test it before it is added to the model. Right-clicking a table or measure in the Data pane of DAX query view offers quick queries, such as Show top 100 rows and Define and evaluate, which write a query for you. The query tabs are saved with the report, so the tests stay with the measures they test (Microsoft, 2025a).
 
-Treat these queries as part of the model's documentation. A tab named Tests that holds one query per control total, each with a comment saying what it should return, is the Power BI counterpart of the control totals of Chapter 4 and the audit library of Chapter 12. Anyone who changes the model can run the tab again and see at once whether a number moved. @fig-14-06 shows the first test of Tutorial 14.2 after it has run.
+Treat these queries as part of the model's documentation. A tab named Tests that holds one query per control total, each with a comment saying what it should return, is the Power BI counterpart of the control totals of Chapter 4 and the audit query library of Chapter 12. Anyone who changes the model can run the tab again and see at once whether a number moved. @fig-14-06 shows the first test of Tutorial 14.2 after it has run.
 
 ![A Test in DAX Query View.](/visuals/svg/fig-14-06-dax-query-view.svg){#fig-14-06 fig-alt="A mock of DAX query view in Power BI Desktop. A tab named Tests holds a query with a comment line, EVALUATE, and SUMMARIZECOLUMNS grouping by the year of the Date table with the number of invoice lines, revenue, gross margin, and margin percentage. Below the editor, the results grid shows one row for each of fiscal 2024, 2025, and 2026, and the fiscal 2026 revenue is outlined because it must equal Chapter 6's control total."}
 
@@ -162,17 +166,17 @@ Treat these queries as part of the model's documentation. A tab named Tests that
 
 ## Time Intelligence
 
-Comparisons across periods are among the first questions any accounting report must answer: this month against the same month last year, the year to date, the trend over the last few months. DAX's time intelligence functions build them by shifting or extending the dates in the filter context. They take the date column of the marked date table as their argument. @tbl-14-04 lists the ones this chapter uses.
+Comparisons across periods are among the first questions any accounting report must answer: this month against the same month last year, the year to date, the trend over the last few months. DAX's time intelligence functions build them by shifting or extending the dates in the filter context. They take the date column of the marked date table as their argument. @tbl-14-04 lists the ones this Part uses, and where.
 
-| Function | Returns, for the dates in the filter context | Example |
+| Function | Returns, for the dates in the filter context | Used in |
 |------------------|----------------------------------|--------------------|
-| `DATESYTD`, `TOTALYTD` | The year to date, from January 1 | Revenue YTD |
-| `SAMEPERIODLASTYEAR` | The same dates one year earlier | Revenue PY |
-| `DATEADD` | The dates shifted by a number of days, months, quarters, or years | A prior month |
-| `DATESINPERIOD` | A period of a given length ending on a date | A rolling quarter |
-| `DATESBETWEEN` | The dates between two dates, inclusive | The three months before |
+| `TOTALYTD` | A measure's total for the year to date, from January 1 | Revenue YTD, Exercise 14.3 |
+| `SAMEPERIODLASTYEAR` | The same dates one year earlier | Revenue PY, Exercise 14.3 |
+| `DATEADD` | The dates shifted by a number of days, months, quarters, or years | The prior quarter, Exercise 14.4 |
+| `DATESBETWEEN` | The dates between two dates, inclusive | The three months before, Tutorial 14.3 |
+| `DATESINPERIOD` | A period of a given length ending on a date | The trailing twelve months, Chapter 15 |
 
-: Time intelligence functions used in this chapter {#tbl-14-04}
+: Time intelligence functions of this Part and where they are used {#tbl-14-04}
 
 `CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )` returns, for a cell filtered to October 2026, the revenue of October 2025, and the change against the prior year divides the difference by that value. For any period of fiscal 2024, the prior year is blank, because the data begins in January 2024, and the change is blank too, which DIVIDE handles without an error. A prior-year measure also returns values for the months of 2027 in the date table, the prior year of which is 2026. A visual that shows such a measure should be filtered to the years with data, or the reader sees a 2027 row with a prior year and no current year.
 
@@ -194,11 +198,11 @@ Two accounting facts shape the measures. The first is the closing entries. As Ch
 
 ![The Income Statement With and Without the Closing Entries.](/visuals/svg/fig-14-09-closes-trap.svg){#fig-14-09 fig-alt="Two matrices of net income by fiscal year, 2024 to 2026. In the first, built on all postings, net income is zero in every year, because the closing entries reverse each year's revenue and expenses on December 31. In the second, built on a measure that excludes the closing entries, each year shows its net income, which equals the amount the year's closing entry transferred to retained earnings."}
 
-The second is the sign. The ledger stores debits and credits in separate columns, and debits less credits is positive for assets and expenses and negative for liabilities, equity, and revenue, the accounts whose normal balance is a credit. An income statement reads best with revenue positive and expenses negative, so that the total of the column is net income. The P&L Amount measure of Tutorial 14.3 reverses the sign of debits less credits, which gives exactly that, and grouping it by the Account table's AccountType and AccountSubType reproduces the income statement of Chapter 6, now monthly and interactive. For a balance sheet, the sign follows each account's NormalBalance instead, and the balance is cumulative from the first posting to the date in the filter context, which one of this chapter's exercises builds.
+The second is the sign. The ledger stores debits and credits in separate columns, and debits less credits is positive for assets and expenses and negative for liabilities, equity, and revenue, the accounts whose normal balance is a credit. An income statement reads best with revenue positive and expenses negative, so that the total of the column is net income. The P&L Amount measure of Tutorial 14.3 reverses the sign of debits less credits, which gives exactly that, and grouping it by the Account table's AccountType and AccountSubType reproduces the income statement of Chapter 6, now monthly and interactive. For a balance sheet, the balance is cumulative from the first posting to the date in the filter context, and debits less credits leaves assets positive and liabilities and equity negative. A statement reverses the sign by account type, never account by account by NormalBalance, which would add contra accounts such as accumulated depreciation to the totals they reduce. Exercise 14.1 builds the balance sheet and lists the contra accounts.
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-Every report in this book that touches the ledger has had to answer the same two questions: which postings belong to the period, and what sign each account carries. Chapter 6 answered them with Power Query and a pre-closing trial balance, Chapter 10 with a WHERE clause that left out the closing entries, and Chapter 11 with CASE. In Power BI the answers become a column in the model and a measure that every visual inherits, which is what makes a model a control as well as a convenience.
+Every report in this book that touches the ledger has had to answer the same two questions: which postings belong to the period, and what sign each account carries. Chapter 6 answered them with Power Query and a pre-closing trial balance, Chapter 10 with a WHERE clause that left out the closing entries, and Exercise 11.1 with CASE. In Power BI the answers become a column in the model and a measure that every visual inherits, which is what makes a model a control as well as a convenience.
 :::
 
 

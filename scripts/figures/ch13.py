@@ -79,8 +79,8 @@ def fig_13_01() -> Diagram:
         ("Report", "Pages of interactive visuals: cards, charts, matrices, slicers"),
         ("Power BI service", "Publish and share in a browser; pin visuals to dashboards"),
     ]
-    chapters = ["", "Chapter 13, as in Chapters 4 and 5", "Chapters 13 and 14", "Chapters 13 and 15",
-                "Chapter 16"]
+    chapters = ["", "Chapters 13 to 16, as in Chapters 4 and 5", "Chapters 13 to 16, in depth in Chapter 14",
+                "Chapters 13 to 16, as a package in Chapter 15", "Optional: needs a license"]
     w, gap, x0, y0, h = 150, 22, 11, 60, 116
     xs = [x0 + i * (w + gap) for i in range(len(steps))]
     # Bands that show where each step happens.
@@ -100,7 +100,8 @@ def fig_13_01() -> Diagram:
     for a, b in zip(ids, ids[1:]):
         d.arrow(a, b, exit=(1, 0.5), entry=(0, 0.5))
     d.text("<i>Each box is a step of the work; the italic notes name the chapters of Part IV that "
-           "cover it. Refresh repeats the Power Query steps against the source.</i>", 0, y0 + h + 66,
+           "cover it. Every tutorial works in Desktop. Refresh repeats the Power Query steps against the "
+           "source.</i>", 0, y0 + h + 66,
            860, 40, size=SMALL, color=GRAY)
     return d
 

@@ -1,0 +1,88 @@
+# Publishing, Securing, and Sharing Reports {#sec-appendix-publishing}
+
+The chapters of Part IV build every report in Power BI Desktop, which is free and needs no account. A report reaches readers other than its author only when it is published to the Power BI service, and publishing and sharing need a license that not every reader of this book has. This appendix gathers what happens after Desktop: how a report restricts what each reader sees, how it is published and refreshed, and the ways it can be shared, with the risks of each. Everything up to the moment of publishing, including the security of the report and its tests, can be done and checked in Desktop.
+
+The appendix continues the story of Chapters 15 and 16. The controller is about to give each department manager access to Charles River Reports, the package of Chapters 13 to 15, so that each can follow their own cost center against its budget. Before it goes out, internal audit, whose monitoring report Chapter 16 built, reviews who will see what.
+
+
+## Row-Level Security
+
+Row-level security restricts the rows of a semantic model that each user can see. Its rules are written in DAX and grouped into roles: each rule belongs to one table and returns true or false for each row, and only the rows for which it returns true are visible to the members of the role (Microsoft, 2026e). A rule filters its table the way a slicer would, and the filter flows through active relationships to the tables on the many side, so a rule on a dimension such as CostCenter also filters the ledger and the budget lines related to it. Microsoft's guidance is to write rules on dimension tables rather than fact tables, for that reason and for speed (Microsoft, 2024). A table that no relationship connects to the filtered dimension is not filtered at all, a fact that matters for any page built on such a table.
+
+A static role filters on a fixed value, such as a role named Sales whose rule keeps the cost center named Sales. A report for ten cost centers would need ten such roles, each to be kept up to date. A dynamic role filters on the identity of the person viewing the report. The DAX function USERPRINCIPALNAME returns the name the user signed in with, their user principal name, which usually looks like an email address. A rule can compare it with a security table that lists, for each user, the cost centers they may see, so that one role serves every manager and access is changed by editing the table, not the role. Roles are additive: a user in two roles sees the rows of both. Once a report with roles is published, a reader in no role sees no data at all. The rules apply only to people who read the report, never to anyone who can edit the model or who opens the .pbix file in Desktop (Microsoft, 2026e).
+
+Row-level security secures rows. It cannot hide a table, a column, or a measure, and it cannot hide a page. A column of pay rates, for example, is hidden from a role with object-level security, which is defined in the model's TMDL and makes the column invisible to that role, as if it did not exist (Microsoft, 2026b). No setting hides a report page from one role and shows it to another. A page whose totals assume every row, such as an income statement, simply shows the rows the viewer is allowed to see, and nothing on it says the numbers are partial. @tbl-a-01 sets out what each layer of protection covers, including the layers of the Power BI service that the second half of this appendix explains.
+
+| Layer | Protects | Defined in |
+|------------|---------------------------|------------------|
+| Row-level security | Rows of the model's tables, by role | Power BI Desktop, Manage roles |
+| Object-level security | Tables and columns, by role | The model's TMDL |
+| Workspace roles | Who can view, edit, publish, and share | The Power BI service |
+| App audiences | Which items of an app each group sees | The Power BI service |
+| Sensitivity labels | How content is classified, and protection that travels with exports | Microsoft Purview, applied in Desktop or the service |
+
+: The layers that protect a Power BI report {#tbl-a-01}
+
+A security table is also a list of people with access, and access needs the same control as any other authorization. Kobelsky (2014) counts granting access, and authorizing that grant, among the duties that must be segregated in a computer-supported process, the segregation of duties of Chapter 8 applied to access itself: the person who maintains the table should not be the one who approves its entries. Least privilege, the principle that each user gets only the access the job requires, argues for a design in which a person missing from the table sees nothing, rather than everything. And the table must be reviewed. An access review compares the people who have access with the people who should have it, and its usual findings are accounts of people who have left and people whose job has changed.
+
+Charles River's master data shows why. The CostCenter table records a manager for each cost center, and a role built on that column would look like the natural design. But three of the ten managers of record were terminated in 2024, and none of the three was a manager: their job titles were account executive, sales representative, and inventory specialist. The managers who now run two of those departments are not recorded at all, and another department's manager of record is an analyst. A rule built on the master data would give access to the accounts of people who left and none to the managers who need it. A security table maintained by the controller's staff, approved by the controller, and reviewed by internal audit avoids both errors. @fig-a-01 shows which tables the rules of Guided Tutorial A.1 reach.
+
+![What the Security Rules Reach.](/visuals/svg/fig-a-01-rls-reach.svg){#fig-a-01 fig-alt="A model diagram of Charles River Reports with row-level security. A rule on CostCenter filters GLEntry and BudgetLine; a rule on Employee filters LaborTimeEntry; a rule on Item filters SalesInvoiceLine and ProductionCompletionLine for users missing from the Security table. Security sits apart, unrelated, read by the rules. Labels mark which report pages each filtered table feeds, and note that pages such as the Income Statement show only the visible rows without saying so."}
+
+
+{{< include _tutorial-01.qmd >}}
+
+
+## Publishing and Sharing
+
+A report built in Power BI Desktop reaches its readers through the Power BI service. Choosing Home > Publish and a workspace publishes two items, the report and the semantic model it uses, and publishing again replaces the model in the service (Microsoft, 2025c). What a person can do there depends on their license, as @tbl-a-03 summarizes. A free license lets a person publish to their own My workspace and use what they create there, but not share it. Sharing and collaborating need a Pro or Premium Per User license, for the person who shares and, unless the workspace is on a capacity, for the people who view (Microsoft, 2026d). Whether you have such a license depends on your institution, which is why Guided Tutorial A.2 is optional.
+
+| License | What it allows |
+|------------|---------------------------------------------|
+| Free | Publish to My workspace and use the content you create, without sharing it |
+| Pro | Publish to shared workspaces and share with other Pro users |
+| Premium Per User | The Pro capabilities and most Premium features, shared with other Premium Per User users |
+| Capacity (Fabric F64 or higher, or Premium) | Pro and Premium Per User users share content with free users, who can view it |
+
+: What each license allows in the Power BI service {#tbl-a-03}
+
+A workspace is a shared container in the service where a team keeps its reports and semantic models, with four roles: Admin, Member, and Contributor can create and edit content, and Viewer can only view and interact with it (Microsoft, 2025f). Row-level security does not apply to the editing roles, so department managers should be Viewers, or readers of an app, never members who could edit the model. An app packages the content of a workspace for its readers, with up to 25 audiences, each of which sees the items chosen for it (Microsoft, 2025b). Audiences show and hide whole items, such as reports, not pages within a report. A page that should not reach managers, such as the Income Statement, belongs in a separate report, built on the same semantic model and shown only to the controller's audience.
+
+A published model holds a copy of the data, which must be refreshed in the service. CharlesRiver.xlsx sits on a local drive, an on-premises source, so a scheduled refresh in the service needs an on-premises data gateway, software installed on a computer that can reach the file and passes the refreshed data to the service. A workbook stored in OneDrive for work or school or in SharePoint can be refreshed without one (Microsoft, 2025e). Either way, the refresh history and its failure notifications are a control: a report that silently stopped refreshing in March still shows March's figures in June, which is why the package's About page states the period its data covers and Chapter 16's monitoring report shows the last date of each population.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+Publish to web creates a link that anyone on the internet can open, with no sign-in. Anyone with the link can reach all the data in the model, including rows that no visual displays, and the option does not work with row-level security at all (Microsoft, 2025d). It is meant for public data, never for financial reports, monitoring results, or anything else confidential. An administrator can turn it off for the whole organization, and an auditor reviewing a Power BI environment should check that this has been done.
+:::
+
+Two further controls travel with the content. A sensitivity label from Microsoft Purview, applied with Sensitivity on the Home tab of Desktop, classifies a report as, for example, confidential. Applying labels requires a Pro or Premium Per User license and an organization that has enabled them (Microsoft, 2025a). In the service a label does not change who can open the report, which permissions alone decide, but when a reader exports the data to Excel, PowerPoint, or PDF, the label and its protection go with the file, though not with an export to .csv (Microsoft, 2025g). Sensitivity labels are not supported in Power BI projects, the .pbip format that Chapter 16 recommends for change control, so a team that needs both keeps a labeled .pbix for publishing (Microsoft, 2026c). The report's own settings, under File > Options and settings > Options > Report settings, decide whether readers may export summarized data, the underlying data, or nothing, and row-level security still limits what they export to the rows they may see (Microsoft, 2026a). @tbl-a-04 compares the ways of sharing a report and what each risks, and @fig-a-05 shows how the pieces fit together.
+
+| Way to share | Reaches | Main risk |
+|------------|------------------|---------------------------|
+| The .pbix file | Anyone who gets a copy | No row-level security: whoever opens the file in Desktop sees every row |
+| A workspace role | Named people or groups | Admins, Members, and Contributors bypass row-level security |
+| An app with audiences | Named people or groups, as readers | Hidden items remain reachable by a direct link if hidden content is allowed |
+| A share link | People the link names, or the organization | Links can be forwarded beyond the readers intended |
+| Publish to web | Anyone on the internet | All the model's data becomes public |
+
+: Ways to share a Power BI report and their risks {#tbl-a-04}
+
+![From Desktop to the Report's Readers.](/visuals/svg/fig-a-05-sharing-paths.svg){#fig-a-05 fig-alt="A flow diagram. Power BI Desktop publishes a report and its semantic model to a workspace in the Power BI service, where Admins, Members, and Contributors edit and Viewers read, with row-level security applying only to Viewers. An app built from the workspace gives each audience its own reports. A gateway or OneDrive refreshes the model from the source workbook. A separate path, labeled Publish to web and marked as public and to be avoided for financial data, leads from the workspace to anyone on the internet. A note says that sharing the .pbix file itself bypasses all of these controls."}
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+Row-level security has a cost in speed, because every query carries the role's filters. Microsoft suggests measuring it with Performance analyzer, on the Optimize tab: record the visuals of a page without a role, then again with View as, and compare the durations (Microsoft, 2024). A role whose rules sit on dimensions, as the rules of Guided Tutorial A.1 do, usually costs little.
+:::
+
+
+{{< include _tutorial-02.qmd >}}
+
+
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _references.qmd >}}

@@ -1,0 +1,72 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** A role has one rule, on the CostCenter table. Which rows does it restrict?
+
+A.  The rows of every table in the semantic model
+B.  Only the rows of the CostCenter table itself
+C.  The rows of any table that has a column named CostCenterID
+D.  CostCenter and the tables its active relationships reach
+
+**2.** The controller adds a department manager to the workspace as a Member, so that the manager can open the package. What will the manager see?
+
+A.  Only the rows of the manager's own cost center
+B.  Every row, because the rules do not apply to Members
+C.  Nothing, until the manager is added to a security role
+D.  Only the pages that the app audience includes
+
+**3.** Why should the dynamic role not be built on the ManagerID column of Charles River's CostCenter table?
+
+A.  The column holds names rather than the identifiers a rule needs
+B.  USERPRINCIPALNAME cannot be compared with a number
+C.  It names terminated employees and omits current managers
+D.  A role may not read a column of a dimension table
+
+**4.** The role in Guided Tutorial A.1 has a rule on Item: `USERPRINCIPALNAME () IN VALUES ( Security[UserPrincipalName] )`. What is it for?
+
+A.  It hides the items of other cost centers from each manager
+B.  It speeds up the role by filtering the largest table in the model
+C.  It lets the Finance role see every item
+D.  It shows no sales to anyone missing from the security table
+
+**5.** Internal audit wants the column of hourly pay rates hidden from department managers while they still see the hours. Which feature does that?
+
+A.  Object-level security
+B.  Row-level security
+C.  A sensitivity label
+D.  An app audience for managers
+
+**6.** When is Publish to web appropriate for a Charles River report?
+
+A.  When the readers cannot get a Power BI license
+B.  When the report uses row-level security
+C.  When the data may be made public
+D.  When the report is a monitoring page
+
+**7.** The package is published from a file that reads CharlesRiver.xlsx on a local drive. What does a scheduled refresh in the Power BI service need?
+
+A.  An on-premises data gateway that can reach the file
+B.  A Premium Per User license for each reader of the report
+C.  A sensitivity label on the semantic model
+D.  A row-level security role for the refresh
+
+**8.** Viewed as a department manager, the Income Statement page shows only that cost center's rows and nothing on it says so. Which response fits the recommendations of this appendix?
+
+A.  Hide the page so that it no longer appears among the page tabs of the report
+B.  Move it to a separate report for finance, and label what each manager sees
+C.  Add an object-level security rule to the Income Statement page
+D.  Remove the CostCenter rule so that managers see the whole ledger
+
+<!-- Answer key, Appendix A (for instructors; HTML comments are removed from every rendered format):
+     1 D, 2 B, 3 C, 4 D, 5 A, 6 C, 7 A, 8 B.
+     1 D: a rule filters its table and, through active relationships, the tables on the many side.
+     2 B: row-level security applies to Viewers and app readers, not to Admin, Member, or Contributor.
+     3 C: managers of record 81, 83, 85 are terminated; the Sales and Warehouse Managers are not recorded.
+     4 D: deny by default; a user in the role but missing from the table sees no sales (and no cost centers).
+     5 A: object-level security hides tables and columns from a role; row-level security hides rows.
+     6 C: Publish to web needs no sign-in, exposes all the model's data, and does not support row-level security.
+     7 A: a local file is an on-premises source; a gateway (or moving the file to OneDrive or SharePoint) is needed.
+     8 B: no setting secures a page by role, and app audiences show whole reports, so finance's pages go in a separate report;
+          on the pages managers keep, a card naming the cost centers shown tells them what they see. A hidden page can still be
+          reached, so hiding it is not security. -->

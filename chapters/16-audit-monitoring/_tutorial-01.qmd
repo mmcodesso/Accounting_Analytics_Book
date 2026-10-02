@@ -27,7 +27,7 @@ a. Select **JournalEntry**, choose **Home > Merge Queries**, and merge it with *
 b. Expand only MaxApprovalAmount, without the prefix.
 c. Rename the new column `ApproverLimit`.
 
-Each entry now carries the limit of the person who approved it, the column Chapter 8 added with a lookup.
+Each entry now carries the limit of the person who approved it, the column Tutorial 8.3 added with the same merge.
 
 **Step 4. Add the first three flags.** Each flag is 1 when the entry fails the test and 0 when it passes, so the flags of an entry add up to its risk score.
 
@@ -107,9 +107,13 @@ Entry Amount = SUM ( JournalEntry[TotalAmount] )
 
 The matrix reproduces Chapter 8's distribution: most entries score 0, a couple of dozen score 1, a handful score 2, none score 3, and one scores 4.
 
-**Step 8. List the riskiest entries.** Add a table visual with EntryNumber, PostingDate, EntryType, and RiskScore, filtered to RiskScore greater than or equal to 2, and sort it by RiskScore, descending.
+**Step 8. List the riskiest entries.**
 
-The table lists the entries that failed two tests or more. At the top is the opening balance entry of January 2024, which failed four. Five of the others were posted on the first day of a year and keyed on the first Saturday after it, and two are the round debt reclassifications above every approver's limit that Chapter 8 traced.
+a. Add a table visual with EntryNumber, PostingDate, EntryType, and RiskScore.
+b. In the **Filters** pane, under **Filters on this visual**, set RiskScore to **Advanced filtering**, show items when the value is greater than or equal to 2, and click **Apply filter**.
+c. Sort the table by RiskScore, descending.
+
+The table lists the entries that failed two tests or more. At the top is the opening balance entry of January 2024, which failed four. Five of the others were posted on the first day of a year and keyed on the first Saturday after it, and two are the round debt reclassifications that Chapter 8 found above the controller's limit.
 
 **Step 9. Bring in the entries' ledger lines.**
 
@@ -120,7 +124,7 @@ d. In **Account**, keep AccountID, AccountNumber, and AccountName.
 e. Merge **JournalLines** with **Account** on AccountID, expand AccountNumber and AccountName without the prefix, and clear **Enable load** on Account.
 f. Choose **Home > Close & Apply**, and in **Model view** relate JournalLines to **JournalEntry** on SourceDocumentID and JournalEntryID.
 
-As in Chapter 14, the ledger is filtered before anything else, so only the journal entry postings, a few thousand of its hundreds of thousands of rows, reach the model. For these postings, SourceDocumentID holds the JournalEntryID, Chapter 10's source-document join.
+As in Tutorial 8.3, the ledger is filtered before anything else, so only the journal entry postings, a few thousand of its hundreds of thousands of rows, reach the model. For these postings, SourceDocumentID holds the JournalEntryID, Chapter 10's source-document join.
 
 **Step 10. Drill through to an entry's lines.**
 

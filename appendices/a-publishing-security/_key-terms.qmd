@@ -1,0 +1,25 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Access review.** A periodic comparison of the people who have access to a system or report with the people who should have it, approved by someone other than the person who maintains the access. Its usual findings are accounts of people who have left and access that no longer matches a person's job.
+
+**App.** In the Power BI service, a package of the reports and dashboards of one workspace published to readers, who can view and interact with it but not change it. An app can have several audiences, each shown a different selection of its content.
+
+**Least privilege.** The principle that each user receives only the access their job requires, so that a person missing from an access list sees nothing rather than everything.
+
+**Object-level security.** Power BI security that hides tables or columns of a semantic model from the members of a role, as if those objects did not exist. It is defined in the model's TMDL, and visuals that use a hidden column fail for the role.
+
+**On-premises data gateway.** Software, installed on a computer that can reach a data source outside the cloud, such as a workbook on a local drive, through which the Power BI service refreshes a semantic model from that source.
+
+**Publish to web.** A Power BI service option that creates a public link to a report, viewable by anyone on the internet without signing in. It exposes all the data in the model and is not supported with row-level security, so it is never used for confidential data.
+
+**Row-level security.** Power BI security that restricts which rows of a semantic model each user can see, through roles whose DAX rules return true or false for each row of a table. A rule's filter flows through active relationships, and the rules apply to the readers of a report, not to the editors of its workspace.
+
+**Security role.** A named set of row-level or object-level security rules in a semantic model. A static role filters on fixed values, and a dynamic role filters on the identity of the viewer, typically by comparing USERPRINCIPALNAME with a security table. A user in several roles sees the rows of all of them.
+
+**Sensitivity label.** A classification from Microsoft Purview, such as Confidential, applied to Power BI content. The label and its protection travel with data exported to Excel, PowerPoint, or PDF, while access within the service is decided by permissions.
+
+**User principal name.** The name a person signs in with in Microsoft's cloud services, which usually looks like an email address. The DAX function USERPRINCIPALNAME returns it, and dynamic security roles compare it with a security table.
+
+**Workspace.** A shared container in the Power BI service where a team keeps reports and semantic models. Its roles are Admin, Member, Contributor, and Viewer, and only Viewers are subject to row-level security.

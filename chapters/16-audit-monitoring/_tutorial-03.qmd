@@ -1,172 +1,181 @@
-## Guided Tutorial 16.3: Securing the Reporting Package
+## Guided Tutorial 16.3: Reviewing Exceptions and Testing the Reports
 
-**Context and objective.** In this tutorial, you will review and test the access the controller plans for Charles River Reports. You will start with an access review in the monitoring file, comparing the managers recorded for each cost center with the employee records. Then you will add a security table and a dynamic role to the package, test the role as several managers would see it, and write internal audit's findings. Internal auditors do not build the controls they audit, so in practice the controller's staff adds the roles and internal audit tests them; in this tutorial you take both parts in turn.
+**Context and objective.** In this tutorial, you will record internal audit's first dispositions, merge them into the exception register, and measure the exceptions that remain open, starting with the documents that fail more than one test. Then you will test both reports before relying on them: the completeness of the purchase orders and payroll registers, the date through which the monitoring data run, and the package's own tests, rerun as audit evidence. You will finish with a memo to the chief audit executive.
 
-**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.2 and Charles River Reports.pbix as you left it at the end of Chapter 15. Publishing, in Step 10, is optional and needs a Power BI Pro or Premium Per User license.
+**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.2 and Charles River Reports.pbix as you left it at the end of Chapter 15.
 
 **Step-by-step instructions.**
 
-**Step 1. Review the managers of record.**
+**Step 1. Record the dispositions.**
 
-a. In Audit Monitoring.pbix, choose **Home > Get data > Excel workbook**, select **T75_CostCenter**, click **Transform Data**, and rename the query `CostCenterReview`.
-b. Keep CostCenterID, CostCenterName, and ManagerID.
-c. Merge it with **Employee** on ManagerID and EmployeeID, and expand EmployeeName, JobTitle, EmploymentStatus, and TerminationDate without the prefix.
-d. Choose **Home > Close & Apply**, and add a page named `Access Review` with a table visual of the merged columns.
+a. In Audit Monitoring.pbix, choose **Home > Enter data**, and in the **Create Table** dialog name four columns `TestID`, `DocumentNumber`, `Disposition`, and `Note`.
+b. Type the fifteen rows of @tbl-16-04.
+c. Type `Dispositions` as the table's name, and click **Load**.
+d. In **Model view**, right-click **Dispositions**, and choose **Hide in report view**.
 
-@fig-16-09 shows the review. Three of the ten cost centers name a terminated employee as their manager, none of whom held a manager's job, and the department managers who now run two of them are not named anywhere. A fourth cost center names an analyst. Access built on this column would go to the wrong people, so the package needs a list of its own.
+| TestID | DocumentNumber | Disposition | Note |
+|------------------|----------------|------------|---------------------------|
+| `JE AboveLimit` | `JE-2024-000265` | `Expected` | `Year-end close` |
+| `JE AboveLimit` | `JE-2024-000266` | `Expected` | `Year-end close` |
+| `JE AboveLimit` | `JE-2025-000287` | `Expected` | `Year-end close` |
+| `JE AboveLimit` | `JE-2025-000288` | `Expected` | `Year-end close` |
+| `JE AboveLimit` | `JE-2026-000296` | `Expected` | `Year-end close` |
+| `JE AboveLimit` | `JE-2026-000297` | `Expected` | `Year-end close` |
+| `PO AfterTermination` | `PO-2024-000474` | `Deficiency` | `Approver had left` |
+| `PO AfterTermination` | `PO-2025-003922` | `Deficiency` | `Approver had left` |
+| `PO AfterTermination` | `PO-2026-010467` | `Deficiency` | `Approver had left` |
+| `PR AfterTermination` | `Register 840` | `Deficiency` | `Payee had left` |
+| `PR AfterTermination` | `Register 2646` | `Deficiency` | `Payee had left` |
+| `PR AfterTermination` | `Register 5420` | `Deficiency` | `Payee had left` |
+| `PR PaidBeforeApproval` | `Register 2` | `Follow up` | `Paid before approval` |
+| `PR PaidBeforeApproval` | `Register 2647` | `Follow up` | `Paid before approval` |
+| `PR PaidBeforeApproval` | `Register 5421` | `Follow up` | `Paid before approval` |
 
-![The Access Review.](/visuals/svg/fig-16-09-access-review.svg){#fig-16-09 fig-alt="A mock of a Power BI table visual on a page named Access Review. Each row is a cost center with its manager of record, that person's job title, employment status, and termination date. Three rows, for Executive, Sales, and Warehouse, are outlined: their managers of record are terminated employees whose job titles are not managerial. The Research and Development row names an analyst. A note lists the Sales Manager and the Warehouse Manager, who appear in the employee records but not as managers of record."}
+: The dispositions of a first review {#tbl-16-04}
 
-**Step 2. Give each employee a cost center in the package.**
+The table holds the conclusions of a first review, with Chapter 8's three dispositions. The year-end closes are expected, for the reason Chapter 8 gave; the orders and registers of the employee who had left are control deficiencies to report, as Chapter 12 and Exercise 12.5 found; and the payments made before their registers were approved need a question for payroll. Each test and document number must match the register character for character, or the disposition will attach to nothing.
 
-a. Open Charles River Reports.pbix, choose **Home > Transform data**, and select the **Employee** query.
-b. Choose **Home > Choose Columns**, add CostCenterID, and choose **Home > Close & Apply**.
+**Step 2. Merge the dispositions into the register.**
 
-The Plant page's labor time is related to Employee, so a rule on the employee's cost center can reach it.
+a. Choose **Home > Transform data**, and select the **Exceptions** query.
+b. Choose **Home > Merge Queries**, and select **Dispositions** as the second table.
+c. In the Exceptions preview, click TestID, and then hold Ctrl and click DocumentNumber; in the Dispositions preview, click TestID and DocumentNumber in the same order.
+d. Keep the **Left Outer** join, click **OK**, and expand Disposition and Note without the prefix.
+e. Choose **Home > Close & Apply**.
 
-**Step 3. Build the security table.**
+A merge can match on several columns at once, and the order in which you select them pairs them, as the small numbers beside the column headers show. The register keeps every exception, with a disposition on the fifteen that have one and null on the rest. Because the merge is a step of the Exceptions query, every refresh runs the tests again and then attaches the conclusions, however the rows of the register change.
 
-a. Choose **Home > Enter data**, and in the **Create Table** dialog name two columns `UserPrincipalName` and `CostCenterID`.
-b. Type the nine rows of @tbl-16-06, leaving out its Cost center column, which is there for you to read.
-c. Type `Security` as the table's name, and click **Load**.
-d. In **Model view**, right-click **Security**, and choose **Hide in report view**.
+**Step 3. Measure the open exceptions, and test the dispositions.**
 
-| UserPrincipalName | CostCenterID | Cost center |
-|--------------------------------------|------|----------------|
-| `employee001@charlesriver.example` | 1 | Executive |
-| `employee006@charlesriver.example` | 2 | Sales |
-| `employee007@charlesriver.example` | 3 | Warehouse |
-| `employee004@charlesriver.example` | 4 | Manufacturing |
-| `employee010@charlesriver.example` | 5 | Purchasing |
-| `employee005@charlesriver.example` | 6 | Administration |
-| `employee011@charlesriver.example` | 7 | Customer Service |
-| `employee012@charlesriver.example` | 9 | Marketing |
-| `employee014@charlesriver.example` | 10 | Design Services |
-
-: The security table, as approved by the controller {#tbl-16-06}
-
-**Step 4. Check the list against the access review.**
-
-a. Compare each address with the Access Review page of Step 1 and the employee records, and confirm that it belongs to the manager the controller named.
-b. Record the cost center the list leaves out, and who approved the list.
-
-The addresses are the Email column of the employee records, which serves here as each user's sign-in name. The list names the managers who actually run each department, as the controller confirmed them, and Research and Development is left out until the controller names its manager, so for now no one sees it. The table is not related to anything: the rules read it.
-
-**Step 5. Create the role and its first two rules.**
-
-a. Choose **Modeling > Manage roles**, click **New role**, and name the role `Cost Center Managers`.
-b. Under **Tables**, select **CostCenter**, click **Switch to DAX editor**, and enter the first rule below.
-c. Select **Employee**, and enter the same rule.
-
-<!-- dax-check: skip -->
-```
-[CostCenterID] IN CALCULATETABLE (
-    VALUES ( Security[CostCenterID] ),
-    Security[UserPrincipalName] = USERPRINCIPALNAME ()
-)
-```
-
-The rule keeps a cost center if it is among the cost centers the security table lists for the person viewing the report. On CostCenter it filters the ledger and the budget lines; on Employee it filters the labor time of the Plant page to the employees of those cost centers. @fig-16-10 shows the editor with the rule on CostCenter; the tables that carry a rule are marked in the list.
-
-![The Manage Security Roles Dialog.](/visuals/svg/fig-16-10-manage-roles.svg){#fig-16-10 fig-alt="A mock of Power BI's Manage security roles dialog. The Roles list holds Cost Center Managers and Finance, with a New role button. The Tables list marks CostCenter, Employee, Item, and Security as having a filter. The rules area, switched to the DAX editor, shows the rule on CostCenter, which keeps the cost centers listed in the Security table for the user principal name of the viewer. Save and Close buttons sit at the bottom."}
-
-**Step 6. Deny everyone else, and add a role for finance.**
-
-a. Select **Item**, and enter the first rule below.
-b. Select **Security**, and enter the second rule below.
-c. Click **New role**, name it `Finance`, and leave it without rules.
-d. Click **Save**.
-
-<!-- dax-check: skip -->
-```
-USERPRINCIPALNAME () IN VALUES ( Security[UserPrincipalName] )
-```
-
-<!-- dax-check: skip -->
-```
-[UserPrincipalName] = USERPRINCIPALNAME ()
-```
-
-The invoice lines and the completions are not related to CostCenter, so without the Item rule anyone in the role would see every sale. The rule returns true for every item when the viewer is in the security table and false when the viewer is not, so a person added to the role by mistake sees no sales and no cost centers at all. The rule on Security keeps each user from reading the other users' rows. The Finance role, for the controller and her staff, filters nothing.
-
-**Step 7. View the report as the Sales Manager.**
-
-a. Choose **Modeling > View as**.
-b. Select **Other user**, type `employee006@charlesriver.example`, and select **Cost Center Managers**.
-c. Click **OK**, and open the Budget page, the Income Statement page, the Plant page, and the Sales and Discounts page in turn.
-
-A bar above the page names the role and the user while you view as them. The Budget page now holds one row, Sales, with the same budget, actual, and flexed budget as before, because the commission budget and the revenue budget it is flexed with both sit in the Sales cost center. The Plant page is empty. The Sales and Discounts page shows every sale, as the controller intends for listed managers. The Income Statement shows a net income many times the company's, because it adds Sales' revenue to Sales' costs only, and nothing on the page says so, as @fig-16-11 shows.
-
-**Step 8. View the report as three more people.**
-
-a. Repeat Step 7 for `employee007@charlesriver.example`, the Warehouse Manager, and record what the Budget and Income Statement pages show.
-b. Repeat it for `employee004@charlesriver.example`, the Production Manager, and record what the Budget and Plant pages show.
-c. Repeat it for `employee083@charlesriver.example`, the terminated employee recorded as manager of Sales.
-d. Choose **Stop viewing** to return to your own view.
-
-The Warehouse Manager sees the Warehouse budget and an income statement that is a loss. The Production Manager sees the whole Plant page but an empty Budget page, because Manufacturing's costs are budgeted as cost of goods sold, not operating expense, so the page meant for department managers does not serve this one. The former employee, absent from the security table, sees nothing at all, which is the deny-by-default design working.
-
-![The Package Viewed as Two Managers.](/visuals/svg/fig-16-11-view-as.svg){#fig-16-11 fig-alt="Two mocks of report pages viewed through View as, each with a bar at the top naming the role Cost Center Managers and the user. On the left, the Budget page viewed as the Sales Manager shows a single row for Sales and a card reading Cost centers shown: Sales. On the right, the Income Statement viewed as the Warehouse Manager shows only Warehouse expenses and a net loss, with a card reading Cost centers shown: Warehouse, the only sign on the page that the statement is partial."}
-
-**Step 9. Tell readers what they are seeing.**
-
-a. Add the two measures below to the Measures table.
-b. Add a card of Cost Centers Shown to the Budget page and the Income Statement page, titled `Cost centers shown`.
-c. Add a card of Who Am I to the About page.
+a. Add the measures below to the Measures table.
+b. In DAX query view, open the **Tests** tab, add the query of Test 3 below it, select the query, and click **Run**.
 
 <!-- dax-check: measure -->
 ```
-Cost Centers Shown =
-CONCATENATEX (
-    DISTINCT ( CostCenter[CostCenterName] ),
-    CostCenter[CostCenterName], ", ",
-    CostCenter[CostCenterName], ASC
+Reviewed Exceptions = CALCULATE ( [Exceptions], NOT ISBLANK ( Exceptions[Disposition] ) )
+Open Exceptions = CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ) )
+```
+
+<!-- dax-check: query -->
+```
+// Test 3: every disposition must match an exception of the register
+EVALUATE
+ROW (
+    "Dispositions", COUNTROWS ( Dispositions ),
+    "Reviewed exceptions", [Reviewed Exceptions],
+    "Open exceptions", [Open Exceptions]
 )
 ```
 
+The number of dispositions equals the number of reviewed exceptions, so every disposition found its exception. If the two differ, a test or document number has been mistyped, and the exception it was meant for still counts as open. The open exceptions are by far the larger group.
+
+**Step 4. Build the review page.**
+
+a. Add a page named `Review`, with a card of Reviewed Exceptions and a card of Open Exceptions.
+b. Add a matrix with TestID on **Rows**, Year on **Columns**, and Open Exceptions as **Values**.
+
+The matrix shows where the open exceptions are. Most of them belong to one test, the registers approved by the employee they pay, a single design finding that the memo of Step 9 reports once rather than document by document. The year-end closes have left the AboveLimit row, which now holds only the entries that still need a look.
+
+**Step 5. List the documents that fail more than one test.**
+
+a. Add a table visual with DocumentNumber, Exceptions, and Open Exceptions.
+b. In the **Filters** pane, under **Filters on this visual**, show items when Exceptions is greater than or equal to 2, and click **Apply filter**.
+c. Sort the table by Exceptions, descending.
+
+At the top of the table, as @fig-16-07 shows, is the opening balance entry, which failed four tests. The other journal entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The purchase orders include small orders that buyers with no approval limit approved themselves, the departed account executive's approvals, and two capital orders the purchasing manager approved alone. No payroll register fails two tests. The orders approved after the approver left are reviewed for one of their two tests and still open for the other: a disposition belongs to an exception, not to a document.
+
+![The Review Page.](/visuals/svg/fig-16-07-review-page.svg){#fig-16-07 fig-alt="A mock of a Power BI report page named Review. Two cards show the number of reviewed exceptions and the much larger number of open exceptions. A matrix lists the open exceptions by test and year; the row of registers approved by their own employee holds most of them, and the row of journal entries above the approver's limit is small because the year-end closes have dispositions. A table lists the documents that fail two tests or more, with the opening balance entry at the top with four, followed by journal entries and purchase orders with two; three orders show one open exception of their two."}
+
+**Step 6. Test the populations.** Journal entries were reconciled to the ledger in Test 1; orders and registers need tests of their own.
+
+a. In the **Tests** tab, add the query of Test 4 below.
+b. Select it, and click **Run**.
+
+<!-- dax-check: query -->
+```
+// Test 4: the purchase orders have no gaps, and three registers were never paid
+EVALUATE
+VAR Numbers =
+    SELECTCOLUMNS (
+        PurchaseOrder,
+        "Number", VALUE ( RIGHT ( PurchaseOrder[PONumber], 6 ) )
+    )
+VAR Unpaid =
+    FILTER ( PayrollRegister, ISBLANK ( PayrollRegister[PaymentDate] ) )
+RETURN
+    ROW (
+        "Orders", COUNTROWS ( PurchaseOrder ),
+        "First number", MINX ( Numbers, [Number] ),
+        "Last number", MAXX ( Numbers, [Number] ),
+        "Registers", COUNTROWS ( PayrollRegister ),
+        "Registers not paid", COUNTROWS ( Unpaid )
+    )
+```
+
+The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment date. @fig-16-08 shows the result. The order numbers run from 1 to the number of orders, so none is missing, the gap test of Chapter 8 on a series that continues across the years. Three registers have no payment: the ones Chapter 12 found posted to the ledger as paid with no payment record behind them. Two of them already appear among the exceptions as pay after termination; the third, the chief executive's first register, is a finding for the memo.
+
+![Test 4 in DAX Query View.](/visuals/svg/fig-16-08-population-test.svg){#fig-16-08 fig-alt="A mock of DAX query view in Audit Monitoring.pbix with the Tests tab open. The editor holds the query of Test 4, which counts the purchase orders, finds the first and last order numbers, and counts the payroll registers and those without a payment date. The Results grid shows one row: the number of orders equal to the last order number, a first number of 1, the number of registers, and 3 registers not paid."}
+
+**Step 7. State the date through which the data run.**
+
+a. Add the measure below to the Measures table, and set its format to a short date.
+b. On the Monitoring page, add a card of Data Through, titled `Data through`.
+
 <!-- dax-check: measure -->
 ```
-Who Am I = USERPRINCIPALNAME ()
+Data Through =
+MINX (
+    {
+        MAX ( JournalEntry[PostingDate] ),
+        MAX ( PurchaseOrder[OrderDate] ),
+        MAX ( PayrollRegister[PayDate] )
+    },
+    [Value]
+)
 ```
 
-DISTINCT leaves out the blank row that the ledger lines without a cost center would add to VALUES. Viewed as a manager, the card names that manager's cost centers; viewed by finance, it lists them all. Who Am I shows the name the rules compare: in Desktop your own sign-in, or the user you typed in View as; in the service, the reader's sign-in name. A reader who sees an unexpected name, or none of the expected cost centers, knows to ask before relying on the page.
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December 2026: the payroll tests have seen pay dates only through the 18th, while the journal entries and orders run to the 31st. The December column of the heat map is complete for two processes and partial for the third, and the card says so on the page the reviewer reads. With the Year slicer set to an earlier year, it shows that year's last payday.
 
-**Step 10. Publish, if you have a license (optional).**
+**Step 8. Rerun the package's tests.**
 
-a. Choose **Home > Publish**, sign in, and select a workspace you can publish to.
-b. In the service, open the semantic model's **More options (...)** menu, choose **Security**, and add a colleague to **Cost Center Managers**.
-c. Choose **More options (...)** next to the role, and then **Test as role**.
+a. Save Audit Monitoring.pbix, and open Charles River Reports.pbix.
+b. In DAX query view, open the **Tests** tab, select the query of Test 1 with its comment line, and click **Run**.
+c. Run Tests 2 to 5 in the same way, one at a time.
+d. Compare each result with the values its chapter expected, and record the result and today's date.
+e. Read the period that the About page states, and close the file without saving it.
 
-If you publish to My workspace with a free license, the report works for you, but you cannot share it, so the roles have no one to apply to. Remember that row-level security applies only to readers: a colleague you make a Member of the workspace sees every row.
+Each test returns the totals of the chapter it was written against, so the package's sales, ledger, budget, and plant pages still compute what Chapters 6, 7, and 11 computed. The About page's note that the time records end before the year does agrees with what Step 7 found for payroll. Closing without saving leaves the controller's file as you found it: internal audit tests the package but does not change it.
 
-**Step 11. Write the findings.** Write a short memo from internal audit to the controller that sets out what the review found and what you recommend.
+**Step 9. Write the memo.** Write a short memo to the chief audit executive.
 
-a. Describe the managers of record, and recommend who should maintain and who should approve the security table, and how often it is reviewed.
-b. Describe what each manager sees, including the pages that become partial and the Budget page that does not serve the Production Manager.
-c. Recommend how the package should be shared: managers as Viewers or app readers, the Income Statement and Validation pages in a separate report for finance, and Publish to web turned off.
+a. Report the dispositions recorded and the open exceptions, with the documents that fail more than one test listed first.
+b. Report the registers approved by the employee they pay as one finding on the design of the payroll approval, and recommend a second approver.
+c. Report the results of Tests 1 to 4 of the monitoring file and Tests 1 to 5 of the package, with the date you ran them and the date through which the data run.
+d. Recommend change controls for both reports: a project under version control, a named owner, a reviewer who approves each change, the tests rerun before each release, and no copies of the file in circulation.
+e. Save Audit Monitoring.pbix.
 
-<!-- Tutorial 16.3 expected values (SQL twins; CR16 reference model in Desktop 2.158, roles tested through ADOMD.NET with
-     Roles= and literal-UPN test roles; the rule with USERPRINCIPALNAME returned no rows for the Windows identity, as expected):
-     Access review: Executive 81 Daniel Diaz, Account Executive, Terminated 2024-04-26; Sales 83 Cassandra Cardenas, Sales
-     Representative, Terminated 2024-06-21; Warehouse 85 Dean Cook, Inventory Specialist, Terminated 2024-09-13; Research and
-     Development 13 Melinda Murphy, Product Analyst, Active; the other six are their departments' managers (4, 10, 5, 11, 12, 14).
-     Actual Sales Manager employee 6 (Carrie Schultz), Warehouse Manager employee 7 (Robert Fisher). 2026, Operating Expense:
-     Sales Manager sees Sales only, budget 2,734,179.05, actual 1,018,872.21, flexed 1,090,985.80 (unchanged); Income Statement net
-     income 11,306,186.32 (Sales revenue 28,517,713.92 less Sales expenses 17,211,527.60); Revenue measure 29,756,420.08 (all sales);
-     Plant blank. Warehouse Manager: 353,015.28 / 447,856.23; net income -447,856.23; Plant hours blank (standard hours still
-     66,997.8, completions unrelated to CostCenter). Production Manager: Budget page empty (Manufacturing has COGS budget lines
-     only); Plant 101,237 hours / 66,997.8 standard / 1.511; net income -2,412,332.31; 67 employees. employee083: nothing (no cost
-     centers, no employees, no items, Revenue blank); the Customer table still lists 220 customers. Finance (no rules) and no role:
-     everything (net income 4,503,611.24; Cost Centers Shown lists all ten). Who Am I in Desktop without View as returned the
-     Windows identity (machine\user on a local account). Labels to confirm in 2.158: the View as roles dialog (Other user, role
-     check boxes, OK), the bar shown while viewing as, and Stop viewing; UI Automation reads Manage security roles (New role,
-     Tables, Switch to DAX editor, Save, Close) and Modeling > Security (Manage roles, View as). -->
+<!-- Tutorial 16.3 expected values (SQL twins; AM16 reference model in Desktop 2.158, extended with the Dispositions table and
+     the two-key merge, every DAX block run through ADOMD.NET): Dispositions 15 rows; Test 3: 15 / 15 / 136 (151 exceptions).
+     Reviewed by test: JE AboveLimit 6 of 9 (open 3: JE-2024-000001, JE-2024-000103, JE-2026-000001), PO AfterTermination 3 of
+     3, PR AfterTermination 3 of 3, PR PaidBeforeApproval 3 of 3. By disposition: Expected 6, Deficiency 6, Follow up 3. Open by
+     process and year: JE 14 / 10 / 13; PO 10 / 5 / 7; PR 25 / 26 / 26 (PR SelfApproved 25 / 26 / 26 of 77, the rest of PR
+     reviewed). Documents with two or more exceptions: 19 (JE-2024-000001 with 4; JE-2024-000002, JE-2024-000103, JE-2025-000001,
+     JE-2025-000002, JE-2026-000001, JE-2026-000002, JE-2026-000003; PO-2024-000001 and 000002, PO-2025-003923 and 003924,
+     PO-2026-010468 and 010469 (self-approved by buyers and procurement analysts with a limit of 0, also above it);
+     PO-2024-000474, PO-2025-003922, PO-2026-010467 (employee 81, after termination and above a limit of 0; open 1 each);
+     PO-2024-001942 and PO-2026-011104 (360,000 and 280,000, created and approved by employee 10, the Purchasing Manager, limit
+     25,000)). Test 4: 18,832 orders, first 1, last 18,832 (PO numbers continue across years); 8,197 registers, 3 not paid
+     (registers 1, 2646, 5420; Chapter 12: their PayrollPayment GL rows are trace orphans; register 1 is the CEO's first
+     register, not an exception of the register's tests). Data Through: 2026-12-18 (JE 2026-12-31, PO 2026-12-31, last PayDate
+     2026-12-18); by year 2024-12-20, 2025-12-19, 2026-12-18. The package's Tests 1-5 (Chapters 14-15): Test 1 by year 9,040 /
+     27,313,723.48, 9,371 / 29,376,702.28, 9,522 / 29,756,420.08; Test 2 Furniture margins of Chapter 6's bridge; Test 3 71
+     accounts, 67,107,722.36; Test 4 Chapter 7's 2026 operating expense budget and actual; Test 5 1.18, 1.41, 1.51. -->
 
-**Checkpoint.** Before you report to the controller, confirm the following:
+**Checkpoint.** Before you send the memo, confirm the following:
 
-- The access review lists the managers of record against the employee records, with the terminated managers visible.
-- Viewed as the Sales Manager, the Budget page shows only Sales, and the card says so.
-- Viewed as the terminated manager of record, the report shows nothing.
-- Your memo names the pages that a role leaves partial and recommends how the package is shared.
+- The dispositions are merged into the register on the test and the document, and Test 3 shows that every one found its exception.
+- The Review page shows the open exceptions by test and year and lists the documents that fail two tests or more.
+- Test 4 shows the purchase orders complete and the three unpaid registers, and the Data Through card shows the date through which every process has been tested.
+- The package's Tests 1 to 5 return the values their chapters expected, and the package was closed without saving.
 
-Row-level security is only as good as the list behind it and the pages it is applied to, and both are things an auditor can test before any manager opens the report.
+A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on both reports.

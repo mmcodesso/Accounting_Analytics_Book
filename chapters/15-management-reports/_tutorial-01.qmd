@@ -21,7 +21,7 @@ a. Select **Model view**, and drag PromotionID from **SalesInvoiceLine** onto Pr
 b. Check that the relationship reads many to one, with a single cross filter direction.
 c. Hide PromotionID in both tables, as you hid the other keys in Tutorial 14.1.
 
-Most invoice lines carry no promotion, so their PromotionID is blank. In a visual grouped by promotion, they appear under (Blank), the meaningful blank of Chapter 13: lines sold without a promotion.
+Most invoice lines carry no promotion, so their PromotionID is blank. In a visual grouped by promotion, they appear under (Blank), a meaningful blank in Chapter 5's term, which Chapter 13 met in a visual: lines sold without a promotion.
 
 **Step 3. Build a table of the steps from list price to net.** The waterfall needs one category for each step, and no table in the model holds them, so you will type them in.
 

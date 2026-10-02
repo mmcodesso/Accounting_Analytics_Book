@@ -1,0 +1,31 @@
+{{< pagebreak >}}
+
+## References
+
+Kobelsky, K. W. (2014). A conceptual model for segregation of duties: Integrating theory and practice for manual and IT-supported processes. *International Journal of Accounting Information Systems*, *15*(4), 304–322. <https://doi.org/10.1016/j.accinf.2014.05.003>
+
+Microsoft. (2024). *Row-level security (RLS) guidance in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/guidance/rls-guidance>
+
+Microsoft. (2025a). *How to apply sensitivity labels in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-security-apply-data-sensitivity-labels>
+
+Microsoft. (2025b). *Publish an app in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-create-distribute-apps>
+
+Microsoft. (2025c). *Publish from Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-upload-desktop-files>
+
+Microsoft. (2025d). *Publish to web from Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-publish-to-web>
+
+Microsoft. (2025e). *Refresh a semantic model created from an Excel workbook - cloud*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/connect-data/refresh-excel-file-onedrive>
+
+Microsoft. (2025f). *Roles in workspaces in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-roles-new-workspaces>
+
+Microsoft. (2025g). *Sensitivity labels in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-security-sensitivity-label-overview>
+
+Microsoft. (2026a). *Export data from a Power BI visualization*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-export-data>
+
+Microsoft. (2026b). *Object-level security (OLS) with Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/security/service-admin-object-level-security>
+
+Microsoft. (2026c). *Power BI Desktop projects (PBIP)*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview>
+
+Microsoft. (2026d). *Power BI service features by license type*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/fundamentals/service-features-license-type>
+
+Microsoft. (2026e). *Row-level security (RLS) with Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/security/service-admin-row-level-security>

@@ -86,11 +86,11 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 **Deliverable.** The matrix on the Ex 13.3 page and a half-page memo.
 
 <!-- Instructor notes, Exercise 13.3: fiscal 2026 promotion lines and discounts by month: Textiles Seasonal (5, 2025 promotion)
-     January 10 lines, 662.89; Wholesale Customer (6, November 2025) January 44, February 8, March 2 (6,858.13); Harbor Collection (7)
-     March 18, April 29, May 16, June 4, August 1 (30,478.56); Furniture Seasonal (8) September 167 (95,996.97), October 249 (136,935.59),
+     January 10 lines, 662.89; Wholesale Customer (6, November 2025) January 44, February 8, March 2 (6,858.14); Harbor Collection (7)
+     March 18, April 29, May 16, June 4, August 1 (30,478.57); Furniture Seasonal (8) September 167 (95,996.97), October 249 (136,935.59),
      November 119 (51,965.03), December 41 (11,155.99); Design Trade Customer (9) November 61 (21,482.20), December 27 (6,575.37).
      Total 362,110.75. The (Blank) row is the 8,726 lines without a promotion (26,479,419.83 of revenue, zero discount), a meaningful
-     blank (Chapter 2), not a broken key. Lines invoiced after the end date in 2026: promotion 8, 160 lines in November and December
+     blank (Chapter 5), not a broken key. Lines invoiced after the end date in 2026: promotion 8, 160 lines in November and December
      (all ordered within the promotion's dates, Chapter 5); promotion 9, 27 lines in December; promotions 5 and 6 (2025 promotions) all
      2026 lines; promotion 7 (Harbor) ends 2026-02-28 before its 2026-03-01 start, so all its 68 lines fall after the end date: a
      master-data error, since its lines were ordered in March and April (the Part II case). The discount is applied when the order is
@@ -142,7 +142,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (3) Switch to the entire data set and record the same figures. Identify every column whose profile changes materially, and explain why the first 1,000 rows of these Tables are not representative.
 
-(4) For three of the columns with empty values, decide whether the blanks are meaningful blanks (Chapter 2), data that should exist, or a matter for follow-up, and give your reason.
+(4) For three of the columns with empty values, decide whether the blanks are meaningful blanks (Chapter 5), data that should exist, or a matter for follow-up, and give your reason.
 
 (5) Write a one-page profile memo, in the form of Chapter 10's data profile, that the auditor can file with the report.
 

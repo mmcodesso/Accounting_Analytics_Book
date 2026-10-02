@@ -73,7 +73,7 @@ c. Remove the field you added in this step from the well, and clear the selectio
 
 The count taken from SalesInvoiceLine falls to the invoices that contain a Furniture line. The count taken from SalesInvoice does not change at all. The Furniture selection filters the Item table, and the filter flows from Item to the invoice lines, but not from the invoice lines back to the invoices. A count that ignores a filter on the page looks plausible and is wrong, which is why the card in Step 3 counts invoices from the lines. Chapter 14 explains the direction of filters in full.
 
-**Step 9. Save the report.**
+**Step 9. Save the report.** Save Charles River Reports.pbix, which the next tutorial and the chapters after it extend.
 
 <!-- Tutorial 13.2 expected values (fiscal 2026, read-only twin): cards Revenue 29,756,420.08; At list price 33,589,137.45;
      Discounts 362,110.75; Invoices 7,171. Furniture selected: 17,395,054.38; 19,878,268.16; 347,864.64; 3,093 invoices with a

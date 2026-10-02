@@ -18,7 +18,7 @@ The invoice lines now carry the three columns, and the match message of the merg
 
 **Step 2. Create the date table.** A DAX table covers every day of the ledger's years.
 
-a. In Report view, choose **Modeling > New table**.
+a. In **Report view**, choose **Modeling > New table**.
 b. Replace the text in the formula bar with the formula below, and press Enter.
 
 <!-- dax-check: table -->
@@ -39,9 +39,9 @@ The Data pane now lists a table named Date with seven columns. CALENDAR supplies
 
 **Step 3. Sort the month names and mark the date table.**
 
-a. Select the Date column of the Date table in the Data pane, and on the **Column tools** tab set **Data type** to **Date**, so that the dates show without a time.
+a. Select the Date column of the Date table in the **Data** pane, and on the **Column tools** tab set **Data type** to **Date**, so that the dates show without a time.
 b. Select the MonthName column, and on the **Column tools** tab choose **Sort by column > MonthNumber**.
-c. Right-click the **Date** table in the Data pane, and choose **Mark as date table**.
+c. Right-click the **Date** table in the **Data** pane, and choose **Mark as date table**.
 d. Choose Date as the date column, and confirm.
 e. Select **Table view**, select the **Date** table, and read the number of rows in the status bar.
 

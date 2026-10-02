@@ -15,10 +15,11 @@ The Measures table appears in the Data pane with one column, Column1. You will h
 
 **Step 2. Write the base measures.** Each measure is a named sum or count of the fact table.
 
-a. Select the **Measures** table in the Data pane, and choose **Modeling > New measure**.
+a. Select the **Measures** table in the **Data** pane, and choose **Modeling > New measure**.
 b. Type the first definition below in the formula bar, and press Enter.
 c. Repeat the two actions for each of the other definitions.
 d. Select each new measure, and on the **Measure tools** tab, set its format: the thousands separator and two decimals for amounts, and a whole number for the two counts.
+e. Right-click Column1 of the Measures table, and choose **Hide in report view**.
 
 <!-- dax-check: measure -->
 ```
@@ -29,7 +30,7 @@ Invoice Lines = COUNTROWS ( SalesInvoiceLine )
 Invoices = DISTINCTCOUNT ( SalesInvoiceLine[SalesInvoiceID] )
 ```
 
-Each line is a separate measure: type one at a time. Hide Column1 of the Measures table by right-clicking it and choosing **Hide in report view**. Invoices counts the distinct invoice numbers among the lines in the filter context, so it now follows any selection on Item, Customer, or Date.
+Each line is a separate measure, typed one at a time, and with Column1 hidden the Measures table moves to the top of the Data pane. Invoices counts the distinct SalesInvoiceID values among the lines in the filter context, so it now follows any selection on Item, Customer, or Date.
 
 **Step 3. Write the standard cost and the margin.** Standard cost needs an iterator, because the cost per unit lives on the Item table.
 
@@ -75,6 +76,8 @@ SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * SalesInvoiceLine[UnitPrice
 ```
 Discount Rate = DIVIDE ( [Discounts], [Price Before Discount] )
 ```
+
+Price Before Discount multiplies each line's quantity by its unit price, so the rate divides the discount dollars by the dollars they were taken from, and each line counts in proportion to its value. For fiscal 2026 the rate is well above the average of the Discount column that Chapter 13 found misleading, because the discounted lines are larger than the average line.
 
 **Step 5. Use CALCULATE to fix one filter and remove another.**
 
@@ -174,4 +177,4 @@ A reader who points at a measure in the Data pane now sees what it means, and th
 - Test 1's fiscal 2026 row equals Chapter 6's control totals, and Test 2 reproduces the Furniture margins at the two ends of Chapter 6's bridge.
 - Discount Rate is higher than the Average of Discount of Chapter 13, and Share of Revenue adds up to 100% across the item groups of a year.
 
-The measures now say what the report's numbers mean, and the tests prove it. The fall in Furniture's margin is visible quarter by quarter. Comparing it with the same quarter of the year before needs the time intelligence of the next section.
+The measures now say what the report's numbers mean, and the tests prove it. The fall in Furniture's margin is visible quarter by quarter. Comparing it with the same quarter of the year before needs time intelligence, which the next section explains and Exercise 14.3 builds.

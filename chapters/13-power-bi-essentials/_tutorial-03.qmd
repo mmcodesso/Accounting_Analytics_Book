@@ -13,7 +13,7 @@ b. Add a **Line chart** with Month from SalesInvoice in **X-axis** and LineTotal
 c. Drag FiscalYear into the **Filters on this visual** section of the **Filters** pane, and select **2026**.
 d. Read the value axis: the lowest and highest values it shows.
 
-The line swings from the bottom of the chart to the top and back again, as if revenue lurched from month to month. The axis begins just below the weakest month, so the chart's whole height covers the gap between the weakest and the strongest month, which is a small fraction of a month's revenue.
+The line swings from the bottom of the chart to the top and back again, as if revenue lurched from month to month. The axis begins just below the weakest month, so the chart's whole height covers the gap between the weakest and the strongest month, which is a small fraction of a month's revenue, the narrow band of Chapter 7.
 
 **Step 2. Start the axis at zero.**
 
@@ -31,7 +31,7 @@ a. Add a **Table** visual with Month and LineTotal.
 b. Read the revenue of January 2024, February 2024, and December 2026.
 c. Record the increase from January 2024 to December 2026, and from February 2024 to December 2026.
 
-The draft's claim is arithmetically true. January 2024 was the company's first month of recorded sales, with about half the usual number of invoices, so any comparison that starts there shows growth that the business did not experience. Measured from February 2024, the increase is a small fraction of the draft's.
+The draft's claim is arithmetically true. January 2024 was the company's first month of recorded sales, with about half the usual number of invoices, the start-up month of Chapter 7, so any comparison that starts there shows growth that the business did not experience. Measured from February 2024, the increase is a small fraction of the draft's.
 
 **Step 4. Compare whole years instead.**
 
@@ -74,6 +74,8 @@ a. Select each chart in turn, and under **Format visual > General**, type altern
 b. Check that every title says what the chart shows and over which period.
 c. Save the report.
 
+A screen reader now announces each chart by what it shows and what it means, and every title names its period, so the page tells the same story to every reader.
+
 <!-- Tutorial 13.3 expected values (read-only twin): fiscal 2026 monthly revenue from 2,260,980.22 (February) to 2,688,918.15
      (January), mean 2,479,701.67; the range is 17% of the mean. Revenue: January 2024 1,408,516.50; February 2024 2,170,765.25;
      December 2026 2,519,722.16; increase from January 2024 +78.9%, from February 2024 +16.1%. Fiscal years 27,313,723.48,
@@ -81,7 +83,7 @@ c. Save the report.
      share of revenue in 2026 peak in October at 6.0% (136,935.59 of 2,297,493.18), then September 3.8% and November 3.0%. The
      secondary axis appears automatically because the two ranges barely overlap (Microsoft Learn, combo chart page). -->
 
-**Checkpoint.** The review page should now hold three corrected charts. Confirm the following:
+**Checkpoint.** The review page should now hold the corrections of the three draft charts: four charts and a table. Confirm the following:
 
 - The monthly revenue chart starts at zero, and its title names the period.
 - You recorded the growth from January 2024 and from February 2024, and the change from fiscal 2025 to fiscal 2026, and can explain why they differ.

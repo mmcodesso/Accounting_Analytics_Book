@@ -1,0 +1,71 @@
+## Guided Tutorial A.2: Publishing and Sharing the Package
+
+**Context and objective.** In this tutorial, you will publish Charles River Reports to the Power BI service, assign a colleague to the role of Guided Tutorial A.1, and test the role in the service, where it applies to real sign-ins rather than the names you typed in View as. Then you will complete internal audit's memo with a recommendation on how the package should be shared.
+
+**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Guided Tutorial A.1. Steps 1 to 4 need a Power BI Pro or Premium Per User license and a colleague who also has one; with a free license you can publish to My workspace but not share, so the roles have no one to apply to. If you have no license, read Steps 1 to 4 and do Step 5, which needs none.
+
+**Step-by-step instructions.**
+
+**Step 1. Add real sign-in names to the security table.** The addresses of @tbl-a-02 belong to Charles River's employees, not to anyone who can sign in to your organization's service.
+
+a. Choose **Home > Transform data**, and select the **Security** query.
+b. Under **Applied Steps**, click the settings icon beside the **Source** step to reopen the **Create Table** dialog.
+c. Add a row with your own sign-in name and the CostCenterID `2`, and a row with your colleague's sign-in name and the CostCenterID `3`.
+d. Click **OK**, choose **Home > Close & Apply**, and save the report.
+
+The security table now maps you to Sales and your colleague to Warehouse. A change to a table created with Enter data can be made only in Desktop and published again, never in the service, which is one more reason the table needs an owner and a record of each change.
+
+**Step 2. Publish the report.**
+
+a. Choose **Home > Publish**, and sign in if you are asked.
+b. Select a shared workspace in which you are an Admin, and click **Select**.
+c. Open the link that Power BI Desktop shows when publishing succeeds.
+
+Publishing puts two items in the workspace, the report and the semantic model, both named Charles River Reports. The roles travel inside the model, but their members do not: in the service, the role has no one in it yet. A free license lets you publish only to My workspace, where nothing can be shared.
+
+**Step 3. Assign the role and test it as yourself.**
+
+a. In the workspace, open the **More options (...)** menu of the semantic model, and choose **Security**.
+b. Select **Cost Center Managers**, add yourself and your colleague as members, and save the change.
+c. Choose **More options (...)** next to the role, and then **Test as role**.
+d. Open the Budget page and the About page.
+e. Choose **Back to Row-Level Security**.
+
+The header names the role and the person it is applied as, and the report shows Sales only, with your sign-in name on the Who Am I card. Test as role evaluates the rules with your own identity (Microsoft, 2026e), so it cannot show what your colleague will see; only your colleague, signed in, can. As an Admin of the workspace, you see every row when you open the report normally, because row-level security does not apply to the editing roles.
+
+**Step 4. Have your colleague open the report.**
+
+a. In the workspace, choose **Manage access**, and then **Add people or groups**.
+b. Add your colleague with the **Viewer** role, and select **Add**.
+c. Ask your colleague to sign in again, and to open the report and its Budget and About pages.
+d. Record what your colleague sees, and the name on the Who Am I card.
+
+Your colleague, a Viewer, sees only Warehouse, and the Who Am I card shows the colleague's sign-in name, the value the rules compared with the security table. When the test is over, remove your colleague's and your own rows from the security table and publish again, so that the table lists only the people the controller approved.
+
+**Step 5. Recommend how the package is shared.** Add a section to internal audit's memo of Guided Tutorial A.1.
+
+a. Recommend the workspace role of the department managers, and of the controller's staff who maintain the package.
+b. Recommend where the Income Statement and Validation pages belong, given that row-level security cannot hide a page and app audiences show whole reports.
+c. Recommend how the semantic model is refreshed, and who watches the refresh history.
+d. Recommend whether Publish to web should be allowed, and whether the package should carry a sensitivity label.
+
+<!-- Guided Tutorial A.2 notes (Learn: Publish from Desktop 2025c; workspace roles 2025f; RLS 2026e (ms.date 2026-05-13): RLS
+     applies to Viewers only; Security is on the semantic model's More options menu; Test as role is under More options next to
+     the role, with a "Now viewing as" header and "Back to Row-Level Security"; Test as role uses your own identity for
+     USERPRINCIPALNAME, so another user's view is validated by that user signing in. Give access (Learn, 2025-11-01): Manage
+     access needs the workspace Admin role; + Add people or groups, Add > Close; changes take effect at the user's next sign-in.
+     Enter data (Learn, 2025-02-26): data in an
+     Enter data table can be changed only in Desktop and republished). Label to confirm in 2.158: the settings
+     (gear) icon of the Source step reopens the Create Table dialog. Expected memo: managers as Viewers or app readers, the
+     controller's staff as Members or Contributors (who bypass RLS, so the list of editors is itself reviewed); the Income
+     Statement and Validation pages in a separate finance report on the same semantic model, shown to the controller's audience;
+     a gateway, or the workbook moved to OneDrive or SharePoint, with failure notifications to the package's owner; Publish to
+     web disabled by the administrator; a Confidential label where labels are enabled (not supported in .pbip projects). -->
+
+**Checkpoint.** Before you send the memo, confirm the following:
+
+- The security table holds your own and your colleague's sign-in names, and the report was published again after the change.
+- Testing as the role shows Sales for you, your colleague sees Warehouse, or, without a license, your memo explains what each test would show.
+- The memo recommends a workspace role for each kind of reader, a home for the finance pages, a refresh owner, and a position on Publish to web and labels.
+
+Publishing moves the report from a file you control to a service many people reach, and every way of sharing it either keeps the rules of Guided Tutorial A.1 in force or quietly bypasses them.
