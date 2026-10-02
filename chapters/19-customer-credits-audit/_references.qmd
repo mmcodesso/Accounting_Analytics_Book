@@ -1,0 +1,21 @@
+{{< pagebreak >}}
+
+## References
+
+American Institute of Certified Public Accountants. (2025). *Audit sampling: Audit guide*. <https://www.aicpa-cima.com/cpe-learning/publication/audit-sampling-audit-guide>
+
+Association of Certified Fraud Examiners. (2026). *Occupational fraud 2026: A report to the nations*. <https://www.acfe.com/fraud-resources/report-to-the-nations>
+
+Cohen, J. R., Joe, J. R., Thibodeau, J. C., & Trompeter, G. M. (2020). Audit partners' judgments and challenges in the audits of internal control over financial reporting. *Auditing: A Journal of Practice & Theory*, *39*(4), 57–85. <https://doi.org/10.2308/ajpt-18-088>
+
+Committee of Sponsoring Organizations of the Treadway Commission & Association of Certified Fraud Examiners. (2023). *Fraud risk management guide* (2nd ed.). <https://www.aicpa-cima.com/cpe-learning/publication/fraud-risk-management-guide>
+
+Institute of Internal Auditors. (2024). *Global internal audit standards*. <https://www.theiia.org/en/standards/2024-standards/global-internal-audit-standards/>
+
+Public Company Accounting Oversight Board. (n.d.-a). *AS 2201: An audit of internal control over financial reporting that is integrated with an audit of financial statements*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2201>
+
+Public Company Accounting Oversight Board. (n.d.-b). *AS 2315: Audit sampling*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2315>
+
+Public Company Accounting Oversight Board. (n.d.-c). *AS 2401: Consideration of fraud in a financial statement audit*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401>
+
+Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>

@@ -51,6 +51,7 @@ book:
       chapters:
         - chapters/17-statements-for-a-lender/chapter.qmd
         - chapters/18-make-buy-or-reprice/chapter.qmd
+        - chapters/19-customer-credits-audit/chapter.qmd
   appendices:
     - appendices/a-publishing-security/appendix.qmd
 
