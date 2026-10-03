@@ -34,6 +34,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A trial balance whose debit and credit balances agree, a common-size income statement for fiscal 2026 that ties to the closing entry, a revenue reconciliation, and a half-page memo.
 
+<!-- notes: ch06.ex1 -->
 <!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at 2026-12-31 (GLEntry with PostingDate before 2027-01-01, without
      JE-2026-000296 and JE-2026-000297, 45 rows) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both
      67,107,722.36. Revenue and expense accounts show only fiscal 2026 because the 2024 and 2025 closing entries zeroed them.
@@ -44,8 +45,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
      subtype Other Income or Expense, and interest expense 7030 of 28,946.47); net income 4,503,611.24 (15.15%), equal to JE-2026-000297.
      Balance sheet: assets 39,328,524.11 = liabilities 13,896,428.43 + equity 20,928,484.44 + net income 4,503,611.24. The balances
      include the unsupported opening balances found in Chapter 8. Revenue reconciliation, account balance vs InvoiceLines 2026: 4010
-     17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020 5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030 3,278,211.11 vs
-     Textiles, equal; 4040 1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080 1,213,344.00 vs Services, equal. The differences are
+     17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020
+     5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030
+     3,278,211.11 vs Textiles, equal; 4040
+     1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080
+     1,213,344.00 vs Services, equal. The differences are
      SI-2026-013742 (Furniture, dated 2025-12-04), SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03),
      dated in 2025 with the next year's number and posted 2026-01-01. InvoiceLines assigns them to fiscal 2025 by their invoice dates,
      the ledger to fiscal 2026. The date that determines the period is the delivery of the goods, not the invoice date or number (every
@@ -72,12 +76,9 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** Two PivotTables, a list of the largest combinations and changes, and a disclosure paragraph.
 
-<!-- Instructor notes, Exercise 6.2: 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24%
-     (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes
-     from 2025 for combinations over $500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting
-     +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4%
-     (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade
-     -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the
+<!-- notes: ch06.ex2 -->
+<!-- Instructor notes, Exercise 6.2: 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24% (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes
+     from 2025 for combinations over $500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4% (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the
      segment and the product line coincide there. A nonpublic entity may elect not to give the quantitative disaggregation
      (ASC 606-10-50-7); the exercise treats the disclosure as if it were required. -->
 
@@ -102,11 +103,9 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A profitability PivotTable by product line and by Furniture product type, and a short written interpretation.
 
-<!-- Instructor notes, Exercise 6.3: 2026 margin at standard cost: Accessories 50.96% (margin 954,080.96 on 1,872,273.66), Textiles 49.47%
-     (1,621,892.16 on 3,278,211.11), Lighting 46.66% (2,798,584.12 on 5,997,536.93), Furniture 42.34% (7,365,245.96 on 17,395,054.38).
-     Excluding Services, revenue shares are Furniture 60.9%, Lighting 21.0%, Textiles 11.5%, Accessories 6.6%, and margin shares 57.8%,
-     22.0%, 12.7%, 7.5%, so Lighting, Textiles, and Accessories contribute more margin than revenue. Furniture types: highest DSK (desk)
-     44.36% and CON (console table) 44.00%; lowest BNH (bench) 39.04% and BKC (bookcase) 39.37%. Services items carry StandardCost 0, so
+<!-- notes: ch06.ex3 -->
+<!-- Instructor notes, Exercise 6.3: 2026 margin at standard cost: Accessories 50.96% (margin 954,080.96 on 1,872,273.66), Textiles 49.47% (1,621,892.16 on 3,278,211.11), Lighting 46.66% (2,798,584.12 on 5,997,536.93), Furniture 42.34% (7,365,245.96 on 17,395,054.38).
+     Excluding Services, revenue shares are Furniture 60.9%, Lighting 21.0%, Textiles 11.5%, Accessories 6.6%, and margin shares 57.8%, 22.0%, 12.7%, 7.5%, so Lighting, Textiles, and Accessories contribute more margin than revenue. Furniture types: highest DSK (desk) 44.36% and CON (console table) 44.00%; lowest BNH (bench) 39.04% and BKC (bookcase) 39.37%. Services items carry StandardCost 0, so
      their margin shows 100%; their cost is design staff time. Possible measures: ServiceTimeEntry.ExtendedCost for 2026 work dates
      (220,317.28, a margin of about 82%) or the 2026 Design Services salaries expense in account 6280 (471,214.88, about 61%). The gap
      shows that the answer depends on the cost definition, which the report must state. -->
@@ -136,6 +135,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A product-type bridge that ties to the change in margin, and a short comparison and recommendation.
 
+<!-- notes: ch06.ex4 -->
 <!-- Instructor notes, Exercise 6.4: Furniture margin 1,810,257.09 (Q3) to 1,695,211.02 (Q4), change -115,046.07. Product-type bridge:
      price -183,737.35, cost +43,345.66, volume +7,885.63, mix +17,459.98 (sums exactly). The cost effect is not zero because each type's
      average standard cost per unit depends on which of its items were sold: DSK (desks) price per unit 731.85 to 628.50 and cost per unit
@@ -168,8 +168,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** An expectation worksheet with the flagged differences and a half-page explanation of the threshold and the follow-up.
 
-<!-- Instructor notes, Exercise 6.5: flagged (over 10% and over $50,000): Lighting Q1 +215,084.80 (+15.9%), Textiles Q4 +166,764.46 (+24.4%),
-     Accessories Q2 -76,547.35 (-15.0%), Services Q2 -66,187.40 (-20.9%), Services Q3 -52,688.80 (-16.4%), Services Q4 +77,195.65 (+26.9%).
+<!-- notes: ch06.ex5 -->
+<!-- Instructor notes, Exercise 6.5: flagged (over 10% and over $50,000): Lighting Q1 +215,084.80 (+15.9%), Textiles Q4 +166,764.46 (+24.4%), Accessories Q2 -76,547.35 (-15.0%), Services Q2 -66,187.40 (-20.9%), Services Q3 -52,688.80 (-16.4%), Services Q4 +77,195.65 (+26.9%).
      Not flagged: Furniture Q4 -315,983.47 (-7.1%), the largest dollar difference, and Furniture Q2 +266,724.77 (+6.2%). A percentage test
      alone misses large dollar differences in the largest product line; a tolerable amount based on materiality, or an expectation that
      reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it
@@ -201,13 +201,8 @@ FILTER(InvoiceLines[LineTotal],(InvoiceLines[FiscalYear]=2026)*(InvoiceLines[Ite
 
 **Deliverable.** A profile workbook with the four summaries and a written profile suitable for the audit workpapers.
 
-<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08;
-     Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.89; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66,
-     923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of
-     revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez,
-     Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816),
-     Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10,
-     662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:
-     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, 2025) and 6 (Wholesale, November
-     2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are
+<!-- notes: ch06.ex6 -->
+<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08; Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.89; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66, 923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of
+     revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez, Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816), Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10, 662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:
+     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, 2025) and 6 (Wholesale, November 2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are
      left for the audit work later in Part II. -->

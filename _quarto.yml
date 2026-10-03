@@ -19,6 +19,7 @@ book:
     - front-matter/to-the-student.qmd
     - front-matter/about-the-dataset.qmd
     - front-matter/downloads.qmd
+    - front-matter/companion-files.qmd
     - part: "Foundations of Accounting Analytics"
       chapters:
         - chapters/01-role-of-analytics/chapter.qmd

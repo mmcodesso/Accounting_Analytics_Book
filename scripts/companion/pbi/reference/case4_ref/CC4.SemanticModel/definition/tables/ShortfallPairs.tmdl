@@ -1,0 +1,62 @@
+table ShortfallPairs
+
+	column Justification
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Justification
+
+	column Requisitions
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: Requisitions
+
+	column RequisitionedQty
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: RequisitionedQty
+
+	column EstimatedValue
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: EstimatedValue
+
+	column FirstRequest
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: FirstRequest
+
+	column LastRequest
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: LastRequest
+
+	column IssuedQty
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: IssuedQty
+
+	column IssuedCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: IssuedCost
+
+	partition ShortfallPairs = m
+		mode: import
+		source =
+			let
+			    Source = Table.SelectRows(RequisitionsStaged, each [Channel] = "Work-order shortfall"),
+			    Value = Table.AddColumn(Source, "EstimatedValue", each [Quantity] * [EstimatedUnitCost], type number),
+			    Grouped = Table.Group(Value, {"Justification"}, {{"Requisitions", each Table.RowCount(_), Int64.Type},
+			        {"RequisitionedQty", each List.Sum([Quantity]), type number}, {"EstimatedValue", each List.Sum([EstimatedValue]), type number},
+			        {"FirstRequest", each List.Min([RequestDate]), type date}, {"LastRequest", each List.Max([RequestDate]), type date}}),
+			    IssuedByPair = Table.Group(IssuesStaged, {"PairKey"}, {{"IssuedQty", each List.Sum([QuantityIssued]), type number},
+			        {"IssuedCost", each List.Sum([ExtendedStandardCost]), type number}}),
+			    Merged = Table.NestedJoin(Grouped, {"Justification"}, IssuedByPair, {"PairKey"}, "I", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "I", {"IssuedQty", "IssuedCost"})
+			in
+			    Expanded
+

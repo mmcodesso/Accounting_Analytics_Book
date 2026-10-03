@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will classify the manufacturing payroll of fiscal 2026 with a CASE expression and tie the result to the ledger. You will then turn the manufacturing labor time into a month-by-month table of direct, indirect, and overtime hours, find how far the time records fall short of the year's end, compare the overtime share of each kind of labor, and measure how long work orders took from release to completion in each year.
 
-**Prerequisites.** Complete Chapter 10, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter10.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter11.sql` beside your working copy. As in Chapters 9 and 10, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
+**Prerequisites.** Complete Chapter 10, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter10.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter11.sql` beside your working copy. As in Chapters 9 and 10, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it. If you start here, you need only the working copy, made as Step 1 of Tutorial 9.1 describes.
 
 ```sql
 /* Chapter 11: the plant's hours, month by month
@@ -78,9 +78,9 @@ a. Type and run the query below.
 b. Read the number of rows in the message pane.
 c. Read the DirectHours and IndirectHours of the first six months, and the DaysWithTime of the last row.
 
-The result has one row for each month from January 2024 to December 2026, 36 in all, so a window over it can count months by counting rows. @fig-11-02 shows the first months, which tell a story of their own. January 2024 is the month in which the data begins, when the first work orders were only starting, and most of its time is indirect. From February to May 2024 almost no indirect time was recorded. In March 2024 there is none at all; the month still has a row, because its direct entries create it, and the CASE gives it an IndirectHours of zero. From June 2024 on, indirect time appears in every month. The last row has far fewer days with time records than any other month, because the time records end on 11 December 2026, as Tutorial 10.3 found.
+The result has one row for each month from January 2024 to December 2026, 36 in all, so a window over it can count months by counting rows. @fig-11-02 shows the first months, which tell a story of their own. January 2024 is the month in which the data begins, when the first work orders were only starting, and most of its time is indirect. From February to May 2024 the plant recorded far less indirect time than in the months that follow, and from the summer of 2024 indirect time is a large part of every month. A month with no indirect time at all would still have a row, because its direct entries create it, and the CASE would give it an IndirectHours of zero. The last row has far fewer days with time records than any other month, because the time records end on 11 December 2026, as Tutorial 10.3 found.
 
-![Manufacturing Labor Time in the First Months of 2024.](/visuals/svg/fig-11-02-early-months.svg){#fig-11-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, shows a query that groups the manufacturing labor time by month, counts the days with time records, and puts the direct, indirect, and overtime hours in columns of their own with conditional aggregation. The grid shows the first eight months, January to August 2024. January has more indirect than direct hours; the IndirectHours of February to May, outlined, are close to zero, with none at all in March; and indirect time returns in June."}
+![Manufacturing Labor Time in the First Months of 2024.](/visuals/svg/fig-11-02-early-months.svg){#fig-11-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, shows a query that groups the manufacturing labor time by month, counts the days with time records, and puts the direct, indirect, and overtime hours in columns of their own with conditional aggregation. The grid shows the first eight months, January to August 2024. January has more indirect than direct hours; the IndirectHours of February to May, outlined, are far lower than in the months that follow; and indirect time climbs from June."}
 
 **Step 3. Find how far the time records fall short of the month's end.** The date function's modifiers move a date to the end of its month, and julianday measures the distance between two dates.
 
@@ -155,7 +155,7 @@ The time from completion to close stayed at about the same number of days in eac
 **Checkpoint.** Check that:
 
 - the payroll categories other than employee deductions add up to the ledger's charge to account 1090 for fiscal 2026;
-- the monthly pivot has one row for each of the 36 months, with almost no indirect time from February to May 2024 and few days of time records in December 2026;
+- the monthly pivot has one row for each of the 36 months, with far less indirect time from February to May 2024 than later in the year, and few days of time records in December 2026;
 - the time records end nearly three weeks before the end of December 2026;
 - the overtime share of direct labor rose from about a tenth to a quarter or more, while that of indirect labor stayed at about a twelfth;
 - the average time from release to completion more than doubled from fiscal 2024 to fiscal 2026;

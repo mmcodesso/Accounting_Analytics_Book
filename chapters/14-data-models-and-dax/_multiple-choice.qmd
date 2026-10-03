@@ -107,6 +107,7 @@ B.  Revenue is stored as credits, which cancel the debits of the expenses
 C.  The Date table is not marked, so the years are not kept apart
 D.  The relationship between GLEntry and Account is set to Both
 
+<!-- notes: ch14.mcq -->
 <!-- Answer key, Chapter 14 (for instructors; HTML comments are removed from every rendered format):
      1 A, 2 C, 3 B, 4 D, 5 C, 6 A, 7 B, 8 D, 9 B, 10 D, 11 A, 12 C, 13 B, 14 C, 15 A.
      1 A: the grain is the event one row represents, one line of one invoice.

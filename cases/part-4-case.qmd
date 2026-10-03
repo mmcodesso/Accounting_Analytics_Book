@@ -59,15 +59,14 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - Start a Validation page that reproduces control totals you already trust and ties the new tables to the ledger: net income by fiscal year, total assets at each year-end with the Balance measure of Exercise 14.1, and the materials received and issued each year against the postings to account 1045. Put the queries behind them in a Tests tab in DAX query view.
 - Add a measure `Data Through` that returns the earliest of the last posting dates of the documents behind the working-capital accounts, as Tutorial 16.3 did for its populations, and show it on an About page that states the report's purpose, sources, and definitions. Explain why the last posting date in the ledger is the wrong answer.
 
-<!-- Instructor notes, Requirement 1: GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and
-     -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL | WO=<id> |
+<!-- notes: case4.r1 -->
+<!-- Instructor notes, Requirement 1: GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL | WO=<id> |
      ITEM=<id>" for a work-order shortfall (21,437 requisitions; the ITEM in the text always equals ItemID), "Supply plan <id> - ..." for
      the supply plan (3,921; all but 3 carry a SupplyPlanRecommendationID), and six capital requests ("Other"). Receipts: 29,597 lines, every
      one with its order line, and every order line (24,842) with exactly one requisition; the purchase order header's RequisitionID is blank
      on 4,408 orders, which is why the merge goes through the line. Issues: 70,126 lines on 19,234 issues, every issue with its work order;
      6 issue headers have no lines (Chapter 12). Requisitions: 25,364; 6 with no approver (Exercise 2.5); 522 Approved and never ordered,
-     all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 /
-     5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw
+     all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw
      Materials and Packaging items) 7,823,080.62 / 13,490,602.93 / 17,578,136.00 and issued 10,560,905.25 / 10,005,081.44 / 10,161,204.64,
      equal to the GoodsReceipt debits and MaterialIssue credits to 1045 (AccountNumber, not AccountID). Data Through: the minimum of the
      last PostingDate of SalesInvoice, CashReceiptApplication, PurchaseInvoice, DisbursementPayment, GoodsReceipt, MaterialIssue, and
@@ -85,6 +84,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - From a matrix of the bridge, drill through from the investing and financing steps to their postings, as in Exercise 15.1, and find the entries that moved no cash. Restate the operating, investing, and financing sections as the indirect method requires. The standard on the statement of cash flows (FASB Accounting Standards Codification Topic 230) reports only cash receipts and payments in the statement, and requires investing and financing activities that involve no cash to be disclosed separately.
 - Measure the cash the company holds net of the sales tax it has collected and not remitted, and find in DebtSchedule the principal of the notes due within a year. Explain what each means for the balance sheet and for the committee's view of the company's cash.
 
+<!-- notes: case4.r2 -->
 <!-- Instructor notes, Requirement 2: year-end 2024 / 2025 / 2026: current assets 21,074,807.78 / 29,358,195.27 / 37,236,780.57;
      current liabilities 7,621,731.07 / 10,666,774.33 / 13,507,123.75; working capital 13,453,076.71 / 18,691,420.94 / 23,729,656.82;
      current ratio 2.77 / 2.75 / 2.76; quick ratio (cash and receivables over current liabilities) 1.43 / 1.32 / 0.98; inventories are 64%
@@ -123,17 +123,18 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - On one page, let a field parameter switch a line chart among the measures by quarter, as in Exercise 15.3, and add a report-page tooltip that shows the balance and the twelve-month flow behind each point. Add a matrix of all the measures at each quarter-end, with icons that compare the days of supply with the policy targets.
 - Recompute days sales outstanding and days payables outstanding without the lines of the opening entry, and compare each measure at the end of 2024 with a version on the average balance of the year. Explain which version the committee should see, what 2024 can and cannot show, and which component moved the cycle.
 
+<!-- notes: case4.r3 -->
 <!-- Instructor notes, Requirement 3: definitions: billing = SalesInvoice debits to 1020; cost of goods sold = GL Amount on
      AccountSubType "COGS" (the close JE-2026-000296 credits COGS by 18.63 million, so a window that includes a close reads zero without
      GL Amount; COGS here includes freight-out, purchase price variance, and manufacturing variance); supplier invoices = PurchaseInvoice
      credits to 2010; materials flow = MaterialIssue credits to 1045; finished goods flow = Shipment credits to 1040. Window =
      DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ), with the twelve-month count of Tutorial 15.3 and MAX ( 'Date'[Date] )
-     <= [Data Through]; 2024-Q1 to Q3 and every 2027 quarter are blank (checked in the engine). Quarter-ends 2024-Q4 to 2026-Q4: DSO 62.2,
-     61.1, 58.8, 56.7, 54.9, 59.2, 58.5, 55.4, 54.9; DIO 229.9, 237.6, 249.8, 269.4, 311.7, 338.3, 372.8, 414.7, 469.8; materials days 29.3,
-     69.7, 93.8, 126.3, 158.1, 229.9, 282.8, 351.0, 422.1; finished goods days 235.5, 222.7, 228.5, 228.4, 255.8, 245.5, 253.5, 258.1, 280.8;
+     <= [Data Through]; 2024-Q1 to Q3 and every 2027 quarter are blank (checked in the engine). Quarter-ends 2024-Q4 to 2026-Q4: DSO 62.2, 61.1, 58.8, 56.7, 54.9, 59.2, 58.5, 55.4, 54.9;
+     DIO 229.9, 237.6, 249.8, 269.4, 311.7, 338.3, 372.8, 414.7, 469.8; materials days 29.3, 69.7, 93.8, 126.3, 158.1, 229.9, 282.8, 351.0, 422.1;
+     finished goods days 235.5, 222.7, 228.5, 228.4, 255.8, 245.5, 253.5, 258.1, 280.8;
      DPO 118.4, 107.6, 109.1, 110.0, 106.2, 101.8, 103.2, 96.8, 98.9; cycle 173.7, 191.2, 199.5, 216.1, 260.4, 295.7, 328.1, 373.2, 425.7.
-     Without JE-2024-000001: DSO 57.4, 56.6, 54.4, 52.4, 50.5, 54.9, 54.1, 51.1, 50.5; DPO 66.2, 62.9, 62.8, 66.3, 65.5, 63.5, 67.4, 62.0,
-     65.7; cycle 221.2 at 2024-Q4, 296.7 at 2025-Q4, 454.6 at 2026-Q4. Average-balance versions by year (beginning balance of 2024 = the
+     Without JE-2024-000001: DSO 57.4, 56.6, 54.4, 52.4, 50.5, 54.9, 54.1, 51.1, 50.5; DPO 66.2, 62.9, 62.8, 66.3, 65.5, 63.5, 67.4, 62.0, 65.7;
+     cycle 221.2 at 2024-Q4, 296.7 at 2025-Q4, 454.6 at 2026-Q4. Average-balance versions by year (beginning balance of 2024 = the
      opening entry): DSO 33.5 / 56.3 / 54.5; DIO 201.6 / 260.3 / 384.0; materials 76.7 / 94.6 / 288.9; DPO 85.3 / 99.2 / 92.8; they lag a
      fast build (289 against 422 days in 2026) and in 2024 rest on the opening entry, so materials look like 77 days when the year-end stock
      stood at 29. Policy targets: raw materials 28 days and packaging 24; finished goods 12-16 (manufactured, lot-for-lot) and 24-28
@@ -149,12 +150,13 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - Add a what-if parameter for the target days of materials supply, as in Exercise 15.4, with the policy target as its default, and measures for the materials that the target allows at the current rate of issue, the excess above it, and the months of issues the excess represents. Test targets of 28, 60, and 90 days, and compare the excess with the year's fall in cash.
 - State what the estimate assumes and leaves out, among them the finished goods and the requisitions approved but not yet ordered at year-end, and how quickly the cash could come back.
 
+<!-- notes: case4.r4 -->
 <!-- Instructor notes, Requirement 4: materials receipts by channel (supply plan / work-order shortfall): 2024 5,681,207.72 (336 lines) /
-     2,141,872.90 (3,094 lines); 2025 7,017,928.00 (390) / 6,472,674.93 (8,077); 2026 6,358,142.79 (363) / 11,219,993.21 (12,615); issues
+     2,141,872.90 (3,094 lines); 2025 7,017,928.00 (390) /
+     6,472,674.93 (8,077); 2026 6,358,142.79 (363) /
+     11,219,993.21 (12,615); issues
      stayed near 10 million (2026: raw materials 9,687,944.26, packaging 473,260.38). The supply plan's receipts and production's use are
-     flat; the shortfall channel carries the build. 2026 build 7,416,931.36, of which six raw materials make up about 96%: RAW-CTN-0010
-     Cotton Fabric Roll +2,959,318.29, RAW-LED-0005 LED Module Pack +1,153,243.40, RAW-LIN-0008 +1,134,217.41, RAW-LIN-0002 +797,202.63,
-     RAW-LIN-0006 +549,623.46, RAW-LIN-0004 +521,297.17 (Linen Fabric Rolls); packaging nets -5,594.49. Stock by item cannot be rebuilt,
+     flat; the shortfall channel carries the build. 2026 build 7,416,931.36, of which six raw materials make up about 96%: RAW-CTN-0010 Cotton Fabric Roll +2,959,318.29, RAW-LED-0005 LED Module Pack +1,153,243.40, RAW-LIN-0008 +1,134,217.41, RAW-LIN-0002 +797,202.63, RAW-LIN-0006 +549,623.46, RAW-LIN-0004 +521,297.17 (Linen Fabric Rolls); packaging nets -5,594.49. Stock by item cannot be rebuilt,
      because the opening materials of 3,587,025.70 carry no item detail. Shortfall requisitions: 3,180 / 7,304 / 10,953 a year, estimated at
      2,466,594.50 / 6,813,074.37 / 11,343,750.21; 10,365 work order and item pairs, of which 5,702 were requisitioned more than once, holding
      16,774 requisitions; at most 18 for one pair, WO-2025-008090 and RAW-CTN-0010, monthly from 2025-08-13 to 2026-11-01 (the work order
@@ -164,10 +166,9 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      19,834,541.04. Approvals: every shortfall requisition (21,437) was approved by employee 4, the Production Manager, who also requested
      351 of them; production staff requested the rest (Assemblers, Machine Operators, Quality Technicians); the CFO approved 3,915
      supply-plan requisitions, 6 have no approver; the six capital requests were approved by the CFO (4) and the Purchasing Manager (2).
-     What-if (twelve-month issues 10,161,204.64): 28 days allows 779,489.67, an excess of 10,972,164.25, 12.96 months of issues; 60 days
-     1,670,335.01, 10,081,318.91, 11.91 months; 90 days 2,505,502.51, 9,246,151.41, 10.92 months; even at 90 days the excess is about ten
+     What-if (twelve-month issues 10,161,204.64): 28 days allows 779,489.67, an excess of 10,972,164.25, 12.96 months of issues; 60 days 1,670,335.01, 10,081,318.91, 11.91 months; 90 days 2,505,502.51, 9,246,151.41, 10.92 months; even at 90 days the excess is about ten
      times the year's fall in cash. Left out: finished goods at 28 days of shipments would be 1,213,408.82 against 12,169,701.74; 522
-     approved, unordered shortfall requisitions (510,445.06); 486 purchase order lines not fully received at year-end (617,265.17, of which
+     approved, unordered shortfall requisitions (510,445.06); 486 purchase order lines not fully received at year-end (617,265.16, of which
      materials 408,584.88); every inventory policy ends 2026-12-31, so the 2027 targets need approval. The cash comes back only as purchases
      fall below use, over 2027 and beyond, and only if the stock can be used. Optional: shortfall requisitions dated after their
      work order's due date numbered 137, 2,178, and 5,039 a year (estimated 69,032.98, 2,186,214.31, and 5,372,871.72). Engine-checked. -->
@@ -179,6 +180,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - Test account 2050 Sales Tax Payable: what posts to it, what never does, and what evidence outside the database would show whether the tax was remitted.
 - Record each reconciling item and finding in a `Findings` table, entered with Enter data, with its account, amount, and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions. Add tests to the Tests tab: each difference equals the items recorded for it, the bridge ends at the change in cash, and every measure is blank after Data Through.
 
+<!-- notes: case4.r5 -->
 <!-- Instructor notes, Requirement 5: balances at 2026-12-31 by source: 1020 SalesInvoice 92,727,541.64, CashReceiptApplication
      -87,896,623.29, CreditMemo -412,114.03, JournalEntry 380,000.00 (4,798,804.32); 1045 GoodsReceipt 38,891,819.55, MaterialIssue
      -30,727,191.33, JournalEntry 3,587,025.70 (11,751,653.92); 1040 JournalEntry 4,111,795.76, GoodsReceipt 13,295,060.67,
@@ -194,8 +196,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      payables on ReceivedDate, as the ledger posts them; on InvoiceDate, 2025-12-31 differs by ASV0050-2025-040073 (3,266.27). Billing by
      invoice date less the ledger: +791.35 (2024; SI-2025-006733 to 006735, dated November-December 2024, posted 2025-01-01), +4,119.16
      (2025), -4,910.51 (2026; SI-2026-013741 to 013743, posted 2026-01-01); only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff
-     error), and the other dates are wrong, not the ledger. Sales tax: credits only from SalesInvoice (1,787,832.54 / 1,923,180.10 /
-     1,948,415.82, equal to the invoices' TaxAmount), debits only from CreditMemo; no payment and no journal entry ever posts to 2050.
+     error), and the other dates are wrong, not the ledger. Sales tax: credits only from SalesInvoice (1,787,832.54 / 1,923,180.10 / 1,948,415.82, equal to the invoices' TaxAmount), debits only from CreditMemo; no payment and no journal entry ever posts to 2050.
      Evidence outside the database: the sales tax returns filed, the tax authority's account, the bank statements, and a bank
      reconciliation. Findings: 1020 opening receivables with no invoice, 380,000.00, follow up; 2010 opening payables with no invoice,
      2,096,371.12, follow up; 2010 note invoices still open in the subledger, 640,000.00, expected, close them against the notes; 2050 no
@@ -212,6 +213,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 
 Close the memo with your recommendation.
 
+<!-- notes: case4.r6 -->
 <!-- Instructor notes, Requirement 6: a strong memo describes rather than accuses: "no remittance is recorded in the ledger", "requisitions
      repeated for one work order and item". It explains that the profit was real but went into inventories, materials above all, while
      unremitted sales tax and growing payables held cash up, so the cash on the balance sheet overstates what the company can use.

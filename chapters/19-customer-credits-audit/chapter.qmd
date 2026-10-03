@@ -75,7 +75,7 @@ You will keep the files in @tbl-19-02. Requirement 4's query flags each refund, 
 
 | Tool | File | Holds | Hand-off |
 |--------|------------------------|--------------------------|------------------------|
-| SQL | Credits.sql, run on CharlesRiver_Work.sqlite | The map of the cycle, reconciliations, control and substantive tests | Export to CSV of the refund flags |
+| SQL | Credits.sql, run on CharlesRiver_Capstone.sqlite | The map of the cycle, reconciliations, control and substantive tests | Export to CSV of the refund flags |
 | Excel | Credits Audit.xlsx | Materiality, the risk-and-control matrix, the sample, the evaluation of deficiencies | Tables for the report's appendix |
 | Power BI | Credits Analytics.pbix, and Audit Monitoring.pbix updated | Returns analytics and refund ranking; the continuing tests | Reads CharlesRiver.xlsx and the refund flags |
 
@@ -99,7 +99,7 @@ Some of what an audit needs is not in the database. MaxApprovalAmount in Employe
 
 ## Getting Started
 
-Set up your files before you begin. Make a working copy of the downloaded CharlesRiver.sqlite named CharlesRiver_Work.sqlite, and open the copy in DB Browser for SQLite, so that the download is never changed. Start Credits.sql with a header comment that states its purpose, the database file, the preparer and the date, and the checks it performs, and write two comment lines above every query: what it tests, and its population and expected result. Create Credits Audit.xlsx with a Documentation worksheet that states the purpose, the sources, and the date through which the data run, and create Credits Analytics.pbix. You need DB Browser for SQLite, Excel for Microsoft 365 (for RANDARRAY, SORTBY, and BETA.INV), and Power BI Desktop, which runs only on Windows; if you work on a Mac, plan to use a Windows computer for Requirements 5 and 10.
+Set up your files before you begin. Make a working copy of the downloaded CharlesRiver.sqlite named CharlesRiver_Capstone.sqlite, and open the copy in DB Browser for SQLite, so that the download is never changed and the CharlesRiver_Work.sqlite of Part III keeps its views. Start Credits.sql with a header comment that states its purpose, the database file, the preparer and the date, and the checks it performs, and write two comment lines above every query: what it tests, and its population and expected result. Create Credits Audit.xlsx with a Documentation worksheet that states the purpose, the sources, and the date through which the data run, and create Credits Analytics.pbix. You need DB Browser for SQLite, Excel for Microsoft 365 (for RANDARRAY, SORTBY, and BETA.INV), and Power BI Desktop, which runs only on Windows; if you work on a Mac, plan to use a Windows computer for Requirements 5 and 10.
 
 Work in three milestones, one for each phase of the requirements. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the audit.
 
@@ -107,16 +107,20 @@ Work in three milestones, one for each phase of the requirements. Your instructo
 2. **Test controls and balances** (Requirements 4 to 7): the control tests, the analytics report, the sampling plan with its frozen selection, and the substantive tests and timeline.
 3. **Evaluate and report** (Requirements 8 to 10): the evaluation of deficiencies, the report to the committee, and the continuing tests.
 
+<!-- notes: ch19.m1 -->
 <!-- Instructor notes, Milestone 1 checkpoints: 612 returns, 612 credit memos (632,245.91), 222 refunds (216,718.42), 637 clawbacks
      (10,832.09); credit SubTotal equals 4060 in every year (145,655.35 / 201,104.38 / 242,764.56); 2060 at the year-ends 3,105.75 /
-     1,008.67 / 3,413.46; materiality 225,180.56, performance 168,885.42, clearly trivial 11,259.03; 2026 expectation at the 2025 rate
+     1,008.67 /
+     3,413.46; materiality 225,180.56, performance 168,885.42, clearly trivial 11,259.03; 2026 expectation at the 2025 rate
      203,762.47 against 242,764.56. -->
 
+<!-- notes: ch19.m2 -->
 <!-- Instructor notes, Milestone 2 checkpoints: credits above the approver's limit 414 (421,606.55); credit approver also applied cash to
      the invoice 206; refunds above limit 163 (145,938.94); refunds dated before the customer's payment 58 (71,306.30); key items 7
      refunds (31,628.48), sample of 59 from the remaining 215; the largest refund RF-2025-000097, 17,745.96, paid while 13,081.41 was
      unpaid. -->
 
+<!-- notes: ch19.m3 -->
 <!-- Instructor notes, Milestone 3 checkpoints: two significant deficiencies (credits; refunds), the Accounting Manager's concentration a
      deficiency, no material weakness; register additions 414, 206, 163, and 58 exceptions. -->
 
@@ -136,17 +140,17 @@ The map comes from the records, not from a description of how the process should
 - Build a matrix of the ledger's postings by source document and account, and list who records each document, by job title.
 - Mark on @fig-19-01 what the records can evidence at each control point and what they cannot.
 
+<!-- notes: ch19.r1 -->
 <!-- Instructor notes, Requirement 1: returns 612 (637 lines), 2024-01-25 to 2026-12-24, 162 customers; Credited 390, Refunded 222;
-     reasons Late Delivery 141, Wrong Item 120, Customer Remorse 119, Damaged 117, Quality Concern 115; received by Inventory Specialists
-     243, Shipping Clerks 240, the Warehouse Manager 129. Credit memos 612 (637 lines), 2024-01-28 to 2026-12-26: Applied 387
-     (385,514.61), Refunded 222 (243,317.84), Issued 3 (3,413.46), total 632,245.91; approved by Customer Service Representatives 414 and
-     the Customer Service Manager 198; ApprovedDate equals CreditMemoDate on all 612; 0-3 days after the return (mean 1.4, 175 the same
+     reasons Late Delivery 141, Wrong Item 120, Customer Remorse 119, Damaged 117, Quality Concern 115; received by Inventory Specialists 243, Shipping Clerks 240, the Warehouse Manager 129. Credit memos 612 (637 lines), 2024-01-28 to 2026-12-26: Applied 387
+     (385,514.61), Refunded 222
+     (243,317.84), Issued 3
+     (3,413.46), total 632,245.91; approved by Customer Service Representatives 414 and the Customer Service Manager 198; ApprovedDate equals CreditMemoDate on all 612; 0-3 days after the return (mean 1.4, 175 the same
      day). Refunds 222 (216,718.42), one per refunded credit, 2024-02-17 to 2026-12-22, 2-94 days after the credit (mean 11.0; 14 over 30
      days), cleared 0-3 days later; approved by Administrative Specialists 84, Staff Accountants 79, the Accounting Manager 59. Clawbacks
      637 (10,832.09), one per credit line, same date and approver as the credit. Receipts 7,409 (87,896,623.29) recorded by customer
      service (manager 2,493, representatives 4,916); 27,117 applications, all by customer service. No orphans in any direction; numbers
-     run without gaps and continue across years (SR and CM 1-158, 159-390, 391-612; RF 1-55, 56-139, 140-222; SCAJ 1-167, 168-405,
-     406-637). Posting matrix (GL rows): CreditMemo Dr 4060 637 rows 589,524.29, Dr 4050 99 rows 4,133.82, Dr 2050 612 rows 38,587.80,
+     run without gaps and continue across years (SR and CM 1-158, 159-390, 391-612; RF 1-55, 56-139, 140-222; SCAJ 1-167, 168-405, 406-637). Posting matrix (GL rows): CreditMemo Dr 4060 637 rows 589,524.29, Dr 4050 99 rows 4,133.82, Dr 2050 612 rows 38,587.80,
      Cr 1020 415 rows 412,114.03, Cr 2060 225 rows 220,131.88 (28 credits post to both); SalesReturn Dr 1040 325,840.19, Cr 5010-5040;
      CustomerRefund Dr 2060, Cr 1010 216,718.42; SalesCommissionAdjustment Dr 2034, Cr 6290 10,832.09; CashReceipt Dr 1010, Cr 2060
      (14,818 rows); CashReceiptApplication Dr 2060, Cr 1020 (54,234 rows). GLEntry.CreatedByEmployeeID equals the document's approver,
@@ -164,16 +168,13 @@ Every later test assumes that the populations are complete. Two-sided totals by 
 - Roll 2060 forward to each year-end and name the items in each balance, and reconcile 2034 at the end of fiscal 2026.
 - State what you excluded and why.
 
-<!-- Instructor notes, Requirement 2 (2024 / 2025 / 2026, all to the cent): credits 158 / 232 / 222; SubTotal = 4060 145,655.35 /
-     201,104.38 / 242,764.56 (589,524.29); freight = 4050 1,227.26 / 1,109.93 / 1,796.63; tax = 2050 9,547.39 / 13,143.88 / 15,896.53
-     (38,587.80); GrandTotal 156,430.00 / 215,358.19 / 260,457.72 = Cr 1020 108,295.50 / 130,873.42 / 172,945.11 + Cr 2060 48,134.50 /
-     84,484.77 / 87,512.61. Returns at standard = 1040 76,390.25 / 111,321.12 / 138,128.82 (325,840.19); COGS credits 5010 40,502.86 /
-     73,787.18 / 96,026.14, 5020 16,781.43 / 17,985.54 / 25,386.87, 5030 13,125.13 / 12,655.71 / 11,366.42, 5040 5,980.83 / 6,892.69 /
-     5,349.39. Refunds 55 / 84 / 83 = 45,028.75 / 86,581.85 / 85,107.82 to 1010 and 2060. Clawbacks 2,694.49 / 3,768.06 / 4,369.54 to
+<!-- notes: ch19.r2 -->
+<!-- Instructor notes, Requirement 2 (2024 / 2025 / 2026, all to the cent): credits 158 / 232 / 222; SubTotal = 4060 145,655.35 / 201,104.38 / 242,764.56 (589,524.29); freight = 4050 1,227.26 / 1,109.93 / 1,796.63; tax = 2050 9,547.39 / 13,143.88 / 15,896.53
+     (38,587.80); GrandTotal 156,430.00 / 215,358.19 / 260,457.72 = Cr 1020 108,295.50 / 130,873.42 / 172,945.11 + Cr 2060 48,134.50 / 84,484.77 / 87,512.61. Returns at standard = 1040 76,390.25 / 111,321.12 / 138,128.82 (325,840.19); COGS credits 5010 40,502.86 / 73,787.18 / 96,026.14, 5020 16,781.43 / 17,985.54 / 25,386.87, 5030 13,125.13 / 12,655.71 / 11,366.42, 5040 5,980.83 / 6,892.69 / 5,349.39. Refunds 55 / 84 / 83 = 45,028.75 / 86,581.85 / 85,107.82 to 1010 and 2060. Clawbacks 2,694.49 / 3,768.06 / 4,369.54 to
      2034 and 6290 (accruals 521,989.10 / 568,898.84 / 570,717.47; payments 470,066.75 / 566,286.93 / 565,561.09). Receipts =
      applications = 24,574,608.36 / 31,633,933.20 / 31,688,081.73, Dr 1010 and Cr 1020. 2060 at the year-ends 3,105.75 (CM-2024-000147
-     2,641.08; CM-2024-000158 464.67) / 1,008.67 (CM-2025-000329, -000375, -000376) / 3,413.46 (Issued CM-2026-000583 1,503.06, -000605
-     912.97, -000607 997.43). 2034 at 2026-12-31 48,858.55. Excluded: the closes on 4060 (3 rows, 589,524.29) and 6290 (3 rows). -->
+     2,641.08; CM-2024-000158
+     464.67) / 1,008.67 (CM-2025-000329, -000375, -000376) / 3,413.46 (Issued CM-2026-000583 1,503.06, -000605 912.97, -000607 997.43). 2034 at 2026-12-31 48,858.55. Excluded: the closes on 4060 (3 rows, 589,524.29) and 6290 (3 rows). -->
 
 **Requirement 3: Assess the risks and set materiality (Chapters 6 and 8).**
 
@@ -184,6 +185,7 @@ A planning workbook keeps its parameters in cells that every later test refers t
 - Brainstorm the fraud risks with @tbl-19-01 and AS 2401's three conditions, mapped to the people and documents of @fig-19-01.
 - Build a risk-and-control matrix: risk, assertion, control point, test, tool, and whether the evidence lies in the database or outside it.
 
+<!-- notes: ch19.r3 -->
 <!-- Instructor notes, Requirement 3: income before income taxes as recorded, 4,503,611.24: materiality 225,180.56, performance
      materiality 168,885.42, clearly trivial 11,259.03. Return rate on revenue (SalesInvoice postings to 4010-4040 and 4080:
      27,313,074.43 / 29,372,768.96 / 29,761,002.45): 0.533% / 0.685% / 0.816%; 2026 expectation at the 2025 rate 203,762.47 against
@@ -204,12 +206,13 @@ Each test joins a document to the people who handled it and to the cash on the i
 - Compare each refund's method with the methods of the receipts on the credited invoice, and test the clawbacks for completeness and accuracy and the refunds for one per credit.
 - Combine the exceptions in one list by year with UNION ALL, and export the refund flags as RefundFlags.csv.
 
+<!-- notes: ch19.r4 -->
 <!-- Instructor notes, Requirement 4 (three years; fiscal 2026 in brackets): credits above the approver's limit 414 / 421,606.55 (104 /
-     157 / 153 a year) [153 / 172,307.40], all approved by customer service representatives with a limit of 0; the manager's 25,000 is
+     157 /
+     153 a year) [153 / 172,307.40], all approved by customer service representatives with a limit of 0; the manager's 25,000 is
      never exceeded. Credit approver also applied cash to the credited invoice: 206 / 214,824.39 (60 / 77 / 69) [69 / 68,514.82]; on or
-     before the credit date 44 / 42,044.83 [14]; recorded or applied 356 / 376,965.42. Refunds above the limit 163 / 145,938.94 (Staff
-     Accountants 79 / 71,555.36, Administrative Specialists 84 / 74,383.58; 43 / 61 / 59 a year) [59 / 56,131.84]; the Accounting
-     Manager's 59 (70,779.48) are within limit. Refunds dated before the last payment on the credited invoice 58 / 71,306.30 (10 / 29 /
+     before the credit date 44 / 42,044.83 [14]; recorded or applied 356 / 376,965.42. Refunds above the limit 163 / 145,938.94 (Staff Accountants 79 / 71,555.36, Administrative Specialists 84 / 74,383.58; 43 / 61 / 59 a year) [59 / 56,131.84]; the Accounting Manager's 59 (70,779.48) are within limit. Refunds dated before the last payment on the credited invoice 58 / 71,306.30 (10 /
+     29 /
      19) [19 / 24,893.21]; before any payment 41 / 36,034.57 [14 / 16,670.59]; 28 also before the invoice's due date; the payment arrived
      1-19 days later (mean 5.6). Cause: credits are split between 1020 and 2060 by the invoice's final payments, so 106 of the 225 credits
      to 2060 were posted when nothing had been paid; this is how the records were produced, but the control does not check it. Past due
@@ -218,8 +221,7 @@ Each test joins a document to the people who handled it and to the cash on the i
      62,483.48]: no customer pays by one method only, and a refund method chosen at random across four methods would mismatch about this
      often, so it is an anomaly to follow up, not a rule. Clean: employment dates; refund approver never the credit approver; returns
      always received in the warehouse; one refund per credit, equal to the credit's 2060 part (222 of 222); a clawback for every credit
-     line (637), base = line total and rate = the accrual's; amount = base x rate except half-cent rounding on SCAJ-2024-000128,
-     SCAJ-2025-000347, -000368; 619 clawbacks netted in later commission payments, 18 pending at the end of 2026. Optional design note:
+     line (637), base = line total and rate = the accrual's; amount = base x rate except half-cent rounding on SCAJ-2024-000128, SCAJ-2025-000347, -000368; 619 clawbacks netted in later commission payments, 18 pending at the end of 2026. Optional design note:
      the Accounting Manager approved all 8 commission rates (which end 2026-12-31), created all 27,933 accruals, and approved all 196
      commission payments. -->
 
@@ -232,17 +234,16 @@ The committee will want to see where returns grow and which refunds deserve a se
 - Look for concentration by carrier, warehouse, and customer, as a share of each customer's sales.
 - Score each refund on its flags, one point for each, and let a reviewer drill through from the score to the refund, its credit, and its invoice.
 
+<!-- notes: ch19.r5 -->
 <!-- Instructor notes, Requirement 5: credits by group 2024 / 2025 / 2026: Furniture 73,312.97 / 129,872.44 / 161,086.15 (0.468% /
-     0.743% / 0.926% of 4010); Lighting 33,062.08 / 32,578.56 / 48,813.77; Textiles 26,889.07 / 24,090.73 / 22,396.32; Accessories
-     12,391.23 / 14,562.65 / 10,468.32. Damaged 22,547.39 / 47,008.01 / 73,617.40 (Furniture Damaged 5,273.25 / 31,696.30 / 50,172.01).
-     Furniture families 2026: TBL 36,350.42, DSK 31,186.47, SDB 22,766.37, CTB 20,790.93, NGT 19,797.66. Wholesale 82,477.55 / 90,614.46
-     / 148,224.44. No concentration by carrier (Damaged lines 25-33 each) or warehouse (326 / 311 lines). Returns come 7-74 days after
+     0.743% /
+     0.926% of 4010); Lighting 33,062.08 / 32,578.56 / 48,813.77; Textiles 26,889.07 / 24,090.73 / 22,396.32; Accessories 12,391.23 / 14,562.65 / 10,468.32. Damaged 22,547.39 / 47,008.01 / 73,617.40 (Furniture Damaged 5,273.25 / 31,696.30 / 50,172.01).
+     Furniture families 2026: TBL 36,350.42, DSK 31,186.47, SDB 22,766.37, CTB 20,790.93, NGT 19,797.66. Wholesale 82,477.55 / 90,614.46 / 148,224.44. No concentration by carrier (Damaged lines 25-33 each) or warehouse (326 / 311 lines). Returns come 7-74 days after
      shipment (mean 28.3; 3-72 after delivery). By shipment year 0.606% / 0.726% / 0.794%; December 2026 shipments 0.05% (censored), other
      2026 months 0.51-1.35%; 27 return lines (30,304.99) fall in a later year than their shipment; 2024 has no 2023 carry-in. Credits on
      sales 0.682% overall; customer 128 (Strategic, Net 45) 3.61% (38,912.92 on 1,077,502.22), 16 credits (41,442.26; 13 approved by two
      representatives), 6 refunds (26,315.10), all dated before the customer's payment; small customers 178 (4.86%) and 35 (4.15%) rank
-     higher on tiny sales. Refund approvers by year: Accounting Manager 12 / 23 / 24, Administrative Specialists 23 / 38 / 23, Staff
-     Accountants 20 / 23 / 36. Score from five flags (refund above authority, credit above authority, method mismatch, before payment, past
+     higher on tiny sales. Refund approvers by year: Accounting Manager 12 / 23 / 24, Administrative Specialists 23 / 38 / 23, Staff Accountants 20 / 23 / 36. Score from five flags (refund above authority, credit above authority, method mismatch, before payment, past
      due at least the refund): 0-5 = 4, 18, 53, 83, 44, 20; 64 refunds score 4 or 5 (80,776.86); RF-2025-000097 scores 4 (its approver was
      within limit). Weekend dates are spread evenly (62 refunds, 179 credits) and are not a useful flag here. -->
 
@@ -267,8 +268,8 @@ The selection and its evaluation are worksheet work, with the random selection C
 - Apply the same sample to one attribute the data can test, the refund dated before the customer's payment, and compare the sample's conclusion with Requirement 4's result for the whole population.
 - The database holds no documents, so you cannot complete the three attributes here. Deliver the sampling plan, the frozen selection, and the rule for evaluating it, and do not invent results.
 
-<!-- Instructor notes, Requirement 6: key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134,
-     RF-2026-000158, -000218); remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population
+<!-- notes: ch19.r6 -->
+<!-- Instructor notes, Requirement 6: key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134, RF-2026-000158, -000218); remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population
      table is conservative). Upper limits at n = 59: 0 deviations 4.95%, 1 7.79%, 2 10.29%, 3 12.62%; only zero deviations supports
      reliance at 5%. Data attribute: 52 of the 215 deviate (24.2%), and 6 of the 7 key items; a sample of 59 expects 14.3, and about 93%
      of draws give 10 to 19 (P(X <= 9) = 0.041, P(X <= 19) = 0.967), with upper limits of about 27% at 10, 35% at 14, and 44% at 19: every
@@ -283,6 +284,7 @@ The selection and its evaluation are worksheet work, with the random selection C
 - Test for lapping: receipts applied to another customer's invoices, delays from receipt to deposit and from receipt to application, and receipts applied to invoices dated after them. Explain why a first-digit test does not suit these populations, using Chapter 8's criteria.
 - Build a timeline of the largest refund, from the shipment to the last receipt on its invoice, with who did each step. Record a disposition, and list the evidence outside the database that would settle it.
 
+<!-- notes: ch19.r7 -->
 <!-- Instructor notes, Requirement 7: substantive tests clean: 637 of 637 credit lines trace to their return, shipment, and invoice
      lines; no quantity above shipped and no shipment line returned twice; price and discount equal the invoice line's; LineTotal =
      ROUND(Q x P x (1 - D), 2) except a half-cent on credit line 84; 612 credits on 612 distinct invoices, none above its invoice; SubTotal
@@ -293,8 +295,7 @@ The selection and its evaluation are worksheet work, with the random selection C
      and invoice date; every receipt fully applied; 491 receipts (526 applications, 395,196.29) were applied to invoices dated after the
      receipt, deposits held in 2060, not lapping. First digits: 612 credits and 222 refunds are too few, and their amounts are prices times
      quantities plus tax. Timeline: SH-2025-004100 shipped 2025-04-27 (FedEx Freight), delivered 04-30; SI-2025-008932 dated 04-30,
-     18,774.16, due 06-14 (customer 128); CR-2025-003258 05-17, check, 5,692.75 applied (recorded and applied by the Customer Service
-     Manager); SR-2025-000255 06-06, Damaged (15.71 of 15.71 FUR-DSK-0071; 2.62 of 6.86 FUR-CTB-0045), received by a Shipping Clerk;
+     18,774.16, due 06-14 (customer 128); CR-2025-003258 05-17, check, 5,692.75 applied (recorded and applied by the Customer Service Manager); SR-2025-000255 06-06, Damaged (15.71 of 15.71 FUR-DSK-0071; 2.62 of 6.86 FUR-CTB-0045), received by a Shipping Clerk;
      CM-2025-000255 06-09, 17,745.96, the largest credit of the three years, approved by a representative with a limit of 0, all to 2060
      while 13,081.41 of the invoice was unpaid; clawbacks SCAJ-2025-000268/269 (321.33 and 11.93); RF-2025-000097 06-15, a Sunday, wire,
      approved by the Accounting Manager (within the 25,000 limit), cleared 06-18; CR-2025-003473 received 06-17 (check, recorded and
@@ -326,6 +327,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 - Classify each, and give it a disposition in Chapter 8's terms.
 - Report the clean results with the same care as the exceptions.
 
+<!-- notes: ch19.r8 -->
 <!-- Instructor notes, Requirement 8 (expected; reasoned alternatives accepted): D1 credit authority (414; 2026 exposure 172,307.40,
      above performance materiality 168,885.42 and below materiality; all 2026 credits 260,457.72, above it). D2 segregation in customer
      service (receipts, applications, credits, clawbacks; 206 overlaps): a design deficiency, mitigated but not removed by every credit
@@ -343,6 +345,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 
 **Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. Managers often resist a finding of a weakness when no error has been detected (Cohen et al., 2020), so prepare the evidence for each compensating control they may point to.
 
+<!-- notes: ch19.r9 -->
 <!-- Instructor notes, Requirement 9: the conclusion describes rather than accuses: the records reconcile and the balances tested are
      right; the controls over who may grant credits and refunds are not designed to prevent an unauthorized one; two significant
      deficiencies; one refund under follow-up; no trace of lapping. Actions: an approved delegation of authority for credits and refunds,
@@ -363,10 +366,8 @@ The register in Audit Monitoring.pbix already runs the rule tests of Chapters 8 
 - If you did not build Audit Monitoring.pbix in Chapter 16, build a small register in Credits Analytics.pbix instead: a Tests table entered with Enter data, and an exceptions table that appends the documents each of the four tests flags.
 - Recheck the date through which the register's data run, and record the change.
 
-<!-- Instructor notes, Requirement 10: exceptions and rates per 1,000 (2024 / 2025 / 2026; three years): CM AboveLimit 414 (104 / 157 /
-     153; 658.2 / 676.7 / 689.2; 676.5); CM CashAndCredit 206 (60 / 77 / 69; 379.7 / 331.9 / 310.8; 336.6); RF AboveLimit 163 (43 / 61 /
-     59; 781.8 / 726.2 / 710.8; 734.2); RF BeforePayment 58 (10 / 29 / 19; 181.8 / 345.2 / 228.9; 261.3). Populations: credits 158 / 232 /
-     222, refunds 55 / 84 / 83. The register grows from 151 to 992 rows, (TestID, DocumentNumber) still unique. For BeforePayment, group
+<!-- notes: ch19.r10 -->
+<!-- Instructor notes, Requirement 10: exceptions and rates per 1,000 (2024 / 2025 / 2026; three years): CM AboveLimit 414 (104 / 157 / 153; 658.2 / 676.7 / 689.2; 676.5); CM CashAndCredit 206 (60 / 77 / 69; 379.7 / 331.9 / 310.8; 336.6); RF AboveLimit 163 (43 / 61 / 59; 781.8 / 726.2 / 710.8; 734.2); RF BeforePayment 58 (10 / 29 / 19; 181.8 / 345.2 / 228.9; 261.3). Populations: credits 158 / 232 / 222, refunds 55 / 84 / 83. The register grows from 151 to 992 rows, (TestID, DocumentNumber) still unique. For BeforePayment, group
      the applications by invoice for the last ApplicationDate and merge it; for CashAndCredit, merge the applications and test whether the
      credit's approver is among their appliers. Data Through stays 2026-12-18 (payroll); credits end 2026-12-26 and refunds 2026-12-22.
      After remediation, the two authority tests should fall to zero; the other two are the ones that would catch the next case. -->

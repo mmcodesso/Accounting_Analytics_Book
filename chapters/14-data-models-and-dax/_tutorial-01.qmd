@@ -99,10 +99,10 @@ c. Save the report.
 
 Every year's line count, line total, list amount, and discounts should be unchanged, which proves that the restructuring lost no invoice line and moved none to another year. @fig-14-01 compares the model before and after.
 
+<!-- notes: ch14.t1 -->
 <!-- Tutorial 14.1 expected values (Desktop 2.158 reference model, run through the local engine on 2026-10-01, and SQL):
      Date: 1,461 rows (2024-01-01 to 2027-12-31), YearMonth "2026-01" etc. Merge: 27,933 lines, every SalesInvoiceID matched.
-     Validation table after re-pointing: 2024 9,040 / 27,313,723.48 / 30,596,029.91 / 126,607.64; 2025 9,371 / 29,376,702.28 /
-     33,030,575.85 / 234,534.72; 2026 9,522 / 29,756,420.08 / 33,589,137.45 / 362,110.75 (unchanged). Invoices (DISTINCTCOUNT of
+     Validation table after re-pointing: 2024 9,040 / 27,313,723.48 / 30,596,029.91 / 126,607.64; 2025 9,371 / 29,376,702.28 / 33,030,575.85 / 234,534.72; 2026 9,522 / 29,756,420.08 / 33,589,137.45 / 362,110.75 (unchanged). Invoices (DISTINCTCOUNT of
      SalesInvoiceLine[SalesInvoiceID]) 6,735, 7,008, 7,171. Unquoted Item or Date in a formula fails ("The syntax for 'Item' is
      incorrect"), and one broken measure stops every measure from evaluating. -->
 

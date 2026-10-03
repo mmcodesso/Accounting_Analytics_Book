@@ -28,18 +28,15 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the six queries and a half-page memo.
 
+<!-- notes: ch09.ex1 -->
 <!-- Instructor notes, Exercise 9.1: 104 accounts: Asset 25, Liability 18, Equity 8, Revenue 13, Expense 40. Eighteen subtypes,
-     including Header (10), Current Asset (11), Fixed Asset (5), Contra Fixed Asset (4), Contra Current Asset (1), Current Liability
-     (13), Long-Term Liability (3), Operating Revenue (6), Contra Revenue (2), COGS (8), Operating Expense (29), Closing (1).
+     including Header (10), Current Asset (11), Fixed Asset (5), Contra Fixed Asset (4), Contra Current Asset (1), Current Liability (13), Long-Term Liability (3), Operating Revenue (6), Contra Revenue (2), COGS (8), Operating Expense (29), Closing (1).
      Header accounts: 10; eight top-level headers (1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000) have a NULL ParentAccountID, while
      1100 Fixed Assets and 2100 Long-Term Liabilities are sub-headers under 1000 and 2000, so the chart has two levels of headers. No
      header account has a posting. Opposite normal balances (8): 1030 Allowance for Doubtful Accounts, 1150/1160/1170/1186 accumulated
-     depreciation (contra assets, credit); 3040 Dividends or Owner Distributions (contra equity, debit); 4060 Sales Returns and Allowances
-     and 4070 Sales Discounts (contra revenue, debit). The query needs parentheses:
+     depreciation (contra assets, credit); 3040 Dividends or Owner Distributions (contra equity, debit); 4060 Sales Returns and Allowances and 4070 Sales Discounts (contra revenue, debit). The query needs parentheses:
      (AccountType IN ('Asset','Expense') AND NormalBalance = 'Credit') OR (AccountType IN ('Liability','Equity','Revenue') AND NormalBalance = 'Debit').
-     Inactive (8), none with any posting: 4070 Sales Discounts, 5070 Inventory Adjustments, 6170 Bad Debt Expense, 6260 Salaries Expense -
-     Manufacturing, 6270 Factory Overhead Expense, 7000 Other Income and Expense (header), 7010 Interest Income, 7040 Foreign Exchange Gain
-     or Loss. Manufacturing salaries and factory overhead are charged to 1090 Manufacturing Cost Clearing (AccountID 92) and reach cost of
+     Inactive (8), none with any posting: 4070 Sales Discounts, 5070 Inventory Adjustments, 6170 Bad Debt Expense, 6260 Salaries Expense - Manufacturing, 6270 Factory Overhead Expense, 7000 Other Income and Expense (header), 7010 Interest Income, 7040 Foreign Exchange Gain or Loss. Manufacturing salaries and factory overhead are charged to 1090 Manufacturing Cost Clearing (AccountID 92) and reach cost of
      goods sold through inventory and 5080 Manufacturing Variance. Memo points: 1030 has no postings, so no allowance has ever been recorded
      (Chapter 8); 4070 is inactive, so discounts are netted in revenue (Part II case). -->
 
@@ -66,6 +63,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the queries and a short comparison.
 
+<!-- notes: ch09.ex2 -->
 <!-- Instructor notes, Exercise 9.2: 5060 Purchase Price Variance is AccountID 55. Fiscal 2026 source types: PurchaseInvoice and
      JournalEntry; the JournalEntry row is closing entry JE-2026-000296, a credit of 176,011.36, which clears the account. PurchaseInvoice
      postings: 23,556 rows with three descriptions: "Record unfavorable purchase variance" 12,389 debits (167,063.83), "Record favorable
@@ -99,6 +97,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the queries and a short description of how the standards are built.
 
+<!-- notes: ch09.ex3 -->
 <!-- Instructor notes, Exercise 9.3: 88 manufactured items (Furniture 56, Lighting 26, Textiles 5, Accessories 1). Material cost =
      StandardCost - StandardConversionCost, from 10.43 to 558.40. The component check returns no rows: labor + variable overhead + fixed
      overhead = conversion for every item. Labor rate per standard hour ranges from 23.27 to 31.82, so rates are item-specific, not one plant
@@ -128,6 +127,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the queries and a half-page memo.
 
+<!-- notes: ch09.ex4 -->
 <!-- Instructor notes, Exercise 9.4: 670 work orders have a NULL ClosedDate: Released 558, In Progress 27, Completed 85 (completed but not
      closed). Every WorkOrderNumber carries the year of its ReleasedDate, and every open work order is a 2026 work order (released
      2026-05-23 to 2026-12-31); COALESCE shows not completed for the 585 released or in progress and a date for the 85 completed. Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23
@@ -158,8 +158,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the queries and a short comparison with Tutorial 2.1.
 
-<!-- Instructor notes, Exercise 9.5: Status values Delivered (8,967) and In Transit (740); ShippedBy DHL Supply Chain, FedEx Freight,
-     Private Fleet, UPS Freight. No TrackingNumber (NULL): 392 shipments, dated 2024-01-16 to 2026-12-31. In Transit with DeliveryDate
+<!-- notes: ch09.ex5 -->
+<!-- Instructor notes, Exercise 9.5: Status values Delivered (8,967) and In Transit (740); ShippedBy DHL Supply Chain, FedEx Freight, Private Fleet, UPS Freight. No TrackingNumber (NULL): 392 shipments, dated 2024-01-16 to 2026-12-31. In Transit with DeliveryDate
      before 2026-12-31: 739, the oldest delivered 2024-01-10 (one more In Transit shipment has a DeliveryDate on or after 2026-12-31). The
      SQL results equal the Excel filters of Tutorial 2.1. Dimensions: completeness (tracking number) and consistency or timeliness (status
      that contradicts the delivery date). The tests are saved as text and rerun with one click. -->
@@ -183,10 +183,11 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Deliverable.** A script with the queries and a short list of findings with follow-up questions.
 
+<!-- notes: ch09.ex6 -->
 <!-- Instructor notes, Exercise 9.6: three Direct Manufacturing labor rows have no WorkOrderOperationID: LaborTimeEntryIDs 213 (employee
-     17, work order 1, 2024-01-17, 3.74 hours), 26171 (employee 17, work order 5328, 2025-01-02, 1.55 hours), and 48261 (employee 18, work
-     order 9897, 2026-01-02, 0.50 hours); employees 17 and 18 are assemblers. They are planted anomalies (invalid direct labor operation
-     link). ClockStatus values: Approved (52,962) and Pending (5). Three entries have no ClockOutTime, all for employee 85 (an Inventory
-     Specialist) on January 1 of 2024, 2025, and 2026, with Pending status (planted missing clock-out). Thirteen employees have a
+     17, work order 1, 2024-01-17, 3.74 hours), 26171 (employee
+     17, work order 5328, 2025-01-02, 1.55 hours), and 48261 (employee
+     18, work order 9897, 2026-01-02, 0.50 hours); employees 17 and 18 are assemblers. They are planted anomalies (invalid direct labor operation
+     link). ClockStatus values: Approved (52,962) and Pending (5). Three entries have no ClockOutTime, all for employee 85 (an Inventory Specialist) on January 1 of 2024, 2025, and 2026, with Pending status (planted missing clock-out). Thirteen employees have a
      TerminationDate; all are Terminated with IsActive 0, so the three columns agree. Missing links mean labor cost that cannot be traced
      to an operation; missing clock-outs mean paid hours without a complete time record. -->

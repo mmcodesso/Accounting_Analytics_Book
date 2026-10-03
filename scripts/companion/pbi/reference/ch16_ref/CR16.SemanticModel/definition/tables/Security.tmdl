@@ -1,0 +1,32 @@
+table Security
+	isHidden
+
+	column UserPrincipalName
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: UserPrincipalName
+
+	column CostCenterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CostCenterID
+
+	partition Security = m
+		mode: import
+		source =
+			let
+			    Source = #table(type table [UserPrincipalName = text, CostCenterID = Int64.Type], {
+				    {"employee001@charlesriver.example", 1},
+				    {"employee006@charlesriver.example", 2},
+				    {"employee007@charlesriver.example", 3},
+				    {"employee004@charlesriver.example", 4},
+				    {"employee010@charlesriver.example", 5},
+				    {"employee005@charlesriver.example", 6},
+				    {"employee011@charlesriver.example", 7},
+				    {"employee012@charlesriver.example", 9},
+				    {"employee014@charlesriver.example", 10}
+			    })
+			in
+			    Source

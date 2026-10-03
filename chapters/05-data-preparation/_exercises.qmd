@@ -24,6 +24,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A quarterly schedule of gross and net Furniture revenue for fiscal 2026 with a short note on the timing of credits.
 
+<!-- notes: ch05.ex1 -->
 <!-- Instructor notes, Exercise 5.1: gross Furniture revenue 2026 Q1-Q4 4,354,122.83 / 4,600,820.85 / 4,283,322.86 / 4,156,787.84.
      Furniture credit memo lines by CreditMemoDate: Q1 30 lines 42,139.69; Q2 15 lines 23,789.08; Q3 28 lines 55,437.94; Q4 25 lines 39,719.44
      (98 lines, 161,086.15). Net: 4,311,983.14 / 4,577,031.77 / 4,227,884.92 / 4,117,068.40. No unmatched rows. 14 credit memo lines dated in
@@ -52,10 +53,9 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A SalesInvoice Table with the test columns and a half-page memo on the invoices whose numbers or dates are inconsistent.
 
-<!-- Instructor notes, Exercise 5.2: six invoices carry the next year's number prefix: SI-2025-006733 (2024-11-23), SI-2025-006734 (2024-12-05),
-     SI-2025-006735 (2024-12-15), SI-2026-013741 (2025-11-29), SI-2026-013742 (2025-12-04), SI-2026-013743 (2025-12-03). Three invoices are dated
-     before their order: SI-2024-000001 (2024-01-01, order 2024-01-02), SI-2024-000002 (2024-01-02, order 2024-01-03), SI-2024-000003 (2024-01-01,
-     order 2024-01-02). These nine are exactly the nine invoices dated before their first shipment in Tutorial 2.1. Together they suggest
+<!-- notes: ch05.ex2 -->
+<!-- Instructor notes, Exercise 5.2: six invoices carry the next year's number prefix: SI-2025-006733 (2024-11-23), SI-2025-006734 (2024-12-05), SI-2025-006735 (2024-12-15), SI-2026-013741 (2025-11-29), SI-2026-013742 (2025-12-04), SI-2026-013743 (2025-12-03). Three invoices are dated
+     before their order: SI-2024-000001 (2024-01-01, order 2024-01-02), SI-2024-000002 (2024-01-02, order 2024-01-03), SI-2024-000003 (2024-01-01, order 2024-01-02). These nine are exactly the nine invoices dated before their first shipment in Tutorial 2.1. Together they suggest
      backdated invoices: numbered in the later period but dated earlier, which is a revenue cutoff risk. Order and shipment numbers show no
      such mismatch. Evidence to request: the invoice creation logs, the shipping documents, and customer acknowledgments. -->
 
@@ -80,10 +80,8 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A product mix grid for the Furniture group in 2026-Q3 and 2026-Q4, with a short interpretation.
 
-<!-- Instructor notes, Exercise 5.3: Furniture revenue by product type, Q3 / Q4 (quantity Q3 / Q4): BKC 259,617.77 / 297,121.44 (475.61 / 517.59);
-     BNH 234,227.64 / 239,562.62 (374.62 / 422.79); CON 454,136.92 / 504,299.85 (636.04 / 667.36); CTB 732,861.82 / 690,150.36 (1,296.08 / 1,240.95);
-     DSK 768,977.89 / 751,338.42 (1,050.73 / 1,195.45); NGT 457,540.67 / 369,972.92 (905.06 / 734.14); SDB 633,110.81 / 558,717.15 (1,072.57 / 958.22);
-     TBL 742,849.34 / 745,625.08 (1,280.52 / 1,385.62). Totals 4,283,322.86 / 4,156,787.84. Nightstands and sideboards lost the most revenue;
+<!-- notes: ch05.ex3 -->
+<!-- Instructor notes, Exercise 5.3: Furniture revenue by product type, Q3 / Q4 (quantity Q3 / Q4): BKC 259,617.77 / 297,121.44 (475.61 / 517.59); BNH 234,227.64 / 239,562.62 (374.62 / 422.79); CON 454,136.92 / 504,299.85 (636.04 / 667.36); CTB 732,861.82 / 690,150.36 (1,296.08 / 1,240.95); DSK 768,977.89 / 751,338.42 (1,050.73 / 1,195.45); NGT 457,540.67 / 369,972.92 (905.06 / 734.14); SDB 633,110.81 / 558,717.15 (1,072.57 / 958.22); TBL 742,849.34 / 745,625.08 (1,280.52 / 1,385.62). Totals 4,283,322.86 / 4,156,787.84. Nightstands and sideboards lost the most revenue;
      consoles and bookcases gained. Share changes: NGT -1.8 pts, SDB -1.3 pts, CON +1.5 pts, BKC +1.1 pts; the two-point threshold highlights
      none, a useful result: the mix shift is modest. Quantities are fractional on most lines (the validity finding), so unit counts are not
      whole products; revenue shares avoid the issue. -->
@@ -107,11 +105,11 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A lag analysis by quarter, a count of promotion lines invoiced after each promotion ended, and a short recommendation.
 
+<!-- notes: ch05.ex4 -->
 <!-- Instructor notes, Exercise 5.4: order-to-invoice lag across all 20,914 invoices: median 12 days, mean 21.3 (90th percentile 52 days);
      the mean exceeds the median because a minority of orders take much longer to invoice (right skew). Fiscal 2026 by quarter, invoices and
      average lag: Q1 1,845, 23.1 days; Q2 1,782, 20.5; Q3 1,756, 21.4; Q4 1,788, 21.6 (medians 13, 11, 13, 12): stable. Promotion lines invoiced after the end date:
-     PROMO-2024-001 80 of 80, PROMO-2024-002 147 of 431, PROMO-2024-003 74 of 149, PROMO-2025-004 74 of 74, PROMO-2025-005 74 of 228,
-     PROMO-2025-006 201 of 414, PROMO-2026-007 68 of 68, PROMO-2026-008 160 of 576, PROMO-2026-009 27 of 88. Promotions 001, 004, and 007 have
+     PROMO-2024-001 80 of 80, PROMO-2024-002 147 of 431, PROMO-2024-003 74 of 149, PROMO-2025-004 74 of 74, PROMO-2025-005 74 of 228, PROMO-2025-006 201 of 414, PROMO-2026-007 68 of 68, PROMO-2026-008 160 of 576, PROMO-2026-009 27 of 88. Promotions 001, 004, and 007 have
      every line after the end date because their dates are wrong (a one-day promotion, and two whose end dates precede their start dates);
      these are left for the audit analytics chapter. Revenue belongs to the invoice date; the order date explains the price. Three invoices
      have a negative lag (Exercise 5.2). -->
@@ -139,11 +137,14 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A Supplier Table with the match key and the matched employee details, and a half-page memo.
 
+<!-- notes: ch05.ex5 -->
 <!-- Instructor notes, Exercise 5.5: six suppliers share an exact address and city with an employee: Supplier 1 Anderson-Noble and employee 22
-     Rose Kim (Assembler); 2 Watson, Mitchell and Chen and 46 Michael Hinton (Machine Operator); 3 Lucas, Green and Richardson and 33 Doris
-     Rivera (Assembler); 4 Stokes, Mann and Keller and 119 Kaitlyn Johnson (Designer); 5 Nelson-Rocha and 65 Chelsea Horn (Quality Technician);
-     6 Wright, Sanchez and Garza and 20 Kenneth Boyd (Assembler). Payments: supplier 1 394 payments 356,457.22; 2 325 450,394.32; 3 390 370,084.55;
-     4 215 690,348.44; 5 237 563,948.67; 6 376 352,041.01. These are the AnomalyLog's related_party_address_match items. The addresses match
+     Rose Kim (Assembler); 2 Watson, Mitchell and Chen and 46
+     Michael Hinton (Machine Operator); 3 Lucas, Green and Richardson and 33
+     Doris Rivera (Assembler); 4 Stokes, Mann and Keller and 119
+     Kaitlyn Johnson (Designer); 5 Nelson-Rocha and 65
+     Chelsea Horn (Quality Technician); 6 Wright, Sanchez and Garza and 20
+     Kenneth Boyd (Assembler). Payments: supplier 1 394 payments 356,457.22; 2 325 450,394.32; 3 390 370,084.55; 4 215 690,348.44; 5 237 563,948.67; 6 376 352,041.01. These are the AnomalyLog's related_party_address_match items. The addresses match
      exactly, so standardizing does not change the result, which students should note. Next procedures: confirm ownership, review the
      approval of these suppliers and of their invoices, and compare prices with other suppliers. -->
 
@@ -174,15 +175,14 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Deliverable.** A reviewed supplier list and item master with the test columns, and a half-page memo.
 
-<!-- Instructor notes, Exercise 5.6: PROPER changes 62 of 110 supplier names, for example "Watson, Mitchell and Chen" to "Watson, Mitchell And
-     Chen" and "Donaldson LLC" to "Donaldson Llc": the names are already consistently cased, so standardizing damages them. No TaxID or
+<!-- notes: ch05.ex6 -->
+<!-- Instructor notes, Exercise 5.6: PROPER changes 62 of 110 supplier names, for example "Watson, Mitchell and Chen" to "Watson, Mitchell And Chen" and "Donaldson LLC" to "Donaldson Llc": the names are already consistently cased, so standardizing damages them. No TaxID or
      BankAccount is shared: no duplicate suppliers on these keys, although duplicates with different identifiers would not be caught.
      Seven suppliers are unapproved (IDs 104 to 110), and none has a purchase order or a payment: the approval control appears to work.
      Seven suppliers are rated High risk (IDs 11, 24, 40, 55, 57, 80, and 104), six of them approved and receiving business. The six
      related-party suppliers of Exercise 5.5 are also worth focusing on. Item master: three items are Discontinued but IsActive 1 (IDs 1, 2, 6:
      ACC-MIR-0001, LGT-TBL-0001, TXT-THR-0001), a status conflict. Three Discontinued items with IsActive 0 were still invoiced in every year
      through 2026-12-31: ACC-PLN-0002 (132 lines), LGT-PND-0002 (68), and FUR-SDB-0002 (216), the sideboard used as an example in the chapter.
-     Two items were invoiced before their LaunchDate: LGT-CHD-0019 (launch 2026-01-21; 58 lines from 2024-02-11 to 2026-01-15) and ACC-ART-0020
-     (launch 2025-02-05; 54 lines from 2024-01-11 to 2025-01-31), 112 lines and 206,424.41 in all. These are the AnomalyLog's
+     Two items were invoiced before their LaunchDate: LGT-CHD-0019 (launch 2026-01-21; 58 lines from 2024-02-11 to 2026-01-15) and ACC-ART-0020 (launch 2025-02-05; 54 lines from 2024-01-11 to 2025-01-31), 112 lines and 206,424.41 in all. These are the AnomalyLog's
      item_status_alignment_conflict, discontinued_item_in_new_activity, and prelaunch_item_in_new_activity items; the log also names item 228,
      but no line of item 228 is dated before its launch. The findings mean the status and launch fields cannot be relied on to control sales. -->

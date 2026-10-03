@@ -169,15 +169,14 @@ RETURN
 
 The query keeps every posting through December 31, 2026, except the two closing entries of 2026, as Chapter 6's pre-closing trial balance did. It calculates each account's balance and adds up the debit balances and the credit balances separately. The two totals must be equal, and equal to Chapter 6's.
 
+<!-- notes: ch14.t3 -->
 <!-- Tutorial 14.3 expected values (Desktop 2.158 reference model through the local engine, and SQL): GLEntry 815,921 rows;
      closes flagged: JE-2024-000265 (42 postings), -000266 (2), JE-2025-000287 (43), -000288 (2), JE-2026-000296 (43), -000297 (2);
-     VoucherNumber equals an EntryNumber only on the 2,821 JournalEntry postings. Net Income 2024 5,110,308.27, 2025 5,134,354.71,
-     2026 4,503,611.24 (each equal to its Income Summary to Retained Earnings close); with the closes included 0.00 in every year.
+     VoucherNumber equals an EntryNumber only on the 2,821 JournalEntry postings. Net Income 2024 5,110,308.27, 2025 5,134,354.71, 2026 4,503,611.24 (each equal to its Income Summary to Retained Earnings close); with the closes included 0.00 in every year.
      2026 by subtype (credit-positive): Operating Revenue 29,973,822.48; Contra Revenue -242,764.56; COGS -18,634,303.63;
      Operating Expense -6,471,696.58; Other Expense -28,946.47; Other Income or Expense -92,500.00. Operating expense by year
      6,033,733.49, 6,355,491.55, 6,471,696.58. Deviations above 20%: 2024-02 +44.8% (its expectation is January 2024 alone, the start-up
-     month), and the six three-pay-date months 2024-03 +51.4%, 2024-08 +29.6%, 2025-01 +28.1%, 2025-08 +26.7%, 2026-01 +30.3%,
-     2026-07 +25.4%; every other month within
+     month), and the six three-pay-date months 2024-03 +51.4%, 2024-08 +29.6%, 2025-01 +28.1%, 2025-08 +26.7%, 2026-01 +30.3%, 2026-07 +25.4%; every other month within
      -10.5% to +1.9%; 2024-01 blank. Test 3: 71 accounts, debit and credit balances 67,107,722.36. The first version of the
      expectation used DATESINPERIOD ending on the last day of the prior month; for January 2024 that window lies before the date
      table, and the function returned a stray date, giving a false expectation, so the text uses DATESBETWEEN with a guard. -->

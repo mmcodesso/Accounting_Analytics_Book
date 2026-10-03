@@ -1,0 +1,30 @@
+table WorkCenter
+
+	column WorkCenterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: WorkCenterID
+
+	column WorkCenterCode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: WorkCenterCode
+
+	column WorkCenterName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: WorkCenterName
+
+	partition WorkCenter = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T47_WorkCenter",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"WorkCenterID", "WorkCenterCode", "WorkCenterName"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"WorkCenterID", Int64.Type}, {"WorkCenterCode", type text},
+			        {"WorkCenterName", type text}})
+			in
+			    Typed
+

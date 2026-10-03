@@ -107,6 +107,7 @@ B.  3, 3.5, and 0
 C.  3, 3, and 1
 D.  An error, because the statement has no FROM clause
 
+<!-- notes: ch09.mcq -->
 <!-- Answer key, Chapter 9 (for instructors; HTML comments are removed from every rendered format):
      1 B, 2 D, 3 A, 4 C, 5 C, 6 A, 7 D, 8 B, 9 A, 10 D, 11 B, 12 C, 13 A, 14 D, 15 B.
      1 B: a column list separated by commas returns just those columns.

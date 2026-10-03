@@ -1,0 +1,63 @@
+-- @@ row counts
+EVALUATE
+ROW (
+    "Employee", COUNTROWS ( Employee ),
+    "JournalEntry", COUNTROWS ( JournalEntry ),
+    "JournalLines", COUNTROWS ( JournalLines ),
+    "PurchaseOrder", COUNTROWS ( PurchaseOrder ),
+    "PayrollRegister", COUNTROWS ( PayrollRegister ),
+    "Exceptions", COUNTROWS ( Exceptions ),
+    "Tests", COUNTROWS ( Tests ),
+    "CostCenterReview", COUNTROWS ( CostCenterReview )
+)
+-- @@ JE flags
+EVALUATE
+ROW (
+    "Weekend", SUM ( JournalEntry[Weekend] ),
+    "Backdated", SUM ( JournalEntry[Backdated] ),
+    "SelfApproved", SUM ( JournalEntry[SelfApproved] ),
+    "AboveLimit", SUM ( JournalEntry[AboveLimit] ),
+    "RoundAmount", SUM ( JournalEntry[RoundAmount] )
+)
+-- @@ score distribution
+EVALUATE
+SUMMARIZECOLUMNS ( JournalEntry[RiskScore], "Entries", [Entries], "Amount", ROUND ( [Entry Amount], 2 ) )
+ORDER BY JournalEntry[RiskScore]
+-- @@ validation
+EVALUATE
+ROW ( "Entries", [Entries], "Entry amount", ROUND ( [Entry Amount], 2 ), "Line debits", ROUND ( [Line Debits], 2 ),
+    "Line credits", ROUND ( SUM ( JournalLines[Credit] ), 2 ) )
+-- @@ JE-2024-000001 lines
+EVALUATE
+CALCULATETABLE (
+    ROW ( "Lines", COUNTROWS ( JournalLines ), "Debits", ROUND ( SUM ( JournalLines[Debit] ), 2 ), "Credits", ROUND ( SUM ( JournalLines[Credit] ), 2 ) ),
+    JournalEntry[EntryNumber] = "JE-2024-000001"
+)
+-- @@ exceptions by test
+EVALUATE
+SUMMARIZECOLUMNS ( Tests[TestID], Tests[Process], "Exceptions", [Exceptions], "Population", [Population], "Rate", ROUND ( [Rate per 1,000], 2 ) )
+ORDER BY Tests[TestID]
+-- @@ exceptions by month name
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[MonthNumber], 'Date'[MonthName], "Exceptions", [Exceptions] )
+ORDER BY 'Date'[MonthNumber]
+-- @@ exceptions by test and month name
+EVALUATE
+SUMMARIZECOLUMNS ( Tests[TestID], 'Date'[MonthNumber], "Exceptions", [Exceptions] )
+ORDER BY Tests[TestID], 'Date'[MonthNumber]
+-- @@ exceptions by year and process
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[Year], Tests[Process], "Exceptions", [Exceptions], "Population", [Population], "Rate", ROUND ( [Rate per 1,000], 2 ) )
+ORDER BY 'Date'[Year], Tests[Process]
+-- @@ by approver
+EVALUATE
+SUMMARIZECOLUMNS ( Employee[EmployeeName], Employee[JobTitle], "Exceptions", [Exceptions] )
+ORDER BY [Exceptions] DESC
+-- @@ cost center review
+EVALUATE
+SELECTCOLUMNS ( CostCenterReview, "CC", CostCenterReview[CostCenterName], "Mgr", CostCenterReview[ManagerID],
+    "Name", CostCenterReview[EmployeeName], "Title", CostCenterReview[JobTitle], "Status", CostCenterReview[EmploymentStatus],
+    "Term", CostCenterReview[TerminationDate] )
+-- @@ population total by process
+EVALUATE
+SUMMARIZECOLUMNS ( Tests[Process], "Population", [Population] )

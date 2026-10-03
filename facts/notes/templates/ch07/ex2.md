@@ -1,0 +1,4 @@
+<!-- Instructor notes, Exercise 7.2: {{ d.C }} Budget Table total {{ summary|money }} ({{ rows|count }} rows) against BudgetLine revenue, COGS, and operating-expense lines
+     {{ detail|money }}; difference {{ gap|money }}. The difference is exactly the {{ blank_rows|count }} operating-expense BudgetLine rows with a blank CostCenterID,
+     twelve months for each of {{ accounts|length }} accounts: {% for n, name, amount in accounts %}{{ n }} {{ name }} {{ amount|money }}{{ '; ' if not loop.last }}{% endfor %}. The Budget Table omits these accounts entirely. Gaps in earlier years: {% for y, g in earlier %}{{ y }} {{ g|money }}{{ '; ' if not loop.last }}{% endfor %}.
+     BudgetLine is the complete source; a control is a monthly reconciliation of the summary to the detail with a zero-difference check. -->

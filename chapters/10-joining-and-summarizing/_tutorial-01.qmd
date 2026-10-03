@@ -2,7 +2,7 @@
 
 **Context and objective.** The WorkOrderClose table records each variance but not the product that produced it. In this tutorial, you will join the closes to their work orders and items, test that every close finds its match, and summarize the variance by item group and year. You will check the total against the ledger, keep the items that carry the most variance with HAVING, and list every manufactured item with a left join, including the items with no closes.
 
-**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter09.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter10.sql` beside your working copy. As in Chapter 9, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it.
+**Prerequisites.** Complete Chapter 9, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab. If Chapter09.sql is still open in the editor, click **New tab** (Ctrl+T) for an empty editor tab. Start a new script for the chapter with the header comment below, with your own name and the date, and click **Save SQL file** to save it as `Chapter10.sql` beside your working copy. As in Chapter 9, type each query of the chapter's tutorials at the end of the script, under its comment, and run it by selecting it. If you start here, you need only the working copy, made as Step 1 of Tutorial 9.1 describes.
 
 ```sql
 /* Chapter 10: manufacturing variance, joined and summarized

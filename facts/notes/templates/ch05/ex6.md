@@ -1,0 +1,10 @@
+<!-- Instructor notes, Exercise 5.6: PROPER changes {{ changed }} of {{ suppliers }} supplier names, for example {% for name, changed_name in examples %}"{{ name }}" to "{{ changed_name }}"{{ ' and ' if not loop.last }}{% endfor %}: the names are already consistently cased, so standardizing damages them. No TaxID or
+     BankAccount is shared: no duplicate suppliers on these keys, although duplicates with different identifiers would not be caught.
+     {{ w_unapproved }} suppliers are unapproved (IDs {{ unapproved_first }} to {{ unapproved_last }}), and none has a purchase order or a payment: the approval control appears to work.
+     {{ w_high }} suppliers are rated High risk (IDs {{ high }}), {{ w_high_approved }} of them approved and receiving business. The {{ w_related }}
+     related-party suppliers of Exercise 5.5 are also worth focusing on. Item master: {{ w_conflict }} items are Discontinued but IsActive 1 (IDs {{ conflict_ids }}:
+     {{ conflict_codes }}), a status conflict. {{ w_inactive }} Discontinued items with IsActive 0 were still invoiced in every year
+     through {{ latest }}: {% for code, n in inactive %}{{ code }} ({{ n|count }}{{ ' lines' if loop.first }}){% if loop.revindex == 2 %}{{ ',' if loop.length > 2 }} and {% elif not loop.last %}, {% endif %}{% endfor %}, the sideboard used as an example in the chapter.
+     {{ w_prelaunch }} items were invoiced before their LaunchDate: {% for p in prelaunch %}{{ p.code }} (launch {{ p.launch }}; {{ p.lines|count }} lines from {{ p.first }} to {{ p.last }}){% if loop.revindex == 2 %}{{ ',' if loop.length > 2 }} and {% elif not loop.last %}, {% endif %}{% endfor %}, {{ prelaunch_lines|count }} lines and {{ prelaunch_amount|money }} in all. These are the AnomalyLog's
+     item_status_alignment_conflict, discontinued_item_in_new_activity, and prelaunch_item_in_new_activity items; the log also names item {{ extra }},
+     but no line of item {{ extra }} is dated before its launch. The findings mean the status and launch fields cannot be relied on to control sales. -->

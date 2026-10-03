@@ -2,13 +2,13 @@
 
 **Context and objective.** In this tutorial, you will examine the Charles River O2C tables in Excel and identify specific data quality problems across several worksheets. The goal is to practice applying the four quality dimensions (accuracy, completeness, consistency, and timeliness) and the tests in @tbl-02-03 to a real dataset, and to document what you find. This tutorial connects to the opening scenario by showing you how a data quality assessment works in practice.
 
-**Prerequisites.** You need Microsoft Excel installed on your computer and access to the CharlesRiver.xlsx file provided with this textbook.
+**Prerequisites.** You need Microsoft Excel installed on your computer and the CharlesRiver.xlsx file provided with this textbook. This tutorial adds columns to a worksheet, so work in a copy: copy CharlesRiver.xlsx in its folder, name the copy CharlesRiver_Work.xlsx, and use it for the rest of Part I. The downloaded workbook then stays as provided for Parts II and IV, whose tutorials read it with Power Query.
 
 **Step-by-step instructions.**
 
 **Step 1. Get to know the SalesOrder worksheet.**
 
-a. Open CharlesRiver.xlsx in Excel and click the **SalesOrder** worksheet tab.
+a. Open CharlesRiver_Work.xlsx in Excel and click the **SalesOrder** worksheet tab.
 b. Scroll across the columns to familiarize yourself with the available fields. You should see columns including SalesOrderID, OrderNumber, CustomerID, OrderDate, RequestedDeliveryDate, SalesRepEmployeeID, FreightTerms, and Status.
 c. Scroll down to get a sense of the number of records.
 

@@ -26,6 +26,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the cutoff tests and a half-page memo.
 
+<!-- notes: ch12.ex1 -->
 <!-- Instructor notes, Exercise 12.1: revenue by delivery date (every shipment is delivered in the year it ships). Fifteen invoices for goods
      delivered in December 2024 were invoiced and posted in January 2025 (SubTotal 90,138.93), and eight for December 2025 deliveries were
      posted in January 2026 (19,540.86), among them SI-2026-013742 (dated 2025-12-04, shipped 2025-12-06, posted 2026-01-01). Nine December
@@ -37,10 +38,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      cutoff error; they are Exercise 5.2's invoices except SI-2026-013742. Exercises 6.1 and 10.1 compared InvoiceLines, built on invoice
      dates, with the ledger: of their three 2026 differences, only SI-2026-013742 is a revenue cutoff error. Supplier invoices post on their
      ReceivedDate (no exception); one, ASV0050-2025-040073 (dated 2025-12-30, received 2026-01-01, 3,266.27, supplier 50), crosses the
-     year-end. Payroll: hourly labor of 2024 work paid in fiscal 2025, 117,073.89 (manufacturing 98,041.68); of 2025 work paid in fiscal
-     2026, 138,290.66 (manufacturing 117,800.12). With salaries and employer taxes and benefits allocated by working day, the full cost of
+     year-end. Payroll: hourly labor of 2024 work paid in fiscal 2025, 117,073.89 (manufacturing 98,041.68); of 2025 work paid in fiscal 2026, 138,290.66 (manufacturing 117,800.12). With salaries and employer taxes and benefits allocated by working day, the full cost of
      late-December work is about 296,000 (2024) and 335,000 (2025). Periods 70-77 average 287,283.61 (manufacturing 148,478.01); the 13
-     working days of 14-31 December 2026 cost about 383,000-392,000 (manufacturing about 185,000-199,000), never recorded. Account 2030
+     working days of 14-31 December 2026 cost about 383,000-392,000 (manufacturing about 198,000-199,000), never recorded. Account 2030
      holds only the opening 95,000, so no year-end accrues the wages; each year-end's liability is understated by the amounts above. -->
 
 
@@ -64,17 +64,23 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the aging tests and a half-page memo.
 
+<!-- notes: ch12.ex2 -->
 <!-- Instructor notes, Exercise 12.2: receivables at 2026-12-31 (days past due = julianday of the as-of date less julianday of DueDate;
      Current is zero or less): 1,079 invoices with a positive open balance, 4,418,804.32, from 203 customers. Current 780 invoices,
-     3,655,971.50; 1-30 days 258, 745,674.84; 31-60 days 28, 16,711.26; 61-90 days 10, 405.41; over 90 days 3, 41.31, the aging of
+     3,655,971.50; 1-30 days 258,
+     745,674.84; 31-60 days 28,
+     16,711.26; 61-90 days 10,
+     405.41; over 90 days 3,
+     41.31, the aging of
      Tutorial 8.2. Account 1020 (AccountID 3) at 2026-12-31 is 4,798,804.32; the 380,000.00 difference is the opening-balance line of
      JE-2024-000001, which no invoice supports (Chapter 8's finding). 225 invoices have a negative balance (-220,131.88 in all):
      credit memos on paid invoices, which post to account 2060 and are refunded, so they are not receivables. Strata by customer:
      under 1,000, 32 customers, 11,266.04; 1,000-9,999, 65, 330,518.49; 10,000-49,999, 83, 2,206,317.97; 50,000 and over, 23,
      1,870,701.82, 42.3% of the balance, the key items of Tutorial 8.2. Receipts not invoiced: 1,150 receipt lines, 1,020,992.80 (account
-     2020 is 1,020,992.06; the 0.74 is the rounding of each invoice line's clearing amount). By receipt month: 2026-12 804,428.99 (736
-     lines); 2026-11 188,895.56 (327); 2026-10 23,921.61 (75); 2026-09 2,836.29 (11); 2026-08 910.34 (1). Largest suppliers: 17 (59 lines,
-     64,236.70), 52 (30, 49,449.79), 27 (63, 47,596.03). Receipts from August to October are more than two months old and need follow-up
+     2020 is 1,020,992.06; the 0.74 is the rounding of each invoice line's clearing amount). By receipt month: 2026-12 804,428.99 (736 lines); 2026-11 188,895.56 (327); 2026-10 23,921.61 (75); 2026-09 2,836.29 (11); 2026-08 910.34 (1). Largest suppliers: 17 (59 lines,
+     64,236.70), 52 (30,
+     49,449.79), 27 (63,
+     47,596.03). Receipts from August to October are more than two months old and need follow-up
      (disputed invoices, lost invoices, or receipts recorded against the wrong order). -->
 
 
@@ -84,7 +90,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Table group:** Manufacturing
 
-**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with almost no indirect time are complete. The plant manager asks what the work-center comparison looks like when only the time recorded while each operation was open is counted, and what the plant was doing in the first months of 2024.
+**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with little indirect time are complete. The plant manager asks what the work-center comparison looks like when only the time recorded while each operation was open is counted, and what the plant was doing in the first months of 2024.
 
 **Requirements.**
 
@@ -94,21 +100,21 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (3) Rank the work centers by each ratio, and describe how the ranking changes.
 
-(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain why indirect time is almost absent from February to May 2024, and find the month in which the share of direct time recorded after its operation ended first passed a quarter.
+(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain why there is so little indirect time from February to May 2024, and find the month in which the share of direct time recorded after its operation ended first passed a quarter.
 
 (5) Write a short memo (one half page) to the plant manager: what the operation-level data can and cannot support, and what should change in how time is recorded.
 
 **Deliverable.** A script with the comparison and a half-page memo.
 
+<!-- notes: ch12.ex3 -->
 <!-- Instructor notes, Exercise 12.3: counting only the time recorded while the operation was open, every work center falls below plan in
      fiscal 2026: Assembly 0.34, Cutting 0.29, Finishing and Test 0.39, Packing 0.22, Quality Assurance 0.81 (against all-hours ratios of
      0.40, 0.41, 0.56, 4.19, 4.01; operations that ended by 2026-12-11, the last day with time records, as in Tutorial 11.2). In 2024 the
      in-window ratios were 0.62, 0.55, 0.68, 0.38, 1.28. The Packing excess disappears, which shows that it came from time charged after the
      operation ended; Packing is the last operation of every routing, so late time lands there. January to July 2024: work orders released
-     336, 568, 680, 524, 515, 460, 328; units completed 348, 6,110, 6,280, 6,673, 4,524, 5,877, 3,201; manufactured units shipped 2,018,
-     3,331, 3,182, 3,539, 3,673, 3,686, 3,311. From February to June the plant completed about 12,000 more units than it shipped, an
+     336, 568, 680, 524, 515, 460, 328; units completed 348, 6,110, 6,280, 6,673, 4,524, 5,877, 3,201; manufactured units shipped 2,018, 3,331, 3,182, 3,539, 3,673, 3,686, 3,311. From February to June the plant completed about 12,000 more units than it shipped, an
      inventory build that kept every hour on work orders; when releases and completions fell to the rate of shipments from July, the same
-     64 employees kept their hours, and the unassigned days became indirect time. The late-recorded share was 0.03-0.16 a month through
+     64 employees kept their hours, and the unassigned days became indirect time. The late-recorded share was 0.00-0.16 a month through
      June 2024 and 0.41 in July 2024, the month surge days began in earnest. Operation-level efficiency cannot be measured until time is
      recorded against open operations; the plant-level measure of Chapter 11 is unaffected. -->
 
@@ -133,12 +139,11 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the analysis and a short list of findings and recommendations.
 
-<!-- Instructor notes, Exercise 12.4: 18,145 approvals, spread almost evenly over four reason codes in every year (Backlog Recovery, Late
-     Operation, Load Surge, Month-End Support; about a quarter each), so the reasons carry no information about why overtime grew. The
+<!-- notes: ch12.ex4 -->
+<!-- Instructor notes, Exercise 12.4: 18,145 approvals, spread almost evenly over four reason codes in every year (Backlog Recovery, Late Operation, Load Surge, Month-End Support; about a quarter each), so the reasons carry no information about why overtime grew. The
      Production Manager approved 16,676 approvals (about 92%). Every approval grants exactly the hours requested, and every approval is
      dated on the work date itself, so no request was ever reduced or approved in advance. All 5,952 clock entries of the 93 surge days
-     were approved by the Production Manager on the work date. Manufacturing overtime on other days stayed about the same (6,273, 6,426,
-     5,918 hours), while overtime on surge days grew from 3,456 to 9,216 and 14,112 hours: all the growth. The control records overtime
+     were approved by the Production Manager on the work date. Manufacturing overtime on other days stayed about the same (6,273, 6,426, 5,918 hours), while overtime on surge days grew from 3,456 to 9,216 and 14,112 hours: all the growth. The control records overtime
      rather than authorizing it: approval in advance, a limit per employee and week, and informative reasons reviewed by someone outside
      production would make it a control. -->
 
@@ -165,9 +170,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the tests and a list of findings.
 
+<!-- notes: ch12.ex5 -->
 <!-- Instructor notes, Exercise 12.5: (1) three registers pay the Account Executive (employee 81, Sales cost center, terminated
-     2024-04-26) after the termination: 840 (period from 2024-04-22, paid 2024-05-10), 2646 (paid 2025-01-03), and 5420 (paid
-     2026-01-02), 9,424.91 gross each, about four times the employee's usual gross pay (2,217.25) and the amount of the chief
+     2024-04-26) after the termination: 840 (period from 2024-04-22, paid 2024-05-10), 2646 (paid 2025-01-03), and 5420 (paid 2026-01-02), 9,424.91 gross each, about four times the employee's usual gross pay (2,217.25) and the amount of the chief
      executive's register, all charged to the Executive cost center. Only 840, whose period includes the termination date, could be a
      final paycheck, and even it pays four times the usual amount. 2646 and 5420 are the registers of Tutorial 12.1 with no payment
      record. (2) One person, the Accounting Manager (employee 5), approved all 8,197 registers, each on its pay date. (3) 77 registers,
@@ -199,6 +204,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the tests and a table of results and dispositions.
 
+<!-- notes: ch12.ex6 -->
 <!-- Instructor notes, Exercise 12.6: (1) six supplier invoice numbers each appear twice for the same supplier; each pair has different
      amounts, and each invoice was paid once (Exercise 2.6). Standardized numbers (UPPER, TRIM, and REPLACE of hyphens and spaces)
      find the same six pairs and no others: the numbers are entered consistently. (2) Two check numbers are used twice, both for
@@ -206,9 +212,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      pairs share supplier and amount on different dates; 13 are within 30 days (the chapter's example, with 14 days, finds 6), and
      none pays the same invoice, so they are recurring purchases rather than duplicates. Grouping finds identical values; comparing
      each payment with other payments across a range of dates needs the table joined to itself.
-     (4) No gaps in any series. Sales invoices and cash receipts continue across years (SI 1-6,732 in 2024,
-     6,733-13,740 in 2025, 13,741-20,914 in 2026; CR 1-2,274, 2,275-4,840, 4,841-7,409), as do purchase orders (1-3,921, 3,922-10,466,
-     10,467-18,832); journal entries restart each year (1-266, 1-288, 1-297). A LAG partitioned by year on a continuing series would miss a
+     (4) No gaps in any series. Sales invoices and cash receipts continue across years (SI 1-6,732 in 2024, 6,733-13,740 in 2025, 13,741-20,914 in 2026; CR 1-2,274, 2,275-4,840, 4,841-7,409), as do purchase orders (1-3,921, 3,922-10,466, 10,467-18,832); journal entries restart each year (1-266, 1-288, 1-297). A LAG partitioned by year on a continuing series would miss a
      gap between the last number of one year and the first of the next. (5) MAD: all payments 0.01295, full payments 0.00755, partial payments
      0.04496, exactly the values of Tutorial 8.1. printf writes 688.42 as 6.884200e+02 and 0.12 as 1.200000e-01, so the first character is
      the first significant digit for every positive amount (the smallest payment is 0.12); LOG10 needs SQLite's math functions, which DB

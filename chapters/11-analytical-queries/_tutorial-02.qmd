@@ -2,7 +2,7 @@
 
 **Context and objective.** In Chapter 10 you followed the conversion cost through account 1090 for whole years. In this tutorial, you will measure the gap between the actual cost charged to the account and the standard cost released by completions for each month, accumulate it through each year, compare each month with the same month a year earlier, rank the months, and find what the largest months have in common. You will then rank the work centers by the hours recorded against their planned hours.
 
-**Prerequisites.** Complete Tutorial 11.1, and continue at the end of Chapter11.sql.
+**Prerequisites.** Complete Tutorial 11.1, and continue at the end of Chapter11.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter11.sql as it stands at the end of Tutorial 11.1 from [Companion Files](#sec-companion-files).
 
 **Step-by-step instructions.**
 

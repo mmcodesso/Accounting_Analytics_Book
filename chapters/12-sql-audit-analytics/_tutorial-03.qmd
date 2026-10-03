@@ -1,8 +1,8 @@
 ## Guided Tutorial 12.3: Testing the Hours Behind the Variance
 
-**Context and objective.** The committee wants to know whether the extra hours behind the manufacturing variance were worked, approved, recorded against the right operations, and paid correctly, and why indirect time almost vanishes from the records for four months of 2024. In this tutorial, you will profile the time records, reconcile the hours along the chain from the time clock to the payroll, test whose time was paid, and compare the pay with an expectation built from the hours and the pay rates. You will then test the overtime approvals and the days on which everyone clocked the same hours, test when direct time was recorded, and decide what the results mean for the variance.
+**Context and objective.** The committee wants to know whether the extra hours behind the manufacturing variance were worked, approved, recorded against the right operations, and paid correctly, and why so little indirect time appears in the records for four months of 2024. In this tutorial, you will profile the time records, reconcile the hours along the chain from the time clock to the payroll, test whose time was paid, and compare the pay with an expectation built from the hours and the pay rates. You will then test the overtime approvals and the days on which everyone clocked the same hours, test when direct time was recorded, and decide what the results mean for the variance.
 
-**Prerequisites.** Complete Tutorials 12.1 and 12.2, and continue at the end of Audit.sql. @fig-10-08 shows the payroll and time tables, and @fig-12-07 the chain of records that the tests follow.
+**Prerequisites.** Complete Tutorials 12.1 and 12.2, and continue at the end of Audit.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Audit.sql as it stands at the end of Tutorial 12.2 from [Companion Files](#sec-companion-files). @fig-10-08 shows the payroll and time tables, and @fig-12-07 the chain of records that the tests follow.
 
 **Step-by-step instructions.**
 
@@ -67,7 +67,7 @@ b. Read PeriodsThatDiffer and the three totals.
 
 The three records agree in every pay period: the hours clocked are the hours recorded and the hours paid. Step 4 tests whether each paid hour belongs to the employee who was paid.
 
-**Step 3. Look at the months with almost no indirect time.** Splitting the manufacturing hours of each pay period of fiscal 2024 by kind of labor shows what the records hold for those months.
+**Step 3. Look at the months with little indirect time.** Splitting the manufacturing hours of each pay period of fiscal 2024 by kind of labor shows what the records hold for those months.
 
 a. Type and run the test below.
 
@@ -92,7 +92,7 @@ a. Type and run the test below.
 
 b. Read the IndirectHours of the periods from February to May.
 
-The result answers the second question that Chapter 11 handed on. From February to May 2024, the plant recorded normal hours in every pay period, and nearly all of them were direct time; from June, a large part of most periods is indirect. Nothing is missing from those months. The plant was building stock: in its first months it completed thousands of units more than it shipped, which kept nearly every hour on work orders. When production fell back to the rate of shipments in the summer, the same employees kept their hours, and the time that no work order needed became indirect time. Exercise 12.3 measures the build.
+The result answers the second question that Chapter 11 handed on. From February to May 2024, the plant recorded normal hours in every pay period, and most of them were direct time; from June, a large part of most periods is indirect. Nothing is missing from those months. The plant was building stock: in its first months it completed thousands of units more than it shipped, which kept most hours on work orders. When production fell back to the rate of shipments in the summer, the same employees kept their hours, and the time that no work order needed became indirect time. Exercise 12.3 measures the build.
 
 **Step 4. Test whose time was paid.** A payroll earnings line points to the labor time entry it pays, so each line can be checked against the employee paid and against the approval of the clock entry behind it. Employee appears twice in the test, as pe for the employee paid and as we for the employee who worked, so that each row can show both.
 
@@ -335,7 +335,7 @@ The script now holds every test of the chapter under a comment that names it and
 **Checkpoint.** Check that:
 
 - the profile finds a handful of entries awaiting approval and three with no clock-out time, in records that end on 11 December 2026;
-- clocked, recorded, and paid hours agree in every pay period, and the manufacturing hours of February to May 2024 are complete, almost all of them direct;
+- clocked, recorded, and paid hours agree in every pay period, and the manufacturing hours of February to May 2024 are complete, most of them direct;
 - six earnings lines pay a terminated employee's time to others, two of them to an Assembler, and eight rest on unapproved clock entries;
 - every earnings line agrees with the expectation from its hours and the employee's rate to within a cent;
 - long overtime is approved, except three entries of the terminated employee whose approvals are not linked;

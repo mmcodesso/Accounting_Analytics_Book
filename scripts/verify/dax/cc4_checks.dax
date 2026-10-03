@@ -1,0 +1,159 @@
+-- @@ bridge by year and step
+DEFINE
+    MEASURE GLEntry[GL Amount] = CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), GLEntry[IsYearEndClose] = FALSE () )
+    MEASURE GLEntry[Cash Effect] = CALCULATE ( - [GL Amount], KEEPFILTERS ( Account[Step] <> "Cash" ) )
+    MEASURE GLEntry[Change in Cash] = CALCULATE ( [GL Amount], Account[Step] = "Cash" )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year], Account[Step],
+    TREATAS ( { 2025, 2026 }, 'Date'[Year] ),
+    "Cash Effect", ROUND ( [Cash Effect], 2 )
+)
+ORDER BY 'Date'[Year], Account[Step]
+-- @@ bridge totals and activity
+DEFINE
+    MEASURE GLEntry[GL Amount] = CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), GLEntry[IsYearEndClose] = FALSE () )
+    MEASURE GLEntry[Cash Effect] = CALCULATE ( - [GL Amount], KEEPFILTERS ( Account[Step] <> "Cash" ) )
+    MEASURE GLEntry[Change in Cash] = CALCULATE ( [GL Amount], Account[Step] = "Cash" )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year], Account[Activity],
+    TREATAS ( { 2024, 2025, 2026, 2027 }, 'Date'[Year] ),
+    "Cash Effect", ROUND ( [Cash Effect], 2 ),
+    "Change in Cash", ROUND ( [Change in Cash], 2 )
+)
+ORDER BY 'Date'[Year], Account[Activity]
+-- @@ year-end balance sheet and ratios
+DEFINE
+    MEASURE GLEntry[Balance] =
+        VAR AsOf = MAX ( 'Date'[Date] )
+        RETURN CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), REMOVEFILTERS ( 'Date' ), 'Date'[Date] <= AsOf,
+            NOT ( GLEntry[IsYearEndClose] && GLEntry[PostingDate] = AsOf ) )
+    MEASURE GLEntry[Current Assets] = CALCULATE ( [Balance], Account[AccountSubType] IN { "Current Asset", "Contra Current Asset" } )
+    MEASURE GLEntry[Current Liabilities] = - CALCULATE ( [Balance], Account[AccountSubType] = "Current Liability" )
+    MEASURE GLEntry[Quick Assets] = CALCULATE ( [Balance], Account[AccountNumber] IN { 1010, 1020 } )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year],
+    TREATAS ( { 2024, 2025, 2026 }, 'Date'[Year] ),
+    "Total assets", ROUND ( CALCULATE ( [Balance], Account[AccountType] = "Asset" ), 2 ),
+    "Current assets", ROUND ( [Current Assets], 2 ),
+    "Current liabilities", ROUND ( [Current Liabilities], 2 ),
+    "Working capital", ROUND ( [Current Assets] - [Current Liabilities], 2 ),
+    "Current ratio", ROUND ( DIVIDE ( [Current Assets], [Current Liabilities] ), 2 ),
+    "Quick ratio", ROUND ( DIVIDE ( [Quick Assets], [Current Liabilities] ), 2 ),
+    "Cash net of sales tax", ROUND ( CALCULATE ( [Balance], Account[AccountNumber] IN { 1010, 2050 } ), 2 )
+)
+-- @@ quarter-end working-capital measures with guards
+DEFINE
+    MEASURE GLEntry[GL Amount] = CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), GLEntry[IsYearEndClose] = FALSE () )
+    MEASURE GLEntry[Balance] =
+        VAR AsOf = MAX ( 'Date'[Date] )
+        RETURN CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), REMOVEFILTERS ( 'Date' ), 'Date'[Date] <= AsOf,
+            NOT ( GLEntry[IsYearEndClose] && GLEntry[PostingDate] = AsOf ) )
+    MEASURE GLEntry[Data Through] =
+        MINX (
+            {
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "SalesInvoice" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "CashReceiptApplication" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "PurchaseInvoice" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "DisbursementPayment" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "GoodsReceipt" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "MaterialIssue" ),
+                CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] = "Shipment" )
+            },
+            [Value]
+        )
+    MEASURE GLEntry[Full Window] =
+        VAR Window = DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH )
+        RETURN COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), Window ) ) = 12 && MAX ( 'Date'[Date] ) <= [Data Through]
+    MEASURE GLEntry[Billing TTM] =
+        CALCULATE ( SUM ( GLEntry[Debit] ), Account[AccountNumber] = 1020, GLEntry[SourceDocumentType] = "SalesInvoice",
+            DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[COGS TTM] =
+        CALCULATE ( [GL Amount], Account[AccountSubType] = "COGS", DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[Issues TTM] =
+        CALCULATE ( SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] ), Account[AccountNumber] = 1045, GLEntry[SourceDocumentType] = "MaterialIssue",
+            DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[Shipments TTM] =
+        CALCULATE ( SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] ), Account[AccountNumber] = 1040, GLEntry[SourceDocumentType] = "Shipment",
+            DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[Supplier Invoices TTM] =
+        CALCULATE ( SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] ), Account[AccountNumber] = 2010, GLEntry[SourceDocumentType] = "PurchaseInvoice",
+            DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[DSO] = IF ( [Full Window], DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] = 1020 ), [Billing TTM] ) * 365 )
+    MEASURE GLEntry[DSO without opening] =
+        IF ( [Full Window], DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] = 1020, GLEntry[VoucherNumber] <> "JE-2024-000001" ), [Billing TTM] ) * 365 )
+    MEASURE GLEntry[DIO] = IF ( [Full Window], DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] IN { 1040, 1045, 1046 } ), [COGS TTM] ) * 365 )
+    MEASURE GLEntry[Materials Days] = IF ( [Full Window], DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] = 1045 ), [Issues TTM] ) * 365 )
+    MEASURE GLEntry[FG Days] = IF ( [Full Window], DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] = 1040 ), [Shipments TTM] ) * 365 )
+    MEASURE GLEntry[DPO] = IF ( [Full Window], DIVIDE ( - CALCULATE ( [Balance], Account[AccountNumber] = 2010 ), [Supplier Invoices TTM] ) * 365 )
+    MEASURE GLEntry[DPO without opening] =
+        IF ( [Full Window], DIVIDE ( - CALCULATE ( [Balance], Account[AccountNumber] = 2010, GLEntry[VoucherNumber] <> "JE-2024-000001" ),
+            [Supplier Invoices TTM] ) * 365 )
+    MEASURE GLEntry[CCC] = IF ( [Full Window], [DSO] + [DIO] - [DPO] )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[YearQuarter],
+    "DSO", ROUND ( [DSO], 1 ), "DSO x", ROUND ( [DSO without opening], 1 ), "DIO", ROUND ( [DIO], 1 ),
+    "Mat", ROUND ( [Materials Days], 1 ), "FG", ROUND ( [FG Days], 1 ), "DPO", ROUND ( [DPO], 1 ),
+    "DPO x", ROUND ( [DPO without opening], 1 ), "CCC", ROUND ( [CCC], 1 )
+)
+ORDER BY 'Date'[YearQuarter]
+-- @@ data through and the what-if
+DEFINE
+    MEASURE GLEntry[Balance] =
+        VAR AsOf = MAX ( 'Date'[Date] )
+        RETURN CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), REMOVEFILTERS ( 'Date' ), 'Date'[Date] <= AsOf,
+            NOT ( GLEntry[IsYearEndClose] && GLEntry[PostingDate] = AsOf ) )
+    MEASURE GLEntry[Issues TTM] =
+        CALCULATE ( SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] ), Account[AccountNumber] = 1045, GLEntry[SourceDocumentType] = "MaterialIssue",
+            DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+    MEASURE GLEntry[Allowed 28] = DIVIDE ( [Issues TTM], 365 ) * 28
+    MEASURE GLEntry[Excess 28] = CALCULATE ( [Balance], Account[AccountNumber] = 1045 ) - [Allowed 28]
+    MEASURE GLEntry[Months 28] = DIVIDE ( [Excess 28], DIVIDE ( [Issues TTM], 12 ) )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year],
+    TREATAS ( { 2026 }, 'Date'[Year] ),
+    "Last ledger date", CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS ( 'Date' ) ),
+    "Allowed", ROUND ( [Allowed 28], 2 ), "Excess", ROUND ( [Excess 28], 2 ), "Months", ROUND ( [Months 28], 2 )
+)
+-- @@ receipts by channel (materials), issues, requisitions
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Year], Receipts[Channel],
+    TREATAS ( { "Raw Materials", "Packaging" }, 'Item'[ItemGroup] ),
+    "Lines", COUNTROWS ( Receipts ), "Cost", ROUND ( SUM ( Receipts[ExtendedStandardCost] ), 2 )
+)
+ORDER BY 'Date'[Year], Receipts[Channel]
+-- @@ issues by year
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[Year], "Issued", ROUND ( SUM ( Issues[ExtendedStandardCost] ), 2 ) )
+-- @@ requisitions by channel and approver
+EVALUATE
+SUMMARIZECOLUMNS ( Requisitions[Channel], Requisitions[ApproverTitle], "Requisitions", COUNTROWS ( Requisitions ) )
+ORDER BY Requisitions[Channel]
+-- @@ shortfall pairs
+EVALUATE
+ROW (
+    "Pairs", COUNTROWS ( ShortfallPairs ),
+    "Repeated pairs", COUNTROWS ( FILTER ( ShortfallPairs, ShortfallPairs[Requisitions] > 1 ) ),
+    "In repeated pairs", SUMX ( FILTER ( ShortfallPairs, ShortfallPairs[Requisitions] > 1 ), ShortfallPairs[Requisitions] ),
+    "Most for one pair", MAX ( ShortfallPairs[Requisitions] ),
+    "Matched", COUNTROWS ( FILTER ( ShortfallPairs, NOT ISBLANK ( ShortfallPairs[IssuedQty] ) ) ),
+    "Requisitioned units", ROUND ( SUM ( ShortfallPairs[RequisitionedQty] ), 1 ),
+    "Issued units", ROUND ( SUM ( ShortfallPairs[IssuedQty] ), 1 ),
+    "Estimated value", ROUND ( SUM ( ShortfallPairs[EstimatedValue] ), 2 )
+)
+-- @@ open items, notes, policy targets
+EVALUATE
+ROW (
+    "AR invoices", COUNTROWS ( ARInvoices ), "AR open", ROUND ( SUM ( ARInvoices[OpenBalance] ), 2 ),
+    "AP invoices", COUNTROWS ( APInvoices ), "AP open", ROUND ( SUM ( APInvoices[OpenBalance] ), 2 ),
+    "AP past due excl notes", ROUND ( SUMX ( FILTER ( APInvoices, APInvoices[DueDate] < DATE ( 2026, 12, 31 )
+        && NOT ( APInvoices[PurchaseInvoiceID] IN { 3160, 21692 } ) ), APInvoices[OpenBalance] ), 2 ),
+    "Principal due 2027", ROUND ( SUMX ( FILTER ( DebtSchedule, YEAR ( DebtSchedule[PaymentDate] ) = 2027 ), DebtSchedule[PrincipalAmount] ), 2 ),
+    "Raw target", CALCULATE ( MAX ( 'Item'[TargetDaysSupply] ), 'Item'[ItemGroup] = "Raw Materials" ),
+    "Items with target", COUNTROWS ( FILTER ( 'Item', NOT ISBLANK ( 'Item'[TargetDaysSupply] ) ) )
+)

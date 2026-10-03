@@ -1,0 +1,7 @@
+<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds {{ account.number }} {{ account.name }} and {{ unposted.number }} {{ unposted.name }} (no postings); only {{ account.number }} has entries. {{ d.C }}: {{ now.number }}, {{ now.date }}, "{{ now.desc }}": Dr {{ account.number }} {{ now.loss|money }}, Dr {{ now.acc.account }}
+     {{ now.acc.name }} {{ now.acc.amount|money }}, Cr {{ now.cost.account }} {{ now.cost.name }} {{ now.cost.amount|money }}; FixedAssetEvent {{ now.event }},
+     asset {{ now.asset }}, "{{ now.event_desc }}", proceeds {{ now.proceeds|num }}; loss = cost {{ now.cost.amount|num }} - accumulated depreciation {{ now.acc.amount|num }} -
+     proceeds {{ now.proceeds|num }}. {{ d.P }}: {{ before.number }}, {{ before.date }}: Dr {{ account.number }} {{ before.loss|money }}, Dr {{ before.cash.account }} Cash {{ before.cash.amount|money }}, Dr {{ before.acc.account }} {{ before.acc.amount|money }}, Cr {{ before.cost.account }} {{ before.cost.name }} {{ before.cost.amount|money }} (asset {{ before.asset }}, "{{ before.event_desc }}"); loss = {{ before.cost.amount|num }} - {{ before.acc.amount|num }} - {{ before.proceeds|num }} proceeds. The closes
+     {{ closes[0] }} and {{ closes[1] }} credit {{ account.number }} but are excluded by GL Amount, so the drill-through shows only the loss entries.
+     (5) Drill-through passes the filters of the selected data point, the row (AccountSubType) and the column (Year); without the year
+     the page would list both years' entries. -->

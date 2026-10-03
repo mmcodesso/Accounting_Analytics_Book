@@ -1,0 +1,59 @@
+table JournalLines
+
+	column GLEntryID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: GLEntryID
+
+	column PostingDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PostingDate
+
+	column SourceDocumentID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: SourceDocumentID
+
+	column AccountNumber
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: AccountNumber
+
+	column AccountName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: AccountName
+
+	column Debit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Debit
+
+	column Credit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Credit
+
+	partition JournalLines = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T3_GLEntry",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"GLEntryID", "PostingDate", "AccountID", "Debit", "Credit",
+			        "SourceDocumentType", "SourceDocumentID"}),
+			    Journal = Table.SelectRows(Kept, each [SourceDocumentType] = "JournalEntry"),
+			    Typed = Table.TransformColumnTypes(Journal, {{"GLEntryID", Int64.Type}, {"PostingDate", type date},
+			        {"AccountID", Int64.Type}, {"Debit", type number}, {"Credit", type number}, {"SourceDocumentID", Int64.Type}}),
+			    Merged = Table.NestedJoin(Typed, {"AccountID"}, Account, {"AccountID"}, "Account", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "Account", {"AccountNumber", "AccountName"}),
+			    Removed = Table.RemoveColumns(Expanded, {"AccountID", "SourceDocumentType"})
+			in
+			    Removed
+

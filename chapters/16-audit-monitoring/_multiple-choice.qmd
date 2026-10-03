@@ -100,6 +100,7 @@ B.  It holds every row and escapes change control
 C.  The copy's measures are recalculated by a different engine
 D.  The copy loses its Tests tab and the queries saved in it
 
+<!-- notes: ch16.mcq -->
 <!-- Answer key, Chapter 16 (for instructors; HTML comments are removed from every rendered format):
      1 C, 2 A, 3 D, 4 B, 5 A, 6 C, 7 B, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B.
      1 C: continuous monitoring is management's ongoing review of its own controls (Tronto & Killingsworth, 2021).

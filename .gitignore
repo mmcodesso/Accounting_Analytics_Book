@@ -40,3 +40,11 @@ CLAUDE.md
 datasets/
 .gitignore
 drafts/
+
+# Power BI project (PBIP) local files: data cache and per-user settings
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/unappliedChanges.json
+
+# Built companion files (uploaded to the companion release, never committed)
+outputs/

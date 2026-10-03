@@ -8,7 +8,7 @@ format:
 
 This case closes Part I. It asks you to use the three chapters together on one realistic assignment: preparing the data for an analysis before the analysis itself begins. You will frame the question with the concepts from Chapter 1, test the data with the techniques from Chapter 2, and navigate the database with the keys and relationships from Chapter 3. The analysis that answers the question comes in Part II, where you will learn the Excel techniques it requires. The work you do here decides whether that analysis can be trusted.
 
-The case uses the same CharlesRiver.xlsx workbook as the Part I tutorials, and every step can be completed with the filters, lookup functions, and PivotTables you have already practiced.
+The case uses CharlesRiver_Work.xlsx, the working copy of the Part I tutorials, and every step can be completed with the filters, lookup functions, and PivotTables you have already practiced.
 
 
 ## The Situation
@@ -18,7 +18,7 @@ You are the staff accountant from the opening scenarios of Chapters 1 and 3. The
 
 ## The Data You Will Use
 
-You will work mainly with these worksheets in CharlesRiver.xlsx:
+You will work mainly with these worksheets in CharlesRiver_Work.xlsx:
 
 - **Item**, which identifies each product's item group and the accounts its revenue and cost post to;
 - **SalesInvoice** and **SalesInvoiceLine**, which record what was billed and when;
@@ -45,6 +45,7 @@ GLEntry stores each account's AccountID, the surrogate key of the Account table,
 - Sketch the join path from SalesInvoiceLine to SalesInvoice and to Item, from ShipmentLine to Shipment and to Item, and from GLEntry to Account. For each join, name the key and state the cardinality.
 - Examine where returns are recorded in the ledger. Identify the part of a return that posts to a Furniture account and the part that posts to an account shared by every product line, and explain what this means for a product-line margin.
 
+<!-- notes: case1.r2 -->
 <!-- Instructor notes, Requirement 2: Item.ItemGroup = 'Furniture' (85 items); every Furniture item has RevenueAccountID 42 (account 4010 Sales Revenue - Furniture) and COGSAccountID 50 (account 5010 COGS - Furniture); InventoryAccountID 5 (1040). Joins: SalesInvoice 1 to 1..many SalesInvoiceLine (SalesInvoiceID); Item 1 to 0..many SalesInvoiceLine (ItemID); Shipment 1 to 1..many ShipmentLine (ShipmentID); Item 1 to 0..many ShipmentLine (ItemID); Account 1 to 0..many GLEntry (AccountID). Returns: SalesReturn postings reduce 5010 (and restore inventory 1040), so the cost side stays by product line; the revenue side of a return is recorded by CreditMemo postings to 4060 Sales Returns and Allowances, which is shared by all product lines, so a Furniture margin built from 4010 and 5010 is a gross margin before returns. Account 4070 Sales Discounts has no postings. -->
 
 **Requirement 3: Test the data (Chapter 2).** Decide which data quality findings matter for this question.
@@ -52,6 +53,7 @@ GLEntry stores each account's AccountID, the surrogate key of the Account table,
 - Determine the most recent complete quarter in the data. Look at the edges of the extract, as you did in Tutorial 2.2, and explain why the latest periods in the ledger are not the quarter to analyze.
 - Review the findings from the Chapter 2 tutorials: invoices dated before their order's first shipment, customers that share a name, and list prices that are blank by design. For each one, decide whether it could distort a comparison of the Furniture margin between the two most recent complete quarters, and explain why.
 
+<!-- notes: case1.r3 -->
 <!-- Instructor notes, Requirement 3: invoices run through 2026-12-31, and the GL continues to 2027-02-23 with only DisbursementPayment rows (supplier payments for prior-year invoices), so the latest complete quarter is 2026 Q4 (compared with 2026 Q3). Of the 9 invoices dated before their order's first shipment, 3 contain Furniture lines (SI-2024-000003, SI-2025-006735, SI-2026-013742), and none falls in 2026 Q3 or Q4 or crosses a quarter end, so they do not affect this comparison (though they matter for revenue cutoff in general). Same-name customers do not affect a product-line margin. Blank list prices belong to purchased items and services, not to Furniture products. -->
 
 **Requirement 4: Reconcile the sub-ledger to the ledger (Chapters 2 and 3).** For each of the two quarters:
@@ -60,10 +62,12 @@ GLEntry stores each account's AccountID, the surrogate key of the Account table,
 - Total the standard cost on Furniture shipment lines shipped in the quarter, and compare it with the Shipment debits to the Furniture COGS account.
 - Explain what agreement tells you, and identify the other source document types that post to the Furniture COGS account.
 
+<!-- notes: case1.r4 -->
 <!-- Instructor notes, Requirement 4: Furniture invoice lines total $4,283,322.86 in 2026 Q3 and $4,156,787.84 in 2026 Q4; SalesInvoice postings to AccountID 42 (4010) match exactly in both quarters. Furniture shipment lines at standard cost total $2,459,120.72 in Q3 and $2,475,813.68 in Q4; Shipment postings to AccountID 50 (5010) match exactly. Other sources posting to 5010: SalesReturn (Q3 -$31,867.81, Q4 -$25,752.61) and, at year-end, JournalEntry (the closing entry). Agreement shows the ledger completely and accurately reflects the sub-ledger for this product line, so either source can support the analysis. -->
 
 **Requirement 5: Find what could mislead (Auditing).** Using GLEntry alone, calculate the Furniture gross margin percentage for each of the two quarters from all the rows posted to the Furniture revenue and COGS accounts. Look at the revenue and cost totals behind each percentage, not only the percentage itself. Then examine the source document types behind the most recent quarter's totals, find the entry responsible for what you see, and identify its EntryType in the JournalEntry worksheet. Explain why this entry must be excluded from a quarterly margin analysis, recompute both margins, and state what they show.
 
+<!-- notes: case1.r5 -->
 <!-- Instructor notes, Requirement 5: using all rows, Q4 Furniture revenue is -$13,241,499.72 and COGS is -$7,496,777.60, because year-end close JE-2026-000296 (EntryType "Year-End Close - P&L to Income Summary", posted 2026-12-31) debits 4010 by $17,398,287.56 and credits 5010 by $9,946,838.67. The naive margin percentage is 43.4%, almost identical to Q3's 43.3%, so the ratio alone hides both the nonsense totals and the decline. Excluding the closing entry (SourceDocumentType JournalEntry with a Year-End Close EntryType), Q4 revenue is $4,156,787.84 and COGS $2,450,061.07 (shipments less returns), and the margin falls from 43.3% in Q3 to 41.1% in Q4. A sub-ledger check at standard cost (invoiced quantity x Item.StandardCost) also falls, from 42.3% to 40.8%. -->
 
 **Requirement 6: Write the data readiness memo.** Write a memorandum of one to two pages to the controller. Organize it in three sections:

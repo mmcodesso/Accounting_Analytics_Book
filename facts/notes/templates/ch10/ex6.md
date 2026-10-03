@@ -1,0 +1,9 @@
+{%- macro sep(loop) -%}{% if loop.revindex == 2 %}{{ ',' if loop.length > 2 }} and {% elif not loop.last %}, {% endif %}{%- endmacro -%}
+<!-- Instructor notes, Exercise 10.6: {{ n_word }} suppliers share an address with an employee (planted related-party matches): {% for m in matches %}{{ 'supplier ' if loop.first }}{{ m.supplier }}
+     {{ m.name }} with {{ 'employee ' if loop.first }}{{ m.employee }} ({{ m.title }}){{ sep(loop) }}{% endfor %}; all {{ n_word }} are approved. Supplier invoices (all dated through {{ end }}): {% for s, n, amount in invoices %}{{ s }} {{ n }}{{ ' invoices' if loop.first }} {{ amount|money }}{{ '; ' if not loop.last }}{% endfor %}. Payments through {{ end }}: {% for s, n, amount in payments %}{{ s }} {{ n }}{{ ' payments' if loop.first else ',' }}
+     {{ amount|money }}{{ '; ' if not loop.last }}{% endfor %}. No two employees share an
+     address, so each supplier matches one employee. Joining invoices and payments in one query fans out ({{ fan|count }} rows for supplier {{ first }}).
+     Supplier {{ big.id }} has {{ big.open|money }} of invoices still open, including {% for c in capital %}{{ c.number }} ({{ c.total|num }}){{ ' and ' if not loop.last }}{% endfor %}, the invoices
+     that the Debt Reclass entries moved (Chapter 8). Shared customer names: {% for s in shared %}{{ s.name }} ({% if s.same %}{{ s.customers[0].id }} and {{ s.customers[1].id }}, both {{ s.customers[0].segment }}{% else %}customers {% for c in s.customers %}{{ c.id }}, {{ c.segment }}{{ ', and ' if not loop.last }}{% endfor %}{% endif %}){{ ' and
+     ' if not loop.last }}{% endfor %}. An exact join misses addresses written differently (Chapter 2) and cannot prove a
+     relationship; the next steps are vendor setup records, conflict-of-interest declarations, and the employees' purchasing roles. -->

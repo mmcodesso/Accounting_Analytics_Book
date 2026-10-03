@@ -1,0 +1,133 @@
+expression Account =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T1_Account",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"AccountID", "AccountNumber", "AccountName"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"AccountID", Int64.Type}, {"AccountNumber", Int64.Type}, {"AccountName", type text}})
+		in
+		    Typed
+	annotation PBI_ResultType = Table
+
+expression JournalEntryFlags =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T2_JournalEntry",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"JournalEntryID", "EntryNumber", "PostingDate", "EntryType", "TotalAmount",
+		        "CreatedByEmployeeID", "CreatedDate", "ApprovedByEmployeeID"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"JournalEntryID", Int64.Type}, {"EntryNumber", type text},
+		        {"PostingDate", type date}, {"EntryType", type text}, {"TotalAmount", type number},
+		        {"CreatedByEmployeeID", Int64.Type}, {"CreatedDate", type datetime}, {"ApprovedByEmployeeID", Int64.Type}}),
+		    Merged = Table.NestedJoin(Typed, {"ApprovedByEmployeeID"}, Employee, {"EmployeeID"}, "Approver", JoinKind.LeftOuter),
+		    Expanded = Table.ExpandTableColumn(Merged, "Approver", {"MaxApprovalAmount"}, {"ApproverLimit"}),
+		    Weekend = Table.AddColumn(Expanded, "Weekend", each if Date.DayOfWeek([CreatedDate], Day.Monday) >= 5 then 1 else 0, Int64.Type),
+		    Backdated = Table.AddColumn(Weekend, "Backdated", each if Date.From([CreatedDate]) > [PostingDate] then 1 else 0, Int64.Type),
+		    SelfApproved = Table.AddColumn(Backdated, "SelfApproved", each if [CreatedByEmployeeID] = [ApprovedByEmployeeID] then 1 else 0, Int64.Type),
+		    AboveLimit = Table.AddColumn(SelfApproved, "AboveLimit", each if [TotalAmount] > [ApproverLimit] then 1 else 0, Int64.Type),
+		    RoundAmount = Table.AddColumn(AboveLimit, "RoundAmount", each if Number.Mod([TotalAmount], 1000) = 0 then 1 else 0, Int64.Type),
+		    Score = Table.AddColumn(RoundAmount, "RiskScore", each [Weekend] + [Backdated] + [SelfApproved] + [AboveLimit] + [RoundAmount], Int64.Type)
+		in
+		    Score
+	annotation PBI_ResultType = Table
+
+expression 'JE Exceptions' =
+		let
+		    Source = JournalEntryFlags,
+		    Unpivoted = Table.Unpivot(Source, {"Weekend", "Backdated", "SelfApproved", "AboveLimit", "RoundAmount"}, "Attribute", "Value"),
+		    Flagged = Table.SelectRows(Unpivoted, each [Value] = 1),
+		    TestID = Table.AddColumn(Flagged, "TestID", each "JE " & [Attribute], type text),
+		    Kept = Table.SelectColumns(TestID, {"TestID", "EntryNumber", "PostingDate", "TotalAmount", "ApprovedByEmployeeID"}),
+		    Renamed = Table.RenameColumns(Kept, {{"EntryNumber", "DocumentNumber"}, {"PostingDate", "EventDate"},
+		        {"TotalAmount", "Amount"}, {"ApprovedByEmployeeID", "EmployeeID"}})
+		in
+		    Renamed
+	annotation PBI_ResultType = Table
+
+expression PurchaseOrderFlags =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T33_PurchaseOrder",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"PurchaseOrderID", "PONumber", "OrderDate", "OrderTotal", "CreatedByEmployeeID",
+		        "ApprovedByEmployeeID"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"PurchaseOrderID", Int64.Type}, {"PONumber", type text},
+		        {"OrderDate", type date}, {"OrderTotal", type number}, {"CreatedByEmployeeID", Int64.Type},
+		        {"ApprovedByEmployeeID", Int64.Type}}),
+		    Merged = Table.NestedJoin(Typed, {"ApprovedByEmployeeID"}, Employee, {"EmployeeID"}, "Approver", JoinKind.LeftOuter),
+		    Expanded = Table.ExpandTableColumn(Merged, "Approver", {"MaxApprovalAmount", "TerminationDate"},
+		        {"ApproverLimit", "ApproverTermination"}),
+		    SelfApproved = Table.AddColumn(Expanded, "SelfApproved", each if [CreatedByEmployeeID] = [ApprovedByEmployeeID] then 1 else 0, Int64.Type),
+		    AboveLimit = Table.AddColumn(SelfApproved, "AboveLimit", each if [OrderTotal] > [ApproverLimit] then 1 else 0, Int64.Type),
+		    AfterTermination = Table.AddColumn(AboveLimit, "AfterTermination",
+		        each if [ApproverTermination] <> null and [OrderDate] > [ApproverTermination] then 1 else 0, Int64.Type)
+		in
+		    AfterTermination
+	annotation PBI_ResultType = Table
+
+expression 'PO Exceptions' =
+		let
+		    Source = PurchaseOrderFlags,
+		    Unpivoted = Table.Unpivot(Source, {"SelfApproved", "AboveLimit", "AfterTermination"}, "Attribute", "Value"),
+		    Flagged = Table.SelectRows(Unpivoted, each [Value] = 1),
+		    TestID = Table.AddColumn(Flagged, "TestID", each "PO " & [Attribute], type text),
+		    Kept = Table.SelectColumns(TestID, {"TestID", "PONumber", "OrderDate", "OrderTotal", "ApprovedByEmployeeID"}),
+		    Renamed = Table.RenameColumns(Kept, {{"PONumber", "DocumentNumber"}, {"OrderDate", "EventDate"},
+		        {"OrderTotal", "Amount"}, {"ApprovedByEmployeeID", "EmployeeID"}})
+		in
+		    Renamed
+	annotation PBI_ResultType = Table
+
+expression PayrollPayment =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T71_PayrollPayment",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"PayrollRegisterID", "PaymentDate"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"PayrollRegisterID", Int64.Type}, {"PaymentDate", type date}})
+		in
+		    Typed
+	annotation PBI_ResultType = Table
+
+expression PayrollPeriod =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T59_PayrollPeriod",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"PayrollPeriodID", "PeriodEndDate", "PayDate"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"PayrollPeriodID", Int64.Type}, {"PeriodEndDate", type date}, {"PayDate", type date}})
+		in
+		    Typed
+	annotation PBI_ResultType = Table
+
+expression PayrollFlags =
+		let
+		    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+		    Data = Source{[Item="T69_PayrollRegister",Kind="Table"]}[Data],
+		    Kept = Table.SelectColumns(Data, {"PayrollRegisterID", "PayrollPeriodID", "EmployeeID", "NetPay",
+		        "ApprovedByEmployeeID", "ApprovedDate"}),
+		    Typed = Table.TransformColumnTypes(Kept, {{"PayrollRegisterID", Int64.Type}, {"PayrollPeriodID", Int64.Type},
+		        {"EmployeeID", Int64.Type}, {"NetPay", type number}, {"ApprovedByEmployeeID", Int64.Type}, {"ApprovedDate", type date}}),
+		    Paid = Table.NestedJoin(Typed, {"PayrollRegisterID"}, PayrollPayment, {"PayrollRegisterID"}, "Payment", JoinKind.LeftOuter),
+		    PaidExpanded = Table.ExpandTableColumn(Paid, "Payment", {"PaymentDate"}),
+		    Period = Table.NestedJoin(PaidExpanded, {"PayrollPeriodID"}, PayrollPeriod, {"PayrollPeriodID"}, "Period", JoinKind.LeftOuter),
+		    PeriodExpanded = Table.ExpandTableColumn(Period, "Period", {"PeriodEndDate", "PayDate"}),
+		    Payee = Table.NestedJoin(PeriodExpanded, {"EmployeeID"}, Employee, {"EmployeeID"}, "Payee", JoinKind.LeftOuter),
+		    PayeeExpanded = Table.ExpandTableColumn(Payee, "Payee", {"TerminationDate"}),
+		    PaidBefore = Table.AddColumn(PayeeExpanded, "PaidBeforeApproval",
+		        each if [PaymentDate] <> null and [PaymentDate] < [ApprovedDate] then 1 else 0, Int64.Type),
+		    AfterTermination = Table.AddColumn(PaidBefore, "AfterTermination",
+		        each if [TerminationDate] <> null and [PeriodEndDate] > [TerminationDate] then 1 else 0, Int64.Type),
+		    SelfApproved = Table.AddColumn(AfterTermination, "SelfApproved", each if [EmployeeID] = [ApprovedByEmployeeID] then 1 else 0, Int64.Type),
+		    Removed = Table.RemoveColumns(SelfApproved, {"PayrollPeriodID"})
+		in
+		    Removed
+	annotation PBI_ResultType = Table
+
+expression 'Payroll Exceptions' =
+		let
+		    Source = PayrollFlags,
+		    Unpivoted = Table.Unpivot(Source, {"PaidBeforeApproval", "AfterTermination", "SelfApproved"}, "Attribute", "Value"),
+		    Flagged = Table.SelectRows(Unpivoted, each [Value] = 1),
+		    TestID = Table.AddColumn(Flagged, "TestID", each "PR " & [Attribute], type text),
+		    Number = Table.AddColumn(TestID, "DocumentNumber", each "Register " & Text.From([PayrollRegisterID]), type text),
+		    Kept = Table.SelectColumns(Number, {"TestID", "DocumentNumber", "PayDate", "NetPay", "ApprovedByEmployeeID"}),
+		    Renamed = Table.RenameColumns(Kept, {{"PayDate", "EventDate"}, {"NetPay", "Amount"}, {"ApprovedByEmployeeID", "EmployeeID"}})
+		in
+		    Renamed
+	annotation PBI_ResultType = Table

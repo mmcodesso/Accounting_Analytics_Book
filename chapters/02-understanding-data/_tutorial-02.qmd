@@ -2,13 +2,13 @@
 
 **Context and objective.** In this tutorial, you will examine the Charles River Accounting Core tables to assess whether the general ledger entries and chart of accounts are complete and consistent. This is a more accounting-specific data quality assessment than the O2C tutorial, because it involves checking whether the accounting records themselves are internally coherent. The skills practiced here connect directly to the audit analytics you will perform in the Excel chapters of Part II and the SQL chapters of Part III.
 
-**Prerequisites.** You need Microsoft Excel installed on your computer, access to the CharlesRiver.xlsx file, and completion of Tutorial 2.1.
+**Prerequisites.** You need Microsoft Excel installed on your computer, your working copy CharlesRiver_Work.xlsx from Tutorial 2.1, and completion of that tutorial.
 
 **Step-by-step instructions.**
 
 **Step 1. Get to know the chart of accounts.**
 
-a. Open CharlesRiver.xlsx in Excel (if not already open) and click the **Account** worksheet tab.
+a. Open CharlesRiver_Work.xlsx in Excel (if not already open) and click the **Account** worksheet tab.
 b. Examine the columns available. You should see fields including AccountID, AccountNumber, AccountName, AccountType, AccountSubType, and ParentAccountID.
 c. Scroll through the list to get a sense of how many accounts exist and how they are organized.
 

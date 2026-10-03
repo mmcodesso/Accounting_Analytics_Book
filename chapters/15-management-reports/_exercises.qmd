@@ -26,12 +26,11 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The Ledger Detail page, the query, and a short note answering requirements (2), (4), and (5).
 
-<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds 7020 Gain or Loss on Asset
-     Disposal and 7040 Foreign Exchange Gain or Loss (no postings); only 7020 has entries. 2026: JE-2026-000115, 2026-06-05, "Recognize loss on asset disposal": Dr 7020 92,500.00, Dr 1186
+<!-- notes: ch15.ex1 -->
+<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds 7020 Gain or Loss on Asset Disposal and 7040 Foreign Exchange Gain or Loss (no postings); only 7020 has entries. 2026: JE-2026-000115, 2026-06-05, "Recognize loss on asset disposal": Dr 7020 92,500.00, Dr 1186
      Accumulated Depreciation - Manufacturing Equipment 117,500.00, Cr 1185 Manufacturing Equipment 210,000.00; FixedAssetEvent 20,
      asset 4, "Retirement Of Obsolete Packing Line Conveyor", proceeds 0; loss = cost 210,000 - accumulated depreciation 117,500 -
-     proceeds 0. 2025: JE-2025-000028, 2025-02-12: Dr 7020 42,000.00, Dr 1010 Cash 28,000.00, Dr 1160 98,000.00, Cr 1120 Warehouse
-     Equipment 168,000.00 (asset 6, "Disposal Of Replaced Forklift A"); loss = 168,000 - 98,000 - 28,000 proceeds. The closes
+     proceeds 0. 2025: JE-2025-000028, 2025-02-12: Dr 7020 42,000.00, Dr 1010 Cash 28,000.00, Dr 1160 98,000.00, Cr 1120 Warehouse Equipment 168,000.00 (asset 6, "Disposal Of Replaced Forklift A"); loss = 168,000 - 98,000 - 28,000 proceeds. The closes
      JE-2026-000296 and JE-2025-000287 credit 7020 but are excluded by GL Amount, so the drill-through shows only the loss entries.
      (5) Drill-through passes the filters of the selected data point, the row (AccountSubType) and the column (Year); without the year
      the page would list both years' entries. -->
@@ -56,9 +55,8 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The table, the measure, and a note answering requirements (3) to (5).
 
-<!-- Instructor notes, Exercise 15.2 (CR15 reference model): 2026 net income by month: Jan 310,849.93; Feb 341,046.27; Mar
-     447,271.03; Apr 442,726.36; May 485,708.78; Jun 325,069.56; Jul 114,521.97; Aug 403,445.66; Sep 468,714.44; Oct 255,812.14;
-     Nov 405,751.40; Dec 502,693.70; YTD at June 2,352,671.93, December 4,503,611.24 (equal to JE-2026-000297). Visual calculations:
+<!-- notes: ch15.ex2 -->
+<!-- Instructor notes, Exercise 15.2 (CR15 reference model): 2026 net income by month: Jan 310,849.93; Feb 341,046.27; Mar 447,271.03; Apr 442,726.36; May 485,708.78; Jun 325,069.56; Jul 114,521.97; Aug 403,445.66; Sep 468,714.44; Oct 255,812.14; Nov 405,751.40; Dec 502,693.70; YTD at June 2,352,671.93, December 4,503,611.24 (equal to JE-2026-000297). Visual calculations:
      YTD = RUNNINGSUM ( [Net Income] ); Change = [Net Income] - PREVIOUS ( [Net Income] ). (3) Filtered to July-December, the running
      sum starts at July and reaches 2,150,939.31 in December, while TOTALYTD still shows 2,467,193.90 in July and 4,503,611.24 in
      December, because the measure reads the model and the visual calculation only the visual's rows. (4) July is the month with three
@@ -87,10 +85,10 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The chart and its slicer, and a short note answering requirements (3) to (5).
 
+<!-- notes: ch15.ex3 -->
 <!-- Instructor notes, Exercise 15.3 (CR15 reference model): Labor Cost per Standard Hour = DIVIDE ( CALCULATE ( SUM (
      LaborTimeEntry[ExtendedLaborCost] ), KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" ) ), [Standard Hours to Cut-off] ).
-     By year: hours per standard hour 1.18, 1.41, 1.51; overtime share 0.116, 0.167, 0.198; labor cost per standard hour 33.18,
-     40.71, 44.21 (manufacturing labor cost 2,351,220.56; 2,691,548.63; 2,961,742.51). (4) Cost per standard hour = hours per standard
+     By year: hours per standard hour 1.18, 1.41, 1.51; overtime share 0.116, 0.167, 0.198; labor cost per standard hour 33.18, 40.71, 44.21 (manufacturing labor cost 2,351,220.56; 2,691,548.63; 2,961,742.51). (4) Cost per standard hour = hours per standard
      hour x cost per hour; overtime hours cost a premium, and the overtime share grew, so the cost per hour rose too (rates also rose).
      (5) Learn: field parameters cannot be the linked fields of a drill-through or tooltip page; link the underlying fields instead. -->
 
@@ -114,6 +112,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The page with the slider and the measures, and a short recommendation.
 
+<!-- notes: ch15.ex4 -->
 <!-- Instructor notes, Exercise 15.4 (CR15 reference model and Python): promotion 9 2026 lines: 561.74 units, price before discount
      416.23 per unit, standard cost 215.99 per unit (the Part II case's inputs). Break-even lift = (p (1 - 0.01903) - c) / (p (1 - d)
      (1 - 0.01903) - c) - 1: 5% 11.9%, 8% 20.5%, 10% 27.0%, 12% 34.2% (the Part II case), 15% 46.7%. The case found no lift in any
@@ -144,6 +143,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The chart, a table of the comparisons, and the audit note.
 
+<!-- notes: ch15.ex5 -->
 <!-- Instructor notes, Exercise 15.5: actual fiscal 2026 Q4 revenue 7,287,187.68 (invoice lines; 33 months from January 2024 to
      September 2026 fit the forecast). Chapter 7's backtest for the same quarter: trend +4.72% error, mean +0.03% (monthly error
      3.65%), same quarter last year +0.32% (11.48% monthly). Power BI's forecast is computed in the visual (exponential smoothing,
@@ -174,10 +174,10 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Deliverable.** The queries, the matrix, and an audit note answering requirements (4) to (6).
 
+<!-- notes: ch15.ex6 -->
 <!-- Instructor notes, Exercise 15.6 (SQL): direct lines that join both an operation and a clock entry: 51,097. Disagreements by year
      (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.5; 15,522 in
-     all. 2026 matrix (hours): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9,
-     Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8; Finishing operations at Finishing 8,101.6, at Assembly
+     all. 2026 matrix (hours): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9, Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8; Finishing operations at Finishing 8,101.6, at Assembly
      1,354.8; Cutting at Cutting 3,696.8; QA at QA 674.9, at Assembly 420.8. After the operation's end: 2,243 of the 3,137 disagreeing
      lines (72%) against 5,823 of 13,905 direct lines (42%), so the disagreement concentrates in the late time of Chapter 12. Indirect
      2026 by clock work center: Assembly 16,830.0, Finishing and Test 9,561.6, Cutting 7,477.9, Packing 3,354.4, QA 1,249.0. Conclusion:

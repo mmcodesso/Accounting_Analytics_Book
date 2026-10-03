@@ -1,0 +1,69 @@
+---
+format:
+  html:
+    number-sections: false
+---
+
+<!-- Registered in Phase 1 with the Part III files; each Part's list arrives with its files.
+To confirm in Power BI Desktop 2.158 and Excel: the Change Source dialog for an Excel Workbook source (file path box
+and Browse), the "Apply changes" bar after a source change, and whether Excel for Mac offers Data Source Settings. -->
+
+# Companion Files {#sec-companion-files .unnumbered}
+
+Many tutorials build on a file that an earlier tutorial started. The Excel chapters grow one analysis workbook from Chapter 4 to Chapter 7, the SQL chapters build a script in each chapter, and the Power BI chapters grow one reporting package from Chapter 13 to Chapter 15. If you start a tutorial without that file, download its start file from this page. A start file holds the work as it stands at the end of the previous tutorial, so it also lets you check your own work against it. Each chapter also has a chapter-end file, the copy its exercises start from.
+
+## What Each File Contains
+
+Every file states the dataset release it was built from, and it explains itself:
+
+- An Excel workbook has a **Solution Notes** worksheet. It lists the queries, worksheets, and named cells the workbook holds and the steps completed so far. It compares each control total with the value the book expects, and it says what the results mean.
+- A SQL script opens with the header comment the SQL chapters use. Each query keeps its two comment lines, and a result line gives the rows it returns.
+- A Power BI file has a **Notes** page with the same sections as the Solution Notes worksheet, next to the **Validation** page and the tests the chapters build.
+
+Solutions to the exercises, the comprehensive cases, and the capstone cases will be available to instructors.
+
+## Match the Dataset Release
+
+The files are built from dataset release {{< var dataset.version >}}, the release this edition uses (see [Downloads](#sec-downloads)). With a different release, the queries still run, but the values differ from the book and from the expected values in the files.
+
+## Point a File at Your Copy of the Dataset
+
+The Excel and Power BI files read CharlesRiver.xlsx with Power Query from the folder where they were built. Point each file at your own copy once, before you refresh it.
+
+In Excel:
+
+1. Open the file and select **Data > Get Data > Data Source Settings**.
+2. Keep **Data sources in current workbook** selected, select the CharlesRiver.xlsx source, and select **Change Source**.
+3. Browse to your copy of CharlesRiver.xlsx, select **OK**, and close the dialog.
+4. Select **Data > Refresh All**.
+
+In Power BI Desktop:
+
+1. Open the file and select **Home > Transform data > Data source settings**.
+2. Select the CharlesRiver.xlsx source and select **Change Source**.
+3. Browse to your copy of CharlesRiver.xlsx, select **OK**, and close the dialog.
+4. If a bar reports pending changes, select **Apply changes**. Otherwise, select **Refresh** on the **Home** tab.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+
+Power BI Desktop's new Power Query experience, a preview feature, has no **Change Source** button. If you turned it on, turn it off in **File > Options and settings > Options > Preview features** while you change the source.
+:::
+
+The SQL scripts need no change of source. Make your working copy CharlesRiver_Work.sqlite as Tutorial 9.1 describes, save the script in the same folder, open the copy in DB Browser for SQLite, and open the script from the **Execute SQL** tab with **Open SQL file(s)**. The Part III case uses the view that Tutorial 11.3 saves in the working copy. If you skipped that tutorial, run Setup_Part3_Views.sql once and select **Write Changes**.
+
+## Files by Part
+
+The files for the SQL chapters are ready. The files for the Excel and Power BI chapters will be added here.
+
+### Part III: SQL
+
+Each chapter's download holds its script at the start of each tutorial after the first, and at the end of the chapter. The first tutorial of each chapter starts a new script, so it needs only the working copy.
+
+- [Chapter09-companion.zip]({{< var companion.download >}}/Chapter09-companion.zip): Chapter09.sql at the start of Tutorials 9.2 and 9.3, and at the end of Chapter 9.
+- [Chapter10-companion.zip]({{< var companion.download >}}/Chapter10-companion.zip): Chapter10.sql at the start of Tutorials 10.2 and 10.3, and at the end of Chapter 10.
+- [Chapter11-companion.zip]({{< var companion.download >}}/Chapter11-companion.zip): Chapter11.sql at the start of Tutorials 11.2 and 11.3, and at the end of Chapter 11, with Setup_Part3_Views.sql.
+- [Chapter12-companion.zip]({{< var companion.download >}}/Chapter12-companion.zip): Audit.sql at the start of Tutorials 12.2 and 12.3, and at the end of Chapter 12.
+- [Setup_Part3_Views.sql]({{< var companion.download >}}/Setup_Part3_Views.sql): recreates the view MonthlyLaborEfficiency of Tutorial 11.3 in your working copy, for the Part III case.
+
+<!-- Part II arrives in Phase 4 and Part IV in Phase 5, from scripts/companion/manifest.yml. -->

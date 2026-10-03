@@ -39,6 +39,7 @@ RETURN
 
 **Deliverable.** The page with the matrix, the two variant measures, and a short note answering requirements (1) and (3) to (5).
 
+<!-- notes: ch14.ex1 -->
 <!-- Instructor notes, Exercise 14.1 (Desktop 2.158 reference model through the local engine, and SQL): (2) at 2026-12 (AsOf
      2026-12-31): Asset 39,328,524.11; Liability -13,896,428.43; Equity -20,928,484.44; Revenue -29,638,557.92; Expense 25,134,946.68;
      total 0.00. Revenue and expense together -4,503,611.24, the net income of fiscal 2026; 13,896,428.43 + 20,928,484.44 + 4,503,611.24
@@ -85,16 +86,18 @@ CALCULATE (
 
 **Deliverable.** The queries, the matrix and the table visual on the Ex 14.2 page, and a short note answering requirements (3) to (6).
 
+<!-- notes: ch14.ex2 -->
 <!-- Instructor notes, Exercise 14.2 (the reference model related SalesInvoiceLine[ShipmentDate] inactively, with the same results):
      (3) Date and ShippedLines are already related on InvoiceDate, and only one path between two tables can be active. (4) By invoice
      date 27,313,723.48; 29,376,702.28; 29,756,420.08; by ship date 26,358,117.76; 28,040,804.94; 28,528,117.59; (Blank) 3,519,805.55,
      the 439 Services lines (1,045,095.60; 1,261,365.95; 1,213,344.00), which have no shipment, so the inactive relationship finds no
      date for them; both columns total 86,446,845.84. 27,494 lines have a shipment. (5) 28 lines cross a year: 16 lines on 15 invoices
-     dated 2025-01-01 to 01-06 for shipments of December 2024 (90,138.93) and 7 lines on 7 invoices dated 2026-01-01 to 01-06 for
-     shipments of December 2025 (16,307.68), the invoices for December deliveries posted in January (Chapter 12 counts 8 invoices,
+     dated 2025-01-01 to 01-06 for shipments of December 2024 (90,138.93) and 7 lines on 7 invoices
+     dated 2026-01-01 to 01-06 for shipments of December 2025 (16,307.68), the invoices for December deliveries posted in January (Chapter 12 counts 8 invoices,
      19,540.86, for 2025 because it also includes SI-2026-013742, which is dated in 2025 and posted on 2026-01-01, and so crosses by
      posting date, not by invoice date); 3 lines on SI-2025-006733 to 006735, dated 2024-11-23 to 12-15 and shipped 2025-01-01
-     (649.05), and 2 lines on SI-2026-013741 and 013743, dated 2025-11-29 and 12-03 and shipped 2026-01-01 (1,349.19), the invoices
+     (649.05), and 2 lines on SI-2026-013741 and 013743, dated 2025-11-29 and 12-03 and shipped 2026-01-01
+     (1,349.19), the invoices
      dated before their shipment (Chapter 12; their numbers carry the next year's prefix, Chapter 5). (6) Revenue is recognized when
      control passes, which for Charles River's goods is at shipment or delivery (every shipment is delivered in the year it ships);
      invoice-date revenue misstates the years by the late invoices, and Services have no ship date, so a ship-date report needs a rule
@@ -122,14 +125,10 @@ CALCULATE (
 
 **Deliverable.** The measures, the matrix and the table visual on the Ex 14.3 page, and a short note answering requirements (2) to (5).
 
-<!-- Instructor notes, Exercise 14.3 (reference model through the local engine): Furniture 2026 against 2025 by month: January +0.3%,
-     February +1.4%, March +1.9%, April +3.6%, May +8.0%, June +6.6%, July -1.2%, August -8.1%, September +3.3%, October -22.7%
-     (1,314,620.10 against 1,700,781.60), November +12.8% (1,425,903.01 against 1,264,497.48), December -6.1% (1,416,264.73 against
-     1,507,492.23). October and November equal Exercise 11.2's ledger figures; the ledger differs only in January, by SI-2026-013742.
+<!-- notes: ch14.ex3 -->
+<!-- Instructor notes, Exercise 14.3 (reference model through the local engine): Furniture 2026 against 2025 by month: January +0.3%, February +1.4%, March +1.9%, April +3.6%, May +8.0%, June +6.6%, July -1.2%, August -8.1%, September +3.3%, October -22.7% (1,314,620.10 against 1,700,781.60), November +12.8% (1,425,903.01 against 1,264,497.48), December -6.1% (1,416,264.73 against 1,507,492.23). October and November equal Exercise 11.2's ledger figures; the ledger differs only in January, by SI-2026-013742.
      Furniture's YTD change is positive from January to September, -1.1% in October, +0.01% in November, -0.5% in December. December
-     2026 YTD against PY YTD: Accessories 1,872,273.66 / 1,944,887.00 (-3.7%); Furniture 17,395,054.38 / 17,485,275.08 (-0.5%);
-     Lighting 5,997,536.93 / 5,501,329.02 (+9.0%); Services 1,213,344.00 / 1,261,365.95 (-3.8%); Textiles 3,278,211.11 / 3,183,845.23
-     (+3.0%); total 29,756,420.08 / 29,376,702.28 (+1.3%). (4) Services swings most (-37.0% in July, +42.7% in December): it bills
+     2026 YTD against PY YTD: Accessories 1,872,273.66 / 1,944,887.00 (-3.7%); Furniture 17,395,054.38 / 17,485,275.08 (-0.5%); Lighting 5,997,536.93 / 5,501,329.02 (+9.0%); Services 1,213,344.00 / 1,261,365.95 (-3.8%); Textiles 3,278,211.11 / 3,183,845.23 (+3.0%); total 29,756,420.08 / 29,376,702.28 (+1.3%). (4) Services swings most (-37.0% in July, +42.7% in December): it bills
      7 to 15 lines a month to 7 to 15 customers (19 customers in the year), and one design-service line of up to 30,342.90 (December)
      moves a month's total; Textiles also swings (-30.7% February, +38.1% December). (5) The 2027 row shows Revenue PY 29,756,420.08 and
      no revenue, because the date table runs through 2027; fix: IF ( NOT ISBLANK ( [Revenue] ), CALCULATE ( [Revenue],
@@ -168,10 +167,13 @@ RETURN
 
 **Deliverable.** The measures and the matrix on the Ex 14.4 page, and a short note answering requirements (3), (5), and (6).
 
+<!-- notes: ch14.ex4 -->
 <!-- Instructor notes, Exercise 14.4 (reference model through the local engine; Bridge Check 0 in every row): Furniture 2026 by quarter
      (Margin PQ, volume, mix, price lists, promotions, margin): Q1 1,895,399.20, -80,923.53, -14,812.65, -759.08, +75,710.81,
-     1,874,614.74; Q2 1,874,614.74, +106,551.62, +19,161.18, -4,820.34, -10,344.08, 1,985,163.11; Q3 1,985,163.11, -100,923.52,
-     -10,716.35, +11,707.89, -74,974.04, 1,810,257.09; Q4 1,810,257.09, +7,885.63, -3,317.93, +1,073.25, -120,687.02, 1,695,211.02
+     1,874,614.74; Q2 1,874,614.74, +106,551.62, +19,161.18, -4,820.34, -10,344.08,
+     1,985,163.11; Q3 1,985,163.11, -100,923.52, -10,716.35, +11,707.89, -74,974.04,
+     1,810,257.09; Q4 1,810,257.09, +7,885.63, -3,317.93, +1,073.25, -120,687.02,
+     1,695,211.02
      (Chapter 6's bridge). (3) Each item has one StandardCost, so cost per unit changes only with the mix, which the mix effect
      already includes (Chapter 6). (5) Q3: fewer units than Q2 (volume) and the first month of promotion 8 (September) together; Q4:
      volume, mix and price lists small, promotions larger than the whole decline. (6) Lighting 2026-Q4: 683,521.69 to 657,275.48;
@@ -219,16 +221,15 @@ SUMMARIZECOLUMNS (
 
 **Deliverable.** The query tab and a memo answering requirements (1) to (4).
 
+<!-- notes: ch14.ex5 -->
 <!-- Instructor notes, Exercise 14.5 (reference model through the local engine): (1) Customer Rows 220 for every group (the
      Customer table, unfiltered by Item or Date because the filter does not flow from the lines to Customer); Customers Invoiced
      Accessories 188, Furniture 190, Lighting 187, Services 19, Textiles 181 (209 in all); Customer Rows Both equals Customers Invoiced.
      A report uses the distinct count on the fact table; Both gives the same answer here but changes every measure that uses the
      relationship. (2) Operating Expense 6,471,696.58 for every group; with Both on the Date relationship, a selection on Item filters
-     Date to the days with an invoice of that group, and the ledger follows: Accessories 6,285,069.07 (355 days), Furniture 6,426,770.19
-     (360), Lighting 6,117,912.10 (355), Textiles 5,855,785.92 (325), Services 1,570,297.47 (12 days), total 6,471,696.58 (365). The
+     Date to the days with an invoice of that group, and the ledger follows: Accessories 6,285,069.07 (355 days), Furniture 6,426,770.19 (360), Lighting 6,117,912.10 (355), Textiles 5,855,785.92 (325), Services 1,570,297.47 (12 days), total 6,471,696.58 (365). The
      Services figure is the operating expense of the twelve days on which design services were invoiced, a number with no meaning:
-     a selection in one fact table has filtered the other. (3) REMOVEFILTERS: Accessories 6.29%, Furniture 58.46%, Lighting 20.16%,
-     Services 4.08%, Textiles 11.02%, total 100%; ALL(SalesInvoiceLine): 2.17%, 20.12%, 6.94%, 1.40%, 3.79%, total 34.42%, the share of
+     a selection in one fact table has filtered the other. (3) REMOVEFILTERS: Accessories 6.29%, Furniture 58.46%, Lighting 20.16%, Services 4.08%, Textiles 11.02%, total 100%; ALL(SalesInvoiceLine): 2.17%, 20.12%, 6.94%, 1.40%, 3.79%, total 34.42%, the share of
      fiscal 2026 in three years of revenue (86,446,845.84), because ALL on the fact table removes the year as well. (4) Both
      directions (compare a count with and without CROSSFILTER); a count taken from a dimension or header (compare with a distinct count
      on the facts); ALL on a fact table in a share (shares must total 100%); inactive relationships used without USERELATIONSHIP;
@@ -271,12 +272,12 @@ RETURN
 
 **Deliverable.** The Control Totals tab and the conclusion.
 
+<!-- notes: ch14.ex6 -->
 <!-- Instructor notes, Exercise 14.6 (reference model through the local engine; all tests pass within 0.01): invoice lines 9,522;
      revenue 29,756,420.08 (Chapter 6); net income 4,503,611.24 (JE-2026-000297); journal entry debits 129,860,610.27 (all years,
      closes included, equal to JournalEntry TotalAmount, Chapter 8; written with SUM ( GLEntry[Debit] ) and SourceDocumentType =
      "JournalEntry", not with GL Amount); 5080 in fiscal 2026 2,265,636.88 (Chapter 10, Account[AccountNumber] = 5080 with GL Amount);
-     invoice revenue in the ledger 29,761,002.45 (Exercise 10.1). (2) The ledger exceeds the lines by 4,582.37: SI-2026-013741 to
-     013743 (1,112.23 + 3,233.18 + 236.96), dated in late 2025 and posted on 2026-01-01 (Chapter 6, Exercise 6.1); a reconciling item
+     invoice revenue in the ledger 29,761,002.45 (Exercise 10.1). (2) The ledger exceeds the lines by 4,582.37: SI-2026-013741 to 013743 (1,112.23 + 3,233.18 + 236.96), dated in late 2025 and posted on 2026-01-01 (Chapter 6, Exercise 6.1); a reconciling item
      is tested as its own expected difference, not left as a failure. (3) With the closes kept: net income 0 and 5080 0 fail; invoice
      lines, revenue, journal entry debits, invoice revenue in the ledger, and Test 3's trial balance (which excludes the two closes by
      VoucherNumber) still pass. (4) The tests show agreement of totals with earlier, independent calculations on the same database;

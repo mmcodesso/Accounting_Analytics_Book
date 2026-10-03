@@ -2,7 +2,7 @@
 
 **Context and objective.** The ledger postings tell you how much variance was recorded, but not which work orders produced it or which part of the cost went over standard. In this tutorial, you will rank the work order closes of fiscal 2026 by their variance, look at the parts of the largest ones, and examine the favorable end of the ranking. You will then list the closes above a review threshold in either direction, copy a result into Excel, and complete the chapter's script.
 
-**Prerequisites.** Complete Tutorials 9.1 and 9.2, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. As before, type each query at the end of the script and run it by selecting it. You also need Excel for Step 5.
+**Prerequisites.** Complete Tutorials 9.1 and 9.2, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. As before, type each query at the end of the script and run it by selecting it. You also need Excel for Step 5. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter09.sql as it stands at the end of Tutorial 9.2 from [Companion Files](#sec-companion-files).
 
 **Step-by-step instructions.**
 

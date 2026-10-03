@@ -2,7 +2,7 @@
 
 **Context and objective.** The general ledger records every posting to the manufacturing variance account, but it records them among more than 800,000 rows. In this tutorial, you will filter the ledger down to the variance postings of fiscal 2026, find out which source documents produced them, and identify the one posting that must be left out of any analysis of the account. You will also confirm the check from Tutorial 9.1 for every row, list the work orders whose variance has not yet been recorded, and label them with functions.
 
-**Prerequisites.** Complete Tutorial 9.1, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. If you closed it, click **Open SQL file(s)** and choose it. Type each query of this tutorial at the end of the script, under its comment, and run it by selecting it.
+**Prerequisites.** Complete Tutorial 9.1, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. If you closed it, click **Open SQL file(s)** and choose it. Type each query of this tutorial at the end of the script, under its comment, and run it by selecting it. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter09.sql as it stands at the end of Tutorial 9.1 from [Companion Files](#sec-companion-files).
 
 **Step-by-step instructions.**
 

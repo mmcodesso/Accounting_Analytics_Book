@@ -1,0 +1,10 @@
+role 'Test Warehouse Manager'
+	modelPermission: read
+
+	tablePermission CostCenter = [CostCenterID] IN CALCULATETABLE ( VALUES ( Security[CostCenterID] ), Security[UserPrincipalName] = "employee007@charlesriver.example" )
+
+	tablePermission Employee = [CostCenterID] IN CALCULATETABLE ( VALUES ( Security[CostCenterID] ), Security[UserPrincipalName] = "employee007@charlesriver.example" )
+
+	tablePermission Item = "employee007@charlesriver.example" IN VALUES ( Security[UserPrincipalName] )
+
+	tablePermission Security = [UserPrincipalName] = "employee007@charlesriver.example"

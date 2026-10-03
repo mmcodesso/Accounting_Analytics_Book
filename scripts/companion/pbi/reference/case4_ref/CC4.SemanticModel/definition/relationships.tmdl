@@ -1,0 +1,27 @@
+relationship deff1e7d-5c41-5724-999c-53efd3ed1405
+	fromColumn: GLEntry.AccountID
+	toColumn: Account.AccountID
+
+relationship e6956f72-8cdd-587b-90b3-7bacc8d2eddf
+	fromColumn: GLEntry.PostingDate
+	toColumn: Date.Date
+
+relationship 77adcb14-f6a0-5f4d-9ee9-fed4457a234b
+	fromColumn: Receipts.ItemID
+	toColumn: Item.ItemID
+
+relationship 865d5dc5-2398-5897-86f5-22bc7e21fd99
+	fromColumn: Receipts.ReceiptDate
+	toColumn: Date.Date
+
+relationship 7f1707cc-5b8d-5a4b-996a-9d406b043484
+	fromColumn: Issues.ItemID
+	toColumn: Item.ItemID
+
+relationship a3f647ee-75af-506f-926c-c8276948e02b
+	fromColumn: Issues.IssueDate
+	toColumn: Date.Date
+
+relationship 65eea64e-3e18-5b85-800a-e7c771f331cc
+	fromColumn: Requisitions.ItemID
+	toColumn: Item.ItemID

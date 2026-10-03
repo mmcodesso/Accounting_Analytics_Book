@@ -12,7 +12,7 @@
 
 **Requirements.**
 
-(1) Open the CharlesRiver.xlsx workbook in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness).
+(1) Open your working copy, CharlesRiver_Work.xlsx, in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness).
 
 (2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved, such as Quantity, UnitPrice, Discount, and LineTotal, and test whether LineTotal agrees with the other columns. Examine the PricingMethod column and identify the lines priced by approved override rather than by a price list, which deserve closer review.
 
@@ -31,7 +31,7 @@
 
 **Requirements.**
 
-(1) Open the CharlesRiver.xlsx workbook and examine the GLEntry worksheet. Calculate the total debits and total credits across all entries. Determine whether the ledger is in balance.
+(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the GLEntry worksheet. Calculate the total debits and total credits across all entries. Determine whether the ledger is in balance.
 
 (2) Identify the date range covered by the general ledger entries. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within each fiscal year. Note any periods that have an unusually low number of entries compared to other periods, and explain whether each reflects missing transactions or the edges of the extract.
 
@@ -52,7 +52,7 @@
 
 **Requirements.**
 
-(1) Open the CharlesRiver.xlsx workbook and examine the Item worksheet from the Master Data group. Identify any items where the StandardCost field is zero, blank, or appears unreasonable. Assess whether these entries represent data quality problems or legitimate situations, such as service items that have a StandardCost of zero by design.
+(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the Item worksheet from the Master Data group. Identify any items where the StandardCost field is zero, blank, or appears unreasonable. Assess whether these entries represent data quality problems or legitimate situations, such as service items that have a StandardCost of zero by design.
 
 (2) Identify items with a blank ListPrice and use the ItemGroup column to determine whether each is an item Charles River sells. Then identify item names that appear more than once in the Item table and compare the ItemCode and StandardCost of each. Assess whether these are duplicate records or distinct items that share a name, and explain how shared names could distort a cost analysis that groups results by ItemName.
 
@@ -71,7 +71,7 @@
 
 **Requirements.**
 
-(1) Open the CharlesRiver.xlsx workbook and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row), and describe what one row of each table represents.
+(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row), and describe what one row of each table represents.
 
 (2) Department managers often ask for budget reports with months across the top. Sketch the layout of such a report for one cost center. Explain which tidy data principles it would violate and why the tidy form stored in the workbook is better suited to a budget-versus-actual analysis.
 
@@ -113,7 +113,7 @@
 
 **Requirements.**
 
-(1) Open the CharlesRiver.xlsx workbook and examine the PurchaseInvoice and DisbursementPayment worksheets from the P2P table group. Identify the fields that would be relevant for detecting duplicate invoices and duplicate payments, such as SupplierID, InvoiceNumber, CheckNumber, Amount, and PaymentDate.
+(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the PurchaseInvoice and DisbursementPayment worksheets from the P2P table group. Identify the fields that would be relevant for detecting duplicate invoices and duplicate payments, such as SupplierID, InvoiceNumber, CheckNumber, Amount, and PaymentDate.
 
 (2) In the PurchaseInvoice worksheet, use COUNTIFS to count how many times each combination of SupplierID and InvoiceNumber appears, and filter for counts greater than one. In the DisbursementPayment worksheet, do the same for SupplierID and CheckNumber, noting that payments made by ACH or wire transfer have no check number and cannot be tested this way. Record each matching pair you find.
 
@@ -121,6 +121,7 @@
 
 (4) A duplicate payment does not always share a reference number, so test the risk directly. In the PurchaseInvoice worksheet, use SUMIFS to total the payments recorded against each invoice in the DisbursementPayment worksheet, matching on PurchaseInvoiceID, and compare that total with the invoice's GrandTotal. Many invoices are paid in installments, which is normal. Identify any invoice whose payments exceed its GrandTotal, and explain what a clean result does and does not prove.
 
+<!-- notes: ch02.ex6 -->
 <!-- Instructor notes, Exercise 2.6: six supplier invoice numbers appear twice for the same supplier (suppliers 1 and 2, one pair each per year, for example V0002-2024-000182); each pair has different dates and amounts and each invoice was paid once, so they are reused numbers rather than one invoice paid twice, but they still require follow-up. Two check numbers repeat for supplier 1 (CHK0006076 on payments 6076 and 6107, CHK0019708 on payments 19708 and 19843); each pair pays two different invoices of different amounts. The SUMIFS test finds no invoice paid above its GrandTotal (2,641 invoices were paid in installments): recorded payments never exceed an invoice, which does not prove the invoices themselves are valid. The generator's AnomalyLog lists six duplicate payment references, but only these two are present in the data. -->
 
 (5) Assess the reliability of your approach. Consider what duplicates your tests would miss, such as the same invoice entered with a slightly different number or paid by a method that has no check number. Write two to three sentences explaining why a SQL-based approach, which you will learn in Part III, would be more effective for this task.

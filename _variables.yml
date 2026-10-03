@@ -1,0 +1,25 @@
+# Values the book reads with {{< var key >}} shortcodes. Quarto loads this file for every page.
+# The facts registry (Phase 3 of the companion-files and yearly-roll plan) will generate most keys;
+# for now it holds the edition and the dataset release it is verified against.
+
+edition: "2026"
+
+dataset:
+  # The release this edition is verified against. Tags are immutable: a new build gets a new tag.
+  version: "v2026.1"
+  window: "fiscal 2024–2026"
+  # Until release v2026.1 exists, the links still point to the latest release, which today holds
+  # the same files (same SHA-256). Once it is published, switch both URLs to the pinned tag:
+  #   release: https://github.com/mmcodesso/CharlesRiver_Database/releases/tag/v2026.1
+  #   download: https://github.com/mmcodesso/CharlesRiver_Database/releases/download/v2026.1
+  release: "https://github.com/mmcodesso/CharlesRiver_Database/releases/tag/v2026.1"
+  download: "https://github.com/mmcodesso/CharlesRiver_Database/releases/download/v2026.1"
+  sha256:
+    sqlite: "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+    xlsx: "185d42bd069fad177fae23c5e30df93edc7cf2669f687236c8a9f29435388e09"
+    csv: "5f2821ee81f86c2da60702a9feaa51fa18f72687e5d0807c44a7d5489fecffb6"
+
+# Companion files of this edition (scripts/companion/build.py), on a release of the book repository.
+companion:
+  release: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/tag/companion-2026"
+  download: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/download/companion-2026"

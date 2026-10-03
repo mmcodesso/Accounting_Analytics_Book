@@ -1,0 +1,44 @@
+# Companion files: the files readers download to start a tutorial without the earlier ones.
+#
+# Each chain is one file that a run of tutorials builds. The builder writes the file as it stands
+# at the end of every tutorial in the chain. The start file of a tutorial is the end file of the
+# tutorial before it, and the chapter-end file is the copy the chapter's exercises start from.
+# audience: public files go on the book's companion release; instructor files go on the private
+# instructor release (exercise, case, and capstone solutions, from Phase 4 on).
+#
+# Build with:  python scripts/companion/build.py [--tool sql] [--chapter 10]
+
+release_tag: companion-2026          # on github.com/mmcodesso/Accounting_Analytics_Book
+
+chains:
+  - id: ch09-script
+    tool: sql
+    chapter: 9
+    file: Chapter09.sql
+    script: ch09.CHAPTER09           # scripts/figures/ch09.py, the script the tutorial text must match
+    audience: public
+  - id: ch10-script
+    tool: sql
+    chapter: 10
+    file: Chapter10.sql
+    script: ch10.CHAPTER10
+    audience: public
+  - id: ch11-script
+    tool: sql
+    chapter: 11
+    file: Chapter11.sql
+    script: ch11.CHAPTER11
+    audience: public
+  - id: ch12-script
+    tool: sql
+    chapter: 12
+    file: Audit.sql
+    script: ch12.CHAPTER12
+    audience: public
+
+extras:
+  - id: part3-views
+    tool: sql
+    file: Setup_Part3_Views.sql
+    from: ch11.CHAPTER11:create_view  # the view Tutorial 11.3 saves in the working copy
+    audience: public

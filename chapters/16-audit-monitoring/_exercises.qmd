@@ -26,6 +26,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The aging page, the reconciliation, and a short note answering requirements (4) and (5).
 
+<!-- notes: ch16.ex1 -->
 <!-- Instructor notes, Exercise 16.1 (SQL; Chapter 8 and Exercise 12.2): open balance = GrandTotal - applications - credit memos
      (on OriginalSalesInvoiceID), both dated <= 2026-12-31, rounded, kept if > 0: 1,079 invoices, 4,418,804.32 (203 customers).
      Buckets by DueDate at 2026-12-31: Current 3,655,971.50; 1-30 745,674.84; 31-60 16,711.26; 61-90 405.41; over 90 41.31
@@ -53,6 +54,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The two exception queries, the page, and a short note answering requirement (5).
 
+<!-- notes: ch16.ex2 -->
 <!-- Instructor notes, Exercise 16.2 (SQL; Chapter 12 L5-L6): by InvoiceDate, 22 invoices were delivered in the prior year: 15
      invoiced in January 2025 for December 2024 deliveries and 7 in January 2026 for December 2025 deliveries (SubTotal 106,446.61
      together). Chapter 12, by GL posting date, counts 15 and 8: SI-2026-013742 is dated in December 2025 but posted 2026-01-01,
@@ -82,10 +84,11 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The SurgeDays query, the page, and a short note answering requirement (5).
 
+<!-- notes: ch16.ex3 -->
 <!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the
      first is 2024-05-31, then several a month from July 2024, up to 7 in October 2026; every surge day has all 64 hourly
-     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589,
-     and 0.705 of the year's manufacturing overtime; overtime on other days is flat (6,273, 6,426, 5,918). All 5,952 surge entries
+     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705
+     of the year's manufacturing overtime; overtime on other days is flat (6,273, 6,426, 5,918). All 5,952 surge entries
      were approved by the Production Manager on the work date. Distinct values of total hours: Group By with "Count Distinct Rows"
      on the hours column; one value means everyone clocked the same hours. (5) The production manager approved every entry the
      test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found
@@ -112,9 +115,9 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The page, the measure, and the note.
 
+<!-- notes: ch16.ex4 -->
 <!-- Instructor notes, Exercise 16.4 (AM16 reference model, checked in Desktop 2.158's engine): exceptions / population / rate per
-     1,000 by year: journal entries 16 / 266 / 60.15, 12 / 288 / 41.67, 15 / 297 / 50.51; purchase orders 11 / 3,921 / 2.81,
-     6 / 6,545 / 0.92, 8 / 8,366 / 0.96; payroll 27 / 2,645 / 10.21, 28 / 2,774 / 10.09, 28 / 2,778 / 10.08. (1) Population
+     1,000 by year: journal entries 16 / 266 / 60.15, 12 / 288 / 41.67, 15 / 297 / 50.51; purchase orders 11 / 3,921 / 2.81, 6 / 6,545 / 0.92, 8 / 8,366 / 0.96; payroll 27 / 2,645 / 10.21, 28 / 2,774 / 10.09, 28 / 2,778 / 10.08. (1) Population
      uses SELECTEDVALUE ( Tests[Process] ), blank when several processes are in context, so a rate across processes, which
      would mix populations, is never shown. (2) CALCULATE ( [Exceptions], Exceptions[Disposition] <> "Expected", Tests[TestID]
      <> "PR SelfApproved" ) divided by [Population], times 1,000 (a blank Disposition is not equal to "Expected", so open
@@ -122,8 +125,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
      purchase orders unchanged. (4) the count rose by a third (6 to 8) while the rate barely moved (0.92 to 0.96), because the
      number of orders grew by about 28%; from 2024 the rate fell by two-thirds while orders more than doubled. (5) Journal
      entries are the process to watch: their unexplained rate fell in 2025 and rose in 2026, mostly because of single
-     documents that fail several tests (the opening entry's four in 2024, the debt reclassifications' two each in 2024 and
-     2026), while Weekend (6, 5, 6), Backdated (2, 2, 2), and SelfApproved (3, 2, 2) barely move; payroll's unexplained
+     documents that fail several tests (the opening entry's four in 2024, the debt reclassifications' two each in 2024 and 2026),
+     while Weekend (6, 5, 6), Backdated (2, 2, 2), and SelfApproved (3, 2, 2) barely move; payroll's unexplained
      exceptions are two a year, so its rate is almost entirely the design finding. -->
 
 ### Auditing Exercises
@@ -148,6 +151,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The page, the measures, and a short note answering requirements (2) and (5).
 
+<!-- notes: ch16.ex5 -->
 <!-- Instructor notes, Exercise 16.5 (SQL; Chapters 8 and 12): 39,864 payments dated through 2026-12-31; MAD 0.01295 (marginally
      acceptable conformity); full payments 34,115, MAD 0.00755 (acceptable); partial payments 5,749, MAD 0.04496
      (nonconformity), because only invoices of $1,000 or more are paid in parts. A DAX first digit: VALUE ( LEFT ( FORMAT (
@@ -176,6 +180,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The PaymentPairs query, the table of approval shares, and a short note answering requirement (5).
 
+<!-- notes: ch16.ex6 -->
 <!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6; the measures checked in Desktop 2.158's engine on the AM16
      reference model): 113 supplier-and-amount pairs on different dates among the payments through 2026-12-31, 13 within 30
      days, none paying the same invoice (Chapter 8: near-duplicates, not duplicates). Orders Approved = CALCULATE ( COUNTROWS (

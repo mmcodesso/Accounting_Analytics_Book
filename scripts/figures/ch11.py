@@ -349,12 +349,16 @@ def fig_11_02() -> Diagram:
     rows = db.run(sql("hours_by_month"))[1]
     assert len(rows) == 36 and rows[0][0] == "2024-01", rows[:2]
     assert rows[0][3] > rows[0][2], rows[0]                       # the start-up month: mostly indirect
-    assert all(r[3] < 0.02 * r[2] for r in rows[1:5]) and rows[2][3] == 0, rows[1:5]
+    # The start-up build: far less indirect time in February to May than later in the year (contract M5;
+    # the text says "far less", which holds in every window, not "almost none").
+    early = sum(r[3] or 0 for r in rows[1:5]) / 4
+    late = sum(r[3] or 0 for r in rows[6:12]) / 6
+    assert early < 0.3 * late, (early, late)
     assert all(r[3] > 1000 for r in rows[5:-1]) and rows[-1][3] > 0, "indirect time every month from June"
     out = CHAPTER11.mock(d, "hours_by_month", [120, 150, 140, 150, 150], shown=slice(0, 8), compact=True)
     db.emphasize_cells(d, out["geometry"], [(1, 3), (4, 3)])
-    note(d, "The grid shows the first eight of the 36 months. Outlined: February to May 2024, with almost no "
-            "indirect time.", out["bottom"] + 8, 40)
+    note(d, "The grid shows the first eight of the 36 months. Outlined: February to May 2024, with far less "
+            "indirect time than the months that follow.", out["bottom"] + 8, 40)
     return d
 
 

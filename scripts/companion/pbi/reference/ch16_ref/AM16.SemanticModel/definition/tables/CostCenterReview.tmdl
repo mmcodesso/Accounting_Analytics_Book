@@ -1,0 +1,51 @@
+table CostCenterReview
+
+	column CostCenterID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CostCenterID
+
+	column CostCenterName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CostCenterName
+
+	column ManagerID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ManagerID
+
+	column EmployeeName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EmployeeName
+
+	column JobTitle
+		dataType: string
+		summarizeBy: none
+		sourceColumn: JobTitle
+
+	column EmploymentStatus
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EmploymentStatus
+
+	column TerminationDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: TerminationDate
+
+	partition CostCenterReview = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T75_CostCenter",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"CostCenterID", "CostCenterName", "ManagerID"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"CostCenterID", Int64.Type}, {"CostCenterName", type text}, {"ManagerID", Int64.Type}}),
+			    Merged = Table.NestedJoin(Typed, {"ManagerID"}, Employee, {"EmployeeID"}, "Manager", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "Manager", {"EmployeeName", "JobTitle", "EmploymentStatus", "TerminationDate"})
+			in
+			    Expanded
+

@@ -5,7 +5,7 @@ aliases:
 
 # Downloads {#sec-downloads .unnumbered}
 
-This page provides access to the latest version of the book and the dataset used throughout its chapters.
+This page provides access to the latest version of the book and to the release of the dataset that its chapters use.
 Versioned releases for major editions will be added as the project evolves.
 
 
@@ -24,13 +24,17 @@ The Charles River Accounting Dataset supports every chapter of the book across E
 The files are hosted on GitHub Releases to support large file sizes and fast global downloads.
 Visit the [Charles River Accounting Dataset website](https://charlesriver.accountinganalyticshub.com/)
 for documentation and additional information. All dataset changes and updates
-will be posted there. Direct downloads are available below.
+will be posted there.
 
-- [Charles River Accounting Dataset (SQLite)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.sqlite)
-- [Charles River Accounting Dataset (Excel)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver.xlsx)
-- [Charles River Accounting Dataset (CSV package)](https://github.com/mmcodesso/CharlesRiver_Database/releases/latest/download/CharlesRiver_csv.zip)
+This edition of the book is verified against dataset release {{< var dataset.version >}}, which covers {{< var dataset.window >}}.
+Use the files below, which come from that release, so that your results match the chapters. A later release of the dataset can contain different values.
+
+- [Charles River Accounting Dataset (SQLite)]({{< var dataset.download >}}/CharlesRiver.sqlite)
+- [Charles River Accounting Dataset (Excel)]({{< var dataset.download >}}/CharlesRiver.xlsx)
+- [Charles River Accounting Dataset (CSV package)]({{< var dataset.download >}}/CharlesRiver_csv.zip)
 
 All three formats contain the same Charles River data, so students can move between Excel, SQL, and Power BI without changing datasets.
+The [release page]({{< var dataset.release >}}) lists each file's SHA-256 checksum, which you can use to confirm a download.
 
 
 <!-- ## Versioned Editions (coming soon)

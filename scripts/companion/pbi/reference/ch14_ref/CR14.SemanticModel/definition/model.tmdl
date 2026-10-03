@@ -1,0 +1,11 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["Customer","Item","SalesInvoice","SalesInvoiceLine","JournalEntry","GLEntry","Account","CostCenter","ShipDates"]

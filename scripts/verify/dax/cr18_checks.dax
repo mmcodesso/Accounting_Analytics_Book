@@ -1,0 +1,104 @@
+-- @@ totals by view, finished goods, 2026 (expect revenue 28,543,076.08; margins 12,739,803.20 / 10,661,488.03 / 11,731,216.94)
+DEFINE
+    MEASURE SalesInvoiceLine[Revenue] = SUM ( SalesInvoiceLine[LineTotal] )
+    MEASURE SalesInvoiceLine[Standard Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[StandardCost] ) )
+    MEASURE SalesInvoiceLine[Absorption Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[AbsorptionCost] ) )
+    MEASURE SalesInvoiceLine[Time-Driven Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[TimeDrivenCost] ) )
+    MEASURE SalesInvoiceLine[Product Cost] =
+        SWITCH (
+            SELECTEDVALUE ( 'Costing View'[View], "Standard" ),
+            "Standard", [Standard Cost],
+            "Absorption", [Absorption Cost],
+            "Time-driven", [Time-Driven Cost]
+        )
+    MEASURE SalesInvoiceLine[Margin] = [Revenue] - [Product Cost]
+    MEASURE SalesInvoiceLine[Margin %] = DIVIDE ( [Margin], [Revenue] )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Costing View'[View],
+    TREATAS ( { 2026 }, SalesInvoiceLine[Year] ),
+    TREATAS ( { "Manufactured", "Purchased" }, ItemCosts[SupplyMode] ),
+    "Revenue", ROUND ( [Revenue], 2 ),
+    "Margin", ROUND ( [Margin], 2 ),
+    "Margin %", ROUND ( [Margin %], 4 )
+)
+-- @@ no view selected falls back to Standard
+DEFINE
+    MEASURE SalesInvoiceLine[Revenue] = SUM ( SalesInvoiceLine[LineTotal] )
+    MEASURE SalesInvoiceLine[Standard Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[StandardCost] ) )
+    MEASURE SalesInvoiceLine[Absorption Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[AbsorptionCost] ) )
+    MEASURE SalesInvoiceLine[Time-Driven Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[TimeDrivenCost] ) )
+    MEASURE SalesInvoiceLine[Product Cost] =
+        SWITCH (
+            SELECTEDVALUE ( 'Costing View'[View], "Standard" ),
+            "Standard", [Standard Cost],
+            "Absorption", [Absorption Cost],
+            "Time-driven", [Time-Driven Cost]
+        )
+    MEASURE SalesInvoiceLine[Margin] = [Revenue] - [Product Cost]
+EVALUATE
+SUMMARIZECOLUMNS (
+    TREATAS ( { 2026 }, SalesInvoiceLine[Year] ),
+    TREATAS ( { "Manufactured", "Purchased" }, ItemCosts[SupplyMode] ),
+    "Margin", ROUND ( [Margin], 2 ),
+    "Items sold", COUNTROWS ( FILTER ( VALUES ( ItemCosts[ItemCode] ), NOT ISBLANK ( [Revenue] ) ) )
+)
+-- @@ margin % by family and view, manufactured, 2026 (expect FUR-TBL 41.3 / 30.1 / 36.8)
+DEFINE
+    MEASURE SalesInvoiceLine[Revenue] = SUM ( SalesInvoiceLine[LineTotal] )
+    MEASURE SalesInvoiceLine[Standard Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[StandardCost] ) )
+    MEASURE SalesInvoiceLine[Absorption Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[AbsorptionCost] ) )
+    MEASURE SalesInvoiceLine[Time-Driven Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[TimeDrivenCost] ) )
+    MEASURE SalesInvoiceLine[Product Cost] =
+        SWITCH (
+            SELECTEDVALUE ( 'Costing View'[View], "Standard" ),
+            "Standard", [Standard Cost],
+            "Absorption", [Absorption Cost],
+            "Time-driven", [Time-Driven Cost]
+        )
+    MEASURE SalesInvoiceLine[Margin] = [Revenue] - [Product Cost]
+    MEASURE SalesInvoiceLine[Margin %] = DIVIDE ( [Margin], [Revenue] )
+EVALUATE
+SUMMARIZECOLUMNS (
+    ItemCosts[Family],
+    'Costing View'[View],
+    TREATAS ( { 2026 }, SalesInvoiceLine[Year] ),
+    TREATAS ( { "Manufactured" }, ItemCosts[SupplyMode] ),
+    "Margin %", ROUND ( [Margin %], 4 )
+)
+ORDER BY ItemCosts[Family], 'Costing View'[View]
+-- @@ cumulative margin share at ranks 1, 41, 100, 207, 208 by view, finished goods, 2026 (expect about 51% at 41, 100% at 207, blank at 208)
+DEFINE
+    MEASURE SalesInvoiceLine[Revenue] = SUM ( SalesInvoiceLine[LineTotal] )
+    MEASURE SalesInvoiceLine[Standard Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[StandardCost] ) )
+    MEASURE SalesInvoiceLine[Absorption Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[AbsorptionCost] ) )
+    MEASURE SalesInvoiceLine[Time-Driven Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[TimeDrivenCost] ) )
+    MEASURE SalesInvoiceLine[Product Cost] =
+        SWITCH (
+            SELECTEDVALUE ( 'Costing View'[View], "Standard" ),
+            "Standard", [Standard Cost],
+            "Absorption", [Absorption Cost],
+            "Time-driven", [Time-Driven Cost]
+        )
+    MEASURE SalesInvoiceLine[Margin] = [Revenue] - [Product Cost]
+    MEASURE SalesInvoiceLine[Cumulative Margin Share] =
+        VAR TopRank = MAX ( 'Item Rank'[Rank] )
+        VAR Items =
+            FILTER (
+                ADDCOLUMNS ( ALLSELECTED ( ItemCosts[ItemCode] ), "@Margin", [Margin] ),
+                NOT ISBLANK ( [@Margin] )
+            )
+        VAR Shown =
+            IF ( TopRank <= COUNTROWS ( Items ), SUMX ( TOPN ( TopRank, Items, [@Margin], DESC ), [@Margin] ) )
+        RETURN
+            DIVIDE ( Shown, SUMX ( Items, [@Margin] ) )
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Costing View'[View],
+    'Item Rank'[Rank],
+    TREATAS ( { 1, 41, 100, 207, 208 }, 'Item Rank'[Rank] ),
+    TREATAS ( { 2026 }, SalesInvoiceLine[Year] ),
+    TREATAS ( { "Manufactured", "Purchased" }, ItemCosts[SupplyMode] ),
+    "Share", ROUND ( [Cumulative Margin Share], 4 )
+)
+ORDER BY 'Costing View'[View], 'Item Rank'[Rank]

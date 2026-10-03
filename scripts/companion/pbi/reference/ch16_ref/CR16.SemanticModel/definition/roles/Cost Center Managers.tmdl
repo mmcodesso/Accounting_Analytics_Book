@@ -1,0 +1,10 @@
+role 'Cost Center Managers'
+	modelPermission: read
+
+	tablePermission CostCenter = [CostCenterID] IN CALCULATETABLE ( VALUES ( Security[CostCenterID] ), Security[UserPrincipalName] = USERPRINCIPALNAME () )
+
+	tablePermission Employee = [CostCenterID] IN CALCULATETABLE ( VALUES ( Security[CostCenterID] ), Security[UserPrincipalName] = USERPRINCIPALNAME () )
+
+	tablePermission Item = USERPRINCIPALNAME () IN VALUES ( Security[UserPrincipalName] )
+
+	tablePermission Security = [UserPrincipalName] = USERPRINCIPALNAME ()

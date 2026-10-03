@@ -1,0 +1,65 @@
+-- @@ plant hours by type with KEEPFILTERS
+DEFINE
+MEASURE LaborTimeEntry[MH] =
+CALCULATE (
+    SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
+)
+MEASURE LaborTimeEntry[DH] = CALCULATE ( [MH], LaborTimeEntry[LaborType] = "Direct Manufacturing" )
+MEASURE LaborTimeEntry[IH] = CALCULATE ( [MH], LaborTimeEntry[LaborType] = "Indirect Manufacturing" )
+MEASURE LaborTimeEntry[OH] =
+CALCULATE ( SUM ( LaborTimeEntry[OvertimeHours] ), KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" ) )
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[Year], TREATAS ( { 2024, 2025, 2026 }, 'Date'[Year] ),
+    "MH", ROUND ( [MH], 1 ), "DH", ROUND ( [DH], 1 ), "IH", ROUND ( [IH], 1 ), "OH", ROUND ( [OH], 1 ),
+    "NonMfgFiltered", ROUND ( CALCULATE ( [MH], LaborTimeEntry[LaborType] = "NonManufacturing" ), 1 ) )
+-- @@ TTM by month 2024-11..2026-12 (model measure)
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[YearMonth], TREATAS ( { 2024, 2025, 2026, 2027 }, 'Date'[Year] ),
+    "TTM", ROUND ( [Hours per Standard Hour TTM], 3 ), "Monthly", ROUND ( [Hours per Standard Hour], 3 ) )
+ORDER BY 'Date'[YearMonth]
+-- @@ direct hours by work center 2026
+DEFINE
+MEASURE LaborTimeEntry[MH] =
+CALCULATE (
+    SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
+)
+MEASURE LaborTimeEntry[DH] = CALCULATE ( [MH], LaborTimeEntry[LaborType] = "Direct Manufacturing" )
+EVALUATE
+SUMMARIZECOLUMNS ( WorkCenter[WorkCenterName], TREATAS ( { 2026 }, 'Date'[Year] ), "DH", ROUND ( [DH], 1 ), "MH", ROUND ( [MH], 1 ) )
+-- @@ overtime share by job title
+EVALUATE
+SUMMARIZECOLUMNS ( Employee[JobTitle], 'Date'[Year], TREATAS ( { 2024, 2026 }, 'Date'[Year] ),
+    "OTShare", ROUND ( [Overtime Share], 3 ) )
+-- @@ gross to net by step 2026
+EVALUATE
+SUMMARIZECOLUMNS ( ROLLUPADDISSUBTOTAL ( Steps[Step], "IsTotal" ), TREATAS ( { 2026 }, 'Date'[Year] ),
+    "GtN", ROUND ( [Gross to Net], 2 ) )
+-- @@ discounts by promotion 2026
+EVALUATE
+SUMMARIZECOLUMNS ( PromotionProgram[PromotionName], TREATAS ( { 2026 }, 'Date'[Year] ),
+    "Discounts", ROUND ( [Discounts], 2 ), "Lines", [Invoice Lines] )
+-- @@ promotion 8 by month
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[YearMonth], TREATAS ( { "Furniture Seasonal Promotion" }, PromotionProgram[PromotionName] ),
+    "Discounts", ROUND ( [Discounts], 2 ), "Lines", [Invoice Lines] )
+-- @@ budget reconciliation by cost center 2026 opex
+EVALUATE
+SUMMARIZECOLUMNS ( ROLLUPADDISSUBTOTAL ( CostCenter[CostCenterName], "IsTotal" ),
+    TREATAS ( { 2026 }, 'Date'[Year] ), TREATAS ( { "Operating Expense" }, Account[AccountSubType] ),
+    "Budget", ROUND ( [Budget], 2 ), "Actual", ROUND ( [Actual], 2 ), "VarPct", ROUND ( [Variance %], 3 ),
+    "Flexed", ROUND ( [Flexed Budget], 2 ), "Volume", ROUND ( [Volume Effect], 2 ),
+    "Class", ROUND ( [Classification Effect], 2 ), "Remaining", ROUND ( [Remaining Variance], 2 ),
+    "RemPct", ROUND ( [Remaining %], 3 ) )
+-- @@ variance to flexed by month 2026
+EVALUATE
+SUMMARIZECOLUMNS ( 'Date'[YearMonth], TREATAS ( { 2026 }, 'Date'[Year] ), TREATAS ( { "Operating Expense" }, Account[AccountSubType] ),
+    "VarToFlexed", ROUND ( [Variance to Flexed], 2 ) )
+ORDER BY 'Date'[YearMonth]
+-- @@ cost center detail: Warehouse and Administration accounts
+EVALUATE
+SUMMARIZECOLUMNS ( CostCenter[CostCenterName], Account[AccountNumber], Account[AccountName],
+    TREATAS ( { "Warehouse", "Administration" }, CostCenter[CostCenterName] ),
+    TREATAS ( { 2026 }, 'Date'[Year] ), TREATAS ( { "Operating Expense" }, Account[AccountSubType] ),
+    "Budget", ROUND ( [Budget], 2 ), "Actual", ROUND ( [Actual], 2 ) )

@@ -2,7 +2,7 @@
 
 **Context and objective.** The plant's materials and services come through the purchasing chain. In this tutorial, you will perform a three-way match of every purchase order line with its receipts and invoices, test invoice prices against order prices at two tolerances, and reconcile the goods received but not yet invoiced to the ledger. You will then test the approvals of the purchase orders against their approvers' limits, their employment dates, and the rule that no one approves their own order, and measure how concentrated the approvals are.
 
-**Prerequisites.** Complete Tutorial 12.1, and continue at the end of Audit.sql.
+**Prerequisites.** Complete Tutorial 12.1, and continue at the end of Audit.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Audit.sql as it stands at the end of Tutorial 12.1 from [Companion Files](#sec-companion-files).
 
 **Step-by-step instructions.**
 

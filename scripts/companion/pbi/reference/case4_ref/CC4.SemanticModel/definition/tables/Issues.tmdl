@@ -1,0 +1,47 @@
+table Issues
+
+	column MaterialIssueLineID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: MaterialIssueLineID
+
+	column ItemID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ItemID
+
+	column QuantityIssued
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: QuantityIssued
+
+	column ExtendedStandardCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: ExtendedStandardCost
+
+	column IssueDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: IssueDate
+
+	column WorkOrderID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: WorkOrderID
+
+	column PairKey
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PairKey
+
+	partition Issues = m
+		mode: import
+		source =
+			let
+			    Source = IssuesStaged
+			in
+			    Source
+

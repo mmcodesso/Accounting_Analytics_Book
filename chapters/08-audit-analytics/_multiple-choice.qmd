@@ -107,6 +107,7 @@ B.  Thousands of checks were written and never recorded in the ledger.
 C.  The gap test does not work on check numbers stored as text.
 D.  The missing checks were all voided at the end of each year.
 
+<!-- notes: ch08.mcq -->
 <!-- Answer key, Chapter 8 (for instructors; HTML comments are removed from every rendered format):
      1 C, 2 A, 3 D, 4 B, 5 D, 6 B, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 D, 15 A.
      1 C: a test on an incomplete extract cannot find problems in records that were never extracted.

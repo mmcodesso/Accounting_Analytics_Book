@@ -2,7 +2,7 @@
 
 **Context and objective.** Chapter 6 built the pre-closing trial balance of fiscal 2026 in Excel, with Power Query's Group By, and turned it into the income statement of @fig-06-07. In this tutorial, you will put two totals side by side with scalar subqueries, build the trial balance again with one query, and prove with derived tables that its debits equal its credits. You will then use the ledger to follow the cost of production through account 1090 Manufacturing Cost Clearing, the account where the manufacturing variance arises.
 
-**Prerequisites.** Complete Tutorial 10.1, and continue at the end of Chapter10.sql.
+**Prerequisites.** Complete Tutorial 10.1, and continue at the end of Chapter10.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter10.sql as it stands at the end of Tutorial 10.1 from [Companion Files](#sec-companion-files).
 
 **Step-by-step instructions.**
 

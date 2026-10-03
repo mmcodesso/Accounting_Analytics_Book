@@ -2,7 +2,7 @@
 
 **Context and objective.** The controller's third question is whether the variance comes from volume: whether the plant made fewer units over which to spread its costs. In this tutorial, you will measure the plant's output and the standard hours it required, the hours and pay of the manufacturing payroll, and the people it paid. You will then combine output and recorded hours with derived tables into one measure for each year and kind of labor, and test the time that no work order operation carries.
 
-**Prerequisites.** Complete Tutorials 10.1 and 10.2, and continue at the end of Chapter10.sql. @fig-10-08 shows the payroll and time tables that this tutorial joins.
+**Prerequisites.** Complete Tutorials 10.1 and 10.2, and continue at the end of Chapter10.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter10.sql as it stands at the end of Tutorial 10.2 from [Companion Files](#sec-companion-files). @fig-10-08 shows the payroll and time tables that this tutorial joins.
 
 **Step-by-step instructions.**
 

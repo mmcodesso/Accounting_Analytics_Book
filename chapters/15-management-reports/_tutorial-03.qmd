@@ -205,14 +205,11 @@ SUMMARIZECOLUMNS (
 
 The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, which shows that the model, the visuals, and the queries of Part III agree.
 
+<!-- notes: ch15.t3 -->
 <!-- Tutorial 15.3 expected values (SQL twins; checked in Desktop 2.158's engine on the CR15 reference model): LaborTimeEntry
      68,859 rows (Direct 51,117, Indirect 11,702, NonManufacturing 6,040), last WorkDate 2026-12-11; 51,097 direct rows match an
-     operation; ProductionCompletionLine 17,352 rows, 83 items. Test 5: 2024 83,637 / 70,871 / 1.18; 2025 93,391 / 66,109 / 1.41;
-     2026 101,237 / 66,998 / 1.51. TTM (measure) from 2024-12: 1.180, 1.121, 1.195, 1.269, 1.345, 1.392, 1.435, 1.407, 1.412, 1.396,
-     1.399, 1.360, 1.413 (2025-12), 1.440, 1.441, 1.457, 1.464, 1.447, 1.470, 1.508, 1.492, 1.494, 1.544, 1.528, 1.511 (2026-12).
-     Visual calculation on an axis starting 2025-01: 1.375, 1.554, 1.611, 1.592, 1.604, 1.495, 1.463, 1.494, 1.498, 1.470, 1.418,
-     1.413 (equal to the measure from 2025-12). 2026 direct hours by work center: Packing 33,026.9; Assembly 12,777.0; Finishing and
-     Test 10,480.1; Cutting 4,856.0; Quality Assurance 1,602.0; (Blank) 22.1 (direct lines without an operation). Overtime share by
+     operation; ProductionCompletionLine 17,352 rows, 83 items. Test 5: 2024 83,637 / 70,871 / 1.18; 2025 93,391 / 66,109 / 1.41; 2026 101,237 / 66,998 / 1.51. TTM (measure) from 2024-12: 1.180, 1.121, 1.195, 1.269, 1.345, 1.392, 1.435, 1.407, 1.412, 1.396, 1.399, 1.360, 1.413 (2025-12), 1.440, 1.441, 1.457, 1.464, 1.447, 1.470, 1.508, 1.492, 1.494, 1.544, 1.528, 1.511 (2026-12).
+     Visual calculation on an axis starting 2025-01: 1.375, 1.554, 1.611, 1.592, 1.604, 1.495, 1.463, 1.494, 1.498, 1.470, 1.418, 1.413 (equal to the measure from 2025-12). 2026 direct hours by work center: Packing 33,026.9; Assembly 12,777.0; Finishing and Test 10,480.1; Cutting 4,856.0; Quality Assurance 1,602.0; (Blank) 22.1 (direct lines without an operation). Overtime share by
      job title, 2024 to 2026: Assembler 11.9% to 20.1%; Machine Operator 11.8% to 19.6%; Quality Technician 11.1% to 19.5%; plant
      0.116, 0.167, 0.198. The card without a year filter is (Blank): its window ends 2027-12, past the time records; filtered to
      2024-2026 or to 2026 it shows 1.51, and the 2024 measure 1.18. -->
