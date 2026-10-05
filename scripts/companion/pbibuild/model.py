@@ -214,7 +214,7 @@ def entered_m(table: Table) -> str:
     raw = json.dumps(table.entered, separators=(",", ":")).encode("utf-8")
     packed = zlib.compressobj(9, zlib.DEFLATED, -15)
     text = base64.b64encode(packed.compress(raw) + packed.flush()).decode("ascii")
-    names = ", ".join(f"{c.name} = _t" for c in table.columns)
+    names = ", ".join(f"{pq.step(c.name)} = _t" for c in table.columns)   # #"Answered by" when not an identifier
     m_types = {"int64": "Int64.Type", "double": "type number", "string": "type text", "dateTime": "type date",
                "boolean": "type logical", "decimal": "Currency.Type"}
     typed = ", ".join("{" + f"{pq.m_string(c.name)}, {m_types[c.dtype]}" + "}" for c in table.columns)
@@ -249,8 +249,8 @@ class Relationship:
 
     def tmdl(self, model_name: str) -> str:
         rid = uuid.uuid5(uuid.NAMESPACE_URL, f"{model_name}/{self.from_column}/{self.to_column}")
-        ft, fc = self.from_column.split(".", 1)
-        tt, tc = self.to_column.split(".", 1)
+        ft, fc = self.from_column.rsplit(".", 1)          # the last dot: a table name may hold one ("Tests 16.2")
+        tt, tc = self.to_column.rsplit(".", 1)
         lines = [f"relationship {rid}", f"{T}fromColumn: {quote(ft)}.{quote(fc)}", f"{T}toColumn: {quote(tt)}.{quote(tc)}"]
         if not self.active:
             lines.append(f"{T}isActive: false")
@@ -264,12 +264,21 @@ class Role:
     name: str
     filters: dict[str, str] = field(default_factory=dict)   # table -> DAX filter
     model_permission: str = "read"
+    columns: dict[str, dict[str, str]] = field(default_factory=dict)  # object-level security: table -> {column: none}
 
     def tmdl(self) -> str:
         out = [f"role {quote(self.name)}", f"{T}modelPermission: {self.model_permission}", ""]
         for table, dax in self.filters.items():
             out.append(f"{T}tablePermission {quote(table)} = {dax}")
+            for c, perm in self.columns.get(table, {}).items():
+                out += [f"{T*2}columnPermission {quote(c)}", f"{T*3}metadataPermission: {perm}"]
             out.append("")
+        for table, cols in self.columns.items():
+            if table not in self.filters:             # a table with column permissions and no row filter
+                out.append(f"{T}tablePermission {quote(table)}")
+                for c, perm in cols.items():
+                    out += [f"{T*2}columnPermission {quote(c)}", f"{T*3}metadataPermission: {perm}"]
+                out.append("")
         return "\n".join(out) + "\n"
 
 

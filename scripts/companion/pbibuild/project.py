@@ -58,6 +58,7 @@ class Project:
     report: Report
     queries: dict[str, str] = field(default_factory=dict)        # DAX query tabs: name -> query text
     checks: list[tuple[str, Check]] = field(default_factory=list)
+    tmdl_scripts: dict[str, str] = field(default_factory=dict)   # TMDL view script tabs: name -> script text
 
     def check(self, section: str, label: str, expected, dax: str, tolerance: float = 0.005) -> None:
         # Date and Item are reserved words: an unquoted one breaks the whole Checks query
@@ -109,6 +110,13 @@ class Project:
             write(sm / ".pbi" / "daxQueries.json", json.dumps({
                 "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/semanticModel/daxQueries/1.0.0/schema.json",
                 "version": "1.0.0", "tabOrder": list(self.queries), "defaultTab": next(iter(self.queries))}, indent=2))
+        if self.tmdl_scripts:                 # each tab a .tmdl file in TMDLScripts, its settings in .pbi (Learn)
+            for tab, text in self.tmdl_scripts.items():
+                write(sm / "TMDLScripts" / f"{tab}.tmdl", text)
+            write(sm / ".pbi" / "tmdlScripts.json", json.dumps({
+                "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/semanticModel/tmdlScripts/1.0.0/schema.json",
+                "version": "1.0.0", "tabOrder": list(self.tmdl_scripts), "defaultTab": next(iter(self.tmdl_scripts))},
+                indent=2))
         write(rp / "definition.pbir", json.dumps({
             "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
             "version": "4.0", "datasetReference": {"byPath": {"path": f"../{self.name}.SemanticModel"}}}, indent=2))

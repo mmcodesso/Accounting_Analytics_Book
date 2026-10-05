@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 500" width="1280" height="500" role="img" aria-labelledby="title desc">
+<title id="title">One checked revenue credit</title>
+<desc id="desc">Adapted from Figure 1.5. The goods sequence does not describe every service invoice.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<rect x="20" y="45" width="380" height="90" rx="10" fill="#FFFFFF" stroke="#1A5276" stroke-width="2"/>
+<text x="36" y="80" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">SalesInvoice 7947</text>
+<text x="36" y="116" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Line 10645</text>
+<rect x="790" y="45" width="475" height="90" rx="10" fill="#FFFFFF" stroke="#117A65" stroke-width="2"/>
+<text x="806" y="80" font-size="32" fill="#117A65" font-weight="bold" text-anchor="start">GLEntry 126312</text>
+<text x="806" y="116" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Credit $688.42</text>
+<path d="M400 86 L785 86" fill="none" stroke="#117A65" stroke-width="3" stroke-dasharray="10 7"/>
+<path d="M775 80 L785 86 L775 92" fill="none" stroke="#117A65" stroke-width="3"/>
+<text x="422" y="170" font-size="32" fill="#117A65" font-weight="bold" text-anchor="start">Only this revenue credit checked</text>
+<text x="20" y="242" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Other postings, cash, and applications require separate checks.</text>
+<text x="20" y="312" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">One amount agreement does not verify the entire sale.</text>
+<text x="20" y="390" font-size="32" fill="#5D6D7E" font-weight="normal" text-anchor="start">Navigation example: 5 March 2025</text>
+</g>
+</svg>

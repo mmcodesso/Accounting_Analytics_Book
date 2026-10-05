@@ -1,0 +1,5 @@
+| SalesOrderID | CustomerID | CustomerName |
+| --- | --- | --- |
+| 62 | 1 | Walters PLC |
+| 85 | 1 | Walters PLC |
+| 59 | 4 | Edwards, Stanley and Rivera |

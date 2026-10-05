@@ -113,7 +113,7 @@ def ex1(b: Build) -> None:
         "(4) SalesInvoice already relates the invoices to their lines. A second table with the same key would be a "
         "second path from the invoices to the lines, and the model keeps one table per entity; InvoiceHeaders exists "
         "only to test the header amounts, so it stays unrelated (a filter on Item does not change its totals)."]))
-    page.expect = ["ItemGroup", money(dict(cur["groups"])["Furniture"]), money(cur["total"]), "Sum of GrandTotal",
+    page.expect = ["FiscalYear", money(dict(cur["groups"])["Furniture"]), money(cur["total"]), "GrandTotal",
                    money(cur["grand"]), "Model answer: Exercise 13.1"]
 
     t = "Exercise 13.1"
@@ -256,8 +256,9 @@ def ex3(b: Build) -> None:
         "against the volume it added (Chapter 7 and the Part II case)."]))
     top = cur[0]
     names = dict(rows("SELECT PromotionID, PromotionName FROM PromotionProgram"))
-    peak = max(top["months"], key=lambda m: m["disc"])
-    page.expect = ["PromotionName", "Count of SalesInvoiceLineID", money(peak["disc"]), "(Blank)",
+    # the matrix scrolls sideways (twelve months of two values), so the values checked are from its first months
+    peak = max(bad["months"], key=lambda m: m["disc"])
+    page.expect = ["PromotionName", "Count of SalesInvoiceLineID", money(peak["disc"]), f"Expanded {names[bad['id']]}",
                    f"Expanded {names[top['id']]}", "Model answer: Exercise 13.3"]
 
     t = "Exercise 13.3"

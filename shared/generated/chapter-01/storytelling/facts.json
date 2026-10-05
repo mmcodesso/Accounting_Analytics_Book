@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "scripts/slides/refresh_storytelling.py": "b64f66e9b2d074241b5f5efcc33eb9ef6e8f3692fc9b6be082563da978fdd113",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
+    "scripts/figures/ch01.py": "50aca22838b4a23b51b369fde0d7f5d0b4ce94fbf96b43ffeadca6162161368f",
+    "scripts/figures/ch03.py": "54dc5f9d782b2389685fcebf1eee5b241fd5cefc1906e760eed6c435d659c89d"
+  },
+  "input_sha256": {
+    "shared/generated/chapter-01/facts.json": "3b46ba4ed70b787b05d0edd816e1b9a9a30b35bac872a860678d4dd0ba81123c",
+    "shared/generated/chapter-01/source-trace.svg": "81c528937a534b16bd4c272db8970f359a539543ccd43eae6a2fb48d0f054973",
+    "shared/generated/chapter-01/salesorder-focus.svg": "8cc79484ea8e69dcd7699786ff26969c334863075a2ee814444bc4d86f0f0866",
+    "visuals/src/fig-01-01-analytics-continuum.drawio": "318190b68a957ed6dd49992dff5d09a8dbd8029e4a6568d4644412bbb0d17221",
+    "visuals/src/fig-01-03-tools-workflow-mapping.drawio": "f2cd73a9f44f290884a59cd6ff771d82ad66973d1a586e13ab9afd78aa0dc857",
+    "visuals/src/fig-01-04-charles-river-architecture.drawio": "9da5235f675366809347695b6b7c767174b885493eb7aaa02d0eb3f6f06baf0e",
+    "visuals/src/fig-01-05-o2c-process-flow.drawio": "b40f0b93f6b58321c7e3da56ba811b308bcceb58c1148a23c46cda708acceb92",
+    "visuals/src/fig-03-05-chart-of-accounts-table.drawio": "91aa07bc0265d95b6c4900bf466cbb8ca31381c375f5e0372f6d46977b884e80"
+  },
+  "artifact_sha256": {
+    "analytics-types.svg": "df5ca3d21bc20b1ab7040a3b583ef3353cd736b759a60b36520104257c6e3496",
+    "analytics-types.png": "2a0b19ae20f7e7a0a46eb8b83e124d3eb4abb92a24ef3c4e06ee477ff29bba45",
+    "tools-workflow.svg": "8742bae667e6c4a0d5a5233fcaa98a106c10a8863d666441a5b01fc383256a52",
+    "tools-workflow.png": "c3513769b3cfd1ca207c610a789ae0625612cf2bfbb03731cc3e438e7ffd52ce",
+    "architecture-overview.svg": "1575892c9fd17975dc9292c92099414dcb03f8961b215272ce5ac2de86038d80",
+    "architecture-overview.png": "03bbad917bdbb31662cf3b21d9aba3a06619f7d4091a425a2ae8508dbcddd446",
+    "architecture-operating.svg": "b6030f77bf845d7d76a4bc9d94fc4c9d3c74b152b20ba33942f418bfdefa235a",
+    "architecture-operating.png": "075d77b7927037caf00c875536e9ed7474096dd7e973dd0ed185e925d3aed9a0",
+    "architecture-reference.svg": "cdfcd09b8effc9d93ea764fc2a169dcd01324ac4be3605b88c86a06d36019c67",
+    "architecture-reference.png": "5bc0d9d680479e58f59dfe6fe87a2a3522ae73aa77bff6caa1074adea20e1035",
+    "o2c-forward.svg": "96da94585a906da4a7243951dd846cad1c3348fbcf3b5dfc774784c88360a32a",
+    "o2c-forward.png": "008e7da4f67b663ed681f5ff6f061abc8e452a2210e83488ae479f7ba0e84009",
+    "checked-credit.svg": "c63d2cd5cbc43e29e63c6e6ef2d456da82410ff9b08ee3d87576c9a3711b0314",
+    "checked-credit.png": "5e6c4cd7e285f82f2fa3efc87376b5e76274bdac59173d6994defab87c4038b4",
+    "source-trace-dated.svg": "588c02372d1ee1babb7092fbc671308bbc185e1dd71fbd4ba09744ca59c762db",
+    "source-trace-dated.png": "831f20284983fec25ca0ff0a26227c741aa95e3830a8c950df8f5cac4e09f82b",
+    "salesorder-task.svg": "9829a510c64cd29fcffd16dcc2df92a92b1009f13b6052bb5e5e75ce6548ea33",
+    "salesorder-task.png": "cf8eaeddbdcfd56112701f95f7992f8c192875b2a0694a2bdc32b03d44edf168",
+    "_key-task.qmd": "310ab8725fab20a78b817083cb8522b000dde6fa504223cd0c31738f2e5fbb82",
+    "_key-response.qmd": "a9c7a005c880378da7952f858803f3b1eff2071cecd1f261059c77230c082be3",
+    "_source-fields.qmd": "79d1874f22ba48eca530ffebab901ae5634aaa7d1466fc2f4a83783cce8c4b30",
+    "_customer-response.qmd": "a0df0ec46ba624851e5ba9be0d548e8e675f6966dc589eedba81ef804ba0d24f",
+    "_account-focus.qmd": "2b62dba58d476eeab0ca32d5f08ffcffeec4db4d122aa6372ec5d2bf6bd38bd2",
+    "_item-response.qmd": "515c66995136de0a81f83297afe5cc592f506934159a85ad45983336fd34979b",
+    "_initial-response.qmd": "4e2217658e38bfec01666b6090a265f881899eff22f6faa6bcd460acc7309235",
+    "_model-update.qmd": "334ef33683f2d0d679a46ffb1acf3c5900ac3e593e1a0859965afa8b0f299c20"
+  },
+  "key_example": {
+    "orders": [
+      [
+        62,
+        "SO-2024-000062",
+        1
+      ],
+      [
+        85,
+        "SO-2024-000085",
+        1
+      ],
+      [
+        59,
+        "SO-2024-000059",
+        4
+      ]
+    ],
+    "customers": [
+      [
+        1,
+        "Walters PLC"
+      ],
+      [
+        4,
+        "Edwards, Stanley and Rivera"
+      ]
+    ]
+  },
+  "customer_lookup": [
+    1,
+    81,
+    "Koch-Ali"
+  ],
+  "account_rows": [
+    [
+      41,
+      4000,
+      "Revenue",
+      null
+    ],
+    [
+      42,
+      4010,
+      "Sales Revenue - Furniture",
+      41
+    ]
+  ],
+  "item_rows": [
+    [
+      3,
+      "Harbor Bench Acacia Natural 84 in",
+      "Purchased",
+      474.22
+    ],
+    [
+      9,
+      "Willow Sideboard Walnut Whitewash 48 in",
+      "Manufactured",
+      412.81
+    ]
+  ],
+  "margin_change_percentage_points": 1.4811600985568107,
+  "text_hash_policy": "UTF-8 normalized LF; dataset and PNG use raw bytes"
+}

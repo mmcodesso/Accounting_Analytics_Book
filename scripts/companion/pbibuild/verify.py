@@ -44,13 +44,16 @@ ERRORS = ("Something's wrong", "Can't display", "Couldn't load", "couldn't be di
 
 
 def run(pbip: Path, table: str, checks_file: Path, pages: list[str], out_json: Path, render_seconds: int = 12,
-        dax_view: bool = True, role_checks: Path | None = None) -> dict:
-    """`role_checks`: an optional JSON file listing checks queries to run under a role ([{label, role, user, file}])."""
+        dax_view: bool = True, role_checks: Path | None = None, capture_dir: Path | None = None) -> dict:
+    """`role_checks`: an optional JSON file listing checks queries to run under a role ([{label, role, user, file}]).
+    `capture_dir`: an optional folder for an image of Desktop's window on each page (what UI Automation cannot read)."""
     cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(HERE / "verify.ps1"),
            "-Pbip", str(pbip), "-Table", table, "-ChecksFile", str(checks_file), "-OutJson", str(out_json),
            "-RenderSeconds", str(render_seconds)] + (["-DaxView"] if dax_view else [])
     if role_checks:
         cmd += ["-RoleChecks", str(role_checks)]
+    if capture_dir:
+        cmd += ["-CaptureDir", str(capture_dir)]
     if pages:
         cmd += ["-Pages", ";".join(pages)]
     if out_json.exists():
@@ -83,6 +86,11 @@ def judge(result: dict, expect_pages: dict[str, list[str]], dax_tabs: list[str] 
     for label, rc in (result.get("roleChecks") or {}).items():
         rows = rc.get("rows") or []
         rows = [rows] if isinstance(rows, dict) else rows
+        if rc.get("expectError"):                 # the query must fail for the role (object-level security)
+            if rc["expectError"].lower() not in (rc.get("error") or "").lower():
+                problems.append(f"role checks {label}: expected an error containing '{rc['expectError']}', got "
+                                f"{rc.get('error') or 'no error'}")
+            continue
         if rc.get("error") or not rows:
             problems.append(f"role checks {label}: {rc.get('error') or 'the query returned nothing'}")
         for c in rows:

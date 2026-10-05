@@ -14,7 +14,8 @@ param(
     [string]$Pages = "",                     # page display names separated by ";"
     [int]$RenderSeconds = 12,
     [switch]$DaxView,                         # also open DAX query view and read its query tabs
-    [string]$RoleChecks = ""                  # optional JSON file: [{label, role, user, file}], each query run under Roles=
+    [string]$RoleChecks = "",                 # optional JSON file: [{label, role, user, file}], each query run under Roles=
+    [string]$CaptureDir = ""                  # optional folder: a PrintWindow image of Desktop's window per page
 )
 $ErrorActionPreference = "Stop"
 $loc = (Get-AppxPackage -Name Microsoft.MicrosoftPowerBIDesktop).InstallLocation
@@ -69,6 +70,36 @@ function Select-ByName($ids, [string]$name) {
     return $false
 }
 
+function Save-Windows($ids, [string]$name) {
+    # what the canvas draws that UI Automation does not expose (a forecast band, a slider, an error dialog): an image
+    # of each top-level window of the instance, taken with PrintWindow (no input is sent to any window)
+    if (-not ("PbiCapture" -as [type])) {
+        Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @"
+using System; using System.Drawing; using System.Runtime.InteropServices;
+public static class PbiCapture {
+    [StructLayout(LayoutKind.Sequential)] public struct RECT { public int L, T, R, B; }
+    [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr h, out RECT r);
+    [DllImport("user32.dll")] static extern bool PrintWindow(IntPtr h, IntPtr hdc, uint flags);
+    public static void Save(IntPtr h, string path) {
+        RECT r; GetWindowRect(h, out r);
+        using (var bmp = new Bitmap(Math.Max(1, r.R - r.L), Math.Max(1, r.B - r.T))) {
+            using (var g = Graphics.FromImage(bmp)) { IntPtr dc = g.GetHdc(); PrintWindow(h, dc, 2); g.ReleaseHdc(dc); }
+            bmp.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+        }
+    }
+}
+"@
+    }
+    $null = New-Item -ItemType Directory -Force -Path $CaptureDir
+    $k = 0
+    foreach ($w in Desktop-Windows $ids) {
+        $h = [IntPtr]$w.Current.NativeWindowHandle
+        $suffix = if ($k) { "-$k" } else { "" }
+        if ($h -ne [IntPtr]::Zero) { try { [PbiCapture]::Save($h, (Join-Path $CaptureDir "$name$suffix.png")) } catch { } }
+        $k++
+    }
+}
+
 function Read-Names($ids) {
     $names = New-Object System.Collections.Generic.List[string]
     foreach ($w in Desktop-Windows $ids) {
@@ -84,7 +115,10 @@ $deadline = (Get-Date).AddMinutes(8)
 while (-not $m -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 3; $m = Open-Model }
 $newDesk = @(Get-Process PBIDesktop -ErrorAction SilentlyContinue | Where-Object { $beforeDesk -notcontains $_.Id } | ForEach-Object Id)
 try {
-    if (-not $m) { throw "the model did not load within 8 minutes" }
+    if (-not $m) {
+        if ($CaptureDir) { Save-Windows @(Get-Process PBIDesktop -ErrorAction SilentlyContinue | Where-Object { $beforeDesk -notcontains $_.Id } | ForEach-Object Id) "load-failure" }
+        throw "the model did not load within 8 minutes"
+    }
     $result.loaded = $true
     $conn = $m.Conn
     $cmd = $conn.CreateCommand(); $cmd.CommandText = "SELECT [CATALOG_NAME] FROM `$SYSTEM.DBSCHEMA_CATALOGS"
@@ -146,9 +180,9 @@ try {
                     $rrows += [pscustomobject]$row
                 }
                 $r.Close()
-                $result.roleChecks[$rc.label] = [ordered]@{ rows = $rrows; error = $null }
+                $result.roleChecks[$rc.label] = [ordered]@{ rows = $rrows; error = $null; expectError = $rc.expectError }
             } catch {
-                $result.roleChecks[$rc.label] = [ordered]@{ rows = @(); error = $_.Exception.Message }
+                $result.roleChecks[$rc.label] = [ordered]@{ rows = @(); error = $_.Exception.Message; expectError = $rc.expectError }
             } finally { try { $rconn.Close() } catch { } }
         }
     }
@@ -164,6 +198,7 @@ try {
             }
             Start-Sleep -Seconds $RenderSeconds
             $result.pages[$p] = [ordered]@{ selected = $selected; names = (Read-Names $newDesk) }
+            if ($CaptureDir) { Save-Windows $newDesk ($p -replace '[^\w\. -]', '_') }
         }
     }
     if ($DaxView) {

@@ -48,6 +48,22 @@ class ParamVisual(Visual):
         return d
 
 
+@dataclass
+class CalcVisual(Visual):
+    """A visual with several visual calculations: Desktop keys each projection by its queryRef, which pbir writes as
+    "select" for every visual calculation, so the second would show the first's values. Number them select, select1."""
+
+    def doc(self, z: int) -> dict:
+        d = super().doc(z)
+        n = 0
+        for role in d["visual"]["query"]["queryState"].values():
+            for proj in role["projections"]:
+                if "NativeVisualCalculation" in proj["field"]:
+                    proj["queryRef"] = "select" if n == 0 else f"select{n}"
+                    n += 1
+        return d
+
+
 def pct(x: float, places: int = 1) -> str:
     return f"{100 * x:.{places}f}%"
 
@@ -141,9 +157,9 @@ def ex2(b: Build) -> None:
     months = [f"{y}-{m:02d}" for m in range(1, 13)]
     values = lambda: [col("Date", "YearMonth"), M("Net Income"), ytd, change, M("Net Income YTD")]   # noqa: E731
     page = b.report.add(Page("ex152", "Ex 15.2"))
-    page.add(Visual("netIncomeByMonth", "tableEx", 20, 20, 600, 420, {"Values": values()},
+    page.add(CalcVisual("netIncomeByMonth", "tableEx", 20, 20, 600, 420, {"Values": values()},
                     title=f"Net income by month, fiscal {y}", filters=[keep("nimYear", col("Date", "Year"), [y])]))
-    page.add(Visual("secondHalf", "tableEx", 20, 460, 600, 250, {"Values": values()},
+    page.add(CalcVisual("secondHalf", "tableEx", 20, 460, 600, 250, {"Values": values()},
                     title="Filtered to July to December (requirement 3)",
                     filters=[keep("shYear", col("Date", "Year"), [y]), keep("shMonths", col("Date", "YearMonth"), months[6:])]))
     nm = [v for _, v in ctx["months"]]
@@ -279,12 +295,7 @@ def ex4(b: Build) -> None:
     page = b.report.add(Page("ex154", "Ex 15.4"))
     d = col("Discount", "Discount")
     page.add(Visual("discountSlider", "slicer", 20, 20, 360, 110, {"Values": [d]}, title="Discount",
-                    objects={"data": [{"properties": {"mode": lit("Single")}}],
-                             "general": [{"properties": {"filter": {"filter": {
-                                 "Version": 2, "From": [{"Name": "d", "Entity": "Discount", "Type": 0}],
-                                 "Where": [{"Condition": {"Comparison": {"ComparisonKind": 0, "Left": {"Column": {
-                                     "Expression": {"SourceRef": {"Source": "d"}}, "Property": "Discount"}},
-                                     "Right": {"Literal": {"Value": f"{default}D"}}}}}]}}}}]}))
+                    objects={"data": [{"properties": {"mode": lit("Single")}}]}))
     page.add(card("liftCards", 400, 20, 860, 110, [M("Design Trade Units"), M("Design Trade Price per Unit"),
                                                    M("Design Trade Cost per Unit"), meas("Discount", "Discount Value"),
                                                    M("Break-even Lift")]))
@@ -293,7 +304,13 @@ def ex4(b: Build) -> None:
     page.extra = {"visualInteractions": [{"source": "discountSlider", "target": "liftByDiscount", "type": "NoFilter"}]}
     lifts = dict(ctx["lifts"])
     case_lift = lifts[0.12]
+    v_last = 0.0
+    while v_last + 0.01 <= 0.2:
+        v_last += 0.01
     page.add(answer("ex154Answer", 400, 150, 860, 560, [
+        f"(1) The slider runs from 0% to {pct(v_last, 0)}: GENERATESERIES adds the increment step by step, and twenty "
+        "steps of 0.01 land just above 0.2, so the last value is left out (a maximum of 0.21 would include 20%). Until "
+        "the slider is moved, Discount Value returns its default, 12%.",
         f"(2) {name}, fiscal {y}: {ctx['units']:,.2f} units, price before discount {ctx['price']:.2f} per unit, standard "
         f"cost {ctx['cost']:.2f} per unit (the Part II case's inputs).",
         "(4) Break-even lift: " + "; ".join(f"{pct(k, 0)} discount {pct(v)}" for k, v in ctx["lifts"]) +
@@ -307,7 +324,13 @@ def ex4(b: Build) -> None:
     page.expect = ["Break-even Lift", "Discount Value", f"{ctx['units']:,.2f}", pct(case_lift), pct(lifts[0.05])]
 
     t = "Exercise 15.4"
-    b.check(t, "Discount rows (0 to 0.2 by 0.01)", 21, "COUNTROWS ( 'Discount' )", 0)
+    # GENERATESERIES adds the increment step by step, so 0.01 twenty times lands just above 0.2 and the last value is
+    # 0.19 (what Modeling > New parameter writes for these settings); the exercise needs only 5 to 15 percent
+    n, v = 0, 0.0
+    while v <= 0.2:
+        n, v = n + 1, v + 0.01
+    b.check(t, "Discount rows (GENERATESERIES from 0 by 0.01 while at most 0.2)", n, "COUNTROWS ( 'Discount' )", 0)
+    b.check(t, "the largest Discount value", round(v - 0.01, 6), "MAX ( 'Discount'[Discount] )", 0.000001)
     b.check(t, "Design Trade Units", round(ctx["units"], 4), "[Design Trade Units]", 0.0001)
     b.check(t, "Design Trade Price per Unit", round(ctx["price"], 6), "[Design Trade Price per Unit]", 0.000005)
     b.check(t, "Design Trade Cost per Unit", round(ctx["cost"], 6), "[Design Trade Cost per Unit]", 0.000005)
@@ -324,6 +347,15 @@ def ex4(b: Build) -> None:
 
 # --- Exercise 15.5 ---------------------------------------------------------------------------------------------------
 
+# The Analytics-pane forecast of October to December (point, lower bound, upper bound) by the chart's first month, as
+# Power BI Desktop 2.158 drew it on 2026-10-05 on dataset v2026.1. Desktop computes it in the visual, so it cannot be
+# derived here; the page's expect strings require the canvas to show these values, so a new Desktop or dataset that
+# changes them fails the verification and this table (and the model answer) must be read again from the result JSON.
+FORECAST = {"January": [(2435621.24, 1930153.52, 2941088.95), (2419256.64, 1864968.02, 2973545.27),
+                        (2538641.40, 1939496.89, 3137785.90)],
+            "February": [(2490356.37, 2131947.81, 2848764.94), (2473516.52, 2103990.34, 2843042.71),
+                         (2490356.37, 2109952.49, 2870760.26)]}
+
 def ex5(b: Build) -> None:
     ctx = ch15.ex5(b.data, claim)
     y = b.year
@@ -332,37 +364,58 @@ def ex5(b: Build) -> None:
     b.model.tables["Date"].columns.append(Column("MonthStart", "dateTime", fmt="Short Date", summarize="none",
                                                  expression="DATE ( YEAR ( 'Date'[Date] ), MONTH ( 'Date'[Date] ), 1 )"))
     fit = [f"{yy}-{mm:02d}" for yy in range(first, y + 1) for mm in range(1, 13)][:-3]
-    forecast = {"forecast": [{"properties": {"show": lit(True), "forecastLength": {"expr": {"Literal": {"Value": "3L"}}},
-                                             "confidenceLevel": {"expr": {"Literal": {"Value": "95D"}}},
-                                             "confidenceBandStyle": lit("fill")}}],
-                "categoryAxis": [{"properties": {"axisType": lit("Continuous")}}]}
+    # Analytics > Forecast as Desktop 2.158 writes it (read from its scripts, desktop.min.js addAnalyticsObject): an
+    # instance with selector id 1 on the first Y field, and a query transform of algorithm Forecast whose parameters
+    # are literals with a Name (Unit 7 is Desktop's default, Points)
+    params = [("Unit", "7L"), ("ForecastLength", "3L"), ("IgnoreLast", "0L"), ("ConfidenceLevel", "0.95D")]
+    forecast = {"forecast": [{"properties": {
+                    "show": lit(True), "displayName": lit("Forecast 1"),
+                    "transform": {"algorithm": "Forecast",
+                                  "parameters": [{"Literal": {"Value": v}, "Name": n} for n, v in params]}},
+                "selector": {"id": "1", "metadata": f"{KM}.Revenue"}}],
+                "categoryAxis": [{"properties": {"axisType": lit("Scalar")}}]}   # Scalar: Type Continuous
     page = b.report.add(Page("ex155", "Ex 15.5"))
     for i, (name, months, title) in enumerate([
             ("forecastFromJanuary", fit, f"Revenue, January {first} to September {y}, with a three-month forecast"),
             ("forecastFromFebruary", fit[1:], f"Revenue, February {first} to September {y}, with a three-month forecast")]):
-        page.add(Visual(name, "lineChart", 20, 20 + 300 * i, 760, 280,
+        page.add(Visual(name, "lineChart", 20, 20 + 290 * i, 760, 280,
                         {"Category": [col("Date", "MonthStart")], "Y": [M("Revenue")]}, title=title, objects=forecast,
                         filters=[keep(f"{name}Months", col("Date", "YearMonth"), months)]))
     q4 = [f"{y}-{m:02d}" for m in (10, 11, 12)]
-    page.add(Visual("actualQ4", "tableEx", 20, 620, 760, 90, {"Values": [col("Date", "YearQuarter"), M("Revenue")]},
+    page.add(Visual("actualQ4", "tableEx", 20, 600, 760, 110, {"Values": [col("Date", "YearQuarter"), M("Revenue")]},
                     title="Actual revenue of the quarter forecast",
                     filters=[keep("actualQ4Quarter", col("Date", "YearQuarter"), [f"{y}-Q4"])]))
     e = ctx["errors"]
+    months_actual = [sales("substr(si.InvoiceDate, 1, 7) = ?", m_)["rev"] for m_ in q4]
+    def fc(start: str) -> str:
+        v = FORECAST[start]
+        total = sum(x for x, _, _ in v)
+        err = total / ctx["actual"] - 1
+        monthly = sum(abs(x - a) / a for (x, _, _), a in zip(v, months_actual)) / 3
+        return (f"from {start}: " + "; ".join(f"{m_} {money(x)} ({money(lo)} to {money(hi)})" for m_, (x, lo, hi) in
+                                                zip(q4, v)) + f"; quarter {money(total)}, error {pct(err, 2)} (monthly "
+                f"{pct(monthly, 2)})")
+    errs = [abs(sum(x for x, _, _ in v) / ctx["actual"] - 1) for v in FORECAST.values()] +         [abs(e[k]["quarter"]) for k in ("trend", "last")]
+    claim(abs(e["mean"]["quarter"]) < min(errs), "the mean benchmark has the smallest quarter error (the audit note)")
     page.add(answer("ex155Answer", 800, 20, 460, 690, [
-        f"(3) The forecast is computed in the visual (exponential smoothing) and cannot be read from the model: read the "
-        "three months and the interval from the forecast's tooltip, and add the three months.",
+        "(3) The forecast is computed in the visual (exponential smoothing), not in the model, so no measure can return "
+        "it; the tooltip and the visual's data points give the months and the 95% interval. As Power BI Desktop 2.158 "
+        f"drew them, {fc('January')}.",
         f"(4) Actual revenue of fiscal {y}'s fourth quarter: {money(ctx['actual'])}. Chapter 7's benchmarks for the same "
         f"quarter, fitted from February {first} to September {y}: trend {pct(e['trend']['quarter'], 2)} quarter error "
         f"(monthly {pct(e['trend']['monthly'], 2)}); mean {pct(e['mean']['quarter'], 2)} ({pct(e['mean']['monthly'], 2)}); "
         f"same quarter last year {pct(e['last']['quarter'], 2)} ({pct(e['last']['monthly'], 2)}). Compare the forecast's "
         "quarter error with these.",
-        f"(5) January {first}, the start-up month, is {pct(ctx['start'], 0)} of the year's other months; leaving it out "
-        "changes the fit, and the change shows how sensitive the forecast is to one unrepresentative month. With "
-        f"{ctx['years']} years, a seasonal pattern cannot be detected reliably.",
+        f"(5) Starting {fc('February')}. January {first}, the start-up month, is {pct(ctx['start'], 0)} of the year's "
+        "other months; leaving it out changes the forecast, which shows how sensitive it is to one unrepresentative "
+        f"month. With {ctx['years']} years, a seasonal pattern cannot be detected reliably.",
         "(6) Audit note: the forecast is fit for the 2027 plan only if its hindcast error on a known quarter is "
         "disclosed with it, beside the benchmark it beat or did not beat (the mean has done best here), with the "
         "fitted period and the treatment of the start-up month."]))
-    page.expect = ["MonthStart", "Revenue", money(ctx["actual"]), "Model answer"]
+    # the forecast's points, as UI Automation reads them from the canvas ("MonthStart 10/1/2026. Forecast 1 ...")
+    page.expect = ["MonthStart", "Revenue", money(ctx["actual"]), "Model answer"] + [
+        f"Forecast 1 {money(x)}. Upper bound {money(hi)}. Lower bound {money(lo)}." for v in FORECAST.values()
+        for x, lo, hi in v]
 
     t = "Exercise 15.5"
     b.check(t, "MonthStart values (one per month of the Date table)", 12 * len(range(first, b.data.N + 1)),

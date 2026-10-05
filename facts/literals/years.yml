@@ -1,0 +1,163 @@
+# How a year literal in the text is classified (facts/textscan.py; Phase 7 of the yearly-roll program).
+#
+# A year in the window's range (F-1 to N+2, so 2023-2029 in the 2026 edition) is one of:
+#   role     a year of the window (F, P, C, N, or a year next to them): roll_text.py rewrites it by its
+#            value, all years at once (2024 -> 2025 and 2025 -> 2026 in one pass);
+#   edition  the edition's year (the book's own citation): rewritten like a role year (edition = C);
+#   real     a real-world date that a roll keeps: a citation, a standard or law, a software release, a
+#            Microsoft Learn date, the date a value was verified.
+# A year inside a document ID or a date is classified with it (ids.yml, dates.yml).
+#
+# Order of decisions: a per-file decision (files:) first; then the real-world rules and the role
+# rules. A year that matches both, or a role rule with a real-world word nearby (suspect:), is
+# ambiguous until a per-file decision settles it; a year that matches nothing fails the lint.
+#
+# In the patterns, {Y} stands for the year itself; a rule covers a year when one of its matches
+# places {Y} on it. Patterns are Python regular expressions (multiline). "code: true" limits a rule
+# to Python files, "prose: true" to the book and the slides.
+
+range: [-1, 2]          # from F-1 to N+2
+
+real:
+  - name: url (outside the book's own site)
+    rx: 'https?://(?!aa\.accountinganalyticshub\.com)[^\s)>\]"]*{Y}'
+  - name: citation suffix (2025a)
+    rx: '(?<![\w-]){Y}[a-z]\b(?![-\w])'
+  - name: reference entry
+    rx: '^\s*(?:[-*>]\s+)?[A-Z][^\n]{0,400}?\({Y}[a-z]?(?:, [A-Z][a-z]+(?: \d{1,2}(?:–\d{1,2})?)?)?\)\.'
+  - name: copyright
+    rx: '(?:©|\(c\)|[Cc]opyright)\s*{Y}'
+  - name: release number
+    rx: '(?:Release|Release No\.|No\.)\s+{Y}-\d{3}'
+  - name: software release
+    rx: '(?:\((?:GA|Preview),?\s+|\b(?:GA|Preview) (?:in|since) |\bretires? in |\bms\.date |\bStore build [\d.]+ \()(?:(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+)?{Y}'
+  - name: software release (month year release)
+    rx: '(?:January|February|March|April|May|June|July|August|September|October|November|December) {Y} (?:release|update|version|feature summary)'
+  - name: report title
+    rx: '\b(?:Occupational fraud|Report to the Nations)\b[^.\n]{0,20}{Y}'
+  - name: file name (kept; renaming a file is not a text change)
+    rx: '[\w/.-]*{Y}[\w.-]*\.(?:svg|png|pdf|drawio|qmd|html|sql|pbix|pbip|xlsx|csv|zip|json|md)\b|\bfig-(?:\d\d|[a-z])-\d\d-[\w-]*{Y}'
+  - name: include of a reference fragment
+    rx: '_reference-[\w-]*{Y}'
+
+role:
+  - name: edition
+    strong: true
+    class: edition
+    rx: '\b{Y} edition\b|\b(?:companion|instructor|edition)-{Y}\b'
+  - name: anchor of a page of the book (it follows the heading)
+    strong: true
+    rx: 'accountinganalyticshub\.com/[^\s)>\]"]*{Y}'
+  - name: fiscal
+    strong: true
+    rx: '\b[Ff]iscal(?:\s+[Yy]ears?)?\s+(?:(?:20\d\d|and|or|to|through|,|–|-)\s*)*{Y}'
+  - name: FY
+    strong: true
+    rx: '\bFY\s?{Y}'
+  - name: month and year
+    rx: '\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)\.?,?\s+{Y}'
+  - name: season
+    rx: '\b(?:[Ss]pring|[Ss]ummer|[Aa]utumn|[Ff]all|[Ww]inter|[Ee]arly|[Ll]ate|[Mm]id)[\s-]+{Y}'
+  - name: quarter
+    strong: true
+    rx: '{Y}[ -]?Q[1-4]\b|\bQ[1-4][ -]?{Y}|{Y}[ -]?H[12]\b'
+  - name: year-month
+    strong: true
+    rx: '(?<![\w-]){Y}-(?:0[1-9]|1[0-2])\b(?!-\d)'
+  - name: US date
+    strong: true
+    rx: '\b\d{1,2}/\d{1,2}/{Y}\b|\b\d{1,2}-(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-{Y}\b'
+  - name: range
+    strong: true
+    rx: '{Y}\s*(?:–|—|-|to|through|and|or|versus|vs\.?|against)\s*(?:fiscal\s+)?20\d\d\b|\b20\d\d\s*(?:–|—|-|to|through|and|or|versus|vs\.?|against)\s*(?:fiscal\s+)?{Y}'
+  - name: list of years
+    strong: true
+    rx: '\b20\d\d,\s+(?:(?:20\d\d),\s+)*(?:and\s+|or\s+)?{Y}\b|{Y},\s+20\d\d\b'
+  - name: after a word
+    rx: '\b[A-Za-z][\w''’-]*,?\s+(?:\*\*)?{Y}\b'
+  - name: before a word
+    rx: '(?<![\w-]){Y}(?:\*\*)?(?:''s|’s|,)?\s+(?:[A-Za-z]|\$)'
+  - name: in a code span
+    strong: true
+    prose: true
+    rx: '`[^`\n]*{Y}[^`\n]*`'
+  - name: in bold or italics
+    prose: true
+    rx: '\*\*[^*\n]*{Y}[^*\n]*\*\*'
+  - name: multiple-choice option
+    strong: true
+    prose: true
+    rx: '^[A-D]\.\s+{Y}\b'
+  - name: at the end of a clause
+    rx: '\b[A-Za-z][\w-]*,?\s+{Y}(?=\s*[.,;:)!?\]|]|\s*$|\s*--)'
+  - name: identifier with a year
+    strong: true
+    rx: '\b[A-Za-z_][A-Za-z_]*{Y}\b'
+  - name: id prefix
+    strong: true
+    rx: '\b[A-Z][A-Z0-9]{1,9}-{Y}(?![\d])'
+  - name: table cell or header
+    strong: true
+    rx: '(?:^|\|)\s*(?:\*\*)?{Y}(?:\*\*)?\s*(?=\|)'
+  - name: compared year
+    strong: true
+    rx: '(?:=|==|!=|<=|>=|<|>|\bIN\b|\bBETWEEN\b|\bAND\b|\bOR\b|\bin\b|\bnot in\b)\s*[\[(]?\s*''?"?{Y}\b'
+  - name: quoted year
+    strong: true
+    rx: '[''"]{Y}[''"]'
+  - name: year in a pattern or format string
+    strong: true
+    rx: '{Y}(?:%|-\{|-Q\{|\s*▾)|\}\s+{Y}\b'
+  - name: year in a function call
+    strong: true
+    rx: '\b(?:DATE|date|Date|DATEVALUE|datetime|#date|CALENDAR|YEAR|range|strftime|Date\.From|Number\.From|FILTER)\s*\(\s*{Y}\b'
+  - name: tuple, list or dict of years
+    strong: true
+    code: true
+    rx: '[\[(,{]\s*{Y}\s*(?=[,)\]}:])'
+  - name: arithmetic on a year
+    strong: true
+    code: true
+    rx: '{Y}\s*[-+*/]\s*\d|\d\s*[-+]\s*{Y}\b'
+  - name: python assignment or argument
+    strong: true
+    code: true
+    rx: '(?:\b[A-Za-z_]\w*\s*=\s*|[A-Za-z_]\w*=|:\s*){Y}\b'
+
+# Words that make a role year ambiguous within `window` characters of it: the year may be a real-world
+# date. Each such year needs a per-file decision below.
+suspect:
+  - name: software, standards, or publications
+    rx: '\b(?:Microsoft|Learn|GA|Preview|[Rr]etire[sd]?|Desktop 2\.\d+|PCAOB|AICPA|IIA|COSO|ACFE|FASB|IASB|IAESB|IMA|NASBA|CIMA|SEC|W3C|[Aa]mended|[Pp]ublished|[Ee]dition|[Cc]opyright|[Ss]urvey|Journal of|et al\.|took effect|in effect|ms\.date|[Vv]erified|[Dd]ecided|CPA Exam|Standards Board|Oversight Board|Institute of|Association of|Excel 20\d\d|Office 20\d\d)\b'
+    window: 80
+
+# Per-file decisions: a year covered by `rx` takes `class` (real, role or edition); `why` says why.
+# Keys are paths relative to the repository, or globs.
+files:
+  index.qmd:
+    - {rx: 'Codesso, M\. \({Y}\)', class: edition, why: "the book's own citation carries the edition's year"}
+  front-matter/preface.qmd:
+    - {rx: 'framework for management accountants in {Y}', class: real, why: "IMA framework published in 2025"}
+  chapters/01-role-of-analytics/chapter.qmd:
+    - {rx: 'CPA Exam that took effect in January {Y}', class: real, why: "the CPA Evolution exam took effect in January 2024"}
+    - {rx: 'competency framework in {Y}', class: real, why: "IMA framework published in 2025"}
+    - {rx: 'In a {Y} survey by the AICPA', class: real, why: "a 2025 survey"}
+    - {rx: 'In {Y}, the Public Company Accounting Oversight Board', class: real, why: "PCAOB amendments of 2024"}
+  chapters/12-sql-audit-analytics/chapter.qmd:
+    - {rx: 'amended its standards in {Y}', class: real, why: "PCAOB amendments of 2024"}
+  chapters/14-data-models-and-dax/_multiple-choice.qmd:
+    - {rx: 'into February {Y}', class: role, why: "the ledger's last month (N); Microsoft is the date-table guidance"}
+  appendices/a-publishing-security/_exercises.qmd:
+    - {rx: 'RLS guidance {Y}', class: real, why: "a Microsoft Learn page date"}
+  back-matter/closing.qmd:
+    - {rx: 'in effect since {Y}', class: real, why: "the IIA standards took effect in 2025"}
+  slides/chapter-19/index.qmd:
+    - {rx: "IIA's {Y} Global Internal Audit Standards", class: real, why: "the standards' name"}
+    - {rx: 'the {Y} second edition of the COSO', class: real, why: "a publication year"}
+  scripts/figures/powerbi.py:
+    - {rx: 'Power BI Desktop 2\.158 \(September {Y}\)', class: real, why: "the pinned software release"}
+  scripts/figures/ch02.py:
+    - {rx: 'fiscal year "\s*"{Y}\.', class: role, why: "a caption split over two string literals"}
+
+  scripts/companion/xlbuild/audit.py:
+    - {rx: '\({Y} in the', class: role, why: "a comment: the last fiscal year under review (C)"}

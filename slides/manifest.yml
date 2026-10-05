@@ -27,7 +27,18 @@
         "chapters/01-role-of-analytics/_tutorial-01.qmd": "3789d3b88f6c5892daa35493510b5bd76481c54553947346ee981e765fd6066d",
         "chapters/01-role-of-analytics/chapter.qmd": "008d50d583cc500954fb2fdbdd0cf8b39399244f27679e5a83caf43eb4a4e366"
       },
-      "approval_note": "Author approved the revised spacing and progressive disclosure on 2026-10-04 and authorized rollout."
+      "approval_note": "Author approved the finished 47-slide storytelling revision, including cover, surname-only attribution, and architecture alignment, on 2026-10-05: \"Great. I aprove this version\".",
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approved_revision": {
+        "approved_at": "2026-10-05T19:33:23.551166+00:00",
+        "source_sha256": "d5d41279adaa2bdbecba5aae27e95b7e7f3bbb1db44ab8b703951fa2e6bf87f1",
+        "facts_sha256": "ace20763c0a993d2dfa22a117180e5b573e20bbf9caf50aa94a6be5b22dc767a",
+        "revealjs_sha256": "38632a79ae441d9fc5ac039c0fdb5b1e87c493995cbd84f052820798c2bb705b",
+        "pptx_sha256": "891f334ac2efe30bd7b685711ffafc04669c247d216fcb5dc88bf2dae843b8ae"
+      }
     },
     {
       "id": "chapter-02",
@@ -509,7 +520,7 @@
         "chapters/18-make-buy-or-reprice/_further-reading.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/18-make-buy-or-reprice/chapter.qmd": "0f76da5c99819566244c182fb7ac214d902f18bf8ec84c2de233425218a4b74b",
+        "chapters/18-make-buy-or-reprice/chapter.qmd": "58ef9ec69f7047682a8a334ef55d095b75238fb7ca7c95e7e0ddc25e932f4108",
         "chapters/18-make-buy-or-reprice/_references.qmd": "e73f59acce398d152ae06e63eb411795339fcaf1575e268855e9b7577bc3e86e",
         "chapters/18-make-buy-or-reprice/_further-reading.qmd": "bc3703278ee15a2fe85eca6511b1e1a2159703b6a3afc84009fcce23f78db15a"
       },
@@ -517,7 +528,7 @@
         "native_table": true,
         "embedded_media": false
       },
-      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation. Source change reviewed 2026-10-05: public text is identical to the prior sanitized export; only a private comment changed, with no effect on the teaching deck."
     },
     {
       "id": "chapter-19",
@@ -702,7 +713,39 @@
     "shared/generated/chapter-16/_rates.qmd",
     "shared/generated/chapter-16/_review.qmd",
     "shared/generated/chapter-16/monitoring.svg",
-    "shared/generated/chapter-16/monitoring.png"
+    "shared/generated/chapter-16/monitoring.png",
+    "shared/generated/chapter-01/storytelling/facts.json",
+    "shared/generated/chapter-01/storytelling/analytics-types.svg",
+    "shared/generated/chapter-01/storytelling/analytics-types.png",
+    "shared/generated/chapter-01/storytelling/tools-workflow.svg",
+    "shared/generated/chapter-01/storytelling/tools-workflow.png",
+    "shared/generated/chapter-01/storytelling/architecture-overview.svg",
+    "shared/generated/chapter-01/storytelling/architecture-overview.png",
+    "shared/generated/chapter-01/storytelling/architecture-operating.svg",
+    "shared/generated/chapter-01/storytelling/architecture-operating.png",
+    "shared/generated/chapter-01/storytelling/architecture-reference.svg",
+    "shared/generated/chapter-01/storytelling/architecture-reference.png",
+    "shared/generated/chapter-01/storytelling/o2c-forward.svg",
+    "shared/generated/chapter-01/storytelling/o2c-forward.png",
+    "shared/generated/chapter-01/storytelling/checked-credit.svg",
+    "shared/generated/chapter-01/storytelling/checked-credit.png",
+    "shared/generated/chapter-01/storytelling/_key-task.qmd",
+    "shared/generated/chapter-01/storytelling/_key-response.qmd",
+    "shared/generated/chapter-01/storytelling/_source-fields.qmd",
+    "shared/generated/chapter-01/storytelling/_customer-response.qmd",
+    "shared/generated/chapter-01/storytelling/_account-focus.qmd",
+    "shared/generated/chapter-01/storytelling/_item-response.qmd",
+    "shared/generated/chapter-01/storytelling/_initial-response.qmd",
+    "shared/generated/chapter-01/storytelling/_model-update.qmd",
+    "shared/generated/chapter-01/storytelling/source-trace-dated.svg",
+    "shared/generated/chapter-01/storytelling/source-trace-dated.png",
+    "shared/generated/chapter-01/storytelling/salesorder-task.svg",
+    "shared/generated/chapter-01/storytelling/salesorder-task.png",
+    "visuals/src/fig-01-01-analytics-continuum.drawio",
+    "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
+    "visuals/src/fig-01-04-charles-river-architecture.drawio",
+    "visuals/src/fig-01-05-o2c-process-flow.drawio",
+    "visuals/src/fig-03-05-chart-of-accounts-table.drawio"
   ],
   "public_fragments": [
     "shared/fragments/_accounting-analytics.qmd",
@@ -778,7 +821,10 @@
     "scripts/figures/ch13.py",
     "scripts/figures/ch14.py",
     "scripts/figures/ch15.py",
-    "scripts/figures/ch16.py"
+    "scripts/figures/ch16.py",
+    "scripts/slides/refresh_storytelling.py",
+    "slides/reviews/chapter-01-storytelling.md",
+    "tests/test_slide_storytelling.py"
   ],
   "public_book_files": [
     "_quarto.yml",

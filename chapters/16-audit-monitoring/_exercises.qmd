@@ -42,11 +42,11 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Requirements.**
 
-(1) Import T14_Shipment as `CutoffShipments`, keeping ShipmentID and DeliveryDate, and T15_ShipmentLine as `CutoffShipmentLines`, keeping ShipmentLineID and ShipmentID. Merge the delivery date onto the shipment lines.
+(1) Import T14_Shipment as `CutoffShipments`, keeping ShipmentID and DeliveryDate, and T15_ShipmentLine as `CutoffShipmentLines`, keeping ShipmentLineID, ShipmentID, and ExtendedStandardCost. Merge the delivery date onto the shipment lines.
 
-(2) Import T17_SalesInvoiceLine as `CutoffInvoiceLines`, keeping ShipmentLineID and SalesInvoiceID, and merge InvoiceNumber and InvoiceDate from the ARInvoices query of Exercise 16.1 (or import T16_SalesInvoice again as `CutoffInvoices`).
+(2) Import T17_SalesInvoiceLine as `CutoffInvoiceLines`, keeping ShipmentLineID and SalesInvoiceID, and T16_SalesInvoice again as `CutoffInvoices`, keeping SalesInvoiceID, InvoiceNumber, InvoiceDate, and SubTotal. Merge InvoiceNumber, InvoiceDate, and SubTotal onto the invoice lines, and the delivery date from CutoffShipmentLines. The ARInvoices query of Exercise 16.1 cannot supply the invoices, because it keeps only those open at the end of the year.
 
-(3) Build two exception queries with the register's columns: `SI DeliveredPriorYear`, one row per invoice whose lines were all delivered in a year before the year of the invoice, dated by the invoice; and `SL NotInvoiced`, one row per shipment line with no invoice line, dated by its delivery.
+(3) Build two exception queries with the register's columns: `SI DeliveredPriorYear`, one row per invoice whose lines were all delivered in a year before the year of the invoice, dated by the invoice, with its SubTotal as the amount; and `SL NotInvoiced`, one row per shipment line with no invoice line, dated by its delivery, with its standard cost as the amount.
 
 (4) Append them to a copy of the register named `Exceptions 16.2`, add the two tests to a copy of the Tests table, and show the new tests by month.
 
@@ -89,8 +89,10 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
      first is 2024-05-31, then surge days in 26 of the 30 months from July 2024 (about 3 a month), up to 7 in October 2026; every surge day has all 64 hourly
      manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705
      of the year's manufacturing overtime; overtime on other days did not grow (6,273, 6,426, 5,918). All 5,952 surge entries
-     were approved by the Production Manager on the work date. Distinct values of total hours: Group By with "Count Distinct Rows"
-     on the hours column; one value means everyone clocked the same hours. (5) The production manager approved every entry the
+     were approved by the Production Manager on the work date. Distinct values of total hours: Group By's "Count Distinct Rows"
+     counts distinct rows, not the values of one column, so the aggregation is written List.Count ( List.Distinct (
+     [TotalHours] ) ) (or only WorkDate and TotalHours are kept before grouping); one value means everyone clocked the
+     same hours. (5) The production manager approved every entry the
      test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found
      can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The
      Plant page's overtime share is a management measure; the surge-day test is an audit test. -->

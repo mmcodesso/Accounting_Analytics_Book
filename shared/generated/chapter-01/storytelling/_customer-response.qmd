@@ -1,0 +1,3 @@
+| SalesOrderID | CustomerID | CustomerName |
+| --- | --- | --- |
+| 1 | 81 | Koch-Ali |

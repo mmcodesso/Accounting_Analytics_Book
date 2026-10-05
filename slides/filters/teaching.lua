@@ -15,7 +15,10 @@ local function reveal_steps(blocks, rows_only)
   end
   local result = pandoc.List()
   for _, block in ipairs(blocks) do
-    if rows_only and block.t == 'Table' then
+    if block.t == 'Div' and has_class(block, 'persistent') then
+      -- Qualifications and activity instructions remain visible at every step.
+      result:insert(block)
+    elseif rows_only and block.t == 'Table' then
       for _, body in ipairs(block.bodies) do
         for _, row in ipairs(body.body) do
           if step > 0 then

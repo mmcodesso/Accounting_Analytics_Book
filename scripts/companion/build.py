@@ -388,15 +388,17 @@ def project_contents(project) -> dict[str, list[str]]:
     }
 
 
-def same_but_path(a: Path, b: Path, path_a: str, path_b: str) -> None:
+def same_but_path(a: Path, b: Path, path_a: str, path_b: str, also: list[tuple[str, str]] = ()) -> None:
     """The shipped project must be the verified one with only the source path changed (compared before Desktop opens
-    the verification copy and adds its own files)."""
+    the verification copy and adds its own files). `also`: the (verified, shipped) paths of any other source."""
     files_a = sorted(p.relative_to(a) for p in a.rglob("*") if p.is_file())
     files_b = sorted(p.relative_to(b) for p in b.rglob("*") if p.is_file())
     assert files_a == files_b, f"{b}: the shipped files differ from the verified ones"
     for f in files_a:
         ta, tb = (a / f).read_text(encoding="utf-8"), (b / f).read_text(encoding="utf-8")
-        assert ta.replace(path_a, path_b) == tb, f"{f}: differs beyond the source path"
+        for x, y in [(path_a, path_b), *also]:
+            ta = ta.replace(x, y)
+        assert ta == tb, f"{f}: differs beyond the source path"
 
 
 def build_pbi_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
@@ -456,16 +458,18 @@ def build_pbi_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
 
 def role_checks_file(role_checks: dict | None, folder: Path) -> Path | None:
     """Write a builder's checks that must run under a role (label -> (role, effective user or None, [(section,
-    Check)])) as checks queries and the JSON list verify.ps1 reads; None when there are none."""
+    Check)]), optionally with a fourth item, text the query's error must contain when the role may not see what it
+    reads) as checks queries and the JSON list verify.ps1 reads; None when there are none."""
     if not role_checks:
         return None
     from pbibuild.project import checks_query
     folder.mkdir(parents=True, exist_ok=True)
     entries = []
-    for i, (label, (role, user, checks)) in enumerate(role_checks.items()):
+    for i, (label, (role, user, checks, *expect)) in enumerate(role_checks.items()):
         path = folder / f"role-{i}.dax"
         path.write_text(checks_query(checks), encoding="utf-8")
-        entries.append({"label": label, "role": role, "user": user, "file": str(path)})
+        entries.append({"label": label, "role": role, "user": user, "file": str(path)} |
+                       ({"expectError": expect[0]} if expect else {}))
     target = folder / "roles.json"
     target.write_text(json.dumps(entries, indent=2), encoding="utf-8")
     return target
@@ -644,6 +648,16 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
                "with Home > Transform data > Data source settings > Change Source; then choose Home > Refresh.",
         built=f"{date.today().isoformat()}; every check agreed in Power BI Desktop after a refresh on the dataset "
               "release above")
+    # also_sources: other files the project reads (name -> its built copy, relative to the repo); the module's queries
+    # read C:\CharlesRiver\<name>, and the verification copy is pointed at the built copy
+    also = {f"C:\\CharlesRiver\\{n}": str(REPO / rel) for n, rel in (entry.get("also_sources") or {}).items()}
+    if hasattr(module, "prepare"):                  # a builder that writes a source itself (Chapter 19's RefundFlags.csv)
+        module.prepare(also)
+    for neutral, real in also.items():
+        if not Path(real).exists():
+            raise SystemExit(f"{entry['id']}: build {Path(real).name} first (no {real})")
+        stamp["source"] += (f" It also reads {neutral}: copy {Path(real).name} from "
+                            f"{Path(real).parent.name}.zip into that folder.")
     chapter = entry.get("chapter")
     name = entry["file"].removesuffix(".pbip")
     if entry.get("base"):
@@ -657,9 +671,13 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
         table = chain["table"]
         role = (f"solutions to the exercises of {part_name(chapter)}, built on a copy of the project at the end of "
                 f"Tutorial {entry['base']['after']}")
-        sections = solutions.exercise_sections(chapter, [e for e, _ in module.EXERCISES])
+        if kind == "requirements":                  # a capstone that updates a chapter's file (Chapter 19's monitoring)
+            role = entry["role"]
+            sections = solutions.requirement_sections(REPO / entry["source"], [e for e, _ in module.EXERCISES])
+        else:
+            sections = solutions.exercise_sections(chapter, [e for e, _ in module.EXERCISES])
     else:
-        b = module.Build(xlsx=XLSX, exp=Expected(year), year=year)
+        b = module.Build(xlsx=XLSX, exp=Expected(year), year=year, **({"sources": also} if also else {}))
         table = entry["table"]
         role = entry["role"]
         sections = solutions.requirement_sections(REPO / entry["source"], [e for e, _ in module.EXERCISES])
@@ -675,8 +693,13 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
         shutil.rmtree(work)
     work.mkdir(parents=True)
     check_pbip = p.write(work / "verify", str(XLSX))
+    for f in (check_pbip.parent / f"{name}.SemanticModel").rglob("*.tmdl") if also else ():
+        text = f.read_text(encoding="utf-8")
+        for neutral, real in also.items():
+            text = text.replace(neutral, real)
+        f.write_text(text, encoding="utf-8", newline="\n")
     ship = p.write(work / "ship", NEUTRAL).parent
-    same_but_path(check_pbip.parent, ship, str(XLSX), NEUTRAL)
+    same_but_path(check_pbip.parent, ship, str(XLSX), NEUTRAL, [(real, neutral) for neutral, real in also.items()])
     tab = lambda pg: f"Hidden {pg.display}" if pg.hidden else pg.display
     pages = [tab(pg) for pg in p.report.pages]
     roles = role_checks_file(getattr(b, "role_checks", None), work / "roles")
@@ -688,9 +711,13 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
     print(f"  verified {entry['id']}: refresh {result['refreshSeconds']}s, {len(p.checks)} checks agree, "
           f"{len(pages)} pages render")
     folder = out_root / (entry["folder"] if "folder" in entry else f"{folder_name(chapter)}-exercises-pbi")
+    # include_sources: other sources shipped beside the project, in its zip (kept across the folder's rebuild)
+    kept = {n: Path(also[f"C:\\CharlesRiver\\{n}"]).read_bytes() for n in entry.get("include_sources") or ()}
     if folder.exists():
         shutil.rmtree(folder)
     shutil.copytree(ship, folder / name)
+    for n, data in kept.items():
+        (folder / n).write_bytes(data)
     readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition), instructor files",
               (f"Solutions to the Power BI exercises of {part_name(chapter)}: {name} (a Power BI project)"
                if kind == "exercises" else f"{role[0].upper() + role[1:]}: {name} (a Power BI project)"), "",
@@ -701,7 +728,93 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
               "Change Source, choose Home > Refresh, and save it as a .pbix file if you prefer. The Notes page lists the",
               "exercises or requirements with the instructor notes; in DAX query view, the Checks tab tests every value.",
               "These files are for instructors; please do not post them where students can find them.", ""]
+    for neutral, real in also.items():
+        readme[-2:-2] = [f"It also reads {neutral}: copy {Path(real).name} from {Path(real).parent.name}.zip",
+                         "into that folder, or point those queries at your copy the same way."]
     (folder / "README.txt").write_text("\n".join(readme), encoding="utf-8", newline="\n")
+    return zip_folder(folder, suffix="")
+
+
+def build_sql_solution(entry: dict, variables: dict, out_root: Path, release_tag: str, work_suffix: str = "") -> Path:
+    """Write the SQL solution scripts of an exercise set, a case, or a capstone (sqlbuild/script.py), run every query
+    read-only with its checks, run each finished file top to bottom as DB Browser would, and zip."""
+    from sqlbuild.script import Build, notes_block, run
+    from xlbuild import solutions
+    module = importlib.import_module(entry["builder"])
+    kind = entry.get("kind", "exercises")
+    chapter = entry.get("chapter")
+    release = variables["dataset"]["version"]
+    b = Build()
+    for e, apply in module.EXERCISES:
+        b.current = e
+        apply(b)
+        for s in b.scripts.values():
+            for q in s.queries:
+                q.section = q.section or e
+
+    def connect() -> sqlite3.Connection:
+        con = sqlite3.connect(db_uri(), uri=True)
+        if entry.get("setup_views"):         # the view of Tutorial 11.3, as TEMP, for work that reads it
+            extra = next(x for x in load_yaml(HERE / "manifest.yml")["extras"] if x["id"] == "part3-views")
+            ref, key = extra["from"].split(":")
+            run(con, load_script(ref).location(key)[1], statements)
+        return con
+
+    def result_line(res, view) -> str:
+        if res is None:
+            return f"-- Result: creates the view {view}" if view else "-- Result: no rows"
+        if len(res.rows) == 1 and len(res.columns) <= 3:
+            return "-- Result: 1 row (" + ", ".join(f"{c} = {value_text(v)}" for c, v in zip(res.columns, res.rows[0])) + ")"
+        return f"-- Result: {len(res.rows)} rows"
+
+    folder = out_root / (entry.get("folder") or f"{folder_name(chapter)}-exercises-sql")
+    if folder.exists():
+        shutil.rmtree(folder)
+    folder.mkdir(parents=True)
+    prepared = f"instructor solution, built {date.today().isoformat()} on dataset {release}"
+    total = 0
+    for s in b.scripts.values():
+        con = connect()
+        results, checks, failed = [], [], []
+        for q in s.queries:
+            start = time.time()
+            res, view = run(con, q.sql, statements)
+            results.append(result_line(res, view))
+            for c in q.checks:
+                ok, got = c.agrees(res)
+                checks.append((q.section, c, got))
+                if not ok:
+                    failed.append(f"{q.section}: {c.label}: expected {c.expected}, got {got}")
+            if time.time() - start > 60:
+                print(f"  WARNING: {s.file}: '{q.what}' took {time.time() - start:.0f}s")
+        con.close()
+        if failed:
+            raise SystemExit(f"{s.file}: checks fail:\n  " + "\n  ".join(failed))
+        if kind == "exercises":
+            sections = solutions.exercise_sections(chapter, s.sections)
+        else:
+            sections = solutions.requirement_sections(REPO / entry["source"], s.sections)
+        text = s.text(prepared, results, notes_block(sections, checks, release))
+        path = folder / s.file
+        path.write_text(text, encoding="utf-8", newline="\n")
+        con = connect()                          # the file as written runs top to bottom
+        for stmt in statements(path.read_text(encoding="utf-8")):
+            run(con, stmt, statements)
+        con.close()
+        total += len(checks)
+        print(f"  wrote {s.file}: {len(s.queries)} queries, {len(checks)} checks agree")
+    files = sorted(p.name for p in folder.glob("*.sql"))
+    readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition), instructor files",
+              (f"SQL solutions to the exercises of {part_name(chapter)}" if kind == "exercises"
+               else f"{entry['role'][0].upper() + entry['role'][1:]}"), "",
+              f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
+              f"CharlesRiver.sqlite SHA-256 {variables['dataset']['sha256']['sqlite']}", ""] + files + [
+              "", "Open a script in DB Browser for SQLite (Execute SQL > Open SQL file(s)) on a working copy of",
+              "CharlesRiver.sqlite. Each query ends with its result on this dataset release, and the notes block at",
+              "the end repeats the requirements and the instructor notes and lists the values checked.",
+              "These files are for instructors; please do not post them where students can find them.", ""]
+    (folder / "README.txt").write_text("\n".join(readme), encoding="utf-8", newline="\n")
+    print(f"  {entry['id']}: {len(files)} scripts, {total} checks agree")
     return zip_folder(folder, suffix="")
 
 
@@ -741,8 +854,8 @@ def main() -> int:
                 continue
             if args.id not in (None, entry["id"]):
                 continue
-            print(f"{entry['id']}: building {entry['file']}")
-            build = build_excel_solution if entry["tool"] == "excel" else build_pbi_solution
+            print(f"{entry['id']}: building {entry.get('file', 'the SQL scripts')}")
+            build = {"excel": build_excel_solution, "pbi": build_pbi_solution, "sql": build_sql_solution}[entry["tool"]]
             archive = build(entry, variables, instructor, manifest["release_tag"], args.work_suffix)
             print(f"{entry['id']}: -> {archive.relative_to(REPO)}")
         return 0

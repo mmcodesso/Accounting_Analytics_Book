@@ -320,9 +320,10 @@ def ex3(b: Build) -> None:
         f"the Date table runs through {y + 1} and SAMEPERIODLASTYEAR finds fiscal {y}. Revenue PY now returns blank "
         "wherever Revenue is blank: IF ( NOT ISBLANK ( [Revenue] ), CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( "
         "'Date'[Date] ) ) )."]))
-    page.expect = ["Revenue YoY %", pct(lo["yoy"]), "Revenue PY YTD",
-                   money(next(g["before"] for g in ctx["by_group"] if g["group"] == "Furniture")), "Group Lines",
-                   "Model answer: Exercise 14.3"]
+    # a matrix with one value shows no value header, so its title and values prove it rendered
+    page.expect = [f"Revenue against the same month of the prior year, by item group, fiscal {y}", pct(lo["yoy"]),
+                   "Revenue PY YTD", money(next(g["before"] for g in ctx["by_group"] if g["group"] == "Furniture")),
+                   f"Invoice lines by item group and month, fiscal {y}", "Model answer: Exercise 14.3"]
 
     t = "Exercise 14.3"
     furn = "'Item'[ItemGroup] = \"Furniture\""

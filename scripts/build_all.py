@@ -30,15 +30,35 @@ def require_clean(errors: list[str]) -> None:
         raise ValueError('\n'.join(errors))
 
 
-def source_checks(root: Path, manifest: dict) -> list[str]:
+def selected_manifest(manifest: dict, chapter_id: str | None = None) -> dict:
+    """Select a review deck without changing publication eligibility or inventory."""
+    if chapter_id is None:
+        return manifest
+    chapters = [item for item in active_chapters(manifest) if item['id'] == chapter_id]
+    if not chapters:
+        raise ValueError(f'Unknown pilot/approved chapter: {chapter_id}')
+    result = copy.deepcopy(manifest)
+    result['chapters'] = chapters
+    for field in ('public_assets', 'public_fragments'):
+        result[field] = [rel for rel in manifest.get(field, [])
+                         if not rel.startswith('shared/generated/chapter-')
+                         or rel.startswith(f'shared/generated/{chapter_id}/')]
+    return result
+
+
+def source_checks(root: Path, manifest: dict, chapter_id: str | None = None) -> list[str]:
     from scripts.slides.refresh import check_fresh
     from scripts.slides.refresh_foundations import check_fresh as check_foundations
     from scripts.slides.refresh_excel import check_fresh as check_excel
     from scripts.slides.refresh_sql import check_fresh as check_sql
     from scripts.slides.refresh_bi import check_fresh as check_bi
-    errors = (verify_sources(root, manifest) + check_fresh(root)
-              + check_foundations(root, manifest) + check_excel(root, manifest)
-              + check_sql(root, manifest) + check_bi(root, manifest))
+    from scripts.slides.refresh_storytelling import check_fresh as check_storytelling
+    selected = selected_manifest(manifest, chapter_id)
+    errors = (verify_sources(root, selected)
+              + (check_fresh(root) if chapter_id in (None, 'chapter-01') else [])
+              + check_storytelling(root, selected)
+              + check_foundations(root, selected) + check_excel(root, selected)
+              + check_sql(root, selected) + check_bi(root, selected))
     config = load_manifest(root / 'slides/_quarto.yml')
     expected = [item['source'] for item in active_chapters(manifest)]
     if config.get('project', {}).get('render') != expected:
@@ -100,6 +120,8 @@ def dependency_state(root: Path, manifest: dict) -> tuple:
 def preview(root: Path, manifest: dict, quarto: str, chapter_id: str) -> None:
     chapter = next((item for item in active_chapters(manifest) if item['id'] == chapter_id), None)
     if chapter is None: raise ValueError(f'Unknown pilot/approved chapter: {chapter_id}')
+    # Quarto discovers all registered inputs even when previewing one file.
+    # Stage their public includes, while editorial/freshness checks stay scoped.
     prepare(root, manifest)
     stop = threading.Event()
     failures: list[str] = []
@@ -112,7 +134,7 @@ def preview(root: Path, manifest: dict, quarto: str, chapter_id: str) -> None:
                 current = dependency_state(root, watched_manifest)
                 if current != previous:
                     updated = load_manifest(root / 'slides/manifest.yml')
-                    require_clean(source_checks(root, updated))
+                    require_clean(source_checks(root, updated, chapter_id))
                     prepare(root, updated)
                     # Touch just this authoring file to trigger Quarto's document watcher.
                     # Content is unchanged; newly staged dependencies precede the trigger.
@@ -135,12 +157,18 @@ def preview(root: Path, manifest: dict, quarto: str, chapter_id: str) -> None:
         thread.join(timeout=3)
 
 
-def build(root: Path, manifest: dict, quarto: str, *, slides_only=False, include_pilot=False) -> None:
-    require_clean(source_checks(root, manifest))
+def build(root: Path, manifest: dict, quarto: str, *, slides_only=False, include_pilot=False,
+          chapter_id: str | None = None) -> None:
+    if chapter_id and not slides_only:
+        raise ValueError('--chapter requires --slides-only; full-site assembly validates all chapters')
+    selected = selected_manifest(manifest, chapter_id)
+    require_clean(source_checks(root, manifest, chapter_id))
     actual = subprocess.check_output([quarto, '--version'], text=True).strip()
     pinned = str(manifest['toolchain']['quarto'])
     if actual != pinned:
         raise ValueError(f'Quarto {pinned} is required; found {actual}. Review/version changes explicitly.')
+    # Project discovery resolves includes for every registered input. It needs
+    # the full disposable public stage even for a selected document render.
     prepare(root, manifest)
     env = dict(os.environ)
     env['PATH'] = str(Path(sys.executable).parent) + os.pathsep + env.get('PATH', '')
@@ -158,11 +186,28 @@ def build(root: Path, manifest: dict, quarto: str, *, slides_only=False, include
             product = root / '_book' / f'Accounting-Analytics.{ext}'
             if not product.is_file(): raise ValueError(f'Expected book output was not created: {product}')
             shutil.copy2(product, downloads / f'book-latest.{ext}')
-    if active_chapters(manifest):
+    if active_chapters(selected):
         for fmt in ('revealjs', 'pptx'):
-            reset_owned(root, root / 'slides/_build' / fmt)
-            run(root, [quarto, 'render', 'slides', '--to', fmt, '--output-dir', f'_build/{fmt}'], env)
-        require_clean(verify_outputs(root, manifest))
+            if chapter_id:
+                # Quarto may clean its output root. Render into an isolated tree
+                # before replacing only the selected chapter's finished outputs.
+                relative = f'_build/focused/{chapter_id}/{fmt}'
+                stage = root / 'slides' / relative
+                reset_owned(root, stage)
+                run(root, [quarto, 'render', 'slides/' + selected['chapters'][0]['source'],
+                           '--to', fmt, '--output-dir', relative], env)
+            else:
+                reset_owned(root, root / 'slides/_build' / fmt)
+                run(root, [quarto, 'render', 'slides', '--to', fmt, '--output-dir', f'_build/{fmt}'], env)
+        if chapter_id:
+            focused = root / 'slides/_build/focused' / chapter_id
+            require_clean(verify_outputs(root, selected, build_root=focused))
+            for fmt in ('revealjs', 'pptx'):
+                destination = root / 'slides/_build' / fmt
+                reset_owned(root, destination / chapter_id)
+                shutil.copytree(focused / fmt, destination, dirs_exist_ok=True)
+        else:
+            require_clean(verify_outputs(root, selected))
     if not slides_only:
         run(root, [quarto, 'render', '--to', 'html'], env)
         assemble(root, manifest, include_pilot=include_pilot)
@@ -172,9 +217,10 @@ def build(root: Path, manifest: dict, quarto: str, *, slides_only=False, include
         require_clean(verify_outputs(root, validation_manifest, site=root / '_book'))
     report = {'quarto': actual, 'mode': 'slides' if slides_only else 'book-and-slides',
               'includes_pilot': include_pilot or slides_only,
-              'chapters': [item['id'] for item in active_chapters(manifest)],
+              'chapters': [item['id'] for item in active_chapters(selected)],
               'automated_artifact_checks': 'passed', 'browser_review': 'not-run', 'powerpoint_review': 'not-run'}
-    report_path = root / 'outputs/build/build-report.json'
+    report_path = root / ('outputs/build/' + chapter_id + '/build-report.json' if chapter_id
+                          else 'outputs/build/build-report.json')
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print('Build complete. Automated checks passed; consult the separate visual-review report.', flush=True)
@@ -184,6 +230,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='Validate public source closure without rendering or opening data')
     parser.add_argument('--slides-only', action='store_true')
+    parser.add_argument('--chapter', metavar='CHAPTER', help='Focus checks or slide builds on one active chapter')
     parser.add_argument('--include-pilot', action='store_true', help='Include pilot in the local review site; never used by publication CI')
     parser.add_argument('--refresh-shared', action='store_true')
     parser.add_argument('--preview', metavar='CHAPTER')
@@ -192,41 +239,71 @@ def main() -> int:
     parser.add_argument('--quarto', help='Explicit Quarto executable, or set QUARTO_BIN')
     args = parser.parse_args()
     try:
+        if args.chapter and (args.export_public or args.init_reference
+                             or not (args.check or args.slides_only or args.preview)):
+            raise ValueError('--chapter is only supported with --check, --slides-only, or --preview; export and full assembly require all chapters')
+        if args.chapter and args.preview and args.chapter != args.preview:
+            raise ValueError('--chapter must match the --preview chapter')
+        chapter_id = args.chapter or args.preview
         manifest = load_manifest(ROOT / 'slides/manifest.yml')
+        selected_manifest(manifest, chapter_id)
         if args.init_reference:
             initialize_reference(ROOT, args.quarto or find_quarto())
             return 0
         if args.refresh_shared:
-            from scripts.slides.refresh import refresh
-            refresh(ROOT)
-            from scripts.slides.refresh_foundations import refresh as refresh_foundations
-            refresh_foundations(ROOT)
-            # Rebuild the book views of the same public semantics/calculations.
-            # The focused public builder imports only chapters with shared inputs.
-            run(ROOT, [sys.executable, 'scripts/slides/refresh_book_figures.py'])
-            # Cropped teaching views must follow the canonical Draw.io export.
-            run(ROOT, [sys.executable, 'scripts/export_drawio_svgs.py'])
-            from scripts.slides.refresh_excel import refresh as refresh_excel
-            refresh_excel(ROOT)
-            from scripts.slides.refresh_sql import refresh as refresh_sql
-            refresh_sql(ROOT)
-            from scripts.slides.refresh_bi import refresh as refresh_bi
-            refresh_bi(ROOT)
-        require_clean(source_checks(ROOT, manifest))
+            if chapter_id:
+                if chapter_id != 'chapter-01':
+                    raise ValueError('Focused refresh is currently supported for chapter-01 only')
+                from scripts.slides.refresh import refresh
+                from scripts.slides.refresh_storytelling import refresh as refresh_storytelling
+                refresh(ROOT)
+                refresh_storytelling(ROOT)
+            else:
+                refresh_all(ROOT)
+        errors = source_checks(ROOT, manifest, chapter_id)
+        if args.check and chapter_id:
+            report_path = ROOT / 'outputs/build' / chapter_id / 'source-check-report.json'
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            report_path.write_text(json.dumps({'chapter': chapter_id,
+                'status': 'failed' if errors else 'passed',
+                'dataset_free': not args.refresh_shared, 'errors': errors}, indent=2) + '\n', encoding='utf-8')
+        require_clean(errors)
         if args.check:
-            print('Public source closure, provenance, notes, and privacy checks passed (no dataset opened).')
+            detail = 'explicit refresh completed' if args.refresh_shared else 'no dataset opened'
+            print(f'Public source closure, provenance, notes, and privacy checks passed ({detail}).')
         elif args.export_public:
             from scripts.slides.export_public import export_public
             print(export_public(ROOT, manifest, include_pilot=args.include_pilot))
         elif args.preview:
             preview(ROOT, manifest, args.quarto or find_quarto(), args.preview)
         else:
-            build(ROOT, manifest, args.quarto or find_quarto(), slides_only=args.slides_only, include_pilot=args.include_pilot)
+            build(ROOT, manifest, args.quarto or find_quarto(), slides_only=args.slides_only,
+                  include_pilot=args.include_pilot, chapter_id=chapter_id)
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f'ERROR: {exc}', file=sys.stderr)
         return 1
 
+
+def refresh_all(root: Path) -> None:
+    """Explicit authoring refresh; ordinary builds never open datasets."""
+    from scripts.slides.refresh import refresh
+    refresh(root)
+    from scripts.slides.refresh_foundations import refresh as refresh_foundations
+    refresh_foundations(root)
+    # Rebuild the book views of the same public semantics/calculations.
+    # The focused public builder imports only chapters with shared inputs.
+    run(root, [sys.executable, 'scripts/slides/refresh_book_figures.py'])
+    # Cropped teaching views must follow the canonical Draw.io export.
+    run(root, [sys.executable, 'scripts/export_drawio_svgs.py'])
+    from scripts.slides.refresh_storytelling import refresh as refresh_storytelling
+    refresh_storytelling(root)
+    from scripts.slides.refresh_excel import refresh as refresh_excel
+    refresh_excel(root)
+    from scripts.slides.refresh_sql import refresh as refresh_sql
+    refresh_sql(root)
+    from scripts.slides.refresh_bi import refresh as refresh_bi
+    refresh_bi(root)
 
 if __name__ == '__main__':
     raise SystemExit(main())

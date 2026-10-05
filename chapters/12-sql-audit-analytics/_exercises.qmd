@@ -203,7 +203,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (5) Calculate the first significant digit of every supplier payment dated through 2026-12-31 with `printf('%e', Amount)`, and the mean absolute deviation from the expected proportions of `LOG10(1 + 1.0 / Digit)`, for all payments, for full payments (Amount equal to the invoice's GrandTotal), and for partial payments. Compare the results with Tutorial 8.1.
 
-(6) For each test, record the number of exceptions and a disposition, and write a short note on why the fourth test needs a self-join and on what running these tests in SQL gains over a workbook.
+(6) For each test, record the number of exceptions and a disposition, and write a short note on why the near-duplicate test needs a self-join and on what running these tests in SQL gains over a workbook.
 
 **Deliverable.** A script with the tests and a table of results and dispositions.
 

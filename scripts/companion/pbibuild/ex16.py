@@ -235,10 +235,8 @@ def ex2(b: Build) -> None:
         "it falls in the year of its delivery, so this test cannot see it. Chapter 6 found it: a revenue cutoff error, "
         "an invoice posted in the year after the goods shipped.",
         f"{ctx['n_before']} invoices are dated in a year before their delivery ({', '.join(ctx['before'])}), the other "
-        "direction, which the exercise does not ask for.",
-        "Text change: ARInvoices keeps only the invoices open at year-end, so the invoice numbers and dates come from "
-        "SalesInvoice imported again as CutoffInvoices."], size=10))
-    page.expect = ["SI DeliveredPriorYear", "SL NotInvoiced", "DocumentNumber", odd["number"][:3], money(ctx["sub"]),
+        "direction, which the exercise does not ask for."], size=10))
+    page.expect = ["SI DeliveredPriorYear", "SL NotInvoiced", "DocumentNumber", money(ctx["sub"] + ctx["cost"]),
                    "Model answer"]
 
     t = "Exercise 16.2"
@@ -320,8 +318,8 @@ def ex3(b: Build) -> None:
         "is a management measure, the surge-day test an audit test.",
         "Group By: Count Distinct Rows counts distinct rows of the group, not values of one column, so the "
         "aggregation is List.Count ( List.Distinct ( [TotalHours] ) )."], size=10))
-    page.expect = ["Surge days by month", "Surge Share of Overtime", f"{ctx['total']:,}" if False else str(ctx["by_year"][-1][1]),
-                   f"{ctx['on_surge'][-1]:,.0f}", "Model answer"]
+    page.expect = ["Surge days by month", "Surge Share of Overtime", f"{ctx['on_surge'][-1]:,.0f}", pct(ctx["shares"][-1]),
+                   "Model answer"]
 
     t = "Exercise 16.3"
     b.check(t, "surge days in all", ctx["total"], "[Surge Days]", 0)
@@ -332,10 +330,10 @@ def ex3(b: Build) -> None:
     b.check(t, "employees on every surge day (most)", ctx["employees"], "MAX ( SurgeDays[Employees] )", 0)
     b.check(t, "surge entries (all approved by the Production Manager on the work date)", ctx["entries"],
             "SUM ( SurgeDays[Employees] )", 0)
-    b.check(t, "total hours of every surge entry", ctx["regular"] + ctx["overtime"],
-            "CALCULATE ( MAX ( ClockEntries[TotalHours] ), TREATAS ( VALUES ( SurgeDays[WorkDate] ), 'Date'[Date] ) ) + "
-            "CALCULATE ( MIN ( ClockEntries[TotalHours] ), TREATAS ( VALUES ( SurgeDays[WorkDate] ), 'Date'[Date] ) ) - "
-            "CALCULATE ( MIN ( ClockEntries[TotalHours] ), TREATAS ( VALUES ( SurgeDays[WorkDate] ), 'Date'[Date] ) )", 0.001)
+    for fn in ("MIN", "MAX"):
+        b.check(t, f"total hours of the surge entries ({fn})", ctx["regular"] + ctx["overtime"],
+                f"CALCULATE ( {fn} ( ClockEntries[TotalHours] ), TREATAS ( VALUES ( SurgeDays[WorkDate] ), 'Date'[Date] ) )",
+                0.001)
     for yy, h, s, o in zip(years, ctx["on_surge"], ctx["shares"], ctx["other"]):
         cy = f"'Date'[Year] = {yy}"
         b.check(t, f"surge overtime hours {yy}", round(h, 2), f"CALCULATE ( [Surge Overtime Hours], {cy} )", 0.01)
@@ -347,7 +345,7 @@ def ex3(b: Build) -> None:
               "'Date'[YearMonth] <= \"{}\" ), [Surge Days] > 0 ) )")
     first_month = b.d.one("SELECT MIN(substr(WorkDate, 1, 7)) FROM TimeClockEntry")
     sev = [mm for mm in [f"{yy}-{k:02d}" for yy in years for k in range(1, 13)] if first_month <= mm <= peak]
-    several = next(mm for mm in sev if mm[:4] + "-" + mm[5:] and ch16.month_year(mm + "-01") == ctx["several"])
+    several = next(mm for mm in sev if ch16.month_year(mm + "-01") == ctx["several"])
     b.check(t, f"months with surge days from {ctx['several']}", ctx["with_surge"], months.format(several, peak), 0)
     b.check(t, f"surge days in {ctx['peak_month']} (the most)", ctx["peak"],
             "MAXX ( VALUES ( 'Date'[YearMonth] ), [Surge Days] )", 0)
@@ -423,7 +421,7 @@ def ex5(b: Build) -> None:
                               hidden={"DisbursementID", "PurchaseInvoiceID"}))
     m.relate("Payments.PaymentDate", "Date.Date")
     # (2) the first digit from the amount's scientific notation
-    t_pay.columns.append(Column("FirstDigit", "int64", summarize="none",
+    t_pay.columns.append(Column("FirstDigit", "double", fmt="0", summarize="none",          # VALUE returns a number
                                 expression="VALUE ( LEFT ( FORMAT ( Payments[Amount], \"0.00000000E+00\" ), 1 ) )"))
     # (3) the digits and Benford's expected share (a disconnected calculated table), and the measures
     m.add(Table("Digits", [Column("Digit", "int64", "[Digit]", summarize="none"),

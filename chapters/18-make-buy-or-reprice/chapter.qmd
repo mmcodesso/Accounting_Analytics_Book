@@ -123,8 +123,8 @@ Work in four milestones, one for each phase of the requirements. Your instructor
 
 <!-- notes: ch18.m2 -->
 <!-- Instructor notes, Milestone 2 checkpoints: committed cost 4,119,063.77; 39.97 an hour (crew 34.11); unused capacity 29,243.7 hours,
-     1,168,726; time-driven group margins Furniture 38.23%, Lighting 41.23%, Textiles 45.96%; explorer margins 12,739,803.20 (standard),
-     10,661,488.02 (absorption), 11,731,216.94 (time-driven) on revenue of 28,543,076.08. -->
+     1,168,726; time-driven group margins Furniture 38.23%, Lighting 41.23%, Textiles 45.96%; explorer margins (item costs unrounded, as the explorer reads them) 12,739,803.20 (standard),
+     10,661,488.03 (absorption), 11,731,216.94 (time-driven) on revenue of 28,543,076.08. -->
 
 <!-- notes: ch18.m3 -->
 <!-- Instructor notes, Milestone 3 checkpoints: buy BNH, NGT, and TBL only with the crew reduced, +255,481 a year (10.56 positions, a
