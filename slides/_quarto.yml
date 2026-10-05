@@ -1,0 +1,80 @@
+project:
+  type: default
+  output-dir: _build/revealjs
+  render:
+    - chapter-01/index.qmd
+    - chapter-02/index.qmd
+    - chapter-03/index.qmd
+    - chapter-04/index.qmd
+    - chapter-05/index.qmd
+    - chapter-06/index.qmd
+    - chapter-07/index.qmd
+    - chapter-08/index.qmd
+    - chapter-09/index.qmd
+    - chapter-10/index.qmd
+    - chapter-11/index.qmd
+    - chapter-12/index.qmd
+    - chapter-13/index.qmd
+    - chapter-14/index.qmd
+    - chapter-15/index.qmd
+    - chapter-16/index.qmd
+    - chapter-17/index.qmd
+    - chapter-18/index.qmd
+    - chapter-19/index.qmd
+  resources:
+    - _shared/generated/**/*.svg
+    - _shared/generated/**/*.png
+    - '!_build/**'
+    - '!theme/**'
+    - '!manifest.yml'
+    - '!README.md'
+    - '!_shared/**/*.qmd'
+    - '!_shared/**/*.json'
+
+lang: en
+metadata-files:
+  - _shared/theme/metadata.yml
+slide-level: 2
+filters:
+  - ../filters/strip-comments.lua
+  - filters/images.lua
+  - filters/teaching.lua
+format:
+  revealjs:
+    theme: [default, _shared/theme/tokens.scss, theme/reveal.scss]
+    width: 1280
+    height: 720
+    margin: 0.08
+    center: false
+    transition: none
+    background-transition: none
+    incremental: false
+    # The pinned Quarto template omits scrollActivationWidth from initialization.
+    # Keep deliberate fragment advancement at every viewport size.
+    include-after-body:
+      text: |
+        <script>
+        (() => {
+          const keepSlideMode = () => {
+            Reveal.configure({ scrollActivationWidth: 0 });
+            if (Reveal.isScrollView()) Reveal.toggleScrollView(false);
+          };
+          if (Reveal.isReady()) keepSlideMode();
+          else Reveal.on('ready', keepSlideMode);
+        })();
+        </script>
+    controls: true
+    progress: true
+    slide-number: c/t
+    menu: true
+    history: true
+    embed-resources: false
+    code-copy: false
+    auto-stretch: false
+    html-math-method: mathml
+  pptx:
+    reference-doc: _shared/theme/reference.pptx
+    incremental: false
+
+execute:
+  enabled: false

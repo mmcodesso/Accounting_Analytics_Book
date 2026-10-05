@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will answer the controller's second request with PivotTables. You will add the extended standard cost to the InvoiceLines query, summarize fiscal 2026 revenue by item group and quarter, and reconcile the result with the control total from Tutorial 6.1. You will then add the gross margin at standard cost as a calculated field, read the same revenue as shares and as changes, compare the customer segments with the previous year, and chart the margins with a PivotChart.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 6.1, with the Profile worksheet and its control total.
+**Prerequisites.** You need the analysis workbook from Tutorial 6.1, with the Profile worksheet and its control total. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 6.1 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

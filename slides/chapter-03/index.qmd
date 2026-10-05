@@ -1,0 +1,507 @@
+---
+title: "The Accounting Data Environment"
+subtitle: "Chapter 3"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-03.pptx
+---
+
+## Learning objectives {#ch03-objectives .balanced .stepwise}
+
+- Explain tables, row grain, data types, and keys.
+- Read cardinality and optionality in an ER diagram.
+- Connect accounting structures across table groups.
+- Trace a public sale through operations, ledger postings, and settlement.
+
+::: {.notes}
+Delivery: Introduce the objectives one at a time. Purpose: establish the navigation skills needed before writing queries or building models. Allow about 60 seconds. Students know from Chapter 2 that references and populations must be tested. Here they learn the structure behind those tests. Emphasize that memorizing every table is unnecessary. They should be able to locate a relevant table, state its row grain, identify the connecting fields, and explain the expected matches. Ask which of these skills would help interpret an unexpected row count. Transition: return to the controller's question with a database map.
+:::
+
+# Read the structure before combining data {#ch03-module-structure}
+
+::: {.notes}
+Introduce the relational model as an explicit version of familiar accounting cross-references. The chapter teaches a method for reading the map, not a list of every table to memorize.
+:::
+
+## The controller hands you a database map {#ch03-scenario .balanced .stepwise}
+
+The Furniture margin question is still open.
+
+Revenue, cost, products, and customers appear in related tables.
+
+**Which path gives you the right evidence at the right level of detail?**
+
+::: {.notes}
+Delivery: Reveal the situation before the decision question. Purpose: keep database concepts tied to an accounting task. Allow about 60 seconds. Finding a table with a promising name is only a start. The accountant also needs to understand what a row means, how it connects to other records, and whether a join changes the population or repeats amounts. Do not reveal the later diagnostic explanation for the margin change. Ask students why one flat file containing every field might still be difficult to analyze correctly. Transition: begin with the unit stored in a table.
+:::
+
+## A table describes an entity or event {#ch03-table .balanced .step-rows}
+
+| Component | Meaning | Customer example |
+|---|---|---|
+| Table | One kind of entity or event | Customer |
+| Row | One stored instance | One customer record |
+| Column | One attribute | CustomerName |
+| Cell | One row's value for that attribute | A particular name |
+
+::: {.notes}
+Delivery: Reveal one component at a time. Purpose: connect spreadsheet familiarity with database structure. Allow about 60 seconds. A row represents one instance of the table's chosen unit. That grain must be stated before counting or combining records. A column records a defined attribute across the rows. The database schema describes these columns, but the analyst must still interpret the business meaning. Ask students to state the grain of SalesOrder and SalesOrderLine. The former stores an order, while the latter stores a line belonging to an order. Transition: stored data types also influence how values are interpreted.
+:::
+
+## Charles River's stored types {#ch03-types .balanced .step-rows}
+
+| Business meaning | Charles River storage | Import check |
+|---|---|---|
+| Identifier or whole number | INTEGER | Code or quantity? |
+| Monetary amount | REAL | Precision and rounding |
+| Calendar date | TEXT, year-month-day | Recognized as a date? |
+| True/false flag | INTEGER, 1 or 0 | Meaning preserved? |
+
+::: {.notes}
+Delivery: Introduce the rows in sequence. Purpose: distinguish business meaning from physical storage. Allow 60–90 seconds. This describes the Charles River SQLite extract, not every database system. SQLite has additional storage classes, including NULL and BLOB, and flexible typing differs from stricter systems. Dates use an ordered text format, while analytical tools may convert them to their own date type during import. REAL amounts use floating-point representation, so apply appropriate tolerances and rounding at the stated reporting boundary. Ask why a numeric AccountNumber should not be averaged. Transition: a key identifies a row independently of its descriptive fields.
+:::
+
+## Primary keys identify stored rows {#ch03-pk .balanced .stepwise}
+
+A primary key uniquely identifies each row.
+
+Charles River uses single integer surrogate keys, such as CustomerID and SalesOrderID.
+
+Names and business document numbers have different roles.
+
+::: {.notes}
+Delivery: Reveal the definition, the local design, and the distinction. Purpose: establish a reliable basis for matching. Allow about 60 seconds. A surrogate key exists to identify the stored row and need not communicate a business classification. A composite key uses multiple columns in other database designs. CustomerName can repeat even when CustomerID is unique. Business document numbers may also have uniqueness rules, but those rules must be verified in the schema. Ask which column would remain a useful reference if a customer's display name changed. Transition: inspect the difference between a primary key and other unique fields.
+:::
+
+## A document number is not always unique {#ch03-unique .balanced .stepwise}
+
+Charles River enforces uniqueness for fields such as SalesInvoice.InvoiceNumber.
+
+PurchaseInvoice.InvoiceNumber holds the supplier's number and can repeat.
+
+Inspect the actual constraints before assuming that a familiar label is unique.
+
+::: {.notes}
+Delivery: Reveal the contrast before the operating rule. Purpose: explain why the duplicate-risk example in Chapter 2 is possible. Allow about 60 seconds. The primary key still distinguishes the stored purchase-invoice rows, even when a supplier invoice number repeats. A supplier-and-invoice combination can be a useful investigation key without being an enforced database constraint. The teaching point is to separate the row identifier, the business identifier, and the actual uniqueness rules. Ask whether two different suppliers could legitimately use the same invoice number. Transition: a foreign key stores the value needed to reach a related row.
+:::
+
+## Match orders to customers by key {#ch03-key-example .balanced}
+
+Selected public Figure 3.2 records. Repeated CustomerID values link different orders to one customer.
+
+{{< include /_shared/generated/chapter-03/_keys.qmd >}}
+
+::: {.notes}
+Purpose: use a small real sample to make key matching visible. Allow 60–90 seconds. SalesOrderID identifies each order row. CustomerID can repeat across those rows because a customer can place several orders. The displayed names are retrieved from Customer by matching the identifier, not by aligning worksheet row positions. These are selected records, not the full order population. Ask students to count the orders and then the distinct customers in this display. The counts answer different questions. Transition: the same match appears as a relationship in the diagram.
+:::
+
+## The foreign key points to the customer {#ch03-customer-orders}
+
+![Customer and SalesOrder connected through CustomerID.](/_shared/generated/chapter-03/customer-orders.svg){width=95% fig-alt="Customer has primary key CustomerID. SalesOrder has primary key SalesOrderID and foreign key CustomerID. The Customer endpoint means exactly one and the SalesOrder endpoint means zero or many."}
+
+::: {.notes}
+Purpose: connect the sample rows to the schema. Allow about 60 seconds. Read the relationship in both directions: each order has exactly one customer, and a customer can have zero or many orders. The CustomerID in SalesOrder references Customer.CustomerID. The matching fields can have different names in other relationships, such as ComponentItemID referencing ItemID. This focused view adapts the book's relationship semantics and computes the endpoint markers from the pinned data. It omits unrelated columns. Ask students which table contains the repeated CustomerID values. Transition: a logical relationship is not necessarily an enforced constraint.
+:::
+
+## Designed relationships need verification {#ch03-logical .balanced .stepwise}
+
+Charles River declares primary keys and selected unique indexes.
+
+It does **not** declare foreign-key constraints.
+
+Analysts test references and define relationships explicitly in their models.
+
+::: {.notes}
+Delivery: Reveal the distinction before its analytical consequence. Purpose: prevent false confidence from a drawn line. Allow 60–90 seconds. The diagram describes logical relationships in the data. It does not claim that the SQLite file will reject an orphaned reference. A database can enforce referential integrity when suitable constraints are declared and enabled, but this extract does not declare them. Chapter 2's AccountID test is therefore a necessary observation rather than a redundant exercise. Ask what a clean match test establishes and what a later changed extract would require. Transition: reading a line also requires understanding its endpoints.
+:::
+
+# Read cardinality and protect the grain {#ch03-module-relationships}
+
+::: {.notes}
+Explain that cardinality describes how many matches are possible or observed in a relationship, while optionality distinguishes zero matches from a required match. Always read both ends.
+:::
+
+## Read the endpoint symbols {#ch03-notation}
+
+![Four crow's-foot endpoint meanings.](/_shared/generated/chapter-03/crow-foot.svg){width=92% fig-alt="Four large endpoint symbols show exactly one, zero or one, zero or many, and one or many. A circle means optional, a bar means one, and a crow's foot means many."}
+
+::: {.notes}
+Purpose: teach the visual vocabulary before adding a larger schema. Allow 60–90 seconds. Each endpoint describes matches in the table it touches when starting with one row at the opposite end. The circle indicates that zero is permitted. Two bars mean exactly one. A bar and a crow's foot mean one or more, while a circle and a crow's foot mean zero or more. Ask students to read the symbol without naming the table, then add the table context. The frequent misconception is to interpret the left symbol as describing the right table. Transition: one-to-one relationships can still be optional.
+:::
+
+## A work order may not yet have a close {#ch03-close}
+
+![WorkOrder connected to WorkOrderClose.](/_shared/generated/chapter-03/work-order-close.svg){width=95% fig-alt="WorkOrder has primary key WorkOrderID. WorkOrderClose has its own primary key and WorkOrderID as a foreign key. Each close belongs to exactly one work order, and a work order has zero or one close."}
+
+::: {.notes}
+Purpose: distinguish an optional later event from a missing-data conclusion. Allow about 60 seconds. A work order still in production has no close record yet. The absence can be legitimate because the later event has not occurred. A close record belongs to one work order, and the pinned example data contains at most one close per work order. Explain that observed cardinality is evidence about this extract, while enduring business rules require process knowledge and appropriate constraints. Ask what other field or document would help decide whether an absent close is expected. Transition: multiple matches require different treatment.
+:::
+
+## A junction records the association {#ch03-junction}
+
+![SalesOrder and Item connect through SalesOrderLine.](/_shared/generated/chapter-03/order-lines.svg){width=95% fig-alt="SalesOrder and Item each connect to SalesOrderLine. SalesOrderLine contains its own primary key, SalesOrderID, and ItemID. Orders have one or many lines, while items can have zero or many lines. Item is the cross-group reference."}
+
+::: {.notes}
+Purpose: explain how a many-to-many business relationship is represented. Allow 60–90 seconds. An order can contain several items, and an item can appear on several orders. SalesOrderLine records each association, including quantity and other line attributes not shown here. It converts the connection into two one-to-many relationships. The Item link crosses into Master Data and is distinguished by its label and amber line. Ask where quantity belongs: on a customer row, on the item master, or on the particular order line. Transition: a join across these relationships changes the output grain.
+:::
+
+## More joined rows can be correct {#ch03-multiplication .balanced .stepwise}
+
+A customer with several orders appears once for each matched order.
+
+Adding order lines repeats the customer and order attributes again.
+
+Count customers, orders, and lines with the identifier appropriate to the question.
+
+::: {.notes}
+Delivery: Reveal each join effect before the counting rule. Purpose: prevent double-counting without treating legitimate matches as duplicates. Allow 60–90 seconds. The selected key table already showed a repeated CustomerID across different orders. Joining to lines adds another level of repetition. A line-level revenue amount can be appropriate to sum at that grain, while an order-header total repeated on every line would be counted multiple times. Ask which column students would count distinctly for customers and for orders. Emphasize that deleting repeated customer values would also discard valid order detail. Transition: the header-and-line pattern makes this distinction explicit.
+:::
+
+## Header and line tables store different facts {#ch03-header-line .balanced .stepwise}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Header**
+
+One document, such as an invoice.
+
+Date, customer, and document total.
+:::
+::: {.column width="50%"}
+**Line**
+
+One component of that document.
+
+Item, quantity, price, and line amount.
+:::
+::::
+
+::: {.notes}
+Delivery: Explain the header before revealing the line. Purpose: place fields at the correct observational unit. Allow about 60 seconds. SalesOrder and SalesOrderLine, Shipment and ShipmentLine, and SalesInvoice and SalesInvoiceLine use this recurring structure. A document total belongs to the header and is repeated if the header is joined to several lines. Ask students where to find the quantity of one item and where to find the invoice's grand total. Neither table is universally more authoritative for every measure: the appropriate source depends on the question. Transition: the fulfillment path includes an important optional relationship.
+:::
+
+## A shipment line and an invoice line {#ch03-shipment-invoice}
+
+![The optional relationship between shipment and invoice lines.](/_shared/generated/chapter-03/shipment-invoice.svg){width=95% fig-alt="ShipmentLine and SalesInvoiceLine connect through ShipmentLineID. Both endpoints are zero or one. A shipment line may be unbilled, and a service invoice line may have no shipment line."}
+
+::: {.notes}
+Purpose: prevent students from assuming that every step of the revenue path is one-to-many and mandatory. Allow 60–90 seconds. In this dataset, a shipment line is billed on at most one invoice line. Some shipment lines have no associated invoice line, and service invoice lines have no shipment line because no goods were shipped. Read the zero-or-one symbols at both ends. A missing match therefore requires interpretation in relation to process status and document type. Ask how an inner join to shipments could affect a service-revenue population. Transition: settlement has a different pattern involving multiple invoices and receipts.
+:::
+
+## Receipts and invoices meet in applications {#ch03-applications}
+
+![CashReceipt and SalesInvoice connect through CashReceiptApplication.](/_shared/generated/chapter-03/cash-applications.svg){width=95% fig-alt="CashReceipt and SalesInvoice each connect to CashReceiptApplication. An application identifies a receipt and an invoice and records the amount applied. The diagram shows computed cardinality for each logical relationship."}
+
+::: {.notes}
+Purpose: identify a second junction table with an accounting interpretation. Allow 60–90 seconds. One receipt can settle several invoices, and an invoice can be settled by several receipts. Each application records a particular association and its amount. The amount applied to one invoice is not necessarily the receipt's full amount. Explain that this is why a direct one-receipt-to-one-invoice assumption would lose information. Ask where to look for a partial payment applied to an invoice. Transition: practice reading the complete book diagram using these focused views as a guide.
+:::
+
+## Tutorial 3.1: read a path aloud {#ch03-er-activity .balanced}
+
+Find the table, its primary key, and the relevant foreign key.
+
+Read both endpoints and state what one row represents.
+
+Trace order lines through fulfillment, billing, and settlement.
+
+[Open Tutorial 3.1 and the full O2C diagram](https://aa.accountinganalyticshub.com/chapters/03-accounting-data-environment/chapter.html#guided-tutorial-3.1-reading-the-charles-river-o2c-entity-relationship-diagram)
+
+::: {.notes}
+Purpose: let students use the diagram independently. Allow two to three minutes or pause the recording. Ask pairs to begin with SalesOrderLine, identify SalesOrderID and ItemID, and explain the two destinations. Then follow the shipment and billing path. The full table contains additional fields omitted from the focused core diagram, so two shown foreign keys does not mean only two exist in the complete table. Public checkpoint responses identify SalesOrderLine and CashReceiptApplication as junctions and Customer to SalesOrder as one to zero or many. Transition: place the same patterns within the wider accounting environment.
+:::
+
+# Connect business activity to accounting records {#ch03-module-accounting}
+
+::: {.notes}
+Move from individual relationships to the role of table groups. The groups organize the documentation by business function. They are not separately enforced schemas inside the SQLite file.
+:::
+
+## Table groups organize the map {#ch03-groups .balanced .step-rows}
+
+| Group | Main role | Example |
+|---|---|---|
+| Master Data | Shared reference information | Item |
+| Order-to-Cash | Sales, fulfillment, and settlement | SalesInvoice |
+| Manufacturing | Production and cost events | WorkOrder |
+| Accounting Core | Accounts and posted debits/credits | GLEntry |
+
+::: {.notes}
+Delivery: Reveal one business role at a time. Purpose: organize a complex schema without memorizing every table. Allow about 60 seconds. These are selected groups from the larger Charles River environment. A group is a documentation convention, while the SQLite file stores the tables themselves. Different group sizes reflect different process complexity. A small group such as Accounting Core can be central to the analysis even though it has fewer tables than Order-to-Cash. Ask students which group supplies an item's classification and which contains the actual financial posting. Transition: see how the chart of accounts classifies ledger rows.
+:::
+
+## Account classifies each ledger posting {#ch03-account-ledger}
+
+![Account and GLEntry connected through AccountID.](/_shared/generated/chapter-03/account-ledger.svg){width=95% fig-alt="Account contains AccountID and AccountNumber. GLEntry references AccountID. Every posting maps to one account, while an account may have zero or many postings."}
+
+::: {.notes}
+Purpose: translate posting to a T-account into a relational match. Allow about 60 seconds. GLEntry stores AccountID, which is the Account table's surrogate key. AccountNumber and AccountName are retrieved from the matching Account row. Summing the appropriate debit and credit postings by account supports balances for the stated date and scope. Some summary accounts have no postings. Ask why joining to AccountNumber by assuming it equals AccountID would be wrong. The two fields serve different roles even when both are numeric. Transition: Account also contains relationships within its own table.
+:::
+
+## A hierarchy can stay within one table {#ch03-self-reference .balanced .stepwise}
+
+**Account.ParentAccountID** refers to another row's **AccountID**.
+
+Detail accounts can roll up through intermediate groups to a major category.
+
+**Employee.ManagerID** uses the same self-reference pattern.
+
+::: {.notes}
+Delivery: Reveal the account relationship, its use, and the second example. Purpose: explain a self-reference without adding another entity type. Allow about 60 seconds. Both parent and child accounts live in Account. The parent reference stores the parent's key rather than its printed account number. Charles River's Header subtype marks summary accounts that receive no postings themselves. The relationship helps represent financial statement groupings, but a reporting calculation must avoid adding both detail balances and their already summarized totals. Ask whether a top-level account must have a parent. An optional top level is expected. Transition: other keys connect different table groups.
+:::
+
+## Bridge keys have specific roles {#ch03-bridges .balanced .step-rows}
+
+| Shared entity | Example reference | What it connects |
+|---|---|---|
+| Item | SalesOrderLine.ItemID | Sold products to Master Data |
+| Employee | SalesOrder.SalesRepEmployeeID | Orders to the sales representative |
+| Account | Item.RevenueAccountID | Products to revenue classification |
+
+::: {.notes}
+Delivery: Reveal one bridge at a time. Purpose: avoid matching columns merely because their names look similar. Allow 60–90 seconds. A role-specific foreign-key name identifies how the referenced entity participates in the event. CreatedByEmployeeID and ApprovedByEmployeeID, for example, can both point to Employee while representing different responsibilities. Item's InventoryAccountID, RevenueAccountID, and COGSAccountID similarly point to Account for different posting roles. Ask why joining a sales representative field to an account table would be invalid even if some numeric values happened to match. Transition: manufacturing uses one Item table in several roles too.
+:::
+
+## Manufacturing separates plan and execution {#ch03-manufacturing .balanced .stepwise}
+
+**Bill of material:** the product and components expected in production.
+
+**Work order and operating records:** what was issued, performed, and completed.
+
+**WorkOrderClose:** the closing event and variance postings.
+
+::: {.notes}
+Delivery: Reveal the planned structure before execution and close. Purpose: connect database design to managerial accounting. Allow 60–90 seconds. ParentItemID identifies the finished item, while ComponentItemID identifies an input. Both reference Item in different roles. Material issues, operations, and production completions record different events rather than interchangeable measures of production cost. The close resolves the relevant standard-versus-actual differences under the dataset's design. Demand planning and MRP are a separate group. Ask which records would be needed to compare the recipe with actual component use. Transition: these business events reach the ledger through source-document references.
+:::
+
+## Three fields support the source trace {#ch03-source-fields .balanced .step-rows}
+
+| GLEntry field | Role |
+|---|---|
+| SourceDocumentType | Identifies the source kind |
+| SourceDocumentID | Identifies the document within that kind |
+| SourceLineID | Identifies a source line when applicable |
+
+::: {.notes}
+Delivery: Reveal the type, document identifier, and optional line identifier. Purpose: explain why all three must be interpreted together. Allow about 60 seconds. A source identifier by itself is ambiguous because different tables can reuse the same integer keys. SourceDocumentType determines how to interpret SourceDocumentID. SourceLineID appears where a posting originates from a specific line, rather than necessarily on every posting for the document. Ask why filtering only a document number could mix unrelated business events. Transition: this design differs from one declared foreign key pointing to one table.
+:::
+
+## The source trace is a logical reference {#ch03-polymorphic .balanced .stepwise}
+
+SalesInvoice, Shipment, and JournalEntry postings use different source tables.
+
+The same SourceDocumentID column therefore has different destinations.
+
+PayrollSummary identifies a period/cost-center summary rather than a row in a source table.
+
+::: {.notes}
+Delivery: Reveal the examples before the exception. Purpose: distinguish the source trace from an ordinary one-table foreign key. Allow 60–90 seconds. SourceDocumentType selects the relevant interpretation. PayrollSummary is an explicit exception to the convenient statement that the type always names a table: its identifier is a code for a summary. The book draws the trace as a dashed amber link and ordinary logical relationships as solid links. Both should be verified, but the source trace needs type-specific rules. Ask what additional information is needed before looking up a SourceDocumentID. Transition: test the actual existence of the expected source.
+:::
+
+## Test a trace before relying on it {#ch03-trace-test .balanced .stepwise}
+
+Select one SourceDocumentType and interpret its identifier rule.
+
+Match the expected source and, where relevant, the source line.
+
+Investigate missing references and compare amounts at a compatible scope.
+
+::: {.notes}
+Delivery: Reveal the test sequence. Purpose: connect the schema to data-quality work. Allow about 60 seconds. The chapter describes source references that do not resolve, so a line in the diagram is not proof that every row has support. A valid reference also does not prove the amount is correct. The accountant must compare the appropriate source component and posting group. Keep any exceptions visible and document the population tested. Ask how a line-level revenue posting differs from an invoice-level receivable posting. Transition: follow the public Tutorial 3.2 sale to see these distinctions in a concrete sequence.
+:::
+
+# Trace one sale across the environment {#ch03-module-sale}
+
+::: {.notes}
+Introduce the complete public Tutorial 3.2 example. This extends the single revenue posting shown in Chapter 1. The selected sale has operational, invoice, shipment, receipt, and application events with different accounting effects.
+:::
+
+## Tutorial 3.2: start from the invoice {#ch03-invoice .balanced}
+
+Invoice **{{< var slide.chapter03.invoice_number >}}**, dated **{{< var slide.chapter03.invoice_date >}}**
+
+The invoice total includes more than the item revenue.
+
+{{< include /_shared/generated/chapter-03/_invoice-parts.qmd >}}
+
+::: {.notes}
+Purpose: establish the source document and the measure to reconcile. Allow 60–90 seconds. Filter InvoiceNumber in the SalesInvoice worksheet of the working copy. Its key is {{< var slide.chapter03.invoice_id >}}. The table separates subtotal, freight, tax, and grand total using values derived from the dataset. Chapter 1 showed one revenue posting, which corresponded to the invoice line rather than the entire receivable. Ask which amount should agree to the receivable debit. It is the grand total. Transition: inspect the line and its references before looking up the ledger postings.
+:::
+
+## The invoice line supplies the next keys {#ch03-line .balanced .stepwise}
+
+**SalesInvoiceLineID {{< var slide.chapter03.line_id >}}**
+
+{{< var slide.chapter03.quantity >}} units × {{< var slide.chapter03.unit_price >}} = **{{< var slide.chapter03.line_total >}}**
+
+References: SalesOrderLineID **{{< var slide.chapter03.order_line_id >}}**, ShipmentLineID **{{< var slide.chapter03.shipment_line_id >}}**, ItemID **{{< var slide.chapter03.item_id >}}**.
+
+::: {.notes}
+Delivery: Reveal the line, its calculation, and then its references. Purpose: show how one row provides both a measure and navigation fields. Allow 60–90 seconds. Filter SalesInvoiceLine by the invoice key. The quantity and unit price reproduce the displayed line amount. The order-line and shipment-line references stay within Order-to-Cash, while ItemID crosses to Master Data. This is the same public line used in Chapter 1, now read in its wider context. Ask which key leads to the item description and which leads to the fulfillment event. Transition: follow the operating path using those keys.
+:::
+
+## Follow the order and shipment {#ch03-operating-path .balanced .stepwise}
+
+**Order {{< var slide.chapter03.order_id >}}:** {{< var slide.chapter03.order_number >}}, placed {{< var slide.chapter03.order_date >}}.
+
+**Shipment {{< var slide.chapter03.shipment_id >}}:** {{< var slide.chapter03.shipment_number >}}, shipped {{< var slide.chapter03.shipment_date >}}.
+
+This invoice covers part of an order fulfilled and invoiced in several parts.
+
+::: {.notes}
+Delivery: Reveal the order and shipment before discussing the partial fulfillment. Purpose: keep the economic event and document grain distinct. Allow about 60 seconds. Use the line keys from the preceding slide to reach the header rows. The order predates the shipment and invoice. Its full quantity is larger than the quantity billed on this selected invoice, so one invoice must not be treated as the entire order. Ask why aggregating an order total across its shipments would repeat the total. The appropriate quantity depends on whether the question concerns ordered, shipped, or invoiced units. Transition: use the customer and item keys for descriptive context.
+:::
+
+## Retrieve the customer and product context {#ch03-master-context .balanced .stepwise}
+
+**Customer {{< var slide.chapter03.customer_id >}}:** {{< var slide.chapter03.customer_name >}}.
+
+**Item {{< var slide.chapter03.item_id >}}:** {{< var slide.chapter03.item_name >}}, code {{< var slide.chapter03.item_code >}}.
+
+The item belongs to Furniture and carries its accounting mappings.
+
+::: {.notes}
+Delivery: Reveal the customer, the product, and then the posting implication. Purpose: connect business descriptions to keys. Allow about 60 seconds. Customer and Item attributes are retrieved from their master rows rather than inferred from positions in a worksheet. The item code and item name describe the same selected row. The item also stores references to its inventory, revenue, and cost-of-goods-sold accounts, which determine classifications in this example. Ask whether ItemID and an item's revenue AccountID identify the same kind of entity. They do not. Transition: use the invoice type and document key to select the complete posting group.
+:::
+
+## Reconcile the invoice's postings {#ch03-invoice-ledger .balanced}
+
+Filter GLEntry: **SalesInvoice** and SourceDocumentID **{{< var slide.chapter03.invoice_id >}}**.
+
+{{< include /_shared/generated/chapter-03/_invoice-postings.qmd >}}
+
+::: {.notes}
+Purpose: extend Chapter 1's single credit into the invoice's complete posting group. Allow 60–90 seconds. The four rows include a receivable debit and separate credits for item revenue, freight revenue, and sales tax payable. The debit and total credits each equal {{< var slide.chapter03.invoice_total >}}. Only the item revenue posting has the selected source line identifier. The other components originate at invoice level. Ask students to reconcile the table to the invoice component table without treating tax payable as revenue. All values are generated by the same public sale-trace function used in Figure 3.10. Transition: distinguish the ledger's account key from the printed account number.
+:::
+
+## Translate AccountID through Account {#ch03-account-lookup .balanced .stepwise}
+
+GLEntry holds **AccountID**.
+
+Match it to **Account.AccountID** to retrieve AccountNumber, AccountName, and AccountType.
+
+Compare the item's RevenueAccountID with the revenue posting's AccountID.
+
+::: {.notes}
+Delivery: Reveal the stored key, the lookup, and the comparison. Purpose: make the accounting classification trace explicit. Allow about 60 seconds. The previous table displays account numbers and names for readability, but those labels come from a join to Account. They are not the raw AccountID values stored in GLEntry. The public tutorial verifies that the selected item's revenue mapping matches the furniture revenue posting. Ask students to explain what could go wrong if they matched AccountID directly to AccountNumber. It could produce missing or incorrect matches even when both columns are numeric. Transition: the shipment produced a separate set of accounting effects.
+:::
+
+## Shipment postings record inventory cost {#ch03-shipment-ledger .balanced}
+
+Selected shipment line: **{{< var slide.chapter03.shipment_line_id >}}**
+
+{{< var slide.chapter03.quantity >}} units × standard cost {{< var slide.chapter03.standard_cost >}} = **{{< var slide.chapter03.extended_cost >}}**.
+
+{{< include /_shared/generated/chapter-03/_shipment-postings.qmd >}}
+
+::: {.notes}
+Purpose: distinguish invoice revenue from the inventory-cost posting event. Allow 60–90 seconds. Select SourceDocumentType Shipment, the shipment identifier, and the line identifier. These selected line postings debit cost of goods sold and credit finished-goods inventory at standard cost. The shipment has other postings for freight, so this slide is explicitly a selected line view rather than the complete shipment journal. Ask why matching the invoice's revenue amount to the shipment's inventory credit would not be a like-for-like reconciliation. The documents record different measures and roles in the sale. Transition: trace the invoice's settlement through the application table.
+:::
+
+## The application settles this invoice {#ch03-payment .balanced .stepwise}
+
+Application **{{< var slide.chapter03.application_id >}}** applies **{{< var slide.chapter03.applied_amount >}}** on **{{< var slide.chapter03.application_date >}}**.
+
+Receipt **{{< var slide.chapter03.receipt_number >}}** totals **{{< var slide.chapter03.receipt_amount >}}**.
+
+That receipt settles **{{< var slide.chapter03.receipt_invoices >}} invoices**. Its full amount is not this invoice's payment allocation.
+
+::: {.notes}
+Delivery: Reveal the application first, then the receipt, and finally the multiple-invoice context. Purpose: make the junction amount distinct from the receipt amount. Allow 60–90 seconds. Filter CashReceiptApplication for the invoice key. The application points to receipt {{< var slide.chapter03.receipt_id >}}. When students inspect all applications for that receipt, they see why one direct receipt-to-invoice field would be insufficient. Ask which amount should reduce the receivable for this invoice. It is the amount applied here, not the full receipt. The figures come from the public tutorial trace. Transition: the receipt and its application also have different ledger effects.
+:::
+
+## Receipt and application are separate events {#ch03-cash-postings .balanced .stepwise}
+
+**Cash receipt:** debit Cash and credit Customer Deposits and Unapplied Cash.
+
+**Application:** debit the unapplied-cash account and credit Accounts Receivable.
+
+Trace each event with its own SourceDocumentType and SourceDocumentID.
+
+::: {.notes}
+Delivery: Reveal the receipt event, the application event, and then the tracing rule. Purpose: explain the dataset's settlement accounting. Allow 60–90 seconds. The receipt records cash received before its allocation to particular invoices. Applications move amounts from the unapplied balance to settle receivables. This is the Charles River design taught in Tutorial 3.2, not a claim that every ERP uses identical posting stages. Ask why looking only for a CashReceipt posting to Accounts Receivable would miss the intended path here. Other sale-related events, including commissions, can also produce postings outside the selected walkthrough. Transition: ask students to explain the path independently.
+:::
+
+## Tutorial checkpoint {#ch03-trace-checkpoint .balanced}
+
+- Reconcile the invoice total to its posting group.
+- Explain which references are ordinary logical keys and which use the source trace.
+- Distinguish ordered, shipped, invoiced, received, and applied amounts.
+
+[Open Tutorial 3.2](https://aa.accountinganalyticshub.com/chapters/03-accounting-data-environment/chapter.html#guided-tutorial-3.2-tracing-a-sale-from-sales-order-to-general-ledger)
+
+::: {.notes}
+Purpose: test understanding of the path rather than recall of individual identifiers. Allow two to three minutes or pause the recording. Ask students to show the matching fields in their working copy and narrate the invoice-to-ledger reconciliation. A useful explanation distinguishes the invoice's complete posting group from the selected shipment-line pair. It also explains why the receipt amount and the invoice allocation differ. The public tutorial supplies this worked example, while assigned exercises remain independent. Invite a student to identify one point where the wrong grain would cause double-counting. Transition: consolidate a general navigation method.
+:::
+
+## Before every join or lookup {#ch03-join-checklist .balanced .stepwise}
+
+State what a row means in each source.
+
+Identify the matching keys and test whether references resolve.
+
+Read expected matches and optionality at both ends.
+
+Choose the population and measure before aggregating.
+
+::: {.notes}
+Delivery: Reveal the checks in the order students should perform them. Purpose: convert the chapter into a reusable analytical habit. Allow about 60 seconds. These checks apply whether the tool is Excel, SQL, or Power BI. A syntactically successful match can still answer the wrong question if the grain or population is misunderstood. Ask students which check would catch repeated header totals and which would reveal customers omitted because they have no orders. Emphasize that cardinality checks and reconciliation totals should be revisited after data changes. Transition: link these habits to the chapter objectives and the next part of the book.
+:::
+
+## Chapter summary {#ch03-summary .balanced .stepwise}
+
+Keys connect rows with defined business roles.
+
+Cardinality and optionality determine how matching changes the result.
+
+Bridge keys connect groups. The source trace connects postings to originating events.
+
+The correct grain keeps accounting measures meaningful.
+
+::: {.notes}
+Delivery: Reveal one objective-level conclusion at a time. Purpose: finish with the concepts students will reuse in later tools. Allow about 60 seconds. The class has moved from individual rows to relationships and then to a complete public sale trace. Ask a student to explain why the same customer can appear many times in a correct result. Ask another to distinguish SourceDocumentID from an ordinary one-table foreign key. Neither explanation requires SQL syntax yet. The aim is to understand the data before asking a tool to combine it. Transition: independent practice applies this map without supplying assessment answers.
+:::
+
+## Practice and the next part {#ch03-next .balanced}
+
+For assigned work, draw the relevant path and label each table's row grain.
+
+Document key matches, optional relationships, and the measures to reconcile.
+
+Part II uses these structures when importing and analyzing data in Excel.
+
+[Chapter 3 questions and exercises](https://aa.accountinganalyticshub.com/chapters/03-accounting-data-environment/chapter.html#multiple-choice-questions)
+
+::: {.notes}
+Purpose: transition to assessment and subsequent chapters without disclosing solutions. Allow about 45 seconds. Specify the assigned tasks and required evidence for the course. The Part I comprehensive case can use these skills, but this deck does not give its solution. Encourage students to annotate the selected part of the schema rather than reproduce every table. The book remains the source for complete diagrams and instructions. In the recording, state the next activity and end this teaching segment. Transition: provide the conceptual reference and attribution before closing.
+:::
+
+## References and further reading {#ch03-references .balanced}
+
+Codd (1970): the relational model.
+
+Charles River schema figures and public Tutorials 3.1–3.2 supply the worked examples.
+
+[Full Chapter 3 references](https://aa.accountinganalyticshub.com/chapters/03-accounting-data-environment/chapter.html#references)
+
+::: {.notes}
+Purpose: identify the conceptual and practical sources. Allow about 45 seconds. Codd's paper provides the foundational relational-model reference. The schema notation, selected rows, and sale walkthrough are adapted from the book's public Chapter 3 material. The focused diagrams intentionally omit fields and relationships unrelated to the teaching purpose, so consult the complete chapter when planning a wider analysis. Ask students to retain the full schema alongside their working notes. The formal reference follows.
+
+{{< include /_shared/fragments/_reference-codd-1970.qmd >}}
+:::
+
+## Attribution and reuse {#ch03-credits .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 3 teaching adaptation with focused schema views and public narration.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Charles River dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: close with the source and reuse conditions. Allow about 45 seconds. These teaching slides adapt Chapter 3, including its public worked tutorial. Charles River is fictional educational data. The focused diagram endpoints and numerical exhibits are generated from shared public calculation functions. Full diagram and code sources are available in the reviewed source bundle. Notes are public and travel with both output formats. Retain attribution and identify modifications when adapting the deck under the stated license, while respecting any separately credited material's terms. End the recording here or move to the assigned activity.
+:::

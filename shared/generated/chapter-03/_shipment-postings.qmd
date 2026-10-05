@@ -1,0 +1,4 @@
+| Account | Debit | Credit |
+| --- | --- | --- |
+| 5010 COGS - Furniture | $459.32 | — |
+| 1040 Inventory - Finished Goods | — | $459.32 |

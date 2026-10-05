@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will turn the model of Chapter 13 into a star schema. You will merge the invoice header's date, number, and customer into the invoice lines, add a date table, connect the dimensions directly to the lines, and point the report's visuals at the date table. Then you will stop loading the invoice header and confirm on the Validation page that no total has changed. Restructuring a model is a common task, and the order of the steps matters: each visual must stop using a table before the table leaves the model.
 
-**Prerequisites.** You need Charles River Reports.pbix from the tutorials of Chapter 13, with its Sales and Discounts, Validation, and Review pages.
+**Prerequisites.** You need Charles River Reports.pbix from the tutorials of Chapter 13, with its Sales and Discounts, Validation, and Review pages. If you start here, download Charles River Reports as it stands at the end of Chapter 13 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 

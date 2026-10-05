@@ -1,0 +1,386 @@
+---
+title: "SQL Essentials for Accounting Analytics"
+subtitle: "Chapter 9"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-09.pptx
+---
+
+## Learning objectives {#ch09-01 .balanced .stepwise}
+
+- Read a table and write a SELECT query.
+- Calculate, filter, and test missing values.
+- Rank results and interpret the selected population.
+- Save a documented, repeatable script.
+
+::: {.notes}
+Purpose: introduce SQL as a way to make an accounting extraction explicit. Allow 60 seconds. Students already understand rows, keys, and reconciliation. Connect those ideas to a query that a colleague can inspect and run again. The lesson uses a new manufacturing question, so it does not require the Furniture Analysis workbook. Ask what a reviewer needs besides the exported rows. Transition: define the controller's question.
+:::
+
+# Locate the manufacturing variance {#ch09-module-2}
+
+::: {.notes}
+Introduce the business question and the minimum standard-cost background needed to interpret the postings.
+:::
+
+## The controller asks why manufacturing variance grew {#ch09-03 .balanced .stepwise}
+
+Did production become less efficient?
+
+Do the standards still describe the work?
+
+Start with the work orders, their closes, and the ledger.
+
+::: {.notes}
+Purpose: motivate the query work. Allow 60-90 seconds. The opening scenario contrasts a growing manufacturing variance with much smaller sales growth. The database holds production and payroll detail that the earlier workbook did not import. Treat efficiency and outdated standards as hypotheses, not as findings. Ask which records could distinguish them. Transition: explain what the variance measures.
+:::
+
+## Standard cost and the close {#ch09-04 .balanced .stepwise}
+
+Production completions move standard cost into finished goods.
+
+A work-order close transfers actual cost less standard cost to variance.
+
+Material and conversion are separate parts.
+
+::: {.notes}
+Purpose: refresh only the accounting needed for the analysis. Allow 90 seconds. Material costs pass through work in process, while manufacturing payroll and factory overhead enter account 1090 Manufacturing Cost Clearing. Completions release standard costs. The close transfers the remainder to account 5080 Manufacturing Variance. Conversion is split into direct labor and overhead in the close record. Ask why a larger unfavorable variance lowers gross margin in this dataset. Transition: preserve the source before querying.
+:::
+
+## Work in a database copy {#ch09-05 .balanced .stepwise}
+
+Copy the download to **CharlesRiver_Work.sqlite**.
+
+Open that copy in **DB Browser for SQLite**.
+
+Check the full path before running a query.
+
+::: {.notes}
+Purpose: establish the working file. Allow two minutes for setup. The downloaded database remains the pinned source. DB Browser can change data as well as read it, so confirm the title-bar path and use the copy. SELECT queries return results without saving data changes. Write Changes should remain unavailable during these read-only activities. Ask students to distinguish the database file from the SQL script they will save. Transition: inspect the structure.
+:::
+
+## Structure, query, result {#ch09-06 .balanced .stepwise}
+
+**Database Structure:** table and column names.
+
+**Execute SQL:** selected statement and result grid.
+
+**Message pane:** errors and returned row count.
+
+::: {.notes}
+Purpose: orient students without requiring a dense software screenshot. Allow about 60 seconds, or demonstrate the three areas live. Names in the structure are the evidence for names in the query; typing a plausible name is not enough. Select a complete statement before running it, especially when a script has several statements. The message pane confirms execution, not accounting correctness. Ask where to find a missing-column diagnosis. Transition: choose result columns.
+:::
+
+## SELECT names the result {#ch09-07 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-account_columns.qmd >}}
+
+::: {.notes}
+Purpose: read the first complete query aloud. Allow 60-90 seconds. SELECT lists five columns; FROM identifies Account; the semicolon terminates the statement. Commas separate columns and the list need not follow storage order. SELECT star is useful for an initial inspection, while explicit names make a saved extract easier to review. Ask students which part changes if the result needs only the account number and name. Transition: inspect the manufacturing accounts.
+:::
+
+## An identifier is not an account number {#ch09-08 .balanced}
+
+{{< include /_shared/generated/chapter-09/_accounts.qmd >}}
+
+::: {.notes}
+Purpose: prevent a plausible but wrong ledger filter. Allow 60 seconds. AccountID is the database key and AccountNumber is the accounting label. The result maps the two manufacturing accounts. GLEntry stores the identifier, so filtering it with the displayed account number is incorrect. Ask students to point to the value that belongs in an AccountID condition for variance. Transition: calculate a row-level control.
+:::
+
+# Calculate and check the rows {#ch09-module-9}
+
+::: {.notes}
+A computed result can test a relationship in every row, not only produce a report column.
+:::
+
+## A calculated column can be a control {#ch09-10 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-variance_check.qmd >}}
+
+::: {.notes}
+Purpose: connect arithmetic with a reviewable expectation. Allow 90 seconds. Each row should have material plus conversion equal to total variance. ROUND removes fractional-cent noise from the comparison; the alias names its meaning. These are components of one close, not amounts summed across unrelated rows. Ask what a nonzero difference would require before continuing. Transition: inspect a small sample, then test the population.
+:::
+
+## The first rows are a sample {#ch09-11 .balanced}
+
+{{< include /_shared/generated/chapter-09/_checks.qmd >}}
+
+::: {.notes}
+Purpose: distinguish inspection from a population check. Allow 60 seconds. The displayed rows are the first three returned by the public query, including a favorable close. Zero differences here support understanding the calculation but do not prove all rows pass. There is no ORDER BY in this inspection query, so its row order is not a contractual sort order. Ask how to find any failing row without scrolling. Transition: use a WHERE condition.
+:::
+
+## Arithmetic needs the right types {#ch09-12 .balanced .stepwise}
+
+Integer operands can produce integer division.
+
+Use a decimal operand for a fractional ratio.
+
+Preserve the sign when interpreting a variance.
+
+::: {.notes}
+Purpose: prevent silent calculation errors. Allow 60 seconds. In SQLite, dividing two integers truncates the fractional part. A decimal such as 1.0 makes a ratio calculation use non-integer arithmetic. ROUND controls displayed precision after the calculation; it cannot restore a fraction already lost. ABS is useful for magnitude screening but discards favorable or unfavorable direction. Ask why 2 divided by 3 might surprise a spreadsheet user. Transition: review common scalar functions.
+:::
+
+## Functions transform each row {#ch09-13 .balanced .step-rows}
+
+| Function | Purpose |
+|---|---|
+| ROUND | Set numeric precision |
+| ABS | Measure magnitude |
+| SUBSTR | Extract characters |
+| CAST | Convert a type |
+| TRIM / UPPER | Standardize text |
+
+::: {.notes}
+Purpose: distinguish scalar transformations from the aggregate functions of the next chapter. Allow 60-90 seconds. These functions produce a value for each retained row. A transformation needs a documented assumption: a substring position assumes a code pattern, and text cleanup does not prove that two values identify the same entity. Ask which function exposes a release year embedded in a work-order number and what should be checked first. Transition: apply a population filter.
+:::
+
+## WHERE defines the retained population {#ch09-14 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-accounts_by_number.qmd >}}
+
+::: {.notes}
+Purpose: read a complete filter using IN. Allow 60 seconds. The two account numbers are tested in Account, whose structure provides their type and meaning. WHERE keeps rows for which the condition is true. The selected columns still determine the result shape. Ask students to predict the row count before running the query and compare it with the result. Transition: make compound conditions explicit.
+:::
+
+## AND and OR need an explicit grouping {#ch09-15 .balanced .sql-example .stepwise}
+
+```sql
+WHERE FiscalYear = 2026
+  AND (AccountID = 92 OR AccountID = 93)
+```
+
+Both account choices belong inside the year filter.
+
+::: {.notes}
+Purpose: make the intended population visible. Allow 60-90 seconds. This is a teaching condition for GLEntry. AND takes precedence over OR, so removing the parentheses can admit the second account from other years. Ask students to name a row that the unparenthesized condition would incorrectly include. Parentheses help the reviewer even when precedence is familiar. Transition: distinguish range and pattern filters.
+:::
+
+## Range, membership, and pattern {#ch09-16 .balanced .stepwise}
+
+**BETWEEN:** includes both endpoints.
+
+**IN:** one of a stated set of values.
+
+**LIKE:** a text pattern, with `%` for any sequence.
+
+::: {.notes}
+Purpose: choose a predicate that matches the question. Allow 60 seconds. BETWEEN suits a range with known inclusive endpoints. A text date range works only with a consistent sortable representation. IN names discrete categories. LIKE can identify a voucher prefix, but the prefix is evidence to inspect rather than a universal business rule. Ask why a year-end date containing a time needs more care. Transition: handle timestamps explicitly.
+:::
+
+## A timestamp range ends before the next day {#ch09-17 .balanced .sql-example .stepwise}
+
+```sql
+WHERE CreatedDate >= '2026-12-31'
+  AND CreatedDate <  '2027-01-01'
+```
+
+The upper bound is exclusive.
+
+::: {.notes}
+Purpose: preserve the full final day. Allow 60 seconds. This illustrative condition assumes consistently stored ISO-style date and time text. A comparison with less than or equal to the date-only string can omit times later that day. A half-open interval avoids guessing a last second. Ask how to adapt the same pattern to a month. Transition: inspect source categories before selecting one.
+:::
+
+## DISTINCT reveals the recorded categories {#ch09-18 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-source_types.qmd >}}
+
+::: {.notes}
+Purpose: learn valid categories from the data. Allow 60 seconds. This query finds the distinct source-document types on the variance account in fiscal 2026. It does not count how many rows use each type. The public result includes WorkOrderClose and JournalEntry. Ask why selecting every account posting could net away the operating variance. Transition: separate activity from the year-end close.
+:::
+
+## The closing entry is a separate event {#ch09-19 .balanced .stepwise}
+
+Work-order closes record the manufacturing variance.
+
+The year-end journal clears the income-statement account.
+
+Use the appropriate source population for the analysis.
+
+::: {.notes}
+Purpose: keep account clearing from masking operating activity. Allow 60-90 seconds. Tutorial 9.2 identifies JE-2026-000296 as the single journal on this account in the year. Inspect its description and direction before excluding it. For the operating variance, retain WorkOrderClose postings. This is a dataset-specific population decision, not a blanket instruction to omit all journals from all accounting analyses. Ask how a net account balance after closing could mislead. Transition: test missing values.
+:::
+
+# Test missing values and logical errors {#ch09-module-20}
+
+::: {.notes}
+Successful execution does not establish that a query asked the intended question.
+:::
+
+## NULL requires its own test {#ch09-21 .balanced .sql-example .stepwise}
+
+```sql
+WHERE ClosedDate IS NULL
+```
+
+`ClosedDate = NULL` does not test missingness.
+
+An empty string and a zero are different values.
+
+::: {.notes}
+Purpose: explain three-valued logic through a concrete filter. Allow 60 seconds. An equality comparison with NULL yields unknown rather than true, so WHERE does not retain it. IS NULL asks whether a value is absent. A missing close date can be meaningful for open work, while a missing required key could be an exception. Ask students to predict the results of the two predicates before running them. Transition: present missing values without erasing their meaning.
+:::
+
+## COALESCE supplies a stated fallback {#ch09-22 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-open_work_orders.qmd >}}
+
+::: {.notes}
+Purpose: read a query that retains missingness as an interpretable label. Allow 90 seconds. COALESCE displays not completed when CompletedDate is NULL; it does not write that text back to the database. SUBSTR extracts the embedded release year and CAST makes it numeric. The WHERE condition still tests ClosedDate, a different field. Ask why completion and closing should not be treated as the same event. Transition: compare like types.
+:::
+
+## Text years and numeric years differ {#ch09-23 .balanced .sql-example .stepwise}
+
+```sql
+SUBSTR(WorkOrderNumber, 4, 4) = '2026'
+CAST(SUBSTR(WorkOrderNumber, 4, 4) AS INTEGER) = 2026
+```
+
+Choose a consistent type for the comparison.
+
+::: {.notes}
+Purpose: explain a query that runs yet returns an unexpected empty result. Allow 60-90 seconds. SUBSTR returns text. SQLite can apply a column's affinity in a comparison, but an expression such as SUBSTR does not inherit that column affinity. Comparing its text result directly with a numeric literal can fail. The two shown alternatives make the intended type explicit. Ask students to inspect a calculated column before using it as a condition. Transition: test all variance components.
+:::
+
+## Filter for failed reconciliations {#ch09-24 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-check_failures.qmd >}}
+
+::: {.notes}
+Purpose: replace visual scanning with a complete predicate. Allow 60 seconds. The query returns any close whose rounded component difference is nonzero. In the pinned public data it returns no rows. That supports this arithmetic relation across the selected population; it does not establish that each underlying cost was authorized or correctly measured. Ask students to state exactly what passed. Transition: consolidate the first two tutorials.
+:::
+
+## Tutorials 9.1 and 9.2: verify the extraction {#ch09-25 .balanced .stepwise}
+
+Confirm the account mapping and source types.
+
+Test the component difference across {{< var slide.chapter09.closes >}} closes.
+
+Explain the NULL and type-comparison results.
+
+[Open Tutorial 9.2](https://aa.accountinganalyticshub.com/chapters/09-sql-essentials/chapter.html#guided-tutorial-9.2-filtering-the-ledger-to-the-variance-postings)
+
+::: {.notes}
+Purpose: turn the examples into a reproducible checkpoint. Allow three minutes. Students should have the correct working-copy path, a saved header and commented queries, the deliberate spelling error corrected, and an explanation of the year-end journal exclusion. Ask each pair to exchange one filter and identify its population. A correct total with an unexplained predicate is unfinished work. Transition: rank the retained records.
+:::
+
+# Rank, interpret, and preserve the procedure {#ch09-module-26}
+
+::: {.notes}
+Ranking changes the view of a population. It does not explain the cause of a high value.
+:::
+
+## Select the variance components {#ch09-27 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-top_ten-columns.qmd >}}
+
+::: {.notes}
+Purpose: prepare the projection of the ranking query. Allow 60 seconds. This is the SELECT excerpt from Tutorial 9.3; the WHERE, ORDER BY, and LIMIT clauses follow on the next slide. The ratio describes the overhead share of each total and depends on a suitable nonzero denominator. Ask what the components reveal that one total cannot. Transition: define the year and ranking direction.
+:::
+
+## ORDER BY and LIMIT select the leaders {#ch09-28 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-top_ten-order.qmd >}}
+
+::: {.notes}
+Purpose: complete the query from the preceding slide. Allow 60-90 seconds. The date condition sets the close-year population. DESC places the largest totals first; LIMIT returns ten rows. Without ORDER BY, a limited result is not a top-ten ranking. Tied values need an additional key if a reproducible ordering among ties matters. Ask how ascending order changes the accounting interpretation. Transition: read the largest results.
+:::
+
+## Overhead dominates these largest closes {#ch09-29 .balanced}
+
+{{< include /_shared/generated/chapter-09/_largest.qmd >}}
+
+::: {.notes}
+Purpose: interpret the first three of the tutorial's ten ranked results. Allow 60 seconds. The displayed labor, overhead, and total amounts show that overhead is the largest component here. Material is omitted from this focused view but remains in the full query. This result directs the next question; it does not show the product groups or explain why the hours were incurred. Ask what a join would add. Transition: review magnitude in both directions.
+:::
+
+## A threshold can retain both signs {#ch09-30 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-09/_query-review_threshold.qmd >}}
+
+::: {.notes}
+Purpose: distinguish magnitude selection from unfavorable-only ranking. Allow 60 seconds. ABS selects values above the stated threshold in either direction, while the result keeps the signed amount. The order is ascending, so favorable values appear first. The threshold is a teaching choice to focus review, not an audit materiality determination. Ask why replacing the displayed amount with its absolute value would lose information. Transition: preserve the procedure with the result.
+:::
+
+## A script preserves the extraction logic {#ch09-31 .balanced .stepwise}
+
+Record purpose, source file, preparer, and date.
+
+Put a question or expected check above each query.
+
+Save **Chapter09.sql** beside the working copy.
+
+::: {.notes}
+Purpose: make the analysis reviewable after the session. Allow 60 seconds. Saving a result grid does not preserve the code that produced it. A header records the extraction context and checks, while comments help another reader understand the sequence. Save changes to the SQL file even though SELECT did not change the database. Ask what another person would need to reproduce today's result next month. Transition: export with context.
+:::
+
+## An exported result needs its context {#ch09-32 .balanced .stepwise}
+
+Use **Copy with Headers** or export to CSV.
+
+Retain the query, filters, extraction date, and row count.
+
+Check identifiers and numeric types after import.
+
+::: {.notes}
+Purpose: connect SQL results to downstream Excel work. Allow 60 seconds. Column headings travel with Copy with Headers, but types, dates, and identifiers can be reinterpreted by a spreadsheet. Reconcile the imported row count and control amounts. Preserve the SQL source of a manually shared file so the result is not an unexplained snapshot. Ask how leading zeros or date interpretation could affect a later match. Transition: distinguish error classes.
+:::
+
+## Execution and meaning are separate checks {#ch09-33 .balanced .stepwise}
+
+**Syntax error:** the database cannot run the statement.
+
+**Logical error:** the statement runs and asks the wrong question.
+
+Predict columns, row count, and controls before execution.
+
+::: {.notes}
+Purpose: build an error-reading habit. Allow 60-90 seconds. The missing-column message identifies one syntax problem. A missing comma can sometimes be interpreted as an alias and therefore silently change the output, while a type mismatch can return no rows. Review the result shape as well as the message pane. Ask students for one test that would detect an incorrectly broad year filter. Transition: complete the ranking activity.
+:::
+
+## Tutorial 9.3 and chapter handoff {#ch09-34 .balanced .stepwise}
+
+Compare the largest unfavorable and favorable closes.
+
+Export the ten-row result with headings.
+
+Save the script with its checks and interpretation.
+
+[Open Tutorial 9.3](https://aa.accountinganalyticshub.com/chapters/09-sql-essentials/chapter.html#guided-tutorial-9.3-ranking-the-largest-work-order-variances)
+
+::: {.notes}
+Purpose: finish the independent procedure and frame the next chapter. Allow three minutes. Students should explain why overhead deserves further investigation, without treating a top-ten sample as a population decomposition. The next task joins closes to work orders and items, then reconciles their totals to the ledger. Assigned exercises use their own questions and require their own documented queries. Transition: references and attribution.
+:::
+
+## References and further reading {#ch09-35 .balanced}
+
+Datar and Rajan (2021): standard costing.
+
+SQLite: scalar functions, types, and expressions.
+
+Public Chapter 9 tutorials: query sequence and worked results.
+
+[Full Chapter 9 references](https://aa.accountinganalyticshub.com/chapters/09-sql-essentials/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the accounting framework and SQL reference material. The examples are adapted from public Tutorials 9.1-9.3. The complete chapter references include SQLite documentation and research on SQL learning errors. Use the documented SQLite behavior rather than assuming every SQL system treats types identically.
+
+{{< include /_shared/fragments/_reference-datar-2021.qmd >}}
+:::
+
+## Attribution and reuse {#ch09-36 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 9 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

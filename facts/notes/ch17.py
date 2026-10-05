@@ -14,10 +14,8 @@ deliveries they bill, and shipment lines never invoiced, at order price less dis
 year-end that are older than the longest clearing lag of any invoiced accrual; A4 the interest each note has accrued at
 the year-end, from its schedule.
 
-One note is not registered, because its comment states a value the data do not give; its context function renders the
-corrected text, so register it once the comment is fixed:
-- r4 gives 30 of the 33 days of note 2's 1,253.99 as 1,140.00; it is 1,139.99 (1,253.99 x 30 / 33 = 1,139.991), which
-  is also what the comment's own total, 2,007.26, adds up with (867.27 + 1,139.99; 867.27 + 1,140.00 would be 2,007.27).
+The passed items P1 (the allowance) and P2 (expected returns) are estimates: r5 gives each at the d.C year-end and its
+effect on d.C income net of the same estimate at the end of d.P, which would reverse in d.C.
 """
 
 from __future__ import annotations
@@ -87,6 +85,12 @@ def month_before(day: str) -> str:
     """'2026-12-01' -> '2026-11'."""
     y, m = int(day[:4]), int(day[5:7])
     return f"{y - 1}-12" if m == 1 else f"{y}-{m - 1:02d}"
+
+
+def entry(*lines) -> list[tuple[str, str, float]]:
+    """A journal entry's lines from (account, debits less credits): ("Dr" or "Cr", account, amount), debits first, each
+    side in the order given, zero lines left out."""
+    return ([("Dr", a, xr(v)) for a, v in lines if v > 0.004] + [("Cr", a, xr(-v)) for a, v in lines if v < -0.004])
 
 
 def short_series(dates: list[str]) -> str:
@@ -745,18 +749,19 @@ def r3(d, claim):
     window = acc["window"]
     at_window = lags.count(window)
     claim(at_window > 1, "more than one accrual cleared at exactly the longest lag")
-    # the rule of "older than the last two month-ends" against the window rule
-    wrong = []
+    # the rule of "older than the last two month-ends" against the window rule: the accruals it flags inside the window,
+    # and those of them that an invoice cleared after the year-end (wrongly flagged)
+    wrong, early_open = [], []
     for y in d.years:
         for a in acc["entries"].values():
             if not (a["date"] < f"{y}-11-01" and days(a["date"], ye(y)) <= window and open_amount(a, ye(y)) > 0.004):
                 continue
+            early_open.append(a["number"])
             later = sorted((c for c in a["clear"] if c["kind"] == "invoice" and c["date"] > ye(y)), key=lambda c: c["date"])
             if later:
                 wrong.append(dict(year=y, number=a["number"], age=days(a["date"], ye(y)), cleared=later[0]["date"],
                                   invoice=later[0]["doc"]))
-    claim(len(wrong) == 1 and wrong[0]["year"] == d.P, f"the two-month-end rule wrongly flags one accrual, at the end of {d.P}")
-    w = wrong[0] if wrong else dict(number="?", age=0, cleared="?", invoice="?")
+    claim(bool(wrong) or not early_open, "with none wrongly flagged, no accrual inside the window was open at a year-end")
     comp = [composition(d, y) for y in d.years]
     claim(all(c["excess"] > 0 for c in comp), "freight not yet settled exceeds December's freight at each year-end")
     settlements = d.q("SELECT j.PostingDate, j.TotalAmount, substr(j.Description, -7) FROM JournalEntry j "
@@ -807,7 +812,7 @@ def r3(d, claim):
                 n_adj=len(adj), targets=len({a[0] for a in adj}), adj_amount=xr(sum(a[2] for a in adj)),
                 excess=[xr(r[2]) for r in excess], excess_lines=[r[1] for r in excess],
                 lag_low=lags[0], lag_high=window, median=lags[len(lags) // 2], at_window=word(at_window), window=window,
-                wrong=w, comp=comp, opening=comp[0]["opening"], settlements=len(settlements),
+                wrong=wrong, comp=comp, opening=comp[0]["opening"], settlements=len(settlements),
                 settled=xr(sum(s[1] for s in settlements)), shipped=xr(shipped),
                 n_old=last["n_old"], cleanups=len(cleanups), cleanup_entries=cleanup_entries,
                 by_year=[(y, xr(v[0]), v[1]) for y, v in sorted(by_year.items())],
@@ -821,15 +826,16 @@ def r3(d, claim):
 
 @note("ch17.r4", CHAPTER)
 def r4(d, claim):
-    """Not registered: the comment gives 30 of the 33 days of note 2's payment as 1,140.00, and the data give 1,139.99
-    (see the module's docstring). Register it with @note("ch17.r4", CHAPTER) once the comment is fixed."""
     cf, cp, cc = cutoff(d, d.F), cutoff(d, d.P), cutoff(d, d.C)
     claim(cf["n_lines"] == 0 and cp["n_lines"] == 0, f"no shipment of {d.F} or {d.P} was left unbilled")
     claim(cc["n"] == 0, f"no invoice for {d.C} deliveries was posted later")
     claim(all(int(i["posted"][:4]) == i["year"] + 1 for i in late(d)), "each late invoice is posted in the year after the delivery")
-    claim(all(abs(i["freight"]) < 0.005 for i in late(d)), "these invoices carry no freight")
-    dated = [i["number"] for i in cp["invoices"] if i["date"][:4] == str(d.P)]
-    claim(len(dated) == 1, f"one invoice for {d.P} deliveries posted in {d.C} is dated in {d.P}")
+    # freight billed on the late invoices (left out of the SubTotal measure; trivial if any)
+    freight = [i for i in late(d) if abs(i["freight"]) >= 0.005]
+    late_freight = xr(sum(i["freight"] for i in freight))
+    claim(abs(late_freight) < TRIVIAL * materiality(d, d.C), "the freight on the late invoices is clearly trivial")
+    # the late invoices dated in the year of the delivery (posted in the next year): the cutoff errors of Chapter 6
+    dated = {y: [i["number"] for i in x["invoices"] if i["date"][:4] == str(y)] for y, x in ((d.F, cf), (d.P, cp))}
     claim(all(u["shipped"][:7] == f"{d.C}-12" for u in unbilled(d)), f"the lines never invoiced shipped in December {d.C}")
     ids = ",".join(str(u["id"]) for u in unbilled(d)) or "NULL"
     posted = d.one(f"SELECT COALESCE(SUM(g.Debit), 0) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
@@ -849,13 +855,15 @@ def r4(d, claim):
     claim(chart(d)["5080"]["sub"] == "COGS", "5080 is part of cost of goods sold")
     hours = [round(late_december_cost(d, y), -3) for y in (d.F, d.P)]
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ?", d.account("2080")) == 0, "2080 has never been used")
-    ints = [interest(d, y) for y in (d.F, d.P, d.C)]
-    claim([[i["full"] for i in x["items"]] for x in ints] == [[True], [True], [True, False]],
-          "one note's whole payment at the first two year-ends; at the last, one whole payment and one prorated")
-    blank = dict(note="?", date="?", prev="?", interest=0.0, amount=0.0, elapsed=0, span=0)
-    pick = lambda x, k: x["items"][k] if len(x["items"]) > k else blank
-    return dict(cf=cf, cp=cp, cc=cc, dated=dated[0] if dated else "?", pf=pf, pp=pp, pc=pc, hours=hours,
-                i_f=pick(ints[0], 0), i_p=pick(ints[1], 0), c1=pick(ints[2], 0), c2=pick(ints[2], 1), ic=ints[2])
+    ints = [dict(interest(d, y), year=y) for y in (d.F, d.P, d.C)]
+    claim(all(x["items"] for x in ints), "a note payment falls due after each year-end")
+    for x in ints:
+        prorated = [i for i in x["items"] if not i["full"]]
+        # the other day count (the previous payment's day left out), named by its days when one payment is prorated
+        x.update(prorated=bool(prorated), short=prorated[0]["elapsed"] - 1 if len(prorated) == 1 else None)
+    last = max((k for k, x in enumerate(ints) if x["prorated"]), default=None)
+    return dict(cf=cf, cp=cp, cc=cc, dated=dated, late_freight=late_freight, freight_invoices=[i["number"] for i in freight],
+                pf=pf, pp=pp, pc=pc, hours=hours, ints=ints, last_prorated=last)
 
 
 # --- Requirement 5 -------------------------------------------------------------------------------------------
@@ -866,6 +874,21 @@ def allowance(d) -> float:
     amounts = [0.0] * len(BUCKETS)
     for inv in open_invoices(d):
         amounts[bucket_of(inv["days"])] += inv["balance"]
+    return xr(sum(xr(xr(a) * rate_) for a, (_, rate_) in zip(amounts, BUCKETS)))
+
+
+@lru_cache(maxsize=None)
+def allowance_at(d, year: int) -> float:
+    """P1's allowance at another year-end: Tutorial 8.2's open invoices (invoices less the receipts applied and the credit
+    memos dated on or before the year-end, rounded, kept if greater than zero), aged by due date at Exercise 8.1's rates."""
+    asof = ye(year)
+    amounts = [0.0] * len(BUCKETS)
+    for due, balance in d.q("SELECT si.DueDate, si.GrandTotal - COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a "
+                            "WHERE a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?1), 0) - COALESCE((SELECT "
+                            "SUM(c.GrandTotal) FROM CreditMemo c WHERE c.OriginalSalesInvoiceID = si.SalesInvoiceID AND "
+                            "c.CreditMemoDate <= ?1), 0) FROM SalesInvoice si WHERE si.InvoiceDate <= ?1", asof):
+        if xr(balance) > 0:
+            amounts[bucket_of(days(due, asof))] += xr(balance)
     return xr(sum(xr(xr(a) * rate_) for a, (_, rate_) in zip(amounts, BUCKETS)))
 
 
@@ -891,11 +914,18 @@ def r5(d, claim):
     adj = adjustments(d)
     a, total, split = adj["a"], adj["total"], adj["split"]
     pay_p, pay_c = adj["pay"][d.P], adj["pay"][d.C]
-    claim(split[d.C]["cogs"] > 0 and split[d.C]["opx"] < 0, f"A1 debits 5080 and credits operating expense in {d.C}")
-    debits = pay_p["total"] + split[d.C]["cogs"]
-    credits = -split[d.C]["opx"] + pay_c["gross"] + pay_c["tax"] + pay_c["ben"]
-    claim(abs(debits - credits) < 0.005, "A1's entry balances")
-    claim(a["A2"]["C"] > 0 and a["A3"]["C"] > 0 and a["A4"]["C"] < 0, "A2 credits revenue, A3 credits expense, A4 debits 7030")
+    cut_p, cut_c, old_p, old_c = adj["cut"][d.P], adj["cut"][d.C], adj["old"][d.P], adj["old"][d.C]
+    intr_p, intr_c = adj["intr"][d.P], adj["intr"][d.C]
+    # the entries at the year-end, each line as debits less credits; the side follows the sign
+    entries = dict(
+        A1=entry(("retained earnings", pay_p["total"]), ("5080", split[d.C]["cogs"]), ("operating expense", split[d.C]["opx"]),
+                 ("2030", -pay_c["gross"]), ("2032", -pay_c["tax"]), ("2033", -pay_c["ben"])),
+        A2=entry(("1020", cut_c), ("retained earnings", -cut_p), ("revenue", -a["A2"]["C"])),
+        A3=entry(("2040", old_c), ("retained earnings", -old_p), ("operating expense", -a["A3"]["C"])),
+        A4=entry(("retained earnings", intr_p), ("7030", -a["A4"]["C"]), ("2080", -intr_c)))
+    for k, e in entries.items():
+        claim(abs(sum(v for side, _, v in e if side == "Dr") - sum(v for side, _, v in e if side == "Cr")) < 0.005,
+              f"{k}'s entry balances")
     accounts = revenue_accounts(d)
     by_group = defaultdict(float)
     for g, v in cutoff(d, d.C)["group"].items():
@@ -917,15 +947,21 @@ def r5(d, claim):
     wc_fall = xr((r_c["ca"] - r_c["cl"]) - s_c["wc"])
     under_p = xr(s_p["cl"] - s_p["cur"] - r_p["cl"])
     claim(rise > 0 and wc_fall > 0, "current liabilities rise and working capital falls")
-    claim(under_p > mat_p, f"at {d.P} current liabilities were understated by more than {d.P} materiality")
+    claim(under_p > mat_p or pay_p["total"] > mat_p,
+          f"at {d.P} current liabilities, or the payroll liability alone, were understated by more than {d.P} materiality")
     claim(all(adj["pay"][y]["total"] > 0 for y in d.years) and d.one(
         "SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = 'JournalEntry' AND VoucherNumber <> ?",
         d.account("2030"), opening_entry(d)) == 0, "the missing payroll accrual recurs every year")
+    # P1 and P2 are estimates: each is measured at the year-end and, net of the same estimate at the end of d.P (which
+    # reverses in d.C), on d.C income
     p1 = -allowance(d)
+    claim(abs(allowance_at(d, d.C) - allowance(d)) < 0.005, "the allowance at the end of each year is measured as Exercise 8.1 measures it")
+    p1_prior = -allowance_at(d, d.P)
     ra = returns_across(d)
     claim(sorted(ra["pairs"]) == [(d.P, d.F), (d.C, d.P)], "every return in a later year is returned the year after its delivery")
     rc, rp = ra["by_year"].get(d.C, dict(n=0, rev=0.0, cost=0.0)), ra["by_year"].get(d.P, dict(n=0, rev=0.0, cost=0.0))
     p2 = xr(-(rc["rev"] - rc["cost"]))
+    p2_prior = xr(-(rp["rev"] - rp["cost"]))
     marks = ",".join("?" * len(WRITE_DOWN))
     by_year = dict(d.q(f"SELECT CAST(substr(sr.ReturnDate, 1, 4) AS INTEGER), SUM(srl.ExtendedStandardCost) FROM SalesReturn sr "
                        f"JOIN SalesReturnLine srl ON srl.SalesReturnID = sr.SalesReturnID WHERE sr.ReasonCode IN ({marks}) "
@@ -939,17 +975,21 @@ def r5(d, claim):
     p3_years = [xr(by_year.get(y, 0.0)) for y in d.years]
     p3 = -p3_years[-1]
     aggregate = xr(p1 + p2 + p3)
+    agg_income = xr((p1 - p1_prior) + (p2 - p2_prior) + p3)
+    claim(-aggregate < mat_c and abs(agg_income) < mat_c, "the passed items are below materiality, at the year-end and on income")
     residual = composition(d, d.C)["excess"]
     claim(residual < TRIVIAL * mat_c, "the freight residual is trivial")
-    return dict(a=a, total=total, split_p=split[d.P], split_c=split[d.C], a2_accounts=a2_accounts,
+    return dict(a=a, total=total, split_p=split[d.P], split_c=split[d.C], a2_accounts=a2_accounts, entries=entries,
                 equity_p=adj["equity"][d.P], equity_c=adj["equity"][d.C], adj_ni_p=adj["adj_ni"][d.P], adj_ni_c=adj["adj_ni"][d.C],
                 ni_c=net_income(d, d.C), pay_p=pay_p, pay_c=pay_c, cut_p=adj["cut"][d.P], cut_c=adj["cut"][d.C],
                 old_p=adj["old"][d.P], old_c=adj["old"][d.C], intr_p=adj["intr"][d.P], intr_c=adj["intr"][d.C],
                 cur_p=current_portion(d, d.P), cur_c=current_portion(d, d.C), c1090_p=c1090[d.P], c1090_c=c1090[d.C],
                 wip_p=xr(bal(d, ["1046"], ye(d.P))), wip_c=xr(bal(d, ["1046"], ye(d.C))), mat_c=mat_c, mat_p=mat_p,
-                share=total["C"] / mat_c, rise=rise, wc_fall=wc_fall, under_p=under_p, p1=p1,
-                p2=dict(n=rc["n"], rev=rc["rev"], cost=rc["cost"], n_prior=rp["n"], rev_prior=rp["rev"], effect=p2),
-                p3=dict(effect=p3, total=xr(sum(p3_years)), years=p3_years), aggregate=aggregate,
+                share=total["C"] / mat_c, rise=rise, wc_fall=wc_fall, under_p=under_p, p1=p1, p1_prior=p1_prior,
+                p1_income=xr(p1 - p1_prior),
+                p2=dict(n=rc["n"], rev=rc["rev"], cost=rc["cost"], n_prior=rp["n"], rev_prior=rp["rev"], cost_prior=rp["cost"],
+                        effect=p2, income=xr(p2 - p2_prior)),
+                p3=dict(effect=p3, total=xr(sum(p3_years)), years=p3_years), aggregate=aggregate, agg_income=agg_income,
                 agg_share=-aggregate / mat_c, residual=residual)
 
 
@@ -1134,8 +1174,27 @@ def r7(d, claim):
                                       "JOIN ShipmentLine sl ON sl.ShipmentLineID = sil.ShipmentLineID JOIN Shipment s "
                                       "ON s.ShipmentID = sl.ShipmentID GROUP BY 1")}
     unbilled_c = cutoff(d, C)["total"]
-    claim(abs(product[P] - ship.get(P, 0.0)) < 0.005, f"{P} product revenue equals the revenue by ship date")
-    claim(abs(product[C] - ship.get(C, 0.0) - unbilled_c) < 0.005, f"{C} product revenue is the revenue by ship date plus the unbilled")
+    diff = {P: xr(product[P] - ship.get(P, 0.0)), C: xr(product[C] - ship.get(C, 0.0) - unbilled_c)}
+    # what makes the adjusted revenue differ from the revenue by ship date: invoice lines that Requirement 4's test, which
+    # dates each late invoice by its latest delivery, counts in another year than their own delivery
+    assigned = {i["id"]: i["year"] for i in late(d)}
+    moved, mixed, single = defaultdict(float), set(), set()
+    for sid, number, total, delivered, posted, years in d.q(
+            "SELECT si.SalesInvoiceID, si.InvoiceNumber, sil.LineTotal, CAST(substr(s.DeliveryDate, 1, 4) AS INTEGER), "
+            "CAST(substr(p.pd, 1, 4) AS INTEGER), n.years FROM SalesInvoiceLine sil JOIN SalesInvoice si ON si.SalesInvoiceID = "
+            "sil.SalesInvoiceID JOIN ShipmentLine sl ON sl.ShipmentLineID = sil.ShipmentLineID JOIN Shipment s ON s.ShipmentID = "
+            "sl.ShipmentID JOIN (SELECT SourceDocumentID AS id, MIN(PostingDate) AS pd FROM GLEntry WHERE SourceDocumentType = "
+            "'SalesInvoice' GROUP BY 1) p ON p.id = si.SalesInvoiceID JOIN (SELECT sil2.SalesInvoiceID AS id, COUNT(DISTINCT "
+            "substr(s2.DeliveryDate, 1, 4)) AS years FROM SalesInvoiceLine sil2 JOIN ShipmentLine sl2 ON sl2.ShipmentLineID = "
+            "sil2.ShipmentLineID JOIN Shipment s2 ON s2.ShipmentID = sl2.ShipmentID GROUP BY 1) n ON n.id = si.SalesInvoiceID"):
+        year = assigned.get(sid, posted)
+        if year != delivered:
+            moved[year] += total
+            moved[delivered] -= total
+            (mixed if years > 1 else single).add(number)
+    claim(all(abs(diff[y] - moved.get(y, 0.0)) < 0.005 for y in (P, C)),
+          "the adjusted product revenue differs from the revenue by ship date only by lines counted in another year")
+    claim(not single, "the lines counted in another year belong to invoices that bill deliveries of two years")
     # contract balances
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ?", d.account("2070")) == 0, "2070 is unused")
     issued = d.q("SELECT COUNT(*), COALESCE(SUM(GrandTotal), 0) FROM CreditMemo WHERE Status = 'Issued'")[0]
@@ -1149,14 +1208,17 @@ def r7(d, claim):
                 "JOIN SalesInvoice si ON si.SalesInvoiceID = sil.SalesInvoiceID WHERE substr(b.BillingPeriodEndDate, 1, 7) = ? "
                 "AND si.InvoiceDate <> ?", f"{C}-12", ye(C)) == 0
           and d.one("SELECT MAX(WorkDate) FROM ServiceTimeEntry") <= ye(C), "December's work was billed on 31 December")
-    engagements = d.q("SELECT ServiceEngagementID, Status, EndDate, PlannedHours FROM ServiceEngagement WHERE Status <> 'Billed'")
-    claim(len(engagements) == 1, "one engagement is not fully billed by status")
-    e = engagements[0] if engagements else (0, "?", "?", 0.0)
-    worked, through = d.q("SELECT COALESCE(SUM(BillableHours), 0), MAX(WorkDate) FROM ServiceTimeEntry WHERE ServiceEngagementID = ?",
-                          e[0])[0]
-    e_billed = d.one("SELECT COALESCE(SUM(BilledHours), 0) FROM ServiceBillingLine WHERE ServiceEngagementID = ?", e[0])
-    claim(abs(worked - e_billed) < 0.005 and e[3] > worked, "the engagement billed all its hours, fewer than planned")
-    claim(e[2] is not None and e[2] <= ye(C), "the engagement ended within the year")
+    # the engagements not Billed by status: each must have billed every hour worked, so there is no unbilled work
+    engs = []
+    for eid, status, end, planned in d.q("SELECT ServiceEngagementID, Status, EndDate, PlannedHours FROM ServiceEngagement "
+                                         "WHERE Status <> 'Billed' ORDER BY 1"):
+        worked, through = d.q("SELECT COALESCE(SUM(BillableHours), 0), MAX(WorkDate) FROM ServiceTimeEntry "
+                              "WHERE ServiceEngagementID = ?", eid)[0]
+        e_billed = d.one("SELECT COALESCE(SUM(BilledHours), 0) FROM ServiceBillingLine WHERE ServiceEngagementID = ?", eid)
+        claim(abs(worked - e_billed) < 0.005, f"engagement {eid} billed all its hours")
+        engs.append(dict(id=eid, status=status, end=end or "?", ended=end is not None and end <= ye(C), billed=e_billed,
+                         through=day_month(through) if through else "?", planned=planned or 0.0,
+                         short=(planned or 0.0) > worked + 0.005))
     # inventories and accrued liabilities
     claim(chart(d)["5060"]["sub"] == "COGS", "the purchase price variance goes to cost of goods sold")
     claim(d.one("SELECT COUNT(*) FROM GoodsReceiptLine grl JOIN PurchaseOrderLine pol ON pol.POLineID = grl.POLineID "
@@ -1167,8 +1229,11 @@ def r7(d, claim):
           "finished goods leave inventory at standard cost")
     s_c, s_p = statement(d, C), statement(d, P)
     opening_2030 = opening_line(d, "2030")
-    claim(all(abs(s["payroll"] - adjustments(d)["pay"][y]["total"] - opening_2030) < 0.005 for y, s in ((C, s_c), (P, s_p))),
-          "payroll and related is the accrual plus the opening line")
+    # withholdings and benefits of the last payroll not yet remitted at the year-end (2031-2033)
+    withheld = {y: xr(-bal(d, PAYROLL[1:], ye(y))) for y in (P, C)}
+    claim(all(abs(s["payroll"] - adjustments(d)["pay"][y]["total"] - opening_2030 - withheld[y]) < 0.005
+              and abs(-bal(d, ["2030"], ye(y)) - opening_2030) < 0.005 for y, s in ((C, s_c), (P, s_p))),
+          "payroll and related is the accrual plus the opening line plus the payroll liabilities not yet remitted")
     return dict(cost_f=cost[F], cost_p=cost[P], cost_c=cost[C], add_p=add_p, add_c=add_c, disp_p=disp_p, disp_c=disp_c,
                 classes=classes, dep_p=dep[P], dep_c=dep[C], to6130_p=to6130[P], to6130_c=to6130[C], to1090_p=to1090[P],
                 to1090_c=to1090[C], acc_f=acc[F], acc_p=acc[P], acc_c=acc[C], nbv=nbv, life_low=min(lives), life_high=max(lives),
@@ -1177,12 +1242,11 @@ def r7(d, claim):
                 svc_c=services_rev[C], svc_p=services_rev[P], fr_c=freight_rev[C], fr_p=freight_rev[P],
                 segments=[dict(name=k, c=v, p=segment[P].get(k, 0.0)) for k, v in sorted(segment[C].items(), key=lambda kv: -kv[1])],
                 point_c=xr(product[C] + freight_rev[C]), point_p=xr(product[P] + freight_rev[P]), product_p=product[P],
-                ship_c=xr(ship.get(C, 0.0)), unbilled=unbilled_c,
+                ship_c=xr(ship.get(C, 0.0)), ship_p=xr(ship.get(P, 0.0)), unbilled=unbilled_c, diff_p=diff[P], diff_c=diff[C],
+                mixed=sorted(mixed),
                 recv_f=statement(d, F)["recv"], recv_p=s_p["recv"], recv_c=s_c["recv"], opening_ar=opening_line(d, "1020"),
-                credits=credits, issued=word(issued[0]), billable=billable,
-                eng=dict(id=e[0], status=e[1], end=e[2], billed=e_billed, through=day_month(through) if through else "?",
-                         planned=e[3]),
-                s_c=s_c, s_p=s_p, opening_2030=opening_2030)
+                credits=credits, issued=word(issued[0]), issued_n=issued[0], billable=billable, engs=engs,
+                s_c=s_c, s_p=s_p, opening_2030=opening_2030, w_c=withheld[C], w_p=withheld[P])
 
 
 # --- Requirement 8 -------------------------------------------------------------------------------------------

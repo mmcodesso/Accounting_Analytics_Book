@@ -127,22 +127,30 @@ def ex2(d, claim):
     claim(len(lines) == rows[PPV[0][1]]["n"] + rows[PPV[1][1]]["n"]
           and all(abs(r[1] - round(r[2] * (r[3] - r[4]), 2)) < 0.011 for r in lines),
           "each variance is the invoice price against the purchase-order price, times the quantity")
-    # A handful of one-cent variances on lines billed at the order price come from rounding (both sides); allow them.
+    # A handful of one-cent variances on lines billed at the order price come from rounding (both sides); the note counts them.
     claim(all(r[3] < r[4] or (r[3] == r[4] and abs(r[1]) <= 0.01) for r in lines if r[1] < 0),
           "a credit means the supplier billed below the order price (apart from one-cent roundings at the order price)")
+    claim(all(r[3] > r[4] or (r[3] == r[4] and abs(r[1]) <= 0.01) for r in lines if r[1] > 0),
+          "a debit means the supplier billed above the order price (apart from one-cent roundings at the order price)")
+    rounding = dict(credits=sum(1 for r in lines if r[1] < 0 and r[3] == r[4]),
+                    debits=sum(1 for r in lines if r[1] > 0 and r[3] == r[4]))
     grni = d.q("SELECT g.Debit - g.Credit, pil.Quantity, pol.UnitCost FROM GLEntry g "
                "JOIN PurchaseInvoiceLine pil ON pil.PILineID = g.SourceLineID "
                "JOIN PurchaseOrderLine pol ON pol.POLineID = pil.POLineID WHERE g.AccountID = ? AND g.FiscalYear = ? "
                "AND g.SourceDocumentType = 'PurchaseInvoice'", d.account("2020"), d.C)
     claim(len(grni) > 0 and all(abs(r[0] - round(r[1] * r[2], 2)) < 0.011 for r in grni),
           "the invoice clears goods received not invoiced (2020) at the order price of the goods received")
-    top = [dict(amount=r[0], date=r[1], voucher=r[2]) for r in d.q(
-        "SELECT Debit, PostingDate, VoucherNumber FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? "
-        "AND Description = ? ORDER BY Debit DESC LIMIT 4", ppv, d.C, PPV[0][1])]
-    claim(top[0]["amount"] > top[1]["amount"] > top[2]["amount"] > top[3]["amount"],
-          "the three largest unfavorable variances have no ties")
+    # The largest unfavorable variance with every posting of that amount (a tie lists them all), and the next two amounts.
+    amounts = [r[0] for r in d.q("SELECT DISTINCT Debit FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description = ? "
+                                 "ORDER BY Debit DESC LIMIT 3", ppv, d.C, PPV[0][1])]
+    largest = [dict(date=r[0], voucher=r[1]) for r in d.q(
+        "SELECT PostingDate, VoucherNumber FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description = ? "
+        "AND Debit = ? ORDER BY PostingDate, VoucherNumber", ppv, d.C, PPV[0][1], amounts[0])]
     return dict(account=ppv, name=account_name(d, "5060"), close=close, close_amount=credit,
-                pi_rows=sum(r["n"] for r in rows.values()), **{key: rows[text] for key, text, _ in PPV}, net=net, top=top)
+                pi_rows=sum(r["n"] for r in rows.values()), **{key: rows[text] for key, text, _ in PPV}, net=net,
+                rounding=" and ".join(f"{word(n)} one-cent {side[:-1]}{'' if n == 1 else 's'}" for side, n in rounding.items() if n),
+                rounding_verb="is" if sum(rounding.values()) == 1 else "are",
+                largest=amounts[0], postings=largest, next=amounts[1:])
 
 
 # --- Exercise 9.3 --------------------------------------------------------------------------------
@@ -179,7 +187,8 @@ def ex4(d, claim):
                "WHERE ClosedDate IS NULL ORDER BY DueDate, WorkOrderNumber")
     claim({r[1] for r in rows} == set(OPEN_STATUSES), "the open work orders are Released, In Progress, or Completed")
     status = {s: sum(1 for r in rows if r[1] == s) for s in OPEN_STATUSES}
-    claim(all(r[2][:4] == str(d.C) for r in rows), f"every open work order is a {d.C} work order")
+    years = sorted({r[2][:4] for r in rows})
+    by_year = [(y, sum(1 for r in rows if r[2][:4] == y)) for y in years]
     claim(all((r[4] is None) == (r[1] != "Completed") for r in rows),
           "the released and in-progress work orders have no CompletedDate, and the completed ones have one")
     due = [r for r in rows if r[3] <= end]
@@ -188,7 +197,7 @@ def ex4(d, claim):
     claim(due[0][1] == "Released", "the oldest is still Released")
     released = sum(1 for r in due if r[1] == "Released")
     claim(200 <= released < 1000, "hundreds of released work orders are past due")
-    return dict(end=end, n=len(rows), status=status, not_completed=status["Released"] + status["In Progress"],
+    return dict(end=end, n=len(rows), status=status, not_completed=status["Released"] + status["In Progress"], by_year=by_year,
                 released_low=min(r[2] for r in rows), released_high=max(r[2] for r in rows),
                 due=len(due), due_status=due_status,
                 oldest=dict(number=due[0][0], released=due[0][2], due=due[0][3]),
@@ -209,11 +218,10 @@ def ex5(d, claim):
     claim(d.one("SELECT MAX(ShipmentDate) FROM Shipment") == end, f"{end} is the last shipment date of the data")
     transit, oldest = d.q("SELECT COUNT(*), MIN(DeliveryDate) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate < ?", end)[0]
     later = d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate >= ?", end)
-    claim(later == 1, "one more In Transit shipment has a DeliveryDate on or after the last day")
     claim(d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate IS NULL") == 0,
           "every In Transit shipment has a DeliveryDate")
     return dict(end=end, status=[(s, status[s]) for s in SHIPMENT_STATUSES], carriers=carriers, n=n, low=low, high=high,
-                transit=transit, oldest=oldest)
+                transit=transit, oldest=oldest, later=later, later_word=word(later))
 
 
 # --- Exercise 9.6 --------------------------------------------------------------------------------
@@ -225,8 +233,8 @@ def ex6(d, claim):
         "SELECT LaborTimeEntryID, EmployeeID, WorkOrderID, WorkDate, RegularHours + OvertimeHours FROM LaborTimeEntry "
         "WHERE LaborType = 'Direct Manufacturing' AND WorkOrderOperationID IS NULL ORDER BY LaborTimeEntryID")]
     employees = list(dict.fromkeys(r["employee"] for r in labor))
-    claim(len(employees) >= 2, "the unlinked labor rows belong to more than one employee (the wording says 'employees ... are')")
     claim(len({titles[e] for e in employees}) == 1, "the employees on the unlinked labor rows share one job title")
+    title = titles[employees[0]].lower()
     claim([r["id"] for r in labor] == anomalies(d, "invalid_direct_labor_operation_link"),
           "the unlinked labor rows are the planted invalid direct labor operation links")
     clock = dict(d.q("SELECT ClockStatus, COUNT(*) FROM TimeClockEntry GROUP BY 1"))
@@ -246,7 +254,8 @@ def ex6(d, claim):
     claim(all(r[1] != "Terminated" and r[2] == 1 for r in staff if not r[0]),
           "no employee without a TerminationDate is Terminated or inactive")
     return dict(n_labor=word(len(labor)), labor=labor, employees=employees,
-                title=titles[employees[0]].lower() + "s", clock=[(s, clock[s]) for s in CLOCK_STATUSES],
+                title=title + "s" if len(employees) > 1 else ("an " if title[0] in "aeiou" else "a ") + title,
+                clock=[(s, clock[s]) for s in CLOCK_STATUSES],
                 n_missing=word(len(missing)).capitalize(), clock_employee=missing[0][1],
                 clock_title=article(titles[missing[0][1]]), terminated=word(terminated).capitalize())
 

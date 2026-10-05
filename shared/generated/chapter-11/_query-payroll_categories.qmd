@@ -1,0 +1,12 @@
+```sql
+CASE
+  WHEN prl.LineType IN ('Regular Earnings',
+      'Overtime Earnings')
+    THEN 'Hourly pay'
+  WHEN prl.LineType = 'Salary Earnings' THEN 'Salaries'
+  WHEN prl.LineType IN ('Employer Payroll Tax',
+      'Employer Benefits')
+    THEN 'Employer taxes and benefits'
+  ELSE 'Employee deductions'
+END AS Category,
+```

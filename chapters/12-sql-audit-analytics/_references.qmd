@@ -6,6 +6,6 @@ American Institute of Certified Public Accountants. (2026). *Guide to audit data
 
 Institute of Internal Auditors. (2024). *Global internal audit standards*. <https://www.theiia.org/en/standards/2024-standards/global-internal-audit-standards/>
 
-Public Company Accounting Oversight Board. (n.d.). *AS 2305: Substantive analytical procedures*. <https://pcaobus.org/oversight/standards/auditing-standards/details/AS2305>
+{{< include /shared/fragments/_reference-pcaob-2305.qmd >}}
 
 Public Company Accounting Oversight Board. (2024). *Amendments related to aspects of designing and performing audit procedures that involve technology-assisted analysis of information in electronic form* (PCAOB Release No. 2024-007). <https://assets.pcaobus.org/pcaob-dev/docs/default-source/rulemaking/docket-052/2024-007-adoptingrelease.pdf>

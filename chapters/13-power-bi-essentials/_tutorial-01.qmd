@@ -24,15 +24,17 @@ c. Click **Transform Data**.
 
 The **Navigator** lists the worksheets and the Tables of the workbook, as Excel's did in Tutorial 4.1 (@fig-04-02). The Power Query Editor opens with one query for each Table you selected.
 
-**Step 3. Rename the queries and keep the columns the report needs.** A query's name becomes the name of its table in the model.
+**Step 3. Rename the queries, correct two types, and keep the columns the report needs.** A query's name becomes the name of its table in the model.
 
 a. In the **Queries** pane, rename the queries `Customer`, `SalesInvoice`, `SalesInvoiceLine`, and `Item` by double-clicking each name and typing the new one.
-b. Select **Customer**, choose **Home > Choose Columns**, and keep CustomerID, CustomerName, CustomerSegment, and Region.
-c. In **SalesInvoice**, keep SalesInvoiceID, InvoiceNumber, InvoiceDate, and CustomerID.
-d. In **SalesInvoiceLine**, keep SalesInvoiceLineID, SalesInvoiceID, ItemID, Quantity, BaseListPrice, UnitPrice, Discount, LineTotal, PromotionID, and PricingMethod.
-e. In **Item**, keep ItemID, ItemCode, ItemName, ItemGroup, StandardCost, and ListPrice.
+b. Select **SalesInvoiceLine**. If the icon on the Discount header is the whole number icon, 123, click it, choose **Decimal Number**, and click **Replace current** when Power Query asks whether to replace the current conversion.
+c. Set PromotionID to **Whole Number** in the same way.
+d. Select **Customer**, choose **Home > Choose Columns**, and keep CustomerID, CustomerName, CustomerSegment, and Region.
+e. In **SalesInvoice**, keep SalesInvoiceID, InvoiceNumber, InvoiceDate, and CustomerID.
+f. In **SalesInvoiceLine**, keep SalesInvoiceLineID, SalesInvoiceID, ItemID, Quantity, BaseListPrice, UnitPrice, Discount, LineTotal, PromotionID, and PricingMethod.
+g. In **Item**, keep ItemID, ItemCode, ItemName, ItemGroup, StandardCost, and ListPrice.
 
-Each query now ends with a Removed Other Columns step in its **Applied Steps** list.
+Power Query typed each column by looking at only its first 200 rows, as Chapter 4 explained. Those invoice lines carry no promotion, so Discount may be a whole number, which rounds every rate to 0, and PromotionID gets no type, though it should match the key it will be related to in Chapter 15. **Replace current** corrects both before any value is rounded. Each query now ends with a Removed Other Columns step in its **Applied Steps** list.
 
 **Step 4. Keep the items Charles River sells, and set the date type.** As in Tutorial 4.1, the items with a blank ListPrice are ones Charles River buys, not sells.
 

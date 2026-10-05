@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the sales manager's page. A waterfall chart will take fiscal 2026 revenue from list price to net, step by step, and a bar chart will show which promotions gave away the most. A drill-through page will show any one promotion in detail, and a tooltip page will show its discounts month by month when the reader points at it. Along the way, you will add the promotions as a dimension of the invoice lines and build your first disconnected table, a table the model uses without relating it to anything.
 
-**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Chapter 14, with the Measures table and the Tests tab.
+**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Chapter 14, with the Key Measures table and the Tests tab. If you start here, download Charles River Reports as it stands at the end of Chapter 14 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -35,7 +35,7 @@ Steps is a disconnected table: it has no relationship to any other table. Its ro
 
 **Step 4. Write the gross-to-net measure.**
 
-a. Select the **Measures** table, and choose **Modeling > New measure**.
+a. Select the **Key Measures** table, and choose **Modeling > New measure**.
 b. Type the measure below, and format it as an amount.
 
 <!-- dax-check: measure -->

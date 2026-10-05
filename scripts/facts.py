@@ -145,6 +145,15 @@ def cmd_preview(args) -> int:
         content = (REPO / n.file).read_text(encoding="utf-8")
         comments = [m.group(0) for m in re.finditer(r"<!--.*?-->", content, flags=re.S)]
         match = any(norm(c) == norm(text) for c in comments)
+        if args.reworded:
+            # A rewording pass: the note may differ from its comment; show how, word by word.
+            current = notes.regions(REPO / n.file).get(key)
+            if current and norm(current[2]) != norm(text):
+                a, b = norm(current[2]).split(" "), norm(text).split(" ")
+                for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+                    if op != "equal":
+                        print(f"     {key} {op}: {' '.join(a[i1:i2])[:160]!r} -> {' '.join(b[j1:j2])[:160]!r}")
+            match = True
         status = "matches its comment" if match else "NO MATCHING COMMENT"
         if not match:
             label = text.split(":", 1)[0]
@@ -250,6 +259,8 @@ def main() -> int:
     p.add_argument("module")
     p.add_argument("--db", type=Path, default=DB)
     p.add_argument("--also", type=Path, help="a second dataset (a rolled build) to run the claims on")
+    p.add_argument("--reworded", action="store_true",
+                   help="a rewording pass: do not require the note to match its comment; show the word changes")
     args = parser.parse_args()
     return dict(check=cmd_check, sync=cmd_sync, mark=cmd_mark, build=cmd_build, diff=cmd_diff,
                 preview=cmd_preview)[args.cmd](args)

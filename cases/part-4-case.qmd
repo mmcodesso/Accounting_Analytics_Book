@@ -37,7 +37,7 @@ Create Charles River Cash Case.pbix in the same folder as CharlesRiver.xlsx, tur
 - `ARInvoices` (T16_SalesInvoice), with each invoice's open balance at the end of fiscal 2026 from T20_CashReceiptApplication and T23_CreditMemo, as in Exercise 16.1, and `APInvoices` (T37_PurchaseInvoice), with its open balance from T39_DisbursementPayment, as Exercise 8.2 found it in Excel;
 - `DebtSchedule` (T43_DebtScheduleLine), the scheduled payments of the company's notes.
 
-Follow the conventions of Part IV. Open T3_GLEntry with Transform Data and keep only the columns the model needs, but all of its rows. Clear Enable load on the queries that only feed others, relate each fact table to its dimensions and to Date, one-to-many in a single direction, and hide the keys. Keep the measures in a Measures table, each with a description that states its definition.
+Follow the conventions of Part IV. Open T3_GLEntry with Transform Data and keep only the columns the model needs, but all of its rows. Clear Enable load on the queries that only feed others, relate each fact table to its dimensions and to Date, one-to-many in a single direction, and hide the keys. Keep the measures in a Key Measures table, each with a description that states its definition.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -73,7 +73,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      Shipment postings, each with REMOVEFILTERS ( 'Date' ), inside MINX over a table constructor: 2026-12-31. The ledger's last posting is
      2027-02-23: 263 supplier payments of 2026 invoices, 526 rows, 271,327.17 (Dr 2010, Cr 1010); a balance taken at that date shows cash
      8,170,928.63 and payables 5,966,139.49, and a bridge for 2027 shows a fall of 271,327.17 that only means the data stop. Payroll
-     postings end 2026-12-18 (the last two pay periods are open, Part III case); including them would make Data Through 2026-12-18 and
+     summaries and payments end 2026-12-18 (the last two pay periods are open, Part III case; the remittances of payroll liabilities run to 2026-12-30); including them would make Data Through 2026-12-18 and
      blank the last quarter, so the About page should say why payroll is left out. Engine-checked on a reference model in Desktop 2.158. -->
 
 **Requirement 2: Explain where the cash went (Chapters 14 and 15; financial reporting).**
@@ -88,7 +88,7 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 <!-- Instructor notes, Requirement 2: year-end 2024 / 2025 / 2026: current assets 21,074,807.78 / 29,358,195.27 / 37,236,780.57;
      current liabilities 7,621,731.07 / 10,666,774.33 / 13,507,123.75; working capital 13,453,076.71 / 18,691,420.94 / 23,729,656.82;
      current ratio 2.77 / 2.75 / 2.76; quick ratio (cash and receivables over current liabilities) 1.43 / 1.32 / 0.98; inventories are 64%
-     of 2026 current assets. The flat current ratio hides the change; the quick ratio shows it. Steps: 1010 Cash (left out of the
+     of 2026 current assets. The current ratio moves little and hides the change; the quick ratio shows it. Steps: 1010 Cash (left out of the
      waterfall: with it the steps sum to zero, the trap of Net Income with Closes); Revenue and Expense accounts, net income; Contra Fixed
      Asset, depreciation; 1020 and 1030, receivables; 1040, 1045, 1046, inventories; other Current Asset and Contra Current Asset (including
      1090 with a credit balance, 46,730.55, and 8020), other current assets; 2010 and 2020, payables; 2050, sales tax; other Current
@@ -138,8 +138,8 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      opening entry): DSO 33.5 / 56.3 / 54.5; DIO 201.6 / 260.3 / 384.0; materials 76.7 / 94.6 / 288.9; DPO 85.3 / 99.2 / 92.8; they lag a
      fast build (289 against 422 days in 2026) and in 2024 rest on the opening entry, so materials look like 77 days when the year-end stock
      stood at 29. Policy targets: raw materials 28 days and packaging 24; finished goods 12-16 (manufactured, lot-for-lot) and 24-28
-     (purchased); every policy ends 2026-12-31. Value-weighted payment terms: customers about 44 days, suppliers about 40, so receivables
-     run about a week beyond terms and payables, without the opening line, almost four weeks beyond. Conclusion: receivables and payables
+     (purchased); every policy ends 2026-12-31. Value-weighted payment terms: customers about 44 days, suppliers about 40, so receivables,
+     without the opening line, run about a week beyond terms (11 days as recorded) and payables, without it, almost four weeks beyond. Conclusion: receivables and payables
      barely moved; the cycle grew entirely through inventory, materials above all. The apparent fall of DPO from 118 to 99 days as
      recorded is the constant 2.1 million of unsupported opening payables diluted by growing purchases. -->
 
@@ -155,16 +155,16 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      2,141,872.90 (3,094 lines); 2025 7,017,928.00 (390) /
      6,472,674.93 (8,077); 2026 6,358,142.79 (363) /
      11,219,993.21 (12,615); issues
-     stayed near 10 million (2026: raw materials 9,687,944.26, packaging 473,260.38). The supply plan's receipts and production's use are
-     flat; the shortfall channel carries the build. 2026 build 7,416,931.36, of which six raw materials make up about 96%: RAW-CTN-0010 Cotton Fabric Roll +2,959,318.29, RAW-LED-0005 LED Module Pack +1,153,243.40, RAW-LIN-0008 +1,134,217.41, RAW-LIN-0002 +797,202.63, RAW-LIN-0006 +549,623.46, RAW-LIN-0004 +521,297.17 (Linen Fabric Rolls); packaging nets -5,594.49. Stock by item cannot be rebuilt,
+     stayed near 10 million (2026: raw materials 9,687,944.26, packaging 473,260.38). The supply plan's receipts stay below production's use, which
+     holds steady; the shortfall channel carries the build. 2026 build 7,416,931.36, of which six raw materials make up about 96%: RAW-CTN-0010 Cotton Fabric Roll +2,959,318.29, RAW-LED-0005 LED Module Pack +1,153,243.40, RAW-LIN-0008 +1,134,217.41, RAW-LIN-0002 +797,202.63, RAW-LIN-0006 +549,623.46, RAW-LIN-0004 +521,297.17 (Linen Fabric Rolls); packaging nets -5,594.49. Stock by item cannot be rebuilt,
      because the opening materials of 3,587,025.70 carry no item detail. Shortfall requisitions: 3,180 / 7,304 / 10,953 a year, estimated at
      2,466,594.50 / 6,813,074.37 / 11,343,750.21; 10,365 work order and item pairs, of which 5,702 were requisitioned more than once, holding
-     16,774 requisitions; at most 18 for one pair, WO-2025-008090 and RAW-CTN-0010, monthly from 2025-08-13 to 2026-11-01 (the work order
+     16,774 requisitions; at most 18 for one pair, WO-2025-008090 and RAW-CTN-0010, every month from 2025-08-13 to 2026-11-01, one or two a month (the work order
      was due 2025-08-17 and completed 2026-12-01). Merge key "WO-COMPONENT-SHORTFALL | WO=" & Text.From ( [WorkOrderID] ) & " | ITEM=" &
      Text.From ( [ItemID] ): 9,605 pairs matched, 760 with nothing issued; 547,190.8 units requisitioned (estimated 20,623,419.07) against
      252,374.2 issued to the same pairs (8,925,946.87 at standard). Receipts from shortfall requisitions over the three years:
      19,834,541.04. Approvals: every shortfall requisition (21,437) was approved by employee 4, the Production Manager, who also requested
-     351 of them; production staff requested the rest (Assemblers, Machine Operators, Quality Technicians); the CFO approved 3,915
+     351 of them; production staff requested the rest (Assemblers 7,631, Machine Operators 7,111, Quality Technicians 5,706, Production Planners 324, Production Supervisors 314); the CFO approved 3,915
      supply-plan requisitions, 6 have no approver; the six capital requests were approved by the CFO (4) and the Purchasing Manager (2).
      What-if (twelve-month issues 10,161,204.64): 28 days allows 779,489.67, an excess of 10,972,164.25, 12.96 months of issues; 60 days 1,670,335.01, 10,081,318.91, 11.91 months; 90 days 2,505,502.51, 9,246,151.41, 10.92 months; even at 90 days the excess is about ten
      times the year's fall in cash. Left out: finished goods at 28 days of shipments would be 1,213,408.82 against 12,169,701.74; 522
@@ -188,14 +188,13 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
      -56,461,312.87, DisbursementPayment +51,680,217.33, JournalEntry -1,456,371.12 (-2,096,371.12 opening + 360,000 + 280,000 moved to notes),
      -6,237,466.66; 2020 GoodsReceipt -53,336,880.22, PurchaseInvoice +52,315,888.16 (-1,020,992.06, Chapter 12); 2050 SalesInvoice
      -5,659,428.46, CreditMemo +38,587.80. Open items: receivables 1,079 invoices, 4,418,804.32 (positive balances; 225 negative balances,
-     -220,131.88, are credit memos on paid invoices, credited to 2060 and refunded); difference 380,000.00, the opening line of
+     -220,131.88, are credit memos on paid invoices, credited to 2060 and refunded, except 3 (3,413.46) not yet refunded at the year-end); difference 380,000.00, the opening line of
      JE-2024-000001. The same rebuild at 2024-12-31 and 2025-12-31 differs by 379,208.65 and 375,089.49, the cutoff invoices below.
      Payables: 3,462 invoices received and unpaid at 2026-12-31, 4,781,095.54; difference 1,456,371.12 = opening payables 2,096,371.12 less
      the 640,000.00 of PI 3160 and PI 21692, which the ledger moved to notes payable but the subledger still shows open (past due since
      2024-07-30 and 2026-01-26). Aging: past due 2,089,989.68 with them, 1,449,989.68 of 4,141,095.54 (35.0%) without them. Reconcile
      payables on ReceivedDate, as the ledger posts them; on InvoiceDate, 2025-12-31 differs by ASV0050-2025-040073 (3,266.27). Billing by
-     invoice date less the ledger: +791.35 (2024; SI-2025-006733 to 006735, dated November-December 2024, posted 2025-01-01), +4,119.16
-     (2025), -4,910.51 (2026; SI-2026-013741 to 013743, posted 2026-01-01); only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff
+     invoice date less the ledger: +791.35 (2024; SI-2025-006733 to 006735, dated November-December 2024, posted 2025-01-01), +4,119.16 (2025), -4,910.51 (2026; SI-2026-013741 to 013743, posted 2026-01-01); only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff
      error), and the other dates are wrong, not the ledger. Sales tax: credits only from SalesInvoice (1,787,832.54 / 1,923,180.10 / 1,948,415.82, equal to the invoices' TaxAmount), debits only from CreditMemo; no payment and no journal entry ever posts to 2050.
      Evidence outside the database: the sales tax returns filed, the tax authority's account, the bank statements, and a bank
      reconciliation. Findings: 1020 opening receivables with no invoice, 380,000.00, follow up; 2010 opening payables with no invoice,

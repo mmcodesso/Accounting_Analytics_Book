@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 545" width="1280" height="545" role="img" aria-labelledby="title desc">
+<title id="title">Shipment freight outlier in context</title>
+<desc id="desc">Mean freight cost $152.20; largest $873.95. Bars start at zero. Neither magnitude nor this comparison proves an error.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<text x="32" y="47" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="start">Shipment freight cost</text>
+<text x="32" y="140" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Mean of all shipments</text>
+<rect x="440" y="100" width="113.198" height="62" rx="0" fill="#EAF2F8" stroke="#1A5276" stroke-width="2"/>
+<text x="1125" y="142" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">$152.20</text>
+<text x="32" y="305" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Largest recorded cost</text>
+<rect x="440" y="265" width="650" height="62" rx="0" fill="#EAF2F8" stroke="#1A5276" stroke-width="2"/>
+<text x="1125" y="307" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">$873.95</text>
+<text x="440" y="427" font-size="30" fill="#5D6D7E" font-weight="normal" text-anchor="start">0</text>
+<text x="1080" y="427" font-size="30" fill="#5D6D7E" font-weight="normal" text-anchor="end">$874</text>
+<text x="32" y="505" font-size="34" fill="#117A65" font-weight="bold" text-anchor="start">Unusual magnitude identifies a question to investigate.</text>
+</g>
+</svg>

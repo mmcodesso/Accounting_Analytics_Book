@@ -1,0 +1,5 @@
+```sql
+WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+ORDER BY TotalVarianceAmount DESC
+LIMIT 10;
+```

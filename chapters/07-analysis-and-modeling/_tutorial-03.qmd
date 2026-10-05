@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will answer the controller's third question. You will build a contribution margin model of the orders that received the Furniture Seasonal Promotion in 2026, with the model's inputs calculated from the data and stored in named cells. You will then compare scenarios with Scenario Manager, map the result across discounts and volume responses with a data table, find the volume increase the promotion needs to pay for itself with Goal Seek, check that requirement against the order data, and document the assumptions behind your recommendation.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 7.2, with the InvoiceLines and GLOpex Tables, and the SalesInvoiceLine Table with the OrderDate and ItemGroup columns you added in Tutorial 5.2.
+**Prerequisites.** You need the analysis workbook from Tutorial 7.2, with the InvoiceLines and GLOpex Tables, and the SalesInvoiceLine Table with the OrderDate and ItemGroup columns you added in Tutorial 5.2. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 7.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

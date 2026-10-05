@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 585" width="1280" height="585" role="img" aria-labelledby="title desc">
+<title id="title">Distribution of invoice-line amounts</title>
+<desc id="desc">A right-skewed distribution with a long upper tail. Bins reconcile to the fiscal 2026 line count.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<text x="30" y="45" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="start">Fiscal 2026 invoice-line amounts</text>
+<path d="M115,435 L1235,435" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="95" y="445" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="end">0</text>
+<path d="M115,325 L1235,325" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="95" y="335" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="end">1,000</text>
+<path d="M115,215 L1235,215" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="95" y="225" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="end">2,000</text>
+<path d="M115,105 L1235,105" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="95" y="115" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="end">3,000</text>
+<rect x="115" y="166.82" width="68" height="268.18" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="115" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$0k</text>
+<rect x="185" y="204.33" width="68" height="230.67" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="255" y="288.92" width="68" height="146.08" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="325" y="334.79" width="68" height="100.21" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="325" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$3k</text>
+<rect x="395" y="361.63" width="68" height="73.37" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="465" y="372.52" width="68" height="62.48" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="535" y="380.11" width="68" height="54.89" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="535" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$6k</text>
+<rect x="605" y="395.95" width="68" height="39.05" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="675" y="409.92" width="68" height="25.08" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="745" y="420.7" width="68" height="14.3" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="745" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$9k</text>
+<rect x="815" y="423.56" width="68" height="11.44" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="885" y="428.51" width="68" height="6.49" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="955" y="429.39" width="68" height="5.61" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="955" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$12k</text>
+<rect x="1025" y="432.69" width="68" height="2.31" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="1095" y="432.36" width="68" height="2.64" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<rect x="1165" y="430.38" width="68" height="4.62" rx="0" fill="#1A5276" stroke="#FFFFFF" stroke-width="2"/>
+<text x="1165" y="480" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="middle">$15k+</text>
+<text x="30" y="80" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="start">Number of lines</text>
+<text x="30" y="550" font-size="30" fill="#2C3E50" font-weight="normal" text-anchor="start">$1,000 bins. The last bin includes every amount of $15,000 or more.</text>
+</g>
+</svg>

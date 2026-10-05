@@ -115,13 +115,20 @@ def t1(d, claim):
     for y in d.years:
         rows = [r for r in all_lines if r["year"] == y]
         years.append(dict(year=y, n=len(rows), rev=total(rows, "rev"), list=total(rows, "list"), disc=total(rows, "disc")))
-    claim(sum(y["n"] for y in years) == n_lines, "every invoice line is dated in a fiscal year of the window")
+    # Lines dated outside the window (an invoice dated before its shipment can fall in the year before) form rows of
+    # their own in the Validation table.
+    outside = []
+    for y in sorted({r["year"] for r in all_lines} - set(d.years)):
+        rows = [r for r in all_lines if r["year"] == y]
+        outside.append(dict(year=y, n=len(rows), rev=total(rows, "rev"), invoices=len({r["inv"] for r in rows}),
+                            dates=sorted({r["date"] for r in rows})))
+    claim(sum(y["n"] for y in years) + sum(o["n"] for o in outside) == n_lines, "every invoice line has a year row")
     first = all_lines[:TOP_ROWS]
     discounts_first = sorted({r["rate"] for r in first})
     claim(len(discounts_first) == 1, "the first 1,000 lines have a single Discount value")
     return dict(n_lines=n_lines, n_invoices=d.one("SELECT COUNT(*) FROM SalesInvoice"),
                 items=d.one("SELECT COUNT(*) FROM Item WHERE ListPrice IS NOT NULL"), items_all=d.one("SELECT COUNT(*) FROM Item"),
-                customers=d.one("SELECT COUNT(*) FROM Customer"), years=years, rev=total(all_lines, "rev"),
+                customers=d.one("SELECT COUNT(*) FROM Customer"), years=years, outside=outside, rev=total(all_lines, "rev"),
                 first_from=min(r["date"] for r in first), first_to=max(r["date"] for r in first),
                 first_empty=sum(r["promo"] is None for r in first) / len(first),
                 first_discounts=[rate(x) for x in discounts_first],
@@ -193,8 +200,10 @@ def t3(d, claim):
     years = [sum(r["rev"] for r in all_lines if r["year"] == y) for y in d.years]
     invoices = dict(d.q("SELECT substr(InvoiceDate, 1, 7), COUNT(*) FROM SalesInvoice GROUP BY 1"))
     start = f"{d.F}-01"
-    others = [n for m, n in invoices.items() if m != start]
-    claim(invoices[start] < 0.6 * min(others), f"January {d.F} has far fewer invoices than any other month")
+    others = [n for m, n in invoices.items() if m != start and int(m[:4]) in d.years]
+    early = [(f"{month_name(m)} {m[:4]}", n) for m, n in sorted(invoices.items()) if int(m[:4]) < d.F]
+    claim(invoices[start] < min(others) and invoices[start] < 0.6 * sorted(others)[len(others) // 2],
+          f"January {d.F} has the fewest invoices of the window, well below the typical month")
     discounts = defaultdict(float)
     for r in rows:
         discounts[r["month"]] += r["disc"]
@@ -205,7 +214,7 @@ def t3(d, claim):
     return dict(low=monthly[low], low_month=month_name(low), high=monthly[high], high_month=month_name(high), mean=mean,
                 range=(monthly[high] - monthly[low]) / mean, jan=jan, feb=feb, dec=dec, from_jan=dec / jan - 1,
                 from_feb=dec / feb - 1, years=years, changes=[b / a - 1 for a, b in zip(years, years[1:])],
-                jan_invoices=invoices[start], others_low=min(others), others_high=max(others),
+                jan_invoices=invoices[start], others_low=min(others), others_high=max(others), early=early,
                 top=dict(month=month_name(top), share=shares[0][1], disc=discounts[top], rev=monthly[top]),
                 next=[(month_name(m), s) for m, s in shares[1:3]])
 
@@ -268,7 +277,12 @@ def ex2(d, claim):
     parts = sorted((i for i in dups[m] if i in by_key), key=lambda i: -by_key[i])
     claim(name_rank[m] <= TOP_N, "the merged name enters the top ten by name")
     tenth = keys[TOP_N - 1]
-    claim(name_rank[info[tenth][0]] > TOP_N, "the tenth customer by key drops out of the top ten by name")
+    # Grouping by name pushes the tenth customer out of the top ten only when the merged name enters it from outside;
+    # when one of its customers is already in the top ten by key, the name only moves up.
+    inside = [p for p in parts if key_rank[p] <= TOP_N]
+    pushed = name_rank[info[tenth][0]] > TOP_N
+    claim(pushed == (not inside), "the tenth customer by key drops out of the top ten by name exactly when the merged "
+                                  "name enters it from outside")
     s = single[0]
     s_with = [i for i in dups[s] if i in by_key][0]
     largest, second = keys[0], keys[1]
@@ -278,7 +292,8 @@ def ex2(d, claim):
                 merged=dict(name=m, rank=ordinal(name_rank[m]), amount=by_name[m], n=word(len(parts)),
                             parts=[dict(id=i, region=info[i][1], segment=info[i][2], amount=by_key[i],
                                         rank=ordinal(key_rank[i])) for i in parts]),
-                tenth=dict(name=info[tenth][0], id=tenth, amount=by_key[tenth], rank=ordinal(name_rank[info[tenth][0]])),
+                tenth=dict(name=info[tenth][0], id=tenth, amount=by_key[tenth], rank=ordinal(name_rank[info[tenth][0]]),
+                           pushed=pushed, inside=inside[0] if inside else None),
                 single=dict(name=s, ids=dups[s], n=word(len(dups[s])), id=s_with, amount=by_key[s_with]),
                 largest=dict(name=info[largest][0], id=largest, amount=by_key[largest], share=by_key[largest] / revenue),
                 second=dict(name=info[second][0], share=by_key[second] / revenue),
@@ -427,6 +442,9 @@ def ex5(d, claim):
                 discounts_top=len(rates_top), top_empty=empty(top, 0) / len(top),
                 fractional=sum(r[6] != int(r[6]) for r in all_lines),
                 invoices=len(invoices), unpaid=len(unpaid), unpaid_top=sum(r[0] is None for r in invoices[:TOP_ROWS]),
+                unpaid_open=sum(r[1] != "Settled" for r in unpaid), unpaid_settled=sum(r[1] == "Settled" for r in unpaid),
+                first_from=min(r[2] for r in invoices[:TOP_ROWS]), first_line=first_line, later_lines=later_lines,
+                first_invoice=first_invoice, later_invoices=later_invoices,
                 statuses=statuses, top_statuses=top_statuses, items=len(items), sellable=len(sellable), unpriced=len(unpriced),
                 blank=sum(blank.values()), acc=blank["Accessories"], fur=blank["Furniture"], fur_word=word(blank["Furniture"]),
                 svc=blank["Services"], customers=d.one("SELECT COUNT(*) FROM Customer"),
@@ -449,10 +467,13 @@ def ex6(d, claim):
     furniture = [r["rate"] for r in rows if r["group"] == "Furniture"]
     everything = monthly_revenue(all_lines)
     start = f"{d.F}-01"
-    others = [v for m, v in everything.items() if m != start]
+    others = [v for m, v in everything.items() if m != start and int(m[:4]) in d.years]
+    early = [(f"{month_name(m)} {m[:4]}", v) for m, v in everything.items() if int(m[:4]) < d.F]
     growth = everything[f"{d.C}-12"] / everything[start] - 1
-    claim(0.75 <= growth < 0.80, f"growth from January {d.F} to December {d.C} is almost 80%")
     years = [sum(r["rev"] for r in all_lines if r["year"] == y) for y in d.years]
+    changes = [b / a - 1 for a, b in zip(years, years[1:])]
+    claim(everything[start] < min(others), f"January {d.F} is the smallest month of the window")
+    claim(growth > 2 * max(abs(c) for c in changes), "the growth the line chart suggests is far larger than any whole year's change")
     monthly = monthly_revenue(rows)
     discounts = defaultdict(float)
     for r in rows:
@@ -461,6 +482,6 @@ def ex6(d, claim):
     return dict(n_slices=word(len(slices)), slices=slices, avg=sum(r["rate"] for r in rows) / len(rows),
                 ratio=total(rows, "disc") / total(rows, "price"), of_list=total(rows, "disc") / total(rows, "list"),
                 f_avg=sum(furniture) / len(furniture), start=everything[start], low=min(others), high=max(others),
-                changes=[b / a - 1 for a, b in zip(years, years[1:])],
+                early=early, growth=growth, changes=changes,
                 peak=dict(month=month_name(peak), share=discounts[peak] / monthly[peak]),
                 services=groups["Services"], services_share=groups["Services"] / revenue)

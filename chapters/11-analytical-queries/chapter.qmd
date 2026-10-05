@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-11"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 The controller has read your answer from Chapter 10. The plant produced about as much in fiscal 2026 as in fiscal 2024, but it recorded about half as many hours again as the standard hours of its output, up from somewhat more than the standard in 2024. Direct labor stayed within the standard, so the extra hours were indirect time, and overtime more than doubled. The cost of those hours was charged to account 1090 and cleared to the variance account when the work orders closed. She wants to take the finding to the plant manager, and she asks you, her staff accountant, to be ready for the first questions that will come back. When did it start? Is it still getting worse? How much of the extra time is overtime? Is it spread across the plant, or concentrated in a few places?

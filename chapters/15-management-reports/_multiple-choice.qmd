@@ -5,7 +5,7 @@
 **1.** Which of the following is a key performance indicator in the sense of this chapter?
 
 A.  The operating expense of fiscal 2026
-B.  Every measure stored in the Measures table
+B.  Every measure stored in the Key Measures table
 C.  A line chart that shows more than one series
 D.  A cost center's spending against its budget
 

@@ -9,7 +9,9 @@ in the book's figure style (palette colors, Helvetica, 12 px minimum).
 from __future__ import annotations
 
 import re
+import os
 import zipfile
+from pathlib import Path
 from collections.abc import Callable
 from decimal import ROUND_HALF_UP, Decimal
 from functools import lru_cache
@@ -19,7 +21,8 @@ from drawio import (BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, ROW_H, RULE, S
                     Diagram, esc)
 
 BAR_H = 28
-XLSX = REPO_ROOT / "datasets" / "CharlesRiver.xlsx"
+XLSX = (Path(os.environ.get("CHARLESRIVER_DATA", REPO_ROOT / "datasets"))
+        / "CharlesRiver.xlsx").resolve()
 
 
 @lru_cache(maxsize=1)

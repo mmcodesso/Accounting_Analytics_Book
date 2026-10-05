@@ -18,7 +18,7 @@ Brink, W. D., & Stoel, M. D. (2019). Analytics knowledge, skills, and abilities 
 
 Choi, J. H., & Xie, C. L. (2026). Human + AI in accounting: Early evidence from the field. *Journal of Accounting Research*, *64*(3), 1333–1373. <https://doi.org/10.1111/1475-679x.70052>
 
-Earley, C. E. (2015). Data analytics in auditing: Opportunities and challenges. *Business Horizons*, *58*(5), 493–500. <https://doi.org/10.1016/j.bushor.2015.05.002>
+{{< include /shared/fragments/_reference-earley-2015.qmd >}}
 
 Elo, T., Kimpimäki, J.-P., Puumalainen, K., Sjögrén, H., & Pätäri, S. (2026). Mapping the skill landscape: Insights from accounting job advertisements. *Accounting Education*, *35*(5), 595–636. <https://doi.org/10.1080/09639284.2025.2488979>
 
@@ -46,6 +46,6 @@ Spraakman, G., Sanchez-Rodriguez, C., & Tuck-Riggs, C. A. (2021). Data analytics
 
 Suarta, I. M., Suwintana, I. K., Sudiadnyani, I. G. A. O., & Sintadevi, N. P. R. (2024). Employability and digital technology: What skills employers want from accounting workers? *Accounting Education*, *33*(3), 274–295. <https://doi.org/10.1080/09639284.2023.2196665>
 
-Vasarhelyi, M. A., Kogan, A., & Tuttle, B. M. (2015). Big data in accounting: An overview. *Accounting Horizons*, *29*(2), 381–396. <https://doi.org/10.2308/acch-51071>
+{{< include /shared/fragments/_reference-vasarhelyi-2015.qmd >}}
 
 Vitali, S., & Giuliani, M. (2024). Emerging digital technologies and auditing firms: Opportunities and challenges. *International Journal of Accounting Information Systems*, *53*, Article 100676. <https://doi.org/10.1016/j.accinf.2024.100676>

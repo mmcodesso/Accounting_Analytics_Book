@@ -1,0 +1,5 @@
+| Department | Month | Budget amount |
+| --- | --- | --- |
+| Sales | January | $33,136.00 |
+| Sales | February | $33,136.00 |
+| Sales | March | $33,136.00 |

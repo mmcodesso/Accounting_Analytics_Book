@@ -1,0 +1,1 @@
+**Accounting analytics.** The application of data extraction, preparation, analysis, and visualization techniques to financial and operational data for the purpose of supporting financial reporting, managerial decision-making, and audit assurance.

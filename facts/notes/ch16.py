@@ -39,6 +39,14 @@ def word(n: int) -> str:
     return WORDS[n] if n < len(WORDS) else f"{n:,}"
 
 
+def fraction(x: float) -> str:
+    """A share as the notes write it: a common fraction when one is within five points, otherwise a percentage."""
+    for value, text in ((0.25, "a quarter"), (1 / 3, "a third"), (0.5, "half"), (2 / 3, "two-thirds"), (0.75, "three-quarters")):
+        if abs(x - value) < 0.05:
+            return text
+    return f"{100 * x:.0f}%"
+
+
 def asof(d) -> str:
     return f"{d.C}-12-31"
 
@@ -228,18 +236,22 @@ def t2(d, claim):
     december = [e["doc"] for e in ex if e["test"] == "JE AboveLimit" and e["date"][5:7] == "12"]
     claim(sorted(december) == sorted(d.closes), "December's JE AboveLimit exceptions are the year-end closes")
     self_months = Counter(int(e["date"][5:7]) for e in ex if e["test"] == "PR SelfApproved")
-    claim(len(self_months) == 12, "PR SelfApproved has exceptions in every month")
+    claim(len(self_months) == 12, "PR SelfApproved has exceptions in every month name")
+    self_calendar = Counter(e["date"][:7] for e in ex if e["test"] == "PR SelfApproved")
+    calendar = [self_calendar[f"{y}-{m:02d}"] for y in d.years for m in range(1, 13)]
     # approvers: the five with the most exceptions by name, the rest by job title (ties by EmployeeID, descending,
     # the order of the reference model's visual)
     ranked = sorted(Counter(e["emp"] for e in ex).items(), key=lambda kv: (-kv[1], -kv[0]))
-    claim(len(ranked) > 5 and ranked[4][1] > ranked[5][1], "the five approvers named have more exceptions than the rest")
+    # Up to five approvers by name: as many as have more exceptions than everyone after them.
+    top = max((k for k in range(1, min(5, len(ranked) - 1) + 1) if ranked[k - 1][1] > ranked[k][1]), default=0)
+    claim(top >= 3, "at least three approvers have more exceptions than the rest")
     named = []
-    for k, n in ranked[:5]:
+    for k, n in ranked[:top]:
         e = emp[k]
         extra = f", terminated {e['terminated']}" if e["terminated"] else ""
         named.append(f"{e['name']} ({SHORT_TITLES.get(e['title'], e['title'])}{extra}) {n}")
     groups: dict[str, list[int]] = {}
-    for k, n in ranked[5:]:
+    for k, n in ranked[top:]:
         groups.setdefault(emp[k]["title"], []).append(n)
     named += [f"{t}{'s' if len(ns) > 1 else ''} {' and '.join(str(n) for n in ns)}" for t, ns in groups.items()]
     # PO AfterTermination
@@ -256,7 +268,8 @@ def t2(d, claim):
                 selfs=dict(n=len(selfs), approver=self_approver),
                 rates=by_process(rates), months=[(MONTHS[m - 1][:3], months[m]) for m in range(1, 13) if months[m]],
                 january=by_process(january), december=len(december), n_closes=word(len(d.closes)),
-                self_low=min(self_months.values()), self_high=max(self_months.values()), approvers=named,
+                self_low=min(self_months.values()), self_high=max(self_months.values()),
+                self_cal_low=min(calendar), self_cal_high=max(calendar), approvers=named,
                 po_after=[dict(number=o["number"], when=month_year(o["date"])) for o in po_after],
                 po_after_by=po_after[0]["approver"], po_after_limit=emp[po_after[0]["approver"]]["limit"],
                 years=years, je_rates=[1000 * n / p for n, p in zip(years["JE"], per_year(d, pops["JE"]))])
@@ -333,7 +346,11 @@ def t3(d, claim):
     # The package's Tests 1, 3, and 5 (Chapters 14-15)
     test1 = d.q("SELECT CAST(substr(si.InvoiceDate, 1, 4) AS INTEGER), COUNT(*), SUM(l.LineTotal) FROM SalesInvoiceLine l "
                 "JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID GROUP BY 1 ORDER BY 1")
-    claim([r[0] for r in test1] == d.years, "the invoice lines cover the fiscal years of the window")
+    claim(set(d.years) <= {r[0] for r in test1}, "the invoice lines cover the fiscal years of the window")
+    # Lines dated outside the window: their own year row inside the package's Date table (the first fiscal year to the
+    # year after the current one), (Blank) outside it.
+    test1_outside = [(str(y) if d.F <= y <= d.N else "(Blank)", n, rev) for y, n, rev in test1 if y not in d.years]
+    test1 = [r for r in test1 if r[0] in d.years]
     closes = d.closes_of(d.C)
     tb = [r[0] for r in d.q("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE PostingDate <= ? AND VoucherNumber "
                             "NOT IN (%s) GROUP BY AccountID" % ",".join("?" * len(closes)), asof(d), *closes)]
@@ -355,7 +372,8 @@ def t3(d, claim):
                 capital_limit=capital_by["limit"], orders=len(numbers), first=min(numbers), last_number=max(numbers),
                 registers=len(regs), unpaid=[r["id"] for r in unpaid], ceo_register=not_flagged[0]["id"] if not_flagged else None, last=last,
                 through=min(last.values()),
-                through_years=through_years, test1=[(n, rev) for _, n, rev in test1], tb_accounts=len(tb), tb=tb_debit,
+                through_years=through_years, test1=[(n, rev) for _, n, rev in test1], test1_outside=test1_outside,
+                tb_accounts=len(tb), tb=tb_debit,
                 test5=[hours[y] / standard[y] for y in d.years])
 
 
@@ -369,15 +387,16 @@ def ex1(d, claim):
                "Credited AS (SELECT OriginalSalesInvoiceID AS SalesInvoiceID, SUM(GrandTotal) AS Credited FROM CreditMemo "
                "WHERE CreditMemoDate <= ?1 GROUP BY OriginalSalesInvoiceID) "
                "SELECT si.SalesInvoiceID, si.CustomerID, ROUND(si.GrandTotal - COALESCE(a.Applied, 0) - COALESCE(c.Credited, 0), 2), "
-               "julianday(?1) - julianday(si.DueDate), COALESCE(a.Applied, 0) FROM SalesInvoice si "
+               "julianday(?1) - julianday(si.DueDate), COALESCE(a.Applied, 0), si.GrandTotal FROM SalesInvoice si "
                "LEFT JOIN Applied a ON a.SalesInvoiceID = si.SalesInvoiceID LEFT JOIN Credited c ON c.SalesInvoiceID = si.SalesInvoiceID "
                "WHERE si.InvoiceDate <= ?1", end)
     positive = [r for r in rows if r[2] > 0]
     buckets = [dict(name=name, balances=[]) for _, name in BUCKETS]
     for r in positive:
         buckets[[i for i, (low, _) in enumerate(BUCKETS) if r[3] >= low][-1]]["balances"].append(r[2])
-    oldest = buckets[-1]["balances"]
-    claim(sum(1 for b in oldest if b < 1) > len(oldest) / 2, "most balances over 90 days past due are cent residuals")
+    oldest = [r for r in positive if r[3] >= BUCKETS[-1][0]]
+    claim(all(r[4] > 0 and r[2] < 0.1 * r[5] for r in oldest),
+          "the balances over 90 days past due are small residuals of invoices paid almost in full")
     total = sum(r[2] for r in positive)
     entry = d.one("SELECT EntryNumber FROM JournalEntry WHERE EntryType = 'Opening' ORDER BY PostingDate LIMIT 1")
     opening = d.one("SELECT SUM(Debit) - SUM(Credit) FROM GLEntry WHERE AccountID = ? AND VoucherNumber = ?",
@@ -399,7 +418,8 @@ def ex1(d, claim):
     claim(refunded >= 0.95 * len(negative), "the credits on those invoices are (almost all) refunded")
     return dict(asof=end, n=len(positive), total=total, customers=len({r[1] for r in positive}),
                 b=[dict(name=b["name"], amount=sum(b["balances"])) for b in buckets], ledger=ledger,
-                difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative))
+                difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
+                oldest=dict(n=len(oldest), largest=max((r[2] for r in oldest), default=0.0)), refunded=refunded)
 
 
 # --- Exercise 16.2 --------------------------------------------------------------------------------
@@ -470,7 +490,7 @@ def ex3(d, claim):
         f"WHERE c.CostCenterName = 'Manufacturing' GROUP BY 1, 2")}
     on_surge = [overtime.get((y, 1), 0.0) for y in d.years]
     other = [overtime.get((y, 0), 0.0) for y in d.years]
-    claim(max(other) / min(other) < 1.1, "overtime on other days is flat")
+    claim(max(other[1:]) <= 1.1 * other[0], "overtime on other days did not grow")
     manager = d.one("SELECT EmployeeID FROM Employee WHERE JobTitle = 'Production Manager'")
     approvals = d.q(f"SELECT oa.ApprovedByEmployeeID, oa.ApprovedDate, tc.WorkDate FROM TimeClockEntry tc "
                     f"JOIN Employee e ON e.EmployeeID = tc.EmployeeID JOIN CostCenter c ON c.CostCenterID = e.CostCenterID "
@@ -480,7 +500,9 @@ def ex3(d, claim):
           "every surge entry was approved by the Production Manager on the work date")
     by_year = Counter(int(r[0][:4]) for r in surge)
     return dict(by_year=[(y, by_year[y]) for y in d.years], total=len(surge), first=surge[0][0],
-                several=month_year(several + "-01"), peak=peak, peak_month=month_year(peaks[0] + "-01"),
+                several=month_year(several + "-01"), span=span, with_surge=sum(1 for m in per_month if m >= several),
+                average=sum(n for m, n in per_month.items() if m >= several) / span,
+                peak=peak, peak_month=month_year(peaks[0] + "-01"),
                 employees=surge[0][1], regular=surge[0][3], overtime=surge[0][4], on_surge=on_surge,
                 shares=[s / (s + o) for s, o in zip(on_surge, other)], other=other, entries=len(approvals))
 
@@ -501,9 +523,11 @@ def ex4(d, claim):
           "the expected exceptions are the two closes of each year")
     claim(unexplained_n["PO"] == counts["PO"], "the purchase orders' unexplained rate is unchanged")
     po_n, po_r, po_pop = counts["PO"], rates["PO"], pops["PO"]
-    claim(abs(po_n[2] / po_n[1] - 4 / 3) < 0.05, f"the order exceptions rose by a third from {d.P} to {d.C}")
-    claim(abs(po_r[2] / po_r[1] - 1) < 0.1, "the order rate barely moved")
-    claim(abs((1 - po_r[2] / po_r[0]) - 2 / 3) < 0.05, f"from {d.F} the order rate fell by two-thirds")
+    claim(po_n[2] > po_n[1] and po_pop[2] / po_pop[1] - 1 > po_n[2] / po_n[1] - 1 - 0.1,
+          f"the order exceptions rose from {d.P} to {d.C}, but orders grew about as fast or faster, so the rate did not rise much")
+    change = po_r[2] / po_r[1] - 1
+    moved = "barely moved" if abs(change) < 0.1 else f"fell by {fraction(-change)}" if change < 0 else f"rose by {fraction(change)}"
+    claim(po_r[2] < po_r[0], f"from {d.F} the order rate fell")
     claim(po_pop[2] / po_pop[0] > 2, f"orders more than doubled from {d.F}")
     je = unexplained["JE"]
     claim(je[1] < je[0] and je[2] > je[1], f"the journal entries' unexplained rate fell in {d.P} and rose in {d.C}")
@@ -521,13 +545,16 @@ def ex4(d, claim):
           "the change in the journal entries comes mostly from documents that fail several tests")
     stable = [(name, per_year(d, [e["date"] for e in ex if e["test"] == f"JE {name}"]))
               for name in ("Weekend", "Backdated", "SelfApproved")]
-    claim(all(max(v) - min(v) <= 1 for _, v in stable), "Weekend, Backdated, and SelfApproved barely move")
+    spread = max(max(v) - min(v) for _, v in stable)
+    claim(spread <= 2, "Weekend, Backdated, and SelfApproved move by at most two a year")
     pr_left = unexplained_n["PR"]
     claim(len(set(pr_left)) == 1, "payroll's unexplained exceptions are the same number every year")
     pr_self = per_year(d, [e["date"] for e in ex if e["test"] == "PR SelfApproved"])
     claim(all(s / n > 0.9 for s, n in zip(pr_self, counts["PR"])), "payroll's rate is almost entirely the design finding")
     return dict(table=[(p, list(zip(counts[p], pops[p], rates[p]))) for p in ("JE", "PO", "PR")], unexplained=unexplained,
                 po_n=po_n, po_r=po_r, growth=po_pop[2] / po_pop[1] - 1, opening=word(opening["score"]),
+                rose=fraction(po_n[2] / po_n[1] - 1), moved=moved, fell=fraction(1 - po_r[2] / po_r[0]),
+                still="barely move" if spread <= 1 else "move little",
                 opening_year=int(opening["date"][:4]), reclass=word(reclass[0]["score"]),
                 reclass_years=[int(e["date"][:4]) for e in reclass], stable=stable, pr_left=word(pr_left[0]))
 

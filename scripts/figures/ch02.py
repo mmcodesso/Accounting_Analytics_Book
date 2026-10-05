@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from shared.calculations.foundations import budget_example, quality_examples
+
 import excel as xl
-from data import one, q, require_columns
+from data import connection, one, q, require_columns
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, HEAD,
                     HIGHLIGHT, INK, RULE, ROW_H, SMALL, TEAL, TEAL_TINT, WHITE, Diagram, esc,
                     money)
@@ -83,6 +89,7 @@ def fig_02_02() -> Diagram:
 
 def fig_02_03() -> Diagram:
     d = Diagram("Common Data Quality Problems")
+    examples = quality_examples(connection())
 
     def panel(x: float, y: float, title: str, caption: str, headers: list[str],
               widths: list[float], rows: list[tuple], marks: set, label: str, note: str) -> None:
@@ -92,15 +99,7 @@ def fig_02_03() -> Diagram:
         top = y + 56 + ROW_H * (len(rows) + 1) + 8
         d.text(f'<b><font color="{CORAL}">{label}</font></b> {note}', x, top, 420, 56)
 
-    def shipments(numbers: list[str], columns: str) -> list[tuple]:
-        marks = ",".join("?" * len(numbers))
-        rows = q(f"SELECT {columns} FROM Shipment WHERE ShipmentNumber IN ({marks}) "
-                 "ORDER BY ShipmentNumber", *numbers)
-        assert len(rows) == len(numbers), rows
-        return rows
-
-    miss = shipments(["SH-2024-000028", "SH-2024-000029", "SH-2024-000049"],
-                     "ShipmentNumber, ShipmentDate, FreightCost, TrackingNumber")
+    miss = examples['missing']
     panel(0, 0, "Missing Values", "Charles River: Shipment table (Order-to-Cash)",
           ["ShipmentNumber", "ShipmentDate", "FreightCost", "TrackingNumber"], [115, 90, 80, 135],
           [(n, dt, money(f), t or "(blank)") for n, dt, f, t in miss],
@@ -108,9 +107,7 @@ def fig_02_03() -> Diagram:
           "Completeness problem:",
           "TrackingNumber is blank, so there is no carrier record for these shipments.")
 
-    dup = q("SELECT SupplierID, InvoiceNumber, InvoiceDate, GrandTotal FROM PurchaseInvoice "
-            "WHERE SupplierID = 2 AND InvoiceNumber IN ('V0002-2024-000182', 'V0002-2024-000204') "
-            "ORDER BY InvoiceDate")
+    dup = examples['duplicates']
     assert [r[1] for r in dup].count("V0002-2024-000182") == 2, dup
     panel(440, 0, "Duplicate Records", "Charles River: PurchaseInvoice table (Procure-to-Pay)",
           ["SupplierID", "InvoiceNumber", "InvoiceDate", "GrandTotal"], [80, 145, 95, 100],
@@ -120,8 +117,7 @@ def fig_02_03() -> Diagram:
           "The same supplier invoice number is recorded twice, with different dates and amounts. "
           "This is a duplicate-payment risk that requires investigation.")
 
-    stat = shipments(["SH-2024-000001", "SH-2024-000004", "SH-2024-000038"],
-                     "ShipmentNumber, ShipmentDate, Status, DeliveryDate")
+    stat = examples['status']
     panel(0, 250, "Inconsistent Values", "Charles River: Shipment table (Order-to-Cash)",
           ["ShipmentNumber", "ShipmentDate", "Status", "DeliveryDate"], [120, 95, 95, 110],
           stat, {(i, 2) for i, r in enumerate(stat, 1) if r[2] == "In Transit"},
@@ -129,9 +125,8 @@ def fig_02_03() -> Diagram:
           "These shipments are still marked In Transit, although their DeliveryDate passed years "
           "before the data was extracted.")
 
-    out = shipments(["SH-2024-000001", "SH-2024-000002", "SH-2024-000003", "SH-2026-008319"],
-                    "ShipmentNumber, WarehouseID, FreightCost")
-    average, largest = one("SELECT AVG(FreightCost), MAX(FreightCost) FROM Shipment")
+    out = examples['outliers']
+    average, largest = examples['freight_summary']
     assert out[-1][2] == largest, (out, largest)
     panel(440, 250, "Outliers", "Charles River: Shipment table (Order-to-Cash)",
           ["ShipmentNumber", "WarehouseID", "FreightCost"], [140, 120, 160],
@@ -145,11 +140,7 @@ def fig_02_03() -> Diagram:
 
 def fig_02_06() -> Diagram:
     d = Diagram("Messy Versus Tidy Data")
-    budgets = q(
-        "SELECT cc.CostCenterName, b.Month, b.BudgetAmount FROM Budget b "
-        "JOIN CostCenter cc USING (CostCenterID) JOIN Account a USING (AccountID) "
-        "WHERE b.FiscalYear = 2025 AND b.Month <= 3 AND a.AccountNumber IN (6010, 6030, 6240) "
-        "ORDER BY cc.CostCenterID, b.Month")
+    budgets = budget_example(connection())
     assert len(budgets) == 9, budgets
     months = {1: "January", 2: "February", 3: "March"}
     departments = list(dict.fromkeys(name for name, _, _ in budgets))

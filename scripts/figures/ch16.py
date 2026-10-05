@@ -18,15 +18,15 @@ import excel as xl
 import powerbi as pbi
 from check_figures import text_width
 from data import REPO_ROOT, one, q, require_columns
+from data import connection
+from shared.calculations import bi_ch16 as public_calculations
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, HIGHLIGHT,
                     INK, RULE, SMALL, TEAL, TEAL_TINT, WHITE, Diagram, esc)
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-JE_FLAGS = ["Weekend", "Backdated", "SelfApproved", "AboveLimit", "RoundAmount"]
-TESTS = ["JE Weekend", "JE Backdated", "JE SelfApproved", "JE AboveLimit", "JE RoundAmount",
-         "PO SelfApproved", "PO AboveLimit", "PO AfterTermination",
-         "PR PaidBeforeApproval", "PR AfterTermination", "PR SelfApproved"]
-PROCESS = {"JE": "Journal entries", "PO": "Purchase orders", "PR": "Payroll"}
+JE_FLAGS = public_calculations.JE_FLAGS
+TESTS = public_calculations.TESTS
+PROCESS = public_calculations.PROCESS
 
 
 def money(v: float) -> str:
@@ -45,70 +45,21 @@ def note(d: Diagram, text: str, y: float, h: float = 40) -> None:
 
 @lru_cache(maxsize=1)
 def journal_entries() -> list[dict]:
-    """Every journal entry with Chapter 8's five flags and its risk score (Tutorial 16.1)."""
-    require_columns("JournalEntry", ["JournalEntryID", "EntryNumber", "PostingDate", "EntryType", "TotalAmount",
-                                     "CreatedByEmployeeID", "CreatedDate", "ApprovedByEmployeeID"])
-    out = []
-    for jid, num, pd, et, amt, cb, cd, ab, lim in q(
-            "SELECT j.JournalEntryID, j.EntryNumber, j.PostingDate, j.EntryType, j.TotalAmount, "
-            "j.CreatedByEmployeeID, j.CreatedDate, j.ApprovedByEmployeeID, e.MaxApprovalAmount "
-            "FROM JournalEntry j LEFT JOIN Employee e ON e.EmployeeID = j.ApprovedByEmployeeID "
-            "ORDER BY j.EntryNumber"):
-        created = dt.datetime.fromisoformat(cd)
-        flags = dict(Weekend=int(created.weekday() >= 5), Backdated=int(created.date().isoformat() > pd),
-                     SelfApproved=int(cb == ab), AboveLimit=int(amt > lim),
-                     RoundAmount=int(round(amt % 1000, 6) == 0))
-        out.append(dict(id=jid, number=num, posting=pd, type=et, amount=amt, approver=ab, limit=lim,
-                        flags=flags, score=sum(flags.values())))
-    assert len(out) == 851
-    assert [sum(e["flags"][f] for e in out) for f in JE_FLAGS] == [17, 6, 7, 9, 4]
-    assert sorted(Counter(e["score"] for e in out).items()) == [(0, 818), (1, 25), (2, 7), (4, 1)]
-    return out
+    return public_calculations.journal_entries(connection())
 
 
 @lru_cache(maxsize=1)
 def register() -> list[dict]:
-    """The exception register of Tutorial 16.2: one row per exception per test."""
-    rows = []
-    for e in journal_entries():
-        for f in JE_FLAGS:
-            if e["flags"][f]:
-                rows.append(dict(test=f"JE {f}", doc=e["number"], date=e["posting"], amount=e["amount"],
-                                 employee=e["approver"]))
-    for num, od, tot, cb, ab, lim, term in q(
-            "SELECT p.PONumber, p.OrderDate, p.OrderTotal, p.CreatedByEmployeeID, p.ApprovedByEmployeeID, "
-            "e.MaxApprovalAmount, e.TerminationDate FROM PurchaseOrder p "
-            "LEFT JOIN Employee e ON e.EmployeeID = p.ApprovedByEmployeeID"):
-        for test, failed in [("PO SelfApproved", cb == ab), ("PO AboveLimit", tot > lim),
-                             ("PO AfterTermination", term is not None and od > term)]:
-            if failed:
-                rows.append(dict(test=test, doc=num, date=od, amount=tot, employee=ab))
-    for rid, emp, net, ab, ad, paid, pend, pay, term in q(
-            "SELECT r.PayrollRegisterID, r.EmployeeID, r.NetPay, r.ApprovedByEmployeeID, r.ApprovedDate, "
-            "pp.PaymentDate, pe.PeriodEndDate, pe.PayDate, e.TerminationDate FROM PayrollRegister r "
-            "LEFT JOIN PayrollPayment pp ON pp.PayrollRegisterID = r.PayrollRegisterID "
-            "LEFT JOIN PayrollPeriod pe ON pe.PayrollPeriodID = r.PayrollPeriodID "
-            "LEFT JOIN Employee e ON e.EmployeeID = r.EmployeeID"):
-        for test, failed in [("PR PaidBeforeApproval", paid is not None and paid < ad),
-                             ("PR AfterTermination", term is not None and pend > term),
-                             ("PR SelfApproved", emp == ab)]:
-            if failed:
-                rows.append(dict(test=test, doc=f"Register {rid}", date=pay, amount=net, employee=ab))
-    counts = Counter(r["test"] for r in rows)
-    assert [counts[t] for t in TESTS] == [17, 6, 7, 9, 4, 9, 13, 3, 3, 3, 77], counts
-    assert len({(r["test"], r["doc"]) for r in rows}) == len(rows) == 151
-    return rows
+    return public_calculations.register(connection())
 
 
 @lru_cache(maxsize=1)
 def populations() -> dict[str, int]:
-    return {"Journal entries": one("SELECT COUNT(*) FROM JournalEntry")[0],
-            "Purchase orders": one("SELECT COUNT(*) FROM PurchaseOrder")[0],
-            "Payroll": one("SELECT COUNT(*) FROM PayrollRegister")[0]}
+    return public_calculations.populations(connection())
 
 
 def employees() -> dict[int, tuple[str, str]]:
-    return {i: (n, t) for i, n, t in q("SELECT EmployeeID, EmployeeName, JobTitle FROM Employee")}
+    return public_calculations.employees(connection())
 
 
 # -- fig-16-01 --------------------------------------------------------------------------------
@@ -396,25 +347,11 @@ def fig_16_06() -> Diagram:
 
 # -- fig-16-07 --------------------------------------------------------------------------------
 
-DISPOSITIONS = (
-    [("JE AboveLimit", n, "Expected", "Year-end close")
-     for n in ["JE-2024-000265", "JE-2024-000266", "JE-2025-000287", "JE-2025-000288", "JE-2026-000296",
-               "JE-2026-000297"]]
-    + [("PO AfterTermination", n, "Deficiency", "Approver had left")
-       for n in ["PO-2024-000474", "PO-2025-003922", "PO-2026-010467"]]
-    + [("PR AfterTermination", n, "Deficiency", "Payee had left")
-       for n in ["Register 840", "Register 2646", "Register 5420"]]
-    + [("PR PaidBeforeApproval", n, "Follow up", "Paid before approval")
-       for n in ["Register 2", "Register 2647", "Register 5421"]])
+DISPOSITIONS = public_calculations.DISPOSITIONS
 
 
 def reviewed_register() -> list[dict]:
-    """The register of Tutorial 16.3: each exception with the disposition merged on the test and the document."""
-    disp = {(t, n): (d, note) for t, n, d, note in DISPOSITIONS}
-    rows = [dict(r, disposition=disp.get((r["test"], r["doc"]), (None, None))[0]) for r in register()]
-    # Test 3: every disposition found its exception.
-    assert sum(1 for r in rows if r["disposition"]) == len(DISPOSITIONS) == 15
-    return rows
+    return public_calculations.reviewed_register(connection())
 
 
 def fig_16_07() -> Diagram:
@@ -498,7 +435,7 @@ def fig_16_08() -> Diagram:
                           [[str(orders), str(first), str(last), str(regs), str(unpaid)]])
     assert res["bottom"] <= win.bottom, res["bottom"]
     xl.emphasis(d, *res["geometry"][(0, 4)])
-    for i, name in enumerate(["Measures", "Date", "Employee", "Exceptions", "JournalEntry", "JournalLines",
+    for i, name in enumerate(["Key Measures", "Date", "Employee", "Exceptions", "JournalEntry", "JournalLines",
                               "PayrollRegister", "PurchaseOrder", "Tests"]):
         d.text(esc(name), win.panes_x + 8, win.top + 34 + i * 26, pane_w - 12, 22, size=SMALL)
     d.text("<i>The Tests tab of Audit Monitoring.pbix after Run. The order numbers run from 1 to the number of "

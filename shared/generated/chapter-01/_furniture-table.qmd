@@ -1,0 +1,8 @@
+Furniture · fiscal 2026 · invoice-based margin at standard cost
+
+| Measure | Q3 | Q4 |
+|:--|--:|--:|
+| Invoiced revenue | $4,283,322.86 | $4,156,787.84 |
+| Extended standard cost | $2,473,065.77 | $2,461,576.82 |
+| Margin | $1,810,257.09 | $1,695,211.02 |
+| Margin rate | 42.26% | 40.78% |

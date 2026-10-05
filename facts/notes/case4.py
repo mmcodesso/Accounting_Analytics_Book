@@ -8,10 +8,8 @@ the as-of date, the year-end closes left out only when dated on it), flows leave
 measures divide a quarter-end balance by the ledger flow of the twelve months that end on that date, times 365. Amounts
 are rounded half away from zero, as DAX's ROUND and Number.Round do.
 
-Two statements are worded more loosely than the data: Requirement 3's "receivables run about a week beyond terms" holds
-for days sales outstanding without the opening line (as recorded it is about eleven days), and Requirement 5's
-negative receivable balances were "credited to 2060 and refunded" except for the few still awaiting a refund at the
-year-end (the balance of 2060). The claims test the wording on those readings.
+Requirement 3 states how far receivables run beyond terms both without the opening line and as recorded, and
+Requirement 5 names the credits still awaiting a refund at the year-end (the balance of 2060).
 
 One note is not registered, because its comment states a value the data do not give; its context function renders
 the corrected text, so register it once the comment is fixed:
@@ -70,6 +68,18 @@ def xr(x: float, places: int = 2) -> float:
 
 def year_end(year: int) -> str:
     return f"{year}-12-31"
+
+
+def weeks(days: float) -> str:
+    """A number of days as the notes write it in weeks: "about a week", "almost four weeks", "over two weeks"."""
+    w = days / 7
+    n = round(w)
+    if n == 0:
+        return f"{days:.0f} days"
+    unit = "a week" if n == 1 else f"{word(n)} weeks"
+    if abs(w - n) < 0.15:
+        return f"about {unit}"
+    return f"almost {unit}" if w < n else f"over {unit}"
 
 
 # --- the ledger, summarized once -----------------------------------------------------------------
@@ -366,6 +376,23 @@ def number_range(invoices: list[dict]) -> str:
     return first if first == last else f"{first} to {last.rsplit('-', 1)[1]}"
 
 
+def number_list(invoices: list[dict]) -> str:
+    """Invoice numbers as the notes list them: 'SI-2025-006733 to 006735' for three or more consecutive numbers,
+    'SI-2025-000001 and 000002' for two, otherwise in full."""
+    if len(invoices) >= 3 and consecutive(invoices):
+        return number_range(invoices)
+    if len(invoices) == 2 and invoices[0]["number"].rsplit("-", 1)[0] == invoices[1]["number"].rsplit("-", 1)[0]:
+        return f"{invoices[0]['number']} and {invoices[1]['number'].rsplit('-', 1)[1]}"
+    return ", ".join(i["number"] for i in invoices)
+
+
+def date_list(days: list[str]) -> str:
+    """Dates as the notes list them: '2025-01-02 and 01-04', the later ones without their year when it is the same."""
+    days = sorted(set(days))
+    rest = [x[5:] if x[:4] == days[0][:4] else x for x in days[1:]]
+    return days[0] if not rest else ", ".join([days[0]] + rest[:-1]) + f" and {rest[-1]}"
+
+
 def consecutive(invoices: list[dict]) -> bool:
     seqs = [int(i["number"].rsplit("-", 1)[1]) for i in invoices]
     return seqs == list(range(seqs[0], seqs[0] + len(seqs)))
@@ -411,8 +438,8 @@ def r1(d, claim):
     no_approver = d.one("SELECT COUNT(*) FROM PurchaseRequisition WHERE ApprovedByEmployeeID IS NULL")
     never = unordered(d)
     claim(all(r[0] == "Approved" for r in never), "the requisitions never ordered are Approved")
-    claim(all(r[1] == "Shortfall" and r[2][:7] == f"{d.C}-12" for r in never),
-          f"the requisitions never ordered are all work-order shortfall requisitions of December {d.C}")
+    claim(all(r[2][:7] == f"{d.C}-12" for r in never), f"the requisitions never ordered are all requisitions of December {d.C}")
+    never_channels = Counter(r[1] for r in never)
     # Validation.
     ni = [bridge(d, y)["net_income"] for y in d.years]
     assets = [xr(balance(d, numbers(d, lambda n, t, s: t == "Asset"), year_end(y))) for y in d.years]
@@ -446,6 +473,7 @@ def r1(d, claim):
     fall = -bridge(d, d.N)["cash"]
     claim(abs(fall - pay_amount) < 0.005, f"the bridge for {d.N} shows a fall of exactly the payments")
     payroll_end = d.one("SELECT MAX(PostingDate) FROM GLEntry WHERE SourceDocumentType IN ('PayrollSummary', 'PayrollPayment')")
+    remit_end = d.one("SELECT MAX(PostingDate) FROM GLEntry WHERE SourceDocumentType = 'PayrollLiabilityRemittance'")
     open_periods = d.q("SELECT PayrollPeriodID, PeriodStartDate FROM PayrollPeriod WHERE Status = 'Open' AND PeriodStartDate <= ? "
                        "ORDER BY 1", year_end(d.C))
     later = d.one("SELECT COUNT(*) FROM PayrollPeriod WHERE Status <> 'Open' AND PayrollPeriodID > ?",
@@ -460,8 +488,10 @@ def r1(d, claim):
                 empty_issues=empty_issues, requisitions=requisitions, no_approver=no_approver, unordered=len(never),
                 ni=ni, assets=assets, received=received, issued=issued, thru=thru, last=last, n_pay=n_pay,
                 rows_after=rows_after, pay_amount=xr(pay_amount), cash_last=xr(balance(d, ["1010"], last)),
-                ap_last=xr(-balance(d, ["2010"], last)), fall=xr(fall), payroll_end=payroll_end,
-                n_open=word(len(open_periods)))
+                ap_last=xr(-balance(d, ["2010"], last)), fall=xr(fall), payroll_end=payroll_end, remit_end=remit_end,
+                n_open=word(len(open_periods)),
+                never_channels=[(n, {"Shortfall": "work-order shortfall", "Supply plan": "supply plan"}.get(ch, "other"))
+                                for ch, n in never_channels.most_common()])
 
 
 # --- Requirement 2 -------------------------------------------------------------------------------
@@ -479,7 +509,9 @@ def r2(d, claim):
         inv = balance(d, ["1040", "1045", "1046"], year_end(y))
         ye.append(dict(ca=xr(ca), cl=xr(cl), wc=xr(ca - cl), current=xr(ca / cl, 2), quick=xr(quick / cl, 2), inv_share=inv / ca))
     ratios, quicks = [y["current"] for y in ye], [y["quick"] for y in ye]
-    claim(max(ratios) - min(ratios) < 0.05, "the current ratio is flat")
+    moved = max(ratios) / min(ratios) - 1
+    claim(moved < 0.1 and (quicks[0] - quicks[-1]) / quicks[0] > 3 * moved,
+          "the current ratio moves little, far less than the quick ratio falls")
     claim(all(a > b for a, b in zip(quicks, quicks[1:])) and quicks[0] - quicks[-1] > 0.2, "the quick ratio falls every year")
     a1090 = xr(balance(d, ["1090"], year_end(d.C)))
     claim(a1090 < 0, f"1090 has a credit balance at the end of {d.C}")
@@ -624,8 +656,8 @@ def r3(d, claim):
                       "FROM SalesInvoice si JOIN Customer c ON c.CustomerID = si.CustomerID")
     suppliers = d.one("SELECT SUM(pi.GrandTotal * CAST(REPLACE(s.PaymentTerms, 'Net ', '') AS REAL)) / SUM(pi.GrandTotal) "
                       "FROM PurchaseInvoice pi JOIN Supplier s ON s.SupplierID = pi.SupplierID")
-    claim(4 <= last["dso_x"] - customers <= 10, "receivables (without the opening line) run about a week beyond terms")
-    claim(21 <= last["dpo_x"] - suppliers < 28, "payables without the opening line run almost four weeks beyond terms")
+    claim(last["dso_x"] > customers and last["dpo_x"] > suppliers,
+          "receivables and payables (without the opening line) both run beyond terms")
     claim(abs(last["dso"] - first["dso"]) < 10 and abs(last["dpo_x"] - first["dpo_x"]) < 5,
           "receivables and payables barely moved")
     claim(last["dio"] - first["dio"] >= last["ccc_x"] - first["ccc_x"] > 0, "the cycle grew entirely through inventory")
@@ -638,6 +670,8 @@ def r3(d, claim):
     return dict(close=cogs_closes[0][0] if cogs_closes else "?", close_millions=(cogs_closes[0][1] if cogs_closes else 0) / 1e6,
                 entry=opening_entry(d), qs=qs, ends=ends, avg=avg, raw=raw[0], pack=pack[0], made=(min(r[4] for r in made), max(r[4] for r in made)),
                 bought=(min(r[4] for r in bought), max(r[4] for r in bought)), customers=customers, suppliers=suppliers,
+                ar_beyond=weeks(last["dso_x"] - customers), ar_recorded=last["dso"] - customers,
+                ap_beyond=weeks(last["dpo_x"] - suppliers),
                 build_avg=avg[-1]["mat"], build_end=last["mat"], first_avg=avg[0]["mat"], first_end=first["mat"],
                 dpo_from=first["dpo"], dpo_to=last["dpo"], opening_ap=opening_ap / 1e6)
 
@@ -662,10 +696,8 @@ def r4(d, claim):
     groups = dict(d.q(f"SELECT i.ItemGroup, SUM(l.ExtendedStandardCost) FROM MaterialIssueLine l JOIN MaterialIssue m "
                       f"ON m.MaterialIssueID = l.MaterialIssueID JOIN Item i ON i.ItemID = l.ItemID "
                       f"WHERE substr(m.IssueDate, 1, 4) = ? GROUP BY 1", str(d.C)))
-    plans = [y["plan"][1] for y in by_year]
     shorts = [y["short"][1] for y in by_year]
-    claim(max(plans) / min(plans) < 1.3 and max(issues.values()) / min(issues.values()) < 1.1,
-          "the supply plan's receipts and production's use are flat")
+    claim(max(issues.values()) / min(issues.values()) < 1.1, "production's use holds steady")
     claim(all(y["plan"][1] < issues[y["year"]] for y in by_year) and all(a < b for a, b in zip(shorts, shorts[1:])),
           "the supply plan alone stays below use every year while shortfall receipts grow: the shortfall channel carries the build")
     build_rows = d.q(f"WITH r AS (SELECT l.ItemID, SUM(l.ExtendedStandardCost) v FROM GoodsReceiptLine l JOIN GoodsReceipt g "
@@ -698,8 +730,7 @@ def r4(d, claim):
                 "MAX(RequestDate) FROM PurchaseRequisition WHERE Justification LIKE 'WO-COMPONENT-SHORTFALL%' GROUP BY 1")
     repeated = [p for p in pairs if p[1] > 1]
     most = max(p[1] for p in pairs)
-    top_pairs = [p for p in pairs if p[1] == most]
-    claim(len(top_pairs) == 1, "one pair has the most requisitions")
+    top_pairs = sorted((p for p in pairs if p[1] == most), key=lambda p: (p[4], p[0]))     # ties: the earliest first
     tp = top_pairs[0]
     wo_id, item_id = int(re.search(r"WO=(\d+)", tp[0]).group(1)), int(re.search(r"ITEM=(\d+)", tp[0]).group(1))
     wo = d.q("SELECT WorkOrderNumber, DueDate, CompletedDate FROM WorkOrder WHERE WorkOrderID = ?", wo_id)[0]
@@ -707,8 +738,10 @@ def r4(d, claim):
     dates = [r[0] for r in d.q("SELECT RequestDate FROM PurchaseRequisition WHERE Justification = ? ORDER BY 1", tp[0])]
     months = sorted({x[:7] for x in dates})
     span = (int(months[-1][:4]) - int(months[0][:4])) * 12 + int(months[-1][5:]) - int(months[0][5:]) + 1
-    claim(len(months) == span and max(Counter(x[:7] for x in dates).values()) <= 2, "the pair was requisitioned monthly")
-    claim(tp[5] > wo[1] and wo[2] > tp[5], "the pair was requisitioned long after the work order was due, and completed after the last one")
+    per_month = Counter(x[:7] for x in dates).values()
+    claim(len(months) == span and max(per_month) <= 2, "the pair was requisitioned every month, once or twice")
+    claim(tp[5] > wo[1] and wo[2] is not None and wo[2] > tp[5],
+          "the pair was requisitioned long after the work order was due, and completed after the last one")
     issued = {k: (q, c) for k, q, c in d.q("SELECT 'WO-COMPONENT-SHORTFALL | WO=' || m.WorkOrderID || ' | ITEM=' || l.ItemID, "
                                            "SUM(l.QuantityIssued), SUM(l.ExtendedStandardCost) FROM MaterialIssueLine l "
                                            "JOIN MaterialIssue m ON m.MaterialIssueID = l.MaterialIssueID GROUP BY 1")}
@@ -727,8 +760,6 @@ def r4(d, claim):
                      "r.RequestedByEmployeeID LEFT JOIN CostCenter c ON c.CostCenterID = e.CostCenterID WHERE r.Justification "
                      "LIKE 'WO-COMPONENT-SHORTFALL%' AND r.RequestedByEmployeeID <> ? GROUP BY 1, 2 ORDER BY 3 DESC", approver)
     claim(all(r[1] == "Manufacturing" for r in requesters), "production staff requested the rest")
-    claim(sum(r[2] for r in requesters[:3]) > 0.9 * sum(r[2] for r in requesters),
-          "the three titles listed made nearly all of the other shortfall requisitions")
     plan_app = {r[2]: r[3] for r in approvers if r[0] == "Supply plan"}
     claim(set(plan_app) <= {"Chief Financial Officer", None}, "the CFO approved every supply-plan requisition with an approver")
     other_app = [(SHORT_TITLES.get(r[2], r[2]), r[3]) for r in approvers if r[0] == "Other"]
@@ -741,11 +772,13 @@ def r4(d, claim):
         allowed = ttm / 365 * days
         whatif.append(dict(days=days, allowed=xr(allowed), excess=xr(materials - allowed), months=xr((materials - allowed) / (ttm / 12), 2)))
     fall = -bridge(d, d.C)["cash"]
-    claim(fall > 0 and 9 <= whatif[-1]["excess"] / fall <= 11, "even at 90 days the excess is about ten times the year's fall in cash")
+    claim(fall > 0 and whatif[-1]["excess"] / fall >= 2, "cash fell in the year, and even at 90 days the excess is several times the fall")
+    multiple = whatif[-1]["excess"] / fall if fall > 0 else 0.0
     fg = balance(d, ["1040"], year_end(d.C))
     dr, cr = flow(d, ["1040"], f"{d.C}-01-01", year_end(d.C), "Shipment")
     never = unordered(d)
-    claim(all(r[0] == "Approved" and r[1] == "Shortfall" for r in never), "the unordered requisitions are approved shortfall requisitions")
+    claim(all(r[0] == "Approved" for r in never), "the unordered requisitions are approved")
+    never_short = sum(1 for r in never if r[1] == "Shortfall")
     open_lines = {bool(m): (n, v) for m, n, v in d.q(
         f"WITH rec AS (SELECT l.POLineID, SUM(l.QuantityReceived) q FROM GoodsReceiptLine l JOIN GoodsReceipt g ON g.GoodsReceiptID = "
         f"l.GoodsReceiptID WHERE g.ReceiptDate <= ?1 GROUP BY 1) SELECT i.ItemGroup IN ({marks}), COUNT(*), "
@@ -763,13 +796,16 @@ def r4(d, claim):
                 short_counts=[n for _, n, _ in yearly], short_values=[xr(v) for _, _, v in yearly], pairs=len(pairs), repeated=len(repeated),
                 in_repeated=sum(p[1] for p in repeated), most=most, wo=wo[0], item=item_code, first_request=tp[4],
                 last_request=tp[5], due=wo[1], completed=wo[2], matched=len(matched), unmatched=len(pairs) - len(matched),
+                n_top=word(len(top_pairs)), per_month=(word(min(per_month)), word(max(per_month))),
                 units=xr(sum(p[2] for p in pairs), 1), estimated=xr(sum(p[3] for p in pairs)),
                 units_issued=xr(sum(issued[p[0]][0] for p in matched), 1), issued_cost=xr(sum(issued[p[0]][1] for p in matched)),
                 short_receipts=short_receipts, n_years=word(len(d.years)), n_short=n_short, approver=approver,
                 approver_title=approver_title, self_requested=self_requested,
-                requester_titles=[r[0] + "s" for r in requesters[:3]], cfo_plan=plan_app.get("Chief Financial Officer", 0),
+                requester_titles=[(r[0] + "s" if r[2] != 1 else r[0], r[2]) for r in requesters],
+                cfo_plan=plan_app.get("Chief Financial Officer", 0),
                 no_plan=plan_app.get(None, 0), n_other=word(sum(n for _, n in other_app)), other_app=other_app,
                 ttm=xr(ttm), whatif=whatif, fg_target=xr((cr - dr) / 365 * FG_TARGET), fg=xr(fg), n_never=len(never),
+                never_short=never_short, multiple=word(round(multiple)),
                 never_value=xr(sum(r[3] for r in never)), open_lines=sum(v[0] for v in open_lines.values()),
                 open_value=xr(sum(v[1] for v in open_lines.values())), open_materials=xr(open_lines.get(True, (0, 0.0))[1]),
                 late=[(n, xr(v)) for _, n, v in late])
@@ -816,6 +852,7 @@ def r5(d, claim):
     pending = sum(m[3] - m[4] for m in memos)
     claim(abs(pending - balance(d, ["2060"], asof) * -1) < 0.01 and pending < 0.05 * sum(m[3] for m in memos),
           "the credits to 2060 were refunded, except the few still in 2060 at the year-end")
+    waiting = [m for m in memos if m[3] - m[4] > 0.005]
     rebuilt = []
     for y in d.years[:-1]:
         diff = xr(balance(d, ["1020"], year_end(y)) - sum(b for _, b in open_receivables(d, year_end(y)) if b > 0))
@@ -837,33 +874,44 @@ def r5(d, claim):
     past_due = xr(sum(b for _, b, due in open_ap if due < asof))
     past_due_x = xr(sum(b for i, b, due in open_ap if due < asof and i not in note_ids))
     total_x = xr(sum(b for i, b, _ in open_ap if i not in note_ids))
-    claim(d.one("SELECT COUNT(*) FROM GLEntry g JOIN PurchaseInvoice pi ON pi.PurchaseInvoiceID = g.SourceDocumentID "
-                "WHERE g.SourceDocumentType = 'PurchaseInvoice' AND g.PostingDate <> pi.ReceivedDate") == 0,
-          "the ledger posts supplier invoices on their ReceivedDate")
-    crossing = {y: d.q("SELECT InvoiceNumber, GrandTotal FROM PurchaseInvoice WHERE InvoiceDate <= ? AND ReceivedDate > ?",
-                       year_end(y), year_end(y)) for y in d.years}
-    claim([y for y, v in crossing.items() if v] == [d.P] and len(crossing[d.P]) == 1,
-          f"on InvoiceDate only the {d.P} year-end differs, by one invoice")
-    asv = crossing[d.P][0] if crossing[d.P] else ("?", 0.0)
+    elsewhere = d.q("SELECT DISTINCT pi.InvoiceNumber, pi.ReceivedDate, g.PostingDate FROM GLEntry g JOIN PurchaseInvoice pi "
+                    "ON pi.PurchaseInvoiceID = g.SourceDocumentID WHERE g.SourceDocumentType = 'PurchaseInvoice' "
+                    "AND g.PostingDate <> pi.ReceivedDate ORDER BY 1")
+    claim(all(r[1][:4] == r[2][:4] for r in elsewhere),
+          "the supplier invoices the ledger posts on another day than their ReceivedDate stay in the same year")
+    crossing = [(y, number, total) for y in d.years for number, total in d.q(
+        "SELECT InvoiceNumber, GrandTotal FROM PurchaseInvoice WHERE InvoiceDate <= ? AND ReceivedDate > ? ORDER BY 1",
+        year_end(y), year_end(y))]
     # Billing by invoice date less the ledger.
     billing = []
     for y in d.years:
         gl = flow(d, ["1020"], f"{y}-01-01", year_end(y), "SalesInvoice")[0]
         docs = d.one("SELECT COALESCE(SUM(GrandTotal), 0) FROM SalesInvoice WHERE substr(InvoiceDate, 1, 4) = ?", str(y))
         billing.append(xr(docs - gl))
-    out_f, out_p = cross_year(d, d.F), cross_year(d, d.P)
-    claim(not cross_year(d, d.C) and d.one("SELECT COUNT(*) FROM SalesInvoice WHERE InvoiceDate < ?", f"{d.F}-01-01") == 0,
-          "only invoices of the first two years cross into the next")
-    claim(abs(billing[0] - sum(i["total"] for i in out_f)) < 0.01 and abs(billing[-1] + sum(i["total"] for i in out_p)) < 0.01
-          and abs(billing[1] - (sum(i["total"] for i in out_p) - sum(i["total"] for i in out_f))) < 0.01,
-          "the billing differences are the invoices posted in the next year")
-    claim(out_f and out_p and consecutive(out_f) and consecutive(out_p), "the crossing invoices are consecutive numbers")
-    claim(len({i["posted"] for i in out_f}) == 1 and len({i["posted"] for i in out_p}) == 1, "each group posted on one date")
-    shipped_in_year = [i for i in out_f + out_p if i["shipped"][:4] == i["dated"][:4]]
-    claim(len(shipped_in_year) == 1 and shipped_in_year[0] in out_p, f"only one of them shipped in its invoice year, in {d.P}")
-    claim(all(i["shipped"][:4] == i["posted"][:4] for i in out_f + out_p if i not in shipped_in_year),
+    # The invoices dated in one year and posted in the next, from the year before the window: each year's billing
+    # difference is the invoices it sends to the next year less those it receives from the year before.
+    first_dated = int(d.one("SELECT MIN(InvoiceDate) FROM SalesInvoice")[:4])
+    groups = {y: cross_year(d, y) for y in range(min(first_dated, d.F), d.C + 1)}
+    claim(not groups[d.C], f"no invoice dated in {d.C} is posted later")
+    for y, diff in zip(d.years, billing):
+        out_y, in_y = groups.get(y, []), groups.get(y - 1, [])
+        claim(abs(diff - (sum(i["total"] for i in out_y) - sum(i["total"] for i in in_y))) < 0.01,
+              f"the {y} billing difference is the invoices posted in the next year less those posted from the year before")
+    described = {y: [] for y in d.years}
+    for y, group in groups.items():
+        if not group:
+            continue
+        at_dated = y == d.F                           # the first window year's own group, described where it leaves
+        months = sorted({int(i["dated"][5:7]) for i in group})
+        described[y if at_dated else y + 1].append(dict(
+            numbers=number_list(group), posted=date_list([i["posted"] for i in group]),
+            dated=(MONTHS[months[0] - 1] + (f"-{MONTHS[months[-1] - 1]}" if len(months) > 1 else "") + f" {y}")
+            if at_dated else (date_list([i["dated"] for i in group]) if y < d.F else None)))
+    crossed = [i for g in groups.values() for i in g]
+    shipped_in_year = [i for i in crossed if i["shipped"][:4] == i["dated"][:4]]
+    claim(len(shipped_in_year) == 1, "only one of them shipped in its invoice year (Chapter 6's cutoff error)")
+    claim(all(i["shipped"][:4] == i["posted"][:4] for i in crossed if i not in shipped_in_year),
           "the others shipped in the year they were posted, so their dates are wrong, not the ledger")
-    f_months = sorted({int(i["dated"][5:7]) for i in out_f})
     # Sales tax.
     tax_rows = {src: (dr, cr) for src, dr, cr in d.q("SELECT g.SourceDocumentType, SUM(g.Debit), SUM(g.Credit) FROM GLEntry g "
                                                      "WHERE g.AccountID = ? GROUP BY 1", d.account("2050"))}
@@ -885,11 +933,12 @@ def r5(d, claim):
                 neg=xr(sum(b for _, b in neg)), ar_diff=xr(roll["1020"]["total"] - open_ar), entry=entry, rebuilt=rebuilt,
                 n_ap=len(open_ap), ap_total=ap_total, ap_diff=ap_diff, notes_total=xr(sum(c["amount"] for c in capital)),
                 past_due=past_due, past_due_x=past_due_x, total_x=total_x, past_due_share=past_due_x / total_x,
-                asv=dict(number=asv[0], total=asv[1]), billing=billing,
-                out_f=dict(range=number_range(out_f), first=MONTHS[f_months[0] - 1], last=MONTHS[f_months[-1] - 1],
-                           posted=out_f[0]["posted"]) if out_f else {},
-                out_p=dict(range=number_range(out_p), posted=out_p[0]["posted"]) if out_p else {},
-                shipped=shipped_in_year[0]["number"] if shipped_in_year else "?", tax=tax, opening_ar=opening_ar,
+                elsewhere=[dict(number=n, received=r, posted=p) for n, r, p in elsewhere],
+                crossing=[dict(year=y, number=n, total=t) for y, n, t in crossing],
+                billing=[dict(year=y, diff=b, groups=described[y]) for y, b in zip(d.years, billing)],
+                shipped=shipped_in_year[0]["number"] if shipped_in_year else "?",
+                shipped_year=shipped_in_year[0]["shipped"][:4] if shipped_in_year else "?",
+                waiting=dict(n=len(waiting), amount=sum(m[3] - m[4] for m in waiting)), tax=tax, opening_ar=opening_ar,
                 tax_balance=xr(-balance(d, ["2050"], asof)), current_portion=xr(d.one(
                     "SELECT SUM(PrincipalAmount) FROM DebtScheduleLine WHERE substr(PaymentDate, 1, 4) = ?", str(d.N))),
                 after_amount=xr(after_amount), after_rows=after_rows, accrual=processed(d)["accrual"])

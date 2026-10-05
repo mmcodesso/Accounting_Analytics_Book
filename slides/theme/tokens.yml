@@ -1,0 +1,18 @@
+font: Arial
+fallback_font: Liberation Sans
+code_font: Consolas
+colors:
+  ink: '2C3E50'
+  paper: 'FFFFFF'
+  blue: '1A5276'
+  teal: '117A65'
+  gray: '5D6D7E'
+  coral: 'B03A2E'
+  amber: '8A5D00'
+  tint: 'EAF2F8'
+sizes:
+  opening: 42
+  title: 32
+  body: 24
+  evidence: 20
+  attribution: 14

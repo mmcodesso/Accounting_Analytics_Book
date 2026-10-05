@@ -4,13 +4,6 @@ note states, and the claims its wording makes.
 The proposal is the current year's calendar (the promotions that start in d.C), and the plan it is costed
 against is the next year's budget (d.N). Promotions are labeled by their scope: the collection, item group,
 or customer segment they cover.
-
-Two notes are not registered, because their comments state a value the data do not give; each context
-function renders the corrected text, so register it once the comment is fixed:
-- r1 names JE-2026-000297 as the close excluded from the 6290 postings, but the close that posts to 6290 in
-  fiscal 2026 is JE-2026-000296 (as Chapter 7's Tutorial 7.2 and exercise notes say);
-- r3 gives the Wholesale promotion's monthly standard deviation as 9.6% of the mean; it is 9.546%, so 9.5%
-  (9.55% rounded twice).
 """
 
 from __future__ import annotations
@@ -227,7 +220,9 @@ def r2(d, claim):
     claim(d.one("SELECT COUNT(*) FROM SalesInvoiceLine WHERE PromotionID IS NULL AND Discount <> 0") == 0,
           "only promotion lines carry a discount, so the discount total is the promotions' cost")
     growth = years[-1]["disc"] / years[0]["disc"]
-    claim(len(years) == 3 and 2.5 <= growth < 3, "the cost nearly tripled in two years")
+    claim(growth > 1, "the cost grew over the window")
+    grew = ("more than tripled" if growth >= 3 else "nearly tripled" if growth >= 2.5 else "more than doubled" if growth >= 2
+            else "nearly doubled" if growth >= 1.8 else f"grew {growth - 1:.0%}")
     by_promo = [dict(id=pid, disc=sum(r[1] for r in promo if r[0] == pid)) for pid in sorted({r[0] for r in promo})]
 
     groups = [dict(group=g, list=round(lst, 2), red=round(lst - gross, 2), disc=round(disc, 2), net=net)
@@ -291,7 +286,7 @@ def r2(d, claim):
           "the fall promotion's orders are invoiced after it ends")
     name = lambda account_id: d.one("SELECT AccountName FROM Account WHERE AccountID = ?", account_id)
     # "in all" is the total of the yearly amounts as stated (the unrounded total can differ by a cent)
-    return dict(years=years, total=sum(round(y["disc"], 2) for y in years), lines=len(promo), rounded=sum(xround(r[1]) for r in promo), by_promo=by_promo,
+    return dict(years=years, grew=grew, span=word(len(years) - 1), total=sum(round(y["disc"], 2) for y in years), lines=len(promo), rounded=sum(xround(r[1]) for r in promo), by_promo=by_promo,
                 groups=groups, list=lst, red=lst - gross, disc=disc, net=net, after=after, rounding=net - after,
                 ledger=ledger, ledger_total=ledger_total, difference=difference,
                 first=cutoff[0][1], last=cutoff[-1][1][-6:], cutoff_accounts=cutoff_accounts, cutoff_posted=cutoff[0][3],
@@ -308,26 +303,37 @@ def r3(d, claim):
         < p["lines"]]
     claim(len(bad) > 0, "some promotions have recorded dates that do not cover their lines")
     vol = volume(d)
-    claim(all(abs(v["z"]) < 2 for v in vol), "no difference is unusual (all within two standard deviations)")
+    claim(all(v["z"] < 2 for v in vol), "no increase is unusual (all within two standard deviations)")
+    falls = [v for v in vol if v["z"] <= -2]              # unusual falls, if any: no promotion lifted volume either way
     top = max(vol, key=lambda v: v["lift"])
     low = min(vol, key=lambda v: v["lift"])
-    claim(top["lift"] > 0 and top["months"] == 2, "the largest difference is an increase over a two-month promotion")
+    claim(top["lift"] > 0, "the largest difference is an increase")
     claim(low["lift"] < 0, "the lowest difference is a fall")
+    sd_total = ("one-month total (the monthly sd)" if top["months"] == 1 else
+                f"{word(top['months'])}-month total (the monthly sd times the square root of {top['months']})")
     be = breakevens(d)
-    claim(all(v["lift"] < be[v["id"]] / 2 for v in vol), "every difference is far below (under half) its break-even increase")
+    claim(all(v["lift"] < be[v["id"]] for v in vol), "every difference is below its break-even increase")
+    near = max(vol, key=lambda v: v["lift"] / be[v["id"]])
 
     first = d.q("WITH f AS (SELECT CustomerID, MIN(OrderDate) AS d FROM SalesOrder GROUP BY 1) "
                 "SELECT f.CustomerID, f.d, EXISTS (SELECT 1 FROM SalesOrder o JOIN SalesOrderLine l ON l.SalesOrderID = o.SalesOrderID "
                 "WHERE o.CustomerID = f.CustomerID AND o.OrderDate = f.d AND l.PromotionID IS NOT NULL), c.CustomerSince "
                 "FROM f JOIN Customer c ON c.CustomerID = f.CustomerID ORDER BY f.d")
-    claim(not any(r[2] for r in first), "no customer's first order included a promotion line")
+    promoted = [r for r in first if r[2]]                     # customers whose first order included a promotion line
+    promoted_ids = sorted({p for r in promoted for (p,) in d.q(
+        "SELECT DISTINCT l.PromotionID FROM SalesOrder o JOIN SalesOrderLine l ON l.SalesOrderID = o.SalesOrderID "
+        "WHERE o.CustomerID = ? AND o.OrderDate = ? AND l.PromotionID IS NOT NULL", r[0], r[1])})
     claim(first[0][1].startswith(f"{d.F}-01"), f"the data begins in January {d.F}")
     early = sum(1 for r in first if r[1] <= f"{d.F}-04-30")
     claim(early / len(first) >= 0.9, f"first orders cluster in January to April {d.F}")
     late = [r for r in first if r[1] > f"{d.F}-06-30"]
     last = first[-1][1]
     since = [r for r in first if r[3] >= f"{d.F}-01-01"]
-    return dict(bad=series(bad), vol=vol, top=top, low=low, customers=len(first), late=word(len(late)),
+    return dict(bad=series(bad), vol=vol, top=top, low=low, sd_total=sd_total, far=all(v["lift"] < be[v["id"]] / 2 for v in vol),
+                near=dict(near, be=be[near["id"]]),
+                falls=series(f"promotion {v['id']}'s {v['lift']:+.1%} ({v['z']:.1f} standard deviations)" for v in falls),
+                n_falls=len(falls), promoted=len(promoted), n_promoted=word(len(promoted)),
+                promoted_ids=series(promoted_ids), customers=len(first), late=word(len(late)),
                 last=f"{MONTHS[int(last[5:7]) - 1]} {last[:4]}", since=len(since),
                 since_before=sum(1 for r in since if r[1] < r[3]))
 
@@ -445,8 +451,8 @@ def r5(d, claim):
     claim(all(r[2] == mgr_id for r in approved), "the same employee approved every approved override")
     own = [r for r in approved if r[1] == mgr_id]
     pending = [r for r in overrides if r[3] != "Approved"]
-    claim(all(r[3] == "Pending" and r[1] == mgr_id for r in pending),
-          "the requests not approved are all Pending, and all the manager's")
+    claim(all(r[3] == "Pending" for r in pending), "the requests not approved are all Pending")
+    own_pending = [r for r in pending if r[1] == mgr_id]       # the manager's own requests among them
     claim(all(d.one("SELECT COUNT(*) FROM SalesInvoiceLine WHERE SalesOrderLineID = ?", r[4]) > 0 for r in pending),
           "the Pending requests were billed")
     titles = sorted({r[0] for r in d.q("SELECT e.JobTitle FROM PriceOverrideApproval a JOIN Employee e "
@@ -461,7 +467,8 @@ def r5(d, claim):
                 oos_ids=series(r[0] for r in oos), item_id=item_id, code=code, base=base,
                 others=series(f"{c} ({n.split()[0]})" for c, n in others),
                 mgr=dict(id=mgr_id, name=name, title=title), promos=word(len(promos)), approved=len(approved), own=len(own),
-                pending=word(len(pending)), pending_ids=[r[0] for r in pending],
+                pending=word(len(pending)), pending_ids=[r[0] for r in pending], n_pending=len(pending),
+                own_pending=len(own_pending), n_own_pending=word(len(own_pending)),
                 requesters=series(t.lower() + "s" for t in titles),
                 stack_orders=stack_orders, stack_billed=stack_billed, stack_disc=stack_disc)
 
@@ -470,10 +477,11 @@ def r5(d, claim):
 def r6(d, claim):
     vol = volume(d)
     be = breakevens(d)
-    claim(all(v["lift"] < be[v["id"]] / 2 for v in vol), "no promotion came near its break-even increase")
+    claim(all(v["lift"] < be[v["id"]] for v in vol), "no promotion reached its break-even increase")
+    near = all(v["lift"] < be[v["id"]] / 2 for v in vol)      # every increase under half its break-even
     _, quarters, prop_total = proposal_quarters(d)
     share = dict(quarters).get(4, 0.0) / prop_total
     claim(0.6 <= share < 0.72, "about two thirds of the cost lands in the fourth quarter")
     _, discount = goal_seek(d)
-    return dict(promos=word(len(be)), proposed=word(len(proposal(d))),
+    return dict(promos=word(len(be)), proposed=word(len(proposal(d))), reached="came near" if near else "reached",
                 cost=round(prop_total * (1 - commission(d)[2]), -4), discount=discount)

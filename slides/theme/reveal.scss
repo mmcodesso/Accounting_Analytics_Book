@@ -1,0 +1,52 @@
+/*-- scss:defaults --*/
+$presentation-heading-font-weight: 600;
+$presentation-line-height: 1.25;
+$presentation-heading-line-height: 1.12;
+
+/*-- scss:rules --*/
+.reveal { font-variant-numeric: tabular-nums; }
+.reveal .slides { text-align: left; }
+.reveal .slides h1, .reveal .slides h2 { text-transform: none; }
+.reveal .slides h2 { margin-bottom: 0.65em; }
+.reveal .slides p, .reveal .slides li { line-height: 1.3; }
+.reveal .slides li { margin-bottom: 0.35em; }
+.reveal .slides img { display: block; margin: 0.25em auto; max-height: 470px; object-fit: contain; }
+.reveal .slides figure { margin: 0; }
+.reveal .slides figcaption { font-size: 0.65em; margin-top: 0.2em; color: #5D6D7E; }
+.reveal .slides table { font-size: 0.82em; width: 100%; }
+.reveal .slides th, .reveal .slides td { padding: 0.45em 0.5em; }
+.reveal .slides th { border-bottom: 2px solid #1A5276; }
+.reveal .slides td { border-bottom: 1px solid #D5D8DC; }
+.reveal .slides .columns { gap: 1.3em; }
+.reveal .slides .column { min-width: 0; }
+.reveal .slides a { text-decoration: underline; text-underline-offset: 0.12em; }
+.reveal .slides pre { box-shadow: none; padding: 0.45em; background: #EAF2F8; }
+.reveal .slides section.sql-example pre { font-size: 26px; line-height: 1.3; }
+.reveal .slides section.sql-example pre code { font-size: inherit; line-height: inherit; max-height: none; }
+.reveal #title-slide { text-align: left; padding-top: 1.2em; }
+.reveal #title-slide .subtitle { color: #117A65; margin-top: 0.5em; }
+.reveal .slide-number { font-family: Arial, sans-serif; }
+.reveal .slide.level1.present { display: flex; flex-direction: column; justify-content: center; }
+.reveal .balanced .slide-body {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85em;
+}
+.reveal .balanced .slide-body > p,
+.reveal .balanced .slide-body > .fragment > p,
+.reveal .balanced .slide-body > ul,
+.reveal .balanced .slide-body > ol { margin-top: 0; margin-bottom: 0; }
+.reveal .balanced .slide-body li { margin-bottom: 0.65em; }
+.reveal .balanced .slide-body li:last-child { margin-bottom: 0; }
+.reveal .balanced .slide-body li .fragment > p { margin: 0; }
+.reveal .stepwise li:has(> .fragment:not(.visible))::marker { color: transparent; }
+.reveal .balanced .slide-body .column p { margin-top: 0; margin-bottom: 0.7em; }
+// Hidden fragments keep their space, so the content never jumps on advance.
+.reveal .slides .fragment { transition: none; }
+@media print {
+  .reveal .slides .fragment { opacity: 1 !important; visibility: visible !important; }
+  .reveal .stepwise li::marker { color: inherit; }
+}
+@media (prefers-reduced-motion: reduce) { .reveal * { transition: none !important; animation: none !important; } }

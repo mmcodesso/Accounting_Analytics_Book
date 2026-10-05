@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will test every journal entry of fiscal 2024 through 2026 for the characteristics in @tbl-08-03. You will bring each approver's authority limit onto the entries, add a flag for each characteristic, and combine the flags into a risk score. You will then separate the patterns that have an ordinary explanation from the entries that need follow-up, trace the highest-scoring entry to its ledger lines, and complete the workpaper.
 
-**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.2.
+**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.2. If you start here, download AuditAnalytics.xlsx as it stands at the end of Tutorial 8.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 
@@ -58,7 +58,7 @@ b. Drag CreatorTitle and then EntryType to the **Rows** area, and EntryNumber to
 c. Insert a second PivotTable from the same Table on a new worksheet.
 d. Drag EntryType to the **Rows** area, RiskScore to the **Columns** area, and EntryNumber to the **Values** area.
 
-The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, and no employee has an approval limit above $250,000. That is a gap in the approval policy to report, not a sign of override in itself.
+The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, or the year's net income, and no employee has an approval limit above $250,000. That is a gap in the approval policy to report, not a sign of override in itself.
 
 **Step 5. Record a disposition for each flagged entry.**
 

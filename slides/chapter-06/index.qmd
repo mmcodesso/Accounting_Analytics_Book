@@ -1,0 +1,384 @@
+---
+title: "Descriptive and Diagnostic Analytics in Excel"
+subtitle: "Chapter 6"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-06.pptx
+---
+
+## Learning objectives {#ch06-01 .balanced .stepwise}
+
+- Profile amounts and reconcile conditional summaries.
+- Build PivotTables, ratios, and appropriate charts.
+- Explain the Furniture margin change with a reconciled bridge.
+- Prepare a pre-closing trial balance and common-size statement.
+
+::: {.notes}
+Purpose: connect description, diagnosis, and accounting presentation. Allow about 60 seconds. The prepared InvoiceLines Table now contains the attributes required for the controller's question. Students will first prove the population, then compare periods and examine explanations. The ledger remains a separate source with its own posting and closing conventions. Ask students why a good chart cannot compensate for an incomplete population. Transition: separate describing the result from explaining it.
+:::
+
+# Profile and prove the population {#ch06-module-2}
+
+::: {.notes}
+Start with the whole selected population before splitting it into groups. Every summary needs a control total.
+:::
+
+## Description and diagnosis have different jobs {#ch06-03 .balanced .stepwise}
+
+**Descriptive:** what was billed, to whom, and when?
+
+**Diagnostic:** which measured effects explain the change?
+
+The explanation must reconcile to the observed result.
+
+::: {.notes}
+Purpose: establish a sequence for the controller's request. Allow 60 seconds. A decline shown in a chart describes a pattern. Naming a plausible promotion is a hypothesis until the relevant amounts and timing support it. Students should build a precise descriptive comparison before attempting decomposition. Ask what evidence would connect discounts to the reported margin decline. Transition: define the report population using a visible year parameter.
+:::
+
+## A visible report year controls the scope {#ch06-04 .balanced .stepwise}
+
+Set **ReportYear** on the Parameters worksheet.
+
+Use the same year criterion in counts, amounts, and statistics.
+
+Distinguish an invoice period from a posting period.
+
+::: {.notes}
+Purpose: prevent summaries of different populations from being compared as if they were identical. Allow 60 seconds. Tutorial 6.1 uses fiscal 2026 invoice lines. A report year parameter keeps the criterion visible and allows a controlled change to another year. The selected source date remains important even when the year labels match. Ask students to locate where ReportYear enters a formula and where it enters a PivotTable filter. Transition: compare measures of the distribution's center.
+:::
+
+## The mean and median answer different questions {#ch06-05 .balanced}
+
+{{< include /_shared/generated/chapter-06/_profile.qmd >}}
+
+::: {.notes}
+Purpose: interpret the actual fiscal 2026 line population. Allow 60-90 seconds. The mean allocates the total evenly across all lines. The median identifies the middle position in the ordered amounts. A few large lines can pull the mean above a typical middle line. The largest line is a prompt to inspect the underlying type of transaction, not evidence of an error by magnitude alone. Ask students which measure they would use to describe a typical line and why. Transition: look at the distribution itself.
+:::
+
+## A histogram shows the shape {#ch06-06 .balanced}
+
+![](/_shared/generated/chapter-06/histogram.svg){fig-alt="Fiscal 2026 invoice-line counts in adjacent 1000-dollar bins, with a final 15000-dollar-and-above bin. The distribution has a long right tail." width=95%}
+
+::: {.notes}
+Purpose: connect the gap between mean and median to the population's shape. Allow 60-90 seconds. Read the horizontal axis as line amounts and the vertical axis as counts. Adjacent bars represent ranges of a numeric variable. Most lines sit toward the lower amounts, with fewer large values extending the right tail. The final open-ended bin prevents the upper tail from being omitted. Ask how changing bin width could change the visual impression without changing the data. Transition: select complementary numerical measures.
+:::
+
+## Spread and extremes supplement the center {#ch06-07 .balanced .stepwise}
+
+**STDEV.S / STDEV.P:** spread under a sample or population convention.
+
+**MIN / MAX:** endpoints worth inspecting.
+
+**PERCENTILE.INC:** a threshold at a specified rank.
+
+::: {.notes}
+Purpose: avoid treating one statistic as a complete profile. Allow 60 seconds. The standard-deviation choice should match the intended interpretation, even though the difference can be small in a large population. Minimum and maximum values can reveal mixed transaction types or data issues. Percentiles locate positions but do not state how much monetary value lies beyond them. Ask students why the top tenth of rows can contain much more than a tenth of revenue. Transition: apply statistics to a selected year.
+:::
+
+## FILTER supplies the selected values {#ch06-08 .balanced .stepwise}
+
+```text
+=MEDIAN(FILTER(InvoiceLines[LineTotal],
+               InvoiceLines[FiscalYear]=ReportYear))
+```
+
+Use the same population criterion across the profile.
+
+::: {.notes}
+Purpose: show how a statistic without a criteria argument can use a selected population. Allow 60-90 seconds. FILTER returns the year's LineTotal values, which MEDIAN then summarizes. Similar logic supports standard deviation and percentiles. Students should consider what happens when no rows match rather than hiding the resulting error indiscriminately. Ask them to explain the inner expression before the outer function. Transition: use criteria-aware functions for totals and counts.
+:::
+
+## Conditional aggregation names the population {#ch06-09 .balanced .stepwise}
+
+```text
+=SUMIFS(InvoiceLines[LineTotal],
+        InvoiceLines[FiscalYear],ReportYear)
+```
+
+Pair monetary totals with **COUNTIFS**.
+
+Use **AVERAGEIFS, MINIFS, and MAXIFS** for matching questions.
+
+::: {.notes}
+Purpose: read a conditional total in business terms. Allow 60 seconds. The first range provides the amount being summed and the criteria ranges define which rows belong. A monetary total by itself can mask missing or duplicated low-value records, so pair it with a count where appropriate. Make students say the selected population aloud before inspecting the answer. Transition: test whether a manually entered group list covers every row.
+:::
+
+## A group list can omit a valid population {#ch06-10 .balanced .stepwise}
+
+The controller's product list has four groups.
+
+InvoiceLines also includes **Services**.
+
+The sum of group counts and amounts must equal the control totals.
+
+::: {.notes}
+Purpose: teach completeness through the public Tutorial 6.1 discovery. Allow about 60 seconds. Students initially summarize the four merchandise groups and find a difference from the whole-year controls. The missing Services group explains the gap. This is a reporting omission, not necessarily a source-data defect. Ask students how a hard-coded category list could become incomplete next year. Transition: complete the profile and test the parameter change.
+:::
+
+## Tutorial 6.1: prove the profile {#ch06-11 .balanced .stepwise}
+
+Reconcile the five item groups to both controls.
+
+Reconcile histogram bins to the year's line count.
+
+Change ReportYear, inspect the results, then restore 2026.
+
+[Open Tutorial 6.1](https://aa.accountinganalyticshub.com/chapters/06-descriptive-analytics/chapter.html#guided-tutorial-6.1-profiling-fiscal-2026-and-proving-the-total)
+
+::: {.notes}
+Purpose: turn the profile into a tested analytical component. Allow two to three minutes. The public checkpoint requires zero differences for both count and amount after Services is included. Changing the year tests whether every formula actually depends on the named parameter. A formula that remains unchanged may contain a hard-coded year or an unintended range. Ask students to explain a changed number rather than merely observe that something moved. Transition: organize the same data in a PivotTable.
+:::
+
+# Compare dimensions and interpret ratios {#ch06-module-12}
+
+::: {.notes}
+PivotTables rearrange the same evidence. Their value fields and denominators still require explicit definitions.
+:::
+
+## PivotTable areas define the view {#ch06-13 .balanced .step-rows}
+
+| Area | Tutorial 6.2 choice |
+|---|---|
+| Rows | ItemGroup |
+| Columns | Period |
+| Values | Sum of LineTotal |
+| Filters | FiscalYear |
+
+::: {.notes}
+Purpose: connect field placement with the resulting question. Allow about 60 seconds. Rows define the categories compared and columns define the periods. Confirm that LineTotal is summarized by Sum rather than Count. A Count result can indicate that Excel interprets amounts as text or that the wrong summary setting was selected. Ask students to predict the total before building the pivot and reconcile it after construction. Transition: add the cost measure needed for margin.
+:::
+
+## A line margin needs an extended cost {#ch06-14 .balanced .stepwise}
+
+```text
+[Quantity] * [StandardCost]
+```
+
+Add **StdCostAmount** in the InvoiceLines query.
+
+Label the result **invoice-based margin at standard cost**.
+
+::: {.notes}
+Purpose: prevent unit cost from being subtracted from a line amount. Allow 60 seconds. The query multiplies the quantity on each invoice line by the item's standard cost. This measure follows the invoiced population. It differs from ledger gross profit when shipping and invoice periods differ, and it does not introduce actual historical cost changes. Ask students why a standard cost of one unit cannot be directly compared with a line's revenue. Transition: calculate the aggregate rate correctly.
+:::
+
+## Margin rate uses the totals {#ch06-15 .balanced .stepwise}
+
+```text
+=(LineTotal-StdCostAmount)/LineTotal
+```
+
+In this ordinary PivotTable calculated field, the formula uses aggregated values.
+
+An average of line percentages answers a different question.
+
+::: {.notes}
+Purpose: make the denominator explicit. Allow 60-90 seconds. A revenue-weighted margin rate is total margin divided by total revenue. Averaging individual line percentages gives each line equal weight regardless of its revenue. The tutorial uses an ordinary worksheet PivotTable calculated field, not a Data Model measure. Ask students to compare a very small high-margin line with a very large low-margin line and predict the aggregate rate. Transition: interpret the qualified Furniture pattern.
+:::
+
+## Furniture margin falls in Q4 {#ch06-16 .balanced}
+
+![](/_shared/generated/chapter-01/furniture-margin.svg){fig-alt="Four quarterly Furniture invoice-based margin rates at standard cost. Q3 is 42.26 percent and Q4 is 40.78 percent." width=95%}
+
+::: {.notes}
+Purpose: establish the descriptive finding before explaining it. Allow about 60 seconds. This is the same qualified margin preview introduced in Chapter 1, now placed in its full analysis context. Read the axes and units before discussing the Q4 decline. The measure is based on invoice amounts and standard costs, so do not relabel it as financial-statement gross profit. Ask students which comparison would distinguish a Furniture-specific pattern from a company-wide change. Transition: discuss an unusually high rate in another group.
+:::
+
+## A 100% services rate has a measurement limit {#ch06-17 .balanced .stepwise}
+
+Services carries no item standard cost in this measure.
+
+That produces a 100% calculated margin rate.
+
+It does not mean the service has no economic cost.
+
+::: {.notes}
+Purpose: demonstrate that a correctly calculated number can still be misinterpreted. Allow 60 seconds. Service labor and other costs may appear elsewhere in the accounting records instead of the Item.StandardCost field. The rate therefore reflects the measure's design. Students should keep this qualification beside any comparison between Services and merchandise groups. Ask what additional costs would be needed to judge full service profitability. Transition: choose a denominator when displaying shares and changes.
+:::
+
+## Show Values As changes the question {#ch06-18 .balanced .step-rows}
+
+| Display | Interpretation |
+|---|---|
+| % of Column Total | Mix within each quarter |
+| % of Row Total | A group's distribution over time |
+| % Difference From | Change from the selected base |
+
+::: {.notes}
+Purpose: prevent percentages from losing their reference population. Allow 60 seconds. The same revenue cells can express different relationships depending on the chosen denominator or base period. Always name that choice in the title or explanation. A percentage difference from a previous period is not the same as a percentage-point change in a margin rate. Ask students which display answers the share of Q4 revenue represented by Furniture. Transition: select a chart that matches the analytical purpose.
+:::
+
+## Chart choice follows the question {#ch06-19 .balanced .stepwise}
+
+**Bar or column:** compare categories.
+
+**Line:** show a time pattern. **Histogram:** show a distribution.
+
+**Waterfall:** explain how one total becomes another.
+
+::: {.notes}
+Purpose: choose a visual form for its meaning. Allow about 60 seconds. Avoid decorative effects that obscure amounts. Bar lengths need an honest baseline, while a narrowed line-chart axis needs clear labels and an explanation. A chart should retain the unit, period, and population used in the calculation. Ask which chart would suit the margin bridge and why a pie chart would make its positive and negative changes difficult to read. Transition: complete the pivot-based comparison.
+:::
+
+## Tutorial 6.2: validate the PivotTables {#ch06-20 .balanced .stepwise}
+
+Reconcile grand totals and item-group totals.
+
+Compare quarters and customer segments.
+
+Refresh the query, then refresh the PivotTables.
+
+[Open Tutorial 6.2](https://aa.accountinganalyticshub.com/chapters/06-descriptive-analytics/chapter.html#guided-tutorial-6.2-revenue-and-margin-by-product-line-and-quarter)
+
+::: {.notes}
+Purpose: make the pivot a reviewed summary rather than a separate authority. Allow two minutes. Refreshing the source query does not justify assuming that every pivot cache has updated. Confirm the pivot totals against the Profile worksheet and inspect the year filter. Students should be able to explain the Furniture decline and the Services qualification without reading only the chart. Ask which check would reveal a stale filter. Transition: investigate the drivers behind the Furniture change.
+:::
+
+# Explain the change with a reconciled bridge {#ch06-module-21}
+
+::: {.notes}
+The diagnostic module uses the public Tutorial 6.3 calculation. Reveal the explanations after students inspect the evidence.
+:::
+
+## The driver totals narrow the question {#ch06-22 .balanced}
+
+{{< include /_shared/generated/chapter-06/_driver-totals.qmd >}}
+
+::: {.notes}
+Purpose: compare the values that feed the Furniture diagnosis. Allow 60-90 seconds. Read the revenue, extended standard cost, and promotional discount totals for Q3 and Q4. These are unrounded query measures until display, unlike the worksheet's row-rounded examples earlier. Ask students which change seems large enough to matter, then remind them that a complete explanation also considers units and mix. Transition: define the effects before looking at their amounts.
+:::
+
+## Each bridge effect has a defined basis {#ch06-23 .balanced .stepwise}
+
+**Volume:** the change in units at the earlier margin per unit.
+
+**Mix:** the change in list margin per unit.
+
+**Price:** separate price-list reductions from promotions.
+
+::: {.notes}
+Purpose: make the decomposition interpretable and reproducible. Allow 60-90 seconds. The bridge applies the book's chosen sequence to aggregate driver totals. A different ordering or definition can allocate interactions differently, so state the convention. Cost change is zero here because each item has one fixed standard cost in the dataset. That is a property of this measure, not evidence that actual production costs never changed. Ask which effect contains promotional reductions. Transition: inspect the computed dollar effects.
+:::
+
+## Promotions dominate the margin change {#ch06-24 .balanced}
+
+{{< include /_shared/generated/chapter-06/_bridge.qmd >}}
+
+::: {.notes}
+Purpose: read the quantified explanation without overstating it. Allow 60-90 seconds. Parentheses identify negative effects on margin dollars. Promotional discounts have the largest negative effect, while the other effects are smaller. The volume effect is positive and partially offsets the decline. Ask students to compare the promotion effect with the net change and explain why an effect can exceed that net decline. The table uses the same calculation as the book figure. Transition: view the full reconciliation as a waterfall.
+:::
+
+## The effects reconcile Q3 to Q4 {#ch06-25 .balanced}
+
+![](/_shared/generated/chapter-06/bridge.svg){fig-alt="A waterfall of Furniture margin dollars at standard cost. Q3 plus volume, mix, price-list, promotion, and cost effects equals Q4." width=95%}
+
+::: {.notes}
+Purpose: connect the effect table to the opening and closing totals. Allow about 60 seconds. Read the starting Q3 bar, then add each effect in sequence to reach Q4. A negative step reduces the running total and a positive step increases it. The chart labels signs as well as colors. The worksheet's check cell must be zero within the stated rounding tolerance. Ask what an unexplained remainder would mean. Transition: remove promotions from the rate for a supporting comparison.
+:::
+
+## Margin before promotions supports the interpretation {#ch06-26 .balanced}
+
+{{< include /_shared/generated/chapter-06/_margin-rates.qmd >}}
+
+::: {.notes}
+Purpose: triangulate the bridge with a related measure. Allow 60-90 seconds. The before-promotion rate adds the promotional discount back to both revenue and margin. It is a counterfactual measure under the stated calculation, not booked revenue. Comparing the two quarters shows whether the underlying rate falls when that reduction is removed. Ask students why adding the discount only to the numerator would distort the rate. Transition: trace the effect to the promotion programs and their timing.
+:::
+
+## Tutorial 6.3: trace the discount effect {#ch06-27 .balanced .stepwise}
+
+Reconcile the bridge check to zero.
+
+Drill into promotions 8 and 9 and inspect the line detail.
+
+Keep order eligibility and invoice timing distinct.
+
+[Open Tutorial 6.3](https://aa.accountinganalyticshub.com/chapters/06-descriptive-analytics/chapter.html#guided-tutorial-6.3-explaining-the-furniture-margin)
+
+::: {.notes}
+Purpose: link the aggregate diagnosis to the public transaction evidence. Allow three minutes. The tutorial identifies promotion 8 as the dominant Furniture discount source in both quarters, with promotion 9 adding to Q4. Orders under a program can be invoiced after its end date, which explains why the invoice-period effect persists. The drilldown sheet is a snapshot, so record its source filter and refresh context. Ask students to identify a line that supports the timing explanation. Transition: communicate the finding with its measurement limit.
+:::
+
+## A useful finding states evidence and limits {#ch06-28 .balanced .stepwise}
+
+Furniture's invoice-based margin at standard cost declined.
+
+Promotional discounts explain the dominant negative effect.
+
+The bridge is reconciled, and actual historical cost changes are outside this measure.
+
+::: {.notes}
+Purpose: practice a concise, qualified management explanation. Allow 60-90 seconds. Students should combine the observed change, the quantified driver, the supporting transaction evidence, and the relevant limitation. Avoid presenting a standard-cost analysis as a full explanation of every financial-statement margin difference. Ask a student to give the finding in two spoken sentences and invite another to identify the qualification. Transition: apply similarly explicit conventions when working directly with the ledger.
+:::
+
+# Present the ledger before closing {#ch06-module-29}
+
+::: {.notes}
+This module separates ledger presentation from the invoice-line diagnosis and makes signs and closing entries explicit.
+:::
+
+## A pre-closing trial balance needs a scope rule {#ch06-30 .balanced .stepwise}
+
+Filter the intended fiscal year and posting population.
+
+Exclude the identified year-end closing entry.
+
+Group by account and reconcile total debits with credits.
+
+::: {.notes}
+Purpose: explain why a closed ledger can conceal the year's revenue and expense activity. Allow 60 seconds. Closing entries transfer temporary-account balances, so including them changes the question answered by a trial balance. Identify the closing entry by its source and voucher evidence rather than deleting every journal dated at year-end. Preserve the complete ledger as the source. Ask which ordinary adjustment might also occur on December 31. Transition: use clear sign conventions in the statement.
+:::
+
+## Common-size statements make the denominator visible {#ch06-31 .balanced .stepwise}
+
+Present revenue with the reporting sign convention.
+
+Classify cost and operating-expense accounts consistently.
+
+Divide each statement amount by total revenue.
+
+::: {.notes}
+Purpose: connect accounting classification to comparative analysis. Allow 60-90 seconds. A debit-minus-credit ledger measure is useful for balancing, but revenue commonly needs the opposite reporting sign. Document that conversion. A common-size percentage expresses a statement amount relative to total revenue, so the revenue denominator must include the intended population. Ask why a negative credit balance should not automatically appear as negative sales in a management statement. Transition: summarize the controls shared by both source paths.
+:::
+
+## Chapter summary and practice {#ch06-32 .balanced .stepwise}
+
+Profile the population and reconcile every summary.
+
+Define ratios and select charts that match the question.
+
+Explain changes with evidence, a reconciled calculation, and explicit limitations.
+
+::: {.notes}
+Purpose: return to the objectives and assign independent practice. Allow 60-90 seconds. Ask students to name one control at each stage: preparing the profile, building the pivot, explaining the bridge, and presenting ledger balances. The public tutorials show the methods; the assigned exercises require students to apply them to their specified populations. Do not carry a total from one task into another without checking its scope. Transition: the next chapter tests future expectations and management decisions.
+:::
+
+## References and further reading {#ch06-33 .balanced}
+
+Anscombe (1973): inspect graphs alongside numerical summaries.
+
+Public Chapter 6 tutorials: profiles, PivotTables, and margin decomposition.
+
+[Full Chapter 6 references](https://aa.accountinganalyticshub.com/chapters/06-descriptive-analytics/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the analytical ideas and worked sequence. The margin exhibits use the public Tutorial 6.3 bridge and the same invoice-based standard-cost calculation as the book.
+
+{{< include /_shared/fragments/_reference-anscombe-1973.qmd >}}
+:::
+
+## Attribution and reuse {#ch06-34 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 6 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

@@ -1,0 +1,6 @@
+| Operating-expense bridge | Actual less budget |
+| --- | --- |
+| Original variance | ($1,817,952.22) |
+| Commission volume effect | ($1,643,193.26) |
+| Net classification effect | $0.00 |
+| Remaining variance | ($174,758.96) |

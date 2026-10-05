@@ -18,8 +18,8 @@ Holmes, A. F., & Douglass, A. (2022). Artificial intelligence: Reshaping the acc
 
 Jans, M., Alles, M. G., & Vasarhelyi, M. A. (2014). A field study on the use of process mining of event logs as an analytical procedure in auditing. *The Accounting Review*, *89*(5), 1751–1773. <https://doi.org/10.2308/accr-50807>
 
-Wang, R. Y., & Strong, D. M. (1996). Beyond accuracy: What data quality means to data consumers. *Journal of Management Information Systems*, *12*(4), 5–33. <https://doi.org/10.1080/07421222.1996.11518099>
+{{< include /shared/fragments/_reference-wang-strong-1996.qmd >}}
 
-Wickham, H. (2014). Tidy data. *Journal of Statistical Software*, *59*(10), 1–23. <https://doi.org/10.18637/jss.v059.i10>
+{{< include /shared/fragments/_reference-wickham-2014.qmd >}}
 
 Yan, Z., & Moffitt, K. C. (2019). Contract analytics in auditing. *Accounting Horizons*, *33*(3), 111–126. <https://doi.org/10.2308/acch-52457>

@@ -9,118 +9,32 @@ from functools import lru_cache
 
 import excel as xl
 from check_figures import text_width
-from data import one, q, require_columns
+from data import connection, one, q, require_columns
+from shared.calculations.excel_analysis import (lead_digit, conformity, benford, payments as shared_payments, aging as shared_aging, journal_entries as shared_journal_entries)
 from drawio import (BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, ROW_H, RULE, SMALL, WHITE, Diagram,
                     esc)
 
 END = "2026-12-31"   # the end of the period under review: fiscal 2024 through fiscal 2026
 NBSP = "&nbsp;&nbsp;&nbsp;"
-# Nigrini's first-digit MAD ranges: (upper limit, conclusion).
-MAD_RANGES = [(0.006, "Close conformity"), (0.012, "Acceptable conformity"),
-              (0.015, "Marginally acceptable conformity"), (math.inf, "Nonconformity")]
-BUCKETS = [(-9999, "Current"), (1, "1-30 days"), (31, "31-60 days"), (61, "61-90 days"),
-           (91, "Over 90 days")]
+from shared.calculations.excel_analysis import MAD_RANGES, BUCKETS
 
 
 # -- data -------------------------------------------------------------------------------
 
-def lead_digit(amount: float) -> int:
-    """The first significant digit, as =--LEFT(TEXT(x,"0.00000000E+00"),1) returns it."""
-    return int(f"{amount:.8E}"[0])
-
-
-def conformity(mad: float) -> str:
-    return next(label for limit, label in MAD_RANGES if mad < limit)
-
 
 @lru_cache(maxsize=1)
 def payments() -> list[dict]:
-    """Tutorial 8.1's Payments query: supplier payments through fiscal 2026 with their invoices."""
-    require_columns("DisbursementPayment", ["PaymentNumber", "PaymentDate", "SupplierID",
-                                            "PurchaseInvoiceID", "Amount"])
-    rows = [dict(number=n, date=d, supplier=s, invoice=i, amount=a, total=g, name=name)
-            for n, d, s, i, a, g, name in q(
-                "SELECT d.PaymentNumber, d.PaymentDate, d.SupplierID, d.PurchaseInvoiceID, d.Amount, "
-                "pi.GrandTotal, s.SupplierName FROM DisbursementPayment d "
-                "JOIN PurchaseInvoice pi USING (PurchaseInvoiceID) JOIN Supplier s ON s.SupplierID = d.SupplierID "
-                "WHERE d.PaymentDate <= ?", END)]
-    # The population reconciles to the cash credits the payments posted (account 1010, AccountID 2).
-    n, credits = one("SELECT COUNT(*), SUM(g.Credit) FROM GLEntry g JOIN Account a USING (AccountID) "
-                     "WHERE g.SourceDocumentType = 'DisbursementPayment' AND a.AccountNumber = 1010 "
-                     "AND g.PostingDate <= ?", END)
-    assert n == len(rows) and abs(credits - sum(r["amount"] for r in rows)) < 0.005
-    assert all(r["amount"] <= r["total"] for r in rows), "no payment exceeds its invoice"
-    return rows
-
-
-def benford(amounts: list[float]) -> dict:
-    counts = Counter(lead_digit(a) for a in amounts)
-    n = sum(counts.values())
-    expected = {d: math.log10(1 + 1 / d) for d in range(1, 10)}
-    actual = {d: counts[d] / n for d in range(1, 10)}
-    mad = sum(abs(actual[d] - expected[d]) for d in range(1, 10)) / 9
-    return dict(n=n, counts=counts, expected=expected, actual=actual, mad=mad)
+    return shared_payments(connection())
 
 
 @lru_cache(maxsize=1)
 def aging() -> dict:
-    """Tutorial 8.2: open sales invoices at the end of fiscal 2026, aged by due date."""
-    require_columns("CashReceiptApplication", ["SalesInvoiceID", "AppliedAmount", "ApplicationDate"])
-    require_columns("CreditMemo", ["OriginalSalesInvoiceID", "GrandTotal", "CreditMemoDate"])
-    applied, credited = defaultdict(float), defaultdict(float)
-    for sid, amount in q("SELECT SalesInvoiceID, AppliedAmount FROM CashReceiptApplication "
-                         "WHERE ApplicationDate <= ?", END):
-        applied[sid] += amount
-    for sid, amount in q("SELECT OriginalSalesInvoiceID, GrandTotal FROM CreditMemo "
-                         "WHERE CreditMemoDate <= ?", END):
-        credited[sid] += amount
-    as_of = date.fromisoformat(END)
-    out = defaultdict(lambda: [0, 0.0])
-    for sid, due, total in q("SELECT SalesInvoiceID, DueDate, GrandTotal FROM SalesInvoice "
-                             "WHERE InvoiceDate <= ?", END):
-        balance = xl.xround(total - applied[sid] - credited[sid])
-        if balance <= 0:
-            continue
-        days = (as_of - date.fromisoformat(due)).days
-        bucket = [label for low, label in BUCKETS if days >= low][-1]
-        out[bucket][0] += 1
-        out[bucket][1] += balance
-    ledger = dict(q("SELECT SourceDocumentType, SUM(Debit - Credit) FROM GLEntry "
-                    "WHERE AccountID = 3 AND PostingDate <= ? GROUP BY 1", END))
-    counts = dict(q("SELECT SourceDocumentType, COUNT(*) FROM GLEntry "
-                    "WHERE AccountID = 3 AND PostingDate <= ? GROUP BY 1", END))
-    assert one("SELECT AccountNumber FROM Account WHERE AccountID = 3")[0] == 1020
-    other = one("SELECT COUNT(*) FROM GLEntry WHERE AccountID IN (4, 74)")[0]
-    assert other == 0, "the allowance (1030) and bad-debt (6170) accounts have no postings"
-    subledger = sum(v[1] for v in out.values())
-    gl = sum(ledger.values())
-    assert abs(gl - subledger - 380_000) < 0.005, gl - subledger
-    return dict(buckets=out, ledger=ledger, counts=counts, subledger=subledger, gl=gl)
+    return shared_aging(connection())
 
 
 @lru_cache(maxsize=1)
 def journal_entries() -> list[dict]:
-    """Tutorial 8.3's JournalEntries query with its five flags and the risk score."""
-    require_columns("JournalEntry", ["EntryNumber", "PostingDate", "EntryType", "TotalAmount",
-                                     "CreatedByEmployeeID", "CreatedDate", "ApprovedByEmployeeID"])
-    require_columns("Employee", ["EmployeeID", "MaxApprovalAmount"])
-    limit = dict(q("SELECT EmployeeID, MaxApprovalAmount FROM Employee"))
-    rows = []
-    for number, posted, kind, total, creator, created, approver in q(
-            "SELECT EntryNumber, PostingDate, EntryType, TotalAmount, CreatedByEmployeeID, CreatedDate, "
-            "ApprovedByEmployeeID FROM JournalEntry ORDER BY EntryNumber"):
-        flags = dict(Weekend=date.fromisoformat(created[:10]).weekday() >= 5,
-                     Backdated=created[:10] > posted,
-                     SelfApproved=creator == approver,
-                     AboveLimit=total > limit[approver],
-                     RoundAmount=abs(total % 1000) < 0.005)
-        rows.append(dict(number=number, kind=kind, total=total, flags=flags,
-                         score=sum(flags.values())))
-    scores = Counter(r["score"] for r in rows)
-    assert scores[4] == 1 and max(scores) == 4, scores
-    top = max(rows, key=lambda r: r["score"])
-    assert top["number"] == "JE-2024-000001"
-    return rows
+    return shared_journal_entries(connection())
 
 
 # -- drawing helpers --------------------------------------------------------------------
@@ -377,20 +291,24 @@ def fig_08_06() -> Diagram:
         "SELECT GLEntryID, PostingDate, VoucherNumber, Description, Debit FROM GLEntry "
         "WHERE AccountID = 3 AND SourceDocumentType = 'JournalEntry'")
     assert voucher == "JE-2024-000001" and abs(debit - 380_000) < 0.005
-    # The LedgerAR query keeps these columns, in this order, and adds Amount; Show Details lists them
-    # all, and the mock shows five of them under their own column letters.
-    kept = ["GLEntryID", "PostingDate", "AccountID", "VoucherNumber", "SourceDocumentType",
-            "Description", "Debit", "Credit", "Amount"]
-    require_columns("GLEntry", kept[:-1])
+    # The LedgerAR query keeps these columns and adds Amount. Choose Columns keeps the Table's order, so
+    # Show Details lists them in that order, and the mock shows five of them under their own column letters.
+    chosen = ["GLEntryID", "PostingDate", "AccountID", "Debit", "Credit", "VoucherNumber", "SourceDocumentType",
+              "Description"]
+    require_columns("GLEntry", chosen)
+    table_order = [r[1] for r in q("PRAGMA table_info(GLEntry)")]
+    kept = [c for c in table_order if c in chosen] + ["Amount"]
+    assert kept[:-1] == chosen, "Tutorial 8.2 Step 5e lists the columns in the Table's order"
     heads = ["GLEntryID", "PostingDate", "VoucherNumber", "Description", "Amount"]
     letters = [chr(65 + kept.index(h)) for h in heads]
+    hidden = [chr(65 + i) for i, c in enumerate(kept) if c not in heads]
     widths2 = [36, 100, 110, 140, 320, 120]
     xl.table_view(d, 0, y + 24, letters, widths2, heads,
                   [("2", [str(gl_id), posted, voucher, desc, xl.num(debit)])])
     bottom = y + 24 + 22 + ROW_H * 2
     note(d, bottom + 8, "The PivotTable has AccountID and SourceDocumentType in the Rows area. The "
          "LedgerAR query also kept AccountIDs 4 and 74, accounts 1030 and 6170, but no rows exist for "
-         "them. On the detail sheet, columns C, E, G, and H are hidden.")
+         f"them. On the detail sheet, columns {', '.join(hidden[:-1])}, and {hidden[-1]} are hidden.")
     return d
 
 

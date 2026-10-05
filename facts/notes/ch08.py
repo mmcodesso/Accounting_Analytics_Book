@@ -113,17 +113,27 @@ def ex1(d, claim):
                 "a.SalesInvoiceID WHERE si.SalesInvoiceID IS NULL") == 0,
           "every cash application is to an invoice, so none reduces the opening balance")
     small = sorted((i for i in invoices if i["balance"] < 10), key=lambda i: i["days"])
-    current = [i for i in small if i["days"] <= 0]
-    claim(len(current) == 1, "exactly one balance under $10 is current")
-    cur = current[0] if current else small[0]
-    others = [i for i in small if i is not cur]
-    claim(all(i["days"] >= 61 for i in others), "the other balances under $10 are 61 or more days past due")
+    # the balances under $10 that are younger than 61 days, each with its age; the others are 61+ days past due
+    young = [dict(number=i["number"], balance=i["balance"],
+                  age="current" if i["days"] <= 0 else f"{i['days']} day{'s' if i['days'] > 1 else ''} past due")
+             for i in small if i["days"] < 61]
+    others = [i for i in small if i["days"] >= 61]
+    claim(len(others) > 0, "some balances under $10 are 61 or more days past due")
+    # Tutorial 8.2 rounds OpenBalance with Power Query's Round, which rounds a half to even; the note rounds half up,
+    # as Excel's ROUND does. They agree unless a balance ends in a half cent.
+    halves = d.q("SELECT si.GrandTotal - COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a WHERE "
+                 "a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?1), 0) - COALESCE((SELECT SUM(c.GrandTotal) "
+                 "FROM CreditMemo c WHERE c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1), 0) "
+                 "FROM SalesInvoice si WHERE si.InvoiceDate <= ?1", asof(d))
+    claim(not any(abs(abs(b) * 100 % 1 - 0.5) < 1e-6 for (b,) in halves),
+          "no open balance ends in a half cent, so Power Query's Round (half to even) gives the note's balances")
     rows = d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID IN (?, ?)", d.account("6170"), d.account("1030"))
     claim(rows == 0, "neither 6170 nor 1030 has any GL rows")
     return dict(asof=asof(d), b=buckets, n=len(invoices), total=total, loss=loss, opening=opening, entry=entry,
                 loss_with=xr(loss + opening * BUCKETS[-1][1]), small=len(small),
-                small_total=xr(sum(i["balance"] for i in small)), cur=dict(number=cur["number"], balance=cur["balance"]),
-                low=min(i["balance"] for i in others), high=max(i["balance"] for i in others))
+                small_total=xr(sum(i["balance"] for i in small)), young=young,
+                low=min(i["balance"] for i in others) if others else 0.0,
+                high=max(i["balance"] for i in others) if others else 0.0)
 
 
 # --- Exercise 8.2 --------------------------------------------------------------------------------
@@ -190,7 +200,8 @@ def ex3(d, claim):
             past_due[i["customer"]] += i["balance"]
     total = sum(balance.values())
     over = sorted(((k, v) for k, v in balance.items() if v > customers[k]["limit"]), key=lambda kv: -kv[1])
-    claim(all(abs(past_due[k]) < 0.005 for k, _ in over), "none of the customers over their limit has a past-due balance")
+    late = [k for k, _ in over if past_due[k] >= 0.005]          # the customers over their limit with a past-due balance
+    claim(len(over) > 0, "some customers exceed their credit limit")
     ranked = sorted(balance.items(), key=lambda kv: -kv[1])
     top = [dict(name=customers[k]["name"], balance=v, over=k in dict(over)) for k, v in ranked[:5]]
     segments_top = {customers[k]["segment"] for k, _ in ranked[:5]}
@@ -210,7 +221,8 @@ def ex3(d, claim):
                      "CAST(julianday(si.DueDate) - julianday(si.InvoiceDate) AS INTEGER)")
     claim(mismatch == 0, "every invoice's due date matches its customer's PaymentTerms")
     return dict(asof=asof(d), customers=len(balance), n_over=word(len(over)).capitalize(),
-                over=[dict(customers[k], balance=v) for k, v in over], top=top, segment_top=segments_top.pop(),
+                over=[dict(customers[k], balance=v, past_due=past_due[k] if k in late else 0.0) for k, v in over],
+                late=len(late), n_late=word(len(late)), top=top, segment_top=segments_top.pop(),
                 top5=sum(v for _, v in ranked[:5]) / total, top10=sum(v for _, v in ranked[:10]) / total,
                 segments=sorted(segment.items(), key=lambda kv: -kv[1]),
                 terms=[(t, v[0], v[1], len(v[2])) for t, v in sorted(terms.items(), key=lambda kv: int(kv[0].split()[-1]))])
@@ -311,8 +323,10 @@ def ex5(d, claim):
     claim(all(r[2][5:] == "01-01" for run in runs for r in run), "the runs are dated January 1")
     claim(len({(r[8], r[9]) for run in runs for r in run}) == 1, "all the runs' requisitions have the same quantity and unit cost")
     claim(all(len({r[7] for r in run}) == len(run) for run in runs), "each run is for different items")
-    claim(all(len({r[3] for r in run}) >= 2 for run in runs)
-          and any(len({r[3] for r in run}) < len(run) for run in runs), "the runs have mostly (not all) different requesters")
+    distinct = [len({r[3] for r in run}) for run in runs]          # requesters per run
+    requesters = ("different requesters" if all(n == len(run) for n, run in zip(distinct, runs)) else
+                  "mostly different requesters" if all(n >= 2 for n in distinct) else
+                  "one requester each" if all(n == 1 for n in distinct) else "few requesters")
     five = [emp[k]["title"] for k in sorted(emp) if emp[k]["limit"] == 5000]
     # supplier invoices
     invoices = d.q("SELECT PurchaseInvoiceID, ApprovedByEmployeeID, GrandTotal FROM PurchaseInvoice ORDER BY PurchaseInvoiceID")
@@ -362,7 +376,7 @@ def ex5(d, claim):
                 s2=scores[2], s1=scores[1], bands=bands, band=len(band),
                 unapproved=abbreviated([r[1] for r in unapproved]),
                 runs=[dict(first=run[0][1], last="-" + run[-1][1].rsplit("-", 1)[1]) for run in runs],
-                run_len=word(len(runs[0])), qty=runs[0][0][8], cost=runs[0][0][9], value=runs[0][0][6],
+                run_len=word(len(runs[0])), qty=runs[0][0][8], cost=runs[0][0][9], value=runs[0][0][6], requesters=requesters,
                 five=five, n_five=word(len(five)).capitalize(),
                 inv_total=len(invoices), inv_cfo=len(invoices) - len(not_cfo), inv_other=len(not_cfo), g=groups,
                 n_payments=sum(len(v) for v in pairs), pairs=len(pairs), within30=within30, gaps=gaps)
@@ -412,7 +426,9 @@ def ex6(d, claim):
         claim(all(r[1] == approved for r in rows), f"override {oid}'s lines were billed at the pending ApprovedUnitPrice")
         claim(all(r[4] is None for r in rows), f"override {oid}'s lines carry a blank PriceOverrideApprovalID")
         claim(len({r[5] for r in rows}) == len(rows), f"override {oid}'s invoice lines are separate shipments")
-        methods += [r[3] for r in rows if r[3] not in methods]
+        for r in rows:
+            if r[3] not in methods:
+                methods.append(r[3])
         below += sum((reference - r[1]) * r[2] for r in rows)
         billed += len(rows)
         overrides.append(dict(id=oid, line=line, approved=approved, invoices=[r[0] for r in rows],
@@ -430,7 +446,12 @@ def ex6(d, claim):
     after = [r for r in order_lines if r[1] > lists[r[0]]["end"]]
     expired = [lst for lst in lists.values() if lst["status"] == "Expired"]
     claim({r[0] for r in after} == {lst["id"] for lst in expired}, "the lines priced after their list's end are on the Expired lists")
-    claim(all(lst["scope"] == "Segment" for lst in expired), "the Expired lists are segment lists")
+    claim(all(lst["scope"] in ("Segment", "Customer") for lst in expired), "the Expired lists are segment or customer lists")
+    # how the note names each Expired list: its segment ("Strategic segment" the first time) or its customer
+    first_segment = next((lst["id"] for lst in expired if lst["scope"] == "Segment"), None)
+    for lst in expired:
+        lst["label"] = (f"{lst['segment']}{' segment' if lst['id'] == first_segment else ''}" if lst["scope"] == "Segment"
+                        else f"customer {lst['customer']}'s own list")
     claim(not any((o["scope"], o["segment"], o["customer"]) == (lst["scope"], lst["segment"], lst["customer"])
                   and o["id"] != lst["id"] and o["end"] > lst["end"] for lst in expired for o in lists.values()),
           "no Expired list has a successor for its segment")
@@ -461,13 +482,14 @@ def ex6(d, claim):
               "JOIN PriceList mine ON mine.CustomerID = o.CustomerID AND mine.ScopeType = 'Customer' "
               "LEFT JOIN PriceListLine pll ON pll.PriceListLineID = l.PriceListLineID "
               "WHERE l.PricingMethod NOT IN ('Customer Price List', 'Approved Override') ORDER BY l.SalesOrderLineID")
-    claim(len({r[0] for r in own}) == 1, "one customer with its own list has lines under another pricing method")
+    claim(len(own) > 0, "some customers with their own list have lines under another pricing method")
     claim(len({(r[6], r[7]) for r in own}) == 1, "those lines have one PricingMethod and cite one list")
     claim(all(r[8] == r[9] and r[8] != r[10] for r in own),
           "their UnitPrice equals the customer's own list, not the list they cite")
-    cited = lists[own[0][7]]
-    stale = sorted({int(r[5][:4]) for r in own if r[5] > cited["end"]})
-    claim(0 < len(stale) < len(own), "the cited list had expired for some, but not all, of the lines")
+    own = own or [(None,) * 11]
+    customers = list({r[0]: dict(id=r[0], name=r[1], segment=r[2], list=r[3]) for r in own}.values())
+    cited = lists.get(own[0][7], dict(id=None, end=""))
+    stale = sorted({int(r[5][:4]) for r in own if r[5] and r[5] > cited["end"]})   # the years the cited list had expired
     return dict(flagged=flagged, pct=flagged[0]["pct"], approver=dict(id=approver[0], name=approver[1], title=approver[2]),
                 flagged_lines=flagged_lines, n_lines=sum(f["n"] for f in flagged_lines),
                 discount=sum(f["discount"] for f in flagged_lines),
@@ -475,7 +497,7 @@ def ex6(d, claim):
                 overrides=overrides, billed=word(billed), methods=methods, below=below,
                 expired=expired, after=len(after), after_total=sum(r[2] for r in after), per_list=per_list,
                 unused=[u["id"] for u in unused], n_unused=word(len(unused)), original=original[0],
-                customer=dict(id=own[0][0], name=own[0][1], segment=own[0][2], list=own[0][3]),
+                customers=customers, renewed="segment lists" if all(lst["scope"] == "Segment" for lst in expired) else "expired lists",
                 own=[dict(line=r[4], date=r[5], price=r[8], cited=r[10]) for r in own], n_own=word(len(own)),
                 method=own[0][6], cited=cited["id"], stale=stale)
 

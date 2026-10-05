@@ -1,0 +1,382 @@
+---
+title: "Data Preparation and Cleaning in Excel"
+subtitle: "Chapter 5"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-05.pptx
+---
+
+## Learning objectives {#ch05-01 .balanced .stepwise}
+
+- Extract, standardize, and validate attributes.
+- Assign fiscal periods and compare event dates.
+- Retrieve related values through verified keys.
+- Build and reconcile a repeatable InvoiceLines query.
+
+::: {.notes}
+Purpose: introduce preparation as accounting work that requires evidence. Allow 60 seconds and reveal each objective in turn. Chapter 4 established the workbook's structure. This chapter supplies the attributes that the controller's question needs on each invoice line. The central control is preserving the intended population while adding correct information. Ask what could go wrong when a lookup returns a plausible date from the wrong record. Transition: identify the missing attributes in the current workbook.
+:::
+
+# Prepare the attributes the question needs {#ch05-module-2}
+
+::: {.notes}
+Keep the question and the row grain visible throughout preparation. An invoice line remains the unit of analysis.
+:::
+
+## Revenue needs an invoice period and an item group {#ch05-03 .balanced .stepwise}
+
+The invoice line holds the billed amount.
+
+The invoice holds its date. The item holds its group.
+
+**How can we add these attributes without changing the lines?**
+
+::: {.notes}
+Purpose: connect related tables to the business question. Allow about 60 seconds. Summing revenue by quarter requires an invoice date, while comparing Furniture requires an item group. These attributes live in related Tables because each entity has its own grain. Students should name the linking keys before selecting functions or query commands. Ask why copying nearby cells from another worksheet would be unreliable. Transition: first derive useful attributes within the source Tables.
+:::
+
+## Preparation has a stated contract {#ch05-04 .balanced .stepwise}
+
+**Grain:** one row per invoice line.
+
+**Population:** the selected source lines.
+
+**Checks:** key matches, row counts, and billed totals.
+
+::: {.notes}
+Purpose: define success before performing transformations. Allow 60 seconds. A preparation step may intentionally filter a population, but that change must be explicit and measured. Here the final query should retain every source invoice line. Adding a related attribute should neither remove unmatched lines silently nor duplicate lines with multiple matches. Ask students which two checks could detect those outcomes. Explain that counts and totals complement a key uniqueness check. Transition: decode the item identifier in a controlled way.
+:::
+
+## Text functions extract a known structure {#ch05-05 .balanced .stepwise}
+
+```text
+=MID([@ItemCode],5,3)
+```
+
+For a code shaped **GRP-TYP-9999**, the middle three letters identify ProductType.
+
+::: {.notes}
+Purpose: teach positional extraction alongside its assumption. Allow 60 seconds. MID starts counting characters at one in an Excel worksheet, so the product type starts at position five. This works because the code follows a documented pattern. A formula can return three characters even when the source code is malformed, which is why extraction alone is insufficient. Ask students what a missing hyphen would do to the result. Transition: test the assumed structure before relying on the extracted label.
+:::
+
+## Validation checks the extraction rule {#ch05-06 .balanced .stepwise}
+
+```text
+=AND(LEN([@ItemCode])=12,
+     MID([@ItemCode],4,1)="-",
+     MID([@ItemCode],8,1)="-")
+```
+
+Inspect failures and retain the original code.
+
+::: {.notes}
+Purpose: make the text rule falsifiable. Allow 60-90 seconds. This check verifies length and delimiter positions for the pattern used in the tutorial. It does not prove that the letters belong to an approved product-type list or that the four ending characters are digits. State those limits so students do not overclaim validation. Ask them to propose a value that passes this structural check but could still be invalid. Transition: distinguish standardization from changing a business identifier.
+:::
+
+## Standardization preserves meaning {#ch05-07 .balanced .stepwise}
+
+**TRIM** removes unnecessary ordinary spaces.
+
+**UPPER / LOWER** can standardize case.
+
+Keep the original value and test the business rule.
+
+::: {.notes}
+Purpose: encourage deliberate text cleaning. Allow about 60 seconds. Standardizing a description can make comparisons easier, but transforming a key can merge records that should remain distinct. Ordinary space handling also differs from unusual characters copied from another system. Ask students whether a leading zero in a customer code should be removed just because it looks numeric. The answer depends on its meaning as an identifier. Transition: dates need comparable attention to type and business purpose.
+:::
+
+## Periods belong to a defined calendar {#ch05-08 .balanced .stepwise}
+
+```text
+=YEAR([@InvoiceDate])
+=ROUNDUP(MONTH([@InvoiceDate])/3,0)
+```
+
+Charles River's fiscal year follows the calendar year.
+
+::: {.notes}
+Purpose: connect date functions with the accounting calendar. Allow 60 seconds. YEAR and calendar-quarter arithmetic work for Charles River because its fiscal year matches the calendar year. They should not be copied unaltered into a company with a different fiscal calendar. Confirm that InvoiceDate is a real date rather than text displayed to resemble one. Ask which period a December invoice belongs to in this teaching dataset. Transition: the date chosen also determines the question being answered.
+:::
+
+## Invoice date and order date answer different questions {#ch05-09 .balanced .stepwise}
+
+**InvoiceDate:** when revenue is assigned to an invoice period.
+
+**OrderDate:** when the order was placed.
+
+**DueDate:** when the invoice is contractually due.
+
+::: {.notes}
+Purpose: prevent a common period-selection error. Allow 60-90 seconds. These dates describe different events. The chapter's revenue analysis uses invoice dates, while order dates help explain when a promotion influenced purchasing. A due date supports terms and aging, not the invoice quarter. Also distinguish this teaching measure from a full revenue-recognition assessment, which may need other evidence. Ask students why an October order can matter to December invoiced revenue. Transition: calculate and classify payment terms.
+:::
+
+## Terms are a date difference {#ch05-10 .balanced .stepwise}
+
+```text
+=[@DueDate]-[@InvoiceDate]
+```
+
+Format **DaysToDue** as a number.
+
+Investigate negative or unexpected results.
+
+::: {.notes}
+Purpose: show that the calculation and its interpretation are separate steps. Allow 60 seconds. Subtracting two valid Excel dates gives elapsed days. A date format on the result can make a correct number look nonsensical, so choose a numeric format. Negative values deserve inspection because the due date would precede the invoice date. Ask whether a valid numeric result proves that the customer's contracted terms were used. Supporting terms data are still needed. Transition: classify those days with logical functions.
+:::
+
+## Logical functions make categories explicit {#ch05-11 .balanced .stepwise}
+
+**IF / IFS:** select a result from tested conditions.
+
+**AND:** require every condition.
+
+**OR:** accept any listed condition.
+
+::: {.notes}
+Purpose: introduce logical functions through rules students can explain aloud. Allow about 60 seconds. In an IFS classification, order matters because the first true condition determines the result. Test shorter terms before longer upper bounds and include an explicit final category. AND suits a code that must satisfy several requirements, while OR suits a list of acceptable terms. Ask students to describe a 45-day invoice under the tutorial's terms categories. Transition: run the first tutorial's validation checks.
+:::
+
+## Tutorial 5.1: inspect the new attributes {#ch05-12 .balanced .stepwise}
+
+Create **ProductType, CodeCheck, FiscalYear, FiscalQuarter, Period, and terms checks**.
+
+Inspect distinct labels and failed tests.
+
+[Open Tutorial 5.1](https://aa.accountinganalyticshub.com/chapters/05-data-preparation/chapter.html#guided-tutorial-5.1-adding-text-date-and-logical-columns)
+
+::: {.notes}
+Purpose: organize the hands-on work around its checks. Allow three minutes to inspect completed columns or longer for full construction. Students should find no code-format or standard-terms failures in the tutorial population, and the period labels should span the expected teaching window. A zero failure count is a documented observation about this population and these rules, not universal data quality. Ask students to explain one formula without reading its syntax. Transition: retrieve those attributes through related keys.
+:::
+
+# Look up through verified keys {#ch05-module-13}
+
+::: {.notes}
+Introduce the direction of a lookup before discussing its syntax. The return side needs one intended match.
+:::
+
+## An exact lookup returns an invoice attribute {#ch05-14 .balanced}
+
+![](/_shared/generated/chapter-05/lookup.svg){fig-alt="Invoice line 10645 carries SalesInvoiceID 7947. Matching that key to SalesInvoice returns InvoiceDate 2025-03-05." width=95%}
+
+::: {.notes}
+Purpose: visualize the lookup's three roles on the public sale trace. Allow 60-90 seconds. Identify the invoice key on the line, the key column searched in the invoice Table, and the date column returned. Repeated invoice keys across different lines are expected. The invoice Table should provide one intended row for each key. Ask students whether returning the date should add a second line to the source population. It should not. Transition: express the same relationship in XLOOKUP.
+:::
+
+## XLOOKUP separates key and return columns {#ch05-15 .balanced .stepwise}
+
+```text
+=XLOOKUP([@SalesInvoiceID],
+         SalesInvoice[SalesInvoiceID],
+         SalesInvoice[InvoiceDate],"No match")
+```
+
+Count and investigate every **No match** result.
+
+::: {.notes}
+Purpose: read XLOOKUP by argument role. Allow 60-90 seconds. The default exact match suits identifiers. The explicit missing-result label makes failures visible, but students must also check that the key on the return side is unique. XLOOKUP can otherwise return a first match while hiding ambiguity. Demonstrate tracing one returned date to its source invoice. Ask why a missing date should not be replaced with zero. Transition: follow the extra relationship needed for the order date.
+:::
+
+## Some attributes need two lookups {#ch05-16 .balanced .stepwise}
+
+First retrieve **SalesOrderID** from SalesInvoice.
+
+Then retrieve **OrderDate** from SalesOrder.
+
+Document both relationships and their missing matches.
+
+::: {.notes}
+Purpose: teach the path rather than a single impressive formula. Allow 60 seconds. The invoice line knows its invoice, and the invoice identifies the order. Keeping the intermediate order key visible makes the path reviewable. Students should verify each relationship and avoid joining on document descriptions or row positions. Ask which Table should supply the order date when an invoice was issued after the order. Transition: show equivalent lookup approaches students may encounter in existing workbooks.
+:::
+
+## Alternative lookup tools need explicit matching {#ch05-17 .balanced .step-rows}
+
+| Method | Review point |
+|---|---|
+| INDEX with MATCH | Use exact-match mode in MATCH |
+| VLOOKUP | Use FALSE for exact match |
+| XLOOKUP | Verify uniqueness of the lookup key |
+
+::: {.notes}
+Purpose: help students read older or alternative workbook formulas. Allow about 60 seconds. INDEX and MATCH separate row location from the returned column. VLOOKUP searches the first column of its range and uses a column position to choose the return value, so inserted columns can change its meaning. None of these functions automatically resolves duplicate keys as a business question. Ask students which matching behavior would be inappropriate for an invoice ID. Transition: consider relationships with several valid matches.
+:::
+
+## One-to-many needs a different question {#ch05-18 .balanced .stepwise}
+
+A single lookup returns one value.
+
+A customer can have many invoices.
+
+Use a defined aggregation or a table of matching rows.
+
+::: {.notes}
+Purpose: stop a first-match result from being mistaken for a complete relationship. Allow 60-90 seconds. Looking up a customer's invoice amount may retrieve one invoice and miss the rest. If the task is total revenue, an aggregation such as SUMIFS is appropriate. If the task is transaction review, a filtered table may be needed. Ask students to state the desired output grain before choosing either approach. Transition: count lookup failures across the prepared columns.
+:::
+
+## Errors carry information {#ch05-19 .balanced .stepwise}
+
+Use **IFERROR** only with a documented alternative.
+
+A text label can keep an unresolved lookup visible.
+
+A zero can quietly change a monetary total.
+
+::: {.notes}
+Purpose: avoid suppressing evidence during preparation. Allow about 60 seconds. IFERROR catches more than a missing match, so a replacement can hide a broken reference or another formula error. If an analyst substitutes zero for a missing price, the resulting revenue or margin may appear valid while being understated. Ask students to distinguish a true zero from an unavailable value. Retain a way to count and inspect unresolved rows. Transition: compare the two dates behind promotion timing.
+:::
+
+## Tutorial 5.2: inspect promotion timing {#ch05-20 .balanced .stepwise}
+
+Add the six lookup columns and check missing matches.
+
+Filter promotion 8 lines invoiced after October 31, 2026.
+
+Compare their **OrderDate** and **InvoiceDate**.
+
+[Open Tutorial 5.2](https://aa.accountinganalyticshub.com/chapters/05-data-preparation/chapter.html#guided-tutorial-5.2-bringing-dates-and-groups-onto-the-invoice-lines)
+
+::: {.notes}
+Purpose: connect preparation to an interpretation students can defend. Allow two to three minutes. The public tutorial finds promotion lines invoiced after the program ended. That does not by itself establish an unauthorized discount: the associated orders may have been placed while it was active. Keep the program's eligibility terms and the two event dates distinct. Ask students to explain why the invoice quarter can contain effects from an earlier order period. Transition: preserve these findings in a repeatable query.
+:::
+
+# Build one repeatable analytical query {#ch05-module-21}
+
+::: {.notes}
+Power Query now creates the same intended line population with the related attributes included. Worksheet lookups remain useful checks.
+:::
+
+## InvoiceLines begins as a reference query {#ch05-22 .balanced .stepwise}
+
+Reference **SalesInvoiceLine** in Power Query.
+
+Merge invoice, item, and customer attributes through their keys.
+
+Keep one row per source invoice line.
+
+::: {.notes}
+Purpose: introduce the final analysis Table's lineage. Allow about 60 seconds. A query reference uses another query's result and then adds its own steps. It does not automatically read worksheet calculated columns that were added after the source query loaded. That distinction matters when later chapters add ListAmount or DiscountAmount inside InvoiceLines. Ask students where those formulas currently exist. Transition: inspect the join type and selected keys before expanding columns.
+:::
+
+## A left outer merge preserves unmatched source rows {#ch05-23 .balanced .stepwise}
+
+Select the intended key on both sides.
+
+Choose **Left Outer** to retain every source line.
+
+Inspect matches and expand only the required attributes.
+
+::: {.notes}
+Purpose: make merge choices visible controls. Allow 60-90 seconds. A left outer merge retains the starting rows, but expanding multiple right-side matches can still increase the output count. Unmatched rows can carry null attributes and require investigation. Therefore the join label alone does not guarantee correct preparation. Ask what would happen if the return Table contained two rows for one ItemID. Transition: distinguish Excel worksheet syntax from the Power Query language.
+:::
+
+## Power Query uses its own expression language {#ch05-24 .balanced .stepwise}
+
+```text
+Text.Middle([ItemCode], 4, 3)
+```
+
+This returns the same three characters as Excel's `MID(...,5,3)`.
+
+Power Query positions start at zero.
+
+::: {.notes}
+Purpose: explain a syntax difference that otherwise looks like an off-by-one error. Allow 60 seconds. The tutorial's Custom Column formula uses M, the Power Query expression language. Position four refers to the fifth character because counting starts at zero. Column references and function names differ from worksheet formulas. Ask students to predict the result before accepting the dialog's syntax check. A syntactically valid formula can still extract the wrong field. Transition: inspect missing values and quantity checks.
+:::
+
+## Missing and fractional values need context {#ch05-25 .balanced .stepwise}
+
+A blank optional field can be meaningful.
+
+A fractional quantity can reflect the dataset's measurement.
+
+Keep exceptions visible and document their interpretation.
+
+::: {.notes}
+Purpose: prevent automatic cleaning from erasing legitimate evidence. Allow 60-90 seconds. Tutorial 5.3 adds WholeQuantity as a check and finds many fractional quantities. The finding must be documented before anyone rounds them, because quantity is part of billed amounts and cost calculations. Similarly, a blank optional reference differs from a failed required key. Ask students which business rule would justify a transformation. Transition: prove the final query's population against its source.
+:::
+
+## Reconcile the prepared population {#ch05-26 .balanced}
+
+{{< include /_shared/generated/chapter-05/_merge-check.qmd >}}
+
+::: {.notes}
+Purpose: show the two most immediate checks on the prepared Table. Allow 60 seconds. These values come from the same public invoice-line calculation used by the book exhibits. Matching counts and totals are necessary evidence that lines were retained without monetary change. They are not sufficient to prove every new attribute is correct, because an incorrect date can leave the amount unchanged. Ask students to add a targeted key or period check. Transition: run the final tutorial refresh.
+:::
+
+## Tutorial 5.3: verify both methods {#ch05-27 .balanced .stepwise}
+
+Compare InvoiceLines with the worksheet lookups.
+
+Check quarterly Furniture totals and unmatched attributes.
+
+Refresh and confirm the same result.
+
+[Open Tutorial 5.3](https://aa.accountinganalyticshub.com/chapters/05-data-preparation/chapter.html#guided-tutorial-5.3-building-invoicelines-in-power-query)
+
+::: {.notes}
+Purpose: use the earlier method as an independent implementation check. Allow three minutes for students to compare their results. Both methods should assign the same revenue to the same item groups and invoice periods. If counts match but quarterly totals differ, investigate the dates and period calculation rather than adjusting the totals. Keep the worksheet lookup columns as supporting evidence. Ask students to state the source of every comparison total. Transition: record the transformation procedure for the next analyst.
+:::
+
+## A preparation record explains each decision {#ch05-28 .balanced .stepwise}
+
+Record the source, grain, keys, filters, and retained columns.
+
+List calculated attributes and unresolved exceptions.
+
+Save the count, total, and refresh checks.
+
+::: {.notes}
+Purpose: make the resulting Table reproducible. Allow about 60 seconds. Applied Steps record commands, but they do not fully explain why a filter was appropriate or why a null value was retained. The documentation should connect a decision with its business rule and the evidence used to validate it. Ask students to describe one step that would otherwise be ambiguous to a reviewer. Transition: summarize the difference between a convenient Table and a trusted analysis input.
+:::
+
+## Chapter summary {#ch05-29 .balanced .stepwise}
+
+Attributes need a defined meaning and a validation rule.
+
+Lookups require the right keys and an intended match.
+
+A repeatable query still needs population and value checks.
+
+::: {.notes}
+Purpose: revisit the core reasoning before students continue independently. Allow 60 seconds. Ask students to explain why a clean-looking Table can still be unreliable: it may contain a wrong period, a first match among duplicates, or a silently removed unmatched row. Invite one example and the corresponding control. The prepared InvoiceLines Table now supplies the dimensions needed for descriptive and diagnostic work. Transition: move to the next chapter without changing the definition of the line population.
+:::
+
+## Practice and the next chapter {#ch05-30 .balanced .stepwise}
+
+Complete the assigned preparation task and retain its checks.
+
+Next: profile the amounts, compare quarters, and explain the Furniture margin.
+
+::: {.notes}
+Purpose: hand off a stable input to the next analysis. Allow 45-60 seconds. Identify the required starting workbook from the assignment and retain the public tutorial's prepared Table when that is the specified starting point. Students should submit documentation of their own preparation decisions and checks, not only a finished worksheet. The next chapter relies on the meaning of InvoiceLines established here. Pause for questions about source paths or the query reference before closing.
+:::
+
+## References and further reading {#ch05-31 .balanced}
+
+Fernandes et al. (2023): data preparation methods and technology.
+
+Public Chapter 5 tutorials: validation, lookups, and query preparation.
+
+[Full Chapter 5 references](https://aa.accountinganalyticshub.com/chapters/05-data-preparation/chapter.html#references)
+
+::: {.notes}
+Purpose: identify the broader reading behind the preparation workflow. The detailed worked procedures and their checkpoints are in public Tutorials 5.1-5.3.
+
+{{< include /_shared/fragments/_reference-fernandes-2023.qmd >}}
+:::
+
+## Attribution and reuse {#ch05-32 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 5 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

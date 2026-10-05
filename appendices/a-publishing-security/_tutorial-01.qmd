@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will review and test the access the controller plans for Charles River Reports. You will start with an access review in internal audit's monitoring file, comparing the managers recorded for each cost center with the employee records. Then you will add a security table and a dynamic role to the package, test the role as several managers would see it, and write internal audit's findings. Internal auditors do not build the controls they audit, so in practice the controller's staff adds the roles and internal audit tests them; in this tutorial you take both parts in turn. Everything in it is done in Power BI Desktop, with no license.
 
-**Prerequisites.** You need Audit Monitoring.pbix from Chapter 16 and Charles River Reports.pbix as you left it at the end of Chapter 15.
+**Prerequisites.** You need Audit Monitoring.pbix from Chapter 16 and Charles River Reports.pbix as you left it at the end of Chapter 15. If you start here, download this tutorial's folder from [Companion Files](#sec-companion-files), which holds Charles River Reports at the end of Chapter 15 and Audit Monitoring at the end of Chapter 16, and point each project at your copy of CharlesRiver.xlsx, refresh it, and save it as a .pbix file, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -20,7 +20,7 @@ d. Choose **Home > Close & Apply**, and add a page named `Access Review` with a 
 **Step 2. Give each employee a cost center in the package.**
 
 a. Open Charles River Reports.pbix, choose **Home > Transform data**, and select the **Employee** query.
-b. Choose **Home > Choose Columns**, add CostCenterID, and choose **Home > Close & Apply**.
+b. Click the settings icon beside the **Removed Other Columns** step under **Applied Steps** to reopen **Choose Columns**, select CostCenterID as well, and choose **Home > Close & Apply**.
 
 The Plant page's labor time is related to Employee, so a rule on the employee's cost center can reach it.
 
@@ -114,7 +114,7 @@ The Warehouse Manager sees the Warehouse budget and an income statement that is 
 
 **Step 9. Tell readers what they are seeing.**
 
-a. Add the two measures below to the Measures table.
+a. Add the two measures below to the Key Measures table.
 b. Add a card of Cost Centers Shown to the Budget page and the Income Statement page, titled `Cost centers shown`.
 c. Add a card of Who Am I to the About page.
 

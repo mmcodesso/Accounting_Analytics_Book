@@ -1,0 +1,5 @@
+| Fiscal 2026 control | Result |
+| --- | --- |
+| Invoice lines | 9,522 |
+| Distinct invoices | 7,171 |
+| Invoiced revenue | $29,756,420.08 |

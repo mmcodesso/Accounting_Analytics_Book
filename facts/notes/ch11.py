@@ -75,11 +75,28 @@ def ex2(d, claim):
     change = {m: (furniture[(d.C, m)], furniture[(d.P, m)]) for m in range(1, 13)}
     down = min(change, key=lambda m: change[m][0] / change[m][1])
     up = max(change, key=lambda m: change[m][0] / change[m][1])
-    claim(down == 10 and up == 11, "Furniture's largest decline is in October and its largest increase in November "
-                                   "(the wording on the promotion's timing assumes it)")
-    claim(change[10][1] == max(furniture[(d.P, m)] for m in range(1, 13)), f"October {d.P} is Furniture's highest month of {d.P}")
+    # The prior-year month behind the largest decline, ranked among the prior year's months (a high base explains part of it).
+    base_rank = sorted((furniture[(d.P, m)] for m in range(1, 13)), reverse=True).index(change[down][1]) + 1
+    # The current year's Furniture promotion (Chapter 6): the months it priced orders in, and the later months its orders
+    # were invoiced in.
+    promo = d.q("SELECT PromotionID, EffectiveStartDate, EffectiveEndDate FROM PromotionProgram WHERE ItemGroup = 'Furniture' "
+                "AND substr(EffectiveStartDate, 1, 4) = ?", str(d.C))
+    claim(len(promo) == 1, f"fiscal {d.C} has one Furniture promotion")
+    promo_id, start, stop = promo[0] if promo else (None, f"{d.C}-01-01", f"{d.C}-01-01")
+    priced = list(range(int(start[5:7]), int(stop[5:7]) + 1))
+    claim(bool(priced) and stop[:4] == start[:4], "the promotion's dates run forward within the year")
+    invoiced = [int(m) for (m,) in d.q("SELECT DISTINCT substr(s.InvoiceDate, 6, 2) FROM SalesInvoiceLine l JOIN SalesInvoice s "
+                                       "ON s.SalesInvoiceID = l.SalesInvoiceID WHERE l.PromotionID = ? AND substr(s.InvoiceDate, 1, 4) = ? "
+                                       "ORDER BY 1", promo_id, str(d.C))]
+    later = [m for m in invoiced if m > (priced[-1] if priced else 12)]
+    claim(bool(later), "the promotion's orders were invoiced after it ended")
+    claim(down in priced + later or up in priced + later,
+          "the largest decline or the largest increase falls in the promotion's months or the months its orders were invoiced "
+          "(so its timing is the first thing to examine)")
     return dict(closes=closes, rows=len(REVENUE_LINES) * len(months), lines=len(REVENUE_LINES), months=len(months),
                 ytd=ytd, total=total, freight=freight,
+                base=["highest", "second-highest", "third-highest"][base_rank - 1] if base_rank <= 3 else None,
+                priced=[MONTHS[m - 1] for m in priced], later=[MONTHS[m - 1] for m in later],
                 down=dict(month=MONTHS[down - 1], now=change[down][0], before=change[down][1],
                           pct=change[down][0] / change[down][1] - 1),
                 up=dict(month=MONTHS[up - 1], now=change[up][0], before=change[up][1], pct=change[up][0] / change[up][1] - 1))
@@ -162,7 +179,7 @@ def ex6(d, claim):
     amounts = d.q("SELECT RequisitionID, RequisitionNumber, RequestDate, RequestedByEmployeeID, ApprovedByEmployeeID, Status, "
                   "ROUND(Quantity * EstimatedUnitCost, 2) FROM PurchaseRequisition ORDER BY RequisitionID")
     bands = [sum(1 for r in amounts if lo <= r[6] < lo + 50) for lo in range(4700, 5250, 50)]
-    claim(bands[5] >= 2 * max(bands[4], bands[6]), "the band just below 5,000 holds twice as many as its neighbors")
+    claim(bands[5] > bands[6], "the band just below 5,000 holds more than the band just above it")
     middles = [i for i in range(1, len(amounts) - 1) if amounts[i - 1][6] == amounts[i][6] == amounts[i + 1][6]]
     runs = [amounts[i - 1:i + 2] for i in middles]
     claim(len(runs) == 2, "there are two runs of three")
@@ -183,7 +200,7 @@ def ex6(d, claim):
           "the approval limits are 0, 5,000 (two employees), 25,000, and 250,000")
     claim(set(r[0] for r in d.q("SELECT JobTitle FROM Employee WHERE MaxApprovalAmount = 5000")) <=
           {"Production Supervisor", "Production Planner"}, "the two 5,000 limits belong to production employees")
-    return dict(bands=bands, amount=runs[0][0][6], cfo=cfo,
+    return dict(bands=bands, twice=bands[5] >= 2 * max(bands[4], bands[6]), amount=runs[0][0][6], cfo=cfo,
                 runs=[dict(first=run[0][1], last=run[2][1][-6:], date=run[0][2], requesters=[r[3] for r in run]) for run in runs],
                 unapproved=unapproved_in_runs, middles=[amounts[i][0] for i in middles],
                 low=min(r[6] for r in no_approver), high=max(r[6] for r in no_approver))

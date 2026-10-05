@@ -1,0 +1,377 @@
+---
+title: "Audit Monitoring and Report Assurance"
+subtitle: "Chapter 16"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-16.pptx
+---
+
+## Learning objectives {#ch16-01 .balanced .stepwise}
+
+- Define repeatable tests and validate their populations.
+- Build a register at the document-and-test grain.
+- Interpret patterns, rates, and review dispositions.
+- Test the report package and control its changes.
+
+::: {.notes}
+Purpose: frame monitoring as a repeatable evidence process. Allow 60-90 seconds. The earlier audit chapters supplied tests for specific populations. Monitoring runs defined tests again as data change and preserves what reviewers did with the results. The report must expose both its exceptions and its own limits. Misconception to address: a refreshed dashboard constitutes an audit conclusion. Pause and ask: What evidence would show that this month's test covered the intended population? Transition: distinguish the responsibilities.
+:::
+
+# Define the rule and its population {#ch16-module-2}
+
+::: {.notes}
+Start with the risk, test, and expected result. A visual is the reporting surface for a controlled procedure, not a substitute for that procedure.
+:::
+
+## Auditing and monitoring have different owners {#ch16-03 .balanced .stepwise}
+
+**Continuous monitoring:** management reviews its controls.
+
+**Continuous auditing:** internal audit assesses risk and controls.
+
+Both need defined evidence and accountable follow-up.
+
+::: {.notes}
+Purpose: separate operational ownership from assurance. Allow 60-90 seconds. Management owns and operates controls. Internal audit evaluates them and can consider management's monitoring when its reliability is established. Frequency alone does not make a procedure effective. Define who receives the results and who can resolve an exception. Misconception to address: daily refresh removes the need for independent review. Pause and ask: Who should be accountable for correcting an ineffective approval control? Transition: distinguish two kinds of signal.
+:::
+
+## A rule failure and an anomaly are different signals {#ch16-04 .balanced .stepwise}
+
+**Exception:** a record fails a stated rule.
+
+**Anomaly:** an observation differs from an expectation.
+
+Each requires evidence before a conclusion.
+
+::: {.notes}
+Purpose: use precise language for monitoring outputs. Allow 60-90 seconds. A deterministic rule can identify self-approval; an analytical expectation can identify an unusual monthly pattern. Neither label by itself establishes fraud or a misstatement. Keep the rule or expectation with the result so another reviewer can understand why it was selected. Misconception to address: a high score proves wrongdoing. Pause and ask: What additional evidence would turn a flag into a supported finding? Transition: follow the monitoring cycle.
+:::
+
+## The cycle ends with review and action {#ch16-05 .balanced}
+
+![](/_shared/generated/chapter-16/monitoring.svg){fig-alt="A cycle connects a stated rule, a validated population, failed document-test pairs, and evidence-based dispositions that inform the next rule or control." width=95%}
+
+::: {.notes}
+Purpose: show the complete monitoring process. Allow 60-90 seconds. Move around the cycle in order. Validate the population before interpreting failed records, preserve each exception for review, and use the disposition to inform the control or rule. A rule that produces many expected exceptions may need refinement, while a recurring design deficiency may need a control change. Misconception to address: producing a list is the end of the monitoring process. Pause and ask: Which part of this cycle would be missing from an unattended alert report? Transition: write a test specification.
+:::
+
+## A test needs a small, explicit specification {#ch16-06 .balanced .stepwise}
+
+Rule and risk addressed.
+
+Population, period, frequency, and expected result.
+
+Exception key, reviewer, and follow-up requirement.
+
+::: {.notes}
+Purpose: make the procedure reproducible. Allow 60-90 seconds. Record the fields and conditions that define failure, including date and threshold boundaries. Identify the document key that lets a reviewer recover the record. A repeatable rule still needs a controlled change process when its threshold or business meaning changes. Misconception to address: a formula alone documents the test. Pause and ask: Which detail would distinguish two versions of an approval-limit rule? Transition: validate the eligible records.
+:::
+
+## Validate the population before scoring it {#ch16-07 .balanced .stepwise}
+
+Reconcile relevant counts and amounts.
+
+Inspect keys, dates, and missing required fields.
+
+State what the reconciliation does and does not prove.
+
+::: {.notes}
+Purpose: retain the population controls from earlier chapters. Allow 60-90 seconds. An exception rate is meaningful only when its denominator represents the intended eligible records. A ledger agreement is one control, but both sources could omit the same event. Combine reconciliation with coverage, key, sequence, and missing-value checks appropriate to the process. Misconception to address: matching a total proves completeness in every respect. Pause and ask: What omission could leave two sources in agreement? Transition: rebuild the journal-entry flags.
+:::
+
+## Five journal-entry rules reproduce the earlier tests {#ch16-08 .balanced}
+
+{{< include /_shared/generated/chapter-16/_flags.qmd >}}
+
+::: {.notes}
+Purpose: connect Power BI monitoring to Chapter 8's public tests. Allow 60-90 seconds. The flags use the same definitions: weekend creation, posting before creation, self-approval, amount above the approver's limit, and a round amount. The date used for a test matters. These counts cover the public JournalEntry population, not every GLEntry line. Misconception to address: all date-related flags use PostingDate. Pause and ask: Which timestamp establishes whether creation occurred on a weekend? Transition: interpret a score as a review aid.
+:::
+
+## A risk score counts failed rules {#ch16-09 .balanced .stepwise}
+
+Add the defined binary flags for each journal entry.
+
+Use the score to prioritize review.
+
+Retain the individual flags and supporting documents.
+
+::: {.notes}
+Purpose: limit the interpretation of a composite score. Allow 60-90 seconds. Several failed rules can make a document worth reviewing sooner, but the score is not a probability of fraud. The rules may overlap or capture an expected event such as a closing entry. Keep the component flags visible so the reviewer can distinguish the reasons. Misconception to address: four flags mean four separate losses. Pause and ask: Why might a legitimate closing entry trigger more than one rule? Transition: trace the selected entry to its postings.
+:::
+
+## Drill from the entry to its ledger lines {#ch16-10 .balanced .stepwise}
+
+Select the entry by its stable identifier or number.
+
+Inspect the associated debit and credit lines.
+
+Evaluate the business support as well as the balance.
+
+::: {.notes}
+Purpose: connect a document-level flag with accounting evidence. Allow 60-90 seconds. A balanced set of ledger lines confirms the entry's debit-credit structure, but it does not establish authorization or business validity. The drill-through page should identify the selected entry and preserve the route back to the summary. For teaching, present the selected entry and its complete posting view as successive static states. Misconception to address: a balanced entry cannot be inappropriate. Pause and ask: Which evidence would you request beyond the ledger lines? Transition: complete the journal-monitoring checkpoint.
+:::
+
+## Tutorial 16.1: reproduce and trace the tests {#ch16-11 .balanced .stepwise}
+
+Reconcile the journal-entry population.
+
+Compare the five flag counts with the public controls.
+
+Inspect one selected entry and explain its score.
+
+[Open Tutorial 16.1](https://aa.accountinganalyticshub.com/chapters/16-audit-monitoring/chapter.html#guided-tutorial-16.1-journal-entry-monitoring)
+
+::: {.notes}
+Purpose: verify the first monitoring component. Allow 3-5 minutes. Have students demonstrate the population control, flag counts, and document-to-ledger path. Require a short interpretation that separates the reason for selection from the supported conclusion. Save the model before combining it with other processes. Name the measure home table Key Measures, as specified in the revised tutorial. Misconception to address: reproducing the count is the same as reviewing every exception. Pause and ask: What remains unresolved after the selected entry balances? Transition: build the common register.
+:::
+
+# Build and interpret the exception register {#ch16-module-12}
+
+::: {.notes}
+The register keeps one row for each document that fails each test. This grain supports review without confusing failures with unique documents.
+:::
+
+## The register key combines document and test {#ch16-13 .balanced .stepwise}
+
+A document can fail several tests.
+
+Retain one row for each failed document-test pair.
+
+Keep event date, amount, and responsible employee as context.
+
+::: {.notes}
+Purpose: state the register grain before combining data. Allow 60-90 seconds. The same document identifier can appear more than once because each row records a different failed rule. Use a process-qualified document identifier where source systems reuse numeric keys. Do not sum repeated document amounts as though each failed rule created another transaction. Misconception to address: one register row always represents one unique document. Pause and ask: What key would let a reviewer update one specific exception? Transition: turn flag columns into exception rows.
+:::
+
+## Unpivot turns the rules into rows {#ch16-14 .balanced .stepwise}
+
+Keep the document context columns.
+
+Unpivot the test flags into test and value columns.
+
+Retain only the values that indicate failure.
+
+::: {.notes}
+Purpose: explain the Power Query transformation. Allow 60-90 seconds. The wide source has one flag column per rule. Unpivot makes the rule name a value, allowing the common register to stack failures from several tests. A document with no failed rules contributes no exception rows. Preserve the document key and context through the transformation. Misconception to address: unpivoting changes which documents failed the rule. Pause and ask: How many rows would a document with two failed flags contribute? Transition: append the process results.
+:::
+
+## Append matches names; UNION ALL matches positions {#ch16-15 .balanced .stepwise}
+
+Use a common column schema for each process.
+
+Standardize names and compatible types before append.
+
+Check counts before and after combining the tables.
+
+::: {.notes}
+Purpose: transfer the SQL lesson to Power Query. Allow 60-90 seconds. Power Query append aligns columns by their names. SQL UNION ALL aligns selected columns by position. Both operations can retain all exception rows, but schema mistakes can produce blanks or misaligned meanings. Check the output key and required fields as well as its count. Misconception to address: a familiar-looking table guarantees compatible columns. Pause and ask: What would happen if one query called the document key DocumentID and another called it DocumentNumber? Transition: compare failures with distinct documents.
+:::
+
+## Failures and documents produce different totals {#ch16-16 .balanced}
+
+{{< include /_shared/generated/chapter-16/_register.qmd >}}
+
+::: {.notes}
+Purpose: demonstrate overlap without overstating exposure. Allow 60-90 seconds. Read each process's failure count and distinct document count together. The excess failures reflect documents selected by more than one rule. A unique-document view helps assign work, while the document-test view preserves each review reason. Amount exposure requires a deliberate deduplication rule. Misconception to address: adding amounts across all failure rows measures distinct transaction value. Pause and ask: Which count would you use to plan document retrieval? Transition: choose the right denominator.
+:::
+
+## A rate needs the population eligible for the rule {#ch16-17 .balanced}
+
+{{< include /_shared/generated/chapter-16/_rates.qmd >}}
+
+::: {.notes}
+Purpose: compare process rates using explicit denominators. Allow 60-90 seconds. The table expresses self-approval failures per thousand documents in each process over the supplied teaching population. The populations differ greatly, so a raw count can obscure the relative frequency. For a period comparison, both numerator and denominator must be filtered to the same period and eligibility rule. Misconception to address: the largest raw count necessarily has the highest exception rate. Pause and ask: Which records belong in the denominator of a payroll self-approval test? Transition: interpret patterns over time.
+:::
+
+## A heat map should retain readable counts {#ch16-18 .balanced .stepwise}
+
+Use rows for tests and columns for periods.
+
+Keep the number in each cell.
+
+Provide a detail view for the selected test and period.
+
+::: {.notes}
+Purpose: design a monitoring view that can be reviewed. Allow 60-90 seconds. Color helps locate patterns, but the count and labels must carry the meaning. Distinguish a zero from a missing or unavailable period according to the source coverage. A detail action should return the same population represented by the selected cell. Use a static table when teaching the pattern outside the live report. Misconception to address: a pale cell proves that the control worked. Pause and ask: What would a blank cell mean if that process had no data for the month? Transition: separate clustered from recurring failures.
+:::
+
+## Timing patterns suggest different follow-up {#ch16-19 .balanced .stepwise}
+
+A concentration near year-start may relate to closing activity.
+
+A recurring self-approval pattern may reflect control design.
+
+Investigate the process before assigning a cause.
+
+::: {.notes}
+Purpose: interpret public monitoring patterns as investigation leads. Allow 60-90 seconds. The chapter's public register shows clustered journal-entry and purchasing exceptions alongside recurring payroll self-approval. These patterns guide the next inquiry; they do not prove the explanation. Compare the rule, business calendar, underlying documents, and eligibility across periods. Misconception to address: a repeating pattern is automatically expected and can be dismissed. Pause and ask: What evidence would distinguish an approved exception from a design deficiency? Transition: validate the detail path.
+:::
+
+## The detail page must reproduce the selected cell {#ch16-20 .balanced .stepwise}
+
+Carry the test and period into the detail context.
+
+Show the matching document identifiers and evidence fields.
+
+Reconcile the detail count to the selected summary.
+
+::: {.notes}
+Purpose: validate drill-through as part of the procedure. Allow 60-90 seconds. A reviewer needs to know why these records are displayed and that none were lost in navigation. Show the selected test and date scope directly. Check the detail population after changing filters, and provide a clear route back to the monitoring page. Misconception to address: a detail page with plausible records is sufficient evidence of correct filtering. Pause and ask: Which two labels would you expect on the target page? Transition: complete the register activity.
+:::
+
+## Tutorial 16.2: validate the combined register {#ch16-21 .balanced .stepwise}
+
+Check the document-test key and append schema.
+
+Reconcile process counts and eligible populations.
+
+Explain a pattern and demonstrate its detail view.
+
+[Open Tutorial 16.2](https://aa.accountinganalyticshub.com/chapters/16-audit-monitoring/chapter.html#guided-tutorial-16.2-the-exception-register-and-the-monitoring-page)
+
+::: {.notes}
+Purpose: accept the combined register only with controls. Allow 3-5 minutes. Students use the public tutorial rules and data to create the common register. Ask them to explain the difference between test failures, distinct documents, and the process denominator. Review one selected cell against its detail page and retain the checks with the package. Use Key Measures as the measure home table. Students joining here can use the Companion Files project at the end of Tutorial 16.1, reconnect CharlesRiver.xlsx, refresh, and save Audit Monitoring.pbix. Misconception to address: all processes can share one undifferentiated denominator. Pause and ask: Which control would detect duplicate document-test rows? Transition: preserve the reviewer's decisions.
+:::
+
+# Preserve review and assure the report {#ch16-module-22}
+
+::: {.notes}
+Refresh should bring new evidence without erasing completed review. The report itself needs tests, coverage disclosures, and controlled changes.
+:::
+
+## Store dispositions in a separate review table {#ch16-23 .balanced .stepwise}
+
+Record the test and document key.
+
+Record the disposition, evidence, reviewer, and date.
+
+Merge the review record back after refresh.
+
+::: {.notes}
+Purpose: make review history durable. Allow 60-90 seconds. Editing generated exception rows directly risks losing the work on refresh. A separate review table can be merged on the stable document-test key. The public tutorial uses a small example disposition table; a production process needs the governance and evidence fields appropriate to its responsibilities. Misconception to address: a comment typed into a refreshed result table is a durable review record. Pause and ask: What will happen when the source register is rebuilt? Transition: test the review keys.
+:::
+
+## A mistyped review key can hide completed work {#ch16-24 .balanced .stepwise}
+
+Check that each disposition finds an exception.
+
+Check that each document-test key is unique.
+
+Investigate unmatched or duplicated review records.
+
+::: {.notes}
+Purpose: test the join that connects decisions to evidence. Allow 60-90 seconds. A mismatched key can make a reviewed exception appear open. Duplicate review keys can multiply the register and distort counts. Treat these as control failures to resolve, rather than silently dropping the rows or accepting the changed total. Preserve records of intentionally retired exceptions under a defined retention policy. Misconception to address: a successful merge guarantees that every review record matched. Pause and ask: Which check would catch a transposed document number? Transition: read the public disposition example.
+:::
+
+## The disposition separates findings from open work {#ch16-25 .balanced}
+
+{{< include /_shared/generated/chapter-16/_review.qmd >}}
+
+::: {.notes}
+Purpose: interpret the public guided review example. Allow 60-90 seconds. These are the dispositions recorded by the public Tutorial 16.3 example. Expected means the supporting reason is documented; follow-up means work remains; deficiency records a supported control issue. Open exceptions have no recorded disposition. Do not turn the example classifications into an automatic rule for every future record. Misconception to address: a disposition label is enough without supporting evidence. Pause and ask: Which categories still require an action or resolution? Transition: prioritize work without counting one issue repeatedly.
+:::
+
+## Prioritize the review without duplicating the finding {#ch16-26 .balanced .stepwise}
+
+Inspect new and multiply flagged documents.
+
+Retain the evidence for an expected exception.
+
+Report a recurring design problem as a coherent control finding.
+
+::: {.notes}
+Purpose: connect exception-level work with control-level reporting. Allow 60-90 seconds. The register preserves each occurrence, while the report may explain one underlying control-design issue. That distinction prevents repeated rows from becoming repeated independent findings or repeated amounts. Document the population, frequency, consequences, and action owner supporting the conclusion. Misconception to address: every exception row requires a separate finding in the audit report. Pause and ask: How would you retain all occurrences while reporting one design deficiency? Transition: measure approval concentration on its own population.
+:::
+
+## Approval concentration uses all relevant documents {#ch16-27 .balanced .stepwise}
+
+Group approvals by the responsible employee.
+
+Divide by the process's approval population.
+
+Keep this measure separate from an exception rate.
+
+::: {.notes}
+Purpose: avoid confusing control structure with rule failures. Allow 60-90 seconds. A concentration measure asks how much approval activity rests with each person. It is calculated over the relevant population, not only flagged records. Heavy concentration can motivate a control-design review even if a deterministic exception rate is low. Inspect roles and delegated authority before interpreting it. Misconception to address: the employee with the most flags necessarily approved the largest share of all documents. Pause and ask: What denominator would answer the concentration question? Transition: state the coverage of each process.
+:::
+
+## Every process needs its own coverage statement {#ch16-28 .balanced .stepwise}
+
+Show the relevant latest event date.
+
+Identify partial periods and refresh timing.
+
+Distinguish source currency from a successful report refresh.
+
+::: {.notes}
+Purpose: expose the limits of monitoring coverage. Allow 60-90 seconds. The payroll source ends before the calendar year closes, while other process dates can differ. A report refreshed today can still contain an older or incomplete population. Choose the event date that matches the procedure and compare it with the intended review period. The Date table's range does not establish source currency. Misconception to address: a recent refresh timestamp proves current business data. Pause and ask: Which date would you show beside the payroll coverage statement? Transition: test the report as an evidence artifact.
+:::
+
+## Assure the report package as well as the exceptions {#ch16-29 .balanced .stepwise}
+
+Check completeness, calculations, coverage, and changes.
+
+Rerun the saved tests against the reviewed package.
+
+Keep the observed evidence without altering the reviewed version.
+
+::: {.notes}
+Purpose: treat the analytical report as an object of assurance. Allow 60-90 seconds. The reviewer needs to establish what package and data state produced the result. Tutorial 16.3 reruns the public tests and inspects coverage without changing the package being reviewed. Separate authoring fixes from the evidence of the tested version. A failed test requires investigation and a new controlled review. Misconception to address: the author's earlier successful run is sufficient evidence of the current package. Pause and ask: How will another reviewer identify the version you tested? Transition: control future changes.
+:::
+
+## A project format can make changes inspectable {#ch16-30 .balanced .stepwise}
+
+PBIP separates model and report definitions into project files.
+
+Review changes to rules, measures, and report behavior.
+
+Keep local caches and settings out of the shared history.
+
+::: {.notes}
+Purpose: introduce version control for report definitions. Allow 60-90 seconds. A project representation makes text-based differences reviewable. Microsoft documents localSettings.json and cache.abf as default Git exclusions for PBIP. Inspect the generated ignore rules and the files being shared; a project format does not itself approve a change or protect every sensitive source setting. Publishing and access controls are covered in Appendix A. Misconception to address: saving as a project automatically creates a governed approval process. Pause and ask: Which change would require rerunning the exception-count controls? Transition: complete the assurance activity.
+:::
+
+## Tutorial 16.3 and chapter handoff {#ch16-31 .balanced .stepwise}
+
+Match dispositions to their document-test keys.
+
+Document source coverage and unresolved evidence.
+
+Rerun the package tests and preserve the reviewed version.
+
+[Open Tutorial 16.3](https://aa.accountinganalyticshub.com/chapters/16-audit-monitoring/chapter.html#guided-tutorial-16.3-reviewing-exceptions-and-testing-the-reports)
+
+::: {.notes}
+Purpose: close the monitoring cycle with a reviewable deliverable. Allow 3-5 minutes. Ask students to identify one supported disposition, one open item, and one test of the report itself. Keep the evidence and qualifications with the result. The capstone chapters now ask students to select and defend procedures for a broader decision; their conclusions must remain their own supported work. Students joining here need both Companion Files projects: Audit Monitoring at the end of Tutorial 16.2 and Charles River Reports at the end of Chapter 15. Point each at the local CharlesRiver.xlsx, refresh, and save the corresponding .pbix file. Measures remain in Key Measures. Misconception to address: completing the dashboard completes every audit question. Pause and ask: What work remains open, and who owns the next action? Transition: move from guided procedures to capstone decisions.
+:::
+
+## References and further reading {#ch16-32 .balanced}
+
+Public Tutorials 16.1-16.3: monitoring rules, register, and review.
+
+Institute of Internal Auditors (2025): continuous auditing and monitoring.
+
+Microsoft: append, unpivot, and Power BI projects.
+
+[Full Chapter 16 references](https://aa.accountinganalyticshub.com/chapters/16-audit-monitoring/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the public rule and review examples. Institute of Internal Auditors (2025), GTAG: Continuous auditing and monitoring, third edition, is included in the chapter's full APA reference list. Microsoft's append guidance is https://learn.microsoft.com/en-us/power-query/append-queries; unpivot guidance is https://learn.microsoft.com/en-us/power-query/unpivot-column; project documentation is https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview. The tables reuse public figure calculations and public tutorial dispositions. The deck does not provide assessment or comprehensive-case solutions. Transition: acknowledge the source and license.
+:::
+
+## Attribution and reuse {#ch16-33 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 16 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting report or workbook.
+:::

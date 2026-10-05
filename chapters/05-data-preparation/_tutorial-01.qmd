@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will prepare two of the Tables in your analysis workbook for the lookups and summaries that follow. On the Item Table, you will extract each item's product type from its code and test that every code has the expected form. On the SalesInvoice Table, you will assign each invoice to a fiscal year, a fiscal quarter, and a period label, measure its payment terms in days, and use logical functions to group the terms and test them. Each new column is a calculated column, so it fills every row and extends to rows added by a refresh.
 
-**Prerequisites.** You need the Charles River Furniture Analysis workbook from Chapter 4, with the SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram Tables loaded by Power Query.
+**Prerequisites.** You need the Charles River Furniture Analysis workbook from Chapter 4, with the SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram Tables loaded by Power Query. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Chapter 4 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

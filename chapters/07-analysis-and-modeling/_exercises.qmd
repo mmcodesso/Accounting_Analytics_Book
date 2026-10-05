@@ -42,7 +42,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (1) Import the T76_Budget Table with Power Query as a query named `BudgetSummary`. Use **Transform > Group By**, with **Advanced**, to total BudgetAmount by FiscalYear and AccountID, and merge in AccountNumber and AccountName from the Account query of Tutorial 7.2, without the prefix.
 
-(2) Import the T77_BudgetLine Table again as a new query named `BudgetLineAll`, because the BudgetLine query of Tutorial 7.2 holds only 2026. Keep the Revenue, COGS, and Operating Expense categories of every year, and total BudgetAmount by FiscalYear and AccountID with Group By.
+(2) Import the T77_BudgetLine Table again as a new query named `BudgetLineAll`, because the BudgetLine query of Tutorial 7.2 holds only 2026. Keep the Revenue, COGS, and Operating Expense categories of every year, and total BudgetAmount by FiscalYear and AccountID with **Group By**, again with **Advanced**.
 
 (3) Compare the two for 2026 by account, and list every account whose totals differ. Examine the BudgetLine rows behind the differences and identify what they have in common.
 
@@ -101,7 +101,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Requirements.**
 
-(1) Import the T44_Item Table again as a new query named `ItemRouting`, keeping ItemID, ItemCode, ItemGroup, StandardCost, StandardFixedOverheadCost, SupplyMode, and RoutingID, because the Item query of Chapter 4 does not have the last three columns. Import the T50_RoutingOperation, T47_WorkCenter, and T48_WorkCenterCalendar Tables, and list the manufactured items that sold in 2026.
+(1) Import the T44_Item Table again as a new query named `ItemRouting`, keeping ItemID, ItemCode, ItemGroup, StandardCost, StandardFixedOverheadCost, SupplyMode, and RoutingID, because the Item query of Chapter 4 does not have StandardFixedOverheadCost and RoutingID. Import the T50_RoutingOperation, T47_WorkCenter, and T48_WorkCenterCalendar Tables, and list the manufactured items that sold in 2026.
 
 (2) For each item, calculate its 2026 demand in units, its contribution per unit as the 2026 average price per unit minus the variable standard cost (StandardCost minus StandardFixedOverheadCost) minus the commission rate from Tutorial 7.3 times the price, and its run hours per unit at each work center, summing StandardRunHoursPerUnit over the operations of its routing.
 
@@ -118,7 +118,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
      Commission rate 1.903%. Hours needed to meet all demand relative to half of 2026 capacity: Cutting 0.79, Assembly 1.09, Finishing and Test 1.07, Packing 0.94, Quality Assurance 0.13. Optimum: total contribution 9,532,535.21 against 9,861,535.80 if all demand were met (a loss
      of 329,000.59). Only Assembly binds (27,589 hours), with a shadow price of about 166.98 per hour; Finishing uses 14,764 of 15,117 hours.
      Items reduced: LGT-TBL-0003 (0 of 826.5 units), LGT-FLR-0006 (224.8 of 717.0), FUR-DSK-0011 (0 of 537.9), FUR-TBL-0013 (0 of 364.6), LGT-FLR-0008 (0 of 315.7), LGT-SCN-0011 (0 of 805.0), LGT-FLR-0039 (0 of 642.0): the items with the lowest contribution per Assembly
-     hour. Setup hours are ignored; students who include them should get a similar pattern. -->
+     hour. Setup hours are ignored; spread over each item's average 2026 work-order quantity, they leave Assembly the only binding
+     center and raise the contribution lost to about 562,000. -->
 
 
 ### Auditing Exercises
@@ -148,8 +149,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
      residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot
      reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954.
      2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%.
-     The January and February differences nearly offset, which suggests timing of accruals between months rather than a misstatement;
-     evidence: accrual dates against invoice dates, and credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment
+     The January and February differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its
+     invoice's date except 9 of 27,933 (the invoices dated before their first shipment, Tutorial 2.1; 6 of them in another month). The cause is the
+     customer mix: commission rates run from 1.5% (Wholesale) to 4% (design services), and Wholesale was 62% of January's commission
+     base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%, which one regression slope
+     cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment
      rows (232, from credit memos) 4,369.54 = GL 566,347.93. -->
 
 
@@ -169,7 +173,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (4) Compare the 2026 budget's quantities with the 2026 forecast and with the 2026 orders.
 
-(5) Each forecast records the baseline quantity that the forecasting method produced, the quantity after any planner adjustment, the planner, and the employee who approved it. Add a column with the ratio of ForecastQuantity to BaselineForecastQuantity, list the forecasts adjusted by more than half of their baseline, and look up their planners and approvers in the Employee Table. Explain which control the list tests and what it shows.
+(5) Each forecast records the baseline quantity that the forecasting method produced, the quantity after any planner adjustment, the planner, and the employee who approved it. Add a column with the ratio of ForecastQuantity to BaselineForecastQuantity, and list the forecasts adjusted by more than half of their baseline. Import the T74_Employee Table as a query named `Employees`, and look up the planners and approvers of the listed forecasts in it. Explain which control the list tests and what it shows.
 
 (6) Write a memo of half a page that states whether the forecast is consistent with historical experience, the consequences for any estimate or plan that relies on it, what the adjusted forecasts show about the review of planners' changes, and the evidence and explanations you would request from management.
 

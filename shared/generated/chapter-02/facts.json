@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04"
+  },
+  "artifact_sha256": {
+    "freight-comparison.svg": "c9e525882775fe3b15b4bdfd405f83c5285fc03cc4d0f4aee2294732ec5b6c5c",
+    "freight-comparison.png": "04ca7fcc660ababdd00120ae9f4daf41dc63dee2bb586236415c448c6e284ec8",
+    "_missing.qmd": "bfd1254cea7430a130984dfe5f9276b114d8b55dbcb980e67fec54774386d770",
+    "_status.qmd": "ad5d582afbf0df7632e227cb6823be291acb274b30b253489ec1d3f0df45c52e",
+    "_duplicates.qmd": "27afd8f1f91b0cd9289f29e0898942f9205d50e0eaaa2d4411a9751e1266c424",
+    "_budget-wide.qmd": "f79f2b181875a17161e40f5e251ce56bd5429c0d76cb5bbe85bd931cc1d5c40f",
+    "_budget-long.qmd": "b8692fc871a648021e0b819e26b5bbf15cb796af28a17ec7599360a3145534b7"
+  },
+  "variables": {
+    "supplier_invoice": "V0002-2024-000182",
+    "budget_department": "Sales",
+    "freight_mean": "$152.20",
+    "freight_largest": "$873.95"
+  },
+  "quality_examples": {
+    "missing": [
+      [
+        "SH-2024-000028",
+        "2024-01-15",
+        189.01,
+        "TRK202400000028"
+      ],
+      [
+        "SH-2024-000029",
+        "2024-01-16",
+        35.31,
+        null
+      ],
+      [
+        "SH-2024-000049",
+        "2024-01-21",
+        106.73,
+        null
+      ]
+    ],
+    "duplicates": [
+      [
+        2,
+        "V0002-2024-000182",
+        "2024-02-29",
+        4152.6
+      ],
+      [
+        2,
+        "V0002-2024-000182",
+        "2024-03-04",
+        3454.2
+      ],
+      [
+        2,
+        "V0002-2024-000204",
+        "2024-03-17",
+        950.16
+      ]
+    ],
+    "status": [
+      [
+        "SH-2024-000001",
+        "2024-01-03",
+        "Delivered",
+        "2024-01-08"
+      ],
+      [
+        "SH-2024-000004",
+        "2024-01-06",
+        "In Transit",
+        "2024-01-10"
+      ],
+      [
+        "SH-2024-000038",
+        "2024-01-18",
+        "In Transit",
+        "2024-01-20"
+      ]
+    ],
+    "outliers": [
+      [
+        "SH-2024-000001",
+        2,
+        98.03
+      ],
+      [
+        "SH-2024-000002",
+        1,
+        152.57
+      ],
+      [
+        "SH-2024-000003",
+        2,
+        248.92
+      ],
+      [
+        "SH-2026-008319",
+        2,
+        873.95
+      ]
+    ],
+    "freight_summary": [
+      152.1992438446482,
+      873.95
+    ]
+  },
+  "budgets": [
+    [
+      "Sales",
+      1,
+      33136.0
+    ],
+    [
+      "Sales",
+      2,
+      33136.0
+    ],
+    [
+      "Sales",
+      3,
+      33136.0
+    ],
+    [
+      "Administration",
+      1,
+      27319.48
+    ],
+    [
+      "Administration",
+      2,
+      27319.48
+    ],
+    [
+      "Administration",
+      3,
+      27319.48
+    ],
+    [
+      "Marketing",
+      1,
+      20646.36
+    ],
+    [
+      "Marketing",
+      2,
+      20646.36
+    ],
+    [
+      "Marketing",
+      3,
+      20646.36
+    ]
+  ]
+}

@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-19"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is September 2027. Customer returns rarely get a second look at Charles River: the controller's team nets them against sales at every close and moves on. Yet the ledger shows why someone should look: returns and allowances have grown faster than sales for three years, Furniture above all.
@@ -221,7 +224,7 @@ Each test joins a document to the people who handled it and to the cash on the i
      62,483.48]: no customer pays by one method only, and a refund method chosen at random across four methods would mismatch about this
      often, so it is an anomaly to follow up, not a rule. Clean: employment dates; refund approver never the credit approver; returns
      always received in the warehouse; one refund per credit, equal to the credit's 2060 part (222 of 222); a clawback for every credit
-     line (637), base = line total and rate = the accrual's; amount = base x rate except half-cent rounding on SCAJ-2024-000128, SCAJ-2025-000347, -000368; 619 clawbacks netted in later commission payments, 18 pending at the end of 2026. Optional design note:
+     line (637), base = line total and rate = the accrual's; amount = base x rate rounded half up (SQLite's ROUND(base x rate, 2) gives a cent less on SCAJ-2024-000128, SCAJ-2025-000347, -000368, exact half-cent products stored just below the half in binary floating point); 619 clawbacks netted in later commission payments, 18 pending at the end of 2026. Optional design note:
      the Accounting Manager approved all 8 commission rates (which end 2026-12-31), created all 27,933 accruals, and approved all 196
      commission payments. -->
 
@@ -241,9 +244,8 @@ The committee will want to see where returns grow and which refunds deserve a se
      Furniture families 2026: TBL 36,350.42, DSK 31,186.47, SDB 22,766.37, CTB 20,790.93, NGT 19,797.66. Wholesale 82,477.55 / 90,614.46 / 148,224.44. No concentration by carrier (Damaged lines 25-33 each) or warehouse (326 / 311 lines). Returns come 7-74 days after
      shipment (mean 28.3; 3-72 after delivery). By shipment year 0.606% / 0.726% / 0.794%; December 2026 shipments 0.05% (censored), other
      2026 months 0.51-1.35%; 27 return lines (30,304.99) fall in a later year than their shipment; 2024 has no 2023 carry-in. Credits on
-     sales 0.682% overall; customer 128 (Strategic, Net 45) 3.61% (38,912.92 on 1,077,502.22), 16 credits (41,442.26; 13 approved by two
-     representatives), 6 refunds (26,315.10), all dated before the customer's payment; small customers 178 (4.86%) and 35 (4.15%) rank
-     higher on tiny sales. Refund approvers by year: Accounting Manager 12 / 23 / 24, Administrative Specialists 23 / 38 / 23, Staff Accountants 20 / 23 / 36. Score from five flags (refund above authority, credit above authority, method mismatch, before payment, past
+     sales 0.682% overall; customer 128 (Strategic, Net 45) 3.61% (38,912.92 on 1,077,502.22), 16 credits (41,442.26; 13 approved by two representatives), 6 refunds (26,315.10), all dated before the customer's payment;
+     customers 178 (4.86% on sales of 76,595), 35 (4.15% on sales of 32,539), and 73 (3.70% on sales of 491,464) rank higher, two of them on sales under a tenth of 128's. Refund approvers by year: Accounting Manager 12 / 23 / 24, Administrative Specialists 23 / 38 / 23, Staff Accountants 20 / 23 / 36. Score from five flags (refund above authority, credit above authority, method mismatch, before payment, past
      due at least the refund): 0-5 = 4, 18, 53, 83, 44, 20; 64 refunds score 4 or 5 (80,776.86); RF-2025-000097 scores 4 (its approver was
      within limit). Weekend dates are spread evenly (62 refunds, 179 credits) and are not a useful flag here. -->
 
@@ -289,21 +291,14 @@ The selection and its evaluation are worksheet work, with the random selection C
      lines; no quantity above shipped and no shipment line returned twice; price and discount equal the invoice line's; LineTotal =
      ROUND(Q x P x (1 - D), 2) except a half-cent on credit line 84; 612 credits on 612 distinct invoices, none above its invoice; SubTotal
      = the lines; tax = 6.5% of (SubTotal + freight credit) on all 612 (a test on SubTotal alone falsely flags the 99 credits with freight);
-     no freight credit above the invoice's freight. Restocked at full standard cost: Damaged 77,248.17 (11,606.17 / 25,617.84 / 40,024.16)
+     no freight credit above the invoice's freight. Restocked at standard cost, except 17 return lines of less than one unit, costed at the quantity times the shipment line's extended cost
+     (547.29 below standard, 175.48 of it Damaged and Quality Concern): Damaged 77,248.17 (11,606.17 / 25,617.84 / 40,024.16)
      and Damaged plus Quality Concern 137,606.43 (2026: 61,146.00): a valuation follow-up. Lapping clean: no
      application to another customer's invoice; deposits 0-2 days after receipt; every application within 2 days of the later of receipt
      and invoice date; every receipt fully applied; 491 receipts (526 applications, 395,196.29) were applied to invoices dated after the
      receipt, deposits held in 2060, not lapping. First digits: 612 credits and 222 refunds are too few, and their amounts are prices times
-     quantities plus tax. Timeline: SH-2025-004100 shipped 2025-04-27 (FedEx Freight), delivered 04-30; SI-2025-008932 dated 04-30,
-     18,774.16, due 06-14 (customer 128); CR-2025-003258 05-17, check, 5,692.75 applied (recorded and applied by the Customer Service Manager); SR-2025-000255 06-06, Damaged (15.71 of 15.71 FUR-DSK-0071; 2.62 of 6.86 FUR-CTB-0045), received by a Shipping Clerk;
-     CM-2025-000255 06-09, 17,745.96, the largest credit of the three years, approved by a representative with a limit of 0, all to 2060
-     while 13,081.41 of the invoice was unpaid; clawbacks SCAJ-2025-000268/269 (321.33 and 11.93); RF-2025-000097 06-15, a Sunday, wire,
-     approved by the Accounting Manager (within the 25,000 limit), cleared 06-18; CR-2025-003473 received 06-17 (check, recorded and
-     applied by the manager) and CR-2025-003342 received 06-18 (check, recorded by representative 97, applied on 06-19 by representative
-     115, the credit's approver) settle the invoice on 06-19. Disposition: follow up, not a conclusion. Evidence: the wire confirmation's
-     beneficiary and account against the customer's known bank details; a confirmation from the customer of the credit and the refund;
-     the receiving and inspection record and any carrier claim; the customer's written request; why a wire went to a customer who pays by
-     check, and why before its checks arrived. -->
+     quantities plus tax. Timeline: SH-2025-004100 shipped 2025-04-27 (FedEx Freight), delivered 04-30; SI-2025-008932 dated 04-30, 18,774.16, due 06-14 (customer 128); CR-2025-003258 05-17, check, 5,692.75 applied (recorded and applied by the Customer Service Manager); SR-2025-000255 06-06, Damaged (15.71 of 15.71 FUR-DSK-0071; 2.62 of 6.86 FUR-CTB-0045), received by a Shipping Clerk; CM-2025-000255 06-09, 17,745.96, the largest credit of the three years, approved by representative 115 with a limit of 0, all to 2060 while 13,081.41 of the invoice was unpaid; clawbacks SCAJ-2025-000268/269 (321.33 and 11.93); RF-2025-000097 06-15, a Sunday, wire, approved by the Accounting Manager (within the 25,000 limit), cleared 06-18; CR-2025-003473 06-17, check, 9,891.91 applied (recorded and applied on 06-19 by the Customer Service Manager); CR-2025-003342 06-18, check, 3,189.50 applied (recorded by representative 97, applied on 06-19 by representative 115, the credit's approver); the invoice was settled on 06-19. Disposition: follow up, not a conclusion. Evidence: the wire confirmation's beneficiary and account against the customer's known bank details; a confirmation from the customer of the credit and the refund;
+     the receiving and inspection record and any carrier claim; the customer's written request; why the refund went by wire to a customer who paid this invoice by check, and why before its checks arrived. -->
 
 ### Phase 3: Evaluate and Report
 
@@ -331,7 +326,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 <!-- Instructor notes, Requirement 8 (expected; reasoned alternatives accepted): D1 credit authority (414; 2026 exposure 172,307.40,
      above performance materiality 168,885.42 and below materiality; all 2026 credits 260,457.72, above it). D2 segregation in customer
      service (receipts, applications, credits, clawbacks; 206 overlaps): a design deficiency, mitigated but not removed by every credit
-     tracing to a return received in the warehouse at invoice prices, refunds approved in accounting, and the absence of any lapping or
+     tracing to a return received in the warehouse at invoice prices, refunds approved outside customer service (in Administration), and the absence of any lapping or
      false-credit trace. D1 and D2 combined: a SIGNIFICANT DEFICIENCY over credits and receivables (occurrence of credits, completeness of
      cash); not a material weakness, because a material misstatement would need a falsified warehouse record and none of the traces
      appears; a student arguing material weakness from gross exposure must address the compensating link and the likelihood test. D3

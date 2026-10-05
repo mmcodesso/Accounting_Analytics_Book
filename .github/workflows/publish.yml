@@ -1,12 +1,14 @@
-name: Publish Quarto Book
+name: Build and Publish Quarto Book
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 concurrency:
-  group: "pages"
+  group: "quarto-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -19,11 +21,28 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: scripts/slides/requirements.txt
+
+      - name: Install slide build dependencies
+        run: python -m pip install -r scripts/slides/requirements.txt
+
+      - name: Validate public slide sources and regression tests
+        run: |
+          python scripts/build_all.py --check
+          python -m unittest discover -s tests -p 'test_slide*.py' -v
 
       - name: Set up Quarto with TinyTeX
         uses: quarto-dev/quarto-actions/setup@v2
         with:
+          version: "1.9.36"
           tinytex: true
 
       - name: Install render dependencies
@@ -33,24 +52,7 @@ jobs:
 
       - name: Install Draw.io CLI
         run: |
-          drawio_deb_url="$(python3 - <<'PY'
-          import json
-          import sys
-          import urllib.request
-
-          with urllib.request.urlopen("https://api.github.com/repos/jgraph/drawio-desktop/releases/latest") as response:
-              release = json.load(response)
-
-          for asset in release["assets"]:
-              name = asset["name"]
-              if name.endswith(".deb") and "amd64" in name:
-                  print(asset["browser_download_url"])
-                  break
-          else:
-              print("No amd64 .deb asset found in latest drawio-desktop release", file=sys.stderr)
-              sys.exit(1)
-          PY
-          )"
+          drawio_deb_url="https://github.com/jgraph/drawio-desktop/releases/download/v29.6.6/drawio-amd64-29.6.6.deb"
           curl --fail --location --show-error --silent "${drawio_deb_url}" --output /tmp/drawio.deb
           sudo apt-get install --yes /tmp/drawio.deb
 
@@ -67,68 +69,28 @@ jobs:
           chmod +x /tmp/drawio-xvfb
           echo "DRAWIO_BIN=/tmp/drawio-xvfb" >> "${GITHUB_ENV}"
 
-          smoke_source="$(find visuals/src -maxdepth 1 -type f -name '*.drawio' | head -n 1)"
-          if [ -z "${smoke_source}" ]; then
+          sources=(visuals/src/*.drawio)
+          smoke_source="${sources[0]}"
+          if [ ! -f "${smoke_source}" ]; then
             echo "No Draw.io source file found for smoke test"
             exit 1
           fi
           /tmp/drawio-xvfb -x -f svg -o /tmp/drawio-smoke.svg "${smoke_source}"
           test -s /tmp/drawio-smoke.svg
 
-      - name: Create staging directory for downloadable files
-        run: mkdir -p dist/downloads
-
-      - name: Render PDF
-        run: |
-          quarto render --to pdf
-          file="$(find _book -maxdepth 1 -type f -name '*.pdf' | head -n 1)"
-          if [ -z "${file}" ]; then
-            echo "No .pdf file found in _book after PDF render"
-            exit 1
-          fi
-          cp "${file}" dist/downloads/book-latest.pdf
-
-      - name: Render EPUB
-        run: |
-          quarto render --to epub
-          file="$(find _book -maxdepth 1 -type f -name '*.epub' | head -n 1)"
-          if [ -z "${file}" ]; then
-            echo "No .epub file found in _book after EPUB render"
-            exit 1
-          fi
-          cp "${file}" dist/downloads/book-latest.epub
-
-      - name: Render DOCX
-        run: |
-          quarto render --to docx
-          file="$(find _book -maxdepth 1 -type f -name '*.docx' | head -n 1)"
-          if [ -z "${file}" ]; then
-            echo "No .docx file found in _book after DOCX render"
-            exit 1
-          fi
-          cp "${file}" dist/downloads/book-latest.docx
-
-      - name: Render HTML
-        run: quarto render --to html
-
-      - name: Copy downloadable book files into published site
-        run: |
-          mkdir -p _book/downloads
-          for ext in pdf epub docx; do
-            file="dist/downloads/book-latest.${ext}"
-            if [ ! -f "${file}" ]; then
-              echo "Staged file ${file} was not found"
-              exit 1
-            fi
-            cp "${file}" "_book/downloads/book-latest.${ext}"
-          done
+      - name: Build book and chapter slides
+        # The default is dataset-free and publishes only manifest-approved decks.
+        # Pilot decks are rendered for validation but omitted from the assembled site.
+        run: python scripts/build_all.py
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v4
         with:
           path: _book
 
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build-deploy
     runs-on: ubuntu-latest
     environment:

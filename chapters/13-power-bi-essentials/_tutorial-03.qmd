@@ -2,7 +2,7 @@
 
 **Context and objective.** Before the report goes to the managers, the controller asks you to review the charts a colleague drafted for the next sales meeting. Each one is built from correct numbers, and each one invites a wrong conclusion. In this tutorial, you will rebuild the three charts on a review page, see how each misleads, correct it, and make the corrected page accessible.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorials 13.1 and 13.2.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorials 13.1 and 13.2. If you start here, download Charles River Reports as it stands at the end of Tutorial 13.2 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -84,7 +84,7 @@ A screen reader now announces each chart by what it shows and what it means, and
      share of revenue in 2026 peak in October at 6.0% (136,935.59 of 2,297,493.38), then September 3.8% and November 3.0%. The
      secondary axis appears automatically because the two ranges barely overlap (Microsoft Learn, combo chart page). -->
 
-**Checkpoint.** The review page should now hold the corrections of the three draft charts: four charts and a table. Confirm the following:
+**Checkpoint.** The review page should now hold the corrections of the three draft charts: four charts. Confirm the following:
 
 - The monthly revenue chart starts at zero, and its title names the period.
 - You recorded the growth from January 2024 and from February 2024, and the change from fiscal 2025 to fiscal 2026, and can explain why they differ.

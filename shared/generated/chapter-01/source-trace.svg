@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 520" width="1280" height="520" role="img" aria-labelledby="title desc">
+<title id="title">Trace one revenue posting to its source</title>
+<desc id="desc">GLEntry 126312 is a revenue credit of $688.42. The source fields identify SalesInvoice 7947 and line 10645, with quantity 2 at $344.21 each. This is one posting, not the complete journal entry.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<rect x="30" y="90" width="360" height="280" rx="10" fill="#EAF2F8" stroke="#1A5276" stroke-width="2"/>
+<text x="50" y="137" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">GLEntry 126312</text>
+<text x="50" y="195" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Credit: $688.42</text>
+<text x="50" y="239" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Account: 4010</text>
+<text x="50" y="283" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Revenue posting</text>
+<text x="50" y="327" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">2025-03-05</text>
+<rect x="460" y="90" width="360" height="280" rx="10" fill="#EAF2F8" stroke="#1A5276" stroke-width="2"/>
+<text x="480" y="137" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">SalesInvoice 7947</text>
+<text x="480" y="195" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">SI-2025-007947</text>
+<text x="480" y="239" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">2025-03-05</text>
+<text x="480" y="283" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Source document</text>
+<text x="480" y="327" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">for this posting</text>
+<rect x="890" y="90" width="360" height="280" rx="10" fill="#EAF2F8" stroke="#1A5276" stroke-width="2"/>
+<text x="910" y="137" font-size="32" fill="#1A5276" font-weight="bold" text-anchor="start">Line 10645</text>
+<text x="910" y="195" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Quantity: 2</text>
+<text x="910" y="239" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Unit price: $344.21</text>
+<text x="910" y="283" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">Line total: $688.42</text>
+<text x="910" y="327" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">FUR-DSK-0075</text>
+<text x="210" y="52" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="middle">Posting</text>
+<text x="640" y="52" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="middle">Document</text>
+<text x="1070" y="52" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="middle">Document line</text>
+<path d="M396,230 L444,230" fill="none" stroke="#5D6D7E" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="9 6"/>
+<path d="M826,230 L874,230" fill="none" stroke="#5D6D7E" stroke-width="3" marker-end="url(#arrow)" stroke-dasharray="9 6"/>
+<text x="640" y="426" font-size="32" fill="#8A5D00" font-weight="bold" text-anchor="middle">SourceDocumentType + SourceDocumentID + SourceLineID</text>
+<text x="640" y="482" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="middle">One revenue posting; not a complete journal entry.</text>
+</g>
+</svg>

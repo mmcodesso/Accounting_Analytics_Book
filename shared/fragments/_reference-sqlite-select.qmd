@@ -1,0 +1,2 @@
+SQLite. (n.d.-b). *SELECT*. <https://www.sqlite.org/lang_select.html>
+

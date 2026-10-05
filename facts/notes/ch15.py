@@ -202,8 +202,11 @@ def t2(d, claim):
     opex, actual_total = budget(), actual()
     by_month = [actual([m]) - flexed([m]) for m in year]
     ytd = [sum(by_month[:i + 1]) for i in range(12)]
-    claim([i + 1 for i, v in enumerate(by_month) if v > 0] == [1, 7],
-          "January and July are the only months above the flexed budget")
+    above = [i + 1 for i, v in enumerate(by_month) if v > 0]
+    paid = [int(m) for (m,) in d.q("SELECT substr(PayDate, 6, 2) FROM PayrollPeriod WHERE substr(PayDate, 1, 4) = ? "
+                                   "GROUP BY 1 HAVING COUNT(DISTINCT PayDate) = 3 ORDER BY 1", str(d.C))]
+    claim(above and above == paid, "the months above the flexed budget are exactly the months with three pay dates")
+    turns = sorted({m - 1 for m in above if m > 1} | set(above) | {12})     # where the year-to-date column turns
     commission_budget = budget(None, None, ("6290",))
     product_total = sum(product.values())
     return dict(rev=sum(r[6] for r in revenue), rev_lines=len(revenue), rev_cc=revenue[0][1],
@@ -222,7 +225,8 @@ def t2(d, claim):
                 to=dict(name=to["name"], remaining=to["remaining"], pct=to["remaining"] / to["flexed"]),
                 frm=dict(name=frm["name"], remaining=frm["remaining"], pct=frm["remaining"] / frm["flexed"]),
                 blank=blank["remaining"], remaining=actual_total - flexed_total, flexed_total=flexed_total,
-                months=list(zip([m[:3] for m in MONTHS], by_month)), ytd=ytd)
+                months=list(zip([m[:3] for m in MONTHS], by_month)), ytd=ytd, above=[MONTHS[m - 1] for m in above],
+                turns=[(MONTHS[m - 1], ytd[m - 1]) for m in turns])
 
 
 # --- Tutorial 15.3 --------------------------------------------------------------------------------
@@ -286,10 +290,11 @@ def disposal(d, number: str) -> dict:
     event = d.q("SELECT FixedAssetEventID, FixedAssetID, Description, ProceedsAmount FROM FixedAssetEvent "
                 "WHERE JournalEntryID = ? AND EventType = 'Disposal'", rows[0][7])
     ok = len(loss) == len(accumulated) == len(cost) == len(event) == 1 and len(rows) == 3 + len(cash) and len(cash) <= 1
-    out = dict(number=number, date=rows[0][6], ok=ok)
+    out = dict(number=number, date=rows[0][6], ok=ok,
+               entry=d.one("SELECT Description FROM JournalEntry WHERE EntryNumber = ?", number))
     if ok:
         out.update(desc=loss[0][5], loss=loss[0][3] - loss[0][4],
-                   cash=dict(account=cash[0][0], amount=cash[0][3]) if cash else None,
+                   cash=dict(account=cash[0][0], name=cash[0][1], amount=cash[0][3]) if cash else None,
                    acc=dict(account=accumulated[0][0], name=accumulated[0][1], amount=accumulated[0][3]),
                    cost=dict(account=cost[0][0], name=cost[0][1], amount=cost[0][4]),
                    event=event[0][0], asset=event[0][1], event_desc=event[0][2], proceeds=event[0][3])
@@ -340,21 +345,26 @@ def ex2(d, claim):
                    "WHERE a.AccountName = 'Retained Earnings' AND g.VoucherNumber IN (%s)" % ",".join("?" * len(d.closes_of(d.C))),
                    *d.closes_of(d.C))
     claim(len(retained) == 1 and abs(retained[0][1] - total) < 0.005, "the year's net income equals the close's credit to retained earnings")
-    lowest = sorted(range(1, 13), key=lambda m: income[m])
-    claim(lowest[:2] == [7, 10], "July and October are the two months with the lowest net income, July the lowest")
-    pay_dates = d.one("SELECT COUNT(DISTINCT PayDate) FROM PayrollPeriod WHERE substr(PayDate, 1, 7) = ?", f"{d.C}-07")
-    claim(pay_dates == 3, "July has three pay dates")
+    lowest = sorted(range(1, 13), key=lambda m: income[m])[:2]
+    # Requirement (4) explains a low month with an earlier chapter's finding: three pay dates (Chapters 11 and 14), or
+    # the peak of the promotion's discounts with Furniture revenue below the prior year's month (Chapter 11).
+    paid = [int(m) for (m,) in d.q("SELECT substr(PayDate, 6, 2) FROM PayrollPeriod WHERE substr(PayDate, 1, 4) = ? "
+                                   "GROUP BY 1 HAVING COUNT(DISTINCT PayDate) = 3 ORDER BY 1", str(d.C))]
     furniture = {(int(y), int(m)): v for y, m, v in d.q(
         "SELECT substr(PostingDate, 1, 4), substr(PostingDate, 6, 2), SUM(Credit) - SUM(Debit) FROM GLEntry "
         "WHERE AccountID = ? AND SourceDocumentType <> 'JournalEntry' GROUP BY 1, 2", d.account("4010"))}
-    october = furniture[(d.C, 10)] / furniture[(d.P, 10)] - 1
-    claim(october < 0, "October's Furniture revenue is below the prior year's October")
-    peak = d.one("SELECT substr(si.InvoiceDate, 6, 2) FROM SalesInvoiceLine l JOIN SalesInvoice si "
-                 "ON si.SalesInvoiceID = l.SalesInvoiceID WHERE substr(si.InvoiceDate, 1, 4) = ? GROUP BY 1 "
-                 "ORDER BY SUM(l.Quantity * l.UnitPrice * l.Discount) DESC LIMIT 1", str(d.C))
-    claim(peak == "10", "October is the month of the year's largest promotional discounts")
+    peak = int(d.one("SELECT substr(si.InvoiceDate, 6, 2) FROM SalesInvoiceLine l JOIN SalesInvoice si "
+                     "ON si.SalesInvoiceID = l.SalesInvoiceID WHERE substr(si.InvoiceDate, 1, 4) = ? GROUP BY 1 "
+                     "ORDER BY SUM(l.Quantity * l.UnitPrice * l.Discount) DESC LIMIT 1", str(d.C)))
+    low = []
+    for m in lowest:
+        before = furniture.get((d.P, m), 0.0)
+        change = furniture.get((d.C, m), 0.0) / before - 1 if before else 0.0
+        low.append(dict(name=MONTHS[m - 1], pay=m in paid, others=[MONTHS[o - 1] for o in paid if o != m],
+                        promo=m == peak and change < 0, furniture=-change))
+    claim(any(x["pay"] or x["promo"] for x in low), "an earlier chapter's finding explains one of the two lowest months")
     return dict(months=list(zip([m[:3] for m in MONTHS], months)), june=sum(months[:6]), ni=total, close=retained[0][0],
-                h2=sum(months[6:]), july=sum(months[:7]), october=-october)
+                h2=sum(months[6:]), july=sum(months[:7]), low=low)
 
 
 # --- Exercise 15.3 --------------------------------------------------------------------------------
@@ -375,8 +385,8 @@ def ex3(d, claim):
           "the labor cost per standard hour rose faster than the hours per standard hour")
     claim(all(a["share"] < b["share"] for a, b in zip(years, years[1:])), "the overtime share grew every year")
     claim(all(a["per_hour"] < b["per_hour"] for a, b in zip(years, years[1:])), "the cost per hour rose every year")
-    claim(all(a < b for a, b in zip(rates, rates[1:])), "the straight-time rates also rose")
-    return dict(years=years)
+    claim(max(rates) / min(rates) - 1 < 0.02, "the straight-time rate moved little")
+    return dict(years=years, rates=rates)
 
 
 # --- Exercise 15.4 --------------------------------------------------------------------------------
@@ -394,13 +404,16 @@ def ex4(d, claim):
                       d.account("6290"), d.C) / d.one(
         "SELECT SUM(l.LineTotal) FROM SalesInvoiceLine l JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID "
         "WHERE substr(si.InvoiceDate, 1, 4) = ?", str(d.C))
+    # The exercise text states the rate (1.903 percent): a flag for the author when the case's rate moves.
     claim(round(case_rate, 5) == CASE_RATE, "the Part II case's commission rate is 1.903 percent")
     lifts = [(x, breakeven(m["price"], m["cost"], x, CASE_RATE)) for x in DISCOUNTS]
     measured = [v["lift"] for v in volume(d)]
+    # The Part II case's finding, which the recommendation rests on.
     claim(all(abs(v["z"]) < 2 for v in volume(d)), "no promotion's months show an unusual increase in volume")
-    claim(abs(lifts[0][1] - max(measured)) < 0.01, "a 5% discount needs about the largest increase ever measured")
+    gap = lifts[0][1] - max(measured)
     return dict(id=pid, units=m["units"], price=m["price"], cost=m["cost"], lifts=lifts,
-                low=min(measured), high=max(measured))
+                low=min(measured), high=max(measured),
+                five="about" if abs(gap) < 0.01 else "more than" if gap > 0 else "less than")
 
 
 # --- Exercise 15.5 --------------------------------------------------------------------------------
@@ -421,8 +434,9 @@ def ex5(d, claim):
     errors = {k: dict(quarter=sum(f) / sum(actual) - 1,
                       monthly=statistics.mean(abs(fi - ai) / ai for fi, ai in zip(f, actual))) for k, f in methods.items()}
     others = statistics.mean(ys[1:12])
-    claim(0.4 <= ys[0] / others <= 0.65, "January of the first year is about half the size of the other months")
-    return dict(actual=sum(actual), fit_months=len(months) - 3, errors=errors, years=word(len(d.years)))
+    claim(ys[0] < min(ys[1:]), "January of the first year is the smallest month")
+    return dict(actual=sum(actual), fit_months=len(months) - 3, errors=errors, years=word(len(d.years)),
+                start=ys[0] / others)
 
 
 # --- Exercise 15.6 --------------------------------------------------------------------------------
@@ -462,8 +476,9 @@ def ex6(d, claim):
         if r[2] == "Indirect Manufacturing" and r[0] == str(d.C):
             indirect[r[5]] = indirect.get(r[5], 0.0) + r[3]
     claim(None not in indirect, "the time clock places every indirect line at a work center")
+    direct = sum(1 for r in rows if r[2] == "Direct Manufacturing" and r[0] == str(d.C))
     return dict(both=len(both), years=years, total=sum(y["differ"] for y in years), m=matrix,
-                late_differ=late_differ, differ=len(differ), late_all=late_all, now=len(now),
+                late_differ=late_differ, differ=len(differ), late_all=late_all, now=len(now), direct=direct,
                 indirect=sorted(((short(n), v) for n, v in indirect.items()), key=lambda nv: -nv[1]))
 
 

@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will publish Charles River Reports to the Power BI service, assign a colleague to the role of Guided Tutorial A.1, and test the role in the service, where it applies to real sign-ins rather than the names you typed in View as. Then you will complete internal audit's memo with a recommendation on how the package should be shared.
 
-**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Guided Tutorial A.1. Steps 1 to 4 need a Power BI Pro or Premium Per User license and a colleague who also has one; with a free license you can publish to My workspace but not share, so the roles have no one to apply to. If you have no license, read Steps 1 to 4 and do Step 5, which needs none.
+**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Guided Tutorial A.1. If you start here, download Charles River Reports as it stands at the end of Guided Tutorial A.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains. Steps 1 to 4 need a Power BI Pro or Premium Per User license and a colleague who also has one; with a free license you can publish to My workspace but not share, so the roles have no one to apply to. If you have no license, read Steps 1 to 4 and do Step 5, which needs none.
 
 **Step-by-step instructions.**
 

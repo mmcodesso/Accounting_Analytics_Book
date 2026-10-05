@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will add the purchasing and payroll tests of Chapter 12 to the monitoring file, append the exceptions of all three processes into one register, and build the page the audit committee asked for: a heat map of exceptions by test and month, the rates behind it, the approvers who account for them, and a drill-through to the documents. Then you will test the register against the counts of Chapters 8 and 12.
 
-**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.1, with the JE Exceptions query.
+**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.1, with the JE Exceptions query. If you start here, download Audit Monitoring as it stands at the end of Tutorial 16.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Audit Monitoring.pbix, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -104,7 +104,7 @@ c. Hide the keys and the flag columns of the three population tables.
 
 **Step 10. Measure the exceptions and their rates.**
 
-a. Add the measures below to the Measures table, and format Rate per 1,000 with one decimal.
+a. Add the measures below to the Key Measures table, and format Rate per 1,000 with one decimal.
 
 <!-- dax-check: measure -->
 ```
@@ -182,7 +182,7 @@ Each count equals the count of the test in Chapter 8 or Chapter 12. The register
      8,366 by year); PayrollRegister 8,197 (2,645 / 2,774 / 2,778 by PayDate year); PayrollPayment 8,194 rows (registers
      1, 2646, 5420 unpaid). Exceptions 151 rows: JE 43 (Weekend 17, Backdated 6, SelfApproved 7, AboveLimit 9, RoundAmount 4), PO 25
      (SelfApproved 9, AboveLimit 13, AfterTermination 3; 14 distinct orders), PR 83 (PaidBeforeApproval 3: registers 2, 2647, 5421, the CFO, paid 2024-01-18, 2025-01-02, 2026-01-01, one day before approval; AfterTermination 3: registers 840, 2646, 5420,
-     employee 81; SelfApproved 77, employee 5, the Accounting Manager). Rates per 1,000: JE Weekend 19.98, Backdated 7.05, SelfApproved 8.23, AboveLimit 10.58, RoundAmount 4.70; PO SelfApproved 0.48, AboveLimit 0.69, AfterTermination 0.16; PR PaidBeforeApproval 0.37, AfterTermination 0.37, SelfApproved 9.39. By month name (all years): Jan 56, Feb 8, Mar 8, Apr 8, May 9, Jun 8, Jul 11, Aug 10, Sep 6, Oct 7, Nov 8, Dec 12. January by test: JE AboveLimit 2, Backdated 6, RoundAmount 1, SelfApproved 7, Weekend 7; PO AboveLimit 11, AfterTermination 2, SelfApproved 8; PR AfterTermination 2, PaidBeforeApproval 3, SelfApproved 7. December JE AboveLimit 6 = the six year-end closes. PR SelfApproved 6 to 8 every month. By approver: Tasha Todd (Accounting Manager) 89, Cynthia Reyes (CFO) 21, David Roth (Controller) 16, Daniel Diaz (Account Executive, terminated 2024-04-26) 6, Jennifer Cole (Purchasing Manager) 5, Procurement Analysts 4 and 4, Buyers 2 and 2, Production Supervisor 1, Production Manager 1. PO AfterTermination: PO-2024-000474 (April 2024), PO-2025-003922 (January 2025), PO-2026-010467 (January 2026), all approved by employee 81 (also above the limit of 0). By year and process: JE 16 / 12 / 15 (rates 60.15, 41.67, 50.51), PR 27 / 28 / 28, PO 11 / 6 / 8. -->
+     employee 81; SelfApproved 77, employee 5, the Accounting Manager). Rates per 1,000: JE Weekend 19.98, Backdated 7.05, SelfApproved 8.23, AboveLimit 10.58, RoundAmount 4.70; PO SelfApproved 0.48, AboveLimit 0.69, AfterTermination 0.16; PR PaidBeforeApproval 0.37, AfterTermination 0.37, SelfApproved 9.39. By month name (all years): Jan 56, Feb 8, Mar 8, Apr 8, May 9, Jun 8, Jul 11, Aug 10, Sep 6, Oct 7, Nov 8, Dec 12. January by test: JE AboveLimit 2, Backdated 6, RoundAmount 1, SelfApproved 7, Weekend 7; PO AboveLimit 11, AfterTermination 2, SelfApproved 8; PR AfterTermination 2, PaidBeforeApproval 3, SelfApproved 7. December JE AboveLimit 6 = the six year-end closes. PR SelfApproved 6 to 8 in every month name (1 to 3 in each calendar month). By approver: Tasha Todd (Accounting Manager) 89, Cynthia Reyes (CFO) 21, David Roth (Controller) 16, Daniel Diaz (Account Executive, terminated 2024-04-26) 6, Jennifer Cole (Purchasing Manager) 5, Procurement Analysts 4 and 4, Buyers 2 and 2, Production Supervisor 1, Production Manager 1. PO AfterTermination: PO-2024-000474 (April 2024), PO-2025-003922 (January 2025), PO-2026-010467 (January 2026), all approved by employee 81 (also above the limit of 0). By year and process: JE 16 / 12 / 15 (rates 60.15, 41.67, 50.51), PR 27 / 28 / 28, PO 11 / 6 / 8. -->
 
 **Checkpoint.** Before you review the exceptions, confirm the following:
 

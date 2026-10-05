@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 500" width="1280" height="500" role="img" aria-labelledby="title desc">
+<title id="title">Work order and close</title>
+<desc id="desc">WorkOrder.WorkOrderID matches WorkOrderClose.WorkOrderID. The WorkOrder end is exactly one; the WorkOrderClose end is zero or one. Logical relationship, with endpoints computed from the pinned data.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<rect x="30" y="100" width="460" height="117" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="30" y="100" width="460" height="58" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="48" y="139" font-size="33" fill="#FFFFFF" font-weight="bold" text-anchor="start">WorkOrder</text>
+<text x="48" y="199" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">PK  WorkOrderID</text>
+<rect x="790" y="100" width="460" height="166" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="790" y="100" width="460" height="58" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="808" y="139" font-size="33" fill="#FFFFFF" font-weight="bold" text-anchor="start">WorkOrderClose</text>
+<text x="808" y="199" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">PK  WorkOrderCloseID</text>
+<text x="808" y="248" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="start">FK  WorkOrderID</text>
+<path d="M490,209 L790,209" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M500,194 L500,224" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M533,194 L533,224" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M780,194 L780,224" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<circle cx="747" cy="209" r="10" fill="white" stroke="#5D6D7E" stroke-width="3"/>
+<text x="640" y="330" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="middle">WorkOrder: exactly one</text>
+<text x="640" y="382" font-size="32" fill="#2C3E50" font-weight="normal" text-anchor="middle">WorkOrderClose: zero or one</text>
+<text x="640" y="463" font-size="30" fill="#5D6D7E" font-weight="normal" text-anchor="middle">Read each endpoint as matches in the table it touches.</text>
+</g>
+</svg>

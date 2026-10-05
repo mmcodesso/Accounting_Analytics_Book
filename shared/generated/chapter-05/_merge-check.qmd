@@ -1,0 +1,4 @@
+| Population | Rows | Line total |
+| --- | --- | --- |
+| Source invoice lines | 27,933 | $86,446,845.84 |
+| Prepared InvoiceLines | 27,933 | $86,446,845.84 |

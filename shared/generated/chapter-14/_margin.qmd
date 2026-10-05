@@ -1,0 +1,6 @@
+| Furniture quarter | Margin at standard cost |
+| --- | --- |
+| 2026-Q1 | 43.05% |
+| 2026-Q2 | 43.15% |
+| 2026-Q3 | 42.26% |
+| 2026-Q4 | 40.78% |

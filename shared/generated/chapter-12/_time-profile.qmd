@@ -1,0 +1,6 @@
+| Time-clock profile | Result |
+| --- | --- |
+| Entries | 52,967 |
+| Not approved | 5 |
+| No clock-out | 3 |
+| Last work date | 2026-12-11 |

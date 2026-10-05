@@ -216,11 +216,25 @@ def ex4(d, claim):
           "the items reduced are those with the lowest contribution per Assembly hour")
     groups = [(g, sum(1 for r in items if r[2] == g)) for g in GROUPS]
     claim({r[2] for r in items} <= set(GROUPS), "the manufactured items sold belong to the listed groups")
+    # Setup hours need a lot size, which the exercise does not give; the item's average work-order quantity in the year
+    # is one choice (the note names it), and the claims check that it leaves the same work center binding.
+    setup = {(r, w): h for r, w, h in d.q("SELECT RoutingID, WorkCenterID, SUM(StandardSetupHours) "
+                                          "FROM RoutingOperation GROUP BY 1, 2")}
+    lots = dict(d.q("SELECT ItemID, AVG(PlannedQuantity) FROM WorkOrder WHERE substr(ReleasedDate, 1, 4) = ? GROUP BY 1",
+                    str(d.C)))
+    claim(all(lots.get(r[0]) for r in items), f"every manufactured item sold has work orders released in {d.C} (a lot size)")
+    S = np.array([[setup.get((r[4], w), 0.0) / lots[r[0]] if lots.get(r[0]) else 0.0 for r in items] for w, _ in centers])
+    with_setup = linprog(-unit, A_ub=A + S, b_ub=cap, bounds=[(0, q) for q in demand], method="highs")
+    claim(with_setup.status == 0, "Solver finds an optimal solution with setup hours")
+    setup_binding = [short[w] for (w, _), u, c in zip(centers, (A + S) @ with_setup.x, cap) if c - u < 1e-6] \
+        if with_setup.status == 0 else []
+    claim(setup_binding == binding, "with setup hours spread over the lots, the same work center binds")
+    setup_loss = float(unit @ demand) + with_setup.fun if with_setup.status == 0 else 0.0
     return dict(sold=len(items), groups=[(g, n) for g, n in groups if n], unsold=unsold, rate=rate,
                 need=[(short[w], n) for (w, _), n in zip(centers, need)], optimum=-res.fun,
                 full=float(unit @ demand), loss=float(unit @ demand) + res.fun,
                 bind_cap=cap[assembly], shadow=shadow[assembly], fin_used=used[finishing], fin_cap=cap[finishing],
-                reduced=[(items[i][1], x[i], demand[i]) for i in reduced])
+                reduced=[(items[i][1], x[i], demand[i]) for i in reduced], setup_loss=round(setup_loss, -3))
 
 
 @note("ch07.ex5", EXERCISES)
@@ -237,7 +251,6 @@ def ex5(d, claim):
     with_first = fit([invoices[m] for m in months], [revenue[m] for m in months])
     without = fit([invoices[m] for m in months[1:]], [revenue[m] for m in months[1:]])
     average = statistics.mean(revenue[m] for m in months[1:])
-    claim(round(100 * without["se"] / average) == 5, "the residual standard error is roughly 5% of average monthly revenue")
     claim(0.05 * average < 2 * without["se"], "a 5% misstatement lies within two standard errors, so it cannot be reliably detected")
     fitted = [m for m in months if m[:4] in (str(d.F), str(d.P))]
     line = fit([revenue[m] for m in fitted], [commission[m] for m in fitted])
@@ -249,11 +262,48 @@ def ex5(d, claim):
             current.append(dict(month=MONTHS[int(m[5:]) - 1], diff=diff, pct=diff / expected))
     flagged = [r for r in current if abs(r["pct"]) > 0.03]
     others = [r for r in current if abs(r["pct"]) <= 0.03]
-    claim(all(abs(r["pct"]) < 0.025 for r in others), "all other months are within 2.5%")
-    jan, feb = current[0], current[1]
-    claim(jan in flagged and feb in flagged and jan["diff"] * feb["diff"] < 0
-          and abs(jan["diff"] + feb["diff"]) < 0.1 * max(abs(jan["diff"]), abs(feb["diff"])),
-          "the January and February differences are flagged and nearly offset")
+    within = "2.5%" if all(abs(r["pct"]) < 0.025 for r in others) else "3%"
+    # consecutive flagged months whose differences nearly offset: the pattern Requirement (4) asks students to look for
+    offset = [(a, b) for a, b in zip(current, current[1:]) if a in flagged and b in flagged and a["diff"] * b["diff"] < 0
+              and abs(a["diff"] + b["diff"]) < 0.1 * max(abs(a["diff"]), abs(b["diff"]))]
+    claim(len(offset) > 0, "two consecutive months' differences are flagged and nearly offset")
+    pair = offset[0] if offset else (current[0], current[1])
+    # Why they offset. Not timing: each accrual is dated on its invoice's date, except a few (the misdated invoices),
+    # whose commission is too small to move either month. The customer mix: the rate depends on the segment and the
+    # revenue type, so a month weighted toward the lowest-rate segment accrues less per dollar than the regression's one slope.
+    accrual_rows, misdated, other_month = d.q(
+        "SELECT COUNT(*), SUM(a.AccrualDate <> si.InvoiceDate), SUM(substr(a.AccrualDate, 1, 7) <> substr(si.InvoiceDate, 1, 7)) "
+        "FROM SalesCommissionAccrual a JOIN SalesInvoice si ON si.SalesInvoiceID = a.SalesInvoiceID")[0]
+    misdated_invoices = {r[0] for r in d.q("SELECT DISTINCT a.SalesInvoiceID FROM SalesCommissionAccrual a "
+                                           "JOIN SalesInvoice si ON si.SalesInvoiceID = a.SalesInvoiceID "
+                                           "WHERE a.AccrualDate <> si.InvoiceDate")}
+    before_shipment = {r[0] for r in d.q("SELECT si.SalesInvoiceID FROM SalesInvoice si WHERE si.InvoiceDate < "
+                                         "(SELECT MIN(s.ShipmentDate) FROM Shipment s WHERE s.SalesOrderID = si.SalesOrderID)")}
+    claim(misdated_invoices == before_shipment,
+          "the accruals not dated on their invoice's date are those of the invoices dated before their first shipment (Tutorial 2.1)")
+    keys = [f"{d.C}-{MONTHS.index(r['month']) + 1:02d}" for r in pair]
+    moved = d.one("SELECT COALESCE(SUM(a.CommissionAmount), 0) FROM SalesCommissionAccrual a "
+                  "JOIN SalesInvoice si ON si.SalesInvoiceID = a.SalesInvoiceID "
+                  "WHERE substr(a.AccrualDate, 1, 7) <> substr(si.InvoiceDate, 1, 7) "
+                  "AND (substr(a.AccrualDate, 1, 7) IN (?, ?) OR substr(si.InvoiceDate, 1, 7) IN (?, ?))", *keys, *keys)
+    claim(moved < 0.1 * min(abs(r["diff"]) for r in pair),
+          "the accruals dated in another month than their invoice move too little commission to explain the pair (not timing)")
+    low, high = d.q("SELECT MIN(CommissionRatePct), MAX(CommissionRatePct) FROM SalesCommissionAccrual")[0]
+    claim({r[0] for r in d.q("SELECT DISTINCT CustomerSegment FROM SalesCommissionAccrual WHERE CommissionRatePct = ?", low)}
+          == {"Wholesale"}, "the lowest commission rate is Wholesale's")
+    claim({r[0] for r in d.q("SELECT DISTINCT RevenueType FROM SalesCommissionAccrual WHERE CommissionRatePct = ?", high)}
+          == {"Design Service"}, "the highest commission rate is the design services'")
+    mix = "SUM(CASE WHEN CustomerSegment = 'Wholesale' THEN CommissionBaseAmount ELSE 0 END) / SUM(CommissionBaseAmount)"
+    rate = "SUM(CommissionAmount) / SUM(CommissionBaseAmount)"
+    by_month = {m: (s, r) for m, s, r in d.q(f"SELECT substr(AccrualDate, 1, 7), {mix}, {rate} FROM SalesCommissionAccrual "
+                                              "WHERE substr(AccrualDate, 1, 4) = ? GROUP BY 1", str(d.C))}
+    share_year, rate_year = d.q(f"SELECT {mix}, {rate} FROM SalesCommissionAccrual WHERE substr(AccrualDate, 1, 4) = ?",
+                                str(d.C))[0]
+    sign = lambda x: (x > 0) - (x < 0)
+    claim(all(sign(by_month[k][1] - rate_year) == sign(r["diff"]) and sign(by_month[k][0] - share_year) == -sign(r["diff"])
+              for k, r in zip(keys, pair)),
+          "the month below its expectation has more Wholesale and a lower accrual rate than the year, the month above less "
+          "and a higher rate (the customer mix explains the pair)")
     accruals = d.one("SELECT SUM(CommissionAmount) FROM SalesCommissionAccrual WHERE substr(AccrualDate, 1, 4) = ?", str(d.C))
     adj_rows, adj_amount, no_memo = d.q(
         "SELECT COUNT(*), -SUM(g.Debit - g.Credit), SUM(a.CreditMemoID IS NULL) FROM GLEntry g "
@@ -265,7 +315,10 @@ def ex5(d, claim):
                d.account("6290"), d.C)
     claim(abs(accruals - adj_amount - gl) < 0.005, "the accruals less the adjustments equal the ledger")
     return dict(r2_with=with_first["r2"], r2_without=without["r2"], slope=without["b"], se=round(without["se"], -3),
-                average=average, a=line["a"], b=line["b"], r2=line["r2"], flagged=flagged,
+                se_share=without["se"] / average, average=average, a=line["a"], b=line["b"], r2=line["r2"], flagged=flagged,
+                within=within, pair=[pair[0]["month"], pair[1]["month"]],
+                accrual_rows=accrual_rows, misdated=misdated, other_month=other_month, low=low, high=high,
+                share=[by_month[k][0] for k in keys], share_year=share_year, rate=[by_month[k][1] for k in keys],
                 accruals=accruals, adj_rows=adj_rows, adj_amount=adj_amount, gl=gl)
 
 

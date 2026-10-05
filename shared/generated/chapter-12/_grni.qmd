@@ -1,0 +1,5 @@
+| Unbilled-receipt control | Amount |
+| --- | --- |
+| Receipt value not invoiced | $1,020,992.80 |
+| Account 2020 balance | $1,020,992.06 |
+| Difference | $0.74 |

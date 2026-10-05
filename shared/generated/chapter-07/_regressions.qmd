@@ -1,0 +1,4 @@
+| Trend fit | R squared | Slope p-value |
+| --- | --- | --- |
+| All 36 months | 0.169 | 0.013 |
+| Without January 2024 | 0.096 | 0.071 |

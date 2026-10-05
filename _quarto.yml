@@ -1,11 +1,17 @@
 project:
   type: book
+  resources:
+    - '!slides/**'
+    - '!shared/calculations/**'
+    - '!shared/generated/**'
+    - '!outputs/**'
   pre-render:
     - python scripts/export_drawio_svgs.py
 
 filters:
   - filters/strip-comments.lua
   - filters/pdf-figures.lua
+  - filters/slide-links.lua
 
 book:
   title: "Accounting Analytics: An Integrated Approach"

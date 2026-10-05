@@ -1,0 +1,4 @@
+| Manufacturing cost check | Amount |
+| --- | --- |
+| Pay + employer costs | $3,815,397.14 |
+| Account 1090 payroll debits | $3,815,397.14 |

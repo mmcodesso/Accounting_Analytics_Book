@@ -16,7 +16,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Build a matrix with FiscalYear on rows, ItemGroup on columns, and LineTotal as values, with row and column totals. Compare the fiscal 2026 column totals with the revenue by item group you calculated in Chapter 6.
 
-(2) Import T16_SalesInvoice again as a query named `InvoiceHeaders`, keep SalesInvoiceID, InvoiceDate, SubTotal, FreightAmount, TaxAmount, and GrandTotal, and add a FiscalYear custom column. Do not relate it to the other tables. Build a table visual of SubTotal by fiscal year from InvoiceHeaders, and compare it with the line totals by fiscal year.
+(2) Import T16_SalesInvoice again as a query named `InvoiceHeaders`, keep SalesInvoiceID, InvoiceDate, SubTotal, FreightAmount, TaxAmount, and GrandTotal, and add a FiscalYear custom column. Before you choose the columns, make sure FreightAmount has the decimal number type, as Discount does in Step 3 of Tutorial 13.1. Do not relate it to the other tables. Build a table visual of SubTotal by fiscal year from InvoiceHeaders, and compare it with the line totals by fiscal year.
 
 (3) Add FreightAmount, TaxAmount, and GrandTotal to the table visual. Explain why the line totals reconcile to SubTotal but not to GrandTotal, and which of the four amounts is revenue from the sale of goods and services.
 
@@ -142,7 +142,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Requirements.**
 
-(1) Import T17_SalesInvoiceLine, T16_SalesInvoice, T44_Item, and T4_Customer again as queries named `Profile_Lines`, `Profile_Invoices`, `Profile_Items`, and `Profile_Customers`, with every column. Clear **Enable load** on each, so that they stay in the Power Query Editor and do not enter the model.
+(1) Import T17_SalesInvoiceLine, T16_SalesInvoice, T44_Item, and T4_Customer again as queries named `Profile_Lines`, `Profile_Invoices`, `Profile_Items`, and `Profile_Customers`, with every column. Correct Discount in Profile_Lines and FreightAmount in Profile_Invoices to the decimal number type, as in Step 3 of Tutorial 13.1. Clear **Enable load** on each, so that they stay in the Power Query Editor and do not enter the model.
 
 (2) With **Column quality**, **Column distribution**, and **Column profile** turned on, record for each query, on the top 1,000 rows, the share of empty values in every column that has any, and the number of distinct values of PricingMethod, Discount, and Status.
 
@@ -159,10 +159,11 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
      the top 1,000; PriceOverrideApprovalID empty 27,419 (98.2%) against 976 of 1,000; PriceListLineID and ShipmentLineID empty on 439
      lines (1.6%, the Base List design-service lines) against 8 of 1,000; PricingMethod 4 distinct values on both bases; Discount 4
      distinct on the entire set, 1 (zero) on the top 1,000; Quantity is fractional on 26,797 lines (Chapter 5's validity check).
-     Profile_Invoices (20,914): PaymentDate empty on 911 (open invoices) against 2 of 1,000; Status 3 distinct (Settled, Partially Settled, Submitted) against 1 (Settled) on the top 1,000, because the earliest invoices were all paid. Profile_Items (266; 223
+     Profile_Invoices (20,914): PaymentDate empty on 911 (876 open invoices, 35 Settled) against 2 of 1,000; Status 3 distinct (Settled, Partially Settled, Submitted) against 1 (Settled) on the top 1,000, because the earliest invoices are all Settled. Profile_Items (266; 223
      with a ListPrice): ListPrice empty on 43 items bought, not sold; CollectionName empty on 63 of the sellable items (all 56 Accessories,
      3 Furniture, the 4 services). Profile_Customers (220): no empty values; CustomerName has 218 distinct values (Brown LLC and Smith Ltd
-     twice). The first rows are the earliest records, before promotions, overrides, and unpaid invoices existed. Meaningful blanks:
+     twice). The first rows are almost all the earliest records (lines to 2024-02-29, invoices to 2024-03-10; only 60 later lines and 33 later invoices are dated earlier),
+     before the first promotion and with almost every invoice paid; overrides already occur (2.4% of the top 1,000 against 1.8% overall). Meaningful blanks:
      PromotionID (no promotion), PaymentDate (unpaid), PriceListLineID on Base List lines; follow-up: CollectionName on the three
      Furniture items (the Part II case found one of them, FUR-CON-0003, ordered under the Alder promotion). -->
 
@@ -170,7 +171,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Table group:** Order-to-Cash, with the Item and Customer tables from Master Data
 
-**Scenario.** A colleague has drafted a page for the board. It has a pie chart of fiscal 2026 revenue by item group with five slices and no labels, a card titled "Average discount" showing Average of Discount for fiscal 2026, a line chart of revenue by month from January 2024 to December 2026 on the default axis, a line and clustered column chart of revenue and discounts by month, and a page filter in the Filters pane that excludes the Services item group, mentioned nowhere on the page. The controller asks you to review it before it goes out.
+**Scenario.** A colleague has drafted a page for the board. It has a pie chart of fiscal 2026 revenue by item group with five slices and no labels, a card titled "Average discount" showing Average of Discount for fiscal 2026, a line chart of revenue by month from January 2024 to December 2026 on the default axis, a line and clustered column chart of revenue and discounts by month of fiscal 2026, and, on that chart only, a filter in the Filters pane that excludes the Services item group, mentioned nowhere on the page. The controller asks you to review it before it goes out.
 
 **Requirements.**
 
@@ -193,7 +194,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
      in fiscal 2026 is 0.85%, an unweighted average of line rates; discount dollars over the dollars before discount are 1.20%
      (1.08% of list), and Furniture's average rate is 1.98%; the right figure is a ratio of totals, which needs a measure (Chapter 14);
      until then, show discount dollars and the list amount side by side. Line chart: the default axis and the January 2024 start-up
-     month (1,408,516.50 against 2,093,775 to 2,719,019 in the other months) suggest growth of almost 80% to December 2026; whole
+     month (1,408,516.50 against 2,093,775 to 2,719,019 in the other months) suggest growth of 79% to December 2026; whole
      years show +7.6% and +1.3%; start the axis at zero and compare whole years. Combo chart: the discounts get their own axis and
      appear comparable to revenue (October 2026 discounts were 6.0% of that month's revenue); use one axis or two charts. Hidden
      filter: excluding Services removes 1,213,344.00 (4.1%) of fiscal 2026 revenue without telling the reader; move it to a visible

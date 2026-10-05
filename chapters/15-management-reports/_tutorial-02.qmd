@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the page the department managers will read: each cost center's operating expense for fiscal 2026 against its budget. You will add the budget lines as a second fact table that shares Account, CostCenter, and Date with the ledger, mark the variances that need attention, and then explain them. A flexed budget will set aside the volume in the commission budget, a drill-through page will expose a cost that the budget and the ledger classify differently, and a reconciliation will show what remains. A visual calculation will show how the variance built up through the year.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorial 15.1, with the ledger star of Tutorial 14.3.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 15.1, with the ledger star of Tutorial 14.3. If you start here, download Charles River Reports as it stands at the end of Tutorial 15.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -33,7 +33,7 @@ d. Hide the two keys of BudgetLine.
 
 **Step 3. Write the budget measures.**
 
-a. Add the measures below to the Measures table, one at a time.
+a. Add the measures below to the Key Measures table, one at a time.
 b. Format the first three as amounts and Variance % as a percentage with one decimal.
 
 <!-- dax-check: measure -->
@@ -114,7 +114,7 @@ The Warehouse has a depreciation account with actual expense and no budget at al
 **Step 9. Reconcile the variances.**
 
 a. Add the measures below, formatting the first three as amounts and Remaining % as a percentage with one decimal.
-b. On the Budget page, add a table visual with CostCenterName, Variance, Volume Effect, Classification Effect, Remaining Variance, and Remaining %.
+b. On the Budget page, add a table visual with CostCenterName, Variance, Volume Effect, Classification Effect, Remaining Variance, and Remaining %, filtered to Operating Expense as the matrix is.
 
 <!-- dax-check: measure -->
 ```
@@ -173,8 +173,7 @@ The budget equals the operating-expense budget lines of Chapter 7, including the
      1,090,985.80 (other opex 469,205.76 + 621,780.04). Volume effect -1,643,193.25; depreciation 6130: budget 272,578.56 all
      Administration, actual 170,749.92 Administration and 101,828.64 Warehouse; classification +101,828.64 / -101,828.64, total 0.
      Remaining: Warehouse -6,987.69 (-2.0%), Administration -10,660.61 (-1.6%), Sales -72,113.59 (-6.6%), others as above, (Blank)
-     +16,642.78; total -174,758.97. Monthly variance to flexed (engine; the rate is applied month by month): Jan +99,620.67, Feb -36,350.15, Mar -43,925.89, Apr -34,491.81, May -38,383.26, Jun -39,824.69, Jul +98,203.74, Aug -36,397.02, Sep -37,008.46, Oct -37,116.99, Nov -36,459.18, Dec -32,625.93; YTD +99,620.67 in January, -93,355.12 in June, +4,848.62 in July, -174,758.96
-     in December. Test 4: 8,289,648.80; 6,646,455.55;
+     +16,642.78; total -174,758.97. Monthly variance to flexed (engine; the rate is applied month by month): Jan +99,620.67, Feb -36,350.15, Mar -43,925.89, Apr -34,491.81, May -38,383.26, Jun -39,824.69, Jul +98,203.74, Aug -36,397.02, Sep -37,008.46, Oct -37,116.99, Nov -36,459.18, Dec -32,625.93 (above the flexed budget only in January and July, the months with three pay dates); YTD +99,620.67 in January, -93,355.12 in June, +4,848.62 in July, -174,758.96 in December. Test 4: 8,289,648.80; 6,646,455.55;
      6,471,696.58. -->
 
 **Checkpoint.** Before you move on, confirm the following:

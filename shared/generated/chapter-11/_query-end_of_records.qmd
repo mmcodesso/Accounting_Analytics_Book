@@ -1,0 +1,8 @@
+```sql
+SELECT MAX(WorkDate) AS LastWorkDate,
+    date(MAX(WorkDate), 'start of month', '+1 month', '-1 day')
+        AS MonthEnd,
+    julianday(date(MAX(WorkDate), 'start of month', '+1 month',
+        '-1 day')) - julianday(MAX(WorkDate)) AS DaysNotRecorded
+FROM LaborTimeEntry;
+```

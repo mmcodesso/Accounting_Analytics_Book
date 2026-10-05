@@ -318,6 +318,10 @@ class Diagram:
             f"        {body}\n"
             "      </root>\n    </mxGraphModel>\n  </diagram>\n</mxfile>\n"
         )
+        # Preserve mtime when source content is unchanged, keeping incremental
+        # SVG/PDF exports and authoring previews from doing unnecessary work.
+        if path.is_file() and path.read_text(encoding="utf-8") == xml:
+            return
         # Editors and file watchers on Windows can hold the file briefly, so retry the swap.
         temp = path.with_name(f".{path.name}.tmp")
         temp.write_text(xml, encoding="utf-8", newline="\n")

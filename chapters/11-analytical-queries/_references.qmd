@@ -6,6 +6,6 @@ SQLite. (n.d.-a). *CREATE VIEW*. <https://www.sqlite.org/lang_createview.html>
 
 SQLite. (n.d.-b). *Date and time functions*. <https://www.sqlite.org/lang_datefunc.html>
 
-SQLite. (n.d.-c). *Window functions*. <https://www.sqlite.org/windowfunctions.html>
+{{< include /shared/fragments/_reference-sqlite-windows.qmd >}}
 
-SQLite. (n.d.-d). *The WITH clause*. <https://www.sqlite.org/lang_with.html>
+{{< include /shared/fragments/_reference-sqlite-with.qmd >}}

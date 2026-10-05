@@ -1,0 +1,5 @@
+| Process | Test failures | Distinct documents |
+| --- | --- | --- |
+| Journal entries | 43 | 33 |
+| Purchase orders | 25 | 14 |
+| Payroll | 83 | 83 |

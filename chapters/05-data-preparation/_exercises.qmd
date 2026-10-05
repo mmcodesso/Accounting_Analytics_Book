@@ -47,7 +47,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 (3) Use the SalesOrderID to bring each invoice's OrderDate onto the SalesInvoice Table, add a column that flags invoices dated before their order, and count them.
 
-(4) List the invoices flagged by either test. Compare the list with the invoices dated before their first shipment that you found in Tutorial 2.1, and describe what the three findings together suggest about how these invoices were dated.
+(4) List the invoices flagged by either test. Compare the list with the invoices dated before their first shipment that you found in Tutorial 2.1, which are still in CharlesRiver_Work.xlsx, your Part I working copy: filter the Check column of its SalesInvoice worksheet for "Check." Describe what the three findings together suggest about how these invoices were dated.
 
 (5) Write a brief memo (one half page) to the controller that explains the tests, the results, the effect the findings could have on revenue cutoff, and the evidence you would request from the billing team.
 
@@ -82,7 +82,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 <!-- notes: ch05.ex3 -->
 <!-- Instructor notes, Exercise 5.3: Furniture revenue by product type, Q3 / Q4 (quantity Q3 / Q4): BKC 259,617.77 / 297,121.44 (475.61 / 517.59); BNH 234,227.64 / 239,562.62 (374.62 / 422.79); CON 454,136.92 / 504,299.85 (636.04 / 667.36); CTB 732,861.82 / 690,150.36 (1,296.08 / 1,240.95); DSK 768,977.89 / 751,338.42 (1,050.73 / 1,195.45); NGT 457,540.67 / 369,972.92 (905.06 / 734.14); SDB 633,110.81 / 558,717.15 (1,072.57 / 958.22); TBL 742,849.34 / 745,625.08 (1,280.52 / 1,385.62). Totals 4,283,322.86 / 4,156,787.84. Nightstands and sideboards lost the most revenue;
-     consoles and bookcases gained. Share changes: NGT -1.8 pts, SDB -1.3 pts, CON +1.5 pts, BKC +1.1 pts; the two-point threshold highlights
+     consoles and bookcases gained the most, and benches and dining tables also gained. Largest share changes: NGT -1.8 pts, SDB -1.3 pts, CON +1.5 pts, BKC +1.1 pts; the two-point threshold highlights
      none, a useful result: the mix shift is modest. Quantities are fractional on most lines (the validity finding), so unit counts are not
      whole products; revenue shares avoid the issue. -->
 
@@ -125,7 +125,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Requirements.**
 
-(1) Use Power Query to load the Supplier and Employee Tables from CharlesRiver.xlsx into a new workbook, keeping the identifying and address columns.
+(1) Use Power Query to load the Supplier and Employee Tables from CharlesRiver.xlsx into a new workbook, as queries named `Supplier` and `Employee`. Keep every column of Supplier, because Exercise 5.6 uses this Table too, and keep EmployeeID, EmployeeName, JobTitle, Address, and City of Employee.
 
 (2) On each Table, build a match key that joins the Address and City columns. Standardize the key with TRIM and UPPER so that differences in spacing and case do not hide a match, and explain why the key includes the city.
 
@@ -159,7 +159,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 (1) In the workbook of Exercise 5.5, using the Supplier Table, add a column that applies PROPER to SupplierName, and count the names that change. Examine the changed names and explain why applying PROPER to this field would be a mistake.
 
-(2) Test for duplicate suppliers: count the suppliers that share a TaxID and the suppliers that share a BankAccount. Explain what a clean result shows and what it does not.
+(2) Test for duplicate suppliers: count the suppliers that share a TaxID and the suppliers that share a BankAccount. The masked bank accounts begin with `****`, which COUNTIF and COUNTIFS read as wildcards, so compare the values exactly, for example with `=SUM(--(Supplier[BankAccount]=[@BankAccount]))`, which counts the suppliers with the same BankAccount as the row's. Explain what a clean result shows and what it does not.
 
 (3) List the suppliers whose IsApproved flag is 0 and the suppliers whose SupplierRiskRating is High.
 

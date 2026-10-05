@@ -18,6 +18,9 @@ After completing this chapter, you will be able to:
 6. Explain why the source-document columns in GLEntry act as a logical reference to many possible tables rather than a declared foreign key, and use them to trace a transaction across table groups.
 :::
 
+::: {.chapter-slides data-chapter="chapter-03"}
+:::
+
 
 ## Opening Scenario {.unnumbered}
 

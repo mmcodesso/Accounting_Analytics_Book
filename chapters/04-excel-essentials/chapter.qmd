@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-04"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 You are the staff accountant from Part I, and the controller has read your data readiness memo. She agrees with your conclusions: gross margin on the Furniture product line fell from the third quarter of the 2026 fiscal year to the fourth, the sales and ledger data reconcile to the cent, and the analysis must exclude the year-end closing entry. Now she wants the diagnostic answer.
@@ -92,6 +95,8 @@ The simplest way to start an analysis is to open the company workbook and work i
 Power Query, which appears in Excel under Data > Get Data, addresses all of these. Power Query is Excel's tool for connecting to data, shaping it, and loading the result into a workbook. You point it at a source, such as another Excel workbook, a text file, or a database, and choose the data you want. In the Power Query Editor you can then remove columns you do not need, filter out rows, and correct data types, and each action is recorded as a step in the Applied Steps list. When you close the editor, Power Query loads the result into your workbook as an Excel Table. The source is never changed. When the source is updated, Data > Refresh All reads it again and repeats every recorded step, so the Tables in your workbook stay current without any manual copying.
 
 When the source is an Excel workbook, the Power Query Navigator lists everything the workbook contains, each worksheet and each Table, with a different icon for each kind. For CharlesRiver.xlsx, choosing the Table objects, such as T17_SalesInvoiceLine, is the better choice, because a Table already defines its header row and its extent. Once the data has been loaded, the list of applied steps becomes a record of how the data was prepared, which is exactly the kind of evidence a reviewer looks for.
+
+Power Query also gives each column a data type when it reads a workbook, and it records the choice as a step named Changed Type. It decides by looking at only the first 200 rows, so a column whose first rows are unusual can get the wrong type. The Discount column of the invoice lines is an example: the first 200 lines were billed before any promotion, so their Discount is 0, and Power Query may type the column as a whole number, which would round every discount rate to 0. Check the type of every column you will calculate with before you load a query, as Tutorial 4.1 does.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out

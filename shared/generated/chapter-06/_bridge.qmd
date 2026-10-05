@@ -1,0 +1,7 @@
+| Effect on margin dollars | Q3 to Q4 |
+| --- | --- |
+| Volume | $7,885.63 |
+| Mix at list margin | ($3,317.93) |
+| Price-list reductions | $1,073.25 |
+| Promotions | ($120,687.02) |
+| Standard cost change | $0.00 |

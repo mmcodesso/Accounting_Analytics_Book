@@ -18,6 +18,9 @@ After completing this chapter, you will be able to:
 6. Use source-to-ledger traceability to test whether operational transactions are completely and accurately recorded in the general ledger.
 :::
 
+::: {.chapter-slides data-chapter="chapter-02"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 You are a newly hired internal auditor at Charles River, a mid-size home furnishings company that sells furniture, lighting, textiles, and decorative accessories through wholesale and direct-to-business channels. Your supervisor has asked you to assess the quality of the company's accounting data before the team begins the year-end audit. You start by opening the Charles River Excel workbook and examining the Order-to-Cash tables. In the Customer table, you notice two customers listed under exactly the same name, and you cannot tell at a glance whether they are one company or two. In the Shipment table, hundreds of shipments have no tracking number, and some shipments from years ago are still marked "In Transit." You then turn to the Accounting Core tables. In the GLEntry table, a small number of entries carry neither a debit nor a credit amount, and the extract runs several weeks into a fiscal year that has barely begun. Before the audit team can run analytical procedures on revenue, test for duplicate payments, or evaluate journal entries for signs of management override, someone needs to determine whether the underlying data is reliable. Your supervisor has asked you to prepare that assessment. This chapter will give you the vocabulary, the framework, and the practical skills to evaluate whether accounting data is fit for analysis.

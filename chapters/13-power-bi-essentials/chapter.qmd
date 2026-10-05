@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-13"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is spring 2027, and the fiscal 2026 statements are final. You are still the controller's staff accountant, and the requests that reach you have taken on a pattern. Every month the sales manager asks for revenue by customer segment, the marketing manager asks what the promotions cost, and the product managers ask how their item groups are doing. Each request produces another workbook, built from the same data and copied, filtered, and charted a little differently. Last month two of those workbooks reached the same meeting with different totals for the Furniture discounts, and nobody could say at once which one was right.

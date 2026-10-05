@@ -46,14 +46,14 @@ The **Applied Steps** list now ends with one step for the filter and one for the
 
 ![The Item Query in the Power Query Editor.](/visuals/svg/fig-04-03-power-query-editor-item.svg){#fig-04-03 fig-alt="A mock of the Power Query Editor. The Queries pane lists SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram, with Item selected. The preview shows the first items that have a list price, with the columns ItemID, ItemName, ItemGroup, and ListPrice, and the filtered ListPrice column is outlined. The Applied Steps list reads Source, Navigation, Changed Type, Filtered Rows, and Removed Other Columns, with the last two outlined, and the status bar shows how many columns and rows remain."}
 
-**Step 6. Check the data types.** The icon at the left of each column header shows the column's data type.
+**Step 6. Check the data types.** The icon at the left of each column header shows the column's data type, which Power Query chose in the Changed Type step by looking at only the first 200 rows.
 
-a. Select the **SalesInvoice** query and look at the icon on the InvoiceDate column header.
-b. If the column shows a time as well as a date, such as 12:00:00 AM, click the icon and choose **Date**.
-c. Do the same for DueDate and PaymentDate.
-d. Select the **SalesInvoiceLine** query and confirm that Quantity, BaseListPrice, UnitPrice, Discount, and LineTotal have a decimal number type.
+a. Select the **SalesInvoice** query. If InvoiceDate shows a time as well as a date, such as 12:00:00 AM, click the icon on its header, choose **Date**, and click **Replace current** when Power Query asks whether to replace the current conversion.
+b. Do the same for DueDate and PaymentDate.
+c. Check that FreightAmount shows the decimal number icon, 1.2. If it shows the whole number icon, 123, choose **Decimal Number** and click **Replace current** in the same way.
+d. Select the **SalesInvoiceLine** query and check Quantity, BaseListPrice, UnitPrice, Discount, and LineTotal in the same way.
 
-Keep every row of both queries, because the analysis will compare several periods.
+Discount needs the most care. The first 200 invoice lines carry no promotion, so Power Query may have typed Discount as a whole number, which rounds every rate, such as 0.1, to 0. **Replace current** corrects the type in the Changed Type step, before any value is rounded, whereas **Add new step** would correct it only after the rates were lost. Keep every row of both queries, because the analysis will compare several periods.
 
 **Step 7. Load the queries into the workbook.**
 

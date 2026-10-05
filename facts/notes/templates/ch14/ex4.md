@@ -5,4 +5,4 @@
      (Chapter 6's bridge). (3) Each item has one StandardCost, so cost per unit changes only with the mix, which the mix effect
      already includes (Chapter 6). (5) Q3: fewer units than Q2 (volume) and the first month of promotion {{ promotion }} ({{ start_month }}) together; Q4:
      volume, mix and price lists small, promotions larger than the whole decline. (6) Lighting {{ d.C }}-Q4: {{ lighting.pq|money }} to {{ lighting.gm|money }};
-     volume {{ s(lighting.volume) }}, mix {{ s(lighting.mix) }}, price lists {{ s(lighting.lists) }}, promotions {{ s(lighting.promotions) }}: a volume decline, not a price effect. -->
+     volume {{ s(lighting.volume) }}, mix {{ s(lighting.mix) }}, price lists {{ s(lighting.lists) }}, promotions {{ s(lighting.promotions) }}: a {{ main.name }} {{ main.direction }}{{ ', not a price effect' if not main.price }}. -->

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/excel_analysis.py": "929a625979250eb74aa50f12d8b2ab2a870521bd2b1ec8d38820ac5d6353dbb7",
+    "shared/calculations/invoice_margin.py": "8948f830bec9e622f0961eebaf9322c4cc88cc68d22f14273c475c5fdc5c1d70",
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
+    "scripts/slides/refresh_excel.py": "df19257d870f29aaf80ff25fceb3927afe5cc68f332f212a24280dc552a463e9",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/figures/ch04.py": "9b7015687c3a7ffd27a9c94ad34d66b0f457e106b1860c73b43fe049066ff723",
+    "visuals/src/fig-04-05-cell-reference-types.drawio": "34d4fbb6722424a6eea0dead001f6a2bebae0dbe0f48137492edd4482f9dc6c6",
+    "visuals/svg/fig-04-05-cell-reference-types.svg": "cef670609c119ac287ab5fa450cc875229d82ce138a05181cd9f6c5ed423688f"
+  },
+  "artifact_sha256": {
+    "relative.svg": "a449ba060d83c27eb931d8c22654361ba460e7a5128cd105b3ece9b718913b58",
+    "relative.png": "c9c7c336bf4355f125dfb7ead16893fba856417f4a185442d4251b29229aa9d3",
+    "absolute.svg": "c82dcd6e885239dd965b2ba53986b9229fa2c24d1274b32feaa70a04419ad77e",
+    "absolute.png": "8ce9b8870b7dc555aacc454ce7eca37a896d585554f0342728d0869ad0314d6b",
+    "mixed.svg": "af6d7d54bb38d081270617b42b41cb984c63c5bf0dbd36b33dcaccb20d421166",
+    "mixed.png": "ca9841a35b859ac51071c8314a5254c278daf261a29b6ea956a5f9eb23945611",
+    "_control-totals.qmd": "1c291eb06dfdadecb27a6d46370a5a901f8a0134e392ae547a92b2b0e8b0ecfc"
+  },
+  "control_totals": {
+    "rows": 27933,
+    "line_total": 86446845.84,
+    "invoice_subtotal": 86446845.84
+  }
+}

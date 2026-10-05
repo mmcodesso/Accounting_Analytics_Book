@@ -18,6 +18,7 @@ REVENUE_LINES = [("4010", "Furniture"), ("4020", "Lighting"), ("4030", "Textiles
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
           "November", "December"]
 WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+ORDINALS = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 # Chapter 5's Furniture product type codes (tbl-05-03), singular and plural.
 TYPE_NAMES = {"BKC": ("bookcase", "bookcases"), "BNH": ("bench", "benches"), "CON": ("console table", "console tables"),
               "CTB": ("coffee table", "coffee tables"), "DSK": ("desk", "desks"), "NGT": ("nightstand", "nightstands"),
@@ -44,6 +45,15 @@ def lines(d, year: int) -> list[dict]:
 
 def total(rows, field: str, **match) -> float:
     return sum(r[field] for r in rows if all(r[k] == v for k, v in match.items()))
+
+
+def period(start: str, end: str) -> str:
+    """A promotion's effective months in prose: "November 2025", "September to October 2025" (an end on or before the
+    start's month gives the start's month alone)."""
+    s, e = MONTHS[int(start[5:7]) - 1], MONTHS[int(end[5:7]) - 1]
+    if end[:7] <= start[:7]:
+        return f"{s} {start[:4]}"
+    return f"{s} to {e} {start[:4]}" if start[:4] == end[:4] else f"{s} {start[:4]} to {e} {end[:4]}"
 
 
 def series(items: list[str]) -> str:
@@ -114,13 +124,14 @@ def ex1(d, claim):
     for sid, number, date, posted in invoices:
         groups = d.q("SELECT i.ItemGroup, ROUND(SUM(l.LineTotal), 2) FROM SalesInvoiceLine l JOIN Item i ON i.ItemID = l.ItemID "
                      "WHERE l.SalesInvoiceID = ? GROUP BY 1", sid)
-        shipped = [r[0] for r in d.q("SELECT DISTINCT s.ShipmentDate FROM SalesInvoiceLine l JOIN ShipmentLine sl "
-                                     "ON sl.ShipmentLineID = l.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID "
-                                     "WHERE l.SalesInvoiceID = ? ORDER BY 1", sid)]
-        claim(len(groups) == 1, f"{number} has lines of one item group")
-        claim(len(shipped) == 1, f"{number} shipped on one date")
-        found.append(dict(number=number, date=date, posted=posted, group=" and ".join(g for g, _ in groups), first=groups[0][0],
-                          amounts=dict(groups), amount=sum(a for _, a in groups), shipped=shipped[0] if shipped else None))
+        # the invoice's lines by shipment date (an invoice may bill goods shipped on more than one date)
+        shipped = d.q("SELECT s.ShipmentDate, ROUND(SUM(l.LineTotal), 2) FROM SalesInvoiceLine l JOIN ShipmentLine sl "
+                      "ON sl.ShipmentLineID = l.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID "
+                      "WHERE l.SalesInvoiceID = ? GROUP BY 1 ORDER BY 1", sid)
+        claim(len(groups) > 0 and len(shipped) > 0, f"{number} has invoice lines with shipments")
+        found.append(dict(number=number, date=date, posted=posted, group=" and ".join(g for g, _ in groups),
+                          first=groups[0][0] if groups else None, amounts=dict(groups), amount=sum(a for _, a in groups),
+                          shipped=shipped))
     order = [g for _, g in REVENUE_LINES]
     found.sort(key=lambda i: (order.index(i["first"]) if i["first"] in order else len(order), i["number"]))
     claim(all(abs(r["diff"] - sum(i["amounts"].get(r["group"], 0.0) for i in found)) < 0.005 for r in recon),
@@ -130,12 +141,17 @@ def ex1(d, claim):
     claim(len({i["posted"] for i in found}) == 1, "the invoices were posted on one date")
     claim(d.one("SELECT COUNT(*) FROM Shipment WHERE DeliveryDate IS NOT NULL AND substr(DeliveryDate, 1, 4) <> substr(ShipmentDate, 1, 4)") == 0,
           "every shipment is delivered in the year it ships")
-    early = [i for i in found if i["shipped"] and i["shipped"][:4] == str(d.P)]
+    early = [i for i in found if any(s[:4] == str(d.P) for s, _ in i["shipped"])]
     later = [i for i in found if i not in early]
     claim(len(early) == 1, f"only one of the invoices shipped in {d.P}")
-    claim(len(later) == 2 and len({i["shipped"] for i in later}) == 1 and all(i["shipped"][:4] == str(d.C) for i in later),
-          f"the other two shipped on one date in {d.C}")
     early = early[0] if early else found[0]
+    cut = [(s, a) for s, a in early["shipped"] if s[:4] == str(d.P)]           # the goods shipped in the prior year
+    rest = [(s, a) for s, a in early["shipped"] if s[:4] != str(d.P)]
+    # the dates on which everything else shipped: the other invoices, and the rest of the cutoff invoice
+    dates = sorted({s for i in later for s, _ in i["shipped"]} | {s for s, _ in rest})
+    claim(len(later) > 0 and all(s[:4] == str(d.C) for s in dates),
+          f"the other invoices (and any rest of the cutoff invoice) shipped in {d.C}")
+    when = f"on {dates[0]}" if len(dates) == 1 else (f"between {dates[0]} and {dates[-1]}" if dates else "")
     freight = -balance.get("4050", 0.0)
     billed = d.one("SELECT ROUND(SUM(g.Credit) - SUM(g.Debit), 2) FROM GLEntry g WHERE g.AccountID = ? AND g.FiscalYear = ? "
                    "AND g.SourceDocumentType = 'SalesInvoice'", d.account("4050"), d.C)
@@ -146,8 +162,9 @@ def ex1(d, claim):
                 zero=sum(1 for r in tb if r[3] == 0), debits=debits, opr=opr, contra=contra, net_rev=net_rev, cogs=cogs, gm=gm,
                 opex=opex, oi=oi, other=other, loss=loss, interest=interest, ni=ni, assets=assets, liabilities=liabilities,
                 equity=equity, recon=recon, invoices=found, posted=found[0]["posted"],
-                early=dict(number=early["number"], shipped=early["shipped"], amount=early["amount"]),
-                others=WORDS[len(later)], others_shipped=later[0]["shipped"] if later else None, freight=freight)
+                early=dict(number=early["number"], shipped=" and ".join(s for s, _ in cut), amount=early["amount"],
+                           cut=sum(a for _, a in cut), rest=sum(a for _, a in rest), part=bool(rest)),
+                others=WORDS[len(later)] if len(later) < len(WORDS) else len(later), others_shipped=when, freight=freight)
 
 
 @note("ch06.ex2", EXERCISES)
@@ -236,10 +253,12 @@ def ex4(d, claim):
     top = max(types, key=lambda t: abs(change[t][1]))
     claim(change[top][0] < 0 and change[top][1] < 0 and per(b[top], "L") < per(a[top], "L"),
           f"{top}'s price and cost per unit fell because cheaper items made up more of the quarter (its list price per unit fell)")
+    # the other types whose price and cost per unit both fell like the example's, and those where both rose
     same = sorted((t for t in types if t != top and change[t][0] < 0 and change[t][1] < 0), key=lambda t: -b[t]["U"])
-    claim(len(same) == 2, f"two other types' price and cost per unit fell like {top}'s")
-    claim(any((change[t][0] > 0) == (change[t][1] > 0) for t in types if t != top and t not in same),
-          "other types' price and cost per unit also move together")
+    rose_both = sorted((t for t in types if change[t][0] > 0 and change[t][1] > 0), key=lambda t: -b[t]["U"])
+    parts = ([f"{series(same)} move{'s' if len(same) == 1 else ''} the same way"] if same else []) + \
+            ([f"price and cost per unit rose together for {series(rose_both)}"] if rose_both else [])
+    together = "; " + ", and ".join(parts) if parts else ""
     moves = sorted(types, key=lambda t: b[t]["U"] - a[t]["U"])
     fell, rose = moves[:2], moves[::-1][:2]
     claim(all(b[t]["U"] < a[t]["U"] for t in fell) and all(b[t]["U"] > a[t]["U"] for t in rose), "two types fell and two rose")
@@ -247,7 +266,8 @@ def ex4(d, claim):
     return dict(q3=q3, q4=q4, change=q4 - q3, price=price, cost=cost, volume=volume, mix=mix,
                 top=dict(code=top, plural=TYPE_NAMES[top][1], p3=per(a[top], "R"), p4=per(b[top], "R"),
                          c3=per(a[top], "C"), c4=per(b[top], "C")),
-                same=same, promotions=round(promotions, -2), fell=[unit(t) for t in fell], rose=[unit(t) for t in rose])
+                same=same, together=together, promotions=round(promotions, -2), fell=[unit(t) for t in fell],
+                rose=[unit(t) for t in rose])
 
 
 @note("ch06.ex5", EXERCISES)
@@ -262,13 +282,31 @@ def ex5(d, claim):
                              flagged=abs(diff) > 0.10 * expected and abs(diff) > 50000))
     flagged = [r for r in rows if r["flagged"]]
     missed = sorted((r for r in rows if not r["flagged"]), key=lambda r: -abs(r["diff"]))[:2]
-    claim(abs(missed[0]["diff"]) == max(abs(r["diff"]) for r in rows), "the largest unflagged difference is the largest dollar difference")
-    largest = max(GROUPS, key=lambda g: total(now, "R", grp=g))
-    claim(all(r["group"] == largest for r in missed), "the two largest unflagged differences are in the largest product line")
-    claim((missed[0]["group"], missed[0]["q"]) == ("Furniture", 4),
-          "the largest unflagged difference is Furniture Q4, the quarter of the promotion discounts (Tutorial 6.3)")
+    # the largest unflagged difference's rank among all the differences in dollars ("the second-largest")
+    rank = sorted(rows, key=lambda r: -abs(r["diff"])).index(missed[0]) + 1
+    largest = "largest" if rank == 1 else f"{ORDINALS[rank] if rank < len(ORDINALS) else f'{rank}th'}-largest"
+    # the product lines by revenue, and how far down the list the unflagged differences reach
+    lines_ = sorted(GROUPS, key=lambda g: -total(now, "R", grp=g))
+    reach = max(lines_.index(r["group"]) + 1 for r in missed)
+    claim(reach <= 2, "the two largest unflagged differences are in the largest product lines")
+    furniture_q4 = next(r for r in rows if (r["group"], r["q"]) == ("Furniture", 4))
+    claim(furniture_q4["diff"] < 0, "Furniture Q4 revenue fell against the prior year (the quarter of the promotion discounts, Tutorial 6.3)")
     claim(any(r["group"] == "Services" for r in flagged), "Services has flagged differences")
-    return dict(flagged=flagged, missed=missed)
+    # Requirement (5)'s example: the largest flagged difference, split into volume and price (units and price per unit)
+    claim(len(flagged) > 0, "the threshold flags at least one difference")
+    top = max(flagged, key=lambda r: abs(r["diff"]))
+    u0, u1 = total(before, "U", grp=top["group"], q=top["q"]), total(now, "U", grp=top["group"], q=top["q"])
+    r0, r1 = total(before, "R", grp=top["group"], q=top["q"]), total(now, "R", grp=top["group"], q=top["q"])
+    volume, price = (u1 - u0) * r0 / u0, u1 * (r1 / u1 - r0 / u0)
+    claim(abs(volume + price - top["diff"]) < 0.01, "the volume and price parts add up to the difference")
+    driver = "volume" if abs(volume) > abs(price) else "price"
+    claim(abs(max(volume, price, key=abs)) > 0.5 * abs(top["diff"]),
+          f"{top['group']} Q{top['q']}'s difference is mostly {driver} (that part is more than half of it)")
+    example = dict(group=top["group"], q=top["q"], diff=top["diff"], driver=driver, units=u1 / u0 - 1,
+                   price=(r1 / u1) / (r0 / u0) - 1)
+    # the note points Furniture Q4 (the promotion quarter) to its evidence only when the threshold misses it
+    return dict(flagged=flagged, missed=missed, largest=largest, example=example, furniture_q4_missed=not furniture_q4["flagged"],
+                lines="the largest product line" if reach == 1 else f"the {WORDS[reach]} largest product lines")
 
 
 @note("ch06.ex6", EXERCISES)
@@ -312,8 +350,7 @@ def ex6(d, claim):
         if start[:4] == str(d.P):
             dates = [r["date"] for r in rows if r["promo"] == pid]
             months += [int(x[5:7]) for x in dates]
-            when = f"{MONTHS[int(start[5:7]) - 1]} {start[:4]}" if start[:7] == end[:7] else start[:4]
-            late.append(dict(id=pid, scope=segment or group or collection, when=when))
+            late.append(dict(id=pid, scope=segment or group or collection, when=period(start, end)))
     claim(len(late) == 2, f"two promotions of {d.P} have lines invoiced in {d.C}")
     main = max(promos, key=lambda p: promos[p][0])
     claim(any(r["date"] > info[main][5] for r in rows if r["promo"] == main),

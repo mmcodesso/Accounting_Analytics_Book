@@ -16,6 +16,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-07"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 The controller has read your analysis of the Furniture margin, and she is now preparing for the planning meeting for fiscal 2027. She has three requests. First, she needs a revenue forecast for the coming quarter that she can defend when the sales team pushes for a more optimistic number. Second, she wants to know how 2026 compared with the budget, because the budget will be the starting point for next year's plan and she suspects that some of its assumptions were wrong. Third, the sales team has proposed repeating the Furniture Seasonal Promotion, and she wants a recommendation based on what the promotion actually cost and what it would need to achieve to pay for itself. Each request asks what could happen rather than what did happen. This chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.

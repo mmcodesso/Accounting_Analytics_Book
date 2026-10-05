@@ -1,0 +1,430 @@
+---
+title: "Joining and Summarizing Data in SQL"
+subtitle: "Chapter 10"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-10.pptx
+---
+
+## Learning objectives {#ch10-01 .balanced .stepwise}
+
+- Join through keys and retain the intended population.
+- Group, profile, and reconcile amounts.
+- Prevent fan-out and double counting.
+- Compare production with labor over matching dates.
+
+::: {.notes}
+Purpose: extend a query from one table to an accounting explanation. Allow 60 seconds. The important new decision is the grain: what one result row represents before and after a join or aggregate. Each technical step should preserve the population or explicitly document its change. Ask students what could go wrong with a sum after adding a descriptive field. Transition: define the controller's follow-up questions.
+:::
+
+# Join the facts at their keys {#ch10-module-2}
+
+::: {.notes}
+The close has the variance; its related work order and item provide the product context.
+:::
+
+## Products, years, and production activity {#ch10-03 .balanced .stepwise}
+
+Which product groups carry the variance?
+
+How did the amounts change over time?
+
+Did output fall, or did costs rise?
+
+::: {.notes}
+Purpose: connect joins and grouping to business questions. Allow 60 seconds. The prior ranking showed overhead in the largest work-order closes. It did not identify a product group or explain the population total. WorkOrderClose links to WorkOrder, which links to Item. Production completions and labor records answer the activity question. Ask which table supplies each requested attribute. Transition: identify the matching grain.
+:::
+
+## A join returns matching row pairs {#ch10-04 .balanced .stepwise}
+
+Name what one source row represents.
+
+Identify the matching key and expected multiplicity.
+
+Predict the count before joining.
+
+::: {.notes}
+Purpose: replace visual similarity with key-based reasoning. Allow 60-90 seconds. A correct many-to-one match adds attributes without multiplying source rows. A one-to-many match intentionally expands them. Charles River declares no foreign keys, so existence and uniqueness need evidence from the data. Ask whether joining a close to its work order should increase the number of closes. Transition: read the first join.
+:::
+
+## A close matches its work order {#ch10-05 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-10/_query-closes_to_work_orders.qmd >}}
+
+::: {.notes}
+Purpose: read a complete inner join. Allow 90 seconds. woc and wo are table aliases, and the equality compares the corresponding WorkOrderID columns. Qualifying names avoids ambiguity and helps a reviewer see each field's source. An inner join returns only matching pairs. Ask students to compare its count with WorkOrderClose and explain what fewer or more rows would suggest. Transition: follow the second key.
+:::
+
+## The item key supplies the product group {#ch10-06 .balanced}
+
+![](/_shared/generated/chapter-10/item-workorder.svg){fig-alt="Item.ItemID matches WorkOrder.ItemID; endpoints are computed from the public dataset." width=95%}
+
+::: {.notes}
+Purpose: show the focused relationship needed to add ItemGroup. Allow 60 seconds. The diagram uses the same observed-cardinality calculation as the book. A work order identifies its item, while an item can have many work orders. Continue from the close through WorkOrder before joining Item; WorkOrderClose has no direct ItemGroup attribute. Ask which source key must be retained to test the two-join result. Transition: choose an appropriate join type.
+:::
+
+## INNER JOIN and LEFT JOIN answer different questions {#ch10-07 .balanced .stepwise}
+
+**INNER JOIN:** only matching pairs.
+
+**LEFT JOIN:** every left-side row, with NULLs for an unmatched right side.
+
+The left table defines the retained population.
+
+::: {.notes}
+Purpose: make the join type a population decision. Allow 60-90 seconds. An item activity report may need every item, including those with no close in the year. A result focused only on closes can use matching descriptive records once the keys are checked. LEFT JOIN does not prevent multiplication when several right rows match. Ask whether a retained item with NULL close fields means zero activity or a failed key match. Transition: place right-side conditions deliberately.
+:::
+
+## Place a right-side date condition in ON {#ch10-08 .balanced .sql-example .stepwise}
+
+```sql
+FROM WorkOrder AS wo
+LEFT JOIN WorkOrderClose AS woc
+  ON woc.WorkOrderID = wo.WorkOrderID
+ AND woc.CloseDate >= '2026-01-01'
+ AND woc.CloseDate <  '2027-01-01'
+```
+
+This teaching excerpt retains work orders with no 2026 close.
+
+::: {.notes}
+Purpose: explain a common outer-join error. Allow 90 seconds. A WHERE condition requiring a right-side date would reject NULL dates on unmatched rows. In ON, it controls which closes match while retaining the left work orders. This excerpt is the join clause, not a complete SELECT. Ask students to identify a work order whose retention would change if the condition moved to WHERE. Transition: use unmatched rows as a test.
+:::
+
+## An anti-join finds missing matches {#ch10-09 .balanced .sql-example .stepwise}
+
+```sql
+FROM WorkOrder AS wo
+LEFT JOIN WorkOrderClose AS woc
+  ON woc.WorkOrderID = wo.WorkOrderID
+WHERE woc.WorkOrderCloseID IS NULL
+```
+
+Test a right-side key that cannot be NULL in a matched row.
+
+::: {.notes}
+Purpose: connect outer joins with completeness questions. Allow 60-90 seconds. This excerpt retains work orders without a matching close. An open work order can be expected, so unmatched is a classification to interpret, not automatically a failure. Testing a nullable descriptive field would confuse missing attributes with missing rows. Ask which status and date fields help classify the result. Transition: compare alternative anti-match expressions.
+:::
+
+## NOT EXISTS handles a missing match explicitly {#ch10-10 .balanced .stepwise}
+
+`NOT EXISTS` asks whether a related row is absent.
+
+A NULL inside a `NOT IN` list can make the result unknown.
+
+Test the alternatives on a known unmatched record.
+
+::: {.notes}
+Purpose: warn about a silent population loss. Allow 60 seconds. A correlated NOT EXISTS checks matching rows directly and does not require a non-NULL list of values. With NOT IN, a NULL in the subquery can prevent expected rows from passing. Do not choose an expression solely because it is shorter. Ask students to explain the expected result before running either form. Transition: trace ledger source documents.
+:::
+
+## A ledger source needs type and ID {#ch10-11 .balanced .sql-example .stepwise}
+
+```sql
+ON gl.SourceDocumentType = 'WorkOrderClose'
+AND gl.SourceDocumentID = woc.WorkOrderCloseID
+```
+
+Different document tables can reuse the same numeric ID.
+
+::: {.notes}
+Purpose: prevent false cross-document matches. Allow 60 seconds. SourceDocumentID is polymorphic: its meaning depends on SourceDocumentType. The same number could identify a work-order close, invoice, or another event. Even a row-count check can miss plausible-looking but incorrect pairs. Ask students to trace one source ID with and without its type condition. Transition: summarize at a defined grain.
+:::
+
+# Summarize and reconcile {#ch10-module-12}
+
+::: {.notes}
+A grouped result changes the unit of observation. Its totals still need an independent control.
+:::
+
+## GROUP BY changes the result grain {#ch10-13 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-10/_query-variance_by_group.qmd >}}
+
+::: {.notes}
+Purpose: read the complete variance summary. Allow 90 seconds. The joins supply ItemGroup, the date predicate selects fiscal 2026 closes, and each result row becomes one group. COUNT counts closes in that joined population; SUM totals their amounts. Grouping does not repair a multiplied input. Ask students to describe the result grain before and after GROUP BY. Transition: interpret and reconcile the result.
+:::
+
+## Furniture carries the largest variance {#ch10-14 .balanced}
+
+{{< include /_shared/generated/chapter-10/_groups.qmd >}}
+
+::: {.notes}
+Purpose: interpret the group-level evidence. Allow 60 seconds. Furniture is largest in both close count and total variance in this displayed year. That alone does not show a worse cost per unit or establish a product-specific cause. Compare comparable activity and standards before making that claim. Ask students what denominator would help distinguish scale from intensity. Transition: prove that the grouped amounts cover the ledger population.
+:::
+
+## Use the related ledger postings as a control {#ch10-15 .balanced .sql-example}
+
+{{< include /_shared/generated/chapter-10/_query-ledger_variance.qmd >}}
+
+::: {.notes}
+Purpose: show a separately expressed reconciliation query. Allow 60 seconds. This selects account 5080 through its verified AccountID and restricts the source to WorkOrderClose. Net debit less credit preserves the variance sign. The closing journal is excluded by the source condition, not by subtracting an unexplained number. Ask why an unfiltered year-end account balance would be an unsuitable comparison. Transition: read the two totals together.
+:::
+
+## The grouped variance reconciles {#ch10-16 .balanced}
+
+{{< include /_shared/generated/chapter-10/_ledger.qmd >}}
+
+::: {.notes}
+Purpose: establish the bridge from operational closes to accounting postings. Allow 60 seconds. Agreement to cents supports the extraction and aggregation under the defined filters. It does not independently establish the validity of every cost feeding the close. Retain both queries and the reconciliation as part of the workpaper. Ask which mismatch would lead back to the join and which to the posting-period filter. Transition: distinguish several kinds of count.
+:::
+
+## Count the thing the question names {#ch10-17 .balanced .step-rows}
+
+| Expression | What it counts |
+|---|---|
+| COUNT(*) | Rows |
+| COUNT(column) | Non-NULL values |
+| COUNT(DISTINCT key) | Distinct non-NULL keys |
+| SUM(amount) | Non-NULL amounts |
+
+::: {.notes}
+Purpose: connect aggregation with missing values and population grain. Allow 60-90 seconds. A payroll register count is not a people count. COUNT on a right-side key in a left join distinguishes matches from the retained unmatched row. SUM skips NULLs, so a total can conceal incomplete attributes. Ask which pair of counts would expose missing employee keys. Transition: group by stable identity.
+:::
+
+## Group by a key, then show its label {#ch10-18 .balanced .stepwise}
+
+Names and job titles can be shared.
+
+Include the stable identifier in the grouping.
+
+Every selected field should be grouped or aggregated.
+
+::: {.notes}
+Purpose: prevent the accidental combination of different entities. Allow 60 seconds. Two employees can have the same title and two items can have similar names. SQLite permits some bare columns beside aggregates, but the chosen value may not express the intended relationship. Use explicit grouping even when the engine accepts a looser query. Ask students how grouping only by JobTitle changes the question. Transition: filter rows and groups at different stages.
+:::
+
+## WHERE and HAVING operate at different stages {#ch10-19 .balanced .stepwise}
+
+**WHERE:** choose source rows before aggregation.
+
+**HAVING:** choose groups after aggregation.
+
+A date restriction and a group-total threshold have different jobs.
+
+::: {.notes}
+Purpose: explain why conditions belong in different clauses. Allow 60-90 seconds. Tutorial 10.1 selects the year before summing and then retains items above its stated variance threshold. Applying a threshold to each row instead would calculate a different total. Ask students to identify a group of small rows whose sum passes a threshold even though no individual row does. Transition: profile the source before relying on totals.
+:::
+
+## A profile checks the source contract {#ch10-20 .balanced .stepwise}
+
+Count rows, required values, and distinct keys.
+
+List categories and minimum/maximum dates.
+
+Inspect unmatched keys and unexpected ranges.
+
+::: {.notes}
+Purpose: implement Chapter 2's quality questions in SQL. Allow 60 seconds. Each summary tests a particular expectation. A maximum date reveals a coverage boundary that an annual total can hide. Distinct categories expose misspellings or unexpected states. Counts should be interpreted together, since a plausible total can coexist with duplicates or omitted records. Ask what a full-year label should mean if the latest source date is earlier than year-end. Transition: work through the first tutorial.
+:::
+
+## Tutorial 10.1: prove the joined summary {#ch10-21 .balanced .stepwise}
+
+Match the join count to the close population.
+
+Reconcile the item-group variance to the ledger.
+
+Demonstrate which items disappear when a date filter moves.
+
+[Open Tutorial 10.1](https://aa.accountinganalyticshub.com/chapters/10-joining-and-summarizing/chapter.html#guided-tutorial-10.1-joining-the-variance-to-its-work-orders-and-products)
+
+::: {.notes}
+Purpose: combine joins, grouping, and outer-join behavior in a reviewed procedure. Allow three minutes. Students should retain the count checks and explain the year and source-type rules. Have a partner choose an item with no qualifying close and test both placements of the date condition. The resulting difference is a population change, not a software glitch. Transition: prevent repeated header amounts.
+:::
+
+# Prevent double counting {#ch10-module-22}
+
+::: {.notes}
+Amounts belong to a grain. Preserve that grain when joining and summing.
+:::
+
+## Fan-out repeats a header amount {#ch10-23 .balanced}
+
+Illustration: summing this column counts the invoice three times.
+
+| Joined row | Header amount |
+|---|---|
+| Invoice H + line A | Same invoice total |
+| Invoice H + line B | Same invoice total |
+| Invoice H + line C | Same invoice total |
+
+::: {.notes}
+Purpose: make fan-out visible without treating the illustration as dataset evidence. Allow 60-90 seconds. Joining one invoice to three lines correctly returns three pairs, but the header total appears on every pair. Line values belong to the line grain; the header total belongs to the invoice. SUM DISTINCT is not a general repair because different invoices can share an amount. Ask how to aggregate both measures safely. Transition: summarize before combining independent detail.
+:::
+
+## Aggregate each detail population first {#ch10-24 .balanced .stepwise}
+
+Summarize receipts to one row per order line.
+
+Summarize invoices to one row per order line.
+
+Join the two summaries through that key.
+
+::: {.notes}
+Purpose: generalize the fan-out control to multiple detail tables. Allow 60-90 seconds. Joining raw receipts directly to raw invoices can create every receipt-invoice pair within an order line. Aggregating each side first avoids that multiplication when the intended comparison is totals by line. Verify uniqueness of the grouping key and retain count and amount controls. Ask why DISTINCT after a bad join might remove legitimate repeated amounts. Transition: name subquery roles.
+:::
+
+## Subqueries serve three common roles {#ch10-25 .balanced .stepwise}
+
+**Scalar:** one value for a calculation or comparison.
+
+**List or existence test:** select matching entities.
+
+**Derived table:** prepare a result before joining it.
+
+::: {.notes}
+Purpose: organize multi-step SQL without treating every nested query as the same device. Allow 60 seconds. A scalar aggregate can provide a control total, a correlated existence test can retain qualifying entities, and a derived table can establish the intended grain. A correlated expression refers to the current outer row. Ask which role fits pre-aggregating receipt quantities. Transition: read clauses in their logical order.
+:::
+
+## Logical evaluation order {#ch10-26 .balanced .stepwise}
+
+FROM and JOIN, then WHERE
+
+GROUP BY, then HAVING
+
+SELECT, then ORDER BY, then LIMIT
+
+::: {.notes}
+Purpose: explain where values become available. Allow 60 seconds. This is a logical reading order, not a claim about the database optimizer's physical execution plan. It explains why row predicates precede grouped totals and why sorting follows the result projection. Ask students to place a source-date condition and an aggregate threshold in this order. Transition: build a pre-closing accounting report.
+:::
+
+## The trial balance needs an explicit closing rule {#ch10-27 .balanced .stepwise}
+
+Group ledger debits less credits by AccountID.
+
+Use the as-of date and exclude identified closing vouchers.
+
+Join Account for labels and verify a zero net balance.
+
+::: {.notes}
+Purpose: connect aggregate SQL to a familiar accounting report. Allow 90 seconds. Tutorial 10.2 reconstructs the pre-closing trial balance and identifies the two relevant closing vouchers. The policy is tied to the report's purpose. A zero net balance shows debits and credits balance within the selection, not that every classification or amount is correct. Ask which omitted balanced journal would evade that control. Transition: follow the manufacturing clearing account.
+:::
+
+## Account 1090 connects cost and standard output {#ch10-28 .balanced .stepwise}
+
+Payroll and factory-cost journals add actual conversion cost.
+
+Completions release conversion cost at standard.
+
+Work-order closes transfer the remaining variance.
+
+::: {.notes}
+Purpose: interpret the ledger flow rather than only its ending balance. Allow 90 seconds. Grouping account 1090 by source document type and year shows which events create and clear the balance. The public tutorial finds rising payroll charges while standard cost released is nearly flat. Cost clearing and variance recognition occur at different process steps. Ask why comparing just account endings would conceal this flow. Transition: inspect the variance components.
+:::
+
+## The growing conversion variance is overhead {#ch10-29 .balanced}
+
+{{< include /_shared/generated/chapter-10/_parts.qmd >}}
+
+::: {.notes}
+Purpose: distinguish the two conversion components. Allow 60 seconds. The direct labor variance is favorable under the dataset's sign convention and becomes less favorable over time. The overhead variance is positive and rises. These amounts describe the standard-cost allocation; they do not identify individual time-record validity. Ask what operational measure would help explain more overhead with similar output. Transition: verify the trial-balance tutorial.
+:::
+
+## Tutorial 10.2: connect the ledger and operations {#ch10-30 .balanced .stepwise}
+
+Reconcile the close total to the ledger.
+
+Match the pre-closing trial balance from Chapter 6.
+
+Explain the source types in account 1090.
+
+[Open Tutorial 10.2](https://aa.accountinganalyticshub.com/chapters/10-joining-and-summarizing/chapter.html#guided-tutorial-10.2-building-the-trial-balance-and-following-the-conversion-cost)
+
+::: {.notes}
+Purpose: require an accounting interpretation alongside correct SQL. Allow three minutes. Students should demonstrate that the trial balance nets to zero and explain why the closing exclusions are appropriate. A partner should select one source-type subtotal and trace it to its event. Retain both the control and the limitation that balanced records can still be wrong. Transition: compare labor with output over matching dates.
+:::
+
+# Compare labor with comparable output {#ch10-module-31}
+
+::: {.notes}
+Define the coverage and denominator before interpreting an efficiency ratio.
+:::
+
+## Output is fairly stable across the years {#ch10-32 .balanced}
+
+{{< include /_shared/generated/chapter-10/_output.qmd >}}
+
+::: {.notes}
+Purpose: assess volume as a candidate explanation. Allow 60 seconds. Units and standard hours move together, with a dip in the middle year. These are full completion-year totals. Standard hours weight the different products by their labor standards, making them more comparable than units alone. The next labor comparison uses a narrower final-year coverage. Ask why different product mixes make a raw unit total incomplete. Transition: align the measurement windows.
+:::
+
+## Time records end before the calendar year {#ch10-33 .balanced .stepwise}
+
+Profile the latest WorkDate.
+
+Restrict comparable output to the same coverage end.
+
+Distinguish work date from payroll pay date.
+
+::: {.notes}
+Purpose: prevent a denominator mismatch. Allow 60-90 seconds. The public time records end on December 11, 2026, so the hours-per-standard-hour comparison limits output through that date. Full-year output would understate the ratio when later labor is absent. Payroll by pay date answers a cash/payroll-period question rather than precisely the same work-date question. Ask students to point to the date field in each query. Transition: interpret the aligned ratios.
+:::
+
+## Indirect hours rise relative to standard hours {#ch10-34 .balanced}
+
+{{< include /_shared/generated/chapter-10/_hours.qmd >}}
+
+::: {.notes}
+Purpose: read ratios built on the aligned output window. Allow 90 seconds. Direct hours remain below one standard hour per standard hour of output, while indirect hours rise. The ratio denominator is the standard hours of actual output, not employee headcount. Some direct entries lack a valid operation, which the tutorial identifies for follow-up. Ask why a plant-wide direct ratio below one does not prove every operation is efficient. Transition: frame the conclusion and its limits.
+:::
+
+## The comparison directs the next investigation {#ch10-35 .balanced .stepwise}
+
+Similar output explains little of the rising variance.
+
+Indirect time and paid overtime deserve further analysis.
+
+Annual totals cannot show when the change occurred.
+
+::: {.notes}
+Purpose: state a supported diagnostic direction. Allow 60 seconds. The public tutorial shows a largely stable output base with more indirect time and overtime. Avoid turning that association into a conclusion that every recorded hour was necessary, correctly assigned, or authorized. The next chapter builds monthly measures; the audit chapter tests the records behind them. Ask what monthly view would separate a one-time shift from a continuing trend. Transition: finish the workpaper.
+:::
+
+## Tutorial 10.3 and chapter handoff {#ch10-36 .balanced .stepwise}
+
+Reconcile people, paid hours, and recorded hours by their grain.
+
+Document the partial final-year window.
+
+Save the query sequence and one qualified conclusion.
+
+[Open Tutorial 10.3](https://aa.accountinganalyticshub.com/chapters/10-joining-and-summarizing/chapter.html#guided-tutorial-10.3-comparing-output-with-the-hours-it-took)
+
+::: {.notes}
+Purpose: complete the analytical comparison. Allow three minutes. Students should distinguish registers from people, work dates from pay dates, and the full-year output exhibit from the coverage-aligned ratio. Ask a partner to reproduce one numerator and its denominator. The assigned exercises require independent queries; the next chapter adds month-level classification, windows, and a saved measure. Transition: references and attribution.
+:::
+
+## References and further reading {#ch10-37 .balanced}
+
+Datar and Rajan (2021): standard costs and variance interpretation.
+
+SQLite: SELECT, joins, grouping, and query behavior.
+
+Public Tutorials 10.1-10.3: worked queries and controls.
+
+[Full Chapter 10 references](https://aa.accountinganalyticshub.com/chapters/10-joining-and-summarizing/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the accounting interpretation and SQL language behavior. The book chapter provides the complete query sequence and reference list.
+
+{{< include /_shared/fragments/_reference-datar-2021.qmd >}}
+
+{{< include /_shared/fragments/_reference-sqlite-select.qmd >}}
+:::
+
+## Attribution and reuse {#ch10-38 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 10 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

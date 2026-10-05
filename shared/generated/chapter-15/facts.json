@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/bi_ch13.py": "ea4d93874a0097b3a9bdcafc365a12a318ccda33a16d64455756da431da924df",
+    "shared/calculations/bi_ch14.py": "6980d165cd344220828f7af9458ddd779b7fe32920073352224c58c9b8f8bf3f",
+    "shared/calculations/bi_ch15.py": "4add0c662fca41d38949c3ec6e543e9de810d9a9677a243c1cc3acae4df6e7fa",
+    "shared/calculations/bi_ch16.py": "337191ea09729afe1d7090e8973dfb99becf003ea033a45eea0f27c686ba7167",
+    "shared/calculations/excel_analysis.py": "929a625979250eb74aa50f12d8b2ab2a870521bd2b1ec8d38820ac5d6353dbb7",
+    "shared/calculations/invoice_margin.py": "8948f830bec9e622f0961eebaf9322c4cc88cc68d22f14273c475c5fdc5c1d70",
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
+    "scripts/slides/refresh_bi.py": "a003c13d3fdce38f78442171511003726839cdf3c1b8d5c89d9266e5a66516cc",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/slides/refresh_excel.py": "df19257d870f29aaf80ff25fceb3927afe5cc68f332f212a24280dc552a463e9"
+  },
+  "artifact_sha256": {
+    "_gross-to-net.qmd": "5fb1426840daf6cf3016efed2c7b391c05805042245ad3cfba70f99883651f21",
+    "_budget-bridge.qmd": "ea1996c57c34b700dcf69a99ad896169594fbf43de64d2380a301d42802f6aa8",
+    "_classification.qmd": "5d8d440001d19033261495ce1b12d73910770a5d8b60d920a8c07658c7c063a3",
+    "_window.qmd": "e5541e28b184302b3e441e02439b59484f37cc96402bff240037fcb2593bb0b8",
+    "window.svg": "364343992d171ac332d3526f515b7e4302f6f626ec9c8d29b7078dc5e0edfa02",
+    "window.png": "50773588dfa2f47aab2a59a43fec365688901214af801662600e6fbbe697fc2c",
+    "window.csv": "9b18c73d2d8d81561f7c912e6eca328f080a352ac2faf174cb57dab6591b8f78"
+  },
+  "public_examples": {
+    "gross_to_net": [
+      33589137.4518,
+      30118530.1371,
+      29756420.08
+    ],
+    "budget_totals": {
+      "budget": 8289648.799999998,
+      "actual": 6471696.58,
+      "variance": -1817952.2199999986,
+      "volume": -1643193.2581934882,
+      "classification": 2.9103830456733704e-11,
+      "remaining": -174758.96180651028
+    },
+    "budget": {
+      "rows": {
+        "(Blank)": {
+          "budget": 2024273.7,
+          "actual": 2040916.480000001,
+          "variance": 16642.78000000096,
+          "flexed": 2024273.7,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": 16642.78000000096
+        },
+        "Administration": {
+          "budget": 659199.3599999999,
+          "actual": 546710.1099999996,
+          "variance": -112489.25000000023,
+          "flexed": 659199.3599999999,
+          "volume": 0.0,
+          "classification": -101828.63999999998,
+          "remaining": -10660.610000000248
+        },
+        "Customer Service": {
+          "budget": 230151.96000000008,
+          "actual": 221422.9,
+          "variance": -8729.060000000085,
+          "flexed": 230151.96000000008,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -8729.060000000085
+        },
+        "Design Services": {
+          "budget": 558149.4199999998,
+          "actual": 534250.2799999999,
+          "variance": -23899.139999999898,
+          "flexed": 558149.4199999998,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -23899.139999999898
+        },
+        "Executive": {
+          "budget": 854857.5599999996,
+          "actual": 820566.2399999999,
+          "variance": -34291.319999999716,
+          "flexed": 854857.5599999996,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -34291.319999999716
+        },
+        "Marketing": {
+          "budget": 286786.93000000005,
+          "actual": 276150.82,
+          "variance": -10636.110000000044,
+          "flexed": 286786.93000000005,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -10636.110000000044
+        },
+        "Purchasing": {
+          "budget": 385041.95999999996,
+          "actual": 370153.16000000003,
+          "variance": -14888.79999999993,
+          "flexed": 385041.95999999996,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -14888.79999999993
+        },
+        "Research and Development": {
+          "budget": 203993.58,
+          "actual": 194798.15000000005,
+          "variance": -9195.429999999935,
+          "flexed": 203993.58,
+          "volume": 0.0,
+          "classification": null,
+          "remaining": -9195.429999999935
+        },
+        "Sales": {
+          "budget": 2734179.0499999993,
+          "actual": 1018872.2099999997,
+          "variance": -1715306.8399999996,
+          "flexed": 1090985.791806511,
+          "volume": -1643193.2581934882,
+          "classification": null,
+          "remaining": -72113.58180651139
+        },
+        "Warehouse": {
+          "budget": 353015.27999999974,
+          "actual": 447856.22999999975,
+          "variance": 94840.95000000001,
+          "flexed": 353015.27999999974,
+          "volume": 0.0,
+          "classification": 101828.64000000001,
+          "remaining": -6987.690000000002
+        }
+      },
+      "centers": [
+        "(Blank)",
+        "Administration",
+        "Customer Service",
+        "Design Services",
+        "Executive",
+        "Marketing",
+        "Purchasing",
+        "Research and Development",
+        "Sales",
+        "Warehouse"
+      ],
+      "monthly": [
+        99620.67428694142,
+        -36350.147905392805,
+        -43925.89157354087,
+        -34491.805498530855,
+        -38383.264696177794,
+        -39824.68950621516,
+        98203.74293550174,
+        -36397.02233091276,
+        -37008.458681508084,
+        -37116.98835673055,
+        -36459.17937076453,
+        -32625.93110918079
+      ],
+      "flexed_commission": 621780.0318065117
+    },
+    "window": {
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09",
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ],
+      "model_history": [
+        1.4397226443029119,
+        1.4407265668290952,
+        1.4566667623670728,
+        1.4639684404320787,
+        1.4468097948568779,
+        1.469780044306971,
+        1.5075021374234627,
+        1.4921786758048283,
+        1.4940760040412102,
+        1.5444861635544227,
+        1.5279556623964607,
+        1.511048876792922
+      ],
+      "visible_axis": [
+        1.7141785120897644,
+        1.736945174651769,
+        1.8018209382947141,
+        1.7500913824788933,
+        1.679333897955988,
+        1.6095965275059325,
+        1.6298963551290502,
+        1.6138731696491961,
+        1.6058478396683902,
+        1.6307945170995484,
+        1.5454613278413094,
+        1.511048876792922
+      ]
+    }
+  }
+}

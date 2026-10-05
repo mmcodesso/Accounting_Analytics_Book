@@ -48,3 +48,9 @@ drafts/
 
 # Built companion files (uploaded to the companion release, never committed)
 outputs/
+
+# Chapter presentation build products
+slides/_variables.yml
+slides/_shared/
+slides/_build/
+slides/.quarto/

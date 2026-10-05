@@ -6,11 +6,42 @@
 # audience: public files go on the book's companion release; instructor files go on the private
 # instructor release (exercise, case, and capstone solutions, from Phase 4 on).
 #
-# Build with:  python scripts/companion/build.py [--tool sql] [--chapter 10]
+# Build with:  python scripts/companion/build.py [--tool sql|excel|pbi] [--chapter 10]
 
 release_tag: companion-2026          # on github.com/mmcodesso/Accounting_Analytics_Book
+instructor_tag: instructor-2026       # the private instructor release (exercise, case, and capstone solutions)
 
 chains:
+  - id: ch04-07-analysis
+    tool: excel
+    chapters: [4, 5, 6, 7]
+    file: Charles River Furniture Analysis.xlsx
+    builder: xlbuild.analysis        # scripts/companion/xlbuild/analysis.py, one function per tutorial
+    audience: public
+  - id: ch08-audit
+    tool: excel
+    chapters: [8]
+    file: AuditAnalytics.xlsx
+    builder: xlbuild.audit           # scripts/companion/xlbuild/audit.py
+    audience: public
+  - id: ch13-15-reports
+    tool: pbi
+    chapters: [13, 14, 15, "A"]      # "A": the appendix on publishing and security (Guided Tutorial A.1)
+    file: Charles River Reports.pbip
+    builder: pbibuild.reports        # scripts/companion/pbibuild/reports.py, one function per tutorial
+    table: SalesInvoiceLine          # the model has loaded once this table is in the engine
+    also:                            # Guided Tutorial A.1 Step 1 starts in internal audit's file of Chapter 16
+      "Start of Tutorial A.1": {chain: ch16-monitoring, after: "16.3"}
+    audience: public
+  - id: ch16-monitoring
+    tool: pbi
+    chapters: [16]
+    file: Audit Monitoring.pbip
+    builder: pbibuild.audit_monitoring   # scripts/companion/pbibuild/audit_monitoring.py
+    table: JournalEntry
+    also:                            # Tutorial 16.3 Step 8 reruns the package's tests in the controller's file
+      "Start of Tutorial 16.3": {chain: ch13-15-reports, after: "15.3"}
+    audience: public
   - id: ch09-script
     tool: sql
     chapter: 9
@@ -42,3 +73,114 @@ extras:
     file: Setup_Part3_Views.sql
     from: ch11.CHAPTER11:create_view  # the view Tutorial 11.3 saves in the working copy
     audience: public
+
+solutions:                           # instructor files, built with --solutions after the chains
+  - id: ch04-exercises
+    tool: excel
+    chapter: 4
+    file: Chapter 4 Exercises - Solutions.xlsx
+    base: {chain: ch04-07-analysis, after: "4.3"}   # the chapter-end checkpoint the exercises copy
+    builder: xlbuild.ex04
+    audience: instructor
+  - id: ch05-exercises
+    tool: excel
+    chapter: 5
+    file: Chapter 5 Exercises - Solutions.xlsx
+    base: {chain: ch04-07-analysis, after: "5.3"}   # the chapter-end checkpoint the exercises copy
+    builder: xlbuild.ex05
+    audience: instructor
+  - id: ch06-exercises
+    tool: excel
+    chapter: 6
+    file: Chapter 6 Exercises - Solutions.xlsx
+    base: {chain: ch04-07-analysis, after: "6.3"}   # the chapter-end checkpoint the exercises copy
+    builder: xlbuild.ex06
+    audience: instructor
+  - id: ch07-exercises
+    tool: excel
+    chapter: 7
+    file: Chapter 7 Exercises - Solutions.xlsx
+    base: {chain: ch04-07-analysis, after: "7.3"}   # the chapter-end checkpoint the exercises copy
+    builder: xlbuild.ex07
+    audience: instructor
+  - id: ch08-exercises
+    tool: excel
+    chapter: 8
+    file: Chapter 8 Exercises - Solutions.xlsx
+    base: {chain: ch08-audit, after: "8.3"}   # the chapter-end checkpoint the exercises copy
+    builder: xlbuild.ex08
+    audience: instructor
+  - id: ch13-exercises-pbi
+    tool: pbi
+    chapter: 13
+    file: Chapter 13 Exercises - Solutions.pbip
+    base: {chain: ch13-15-reports, after: "13.3"}   # the reader's Save as copy starts here
+    builder: pbibuild.ex13
+    audience: instructor
+  - id: ch14-exercises-pbi
+    tool: pbi
+    chapter: 14
+    file: Chapter 14 Exercises - Solutions.pbip
+    base: {chain: ch13-15-reports, after: "14.3"}   # the reader's Save as copy starts here
+    builder: pbibuild.ex14
+    audience: instructor
+  - id: ch15-exercises-pbi
+    tool: pbi
+    chapter: 15
+    file: Chapter 15 Exercises - Solutions.pbip
+    base: {chain: ch13-15-reports, after: "15.3"}   # the reader's Save as copy starts here
+    builder: pbibuild.ex15
+    audience: instructor
+  - id: ch16-exercises-pbi
+    tool: pbi
+    chapter: 16
+    file: Chapter 16 Exercises - Solutions.pbip
+    base: {chain: ch16-monitoring, after: "16.3"}   # the reader's Save as copy starts here
+    builder: pbibuild.ex16
+    audience: instructor
+  - id: appendix-a-exercises-pbi
+    tool: pbi
+    chapter: "A"
+    file: Appendix A Exercises - Solutions.pbip
+    base: {chain: ch13-15-reports, after: "A.1"}   # the reader's Save as copy starts here
+    builder: pbibuild.exa
+    audience: instructor
+  - id: part2-case
+    tool: excel
+    kind: requirements              # sections are the case's Requirements, with their instructor notes
+    source: cases/part-2-case.qmd
+    file: Charles River Promotion Case.xlsx
+    folder: PartII-case
+    role: the solution to the Part II comprehensive case, built in a new workbook as the case says
+    builder: xlbuild.case2
+    audience: instructor
+  - id: ch17-capstone
+    tool: excel
+    chapter: 17
+    kind: requirements
+    source: chapters/17-statements-for-a-lender/chapter.qmd
+    file: Charles River Lender Package.xlsx
+    folder: Chapter17-capstone-excel
+    role: the Excel part of the solution to the Chapter 17 capstone case
+    builder: xlbuild.cap17
+    audience: instructor
+  - id: ch18-capstone
+    tool: excel
+    chapter: 18
+    kind: requirements
+    source: chapters/18-make-buy-or-reprice/chapter.qmd
+    file: Make Buy Reprice.xlsx
+    folder: Chapter18-capstone-excel
+    role: the Excel part of the solution to the Chapter 18 capstone case
+    builder: xlbuild.cap18
+    audience: instructor
+  - id: ch19-capstone
+    tool: excel
+    chapter: 19
+    kind: requirements
+    source: chapters/19-customer-credits-audit/chapter.qmd
+    file: Credits Audit.xlsx
+    folder: Chapter19-capstone-excel
+    role: the Excel part of the solution to the Chapter 19 capstone case
+    builder: xlbuild.cap19
+    audience: instructor

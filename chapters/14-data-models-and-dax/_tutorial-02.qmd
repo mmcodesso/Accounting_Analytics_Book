@@ -2,24 +2,24 @@
 
 **Context and objective.** In this tutorial, you will write the measures that answer the managers' questions about margin and discounts, and prove them. You will collect the measures in a table of their own, build the sales measures from simple sums to a ratio with a variable, use CALCULATE to fix a filter and to remove one, and show Furniture's margin by quarter. Finally, you will write a tab of tests in DAX query view that compares the measures with the totals of Chapter 6.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorial 14.1, with the sales star and the marked Date table.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 14.1, with the sales star and the marked Date table. If you start here, download Charles River Reports as it stands at the end of Tutorial 14.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 
 **Step 1. Create a table for the measures.**
 
 a. Choose **Home > Enter data**.
-b. Type `Measures` as the table's name, leave the single empty column as it is, and click **Load**.
+b. Type `Key Measures` as the table's name (Power BI Desktop does not accept a table named Measures), leave the single empty column as it is, and click **Load**.
 
-The Measures table appears in the Data pane with one column, Column1. You will hide that column once the table holds its first measure, and the table will then move to the top of the Data pane.
+The Key Measures table appears in the Data pane with one column, Column1. You will hide that column once the table holds its first measure, and the table will then move to the top of the Data pane.
 
 **Step 2. Write the base measures.** Each measure is a named sum or count of the fact table.
 
-a. Select the **Measures** table in the **Data** pane, and choose **Modeling > New measure**.
+a. Select the **Key Measures** table in the **Data** pane, and choose **Modeling > New measure**.
 b. Type the first definition below in the formula bar, and press Enter.
 c. Repeat the two actions for each of the other definitions.
 d. Select each new measure, and on the **Measure tools** tab, set its format: the thousands separator and two decimals for amounts, and a whole number for the two counts.
-e. Right-click Column1 of the Measures table, and choose **Hide in report view**.
+e. Right-click Column1 of the Key Measures table, and choose **Hide in report view**.
 
 <!-- dax-check: measure -->
 ```
@@ -30,11 +30,11 @@ Invoice Lines = COUNTROWS ( SalesInvoiceLine )
 Invoices = DISTINCTCOUNT ( SalesInvoiceLine[SalesInvoiceID] )
 ```
 
-Each line is a separate measure, typed one at a time, and with Column1 hidden the Measures table moves to the top of the Data pane. Invoices counts the distinct SalesInvoiceID values among the lines in the filter context, so it now follows any selection on Item, Customer, or Date.
+Each line is a separate measure, typed one at a time, and with Column1 hidden the Key Measures table moves to the top of the Data pane. Invoices counts the distinct SalesInvoiceID values among the lines in the filter context, so it now follows any selection on Item, Customer, or Date.
 
 **Step 3. Write the standard cost and the margin.** Standard cost needs an iterator, because the cost per unit lives on the Item table.
 
-a. Add the measures below to the Measures table, as in Step 2.
+a. Add the measures below to the Key Measures table, as in Step 2.
 b. Format Standard Cost and Gross Margin as amounts, and Margin % as a percentage with two decimals.
 
 <!-- dax-check: measure -->
@@ -102,7 +102,8 @@ Furniture Revenue shows the same amount on every row, because its filter replace
 
 a. Add a matrix with ItemGroup from Item on **Rows**, YearQuarter from Date on **Columns**, and Margin % as **Values**.
 b. Filter the matrix to the years 2025 and 2026 in the **Filters on this visual** section.
-c. Read the Furniture row across the eight quarters.
+c. Select the year slicer, choose **Format > Edit interactions**, and click the **None** icon above the matrix, so that the slicer's 2026 does not hide the quarters of 2025.
+d. Read the Furniture row across the eight quarters.
 
 @fig-14-07 shows the matrix. Furniture's margin at standard cost holds steady through the first half of 2026, falls in the third quarter, and falls again in the fourth, to its lowest level in the two years, the decline the controller asked about in Part I. Each total is a margin of its own, calculated from the totals of revenue and cost, not an average of the cells beside it.
 
@@ -154,7 +155,7 @@ TREATAS applies a list of values as a filter on a column, here Furniture and fis
 
 **Step 9. Document the measures.**
 
-a. Select **Model view**, and select Revenue in the Measures table.
+a. Select **Model view**, and select Revenue in the Key Measures table.
 b. In the **Properties** pane, type a description, such as `Invoiced revenue: the sum of LineTotal on the invoice lines.`
 c. Add a description to each of the other measures.
 d. On the **Validation** page, add Invoices, Standard Cost, and Margin % to the table of totals, and save the report.
@@ -171,7 +172,7 @@ A reader who points at a measure in the Data pane now sees what it means, and th
 
 **Checkpoint.** Your model should now pass these checks:
 
-- The Measures table holds the sales measures, each with a format and a description, and appears at the top of the Data pane.
+- The Key Measures table holds the sales measures, each with a format and a description, and appears at the top of the Data pane.
 - Test 1's fiscal 2026 row equals Chapter 6's control totals, and Test 2 reproduces the Furniture margins at the two ends of Chapter 6's bridge.
 - Discount Rate is higher than the Average of Discount of Chapter 13, and Share of Revenue adds up to 100% across the item groups of a year.
 

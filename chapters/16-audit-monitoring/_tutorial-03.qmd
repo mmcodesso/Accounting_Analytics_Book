@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will record internal audit's first dispositions, merge them into the exception register, and measure the exceptions that remain open, starting with the documents that fail more than one test. Then you will test both reports before relying on them: the completeness of the purchase orders and payroll registers, the date through which the monitoring data run, and the package's own tests, rerun as audit evidence. You will finish with a memo to the chief audit executive.
 
-**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.2 and Charles River Reports.pbix as you left it at the end of Chapter 15.
+**Prerequisites.** You need Audit Monitoring.pbix from Tutorial 16.2 and Charles River Reports.pbix as you left it at the end of Chapter 15. If you start here, download this tutorial's folder from [Companion Files](#sec-companion-files), which holds Audit Monitoring at the end of Tutorial 16.2 and Charles River Reports at the end of Chapter 15, and point each project at your copy of CharlesRiver.xlsx, refresh it, and save it as a .pbix file, as that page explains.
 
 **Step-by-step instructions.**
 
@@ -47,7 +47,7 @@ A merge can match on several columns at once, and the order in which you select 
 
 **Step 3. Measure the open exceptions, and test the dispositions.**
 
-a. Add the measures below to the Measures table.
+a. Add the measures below to the Key Measures table.
 b. In DAX query view, open the **Tests** tab, add the query of Test 3 below it, select the query, and click **Run**.
 
 <!-- dax-check: measure -->
@@ -118,7 +118,7 @@ The variables hold the order numbers, taken from the last six characters of each
 
 **Step 7. State the date through which the data run.**
 
-a. Add the measure below to the Measures table, and set its format to a short date.
+a. Add the measure below to the Key Measures table, and set its format to a short date.
 b. On the Monitoring page, add a card of Data Through, titled `Data through`.
 
 <!-- dax-check: measure -->

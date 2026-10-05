@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will prepare the revenue forecast the controller asked for. You will build a monthly revenue series from the InvoiceLines Table, measure what moves with it using correlation, fit a trend with the Data Analysis ToolPak, and examine what drives the trend. You will then backtest three forecasting methods on the fourth quarter of 2026, the most recent quarter with actual results, and use the best one to forecast the first quarter of 2027 with a range.
 
-**Prerequisites.** You need the analysis workbook from Chapter 6, with the InvoiceLines Table, and the Analysis ToolPak loaded, as described earlier in this chapter.
+**Prerequisites.** You need the analysis workbook from Chapter 6, with the InvoiceLines Table, and the Analysis ToolPak loaded, as described earlier in this chapter. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Chapter 6 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

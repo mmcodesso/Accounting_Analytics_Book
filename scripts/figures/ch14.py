@@ -17,41 +17,28 @@ import excel as xl
 import powerbi as pbi
 from ch13 import _one_to_many
 from data import one, q, require_columns
+from data import connection
+from shared.calculations import bi_ch14 as public_calculations
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, INK, RULE,
                     SMALL, TEAL, WHITE, Diagram, esc)
 
 GROUPS = ["Accessories", "Furniture", "Lighting", "Services", "Textiles"]
 YEARS = [2024, 2025, 2026]
-CALENDAR = (date(2024, 1, 1), date(2027, 12, 31))
-CLOSE = "j.EntryType LIKE 'Year-End Close%'"
+CALENDAR = public_calculations.CALENDAR
+CLOSE = public_calculations.CLOSE
 
 
 @lru_cache(maxsize=1)
 def lines() -> list[dict]:
-    """The fact table of the star: one row per invoice line with the merged header columns."""
-    require_columns("SalesInvoiceLine", ["SalesInvoiceLineID", "SalesInvoiceID", "ItemID", "Quantity",
-                                         "LineTotal"])
-    require_columns("SalesInvoice", ["SalesInvoiceID", "InvoiceNumber", "InvoiceDate", "CustomerID"])
-    require_columns("Item", ["ItemID", "ItemGroup", "StandardCost", "ListPrice"])
-    rows = q("SELECT l.SalesInvoiceLineID, si.InvoiceDate, si.CustomerID, i.ItemGroup, l.Quantity, "
-             "l.LineTotal, l.Quantity * i.StandardCost FROM SalesInvoiceLine l "
-             "JOIN SalesInvoice si USING (SalesInvoiceID) JOIN Item i USING (ItemID)")
-    assert len(rows) == one("SELECT COUNT(*) FROM SalesInvoiceLine")[0], "every line finds its invoice"
-    out = []
-    for r in rows:
-        d = r[1]
-        out.append(dict(id=r[0], date=d, cust=r[2], grp=r[3], qty=r[4], rev=r[5], cost=r[6],
-                        year=int(d[:4]), quarter=f"{d[:4]}-Q{(int(d[5:7]) + 2) // 3}"))
-    return out
+    return public_calculations.lines(connection())
 
 
 def total(field: str, **match) -> float:
-    return sum(r[field] for r in lines() if all(r[k] == v for k, v in match.items()))
+    return public_calculations.total(connection() ,field, **match)
 
 
 def margin_pct(**match) -> float:
-    rev = total("rev", **match)
-    return (rev - total("cost", **match)) / rev
+    return public_calculations.margin_pct(connection() ,**match)
 
 
 def pct(value: float, places: int = 2) -> str:
@@ -64,23 +51,11 @@ def quarters(years: list[int]) -> list[str]:
 
 @lru_cache(maxsize=1)
 def pnl() -> dict:
-    """Credit less debit by fiscal year, account type and subtype, with and without the closes."""
-    rows = q("SELECT g.FiscalYear, a.AccountType, a.AccountSubType, "
-             f"CASE WHEN {CLOSE} THEN 1 ELSE 0 END, SUM(g.Credit - g.Debit) "
-             "FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
-             "LEFT JOIN JournalEntry j ON j.EntryNumber = g.VoucherNumber "
-             "WHERE a.AccountType IN ('Revenue', 'Expense') GROUP BY 1, 2, 3, 4")
-    out = defaultdict(float)
-    for year, typ, sub, close, value in rows:
-        out[(year, typ, sub, "all")] += value
-        if not close:
-            out[(year, typ, sub, "open")] += value
-    return out
+    return public_calculations.pnl(connection())
 
 
 def pnl_total(year: int, kind: str, typ: str | None = None, sub: str | None = None) -> float:
-    return sum(v for (y, t, s, k), v in pnl().items()
-               if y == year and k == kind and typ in (None, t) and sub in (None, s))
+    return public_calculations.pnl_total(connection() ,year, kind, typ, sub)
 
 
 # -- fig-14-01 --------------------------------------------------------------------------------
@@ -321,7 +296,7 @@ def fig_14_06() -> Diagram:
     res = pbi.dax_results(d, x, bottom + 12, ["Date[Year]", "[Lines]", "[Revenue]", "[Gross Margin]",
                                               "[Margin %]"], [100, 80, 130, 130, 100], rows)
     xl.emphasis(d, *res["geometry"][(2, 2)])
-    for i, name in enumerate(["Measures", "Customer", "Date", "Item", "SalesInvoiceLine"]):
+    for i, name in enumerate(["Key Measures", "Customer", "Date", "Item", "SalesInvoiceLine"]):
         d.text(esc(name), win.panes_x + 8, win.top + 34 + i * 26, pane_w - 12, 22, size=SMALL)
     d.text("<i>The Tests tab of Tutorial 14.2 after Run. The grid shows values without the measures' formats, "
            "which is why the test rounds them. Outlined: the fiscal 2026 revenue, which must equal Chapter 6's "
@@ -395,7 +370,7 @@ def fig_14_08() -> Diagram:
            " &nbsp;&nbsp;<b>Arrow</b>&nbsp;the direction of the filter, from each dimension to the fact table",
            0, y, 860, 22, size=SMALL)
     d.text("<i>The model after Tutorial 14.3: the sales star on the left, the ledger star on the right, and "
-           "the Date table related to both. The Measures table, which has no relationships, is not shown.</i>",
+           "the Date table related to both. The Key Measures table, which has no relationships, is not shown.</i>",
            0, y + 26, 860, 40, size=SMALL, color=GRAY)
     return d
 

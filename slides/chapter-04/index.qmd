@@ -1,0 +1,398 @@
+---
+title: "Excel Essentials for Accounting Analytics"
+subtitle: "Chapter 4"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-04.pptx
+---
+
+## Learning objectives {#ch04-01 .balanced .stepwise}
+
+- Build a refreshable analysis workbook.
+- Use Tables, references, and named parameters correctly.
+- Explore visible records with filters and slicers.
+- Protect inputs and document the evidence.
+
+::: {.notes}
+Purpose: introduce the workbook controls that make later analysis reviewable. Allow about 60 seconds and reveal each objective separately. Students already know the source tables. Their task now is to build a workbook someone else can use and check. Emphasize that a polished worksheet can still be wrong. Ask what a reviewer would need to reproduce a reported total. Connect their answers to sources, formulas, parameters, and refresh instructions. Transition: hear the controller's request.
+:::
+
+# Build the workbook for a reviewer {#ch04-module-2}
+
+::: {.notes}
+Introduce the workbook as part of the evidence supporting a decision. The analysis should survive a handoff and a refresh.
+:::
+
+## The controller wants a durable analysis {#ch04-03 .balanced .stepwise}
+
+The Furniture margin question continues.
+
+The finance team must refresh the workbook and trace its numbers.
+
+**What would make your analysis safe to hand over?**
+
+::: {.notes}
+Purpose: give the technical work a business reason. Allow 60 seconds. The controller needs a diagnostic answer, but first she needs confidence in the workbook that will produce it. Present the handoff as the test of design: a colleague should know which file to open, which inputs to change, and where the results originate. Ask students for one feature of a workbook they have struggled to review. Transition: connect those experiences to the evidence about spreadsheet errors.
+:::
+
+## Structure supports review {#ch04-04 .balanced .stepwise}
+
+Fixed ranges can omit newly added rows.
+
+Copied formulas can drift or stop early.
+
+Visible controls help a reviewer detect mistakes.
+
+::: {.notes}
+Purpose: explain structure as a control. Allow 60-90 seconds. Spreadsheet research documents errors in operational workbooks, but it does not imply that every workbook or formula is wrong. Powell, Baker, and Lawson (2009a) found substantial variation across workbooks. Tables and named inputs reduce particular opportunities for error and make logic easier to inspect. They still need testing. Ask which risk a row-count control would detect and which it would miss. Transition: organize the analysis into distinct worksheets.
+:::
+
+## The workbook has separate responsibilities {#ch04-05 .balanced .step-rows}
+
+| Layer | What belongs here |
+|---|---|
+| Data | Query-loaded Tables |
+| Parameters | Named inputs and limits |
+| Analysis | Calculations and summaries |
+| Documentation | Sources, procedures, and open questions |
+
+::: {.notes}
+Purpose: establish a structure students can maintain throughout Part II. Allow about 60 seconds. Keep the source CharlesRiver.xlsx unchanged and build the Furniture Analysis workbook separately. Documentation appears first even though the data flow begins at the source. Keeping summaries off data sheets prevents a nearby formula from accidentally becoming a Table column. Ask where a report year, a control total, and a refresh date belong. Transition: examine the Table objects used in the data layer.
+:::
+
+## A Table identifies its own data {#ch04-06 .balanced .stepwise}
+
+**Plain range:** a formula refers to fixed cells.
+
+**Excel Table:** a formula refers to a named column.
+
+A Table can grow, while a PivotTable still needs refresh.
+
+::: {.notes}
+Purpose: distinguish a managed Table from formatting that merely looks tabular. Allow 60 seconds. An Excel Table has a name, defined headers, filters, and calculated-column behavior. Banded rows alone are not enough to identify one. Demonstrate the Table Name box if Excel is available. Explain that a structured SUM follows the Table's extent, while a PivotTable may still display a cached result until refreshed. Ask what happens to a fixed SUM when new rows appear below its last cell. Transition: read a structured reference.
+:::
+
+## Structured references name the evidence {#ch04-07 .balanced .stepwise}
+
+```text
+=SUM(SalesInvoiceLine[LineTotal])
+```
+
+The Table name identifies the population.
+
+The column name identifies the measure.
+
+::: {.notes}
+Purpose: help students read formulas as statements about evidence. Allow about 60 seconds. Read the formula aloud: sum the LineTotal column of SalesInvoiceLine. Compare that with a fixed cell range, which forces the reviewer to inspect the worksheet and its last row. The name improves clarity, but a wrongly selected Table or column remains wrong. Ask whether this formula totals the full Table or only the filtered rows. It totals the full Table. Transition: move from a whole column to the current row.
+:::
+
+## A calculated column works row by row {#ch04-08 .balanced .stepwise}
+
+```text
+=ROUND([@Quantity]*[@BaseListPrice],2)
+```
+
+`@` means the current row.
+
+**ListAmount** uses the item's base list price.
+
+::: {.notes}
+Purpose: distinguish row-level calculation from an aggregate. Allow 60 seconds. This is the ListAmount formula from Tutorial 4.1. Excel fills a calculated column throughout the Table and normally extends it to new rows. List amount is a reference amount, not the revenue actually billed. A price-list adjustment and a promotion may both separate it from LineTotal. Ask students why Quantity and BaseListPrice must come from the same row. Transition: calculate the promotional discount separately.
+:::
+
+## Promotion discount has its own basis {#ch04-09 .balanced .stepwise}
+
+```text
+=ROUND([@Quantity]*[@UnitPrice]*[@Discount],2)
+```
+
+**DiscountAmount** isolates the promotional reduction.
+
+List amount less billed revenue also includes price-list effects.
+
+::: {.notes}
+Purpose: preserve the meaning of the discount measure. Allow about 60 seconds. UnitPrice is the price before the promotional discount, whereas BaseListPrice is the item's base list reference. The tutorial rounds this worksheet calculation to cents. Do not call the entire gap between list amount and billed revenue a promotion discount. That would mix distinct pricing mechanisms and distort the diagnosis. Ask which price belongs in the discount formula and why. Transition: load the data without altering the source.
+:::
+
+# Import and check the data {#ch04-module-10}
+
+::: {.notes}
+The next sequence follows Tutorial 4.1. Pause for students to work at the indicated checkpoints.
+:::
+
+## Power Query records the preparation {#ch04-11 .balanced .stepwise}
+
+Connect to the source workbook.
+
+Choose named Table objects and inspect their types.
+
+Transform, load, and refresh the recorded steps.
+
+::: {.notes}
+Purpose: explain the role of Power Query before showing commands. Allow 60 seconds. A query reads the source and records transformations such as choosing columns or filtering rows. The source remains separate from the analysis workbook. Refresh repeats the steps against the current source, so the analyst must still verify both source identity and results. Ask what evidence remains after a manual copy compared with a query. Transition: identify the four Tables required by the first tutorial.
+:::
+
+## Tutorial 4.1: import the Table objects {#ch04-12 .balanced .stepwise}
+
+Select **SalesInvoice, SalesInvoiceLine, Item, and PromotionProgram** in the Navigator.
+
+Choose **Transform Data**, then rename the queries clearly.
+
+[Open Tutorial 4.1](https://aa.accountinganalyticshub.com/chapters/04-excel-essentials/chapter.html#guided-tutorial-4.1-building-the-furniture-analysis-workbook-with-power-query)
+
+::: {.notes}
+Purpose: guide students into the correct objects in the workbook Navigator. Allow two minutes for the activity. CharlesRiver.xlsx lists both worksheets and named Tables. Choose the Table objects with names such as T17_SalesInvoiceLine, then use the chapter's query names in the analysis workbook. Explain that the query name and the source Table name can differ. Pause until students can identify which object they imported. The book supplies the detailed clicks. Transition: inspect inferred data types before loading.
+:::
+
+## Types can silently change the numbers {#ch04-13 .balanced .stepwise}
+
+An inferred whole-number type can remove decimal discounts.
+
+Inspect the **Changed Type** step.
+
+Preserve decimal amounts and rates before loading.
+
+::: {.notes}
+Purpose: make type checking a required import control. Allow 60-90 seconds. Early invoice lines contain zero discounts, so an inferred type based on early rows can be misleading. Inspect Discount and FreightAmount in the Changed Type step and use the appropriate decimal type. Correct the step that would coerce the original values, rather than relying on a later format change. Formatting a rounded value as a percentage cannot recover it. Ask how students would detect the loss. Transition: reconcile the imported populations.
+:::
+
+## Control totals compare independent summaries {#ch04-14 .balanced}
+
+{{< include /_shared/generated/chapter-04/_control-totals.qmd >}}
+
+::: {.notes}
+Purpose: demonstrate a control that spans related source Tables. Allow 60 seconds. The invoice subtotal should equal the sum of its lines, so aggregating both Tables provides a useful import check. The difference is rounded to cents to remove negligible floating-point residue. Agreement supports this reconciliation, but does not prove that every field is accurate or every business transaction reached the source. Ask for an error that could survive the check. Transition: repeat the check after refresh.
+:::
+
+## A refresh is a testable procedure {#ch04-15 .balanced .stepwise}
+
+Run **Data > Refresh All**.
+
+Compare row counts and control totals before and after.
+
+Check that calculated columns remain filled.
+
+::: {.notes}
+Purpose: define evidence of a successful refresh. Allow two minutes for students to refresh an unchanged source. The expected result is unchanged counts and totals, with the worksheet calculations still present. A refresh finishing without an error message is only one check. Have students inspect the calculated columns and document the refresh date. If a value changes, first confirm the source path and query steps. Transition: parameters make changes in the intended inputs visible and controlled.
+:::
+
+# Make formulas reusable {#ch04-module-16}
+
+::: {.notes}
+Connect structured references inside Tables with the cell references used in summary worksheets.
+:::
+
+## Relative references move with the formula {#ch04-17 .balanced}
+
+![](/_shared/generated/chapter-04/relative.svg){fig-alt="Book Figure 4.5, relative-reference panel. Copying B2 times C2 down changes both row references to row 3." width=45%}
+
+::: {.notes}
+Purpose: explain relative references with the book's illustrative worksheet values. Allow 60 seconds. Read the top formula and predict the next row before pointing to it. Copying down moves the referenced row, so each formula uses the quantity and price on its own row. The same principle applies across columns. The selected panel comes directly from Figure 4.5 and is illustrative rather than a dataset result. Ask what would happen if the price reference were accidentally locked. Transition: hold a denominator fixed.
+:::
+
+## Absolute references keep one cell fixed {#ch04-18 .balanced}
+
+![](/_shared/generated/chapter-04/absolute.svg){fig-alt="Book Figure 4.5, absolute-reference panel. Each row divides by the same total in cell B6." width=45%}
+
+::: {.notes}
+Purpose: explain the two dollar signs in an absolute reference. Allow 60 seconds. The numerator changes from B2 to B3 while the denominator stays at B6. The dollar signs lock both column and row when the formula is copied. They do not mean that the cell contains currency. Ask students to predict the formula after a copy to the next row, then after a copy to the right. These are the book's illustrative values. Transition: lock just one dimension for a summary grid.
+:::
+
+## Mixed references support a two-way grid {#ch04-19 .balanced}
+
+![](/_shared/generated/chapter-04/mixed.svg){fig-alt="Book Figure 4.5, mixed-reference panel. Column A holds row labels and row 2 holds discount rates." width=45%}
+
+::: {.notes}
+Purpose: show why a summary grid needs two different locks. Allow 60-90 seconds. The row input stays in column A while its row changes. The discount input stays in row 2 while its column changes. Read the dollar sign together with the part it locks. Ask students to explain the formula in the bottom-left cell, then the top-right formula. The example uses illustrative amounts and discounts. Transition: replace important parameter addresses with meaningful names.
+:::
+
+## Named cells expose the assumptions {#ch04-20 .balanced .stepwise}
+
+**ThresholdPercentile:** a user input, initially 0.90.
+
+**LargeLineThreshold:** a formula calculated from the data.
+
+Label each input, unit, source, and permitted range.
+
+::: {.notes}
+Purpose: distinguish an assumption from a calculated parameter. Allow 60 seconds. Tutorial 4.2 names a percentile input and the amount derived from it. Naming the derived amount does not make it an independent assumption. The Parameters worksheet should state which cell can change and which cell is a formula. Color can reinforce that convention, but labels must also explain it. Ask which value should change if a new population has larger lines. Transition: derive the threshold rather than typing an arbitrary amount.
+:::
+
+## Tutorial 4.2: derive the threshold {#ch04-21 .balanced .stepwise}
+
+```text
+=PERCENTILE.INC(
+  SalesInvoiceLine[LineTotal],ThresholdPercentile)
+```
+
+Change 0.90 to 0.95, observe the result, then restore 0.90.
+
+[Open Tutorial 4.2](https://aa.accountinganalyticshub.com/chapters/04-excel-essentials/chapter.html#guided-tutorial-4.2-parameters-named-cells-and-a-summary-grid)
+
+::: {.notes}
+Purpose: let students see an assumption propagate. Allow two minutes. The function returns the percentile amount for the actual line population. A higher percentile usually raises the threshold and reduces the count strictly above it. Ties can mean that the resulting share of rows differs slightly from an exact tenth or twentieth. Ask students to explain why the share of dollars above the threshold can be much larger than the share of rows. Transition: summarize pricing methods with a reusable grid.
+:::
+
+## One formula fills the pricing grid {#ch04-22 .balanced .stepwise}
+
+```text
+=COUNTIFS(SalesInvoiceLine[PricingMethod],$A16,
+          SalesInvoiceLine[Discount],B$15)
+```
+
+Copy and paste across the grid.
+
+Reconcile its grand total to the line count.
+
+::: {.notes}
+Purpose: apply mixed references to a real tutorial task. Allow 60-90 seconds. Column A holds the pricing-method labels and row 15 holds discount-rate labels. Copy and paste the formula as the tutorial instructs, because dragging a structured reference sideways can change its referenced column. Inspect a far corner after copying. A missing or misspelled category can produce plausible individual counts while the grid total fails. Ask students to identify the two locked dimensions. Transition: protect the parameter that drives the calculations.
+:::
+
+## Validation protects intended input {#ch04-23 .balanced .stepwise}
+
+Set a decimal range from **0.50 to 0.99**.
+
+Add an explanatory message and a Stop alert.
+
+Test an invalid entry, then confirm the valid value.
+
+::: {.notes}
+Purpose: make validation demonstrable rather than decorative. Allow 60 seconds. Tutorial 4.3 applies the rule to ThresholdPercentile. Test 1.5, cancel the rejected entry, and confirm that 0.90 remains. Validation reduces accidental direct entry errors, but pasting or changing workbook structure can bypass intended controls. A reviewer should still inspect the actual value and the rule. Ask why the calculated LargeLineThreshold cell should not receive the same input rule. Transition: use filters to explore a controlled population.
+:::
+
+# Explore and document the result {#ch04-module-24}
+
+::: {.notes}
+The final module teaches selective views without losing track of the complete population.
+:::
+
+## Sorting preserves whole records {#ch04-25 .balanced .stepwise}
+
+Sort the Table by **PromotionID**.
+
+Within each promotion, sort **DiscountAmount** from largest to smallest.
+
+A sort changes order, while a filter changes the view.
+
+::: {.notes}
+Purpose: distinguish ordering from selecting records. Allow about 60 seconds. Work inside the complete Table so all columns remain attached to the same invoice line. Sorting one isolated column in a plain range can destroy record relationships. A multi-level sort first groups promotions and then identifies large discounts within each group. Ask whether the total should change after a sort. It should not. Transition: make the active selection visible with a slicer.
+:::
+
+## A slicer makes the selection visible {#ch04-26 .balanced .stepwise}
+
+Insert a slicer for **PromotionID**.
+
+Select one promotion and inspect its visible records.
+
+Clear the slicer before returning to a complete-population view.
+
+::: {.notes}
+Purpose: help students retain context while exploring subsets. Allow 60 seconds. A slicer changes which Table rows are visible and shows its active selection. It does not remove those rows from the Table. Tell students to record a filter context whenever reporting a subset total. Ask what another reader might conclude if the slicer were outside the visible worksheet area. Transition: use a function that follows the visible rows.
+:::
+
+## SUBTOTAL follows the visible records {#ch04-27 .balanced .stepwise}
+
+```text
+=SUBTOTAL(103,SalesInvoiceLine[SalesInvoiceLineID])
+=SUBTOTAL(109,SalesInvoiceLine[DiscountAmount])
+```
+
+**103:** count nonblank IDs. **109:** sum amounts.
+
+::: {.notes}
+Purpose: pair the visible population with the visible amount. Allow 60-90 seconds. Function 103 counts nonblank cells and 109 sums values while excluding filtered and manually hidden rows. The ID field supplies a populated record identifier for this count. SUM still includes hidden data rows, so it is a useful whole-Table comparison. Ask students to select a promotion and observe which formulas change. Clearing the slicer should restore the complete view. Transition: explain the limits of highlighting.
+:::
+
+## Highlighting identifies a condition {#ch04-28 .balanced .stepwise}
+
+```text
+=$J2>0
+```
+
+The rule tests the Discount column for each row.
+
+A shaded row still needs interpretation.
+
+::: {.notes}
+Purpose: make conditional formatting explainable. Allow 60 seconds. The tutorial selects the Table's data rows with row 2 active and locks the column of the Discount field. Students must confirm the actual column letter in their workbook before using J. The rule then adjusts the row for every record. Highlighting shows that a promotional discount exists, not whether the transaction is improper. Ask how a misplaced active cell would shift the test. Transition: record the public tutorial finding.
+:::
+
+## Tutorial 4.3: a finding and an open question {#ch04-29 .balanced .stepwise}
+
+Promotion 8 stands out in line count and discount dollars.
+
+Its program dates span September and October 2026.
+
+**How much reached each invoice quarter?**
+
+[Open Tutorial 4.3](https://aa.accountinganalyticshub.com/chapters/04-excel-essentials/chapter.html#guided-tutorial-4.3-surfacing-promotions-and-documenting-the-workbook)
+
+::: {.notes}
+Purpose: separate the current observation from the eventual diagnosis. Allow two minutes for students to compare slicer results. The public tutorial identifies promotion 8 as the Furniture Seasonal Promotion at a 10 percent discount. The workbook does not yet connect every line to its invoice date and item group, so this chapter cannot quantify the quarter-specific margin effect. Ask students to write that limitation explicitly. Transition: the documentation worksheet should retain the question for the next analyst.
+:::
+
+## Documentation makes the work repeatable {#ch04-30 .balanced .stepwise}
+
+Record the source and query steps.
+
+Explain parameters, formulas, and control totals.
+
+Identify the preparer, reviewer, refresh date, and unresolved questions.
+
+::: {.notes}
+Purpose: give documentation a practical review function. Allow 60-90 seconds. Ask a student to imagine opening this workbook next month. A source filename alone does not explain which Tables and filters were used, and a total without its meaning does not establish a control. Distinguish a completed preparer entry from a reviewer entry that remains blank until review occurs. Do not imply that writing documentation proves correctness. Transition: test the handoff against the chapter objectives.
+:::
+
+## Workbook handoff checkpoint {#ch04-31 .balanced .stepwise}
+
+- Refresh succeeds against the intended source.
+- Counts and monetary controls reconcile.
+- Inputs are named, explained, and tested.
+- A colleague can trace a result and identify what remains open.
+
+::: {.notes}
+Purpose: close the chapter with observable acceptance criteria. Allow about 90 seconds for a pair review. One student points to a result and the other traces it through the formula, parameter, Table, and query. Have them check a parameter limit and clear any slicers. A failed check is a task to resolve, not a reason to replace the number manually. Source: public Tutorials 4.1-4.3. Transition: Chapter 5 connects the attributes needed for the margin analysis.
+:::
+
+## Practice and the next chapter {#ch04-32 .balanced .stepwise}
+
+Complete the assigned Chapter 4 practice in your analysis workbook.
+
+Preserve the source and document your checks.
+
+Next: bring dates, item groups, and customer attributes onto each invoice line.
+
+::: {.notes}
+Purpose: move students from guided procedure to independent practice without supplying assessment responses. Allow 45 seconds. Identify the starting workbook specified by the assigned task and ask students to keep its source connection documented. Their output should explain what they did and how they checked it. Reinforce that Chapter 5 extends the same analytical structure instead of replacing it. Pause for logistical questions about the file before closing. The chapter's public tutorial links provide the detailed steps.
+:::
+
+## References and further reading {#ch04-33 .balanced}
+
+Powell, Baker, and Lawson (2009a): errors in operational spreadsheets.
+
+Public Chapter 4 tutorials: workbook construction and review.
+
+[Full Chapter 4 references](https://aa.accountinganalyticshub.com/chapters/04-excel-essentials/chapter.html#references)
+
+::: {.notes}
+Purpose: distinguish the research supporting review practices from the worked teaching example. The chapter provides further readings on spreadsheet errors and structured design. The exhibited controls and procedures come from public Tutorials 4.1-4.3.
+
+{{< include /_shared/fragments/_reference-powell-2009a.qmd >}}
+:::
+
+## Attribution and reuse {#ch04-34 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 4 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

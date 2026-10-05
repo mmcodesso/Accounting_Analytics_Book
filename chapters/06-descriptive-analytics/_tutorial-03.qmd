@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will answer the controller's question. You will add the list amount and the promotional discount of each line to the InvoiceLines query, compare the drivers of the Furniture margin in the third and fourth quarters with a PivotTable, and decompose the change in margin into volume, mix, price, and cost effects on a bridge worksheet. You will chart the bridge as a waterfall and drill into the discounts to find the promotions behind them.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 6.2, with the StdCostAmount column in the InvoiceLines query and the MarginPct calculated field.
+**Prerequisites.** You need the analysis workbook from Tutorial 6.2, with the StdCostAmount column in the InvoiceLines query and the MarginPct calculated field. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 6.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

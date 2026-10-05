@@ -1,0 +1,481 @@
+---
+title: "Understanding Data in Accounting"
+subtitle: "Chapter 2"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-02.pptx
+---
+
+## Learning objectives {#ch02-objectives .balanced .stepwise}
+
+- Identify data types and choose a suitable source.
+- Evaluate accuracy, completeness, consistency, and timeliness.
+- Distinguish data structure from data quality.
+- Document tests and trace operational evidence to the ledger.
+
+::: {.notes}
+Delivery: Introduce one objective at a time. Purpose: frame data quality as part of accounting judgment. Allow about 60 seconds. Students already know the analytics workflow from Chapter 1. This chapter asks whether the information entering that workflow is suitable for the question. We will inspect exceptions, distinguish possible explanations, and document both clean and problematic results. Do not promise that one test can establish reliability. Ask students to name a report they would hesitate to use without checking its source. Transition: adopt the role of an internal auditor asked to assess a new extract.
+:::
+
+# Is this extract fit for the task? {#ch02-module-purpose}
+
+::: {.notes}
+Introduce the first module as a decision about whether analysis can begin. The business question, required population, and reporting period determine what quality means.
+:::
+
+## Before the year-end analysis {#ch02-scenario .balanced .stepwise}
+
+The audit team receives the Charles River workbook.
+
+Some names repeat. Some shipment fields are blank. Some periods contain little activity.
+
+**Which findings prevent reliable analysis, and what evidence would resolve them?**
+
+::: {.notes}
+Delivery: Reveal the situation, the observations, and then the decision question. Purpose: establish the chapter's investigation. Allow 60–90 seconds. These observations come from the public opening scenario, not from a completed audit conclusion. A repeated customer name might describe two businesses. A sparse period might be an incomplete extract. Students should explain what they need to know before changing data. Pause after the final question and collect two possible explanations for one observation. The misconception to address is that every unusual value is automatically an error. Transition: identify the meaning and origin of the data before testing it.
+:::
+
+## Quality depends on intended use {#ch02-fit .balanced}
+
+**Data quality:** the degree to which data is fit for its intended use.
+
+Specify the question, population, reporting period, and required detail.
+
+A reliable annual total may still be unsuitable for a monthly comparison.
+
+::: {.notes}
+Purpose: make fitness for use concrete. Allow about 60 seconds. A file can contain accurate records yet omit the days or entities needed for a particular task. A total that answers an annual question may hide a partial month. Explain that the test plan follows the intended decision, rather than a universal checklist detached from context. Ask whether an extract of paid invoices can answer a question about all outstanding invoices. The missing unpaid population makes that extract unsuitable. Source: Chapter 2 and Wang and Strong (1996), cited in the closing references. Transition: classify the fields we will examine.
+:::
+
+## Measurements and labels {#ch02-types .balanced .stepwise}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Quantitative**
+
+Amounts, quantities, counts, and ratios.
+
+Arithmetic has a business meaning.
+:::
+::: {.column width="50%"}
+**Qualitative**
+
+Names, categories, descriptions, and status codes.
+
+Compare or group the labels.
+:::
+::::
+
+::: {.notes}
+Delivery: Explain quantitative values before revealing qualitative values. Purpose: connect field meaning to analytical operations. Allow about 60 seconds. Invoice totals can be summed and quantities can be counted. Customer names and item groups describe entities and categories. Nominal categories have no natural order. Ordinal categories, such as low, medium, and high supplier risk, have an order without equal numerical intervals. Ask which operation would be meaningful for ItemGroup: average the label, or count items in each group. Emphasize that a field's appearance does not determine its meaning. Transition: an identifier can look like a number.
+:::
+
+## A number can be an identifier {#ch02-identifiers .balanced .stepwise}
+
+**AccountNumber** identifies an account.
+
+**Debit** measures an amount.
+
+Sum amounts. Match identifiers. Preserve codes and leading zeros when relevant.
+
+::: {.notes}
+Delivery: Reveal the two fields and then the operating rule. Purpose: prevent meaningless arithmetic on codes. Allow 45–60 seconds. Software may allow an average of account numbers because they are stored numerically. That does not make the result informative. Explain the distinction between storage type and business meaning. Some systems use text for codes to preserve leading zeros. Do not change Charles River types merely to match that general practice. Ask students to classify CustomerID and a count of customers. The first is an identifier, while the second is a quantity. Transition: field meaning is separate from the structure of the source document.
+:::
+
+## How the source is organized {#ch02-structure .balanced .step-rows}
+
+| Structure | Organization | Accounting example |
+|---|---|---|
+| Structured | Defined rows and columns | Ledger extract |
+| Semi-structured | Tags or other organizing elements | XBRL filing |
+| Unstructured | No predefined table | Contract narrative |
+
+::: {.notes}
+Delivery: Introduce one row at a time. Purpose: distinguish organization from content quality. Allow about 60 seconds. Structured sources are convenient inputs for the tools in this book. Tagged filings contain recognizable elements without being a simple rectangular table. A contract narrative requires extraction and interpretation before its facts can be tabulated. The document format alone is not a quality rating. A well-formed ledger table can still have missing transactions, and a contract may be authoritative evidence despite lacking columns. Ask which preparation task changes when moving from a ledger extract to a contract. Transition: accounting sources also differ in the level of detail they provide.
+:::
+
+## Choose the accounting source {#ch02-sources .balanced .step-rows}
+
+| Source | What it provides | Check before use |
+|---|---|---|
+| General ledger | Posted debits and credits | Period and account coverage |
+| Sub-ledger | Detailed invoices and settlements | Agreement with control accounts |
+| Trial balance | Account balances at a date | Date, scope, and reconciliation |
+
+::: {.notes}
+Delivery: Reveal the sources in order. Purpose: distinguish accounting summaries from their underlying detail. Allow 60–90 seconds. One GLEntry row normally represents one debit or credit posting, rather than an entire journal entry. Sub-ledgers retain the documents and settlements behind balances. A trial balance summarizes ledger balances, so it is not a substitute for invoice-level evidence. Debits equaling credits establishes arithmetic balance but cannot prove that every transaction was recorded correctly. Ask which source would help explain a particular customer's unpaid invoice. Transition: the sources may arrive together through an ERP extract or separately from outside the organization.
+:::
+
+## Integrated does not mean verified {#ch02-erp .balanced .stepwise}
+
+An ERP connects financial and operating records.
+
+External files add evidence such as bank transactions or market information.
+
+Check identifiers, classifications, date ranges, and extraction boundaries before combining sources.
+
+::: {.notes}
+Delivery: Reveal the sources before the checks. Purpose: avoid treating system integration as evidence of perfect quality. Allow about 60 seconds. An ERP can carry an entry error through several related records. External sources may be valuable but use different identifiers or reporting periods. For a bank reconciliation, an apparent mismatch could reflect timing rather than an incorrect amount. Ask students to identify one field they would use to match records and one contextual fact they would verify first. The intended lesson is to document the matching basis and coverage. Transition: four quality dimensions organize those checks.
+:::
+
+# Test quality and interpret exceptions {#ch02-module-quality}
+
+::: {.notes}
+Introduce four complementary dimensions. We will use small public examples to separate an observed exception from an explanation or conclusion.
+:::
+
+## Four questions about quality {#ch02-dimensions .balanced .step-rows}
+
+| Dimension | Question |
+|---|---|
+| Accuracy | Does the value represent the underlying event? |
+| Completeness | Are expected records and required values present? |
+| Consistency | Do related representations agree? |
+| Timeliness | Is the information current enough for this task? |
+
+::: {.notes}
+Delivery: Reveal one question at a time. Purpose: provide a usable framework rather than four labels to memorize. Allow 60–90 seconds. Accuracy concerns agreement with the underlying event. Completeness includes both entire records and individual required values. Consistency concerns agreement between representations. Timeliness depends on the reporting task and as-of date. One finding can affect more than one dimension. A stale shipment status can be inconsistent with a delivery date and insufficiently current. Ask students which dimension an omitted business unit affects. Source: the chapter's teaching framework, informed by Wang and Strong (1996). Transition: begin with missing information.
+:::
+
+## Missing tracking information {#ch02-missing .balanced}
+
+Compare populated and blank tracking fields in the same extract.
+
+{{< include /_shared/generated/chapter-02/_missing.qmd >}}
+
+::: {.notes}
+Purpose: read evidence before deciding its consequence. Allow about 60 seconds. These are selected public Figure 2.3 records, not the count of every affected shipment. The first row provides a populated comparison. The other two shipment records exist, but their tracking fields are blank. This is a completeness concern for carrier tracking information. It does not by itself prove that those shipments never occurred or that other shipping evidence is absent. Ask what additional document could corroborate dispatch or delivery. Explain that the next step is to establish whether the field is required and obtain supporting evidence. Transition: compare these blanks with values that are intentionally absent.
+:::
+
+## Not every blank needs a replacement {#ch02-blank-meaning .balanced .stepwise}
+
+**TrackingNumber:** investigate missing shipping information.
+
+**Item.ListPrice:** a blank may be expected for an item the company does not sell.
+
+Replacing every blank with zero can create a new error.
+
+::: {.notes}
+Delivery: Reveal each example and then the caution. Purpose: distinguish missing information from missing-by-design values. Allow about 60 seconds. Tutorial 2.1 shows blank list prices for purchased inputs and other items not sold to customers. Design services that Charles River sells do carry prices. A zero price would state something different from a field that is not applicable. Ask students what rule would justify treating a ListPrice blank as expected. They should refer to the item's business role, not simply the fact that many rows are blank. Transition: related fields can also disagree even when neither is blank.
+:::
+
+## Status and date disagree {#ch02-status .balanced}
+
+Compare the status with delivery evidence and the extract's as-of date.
+
+{{< include /_shared/generated/chapter-02/_status.qmd >}}
+
+::: {.notes}
+Purpose: connect consistency to timeliness. Allow about 60 seconds. These selected shipment records are the public examples in Figure 2.3. The first row is marked Delivered. The other two rows remain In Transit despite recorded delivery dates before the extract. Ask which report could be affected: a report of goods in transit might overstate that population. A date field is still recorded evidence, so investigate whether the date or the status is wrong before correcting either. A stale status is a plausible explanation rather than proof from the table alone. Transition: repeated identifiers require a similarly careful comparison.
+:::
+
+## A repeated invoice number is a risk signal {#ch02-duplicate-invoice .balanced}
+
+Supplier invoice number: **{{< var slide.chapter02.supplier_invoice >}}**
+
+The same supplier and invoice number appear twice, with different dates and amounts.
+
+{{< include /_shared/generated/chapter-02/_duplicates.qmd >}}
+
+::: {.notes}
+Purpose: explain a duplicate-risk test without declaring a duplicate payment. Allow 60–90 seconds. These two selected PurchaseInvoice records come from the book figure. The supplier and supplier invoice number form the comparison basis. Different dates and totals are additional evidence to examine, not a reason to ignore the repeated number. We have not yet inspected disbursements, so the slide does not establish that cash was paid twice. Ask what the team should obtain next: invoice images, entry history, and related payment records are useful possibilities. Transition: repeated names are an even weaker identifier than a supplier-and-invoice combination.
+:::
+
+## Same name, same entity? {#ch02-names .balanced .stepwise}
+
+A repeated CustomerName identifies a candidate for review.
+
+Compare CustomerID, city, region, customer segment, and supporting records.
+
+Document the evidence before merging or deleting records.
+
+::: {.notes}
+Delivery: Pause after the first point before revealing the comparison fields. Purpose: prevent destructive deduplication based only on names. Allow about 60 seconds. Different companies can share a name, while one company can appear under spelling variants. CustomerID identifies the stored row but does not by itself prove that two rows represent different real-world entities. Tutorial 2.1 asks students to compare the other attributes and explain their judgment. Ask whether different cities settle the question conclusively. They are useful evidence, but branches and address changes can complicate the conclusion. Transition: unusual amounts also identify review candidates rather than proven errors.
+:::
+
+## Put an outlier in context {#ch02-freight}
+
+![The largest recorded shipment freight cost compared with the mean.](/_shared/generated/chapter-02/freight-comparison.svg){width=95% fig-alt="Two horizontal bars starting at zero compare mean freight cost across Shipment with the largest recorded freight cost. The largest value is substantially higher, which calls for investigation rather than automatic removal."}
+
+::: {.notes}
+Purpose: interpret an unusual magnitude without converting it into a conclusion. Allow about 60 seconds. The mean is {{< var slide.chapter02.freight_mean >}} and the largest recorded cost is {{< var slide.chapter02.freight_largest >}}, derived from the same calculation used in the book figure. The mean is one reference point, not a threshold proving error. Shipment size, destination, urgency, and carrier terms could explain a large cost. Ask what comparison group would improve this analysis. Similar shipments would provide more useful context than the entire population alone. Transition: turn these examples into a reproducible workbook investigation.
+:::
+
+## Tutorial 2.1: inspect a working copy {#ch02-tutorial-start .balanced}
+
+Copy **CharlesRiver.xlsx** to **CharlesRiver_Work.xlsx**.
+
+Filter Shipment, compare Customer records, and inspect Item.ListPrice.
+
+Record the test, affected population, observation, and follow-up.
+
+[Open Tutorial 2.1](https://aa.accountinganalyticshub.com/chapters/02-understanding-data/chapter.html#guided-tutorial-2.1-inspecting-charles-river-o2c-and-item-data-for-data-quality-problems)
+
+::: {.notes}
+Purpose: give students a complete activity they can follow without waiting for reveals. Allow two to three minutes for an initial inspection, with additional class time as needed. Work in the named copy because this tutorial adds helper columns. Later parts of the book import the original workbook, which should remain as provided. Begin with one filter, record what it selected, and clear it before starting the next test. Ask students to explain the denominator behind any exception count. A common mistake is to leave an earlier filter active and report a partial population. Transition: inspect invoice and shipment dates together.
+:::
+
+## Find the first shipment date {#ch02-minifs .balanced}
+
+On SalesInvoice, find the earliest ShipmentDate for the invoice's SalesOrderID.
+
+```text
+=MINIFS(Shipment!D:D, Shipment!C:C, E2)
+```
+
+Place the result in the tutorial's **Min Date** column and format it as a date.
+
+::: {.notes}
+Purpose: explain the matching logic behind the public tutorial formula. Allow 60–90 seconds. Shipment column D contains ShipmentDate, column C contains SalesOrderID, and SalesInvoice E2 contains the order key for the invoice. MINIFS finds the earliest matching shipment because one order can have several shipments. Use the book's workbook layout and adjust letters if the working copy differs. A zero result needs interpretation because it can mean no shipment matched. Ask why comparing to an arbitrary shipment would be misleading. Transition: distinguish an earlier invoice date from an absent shipment before classifying the result.
+:::
+
+## Flag the date relationship {#ch02-date-check .balanced}
+
+```text
+=IF(M2=0, "No shipment", IF(C2<M2, "Check", "OK"))
+```
+
+**M2:** earliest shipment date. **C2:** invoice date.
+
+Filter **Check**, then investigate the business event and cutoff implications.
+
+::: {.notes}
+Purpose: connect a formula result to an accounting question. Allow 60–90 seconds. In the tutorial layout, M holds Min Date and C holds InvoiceDate. The outer IF separates no shipment from the date comparison. The inner IF flags an invoice dated before the first shipment on its order. A Check result is a potential accuracy and cutoff issue. It is not a complete revenue-recognition conclusion because contractual terms and other evidence can matter. No shipment is expected for design-service invoices that do not involve goods. Ask students why combining both outcomes under one error label would lose useful information. Transition: organize the findings before moving to data structure.
+:::
+
+## Write a finding someone else can review {#ch02-finding .balanced .stepwise}
+
+**Test:** state the population, fields, rule, and reporting date.
+
+**Observation:** record what the data shows and how many records were affected.
+
+**Interpretation:** explain the implication, uncertainty, and next evidence needed.
+
+::: {.notes}
+Delivery: Reveal the three components in sequence. Purpose: turn an exception list into an accountable explanation. Allow about 60 seconds. A reviewer should be able to repeat the test and understand the boundary of the conclusion. For example, blank tracking numbers concern shipping information in the extract. They do not establish non-delivery. Distinguish the count of affected rows from the count of distinct business events. Ask students to rewrite one of their observations using the three-part structure. A clean test result belongs in the same record, because it provides evidence about the checks actually performed. Transition: quality also depends on the structure expected by the analysis.
+:::
+
+# Organize observations for analysis {#ch02-module-tidy}
+
+::: {.notes}
+Introduce tidy data as a structural idea. Reshaping a table can improve its analytical usability without correcting any underlying value.
+:::
+
+## Three tidy-data rules {#ch02-tidy-rules .balanced .stepwise}
+
+Each variable has its own column.
+
+Each observation has its own row.
+
+Each type of observational unit has its own table.
+
+::: {.notes}
+Delivery: Reveal one rule at a time. Purpose: define tidy data through the structure students can inspect. Allow about 60 seconds. A variable is an attribute, such as month or budget amount. An observation depends on the unit being recorded, such as one department's budget for one month. Customer attributes and order events belong to different units. Ask students what a row represents before they apply any of the rules. The common misconception is that a neat-looking report must be tidy data. Source: Wickham (2014), as discussed in Chapter 2. Transition: compare two layouts of the same budget values.
+:::
+
+## A report with months across columns {#ch02-budget-wide .balanced}
+
+Charles River salary budgets, fiscal 2025
+
+Month is encoded in the column headings.
+
+{{< include /_shared/generated/chapter-02/_budget-wide.qmd >}}
+
+::: {.notes}
+Purpose: identify why a familiar report layout needs reshaping for a particular analysis. Allow about 60 seconds. The values are the same public Budget-table salary examples used in Figure 2.6. A reader can compare months conveniently across the page. However, a row currently contains several department-month observations, and month lacks its own variable column. We are not claiming that the report is bad or that analytical tools can never work with wide data. We are preparing one consistent long structure for grouping, filtering, and extending periods. Ask which new column would be required when April arrives. Transition: give month its own column.
+:::
+
+## The same values in long form {#ch02-budget-long .balanced}
+
+Selected department: **{{< var slide.chapter02.budget_department >}}**
+
+One row represents one department-month budget observation.
+
+{{< include /_shared/generated/chapter-02/_budget-long.qmd >}}
+
+::: {.notes}
+Purpose: show that reshaping changes organization rather than the amounts. Allow about 60 seconds. This view displays the first department from the preceding table across its three months. The generated table uses the identical Budget query result, so the values have not been manually re-entered. The full example contains the other departments too. Ask students to point to the observation represented by one selected row. Adding another month now adds rows rather than a new measure column. The misconception to address is that long form creates extra economic activity. It creates separate rows for observations already present. Transition: state the grain explicitly in any table.
+:::
+
+## State what one row represents {#ch02-grain .balanced .step-rows}
+
+| Table | One row represents |
+|---|---|
+| Customer | One stored customer record |
+| SalesInvoiceLine | One line on an invoice |
+| GLEntry | One debit or credit posting |
+| Budget | One account, cost center, and month budget |
+
+::: {.notes}
+Delivery: Reveal one table at a time. Purpose: introduce grain as a safeguard against incorrect counts and totals. Allow about 60 seconds. An invoice can contain multiple lines and produce multiple ledger postings. Counting rows in those tables therefore answers different questions. The budget example on the previous slide selected particular salary accounts, but the underlying table also distinguishes account and cost center. Ask students which identifier would help count invoices rather than invoice lines. They should name SalesInvoiceID and recognize repeated values across lines. Transition: even a correctly structured table can contain unreliable data.
+:::
+
+## Tidy and clean answer different questions {#ch02-tidy-clean .balanced .stepwise}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Tidy**
+
+Are variables and observations organized consistently?
+:::
+::: {.column width="50%"}
+**Clean**
+
+Have relevant missing values, duplicates, and inconsistencies been addressed?
+:::
+::::
+
+::: {.notes}
+Delivery: Reveal the structural question before the quality question. Purpose: keep reshaping separate from validating values. Allow about 60 seconds. A perfectly rectangular invoice table may still omit invoices or contain incorrect amounts. A correct management report may need reshaping before the intended analysis. Cleaning decisions also depend on purpose: an unresolved outlier should not simply disappear from the data. Ask students whether converting months into rows would repair a missing amount. It would not. Source: Chapter 2's distinction between tidy and clean data. Transition: apply quality tests to the ledger while keeping its posting-level grain in view.
+:::
+
+# Examine the accounting core {#ch02-module-core}
+
+::: {.notes}
+Move from operational examples to accounting controls. Explain that a successful accounting consistency check establishes a specific fact, not universal assurance over the entire extract.
+:::
+
+## Tutorial 2.2: begin with the ledger controls {#ch02-core-start .balanced .stepwise}
+
+Inspect the Account classifications.
+
+Compare aggregate debits with aggregate credits.
+
+Check the dates, periods, and source-document types represented.
+
+::: {.notes}
+Delivery: Introduce one control at a time. Purpose: orient students to the public Accounting Core tutorial. Allow about 60 seconds before the workbook activity. Account contains the chart of accounts, while GLEntry contains the postings. The checks address classification coverage, arithmetic consistency, and population boundaries. Tutorial 2.2 provides workbook instructions and expected public observations. Ask students which test might detect an omitted revenue account and which might flag a partial final period. Avoid suggesting that these tests alone validate each transaction. Transition: explain exactly what aggregate balance does and does not establish.
+:::
+
+## A balanced ledger still needs other tests {#ch02-balance-limit .balanced .stepwise}
+
+Equal aggregate debits and credits support arithmetic consistency.
+
+A complete balanced transaction could still be omitted.
+
+A balanced transaction could use the wrong accounts or amounts.
+
+::: {.notes}
+Delivery: Reveal the successful check before its two limitations. Purpose: prevent overclaiming from a familiar accounting control. Allow about 60 seconds. If a transaction's debit and credit are both missing, aggregate equality can survive. Similarly, equal debit and credit errors can leave the ledger balanced. Discuss ordinary rounding separately from a substantive difference. Ask students to describe a balanced misclassification without needing a numerical example. The expected reasoning is that both sides can be recorded while one account is inappropriate. Transition: check whether the identifiers used in postings resolve to existing accounts.
+:::
+
+## Test account references efficiently {#ch02-account-keys .balanced .stepwise}
+
+List distinct **GLEntry.AccountID** values with a PivotTable.
+
+Match each value to **Account.AccountID** using a lookup or count.
+
+Investigate unmatched references and document a clean result too.
+
+::: {.notes}
+Delivery: Reveal the summarize, match, and interpret steps. Purpose: teach referential integrity while keeping the workbook responsive. Allow 60–90 seconds. An orphaned reference points to an account record that does not exist. Tutorial 2.2 summarizes distinct AccountID values rather than copying a lookup formula down every ledger row. A complete match is evidence about reference existence, not whether each posting uses the correct account. Ask students to distinguish those two claims. Chapter 3 will explain why the keys establish the relationship even though Charles River does not declare foreign-key constraints. Transition: verify the period coverage independently.
+:::
+
+## A small period may be a partial period {#ch02-periods .balanced .stepwise}
+
+Inspect the earliest and latest posting dates.
+
+Count entries by fiscal year, fiscal period, and source-document type.
+
+Investigate the extract boundary before interpreting a change in activity.
+
+::: {.notes}
+Delivery: Reveal the investigation sequence. Purpose: qualify comparisons at the edge of an extract. Allow about 60 seconds. The public tutorial explains that the latest fiscal-year activity includes supplier payments settling prior-year invoices. That limited population should not be compared with a full month of all business cycles as if coverage were identical. A minimum and maximum date alone cannot establish that every expected record between them is present. Ask which additional breakdown helps explain the edge period. SourceDocumentType provides context. Transition: examine suspicious posting values without silently deleting them.
+:::
+
+## Zero-amount postings need an explanation {#ch02-zero .balanced}
+
+Filter for **Debit = 0 and Credit = 0** together.
+
+Record the affected rows and their SourceDocumentType.
+
+Investigate whether they reflect a system artifact or an entry problem.
+
+::: {.notes}
+Purpose: distinguish a two-field exception from the normal zero on one side of a posting. Allow about 60 seconds. An ordinary debit row has a zero credit, and an ordinary credit row has a zero debit. The test on this slide requires both values to be zero. Tutorial 2.2 asks students to document the count and source type in their workbook investigation. The presentation does not supply assessment solutions. Ask why a filter on just one zero field would produce a large and mostly irrelevant population. Transition: connect postings to the underlying documents to test a different aspect of quality.
+:::
+
+## Trace in the direction of the question {#ch02-trace .balanced .stepwise}
+
+**Source to ledger:** did expected transactions produce postings?
+
+**Ledger to source:** does each selected posting have supporting evidence?
+
+Compare amounts at the same document and posting scope.
+
+::: {.notes}
+Delivery: Reveal the two directions and then the scope requirement. Purpose: connect traceability to completeness and support. Allow 60–90 seconds. SourceDocumentType identifies the kind of source, SourceDocumentID identifies its document, and SourceLineID can identify a line. A single revenue credit should not be compared with an invoice grand total containing freight and tax as if they were the same measure. Reconcile the relevant posting group to the corresponding document components. Ask students why starting only from recorded ledger rows cannot identify every unrecorded source transaction. Transition: consolidate the checks into a reviewable assessment.
+:::
+
+## Tutorial checkpoint {#ch02-checkpoint .balanced}
+
+- Explain one exception and one plausible alternative explanation.
+- Describe a test that found no problem and its limits.
+- State whether the extract is suitable for your intended period and task.
+
+[Open Tutorial 2.2](https://aa.accountinganalyticshub.com/chapters/02-understanding-data/chapter.html#guided-tutorial-2.2-examining-the-charles-river-accounting-core-for-completeness-and-consistency)
+
+::: {.notes}
+Purpose: assess whether students can explain their work rather than merely operate filters. Allow two to three minutes. Invite pairs to compare one operational finding and one ledger check. A useful response names the tested population, the evidence, and the boundary of the conclusion. For example, matching AccountIDs establishes that referenced accounts exist, while further work is needed to assess correct classification. The public tutorial contains the expected general observations. Do not replace assigned exercise work with a completed solution. Ask each pair to identify one follow-up that could change their assessment. Transition: summarize the habits to carry into the next chapter.
+:::
+
+## Chapter summary {#ch02-summary .balanced .stepwise}
+
+Choose sources and fields that match the question.
+
+Test all four quality dimensions and explain exceptions.
+
+Separate structural reshaping from correcting values.
+
+Document the scope and limits of the evidence.
+
+::: {.notes}
+Delivery: Revisit one learning objective with each point. Purpose: consolidate the chapter into a repeatable approach. Allow about 60 seconds. Students should now be able to identify useful sources, describe quality concerns precisely, and distinguish tidy structure from reliable content. Emphasize the recurring difference between an observation and a supported conclusion. Ask the class which habit would have prevented a mistaken interpretation of the sparse edge period or a repeated customer name. The answer should connect the test to its business context. Transition: related tables require an explicit understanding of keys and relationships, which Chapter 3 develops.
+:::
+
+## Practice and the next chapter {#ch02-next .balanced}
+
+For assigned Chapter 2 practice, document the population, test, evidence, and conclusion.
+
+Keep unresolved exceptions visible in your working record.
+
+Next: tables, keys, cardinality, and the paths connecting business events to the ledger.
+
+[Chapter 2 questions and exercises](https://aa.accountinganalyticshub.com/chapters/02-understanding-data/chapter.html#multiple-choice-questions)
+
+::: {.notes}
+Purpose: transition to independent practice without disclosing answers. Allow 45–60 seconds. Specify the exercises assigned in the course and the expected form of the student's working record. The slide intentionally gives an approach rather than results for assessment questions. Remind students to retain their working copy and preserve the original download. Ask them to identify the table and row grain before each new test. For the recording, close this module after stating where the assignment instructions can be found. Transition: the next chapter makes the relationships behind these cross-table tests explicit.
+:::
+
+## References and further reading {#ch02-references .balanced}
+
+Wang and Strong (1996): data quality from the data consumer's perspective.
+
+Wickham (2014): principles of tidy data.
+
+[Full Chapter 2 references](https://aa.accountinganalyticshub.com/chapters/02-understanding-data/chapter.html#references)
+
+::: {.notes}
+Purpose: make the conceptual sources available for teaching and recording. Allow about 45 seconds. Wang and Strong inform the fitness-for-use perspective. The chapter selects four practical dimensions for accounting work, rather than presenting them as the paper's complete framework. Wickham provides the tidy-data principles used in the budget example. Invite students to consult the chapter for its broader reading list. Full references follow.
+
+{{< include /_shared/fragments/_reference-wang-strong-1996.qmd >}}
+
+{{< include /_shared/fragments/_reference-wickham-2014.qmd >}}
+:::
+
+## Attribution and reuse {#ch02-credits .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 2 teaching adaptation with public narration and selected Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Charles River dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: close with attribution and reuse conditions. Allow about 45 seconds. The deck adapts the Chapter 2 narrative, public tutorials, and figures. Charles River is fictional educational data. The budget and quality exhibits are generated from the same public example functions used by the book. They do not represent live organizational evidence. All notes travel with both presentation formats. Retain credit and identify changes when adapting these materials under the stated license. Any separately credited material retains its own terms. End the recording here or move to the assigned class activity.
+:::

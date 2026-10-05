@@ -2,7 +2,7 @@
 
 ## References
 
-Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
+{{< include /shared/fragments/_reference-datar-2021.qmd >}}
 
 Borthick, A. F., Schneider, G. P., & Viscelli, T. R. (2017). Analyzing data for decision making: Integrating spreadsheet modeling and database querying. *Issues in Accounting Education*, *32*(1), 59–66. <https://doi.org/10.2308/iace-51385>
 

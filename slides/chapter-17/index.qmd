@@ -1,0 +1,355 @@
+---
+title: "Financial Statements for a Lender"
+subtitle: "Chapter 17"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-17.pptx
+---
+
+## The capstone decision {#ch17-01 .balanced .stepwise}
+
+Can the CFO send a supportable financial-statement package to the lender?
+
+What must be adjusted, disclosed, or resolved first?
+
+::: {.notes}
+Purpose: introduce an independent reporting assignment. Allow 60-90 seconds. In the case scenario it is July 2027 and the lender needs comparative statements and notes. Students choose the procedures and tools that produce a traceable package. The briefing explains the work and its checkpoints; the team must develop and defend its own conclusions. Misconception to address: the recorded trial balance is already a complete lender package. Pause and ask: What evidence would you need before recommending release? Transition: define the required period and output.
+:::
+
+## Learning objectives {#ch17-02 .balanced .stepwise}
+
+- Build and reconcile comparative financial statements.
+- Support adjustments and assign them to periods.
+- Reconcile note schedules to the statements.
+- Identify evidence the database cannot supply.
+
+::: {.notes}
+Purpose: turn the assignment into observable capabilities. Allow 60-90 seconds. Students should be able to trace a reported amount back through adjustments to a dated population and its documents. They must also identify where the accounting judgment requires external evidence. Emphasize documentation that another preparer can rerun and a reviewer can challenge. Misconception to address: using all three tools is the objective rather than supporting the decision. Pause and ask: Which output would demonstrate traceability most directly? Transition: establish the scenario constraints.
+:::
+
+## Scope and conditions come from the case {#ch17-03 .balanced .stepwise}
+
+Fiscal 2026 statements with fiscal 2025 comparatives.
+
+Adjustments remain numbered workbook entries for approval.
+
+State the date through which the supporting records run.
+
+::: {.notes}
+Purpose: make the boundaries explicit. Allow 60-90 seconds. The lender requests management-prepared statements, and it may later request outside assurance. Students do not post adjustments to the supplied ledger. Each proposed entry remains supported in the workbook. Use the case dates and the actual source coverage rather than the current computer date to define the reporting evidence. Misconception to address: working with a copy authorizes posting proposed adjustments. Pause and ask: Which file should retain the adjustment evidence and approval decision? Transition: set up the work products.
+:::
+
+## Give each tool a defined handoff {#ch17-04 .balanced}
+
+| Tool | Working artifact | Main role |
+|---|---|---|
+| SQL | LenderPackage.sql | Dated populations and schedules |
+| Excel | Charles River Lender Package.xlsx | Adjustments, statements, notes |
+| Power BI | Charles River Lender Review.pbix | Review, drill-through, tests |
+
+::: {.notes}
+Purpose: organize the required files. Allow 60-90 seconds. Use the full filenames specified in the chapter checklist. Run queries against CharlesRiver_Capstone.sqlite, a working copy of the download. Record export dates and preserve stable identifiers when moving a query result to the workbook. The report reads the workbook's adjustment table as well as the source. Misconception to address: a copied result no longer needs its source query. Pause and ask: How will the reviewer identify the query that produced one schedule? Transition: follow the four milestones.
+:::
+
+## Four milestones build on one another {#ch17-05 .balanced .stepwise}
+
+1. Establish the ledger as recorded.
+2. Support and judge the adjustments.
+3. Prepare the statements and notes.
+4. Resolve open evidence and advise the CFO.
+
+::: {.notes}
+Purpose: set the sequence and review points. Allow 60-90 seconds. The first milestone establishes controls that later work must preserve. Do not let an unresolved population difference flow silently into a note schedule or memo. The instructor can review intermediate submissions according to the course schedule. Students should retain an open-questions list across all four phases. Misconception to address: a final memo can compensate for unvalidated intermediate schedules. Pause and ask: What would stop your team from accepting the first milestone? Transition: start with dated trial balances.
+:::
+
+# Milestone 1: the ledger as recorded {#ch17-module-6}
+
+::: {.notes}
+Requirements 1 and 2 establish dated balances, a review model, and the questions that guide the rest of the assignment.
+:::
+
+## One dated query should serve three year-ends {#ch17-07 .balanced .stepwise}
+
+Use a Params CTE for the as-of date.
+
+Produce the 2024, 2025, and 2026 trial balances consistently.
+
+Retain the account mapping and independent controls.
+
+::: {.notes}
+Purpose: plan a repeatable extraction. Allow 60-90 seconds. The opening comparative period needs an earlier balance to explain movement into 2025. A parameterized query makes the date rule explicit and avoids separately maintained logic. Preserve every account needed to reconcile the total, then map to statement lines in the workbook. Misconception to address: three screenshots establish that three independently edited queries are consistent. Pause and ask: Which result should agree with the Chapter 6 control? Transition: inspect the closing-entry boundary.
+:::
+
+## The closing rule depends on the as-of date {#ch17-08 .balanced .stepwise}
+
+Exclude only closing entries dated on that year-end.
+
+Keep earlier closes in the accumulated balance.
+
+Separate later postings from the year-end population.
+
+::: {.notes}
+Purpose: prevent a carryforward error. Allow 60-90 seconds. For this trial-balance task, removing every historical close would lose the earlier transfer of income into retained earnings. The rule therefore differs from the income-measure example that excludes closes when summarizing annual operating activity. The opening entry is a dated posting too. Test the date condition before interpreting balances. Misconception to address: one closing filter can be copied unchanged into every kind of statement query. Pause and ask: Why would removing an earlier close affect retained earnings? Transition: review the recorded statements.
+:::
+
+## Review before proposing adjustments {#ch17-09 .balanced .stepwise}
+
+Compare statement lines and year-to-year changes.
+
+Drill to accounts, postings, and source-document types.
+
+Record questions with the requirement that will address them.
+
+::: {.notes}
+Purpose: turn analytical review into an evidence plan. Allow 60-90 seconds. Build the Questions table so each concern has a location in the work program. Inspect balances supported only by journal entries and those unchanged since opening. These are leads for investigation, not automatic conclusions about error. Keep the selected threshold and reporting dates visible. Misconception to address: an unusual movement proves an adjustment is needed. Pause and ask: Which question can the ledger answer, and which needs a document? Transition: accept the first milestone.
+:::
+
+## Milestone 1 checkpoint {#ch17-10 .balanced .stepwise}
+
+Do the three trial balances balance?
+
+Can a reviewer trace a flagged line to its postings?
+
+Does each open question have a planned procedure?
+
+[Open Requirements 1-2](https://aa.accountinganalyticshub.com/chapters/17-statements-for-a-lender/chapter.html#phase-1-the-ledger-as-it-stands)
+
+::: {.notes}
+Purpose: pause for acceptance of the recorded baseline. Allow 3-5 minutes. Ask teams to demonstrate one dated query, one reconciliation, and one drill-through question. Require them to explain the closing filter in words. Resolve unexplained differences before continuing to adjustment measurement. A useful checkpoint is the quality of the evidence trail rather than a supplied answer. Misconception to address: finishing the worksheet layout completes the milestone. Pause and ask: Which unresolved difference would you escalate now? Transition: rebuild the balances behind proposed adjustments.
+:::
+
+# Milestone 2: support the adjustments {#ch17-module-11}
+
+::: {.notes}
+Requirements 3 to 5 rebuild accrued expenses, test cutoff, and organize the period and materiality judgments. Preserve each measurement and its evidence.
+:::
+
+## Rebuild a liability from what created and cleared it {#ch17-12 .balanced .stepwise}
+
+Separate opening balances, freight accruals, and service accruals.
+
+Measure clearing activity as of each year-end.
+
+Reconcile the components to the ledger.
+
+::: {.notes}
+Purpose: plan the accrued-expense reconstruction. Allow 60-90 seconds. The account combines events with different document paths. Identify the source and clearing keys before aggregating. An invoice can clear an accrual only through the relevant postings, and a separate adjustment can clear a residual. Use dated ledger evidence rather than assuming an invoice total equals the amount cleared. Misconception to address: subtracting all later invoice totals reconstructs the year-end liability. Pause and ask: Which date boundary determines whether a clearing posting belongs in the balance? Transition: test the joins before judging old items.
+:::
+
+## Prevent fan-out before interpreting an old accrual {#ch17-13 .balanced .stepwise}
+
+State the grain of each source and result.
+
+Aggregate the relevant clearing postings before joining.
+
+Retain unmatched and uncleared items for review.
+
+::: {.notes}
+Purpose: apply the join controls from the SQL chapters. Allow 60-90 seconds. An accrual can be related to invoice lines and reversal entries with different multiplicities. A join that duplicates the accrual amount can produce a plausible but wrong residual. Check counts and totals at each step, and keep opening balances distinct from new estimates. Misconception to address: an old balance must be invalid solely because it is old. Pause and ask: What evidence would establish whether the obligation still exists? Transition: apply one cutoff method consistently.
+:::
+
+## Cutoff tests require both sides of the boundary {#ch17-14 .balanced .stepwise}
+
+Revenue: compare posting with delivery evidence.
+
+Payroll: measure work completed before year-end.
+
+Interest: state the accrual period and day-count convention.
+
+::: {.notes}
+Purpose: organize the three cutoff workstreams. Allow 60-90 seconds. Use the public requirements to define the populations and methods at all relevant year-ends. Queries identify records; the workbook should expose the proration and measurement formulas. Later-year missing payroll registers require the specific estimation approach assigned in the case, with its assumptions documented. Misconception to address: a payment or invoice date alone establishes the expense or revenue period. Pause and ask: Which event date supports each workstream? Transition: assign effects across the comparative periods.
+:::
+
+## Assign each effect to its period {#ch17-15 .balanced .stepwise}
+
+Distinguish an error, a change in estimate, and a reclassification.
+
+Track opening equity and each year's income separately.
+
+Document the facts available when the original amount was prepared.
+
+::: {.notes}
+Purpose: make the period judgment explicit without supplying it. Allow 60-90 seconds. The relevant facts and their availability determine how a difference should be evaluated under the assigned accounting guidance. A later outcome that differs from a supported estimate is not automatically an earlier error. Students must defend their classification and show the effect across the periods presented. Misconception to address: every difference discovered now belongs in current-year income. Pause and ask: What evidence distinguishes a missed fact from new information? Transition: organize the proposed entries.
+:::
+
+## The adjustment schedule is the evidence index {#ch17-16 .balanced}
+
+| Record | Required support |
+|---|---|
+| Numbered entry | Accounts and balanced lines |
+| Measurement | Formula, query, and document identifiers |
+| Period judgment | Opening equity, income, and year-end effects |
+| Decision | Recorded or passed, with the reason |
+
+::: {.notes}
+Purpose: design a reviewable adjustment schedule. Allow 60-90 seconds. Use one row per account in the adjustment-line Table so the report can load and test it. The summary schedule points to the detailed measurement and explains the period judgment. Keep passed items in the record as well as recorded entries; the reviewer needs the complete population of proposed differences. Misconception to address: a passed item can be removed from the schedule. Pause and ask: How will the reviewer connect an entry number to its supporting query? Transition: apply the case materiality condition.
+:::
+
+## Materiality is a judgment with a stated case benchmark {#ch17-17 .balanced .stepwise}
+
+Apply the controller's benchmark to each relevant year.
+
+Evaluate items individually and together.
+
+Retain qualitative concerns and every proposed adjustment.
+
+::: {.notes}
+Purpose: separate the assignment parameter from a universal rule. Allow 60-90 seconds. The case sets the numerical benchmark at five percent of recorded income before income taxes for the year in question. That is the controller's instruction for this assignment, not a universal materiality rule. Recurrence, presentation, and qualitative effects also require discussion. Show the calculation in the workbook. Misconception to address: a small numerical item never matters in aggregate or qualitatively. Pause and ask: Could several passed items affect the same statement line? Transition: accept the adjustment milestone.
+:::
+
+## Milestone 2 checkpoint {#ch17-18 .balanced .stepwise}
+
+Does each entry have an evidence trail and period judgment?
+
+Do the adjusted trial balances balance?
+
+Have you tested the case condition that adjustments do not touch cash?
+
+[Open Requirements 3-5](https://aa.accountinganalyticshub.com/chapters/17-statements-for-a-lender/chapter.html#phase-2-the-adjustments)
+
+::: {.notes}
+Purpose: review the adjustment layer before presentation. Allow 3-5 minutes. Have teams present the structure and validation of one proposed entry without circulating a class answer. Inspect how they kept the earlier-year reversal effects and the opening-equity implications separate. Unresolved evidence should remain identified in the Questions table and the memo plan. Misconception to address: balancing debits and credits establishes that an entry is justified. Pause and ask: Which judgment still needs external evidence? Transition: build statements from the accepted layer.
+:::
+
+# Milestone 3: statements and notes {#ch17-module-19}
+
+::: {.notes}
+Requirements 6 and 7 turn the adjusted balances into a coherent package. Every schedule should reconcile to the statement line it supports.
+:::
+
+## Four statements must tell the same story {#ch17-20 .balanced .stepwise}
+
+Classified balance sheets and income statements.
+
+Changes in stockholders' equity.
+
+Indirect cash-flow statements with noncash activity identified.
+
+::: {.notes}
+Purpose: coordinate the package across statements. Allow 60-90 seconds. Use the adjusted trial balances and the period judgments already documented. Equity must explain the opening-to-closing movement, including supported corrections. The cash-flow reconciliation can change its components while the underlying cash movement remains the same. Identify noncash investing and financing activity for appropriate disclosure under the assigned requirements. Misconception to address: a noncash acquisition belongs in cash investing outflow. Pause and ask: Which cross-statement relationship will you test first? Transition: build the note schedules.
+:::
+
+## A note schedule needs a statement tie {#ch17-21 .balanced .stepwise}
+
+Property and equipment: roll cost and depreciation forward.
+
+Debt: terms, maturities, current portion, and interest.
+
+Revenue and accrued liabilities: supported components and balances.
+
+::: {.notes}
+Purpose: plan the required disclosures as reconciled schedules. Allow 60-90 seconds. The public requirement specifies the note package. Extract the needed records at a stated grain, reconcile to the adjusted basis, and write the explanatory text around that evidence. A sales model used for disaggregation must be reconciled to the ledger and any cutoff adjustment rather than copied unchanged. Misconception to address: a correct source-table total automatically agrees with the adjusted statement. Pause and ask: Which note would need both a document schedule and a ledger reconciliation? Transition: test the workbook-report handoff.
+:::
+
+## Test the adjustment handoff into the review report {#ch17-22 .balanced .stepwise}
+
+Every numbered entry balances.
+
+No adjustment line changes cash under the case conditions.
+
+Adjusted results agree between the workbook and report.
+
+::: {.notes}
+Purpose: validate the second consumer of the adjustment table. Allow 60-90 seconds. The report should load the same adjustment lines the workbook uses, preserving entry numbers and accounts. A repeated amount at the wrong grain can pass a visual check while changing a total. Save the tests with the model so a later workbook refresh can be checked against the same expectations. Misconception to address: the two tools agree merely because they use the same filename. Pause and ask: Which identifier lets the report test one complete entry? Transition: accept the presentation milestone.
+:::
+
+## Milestone 3 checkpoint {#ch17-23 .balanced .stepwise}
+
+Do statements, equity movements, and cash reconcile?
+
+Does every required note tie to its statement line?
+
+Can the review report reproduce the key checks?
+
+[Open Requirements 6-7](https://aa.accountinganalyticshub.com/chapters/17-statements-for-a-lender/chapter.html#phase-3-the-statements-and-notes)
+
+::: {.notes}
+Purpose: accept a coherent package rather than isolated schedules. Allow 3-5 minutes. Ask teams to trace one note amount through the adjusted statement to the source and any proposed entry. Check that labels and comparative presentation reflect the documented period judgments. Preserve unresolved matters for the final recommendation instead of disguising them in polished statements. Misconception to address: a complete-looking PDF establishes completeness of the accounting work. Pause and ask: What unresolved matter must be visible to the CFO? Transition: evaluate what the records cannot settle.
+:::
+
+# Milestone 4: advise the CFO {#ch17-module-24}
+
+::: {.notes}
+Requirements 8 and 9 examine later events, remaining evidence, and the decision to release the package. The database is one source within that evaluation.
+:::
+
+## Later records have a limited coverage window {#ch17-25 .balanced .stepwise}
+
+Profile which transaction types continue after year-end.
+
+Search the available records for relevant later evidence.
+
+List the later events and conditions requiring external inquiry.
+
+::: {.notes}
+Purpose: avoid treating a partial later population as a complete subsequent-events review. Allow 60-90 seconds. The case warns that the later records have restricted scope. Students should demonstrate what is present, how far it runs, and what cannot be observed there. The CFO's evaluation extends beyond the database and requires appropriately dated external evidence under the assigned guidance. Misconception to address: absence from the dataset establishes that no later event occurred. Pause and ask: What inquiry would you make outside the system? Transition: frame the unresolved matters.
+:::
+
+## Separate recorded facts from requested evidence {#ch17-26 .balanced .stepwise}
+
+Tax status and leases.
+
+Sales tax collected and unsupported balances.
+
+Liquidity, future plans, and other conditions relevant to the lender.
+
+::: {.notes}
+Purpose: make the evidence requests decision-useful. Allow 60-90 seconds. For each matter, state what the records show, the evidence needed to settle it, any measurable possible effect, and the proposed treatment. Avoid implying a cause or action by an individual when the records support only a condition. Management's plans and external agreements cannot be invented from ledger patterns. Misconception to address: an evidence request is too vague to belong in a recommendation. Pause and ask: How would you identify an owner and deadline for one request? Transition: write the release recommendation.
+:::
+
+## The memo should support a release decision {#ch17-27 .balanced .stepwise}
+
+State whether the package is ready and why.
+
+Identify the adjustments, passed items, and open evidence.
+
+Recommend changes that prevent recurring close problems.
+
+::: {.notes}
+Purpose: focus the CFO memo on a decision and its conditions. Allow 60-90 seconds. The assignment limits the memo to two pages with an exhibit appendix of no more than three pages. Select the evidence that supports the recommendation instead of narrating every query. Make unresolved conditions, approval needs, and next actions specific. The team must defend its own proposed release decision. Misconception to address: a long list of procedures is the same as a recommendation. Pause and ask: What condition would prevent you from recommending release? Transition: check the final handoff.
+:::
+
+## Deliver a package another accountant can review {#ch17-28 .balanced .stepwise}
+
+SQL file with documented populations and checks.
+
+Workbook, statement-and-note PDF, and review report with tests.
+
+CFO memo with a concise exhibit appendix.
+
+[Open the submission checklist](https://aa.accountinganalyticshub.com/chapters/17-statements-for-a-lender/chapter.html#deliverables-and-checklist)
+
+::: {.notes}
+Purpose: close with a reviewable submission. Allow 2-3 minutes. Use the chapter's full checklist to confirm filenames, required worksheets, notes, questions, tests, and page limits. Reopen the files and trace a selected number end to end. Record the source coverage and explain which tool was used for each task. Preserve the original download and the unposted nature of the proposed adjustments. Misconception to address: submitting the final PDF makes the working evidence unnecessary. Pause and ask: Can a reviewer rerun the extraction behind one reported amount? Transition: acknowledge the assigned references.
+:::
+
+## References and further reading {#ch17-29 .balanced}
+
+Chapter 17 requirements and accounting references.
+
+Earlier chapter controls for statements, cutoff, models, and review.
+
+Use the assigned guidance to support each period and disclosure judgment.
+
+[Full Chapter 17 references](https://aa.accountinganalyticshub.com/chapters/17-statements-for-a-lender/chapter.html#references)
+
+::: {.notes}
+Purpose: identify the authorities for the independent assignment. The chapter's APA references and public requirements identify the applicable FASB Accounting Standards Codification topics, including presentation, cash flows, accounting changes and error corrections, revenue, subsequent events, and going concern. Students should cite the guidance supporting their own judgments and retain the relevant evidence. The case's materiality benchmark and deliverable limits are assignment conditions. This briefing adapts the public requirements without providing completed adjustment schedules or case conclusions. Transition: acknowledge the source and reuse terms.
+:::
+
+## Attribution and reuse {#ch17-30 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 17 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public requirements. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting report or workbook.
+:::

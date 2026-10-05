@@ -1,0 +1,413 @@
+---
+title: "Data Models and DAX Measures"
+subtitle: "Chapter 14"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-14.pptx
+---
+
+## Learning objectives {#ch14-01 .balanced .stepwise}
+
+- Restructure the sales model as a validated star.
+- Distinguish row context from filter context.
+- Write and test reusable measures.
+- Reconcile time comparisons and ledger results.
+
+::: {.notes}
+Purpose: connect modeling choices to dependable calculations. Allow 60-90 seconds. The existing report is the starting point. Students will preserve its controls while changing the model and adding measures. The aim is not to memorize every DAX function, but to explain which rows a calculation sees and to prove the result against an independent check. Misconception to address: a more complicated expression is a more reliable measure. Pause and ask: What evidence should remain unchanged when the model is reorganized? Transition: state the margin question.
+:::
+
+# Build the sales star {#ch14-module-2}
+
+::: {.notes}
+Begin with the validated four-table report from Chapter 13. Save an authoring checkpoint before restructuring it so the before-and-after controls are available.
+:::
+
+## The controller needs a defined margin {#ch14-03 .balanced .stepwise}
+
+Which sales are included?
+
+Which cost basis belongs to those sales?
+
+How should the margin change with the selected period?
+
+::: {.notes}
+Purpose: define the accounting question before writing DAX. Allow 60-90 seconds. The teaching measure uses invoiced revenue and quantity extended at Item standard cost. It is a preview of product economics under that cost basis, not an assertion that invoice-line margin equals financial-statement gross profit. Filters must reach both revenue and its corresponding cost population. Misconception to address: every measure labeled margin has the same accounting basis. Pause and ask: Which denominator would you use for a margin percentage? Transition: identify the grain of the fact table.
+:::
+
+## Facts record events; dimensions describe them {#ch14-04 .balanced .stepwise}
+
+**Sales fact:** one row per invoice line.
+
+**Dimensions:** Item, Customer, and Date.
+
+Use dimension attributes to filter and group the facts.
+
+::: {.notes}
+Purpose: explain the role of a star schema. Allow 60-90 seconds. The fact table retains the keys and amounts associated with each line. The dimension tables provide the descriptive fields used by readers. State the grain before adding another table or measure. Two fact tables can share dimensions without representing the same business events. Misconception to address: a fact table is simply whichever table has the most columns. Pause and ask: What would one row of a monthly budget fact represent? Transition: flatten only the required header fields.
+:::
+
+## Merge header context into the lines {#ch14-05 .balanced .stepwise}
+
+Bring in InvoiceDate, InvoiceNumber, and CustomerID.
+
+Retain one row per SalesInvoiceLineID.
+
+Keep the header query for preparation; disable its model load.
+
+::: {.notes}
+Purpose: turn the original snowflake into a sales star. Allow 60-90 seconds. Tutorial 14.1 merges the header fields needed to interpret and relate each line. This is a modeling transformation, not a change to the database. InvoiceNumber remains useful for tracing a sale even though it is not a separate dimension table. Validate the result before removing the old model relationships. Misconception to address: merging means invoice-level amounts can now be summed once per line. Pause and ask: Which merged header value is an identifier rather than an additive amount? Transition: prove that the merge preserved the population.
+:::
+
+## The merge must preserve the controls {#ch14-06 .balanced}
+
+{{< include /_shared/generated/chapter-14/_merge.qmd >}}
+
+::: {.notes}
+Purpose: verify the structural change independently of appearance. Allow 60-90 seconds. Compare the complete line population before and after the merge, using both the row count and the revenue amount. A duplicate header key can multiply rows and amounts. Missing matches can remove information while preserving a plausible total. Inspect the join and any blanks if a control changes. Misconception to address: a successful merge dialog guarantees one output row per input line. Pause and ask: What failure would increase both the count and the total? Transition: inspect the new filter paths.
+:::
+
+## Each dimension filters the sales fact directly {#ch14-07 .balanced}
+
+![](/_shared/generated/chapter-14/star.svg){fig-alt="Customer, Item, and Date each have a one-to-many single-direction relationship into SalesInvoiceLine after the header fields are merged." width=95%}
+
+::: {.notes}
+Purpose: read the focused star model. Allow 60-90 seconds. Trace each dimension to the fact table. The arrows show how a selection becomes a retained line population. Date uses the invoice date for the active sales relationship. The drawing omits unrelated descriptive columns to make the paths legible; the public tutorial provides the complete field list. Misconception to address: a star requires a bidirectional relationship on each spoke. Pause and ask: Where should a customer segment slicer get its field? Transition: provide one deliberate calendar.
+:::
+
+## The Date table supplies a complete calendar {#ch14-08 .balanced .stepwise}
+
+One row for every day in full calendar years.
+
+Cover the sales and ledger date ranges.
+
+Mark Date as the date table and sort month names correctly.
+
+::: {.notes}
+Purpose: establish the calendar required for comparisons. Allow 60-90 seconds. The tutorial calendar covers 2024 through 2027, including days without transactions. Relate its Date column to the relevant event date and use its attributes in visuals. A complete calendar supports chronological comparisons; it does not mean that the source contains a full period of activity. Misconception to address: a date table can be limited to dates on which transactions occurred. Pause and ask: How could you show a month with no sales? Transition: choose relationships deliberately.
+:::
+
+## Changing a relationship changes the question {#ch14-09 .balanced .stepwise}
+
+Keep the default filter direction from dimension to fact.
+
+Investigate an unresponsive result before choosing Both.
+
+State which date relationship a measure uses.
+
+::: {.notes}
+Purpose: prevent convenience changes from altering meaning. Allow 60-90 seconds. Bidirectional filters can carry a selection from one fact table through a shared dimension into another fact. That may change a denominator unexpectedly. Similarly, invoice date and shipment date answer different timing questions. Make the intended route explicit and test the result after a relationship change. Misconception to address: Both is a harmless way to make every visual respond. Pause and ask: Could a sales selection unintentionally change a ledger total? Transition: complete the restructuring checkpoint.
+:::
+
+## Tutorial 14.1: accept the model only after validation {#ch14-10 .balanced .stepwise}
+
+Inspect the star and the marked Date table.
+
+Confirm row counts and revenue still agree.
+
+Save the model before adding the measures.
+
+[Open Tutorial 14.1](https://aa.accountinganalyticshub.com/chapters/14-data-models-and-dax/chapter.html#guided-tutorial-14.1-building-the-sales-star-and-the-date-table)
+
+::: {.notes}
+Purpose: require a tested model before formula work. Allow 3-5 minutes. Students should demonstrate one customer, item, and date filter and explain the path each takes. Retain the Validation page rather than replacing it with a sales page. If totals changed, resolve the model before adding calculations that might hide the discrepancy. For students joining here, the Companion Files project at the end of Chapter 13 supplies the starting report; reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix. Misconception to address: a later measure can compensate for an unexplained merge difference. Pause and ask: Which control will you show to accept the restructuring? Transition: define explicit calculations.
+:::
+
+# Write measures with a clear context {#ch14-module-11}
+
+::: {.notes}
+Build small measures in sequence. Read each expression aloud as a statement about the rows and values it will use.
+:::
+
+## A column and a measure are evaluated differently {#ch14-12 .balanced .stepwise}
+
+**Calculated column:** a stored result for each row at refresh.
+
+**Measure:** a result evaluated for the current filter context.
+
+Name, format, and document each reusable measure.
+
+::: {.notes}
+Purpose: distinguish persistence from evaluation context. Allow 60-90 seconds. A column is useful for row-level attributes and grouping. A measure computes a result for each visual cell or query context. The same measure can therefore produce different values across a matrix and a meaningful grand total. Put the calculation in the place that matches the question. Misconception to address: a measure is just a calculated column with a shorter name. Pause and ask: Which form should respond to a year slicer? Transition: start with an additive measure.
+:::
+
+## Revenue sums the retained line population {#ch14-13 .balanced .sql-example}
+
+```dax
+Revenue =
+SUM ( SalesInvoiceLine[LineTotal] )
+```
+
+::: {.notes}
+Purpose: read a simple explicit measure. Allow 60-90 seconds. The expression sums LineTotal after the current filters and relationships have selected the relevant rows. Its definition is short because the model carries the context. Format Revenue as a monetary amount and give it a description. A measure name can now be reused by later calculations. Misconception to address: SUM ignores the reader's selections. Pause and ask: What changes when the same measure appears on a Furniture row? Transition: name the filter context.
+:::
+
+## A matrix cell combines several filters {#ch14-14 .balanced .stepwise}
+
+The row can select an item group.
+
+The column can select a quarter.
+
+Slicers and page filters can narrow both.
+
+::: {.notes}
+Purpose: make filter context concrete. Allow 60-90 seconds. For a Furniture cell under one quarter, the fact rows must satisfy both dimensions and any additional report selections. Read the visible labels before interpreting the number. Totals are evaluated in their own context, where some row or column filters are absent. Misconception to address: a matrix total always adds the displayed percentages. Pause and ask: Which filter disappears in the grand-total row? Transition: calculate standard cost one line at a time.
+:::
+
+## SUMX evaluates each line before adding {#ch14-15 .balanced .sql-example}
+
+```dax
+Standard Cost =
+SUMX (
+  SalesInvoiceLine,
+  SalesInvoiceLine[Quantity] *
+    RELATED ( 'Item'[StandardCost] )
+)
+```
+
+::: {.notes}
+Purpose: explain iteration and a related dimension value. Allow 60-90 seconds. SUMX creates a current row for each retained invoice line. RELATED follows the valid many-to-one relationship to retrieve that line's unit standard cost. The multiplication is evaluated for each line and those results are then summed. This is the same public cost basis used by the chapter figures. Misconception to address: multiplying total quantity by an average item cost is equivalent. Pause and ask: Why does a line need its own related unit cost? Transition: separate row context from filter context.
+:::
+
+## Row context and filter context do different work {#ch14-16 .balanced .stepwise}
+
+**Filter context:** which rows are eligible.
+
+**Row context:** which row an iterator is evaluating.
+
+RELATED uses the current row to reach its related record.
+
+::: {.notes}
+Purpose: distinguish the two contexts in the previous formula. Allow 60-90 seconds. The year and product filters determine the eligible invoice lines. SUMX then visits each one and evaluates the expression with that row current. Row context does not by itself act as a filter on every aggregate. This distinction explains many formulas that run but produce repeated totals. Misconception to address: the current row automatically filters every other expression. Pause and ask: Where did the year selection enter the Standard Cost calculation? Transition: build the ratio from totals.
+:::
+
+## The margin rate is a ratio of totals {#ch14-17 .balanced .sql-example}
+
+```dax
+Margin % =
+VAR Rev = [Revenue]
+RETURN
+  DIVIDE ( Rev - [Standard Cost], Rev )
+```
+
+::: {.notes}
+Purpose: define a weighted margin that works at every level. Allow 60-90 seconds. The variable names the revenue value in this evaluation. DIVIDE provides the ratio and handles a zero or blank denominator through its default blank result. Each matrix cell calculates its own revenue and cost totals before dividing. The accounting basis remains standard cost extended to invoiced quantities. Misconception to address: the grand margin is the simple average of product or quarter rates. Pause and ask: Why could an average of the visible rates differ from this total? Transition: inspect the result by quarter.
+:::
+
+## The measure reveals Furniture's quarterly pattern {#ch14-18 .balanced}
+
+{{< include /_shared/generated/chapter-14/_margin.qmd >}}
+
+::: {.notes}
+Purpose: interpret the public result without changing its cost basis. Allow 60-90 seconds. Read the four quarters in order. The decline toward the final quarter is the same opening question explored earlier in the book. The measure locates the pattern under a stated definition; it does not by itself identify the commercial or operational cause. The displayed values come from the shared public calculation. Misconception to address: a lower invoice-based margin proves higher actual production cost. Pause and ask: Which additional evidence would separate pricing from cost explanations? Transition: change one filter deliberately.
+:::
+
+## CALCULATE changes a specific filter {#ch14-19 .balanced .sql-example}
+
+```dax
+Furniture Revenue =
+CALCULATE (
+  [Revenue],
+  'Item'[ItemGroup] = "Furniture"
+)
+```
+
+::: {.notes}
+Purpose: read a filter replacement. Allow 60-90 seconds. The measure evaluates Revenue after applying a Furniture filter to ItemGroup. In the example matrix this replaces a row filter on that same column, while the selected year remains. This is deliberate behavior, so the name should make the fixed category visible. Other filters can still constrain the result. Misconception to address: CALCULATE always adds a condition without replacing an existing one. Pause and ask: What should happen on the Lighting row when only ItemGroup and year define the context? Transition: compare the ordinary and fixed measures.
+:::
+
+## The fixed category repeats across these rows {#ch14-20 .balanced}
+
+{{< include /_shared/generated/chapter-14/_filter-context.qmd >}}
+
+::: {.notes}
+Purpose: test the predicted context change. Allow 60-90 seconds. The ordinary Revenue measure follows the displayed group. Furniture Revenue uses the replacement ItemGroup filter and therefore repeats in this controlled example. The table is a diagnostic view for understanding the measure, not a recommended management display. Keep the same year and avoid additional item attributes while reproducing the example. Misconception to address: a repeated value always indicates a broken relationship. Pause and ask: Which measure should change if the year slicer changes? Transition: define an explicit denominator.
+:::
+
+## REMOVEFILTERS defines the share denominator {#ch14-21 .balanced .sql-example}
+
+```dax
+Share of Revenue =
+DIVIDE (
+  [Revenue],
+  CALCULATE (
+    [Revenue], REMOVEFILTERS ( 'Item' )
+  )
+)
+```
+
+::: {.notes}
+Purpose: show how a denominator preserves some context. Allow 60-90 seconds. The numerator keeps the current item context. The denominator removes filters from Item while retaining the date and customer context. State the intended population for the share before writing the expression. Removing the whole Item table is broader than removing only ItemGroup. Misconception to address: a share denominator always means all records in the database. Pause and ask: Would a customer selection still affect this denominator? Transition: introduce context transition.
+:::
+
+## Context transition turns a current row into filters {#ch14-22 .balanced .stepwise}
+
+CALCULATE can convert row context into filter context.
+
+A measure evaluated in row context gets that transition.
+
+A bare aggregate may otherwise repeat a wider total.
+
+::: {.notes}
+Purpose: introduce the context-transition boundary. Allow 60-90 seconds. Use this as a conceptual checkpoint rather than a long formula demonstration. When iterating over customers, evaluating a measure lets the current customer identify the relevant fact population. A bare SUM without the needed transition can see a wider population. Consult the chapter for the full worked treatment. Misconception to address: every expression inside an iterator automatically filters the facts to its current dimension row. Pause and ask: Why might an iterator show the same total for every customer? Transition: prove the measures with queries.
+:::
+
+## Tests make a measure reviewable {#ch14-23 .balanced .sql-example}
+
+```dax
+EVALUATE
+SUMMARIZECOLUMNS (
+  'Date'[Year],
+  "Revenue", [Revenue],
+  "Margin", [Margin %]
+)
+```
+
+::: {.notes}
+Purpose: run a result query independently of report design. Allow 60-90 seconds. DAX query view evaluates the measures against the model and returns a table. This short teaching query groups by year; Tutorial 14.2 supplies the complete control tests with rounding and expected comparisons. Record the query and its independently supported expectation so future model changes can be checked. Misconception to address: a query that returns rows has passed its accounting test. Pause and ask: Which earlier result could independently check Revenue? Transition: finish the measure checkpoint.
+:::
+
+## Tutorial 14.2: explain and test each result {#ch14-24 .balanced .stepwise}
+
+Validate revenue, counts, and standard-cost margin.
+
+Predict the CALCULATE and REMOVEFILTERS results.
+
+Save the named tests with the model.
+
+[Open Tutorial 14.2](https://aa.accountinganalyticshub.com/chapters/14-data-models-and-dax/chapter.html#guided-tutorial-14.2-writing-and-testing-the-margin-measures)
+
+::: {.notes}
+Purpose: integrate the formula sequence with public controls. Allow 3-5 minutes. Have students run the chapter tests, inspect their result tables, and explain one context change. The point is to preserve a small library of executable checks, not to memorize the numbers on a screenshot. Ask them to retain the definitions and any qualifications needed to interpret the measures. Store the measures in the table named Key Measures, following the revised tutorial naming. Students joining here can use the Companion Files project at the end of Tutorial 14.1, reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix. Misconception to address: visual agreement alone makes a test reproducible. Pause and ask: What changed when the Item filter was removed? Transition: extend the measures to dates and ledger evidence.
+:::
+
+# Respect dates and accounting events {#ch14-module-25}
+
+::: {.notes}
+The same amount can answer different questions under different date paths and closing-entry rules. Make those choices part of the measure definition.
+:::
+
+## A second date needs a deliberate measure {#ch14-26 .balanced .stepwise}
+
+Invoice date answers the invoicing question.
+
+Shipment date answers a delivery-timing question.
+
+USERELATIONSHIP can activate an existing inactive path.
+
+::: {.notes}
+Purpose: separate alternate date roles. Allow 60-90 seconds. The model can retain an inactive relationship for a second date. A measure can activate it for a specified calculation using USERELATIONSHIP inside CALCULATE. The relationship must already exist and the reader must know which event date is being used. The function does not create missing date evidence. Misconception to address: switching the date path is merely a display preference. Pause and ask: Would the same sale necessarily fall in the same month under both dates? Transition: compare equivalent calendar periods.
+:::
+
+## Time comparisons need coverage as well as a calendar {#ch14-27 .balanced .stepwise}
+
+Prior-year and year-to-date measures shift the date context.
+
+The first year has no prior year in this dataset.
+
+A complete calendar does not imply complete activity.
+
+::: {.notes}
+Purpose: qualify time intelligence with source coverage. Allow 60-90 seconds. Date functions can identify the relevant calendar range, but they cannot supply transactions that are absent from the source. Explain blanks for the first prior-year comparison and identify partial periods before comparing them with complete ones. Check the selected date field and the source maximum date. Misconception to address: a blank prior-year result should always be replaced by zero. Pause and ask: How would zero change the implied growth story? Transition: keep the current observation out of its own expectation.
+:::
+
+## An expectation should precede the observation {#ch14-28 .balanced .stepwise}
+
+Define the comparison window explicitly.
+
+Exclude the current month from a historical expectation.
+
+Compare the observed month with that independent baseline.
+
+::: {.notes}
+Purpose: avoid a self-influenced analytical expectation. Allow 60-90 seconds. A spike can raise a moving baseline if the month being tested is included in the window. The chapter builds an expectation from earlier months so the current observation does not help explain itself. State minimum history and coverage requirements before interpreting the difference. Misconception to address: any moving average is an independent benchmark. Pause and ask: What happens to the benchmark when a spike is included in its own window? Transition: bring the ledger into a separate star.
+:::
+
+## The ledger is a second fact table {#ch14-29 .balanced .stepwise}
+
+GLEntry holds posting lines.
+
+Account, CostCenter, and Date describe those postings.
+
+Shared dimensions coordinate views without joining facts directly.
+
+::: {.notes}
+Purpose: preserve separate sales and ledger grains. Allow 60-90 seconds. Invoice lines and ledger postings describe related but different events. A shared Date dimension can filter both, while Account and CostCenter define the ledger context. Avoid a direct fact-to-fact join that multiplies rows or implicitly changes coverage. Reconcile the relevant populations before comparing totals. Misconception to address: two facts should be joined directly because both contain monetary amounts. Pause and ask: What is one row of GLEntry, compared with one invoice line? Transition: identify the year-end closing event.
+:::
+
+## Closing entries change what the total means {#ch14-30 .balanced .stepwise}
+
+Revenue and expense accounts are closed to retained earnings.
+
+A total over all their postings can therefore be zero.
+
+Use the documented closing-entry flag for operating results.
+
+::: {.notes}
+Purpose: explain a surprising but arithmetically valid zero. Allow 60-90 seconds. The zero is the result of including both the year's activity and its closing entries. It is not evidence that the business earned nothing. The tutorial brings a flag from JournalEntry into the prepared ledger so the base measure can distinguish the events. Use the stated flag rather than deleting rows from the source. Misconception to address: a zero net balance proves the income-statement measure is broken. Pause and ask: Which event offsets the year's revenue and expenses? Transition: compare the two event populations.
+:::
+
+## The closing rule changes net income {#ch14-31 .balanced}
+
+{{< include /_shared/generated/chapter-14/_income.qmd >}}
+
+::: {.notes}
+Purpose: reconcile before-close results to the ledger. Allow 60-90 seconds. The all-postings column includes the year-end closes; the other column excludes them under the public tutorial rule. The before-close amounts tie to the income transferred by the closing entries. Display rounding treats negligible floating-point residues as zero. The event rule belongs with the measure definition. Misconception to address: the two columns disagree because one uses a different dataset. Pause and ask: What independent record can support the before-close income? Transition: check the sign convention.
+:::
+
+## Choose signs that match the statement {#ch14-32 .balanced .stepwise}
+
+Credit less debit makes revenue positive.
+
+Expenses then contribute negative amounts.
+
+Check both the statement and the pre-closing trial balance.
+
+::: {.notes}
+Purpose: explain presentation signs without losing the accounting control. Allow 60-90 seconds. A consistent ledger measure can add revenue and expense effects to net income. Formatting cannot repair an inconsistent sign convention. Reconcile the pre-closing trial balance to the earlier control and confirm that its total balances before interpreting the income statement. Use AccountType and subtype deliberately. Misconception to address: a parenthesized expense is inherently an error. Pause and ask: How would a reversal appear under this sign convention? Transition: complete the ledger checkpoint.
+:::
+
+## Tutorial 14.3 and chapter handoff {#ch14-33 .balanced .stepwise}
+
+Validate the calendar and ledger relationships.
+
+Reconcile the closing rule, signs, and trial balance.
+
+Retain the Tests tab for the report package.
+
+[Open Tutorial 14.3](https://aa.accountinganalyticshub.com/chapters/14-data-models-and-dax/chapter.html#guided-tutorial-14.3-modeling-the-ledger-and-the-income-statement)
+
+::: {.notes}
+Purpose: bring the measures under repeatable control. Allow 3-5 minutes. Students should finish with a model whose important results have explicit definitions and tests. Ask them to identify the grain, filter path, and accounting rule behind one sales measure and one ledger measure. The next chapter will organize these results into pages for particular readers and decisions. The measure home table is Key Measures. The Companion Files project at the end of Tutorial 14.2 is the starting point for students joining here; reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix. Misconception to address: a saved model no longer needs its validation queries. Pause and ask: Which test will catch an accidental change to the closing filter? Transition: design the management reporting package.
+:::
+
+## References and further reading {#ch14-34 .balanced}
+
+Kimball and Ross (2013): dimensional modeling.
+
+Microsoft: star schemas, Date tables, CALCULATE, and DAX query view.
+
+Public Tutorials 14.1-14.3: model controls and measures.
+
+[Full Chapter 14 references](https://aa.accountinganalyticshub.com/chapters/14-data-models-and-dax/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the model and calculation guidance. Kimball, R., and Ross, M. (2013), The data warehouse toolkit: The definitive guide to dimensional modeling, third edition, Wiley, is included in the chapter's APA references. Microsoft's CALCULATE reference is https://learn.microsoft.com/en-us/dax/calculate-function-dax; star-schema guidance is https://learn.microsoft.com/en-us/power-bi/guidance/star-schema; DAX query view is documented at https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view. The public tutorials supply complete definitions and validation queries. The focused diagram and calculated tables reuse public book semantics. Transition: acknowledge the source and license.
+:::
+
+## Attribution and reuse {#ch14-35 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 14 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting report or workbook.
+:::

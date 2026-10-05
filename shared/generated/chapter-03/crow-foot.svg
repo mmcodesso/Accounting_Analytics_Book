@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 580" width="1280" height="580" role="img" aria-labelledby="title desc">
+<title id="title">Crow&#x27;s-foot notation</title>
+<desc id="desc">Four endpoint symbols: exactly one, zero or one, zero or many, one or many.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<path d="M80,70 L440,70" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M430,55 L430,85" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M397,55 L397,85" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<text x="520" y="81" font-size="36" fill="#1A5276" font-weight="bold" text-anchor="start">Exactly one</text>
+<path d="M80,188 L440,188" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M430,173 L430,203" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<circle cx="397" cy="188" r="10" fill="white" stroke="#5D6D7E" stroke-width="3"/>
+<text x="520" y="199" font-size="36" fill="#1A5276" font-weight="bold" text-anchor="start">Zero or one</text>
+<path d="M80,306 L440,306" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,291 L413,306" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,306 L413,306" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,321 L413,306" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<circle cx="397" cy="306" r="10" fill="white" stroke="#5D6D7E" stroke-width="3"/>
+<text x="520" y="317" font-size="36" fill="#1A5276" font-weight="bold" text-anchor="start">Zero or many</text>
+<path d="M80,424 L440,424" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,409 L413,424" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,424 L413,424" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M440,439 L413,424" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<path d="M397,409 L397,439" fill="none" stroke="#5D6D7E" stroke-width="3"/>
+<text x="520" y="435" font-size="36" fill="#1A5276" font-weight="bold" text-anchor="start">One or many</text>
+<text x="640" y="539" font-size="32" fill="#5D6D7E" font-weight="normal" text-anchor="middle">Circle = optional   |   Bar = one   |   Crow&#x27;s foot = many</text>
+</g>
+</svg>

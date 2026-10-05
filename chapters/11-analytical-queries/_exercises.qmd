@@ -64,7 +64,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      year-to-date, fiscal 2026: Furniture 17,398,287.56, Lighting 5,998,649.16, Textiles 3,278,211.11, Accessories 1,872,510.62, Services 1,213,344.00, total 29,761,002.45, equal to the trial balance balances of those accounts (operating revenue in the trial balance also
      includes 4050 Freight, 212,820.03) and to the SalesInvoice postings of Exercise 10.1. Furniture, fiscal 2026
      against 2025: largest decline October (1,314,620.10 against 1,700,781.60, -22.7%), largest increase November (1,425,903.01 against
-     1,264,497.48, +12.8%). October 2025 was unusually high; the fiscal 2026 promotion (Chapter 6) lowered prices in September and October
+     1,264,497.48, +12.8%). October 2025 was Furniture's highest month of 2025; the fiscal 2026 promotion (Chapter 6) lowered prices in September and October
      and its orders were invoiced into November and December, so the timing of invoicing and promotions is the first thing to examine. -->
 
 

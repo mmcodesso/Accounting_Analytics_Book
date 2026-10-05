@@ -1,0 +1,389 @@
+---
+title: "Forecasting, Budgeting, and What-If Analysis in Excel"
+subtitle: "Chapter 7"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-07.pptx
+---
+
+## Learning objectives {#ch07-01 .balanced .stepwise}
+
+- Interpret correlation, regression, and their limits.
+- Backtest forecasts against simple benchmarks.
+- Reconcile static, flexible, and actual results.
+- Evaluate a promotion with explicit assumptions and what-if tools.
+
+::: {.notes}
+Purpose: shift from explaining historical results to supporting a future decision. Allow about 60 seconds. The controller now asks what to expect, why the budget differed, and whether to repeat a promotion. Each question needs a different model and a different check. A model's complexity is not evidence of its usefulness. Ask students to name an assumption that could change a recommendation without changing the historical data. Transition: separate the three management questions.
+:::
+
+# Test expectations against evidence {#ch07-module-2}
+
+::: {.notes}
+Introduce the model as a conditional explanation or prediction. Begin with the data pattern before choosing a statistical tool.
+:::
+
+## The controller has three questions {#ch07-03 .balanced .stepwise}
+
+What revenue should we expect next quarter?
+
+Why did actual results differ from the budget?
+
+Should the Furniture promotion run again?
+
+::: {.notes}
+Purpose: keep the analysis tied to distinct decisions. Allow 60 seconds and reveal the questions in order. Forecasting assesses an unknown future outcome, budget analysis evaluates a plan against observed activity, and a promotion model compares conditional alternatives. A good answer to one question does not automatically answer the others. Ask students which part needs an estimate of customer response to a discount. Transition: examine whether the historical revenue series supports a simple trend.
+:::
+
+## The start-up month changes the fitted trend {#ch07-04 .balanced}
+
+![](/_shared/generated/chapter-07/monthly.svg){fig-alt="Monthly Charles River invoiced revenue from January 2024 to December 2026, with trends fitted using all months and excluding the first month. The first month is markedly lower." width=95%}
+
+::: {.notes}
+Purpose: demonstrate why plotting the series precedes interpretation of regression output. Allow 60-90 seconds. The low start-up month pulls the all-month fitted line upward. Excluding it changes the slope because the question now concerns an established operating period. The exclusion needs a business reason, not merely an improved statistical result. Ask students whether the later months show a persistent trend or variation around a level. Transition: distinguish association from an explanation of cause.
+:::
+
+## Correlation describes co-movement {#ch07-05 .balanced .stepwise}
+
+A correlation summarizes a linear relationship.
+
+Its sign gives direction and its magnitude gives strength.
+
+Shared trends, unusual observations, and omitted drivers can shape it.
+
+::: {.notes}
+Purpose: interpret correlation without claiming causation. Allow about 60 seconds. Two variables can move together because a third factor affects both, and a nonlinear relationship can have a small linear correlation. In the tutorial, revenue is compared with customer counts and average line amounts. Ask what a scatterplot might reveal that one coefficient cannot. The same start-up observation can influence more than one reported relationship. Transition: use a regression line as an explicit model with a residual.
+:::
+
+## Regression separates fitted value and residual {#ch07-06 .balanced .stepwise}
+
+**Fitted value:** intercept plus slope times the predictor.
+
+**Residual:** actual value less fitted value.
+
+Inspect the residual pattern as well as the coefficients.
+
+::: {.notes}
+Purpose: define the basic one-predictor model in terms students can read from a chart. Allow 60-90 seconds. The slope is the fitted average change in the response per unit of the predictor within this model. The intercept may fall outside a meaningful operating range, so do not automatically assign it a business interpretation. Residual patterns can reveal a missing trend, seasonality, or changing variability. Ask whether a good-looking line through the history proves future accuracy. Transition: read the output's statistical measures carefully.
+:::
+
+## Model fit and statistical evidence are different {#ch07-07 .balanced .stepwise}
+
+**R squared:** explained variation in the fitted sample.
+
+**p-value:** evidence against a specified null under model assumptions.
+
+**Confidence interval:** uncertainty about the estimated coefficient.
+
+::: {.notes}
+Purpose: prevent common interpretations of regression output from becoming decision rules. Allow 60-90 seconds. A small p-value is not the probability that the null hypothesis is true, and a high R squared is not a guarantee of accurate forecasts. A coefficient interval differs from an interval for a future observation. Explain that these statistics depend on the model and error assumptions. Ask which measure would directly evaluate predictions on observations not used to fit the model. Transition: compare the two fitted windows.
+:::
+
+## The trend result depends on the fitting window {#ch07-08 .balanced}
+
+{{< include /_shared/generated/chapter-07/_regressions.qmd >}}
+
+::: {.notes}
+Purpose: connect the earlier chart with the numerical output. Allow 60-90 seconds. The all-month model's slope test and the model excluding January answer slightly different questions. Students should explain the start-up exclusion using the business context and retain both views for review. Statistical significance can change when one influential observation is removed. Ask whether that sensitivity makes it reasonable to present the original upward slope as a durable growth expectation. Transition: evaluate forecast methods on a held-out quarter.
+:::
+
+# Backtest the forecast {#ch07-module-9}
+
+::: {.notes}
+A forecast is evaluated on data withheld from fitting. Preserve the time order so future information cannot enter the model.
+:::
+
+## A backtest recreates an earlier decision {#ch07-10 .balanced .stepwise}
+
+Fit using information available through September 2026.
+
+Forecast October, November, and December.
+
+Compare with the subsequently observed quarter.
+
+::: {.notes}
+Purpose: define the information boundary of the test. Allow about 60 seconds. The tutorial fits the comparison methods using February 2024 through September 2026, excluding the documented start-up month. The test quarter must not enter the fitting ranges. Ask students why using all of 2026 to estimate the trend before predicting Q4 would overstate the evidence. A backtest helps select a method but one quarter remains a limited sample. Transition: compare the model with simple benchmarks.
+:::
+
+## Simple forecasts provide useful benchmarks {#ch07-11 .balanced .step-rows}
+
+| Method | Forecast logic |
+|---|---|
+| Mean | Historical average |
+| Naive | Last observed value |
+| Seasonal naive | Same season last year |
+| Trend | Extrapolated fitted line |
+
+::: {.notes}
+Purpose: give students alternatives that are easy to explain and hard for a complex model to beat consistently. Allow 60 seconds. Each method reflects a different assumption about the series. The tutorial compares a mean, a trend, and the same months last year. The naive method is also a useful general benchmark even though it is not one of the displayed tutorial results. Ask which assumption best matches a stable level with irregular monthly variation. Transition: implement the trend with controlled ranges.
+:::
+
+## FORECAST.LINEAR needs fixed training ranges {#ch07-12 .balanced .stepwise}
+
+```text
+=FORECAST.LINEAR($B35,$C$3:$C$34,$B$3:$B$34)
+```
+
+B holds the month index. C holds revenue.
+
+Copy the forecast without expanding the training window.
+
+::: {.notes}
+Purpose: expose the references that define the backtest. Allow 60-90 seconds. The future month index changes by row, while both training ranges remain fixed. FORECAST.LINEAR returns the fitted value for that future index. TREND can supply several fitted or forecast values using the same linear-model idea. Ask students to inspect the last forecast formula and confirm that Q4 actuals did not enter its training range. Transition: separate a quarterly error from typical monthly error.
+:::
+
+## Quarter error can hide monthly errors {#ch07-13 .balanced .stepwise}
+
+**Quarter error:** forecast total divided by actual total, less one.
+
+**Monthly MAPE:** average absolute percentage error across the three months.
+
+Opposite monthly errors can cancel in the quarterly total.
+
+::: {.notes}
+Purpose: show why the evaluation measure must fit the use of the forecast. Allow 60 seconds. A quarterly planning estimate and a monthly cash requirement can favor different aspects of accuracy. Taking absolute values prevents positive and negative monthly errors from canceling. MAPE also becomes problematic when actual values are zero or very small, although these tutorial months are positive. Ask students whether a nearly perfect quarter total proves the timing was predicted correctly. Transition: inspect the actual comparison.
+:::
+
+## The mean performs best in this backtest {#ch07-14 .balanced}
+
+{{< include /_shared/generated/chapter-07/_backtest.qmd >}}
+
+::: {.notes}
+Purpose: interpret the public Tutorial 7.1 result. Allow 60-90 seconds. The mean has the smallest quarterly error and the smallest monthly MAPE among these three methods for this quarter. The seasonal comparison has a close quarterly total but much larger monthly errors, illustrating cancellation. Do not claim that the mean will always outperform other methods. Ask students which measure is relevant if the controller needs monthly staffing plans. Transition: state a future estimate with a qualified range.
+:::
+
+## A forecast range needs an honest label {#ch07-15 .balanced .stepwise}
+
+Report the method, training period, and horizon.
+
+Use the tutorial's error-based low and high scenarios.
+
+That range is a planning range, not a formal prediction interval.
+
+::: {.notes}
+Purpose: distinguish a practical sensitivity range from statistical coverage. Allow 60-90 seconds. The tutorial applies the mean method's backtest percentage error around its next-quarter estimate. That gives a transparent planning range, but it does not establish a particular probability that the next quarter falls inside it. A formal prediction interval would need an appropriate model and assumptions. Ask students how they would explain the range to a manager without implying false certainty. Transition: complete the forecast documentation.
+:::
+
+## Tutorial 7.1: document the method choice {#ch07-16 .balanced .stepwise}
+
+Reconcile the monthly series to total revenue.
+
+Compare both trend fits and the held-out-quarter errors.
+
+Explain the selected method and range.
+
+[Open Tutorial 7.1](https://aa.accountinganalyticshub.com/chapters/07-analysis-and-modeling/chapter.html#guided-tutorial-7.1-forecasting-revenue-and-testing-the-forecast)
+
+::: {.notes}
+Purpose: leave a forecast another analyst can reproduce. Allow two to three minutes. Students should retain the source, the monthly aggregation, the reason for excluding January 2024, the fitting window, and the error comparison. The chosen forecast should follow from those checks. Ask a student to explain why the simplest method is defensible here without claiming that simplicity alone makes a forecast correct. Transition: evaluate the budget on a comparable level of activity.
+:::
+
+# Compare the plan with actual activity {#ch07-module-17}
+
+::: {.notes}
+The budget analysis separates differences in volume from differences in prices or costs. Define the benchmark before interpreting a variance.
+:::
+
+## Static and flexible budgets use different volume {#ch07-18 .balanced .stepwise}
+
+**Static:** planned volume at planned prices and costs.
+
+**Flexible:** actual volume at planned prices and costs.
+
+**Actual:** observed amounts under the stated cost measure.
+
+::: {.notes}
+Purpose: explain why a static variance mixes several questions. Allow 60-90 seconds. Selling fewer units than planned changes revenue and cost even if prices and operating efficiency match the plan. A flexible budget asks what the plan would imply for actual activity. Charles River's tutorial uses standard cost for the invoiced units, so keep that qualification on the comparison. Ask whether a lower total expense automatically indicates efficiency when activity also fell. Transition: build the planned-price match carefully.
+:::
+
+## Planned prices need a composite key {#ch07-19 .balanced .stepwise}
+
+Match **FiscalYear, Month, and ItemID**.
+
+Verify one planned price per key.
+
+Inspect unmatched lines and document the fallback.
+
+::: {.notes}
+Purpose: apply the preparation controls to a budget model. Allow 60 seconds. A single item can have different planned prices in different months, so ItemID alone is insufficient. Expanding duplicate planned-price matches could duplicate the actual lines. The public tutorial retains actual amounts for a small number of unplanned items and documents why. That fallback affects the comparison and must remain visible. Ask how counts and totals would reveal a bad merge. Transition: define the two margin variances.
+:::
+
+## The two variances reconcile the margin {#ch07-20 .balanced .stepwise}
+
+**Sales-volume variance:** flexible less static margin.
+
+**Flexible-budget variance:** actual less flexible margin.
+
+Static margin plus both variances equals actual margin.
+
+::: {.notes}
+Purpose: establish the sign convention before showing results. Allow 60 seconds. Under this convention, a negative effect reduces margin and is unfavorable to that measure. The first variance holds planned unit economics while changing volume. The second compares results at actual volume. Ask students to state the reconciliation in words before doing arithmetic. The labels should stay consistent across Tables, charts, and commentary. Transition: read the Furniture example.
+:::
+
+## Furniture's static plan overstates the activity base {#ch07-21 .balanced}
+
+{{< include /_shared/generated/chapter-07/_budget.qmd >}}
+
+::: {.notes}
+Purpose: distinguish a volume-planning problem from the smaller comparison at actual volume. Allow 60-90 seconds. Read the Table as a reconciliation: static margin, the volume adjustment, flexible margin, the remaining adjustment, and actual margin. The very large negative volume variance means the static plan was far from the observed activity level. It does not establish the reason demand or the plan differed. Ask which benchmark should support a price-performance discussion. Transition: investigate the flexible-budget difference.
+:::
+
+## Price and expense assumptions still need inspection {#ch07-22 .balanced .stepwise}
+
+Separate promotion discounts from the price gap before discounts.
+
+Compare the timing of planned and actual promotions.
+
+Check expense drivers such as burden and commission rates.
+
+::: {.notes}
+Purpose: move beyond labeling every unfavorable variance as poor performance. Allow 60-90 seconds. Tutorial 7.2 finds that the plan's price assumptions, promotion timing, and two operating-expense drivers matter. A variable commission expense should be compared at the relevant revenue base, while a salary burden ratio needs a consistent salary population. Ask students which driver would change with sales volume and which could be a fixed planning assumption. Transition: complete and document the budget reconciliation.
+:::
+
+## Tutorial 7.2: explain the variance drivers {#ch07-23 .balanced .stepwise}
+
+Reconcile static margin plus variances to actual margin.
+
+Investigate the unmatched planned prices.
+
+Separate volume, price, timing, and expense-driver explanations.
+
+[Open Tutorial 7.2](https://aa.accountinganalyticshub.com/chapters/07-analysis-and-modeling/chapter.html#guided-tutorial-7.2-comparing-2026-with-the-budget)
+
+::: {.notes}
+Purpose: require a supportable explanation rather than a list of differences. Allow three minutes. Each product line should satisfy the margin reconciliation. Students should trace the Furniture discount timing and test the burden and commission calculations using the tutorial's public steps. The conclusion should distinguish a wrong planning assumption from a change in actual behavior. Ask each pair to identify one variance and the evidence that explains it. Transition: turn that evidence into a conditional promotion model.
+:::
+
+# Model the promotion decision {#ch07-module-24}
+
+::: {.notes}
+The decision model compares contribution under stated assumptions. Historical discounts do not by themselves measure the demand response.
+:::
+
+## Contribution identifies the relevant economics {#ch07-25 .balanced .stepwise}
+
+Revenue less variable costs gives contribution.
+
+Contribution pays fixed costs and then profit.
+
+Break-even units equal fixed costs divided by contribution per unit.
+
+::: {.notes}
+Purpose: refresh the prerequisite needed for the decision model. Allow 60-90 seconds. The relationship assumes a positive contribution per unit and relevant-range behavior for prices and costs. A promotion comparison can hold unchanged fixed costs outside the difference, but new capacity or campaign costs would need to be added if they change. Ask students what would happen if the discounted contribution per unit were zero or negative. Transition: identify the inputs used in the public model.
+:::
+
+## The model separates evidence and assumptions {#ch07-26 .balanced .stepwise}
+
+**From the data:** units, pre-discount price, standard cost, commission rate.
+
+**Scenario inputs:** Discount and Lift.
+
+State the no-promotion baseline explicitly.
+
+::: {.notes}
+Purpose: prevent an assumed demand response from appearing to be an observed fact. Allow 60 seconds. The baseline assumes the promotion's orders would otherwise occur at the pre-discount price. That is a counterfactual assumption requiring judgment. Item standard cost is a proxy for the variable-cost calculation in this teaching model, and the commission rate is derived from the ledger and invoiced revenue. Ask which input needs the strongest commercial evidence. Transition: read the conditional contribution calculation.
+:::
+
+## A discounted price requires more volume {#ch07-27 .balanced .stepwise}
+
+```text
+=PromoUnits*(1+Lift)*
+ (PriceBeforeDiscount*(1-Discount)*(1-CommissionRate)
+  -VariableCost)
+```
+
+Compare this contribution with the no-promotion baseline.
+
+::: {.notes}
+Purpose: explain the model in blocks rather than as one long formula. Allow 60-90 seconds. Units increase according to the assumed lift. Discount reduces the selling price, commission follows the reduced revenue, and variable cost is charged per unit. The difference between this result and the baseline is the decision measure. Ask students to predict the sign when Discount is positive and Lift is zero. Transition: compare named scenarios using the same calculation.
+:::
+
+## The tested discount scenarios reduce contribution {#ch07-28 .balanced}
+
+{{< include /_shared/generated/chapter-07/_scenarios.qmd >}}
+
+::: {.notes}
+Purpose: read the public Tutorial 7.3 scenarios conditionally. Allow 60-90 seconds. The repeat scenario uses a 10 percent discount with no lift. The other discounted scenarios explicitly assume a 15 percent lift. All remain below the no-promotion contribution under this model. That does not imply every possible promotion is unprofitable. Ask students which assumptions would need to change to reverse the sign. Transition: choose the appropriate what-if tool for the next question.
+:::
+
+## What-if tools answer different questions {#ch07-29 .balanced .step-rows}
+
+| Tool | Question |
+|---|---|
+| Scenario Manager | Which named input set gives which result? |
+| Data Table | How does the result vary across input values? |
+| Goal Seek | Which one input reaches a target? |
+| Solver | Which inputs optimize a result under constraints? |
+
+::: {.notes}
+Purpose: match the Excel tool with the analytical task. Allow 60-90 seconds. A Data Table here is the what-if feature, not the named Excel Table used to store records. Goal Seek changes one input to achieve a target value. Solver adds an objective, multiple changing cells, and constraints, but its answer remains dependent on a correctly specified model. Ask which tool finds the lift required for a zero contribution difference. Transition: compare that threshold with business evidence.
+:::
+
+## The 10% discount needs substantial lift {#ch07-30 .balanced .stepwise}
+
+The modeled break-even volume lift is **{{< var slide.chapter07.break_even_lift >}}**.
+
+Goal Seek and the sensitivity table should agree.
+
+The required response still needs evidence.
+
+::: {.notes}
+Purpose: make the decision threshold concrete. Allow 60-90 seconds. This lift is calculated from the same contribution inputs as the book's model. It is a conditional threshold, not a demand forecast. The tutorial's observed order comparison does not show the increase that the promotion would need. Ask what additional evidence a sales team could supply to support a different expected response. Discuss changes in mix or capacity that would require revising the model. Transition: document a recommendation and its conditions.
+:::
+
+## Tutorial 7.3: state a conditional recommendation {#ch07-31 .balanced .stepwise}
+
+Compare scenarios, the sensitivity table, and Goal Seek.
+
+Check the required lift against order evidence.
+
+Document baseline demand, cost, mix, and capacity assumptions.
+
+[Open Tutorial 7.3](https://aa.accountinganalyticshub.com/chapters/07-analysis-and-modeling/chapter.html#guided-tutorial-7.3-should-charles-river-repeat-the-furniture-promotion)
+
+::: {.notes}
+Purpose: combine model output with judgment. Allow three minutes. The recommendation should state what the model says under its assumptions and what evidence supports those assumptions. Distinguish a lower discount or a targeted promotion as alternatives to be evaluated, not automatic improvements. Students should retain their model inputs and the date of the scenario comparison. Ask them to identify one assumption that could materially change the recommendation. Transition: summarize the standards for a defensible model.
+:::
+
+## Chapter summary and practice {#ch07-32 .balanced .stepwise}
+
+Validate forecasts on withheld periods.
+
+Compare budgets at a meaningful activity level.
+
+Separate observed inputs from assumptions and explain sensitivity.
+
+::: {.notes}
+Purpose: close with the checks shared by forecasting and decision modeling. Allow 60 seconds. A forecast needs evidence about predictive accuracy. A variance explanation needs a comparable benchmark. A recommendation needs an explicit baseline and sensitivity to uncertain inputs. Ask students to name the most important limitation of one model from this chapter. The assigned practice uses these methods on its specified questions and populations. Transition: Chapter 8 applies analytical checks to an audit engagement.
+:::
+
+## References and further reading {#ch07-33 .balanced}
+
+Hyndman and Athanasopoulos (2021): forecasting and benchmark evaluation.
+
+Public Chapter 7 tutorials: budgets, backtests, and promotion scenarios.
+
+[Full Chapter 7 references](https://aa.accountinganalyticshub.com/chapters/07-analysis-and-modeling/chapter.html#references)
+
+::: {.notes}
+Purpose: distinguish the general forecasting framework from the Charles River worked models. The displayed calculations follow public Tutorials 7.1-7.3.
+
+{{< include /_shared/fragments/_reference-hyndman-2021.qmd >}}
+:::
+
+## Attribution and reuse {#ch07-34 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 7 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

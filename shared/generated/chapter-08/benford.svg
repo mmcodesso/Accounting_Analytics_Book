@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 650" width="1280" height="650" role="img" aria-labelledby="title desc">
+<title id="title">Full and partial payments have different digit patterns</title>
+<desc id="desc">Full and partial payments have different digit patterns. First significant digit. Nonconformity prompts investigation; it does not establish fraud.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<text x="30" y="45" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="start">Full and partial payments have different digit patterns</text>
+<path d="M130,450 L1210,450" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="460" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">0</text>
+<path d="M130,357.143 L1210,357.143" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="367.143" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">10</text>
+<path d="M130,264.286 L1210,264.286" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="274.286" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">20</text>
+<path d="M130,171.429 L1210,171.429" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="181.429" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">30</text>
+<text x="20" y="92" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="start">Percent of payments</text>
+<text x="130" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">1</text>
+<text x="265" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">2</text>
+<text x="400" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">3</text>
+<text x="535" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">4</text>
+<text x="670" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">5</text>
+<text x="805" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">6</text>
+<text x="940" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">7</text>
+<text x="1075" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">8</text>
+<text x="1210" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">9</text>
+<polyline points="130.00,191.67 265.00,294.80 400.00,336.03 535.00,357.84 670.00,369.13 805.00,380.81 940.00,391.26 1075.00,397.88 1210.00,402.01" fill="none" stroke="#1A5276" stroke-width="4"/>
+<path d="M30 548h65" stroke="#1A5276" stroke-width="4"/>
+<text x="108" y="558" font-size="29" fill="#2C3E50" font-weight="normal" text-anchor="start">Full payments</text>
+<polyline points="130.00,219.03 265.00,377.32 400.00,382.49 535.00,356.97 670.00,340.49 805.00,345.82 940.00,348.08 1075.00,366.49 1210.00,384.75" fill="none" stroke="#117A65" stroke-width="4" stroke-dasharray="3 7"/>
+<path d="M440 548h65" stroke="#117A65" stroke-width="4" stroke-dasharray="3 7"/>
+<text x="518" y="558" font-size="29" fill="#2C3E50" font-weight="normal" text-anchor="start">Partial payments</text>
+<polyline points="130.00,170.47 265.00,286.49 400.00,333.99 535.00,360.01 670.00,376.47 805.00,387.84 940.00,396.15 1075.00,402.50 1210.00,407.51" fill="none" stroke="#5D6D7E" stroke-width="4" stroke-dasharray="12 8"/>
+<path d="M850 548h65" stroke="#5D6D7E" stroke-width="4" stroke-dasharray="12 8"/>
+<text x="928" y="558" font-size="29" fill="#2C3E50" font-weight="normal" text-anchor="start">Benford expected</text>
+<text x="30" y="620" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="start">First significant digit. Nonconformity prompts investigation; it does not establish fraud.</text>
+</g>
+</svg>

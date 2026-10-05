@@ -1,0 +1,4 @@
+| Fiscal 2026 calculation | Rate |
+| --- | --- |
+| Average of line Discount | 0.85% |
+| Discount dollars / price before discount | 1.20% |

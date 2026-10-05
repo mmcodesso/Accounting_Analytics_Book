@@ -1,0 +1,1 @@
+**Source-to-ledger traceability.** The ability to trace a general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.

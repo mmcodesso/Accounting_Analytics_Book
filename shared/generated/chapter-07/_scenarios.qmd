@@ -1,0 +1,6 @@
+| Scenario | Contribution difference |
+| --- | --- |
+| End the promotion | $0.00 |
+| Repeat as in 2026 | ($290,418.84) |
+| 10% discount, 15% lift | ($148,970.24) |
+| 15% discount, 15% lift | ($315,961.07) |

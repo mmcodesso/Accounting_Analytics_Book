@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-08"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 Charles River's audit committee has asked the internal audit team for a data-driven review before the external auditors begin their work on fiscal 2026. You have joined the team, and the chief audit executive has given you three areas to review: the supplier payments of fiscal 2024 through 2026, the accounts receivable at the end of fiscal 2026, and the journal entries of the same three years.

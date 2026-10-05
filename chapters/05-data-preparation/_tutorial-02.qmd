@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will use lookups to bring the attributes the controller's question needs onto each invoice line: the invoice date and period from the invoice, the order date from the sales order, and the item group and product type from the item. You will check that every lookup found its match, reconcile the Furniture revenue by quarter to the totals you reconciled in the Part I case, and find the promotion lines that were invoiced after the promotion ended.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 5.1, with the ProductType column on the Item Table and the Period column on the SalesInvoice Table.
+**Prerequisites.** You need the analysis workbook from Tutorial 5.1, with the ProductType column on the Item Table and the Period column on the SalesInvoice Table. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 5.1 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

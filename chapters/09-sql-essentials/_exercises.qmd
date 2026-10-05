@@ -70,8 +70,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
      purchase variance" 7,270 credits (57,497.25), and "Record nonrecoverable purchase tax" 3,897 debits (66,444.78); the net, 176,011.36,
      equals the close. The purchase variance is the invoice price against the purchase-order price at which the goods were received (the
      invoice clears goods received not invoiced, account 2020, at the receipt value); a credit means the supplier billed below the order
-     price. The account also absorbs purchase tax that cannot be recovered. Largest unfavorable variance 796.29 (2026-01-31, voucher
-     V0101-2026-020853); next 783.75 and 752.40. Purchase variance is recorded when a supplier invoice is posted; manufacturing variance
+     price (three one-cent credits and seven one-cent debits on lines billed at the order price are rounding). The
+     account also absorbs purchase tax that cannot be recovered. Largest unfavorable variance 796.29 (2026-01-31, voucher V0101-2026-020853); next 783.75 and 752.40. Purchase variance is recorded when a supplier invoice is posted; manufacturing variance
      when a work order closes, comparing actual with standard production cost. -->
 
 

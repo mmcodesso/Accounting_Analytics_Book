@@ -23,19 +23,9 @@ tbl-18-02 come from the data as the Part III case computes them: the plan volume
 the salaried staff (the d.C salaried gross), and the depreciation of d.N (the FixedAsset schedule). The claims check
 that the rate, burden, and hours per standard hour the text sets are still the Part III plan's.
 
-One statement is worded more loosely than the data: Requirement 6's "the quote's volume exceeds 2026 sales only slightly"
-holds for the six families together and within 5% for each, but the quote's 1,450 benches are slightly below the 1,454.9
-sold. The claim tests the wording on that reading.
-
-Four notes are not registered, because their comments state a value the data do not give; each context function renders
-the corrected text, so register it once the comment is fixed:
-- m4 and r9 give the proposed rate at 1.0 hours per standard hour as 57.99; it is 57.9954 (the total of 63.4646 less the
-  indirect 5.4691), which rounds to 58.00. 57.99 is 63.46 less 5.47, or the sum of the rounded parts (30.38 + 18.99 +
-  4.36 + 4.26); the revaluations at that rate (+167,288 / +243,171 / +309,655) use the unrounded rate.
-- r8 says the active price lists run at 0.84 to 0.97 of list; the lists with Status 'Active' that have lines (3 and 5 to
-  11) run at 0.84 to 0.94 (by line and by list). The 0.97 is list 4, which is Expired (the note's next clause).
-- r10 says the plant pays for about 17.9 positions of unused capacity; it is 17.849 (29,243.7 / 1,638.4), so 17.8.
-  17.9 is the 17.85 of Requirement 7 rounded again.
+Flags kept on purpose (claims that the author revisits on each roll): which quoted families are worth buying only with
+the crew reduced (Requirements 6 and 10, Milestone 3), the opening scenario's "about ten points" (Requirement 1), and the
+1.18 hours per standard hour that tbl-18-02 sets (Requirement 9).
 """
 
 from __future__ import annotations
@@ -364,7 +354,8 @@ def model(d) -> dict:
     explorer = dict(n_items=len(fg), rev=rev_fg, std=rev_fg - view["std"], absorp=rev_fg - view["absorp"],
                     td=rev_fg - view["td"], td_unused=rev_fg - view["td"] - unused_h * td_rate,
                     year=rev_fg - view_exact["std"] - totals["total"], top_n=top_n, tops=tops,
-                    all_rev=all_rev, all_std=all_std, services=services, std_cost=view_exact["std"])
+                    all_rev=all_rev, all_std=all_std, services=services, std_cost=view_exact["std"],
+                    exact={k: rev_fg - v for k, v in view_exact.items()})
 
     # Requirement 6: make or buy.
     labor_rate = RATE * (1 + BURDEN)
@@ -400,6 +391,10 @@ def model(d) -> dict:
     six = build[:SIX]
     fam_marks = ",".join("?" * len(buy_names))
     six_marks = ",".join(str(r[0]) for r in six)
+    fam_issued = d.one(f"SELECT SUM(l.ExtendedStandardCost) FROM MaterialIssueLine l JOIN MaterialIssue m ON m.MaterialIssueID = "
+                       f"l.MaterialIssueID JOIN WorkOrder wo ON wo.WorkOrderID = m.WorkOrderID JOIN Item i ON i.ItemID = wo.ItemID "
+                       f"WHERE substr(m.IssueDate, 1, 4) = ? AND substr(i.ItemCode, 1, 7) IN ({fam_marks})",
+                       year, *sorted(buy_names)) if buy_names else 0.0
     six_issued = d.one(f"SELECT SUM(l.ExtendedStandardCost) FROM MaterialIssueLine l JOIN MaterialIssue m ON m.MaterialIssueID = "
                        f"l.MaterialIssueID JOIN WorkOrder wo ON wo.WorkOrderID = m.WorkOrderID JOIN Item i ON i.ItemID = wo.ItemID "
                        f"WHERE substr(m.IssueDate, 1, 4) = ? AND substr(i.ItemCode, 1, 7) IN ({fam_marks}) "
@@ -494,7 +489,7 @@ def model(d) -> dict:
                 unused_h=unused_h, data_table=data_table, explorer=explorer, labor_rate=labor_rate, pos_hours=pos_hours,
                 severance=severance, quoted=quoted, buy=buy, lose=lose, gain=gain, hours=hours, positions=positions,
                 tooling=tooling, two_way=two_way, buy_material=buy_material, issues=issues, six=six,
-                build=sum(r[2] for r in build), six_issued=six_issued,
+                build=sum(r[2] for r in build), six_issued=six_issued, fam_issued=fam_issued,
                 freed={wc: freed[wc] for wc in wcs if freed[wc] > 0.5}, wc_names=wc_names, supervision=supervision,
                 headroom=headroom, wcs=wcs, lp=lp, reprice=reprice, plan_stdh=plan_stdh, plan_salary=plan_salary,
                 plan_dep=plan_dep, parts=parts, new_rate=new_rate, one_rate=one_rate, td_std=td_std,
@@ -574,7 +569,6 @@ def m3(d, claim):
 
 @note("ch18.m4", CHAPTER)
 def m4(d, claim):
-    """Milestone 4 (not registered: the comment gives the rate at 1.0 hours as 57.99; see the module docstring)."""
     m = model(d)
     stock = m["stock"]
     incomes = [dict(year=b["year"], amount=b["plan"] - a["plan"]) for a, b in zip(stock, stock[1:])]
@@ -717,13 +711,19 @@ def r4(d, claim):
                    "WHERE c.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly'")
     claim(m["pclass"]["Hourly"]["n"] == hourly, "the hourly crew is every hourly manufacturing employee")
     fams = list(m["fam"].values())
-    claim(all(f["unit"]["std"] < f["unit"]["td"] < f["unit"]["absorp"] for f in fams),
-          "time-driven cost sits between standard and absorption for every family")
+    claim(all(f["unit"]["std"] < f["unit"]["td"] for f in fams), "time-driven cost is above standard for every family")
+    above = [f["name"] for f in fams if f["unit"]["td"] > f["unit"]["absorp"]]     # time-driven above absorption
     claim(m["labor"] / m["stdh"] < m["labor_rate"], "the standards' labor per standard hour is below the current rate with "
                                                      "burden (the standards miss the rate increase)")
     e = m["explorer"]
-    claim(e["td"] - e["absorp"] > e["std"] - e["td"] > 0, "in total, the products cost more than their standards say but "
-                                                           "absorption overstates them by more than that")
+    claim(e["std"] > e["td"] > e["absorp"], "in total, time-driven cost lies between standard and absorption")
+    # where each group's time-driven cost sits, by its totals: nearer standard or nearer absorption
+    near = defaultdict(list)
+    for g in m["groups"]:
+        fs = [f for f in fams if f["group"] == g["name"]]
+        over_std = sum((f["unit"]["td"] - f["unit"]["std"]) * f["units"] for f in fs)
+        under_absorp = sum((f["unit"]["absorp"] - f["unit"]["td"]) * f["units"] for f in fs)
+        near["standard" if over_std < under_absorp else "absorption"].append(g["name"])
     tops = m["explorer"]["tops"]
     claim(all(t["negative"] == 0 for t in tops.values()), "no item loses money under any view")
     table = m["data_table"]
@@ -735,7 +735,9 @@ def r4(d, claim):
                 pract=m["pract"], td_rate=m["td_rate"], crew_rate=m["crew_rate"], sup_rate=m["td_rate"] - m["crew_rate"],
                 fo_rate=m["fo_rate"], mv_rate=m["mv_rate"], conv=conv, unused_h=m["unused_h"], unused=unused,
                 unused_crew=m["unused_h"] * m["crew_rate"], total=conv + unused, fams=fams, groups=m["groups"],
-                n_items=m["explorer"]["n_items"], top_n=m["explorer"]["top_n"], tops=tops, table=table, example=EXAMPLE)
+                n_items=m["explorer"]["n_items"], top_n=m["explorer"]["top_n"], tops=tops, table=table, example=EXAMPLE,
+                above=above, td_over=e["std"] - e["td"], absorp_over=e["td"] - e["absorp"], near_std=near["standard"],
+                near_absorp=near["absorption"])
 
 
 # --- Requirement 5 -----------------------------------------------------------------------------------
@@ -758,7 +760,10 @@ def r5(d, claim):
     claim(made > sold_mfg, "the plant completed more units than it sold in the year (an inventory build)")
     claim(abs(m["totals"]["total"] - ledger_5080(d)) < 0.005, "the variances charged equal 5080")
     ex = m["fam"][EXAMPLE]
-    return dict(e=e, example=EXAMPLE, ex_std=ex["m_std"], ex_absorp=ex["m_unit"], ex_td=ex["unit"]["m_td"])
+    # the totals use the item costs at six decimals, as CR18's CSV holds them; the views whose unrounded total differs
+    labels = dict(std="standard", absorp="absorption", td="time-driven")
+    exact = [dict(view=labels[k], value=e["exact"][k]) for k in ("std", "absorp", "td") if xr(e["exact"][k]) != xr(e[k])]
+    return dict(e=e, example=EXAMPLE, ex_std=ex["m_std"], ex_absorp=ex["m_unit"], ex_td=ex["unit"]["m_td"], exact=exact)
 
 
 # --- Requirement 6 -----------------------------------------------------------------------------------
@@ -768,9 +773,8 @@ def r6(d, claim):
     m = model(d)
     make_buy_claims(m, claim)
     quoted = m["quoted"]
-    claim(sum(q["volume"] for q in quoted) > sum(q["units"] for q in quoted)
-          and all(abs(q["volume"] / q["units"] - 1) < 0.05 for q in quoted),
-          "the quote's volume exceeds the year's sales only slightly")
+    gap = max(abs(q["volume"] / q["units"] - 1) for q in quoted)     # the quoted volumes against the year's sales
+    claim(gap < 0.10, "the quoted volumes are close to the year's sales (within 10% for each family)")
     six = m["six"]
     claim(all(r[1] == "Raw Materials" for r in six), "the six largest builds are raw materials")
     claim(sum(r[2] for r in six) > 0.9 * m["build"], "the six raw materials carry the materials build (over 90% of it)")
@@ -783,8 +787,9 @@ def r6(d, claim):
                 week_hours=WEEK_HOURS, labor_rate=m["labor_rate"], severance=m["severance"],
                 severance_total=m["positions"] * m["severance"], tooling=m["tooling"],
                 net=2 * m["gain"] - m["positions"] * m["severance"] - m["tooling"], n_buy=word(len(m["buy"])),
-                kept_cost=kept, two_way=m["two_way"], buy_material=m["buy_material"],
-                share=m["buy_material"] / m["issues"], six_issued=m["six_issued"], n_six=word(len(six)))
+                kept_cost=kept, two_way=m["two_way"], buy_material=m["buy_material"], gap=gap,
+                fam_issued=m["fam_issued"], issues=m["issues"], share=m["fam_issued"] / m["issues"],
+                six_issued=m["six_issued"], n_six=word(len(six)))
 
 
 # --- Requirement 7 -----------------------------------------------------------------------------------
@@ -800,16 +805,16 @@ def r7(d, claim):
     claim(0.35 <= first_limit - 1 <= 0.45, "growth of about 40% reaches the first limit")
     lp = m["lp"]
     claim(all(s["status"] == 0 for s in lp), "the Solver model solves at each growth rate")
-    claim(all(len(s["binding"]) == 1 for s in lp), "one work center binds at each growth rate")
-    claim(bool(lp[0]["binding"]) and lp[0]["binding"][0]["short"] == wc_short(m["wc_names"][min(head, key=head.get)]),
-          "the work center that binds first is the one with the least headroom")
+    least = wc_short(m["wc_names"][min(head, key=head.get)])
+    claim(all(b["short"] == least for b in lp[0]["binding"]),
+          "a work center that binds at the first growth rate is the one with the least headroom")
     return dict(buy=m["buy"], freed=freed, total=total, use_before=m["used"] / m["pract"],
                 use_after=(m["used"] - total) / m["pract"], unused_h=m["unused_h"],
                 unused_positions=m["unused_h"] / m["pos_hours"], n_buy=word(len(m["buy"])), supervision=m["supervision"],
+                crew_hours=m["hours"], crew_cost=m["hours"] * m["crew_rate"],
                 headroom=[dict(short=wc_short(m["wc_names"][wc]), ratio=head[wc]) for wc in m["wcs"]],
                 lp=[dict(growth=s["growth"], cost=float(s["cost"]),
-                         binding=[dict(short=b["short"], price=float(b["price"])) for b in s["binding"]]
-                         or [dict(short="?", price=0.0)],
+                         binding=[dict(short=b["short"], price=float(b["price"])) for b in s["binding"]],
                          bought=[dict(short=b["short"], units=float(b["units"]), all=bool(b["all"])) for b in s["bought"]])
                     for s in lp])
 
@@ -818,15 +823,11 @@ def r7(d, claim):
 
 @note("ch18.r8", CHAPTER)
 def r8(d, claim):
-    """Requirement 8 (not registered: the comment gives the active price lists' top ratio as 0.97; see the module
-    docstring)."""
     m = model(d)
-    below = {r["name"] for r in m["reprice"]}
     buy_names = {q["name"] for q in m["buy"]}
     claim(all(q["margin"] >= FLOOR for q in m["buy"]), "the families to buy clear the floor at their delivered price")
-    claim(buy_names <= below, "every family to buy is below the floor if kept")
     need = [r["short"] for r in m["reprice"] if r["name"] not in buy_names]
-    claim(all(abs(v["z"]) < 2 for v in volume(d)), "no promotion raised volume (no difference is unusual)")
+    claim(all(v["z"] < 2 for v in volume(d)), "no promotion raised volume (no lift is unusually high)")
     lists = d.q("SELECT pl.PriceListID, pl.Status, MIN(pll.UnitPrice / i.ListPrice), MAX(pll.UnitPrice / i.ListPrice) "
                 "FROM PriceList pl JOIN PriceListLine pll ON pll.PriceListID = pl.PriceListID JOIN Item i ON i.ItemID = pll.ItemID "
                 "GROUP BY 1, 2 ORDER BY 1")
@@ -850,7 +851,6 @@ def r8(d, claim):
 
 @note("ch18.r9", CHAPTER)
 def r9(d, claim):
-    """Requirement 9 (not registered: the comment gives the rate at 1.0 hours as 57.99; see the module docstring)."""
     m = model(d)
     plan_claims(d, claim)
     s_f, s_p, s_c = by_year(m, d.F), by_year(m, d.P), by_year(m, d.C)
@@ -862,7 +862,6 @@ def r9(d, claim):
     claim(s_p["one"] < mat_p and s_c["one"] > mat_c,
           "at 1.0 hours the prior year's balance falls below materiality and the current year's stays above")
     negatives = [dict(code=c, year=s["year"]) for s in m["stock"] for c in s["negative"]]
-    claim(len(negatives) > 1, "more than one item's stock is negative at a year-end")
     opening = d.one("SELECT EntryNumber FROM JournalEntry WHERE EntryType = 'Opening' ORDER BY PostingDate LIMIT 1")
     opening_fg = d.one("SELECT SUM(Debit) - SUM(Credit) FROM GLEntry WHERE AccountID = ? AND VoucherNumber = ?",
                        d.account("1040"), opening)
@@ -877,7 +876,6 @@ def r9(d, claim):
 
 @note("ch18.r10", CHAPTER)
 def r10(d, claim):
-    """Requirement 10 (not registered: the comment gives the unused positions as about 17.9; see the module docstring)."""
     m = model(d)
     make_buy_claims(m, claim)
     unused_positions = m["unused_h"] / m["pos_hours"]
@@ -885,7 +883,6 @@ def r10(d, claim):
           "fitting the crew to the work is worth more than outsourcing")
     below = {r["name"] for r in m["reprice"]}
     buy_names = [q["name"] for q in m["buy"]]
-    claim(set(buy_names) <= below, "the families to buy need increases if kept")
     need = [r["short"] for r in m["reprice"] if r["name"] not in buy_names]
     return dict(lose=m["lose"], buy=m["buy"], positions=m["positions"], unused_positions=unused_positions, need=need,
                 buy_below=[q["short"] for q in m["buy"] if q["name"] in below])

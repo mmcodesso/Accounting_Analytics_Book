@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will give the analysis workbook a parameters worksheet and use named cells, absolute references, and mixed references to summarize the invoice lines. You will define a large-line threshold from the data itself rather than typing an amount, and you will build a grid that shows how the invoice lines are distributed across pricing methods and discount rates. The grid is filled from a single formula, which is the purpose of mixed references.
 
-**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorial 4.1, with the SalesInvoiceLine Table and the Analysis worksheet.
+**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorial 4.1, with the SalesInvoiceLine Table and the Analysis worksheet. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 4.1 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

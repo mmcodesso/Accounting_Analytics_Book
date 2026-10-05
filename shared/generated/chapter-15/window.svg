@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 650" width="1280" height="650" role="img" aria-labelledby="title desc">
+<title id="title">Hours per standard hour: the window changes the result</title>
+<desc id="desc">Hours per standard hour: the window changes the result. Both use ratios of summed hours. The visible axis contains only 2026.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<text x="30" y="45" font-size="34" fill="#1A5276" font-weight="bold" text-anchor="start">Hours per standard hour: the window changes the result</text>
+<path d="M130,450 L1210,450" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="460" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">0</text>
+<path d="M130,368.75 L1210,368.75" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="378.75" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">0.5</text>
+<path d="M130,287.5 L1210,287.5" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="297.5" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">1</text>
+<path d="M130,206.25 L1210,206.25" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="216.25" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">1.5</text>
+<path d="M130,125 L1210,125" fill="none" stroke="#CAD3DA" stroke-width="3"/>
+<text x="112" y="135" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="end">2</text>
+<text x="20" y="92" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="start">Labor hours / standard hour</text>
+<text x="130" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">2026-01</text>
+<text x="620.909" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">2026-06</text>
+<text x="1210" y="492" font-size="29" fill="#5D6D7E" font-weight="normal" text-anchor="middle">2026-12</text>
+<polyline points="130.00,216.05 228.18,215.88 326.36,213.29 424.55,212.11 522.73,214.89 620.91,211.16 719.09,205.03 817.27,207.52 915.45,207.21 1013.64,199.02 1111.82,201.71 1210.00,204.45" fill="none" stroke="#1A5276" stroke-width="4"/>
+<path d="M30 548h65" stroke="#1A5276" stroke-width="4"/>
+<text x="108" y="558" font-size="29" fill="#2C3E50" font-weight="normal" text-anchor="start">Model history</text>
+<polyline points="130.00,171.45 228.18,167.75 326.36,157.20 424.55,165.61 522.73,177.11 620.91,188.44 719.09,185.14 817.27,187.75 915.45,189.05 1013.64,185.00 1111.82,198.86 1210.00,204.45" fill="none" stroke="#117A65" stroke-width="4" stroke-dasharray="12 8"/>
+<path d="M440 548h65" stroke="#117A65" stroke-width="4" stroke-dasharray="12 8"/>
+<text x="518" y="558" font-size="29" fill="#2C3E50" font-weight="normal" text-anchor="start">Filtered visual axis</text>
+<text x="30" y="620" font-size="28" fill="#5D6D7E" font-weight="normal" text-anchor="start">Both use ratios of summed hours. The visible axis contains only 2026.</text>
+</g>
+</svg>

@@ -1,0 +1,437 @@
+---
+title: "Audit Analytics in Excel"
+subtitle: "Chapter 8"
+author: "Mauricio Codesso"
+format:
+  revealjs:
+    output-file: index.html
+  pptx:
+    output-file: chapter-08.pptx
+---
+
+## Learning objectives {#ch08-01 .balanced .stepwise}
+
+- Reconcile a population before testing it.
+- Use strata and first-digit tests to focus review.
+- Age receivables at a defined date and reconcile the detail.
+- Test journal characteristics and document each disposition.
+
+::: {.notes}
+Purpose: introduce audit analytics as a sequence of evidence decisions. Allow about 60 seconds. Students can already prepare and summarize data. Their next task is to use those skills in an engagement where the population, criteria, exceptions, and conclusions must be reviewable. Testing every row does not establish that the extracted population contains every relevant transaction. Ask students what a whole-population test could miss if the source extraction is incomplete. Transition: define the engagement questions.
+:::
+
+# Start with the risk and population {#ch08-module-2}
+
+::: {.notes}
+The audit sequence begins with an objective, not a function. Define an exception before running the test.
+:::
+
+## The internal auditor needs supportable findings {#ch08-03 .balanced .stepwise}
+
+Review supplier payments, receivables, and journal entries.
+
+State the risk and the population for each procedure.
+
+**What evidence would turn a flag into a finding?**
+
+::: {.notes}
+Purpose: distinguish audit inquiry from merely producing exception lists. Allow 60-90 seconds. A flag means a record meets a defined condition. The auditor still needs evidence to classify it as expected, unresolved, or a supported error or control issue. Internal and external auditors may use similar analytics while having different engagement objectives. Ask students for a legitimate reason an entry might be created on a weekend. Transition: make the analytical workflow explicit.
+:::
+
+## An audit test has an evidence trail {#ch08-04 .balanced .stepwise}
+
+Objective and exception criterion.
+
+Reconciled population and repeatable procedure.
+
+Exception evidence, disposition, and reviewed conclusion.
+
+::: {.notes}
+Purpose: connect the test with the resulting workpaper. Allow about 60 seconds. The objective should explain which risk the procedure addresses, and the criterion should be reproducible. An exception list without dispositions leaves the work unfinished. Refining a test after examining expected patterns can be appropriate if the original result and rationale remain documented. Ask students which part another auditor would need to rerun the procedure. Transition: prove the source population before selecting records.
+:::
+
+## Tutorial 8.1 starts a separate audit workbook {#ch08-05 .balanced .stepwise}
+
+Create **AuditAnalytics.xlsx**.
+
+Import supplier payments for the teaching window.
+
+Reconcile them to the related cash postings.
+
+[Open Tutorial 8.1](https://aa.accountinganalyticshub.com/chapters/08-audit-analytics/chapter.html#guided-tutorial-8.1-stratifying-and-testing-supplier-payments)
+
+::: {.notes}
+Purpose: establish the engagement file and its first control. Allow two minutes. The audit workbook is separate from the Furniture Analysis workbook used in earlier chapters. Tutorial 8.1 imports payments and their related invoice and supplier attributes, preserving the payment grain. The ledger comparison selects the payment source type and the cash account rather than all cash activity. Ask students why the entire cash balance would be an inappropriate control for this payment population. Transition: inspect count and amount together.
+:::
+
+## The payment population reconciles {#ch08-06 .balanced}
+
+{{< include /_shared/generated/chapter-08/_payment-control.qmd >}}
+
+::: {.notes}
+Purpose: demonstrate a population control before screening transactions. Allow 60-90 seconds. The displayed payment count and amount reconcile to the related cash-credit postings in the same period. The shared calculation independently checks the ledger count and total. This supports the completeness of this extraction relative to that posting population. It does not prove that the ledger itself contains every authorized or required transaction. Ask students which filters must align on both sides. Transition: direct review effort using value strata.
+:::
+
+## Strata separate count from monetary exposure {#ch08-07 .balanced .stepwise}
+
+Use nonoverlapping amount ranges.
+
+Summarize both the number of payments and their value.
+
+Reconcile all strata to the full population.
+
+::: {.notes}
+Purpose: explain stratification as a way to understand exposure. Allow 60 seconds. Many small payments can dominate the row count while a few large items carry disproportionate value. The public tutorial examines the top strata individually and retains separate consideration of the rest. A high-value selection does not substitute for a representative sample of remaining items. Ask why checking only large payments would miss some control risks. Transition: define exact boundary rules.
+:::
+
+## Every payment belongs to one stratum {#ch08-08 .balanced .stepwise}
+
+```text
+=COUNTIFS(Payments[Amount],">="&A2,
+          Payments[Amount],"<"&B2)
+```
+
+Include the lower boundary and exclude the upper boundary.
+
+::: {.notes}
+Purpose: prevent gaps and double counts at stratum boundaries. Allow 60-90 seconds. A payment exactly at the next lower boundary belongs in that next range. The final stratum needs an open-ended rule or a justified upper bound so the largest items are retained. Use the same boundaries for the count and amount measures. Ask where a payment of exactly 1,000 belongs under adjacent ranges starting at zero and 1,000. Transition: examine the high-value items with appropriate source evidence.
+:::
+
+## Large items are selected for examination {#ch08-09 .balanced .stepwise}
+
+The public tutorial identifies four payments in the top two strata.
+
+Vouch selected payments to their supporting documents.
+
+Record the basis of selection and the result.
+
+::: {.notes}
+Purpose: move from a stratification summary to a test of evidence. Allow about 60 seconds. The selected rows are known items to examine, not automatically errors. Students should identify the invoice, supplier, authorization, and payment support relevant to the objective. Documenting that a row was large explains selection but does not establish its validity. Ask what evidence would support occurrence versus authorization. Transition: use a population-level digit pattern as another screening technique.
+:::
+
+# Investigate patterns without presuming wrongdoing {#ch08-module-10}
+
+::: {.notes}
+First-digit analysis compares an observed distribution with a benchmark. Its suitability depends on how the amounts arise.
+:::
+
+## Benford gives an expected first-digit pattern {#ch08-11 .balanced .stepwise}
+
+```text
+P(first digit = d) = LOG10(1 + 1/d)
+```
+
+The relevant digit is the first significant digit.
+
+Use the pattern only for suitable populations.
+
+::: {.notes}
+Purpose: explain the benchmark and its applicability. Allow 60-90 seconds. Benford's distribution gives smaller leading digits higher expected frequencies. It is often relevant to naturally occurring amounts spanning a range of magnitudes, but assigned identifiers, constrained prices, and policy thresholds can behave differently. Do not apply it simply because a column is numeric. Ask whether an invoice number or a payment amount is the more plausible candidate, then discuss why even payment amounts require context. Transition: calculate the leading digit consistently.
+:::
+
+## The first significant digit can be below one {#ch08-12 .balanced .stepwise}
+
+```text
+=--LEFT(TEXT([@Amount],"0.00000000E+00"),1)
+```
+
+Inspect zero, negative, and missing amounts before applying a rule.
+
+::: {.notes}
+Purpose: show why taking the first displayed character can fail. Allow 60 seconds. Scientific notation places the first significant digit first even when a positive amount is below one. The tutorial population contains positive supplier payments. A different population with credits or zeros needs an explicitly defined treatment before using the same formula. Formatting, commas, and currency symbols should not determine the result. Ask why a leading digit of zero would signal a problem in this specific positive-payment test. Transition: quantify the distance from the benchmark.
+:::
+
+## MAD summarizes the nine absolute gaps {#ch08-13 .balanced .stepwise}
+
+Compare actual and expected shares for digits 1-9.
+
+Take the absolute difference for each digit.
+
+Average those nine differences.
+
+::: {.notes}
+Purpose: explain mean absolute deviation without hiding it behind an acronym. Allow 60-90 seconds. Each digit contributes a gap in proportions, not a difference in monetary amounts. The book uses Nigrini's interpretive ranges as screening guidance. These ranges are not a probability of fraud or a replacement for examining the population. Ask what happens if positive and negative gaps are averaged without absolute values. Transition: inspect the public results before choosing a conclusion.
+:::
+
+## The aggregate pattern conceals different subsets {#ch08-14 .balanced}
+
+{{< include /_shared/generated/chapter-08/_benford.qmd >}}
+
+::: {.notes}
+Purpose: encourage a business explanation for a statistical pattern. Allow 60-90 seconds. The all-payment result combines full and partial payments. Full payments conform more closely to the expected first-digit pattern, while partial payments differ strongly. The displayed labels follow the book's interpretive ranges and apply to this screening measure. Ask why splitting an invoice into installments could change the amounts' digit distribution. Transition: compare the distributions visually.
+:::
+
+## Full and partial payments have different patterns {#ch08-15 .balanced}
+
+![](/_shared/generated/chapter-08/benford.svg){fig-alt="First-digit percentage distributions for full payments, partial payments, and the Benford expected pattern. Partial payments depart much more strongly from the benchmark." width=95%}
+
+::: {.notes}
+Purpose: connect the MAD summary to the underlying digit frequencies. Allow 60-90 seconds. Read the horizontal positions as discrete digits and the vertical axis as percentages of each subset. The lines connect categories only to help comparison and do not represent a time trend. Differences between the subsets suggest examining the payment process and constraints. Ask students which digits contribute to the visible departure. Transition: state a conclusion that the evidence supports.
+:::
+
+## Nonconformity is a reason to investigate {#ch08-16 .balanced .stepwise}
+
+Examine how partial-payment amounts were determined.
+
+Compare the invoices and payment terms.
+
+A pattern alone does not establish fraud or a misstatement.
+
+::: {.notes}
+Purpose: keep screening evidence proportional to the conclusion. Allow 60-90 seconds. The public tutorial supports a process-based explanation for the partial-payment pattern. That explanation should be corroborated with the relevant records and documented, rather than used to dismiss every unusual transaction automatically. The test's value is directing attention and asking a better question. Ask students to write a one-sentence result that avoids accusing anyone. Transition: evaluate receivables using both detail and ledger evidence.
+:::
+
+# Age and reconcile receivables at a date {#ch08-module-17}
+
+::: {.notes}
+An aging schedule is a dated reconstruction. Use the same cut-off for invoices, applications, credits, and the ledger.
+:::
+
+## Open balance depends on the as-of date {#ch08-18 .balanced .stepwise}
+
+Start with invoices issued by **December 31, 2026**.
+
+Subtract receipt applications and credit memos recorded by that date.
+
+Later settlements do not change the historical snapshot.
+
+::: {.notes}
+Purpose: prevent hindsight from changing a period-end balance. Allow 60-90 seconds. A receipt in the following month may support recoverability, but it should not be deducted from the earlier snapshot unless it was applied by that as-of date. Use CashReceiptApplication amounts assigned to each invoice, not the entire receipt amount. Credit memos need the correct original invoice and date. Ask students why using today's open balances would misstate a prior-year aging. Transition: classify the historical balances by days past due.
+:::
+
+## Days past due uses the due date {#ch08-19 .balanced .stepwise}
+
+Days past due = as-of date less DueDate.
+
+Current invoices have zero or negative days past due.
+
+Bucket only the positive open balances.
+
+::: {.notes}
+Purpose: distinguish invoice age from delinquency. Allow about 60 seconds. An invoice can be several weeks old and still be current under its agreed terms. The tutorial buckets current balances, then 1-30, 31-60, 61-90, and over 90 days past due. The cutoffs must cover every intended balance without overlap. Ask where an invoice due exactly on the as-of date belongs. Transition: inspect the actual dated aging rather than only its total.
+:::
+
+## The dated aging shows the balance distribution {#ch08-20 .balanced}
+
+{{< include /_shared/generated/chapter-08/_aging.qmd >}}
+
+::: {.notes}
+Purpose: read the aged population as evidence with limits. Allow 60-90 seconds. Most of this recorded balance is current, while relatively little lies in the oldest buckets. That pattern alone does not establish that all receivables are collectible or even supported by the invoice detail. Count and amount can tell different stories about concentration. Ask students which part a credit manager would investigate first and which reconciliation an auditor still needs. Transition: compare the detail with account 1020.
+:::
+
+## Aging detail and the ledger do not fully agree {#ch08-21 .balanced}
+
+{{< include /_shared/generated/chapter-08/_ar-reconcile.qmd >}}
+
+::: {.notes}
+Purpose: make the reconciliation difference a concrete audit question. Allow 60-90 seconds. The invoice aging total and the receivables ledger balance have the same as-of date, yet differ. The difference is not a rounding adjustment and should not be plugged into the oldest bucket. Retain it as a separate reconciling item until supported. Ask students which source-document grouping would help explain the ledger amount. Transition: follow the public tutorial's source trace.
+:::
+
+## The difference traces to an opening journal {#ch08-22 .balanced .stepwise}
+
+The public tutorial traces **{{< var slide.chapter08.ar_difference >}}** to the opening entry.
+
+That amount has no matching invoice detail in the extract.
+
+Obtain support and assess the reporting implication.
+
+::: {.notes}
+Purpose: distinguish tracing a difference from resolving it. Allow 60-90 seconds. Identifying the journal explains where the ledger amount came from. It does not supply the underlying receivable support or prove that the amount is fictitious. The tutorial also finds no postings to the allowance and bad-debt accounts it examines. That absence prompts an estimation and support question, not an automatic allowance percentage. Ask what prior-period schedule or subsequent evidence would help. Transition: select customer balances for further evidence.
+:::
+
+## Confirmation selection has a defined unit {#ch08-23 .balanced .stepwise}
+
+Select high-value customer balances separately.
+
+Draw the tutorial's random sample from the remaining customers.
+
+Freeze the selected IDs and record the method.
+
+::: {.notes}
+Purpose: preserve the sampling population and selection evidence. Allow 60-90 seconds. Tutorial 8.2 selects by customer because the request concerns the customer's balance, not one arbitrary invoice. It includes twenty other customers as a teaching selection. That number is not a universal audit sample size or an assurance conclusion. Random formulas recalculate, so paste the selected sample as values and retain the population. Ask why selected invoice rows could overrepresent customers with many invoices. Transition: complete the aging workpaper.
+:::
+
+## Tutorial 8.2: reconcile before concluding {#ch08-24 .balanced .stepwise}
+
+Reconstruct and bucket the dated open balances.
+
+Trace the ledger difference and retain the evidence request.
+
+Document the selected customer population.
+
+[Open Tutorial 8.2](https://aa.accountinganalyticshub.com/chapters/08-audit-analytics/chapter.html#guided-tutorial-8.2-aging-receivables-and-reconciling-them-to-the-ledger)
+
+::: {.notes}
+Purpose: organize the aging work around a reviewed conclusion. Allow three minutes. Students should be able to reproduce the open-balance formula, the bucket rules, the ledger filters, and the reconciling item. Distinguish a completed calculation from evidence still needed to support the opening balance or estimate credit losses. Ask each pair to state one supported observation and one unresolved question. Transition: test the journal population that contains the opening entry.
+:::
+
+# Investigate journal flags and document dispositions {#ch08-module-25}
+
+::: {.notes}
+The final module combines risk indicators with accounting context. A score prioritizes review but does not decide its outcome.
+:::
+
+## The five flags describe characteristics {#ch08-26 .balanced .step-rows}
+
+| Flag | Condition in the tutorial |
+|---|---|
+| Weekend | Created on Saturday or Sunday |
+| Backdated | Created after its posting date |
+| SelfApproved | Same creator and approver ID |
+| AboveLimit | Total exceeds approver authority |
+| RoundAmount | Total is an exact thousand |
+
+::: {.notes}
+Purpose: define each indicator so the results are reproducible. Allow 60-90 seconds. The flags use CreatedDate for timing and PostingDate for the accounting period. A backdated flag can identify a normal adjusting process as well as an item needing further explanation. The approval test requires the correct employee limit. Ask students which fields and reference Tables each flag needs. Source: public Tutorial 8.3 and the chapter's discussion of journal-entry risks. Transition: verify a flag on individual records.
+:::
+
+## Check a timing flag by hand {#ch08-27 .balanced .stepwise}
+
+```text
+=INT([@CreatedDate])>[@PostingDate]
+```
+
+INT removes the time component.
+
+The result compares calendar dates, not elapsed hours.
+
+::: {.notes}
+Purpose: expose the exact meaning of Backdated. Allow about 60 seconds. An entry created late on its posting date should not be flagged merely because its timestamp exceeds midnight. Removing the time component aligns the two date values. The definition does not judge whether the entry was authorized or properly supported. Ask students to construct a same-day example and a next-day example and predict both results. Transition: combine the characteristics without turning them into a probability.
+:::
+
+## RiskScore counts the triggered flags {#ch08-28 .balanced .stepwise}
+
+```text
+=[@Weekend]+[@Backdated]+[@SelfApproved]
+ +[@AboveLimit]+[@RoundAmount]
+```
+
+The score prioritizes review. It is not a fraud probability.
+
+::: {.notes}
+Purpose: clarify the score's scale and limits. Allow 60-90 seconds. Excel arithmetic treats TRUE as one and FALSE as zero. The tutorial assigns equal weight to each flag, which is an explicit design choice rather than a validated probability model. Some flags can be related, so a high score need not represent independent evidence. Ask students why a score of two should not be described as twice the likelihood of fraud of a score of one. Transition: inspect the population's score distribution.
+:::
+
+## Most journal entries have no flag {#ch08-29 .balanced}
+
+{{< include /_shared/generated/chapter-08/_scores.qmd >}}
+
+::: {.notes}
+Purpose: read the full result before concentrating on the highest score. Allow 60 seconds. The counts describe this tested population under these five rules. A zero score does not establish that an entry is correct, because an error can lack every selected characteristic. A high score identifies an item to understand, not a conclusion. Ask students what reconciliation should connect journal headers with their ledger lines. Transition: examine ordinary process explanations alongside unresolved items.
+:::
+
+## An expected pattern still needs evidence {#ch08-30 .balanced .stepwise}
+
+Month-end depreciation can fall on a weekend.
+
+Closing entries can exceed routine approval limits.
+
+Document the explanation and any remaining control issue.
+
+::: {.notes}
+Purpose: distinguish a plausible reason from a supported disposition. Allow 60-90 seconds. The tutorial groups entries by type and creator to reveal recurring patterns. Month-end timing can explain a weekend flag, while an approval policy that does not accommodate closing entries can remain a control issue even if the accounting is expected. Ask which evidence would support each explanation. Do not clear an entire group merely because one record is understandable. Transition: retain dispositions with stable record identifiers.
+:::
+
+## Dispositions must stay attached to the right entry {#ch08-31 .balanced .stepwise}
+
+Freeze the exception list with stable entry IDs.
+
+Record **expected with evidence** or **follow up with a question**.
+
+Keep manual notes safe from query reordering.
+
+::: {.notes}
+Purpose: prevent workpaper annotations from drifting to different transactions after refresh. Allow 60 seconds. Tutorial 8.3 pastes the exception list as values before adding dispositions. Another controlled approach would link a separate disposition Table by a stable key. Typing commentary beside a refreshing query can leave it next to a different row. Ask students to describe the evidence required before an item changes from follow-up to resolved. Transition: combine two independent traces to the opening entry.
+:::
+
+## Two procedures lead to the opening entry {#ch08-32 .balanced .stepwise}
+
+The receivables reconciliation identifies the unsupported detail difference.
+
+Journal flags identify the opening entry for review.
+
+Trace its ledger lines and obtain the underlying support.
+
+::: {.notes}
+Purpose: show how separate procedures can strengthen an evidence request. Allow 60-90 seconds. The public tutorials lead from both the receivables difference and the highest-scoring journal to the opening entry. The debit to account 1020 explains the reconciliation difference. Those links justify focused follow-up, but they do not themselves prove a concealed misstatement. Ask students to distinguish the source of the amount, the reason it was flagged, and the support still required. Transition: broaden test design beyond the five flags.
+:::
+
+## Duplicates, gaps, and thresholds need business rules {#ch08-33 .balanced .stepwise}
+
+**Duplicate:** define which fields make records meaningfully alike.
+
+**Gap:** distinguish missing evidence from an unused number.
+
+**Threshold:** consider related transactions and the policy in force.
+
+::: {.notes}
+Purpose: extend the method without treating every unusual pattern as an error. Allow 60-90 seconds. Repeated supplier invoice numbers deserve review in the supplier context, but a repeated amount alone is weak evidence. Number sequences can have legitimate voids. Transactions just below an approval threshold may need grouping by supplier, date, or common purpose. Ask students to propose one expected exception and one supporting document for a chosen test. Transition: put the procedure and findings into a workpaper.
+:::
+
+## A reviewable workpaper states the whole chain {#ch08-34 .balanced .stepwise}
+
+Objective, risk, population, and reconciliation.
+
+Procedure, parameters, results, and supporting evidence.
+
+Dispositions, conclusion, open matters, preparer, and reviewer.
+
+::: {.notes}
+Purpose: connect documentation with the ability to assess the work. Allow 60-90 seconds. A reviewer needs enough detail to understand what was tested and why the conclusion follows. Include the extraction period and the rule thresholds, not just the formula name or a screenshot. An unresolved item belongs in the conclusion as an open matter rather than disappearing from the exception list. Ask students to identify the weakest link in a hypothetical workpaper containing only a result count. Transition: complete the journal tutorial.
+:::
+
+## Tutorial 8.3: finish the evidence trail {#ch08-35 .balanced .stepwise}
+
+Reconcile journal totals with ledger debits.
+
+Review flagged entries and record every disposition.
+
+Trace the opening entry and state the unresolved support.
+
+[Open Tutorial 8.3](https://aa.accountinganalyticshub.com/chapters/08-audit-analytics/chapter.html#guided-tutorial-8.3-testing-journal-entries-for-management-override)
+
+::: {.notes}
+Purpose: complete the public journal-testing procedure. Allow three minutes for a review checkpoint. Students should inspect the five formulas, explain the score distribution, and demonstrate a trace from an entry number to its ledger lines. The workpaper conclusion should distinguish expected recurring patterns, approval-policy issues, and items requiring support. Ask a peer to select one disposition and locate its evidence. Transition: summarize what the chapter's tests can and cannot establish.
+:::
+
+## Chapter summary and practice {#ch08-36 .balanced .stepwise}
+
+A reconciled extraction defines what was tested.
+
+Patterns and scores direct investigation.
+
+Evidence and documented dispositions support the conclusion.
+
+::: {.notes}
+Purpose: revisit the full audit sequence before independent practice. Allow 60-90 seconds. Testing all extracted rows gives broad coverage of that extraction, but does not eliminate population risk or the need for judgment. Ask students to explain the difference between a flag, a supported finding, and an unresolved question. The assigned exercises and Part II case require their own documented procedures and conclusions. Transition: the next part implements comparable analytical reasoning with SQL.
+:::
+
+## References and further reading {#ch08-37 .balanced}
+
+Nigrini (2012): Benford analysis and interpretation.
+
+Public Chapter 8 tutorials: payment, receivables, and journal workpapers.
+
+The chapter references the applicable audit-documentation and journal-testing standards.
+
+[Full Chapter 8 references](https://aa.accountinganalyticshub.com/chapters/08-audit-analytics/chapter.html#references)
+
+::: {.notes}
+Purpose: attribute the digit-analysis framework and point students to the chapter's complete audit references. The displayed examples and public checkpoints come from Tutorials 8.1-8.3.
+
+{{< include /_shared/fragments/_reference-nigrini-2012.qmd >}}
+:::
+
+## Attribution and reuse {#ch08-38 .balanced}
+
+Mauricio Codesso, *Accounting Analytics: An Integrated Approach*, {{< var edition >}}.
+
+Chapter 8 teaching adaptation with public narration and Charles River examples.
+
+[Book](https://aa.accountinganalyticshub.com/) · [Dataset]({{< var dataset.release >}})
+
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+::: {.notes}
+Purpose: make the origin and permitted reuse clear. These slides adapt the chapter and its public guided tutorials. Retain the author, title, source link, and CC BY-SA 4.0 attribution when adapting this material, and identify your changes. External readings retain their own terms. The included teaching notes travel with the presentation and can support a recording. Close by directing students to the assigned practice and the required starting workbook.
+:::

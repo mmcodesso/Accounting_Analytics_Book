@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/sql_ch09.py": "d338c93f4573862c5e4ef7902ddf3084de710be1377c1f15589a89fc7b195e1b",
+    "shared/calculations/sql_ch10.py": "14dac1338eae9334a0f930153b044521b4eb63564ac8cbddf8bc2eee7c482ed4",
+    "shared/calculations/sql_ch11.py": "7db3e595a00ddc9899a04f4a00a203da98dca20068bfab181580c6b4d8e54574",
+    "shared/calculations/sql_ch12.py": "ed51b4e43be562778768dbb5cac07557ff03cf0851f59eea53684545ae3ec000",
+    "scripts/slides/refresh_sql.py": "56f6a9aeec3756598ddfb3ba6fbc0053e9d1ca980122ed1fd86984ab0bb7024b",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/slides/refresh_excel.py": "df19257d870f29aaf80ff25fceb3927afe5cc68f332f212a24280dc552a463e9",
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd"
+  },
+  "artifact_sha256": {
+    "_groups.qmd": "2769347bae575d28b59ee3158d845f672e65f2853776fad7df7427330c753b09",
+    "_ledger.qmd": "855f58364037a3a78b2251a536575ba4397dc506c8fb2ef1baf1c0c9722c9e43",
+    "_output.qmd": "044ee8750570a274519dae6e86d60b473c6e0f589bd46058cf3320cdd8c83e9d",
+    "_hours.qmd": "eb7401c49c5c4abacf2212e9d9ff5b6a696a9d4fa91d1bfeaa60883d581a95cb",
+    "_parts.qmd": "53b4c97f57851f5ea4ab3697a1087381e55db34a4caa5f573b898fb4ea9d2429",
+    "_query-closes_to_work_orders.qmd": "662c8e1055d72d0088a5f00a810dd80d2c83280824c5731be18deb11a271d03c",
+    "_query-variance_by_group.qmd": "848d449b7ac0a90d5b38aa92fb5ffa8f844631205c08a1f82bdb09b241933a6b",
+    "_query-ledger_variance.qmd": "5fb0965db315ea55ae9a72e0604f07822d8942f88696db225b7215eca0ca5840",
+    "item-workorder.svg": "69e7f793bca2fbfc4452613aa2a9f2e9799dbf4011f59e683de8e44bb77ef172",
+    "item-workorder.png": "a121904597ec37163526a80ff5eafe4e0d0d417fc9b19edb165030bc2e1cb04e"
+  },
+  "queries": {
+    "variance_by_group": {
+      "columns": [
+        "ItemGroup",
+        "Closes",
+        "TotalVariance"
+      ],
+      "rows": [
+        [
+          "Furniture",
+          2588,
+          1579134.23
+        ],
+        [
+          "Lighting",
+          1153,
+          521135.8
+        ],
+        [
+          "Textiles",
+          219,
+          165366.85
+        ]
+      ]
+    },
+    "ledger_variance": {
+      "columns": [
+        "LedgerVariance"
+      ],
+      "rows": [
+        [
+          2265636.88
+        ]
+      ]
+    },
+    "output": {
+      "columns": [
+        "CompletionYear",
+        "UnitsCompleted",
+        "StandardHours"
+      ],
+      "rows": [
+        [
+          "2024",
+          52263.0,
+          70871.0
+        ],
+        [
+          "2025",
+          48961.0,
+          66109.0
+        ],
+        [
+          "2026",
+          51160.0,
+          68913.0
+        ]
+      ]
+    },
+    "hours_by_type": {
+      "columns": [
+        "WorkYear",
+        "LaborType",
+        "Hours",
+        "StandardHours",
+        "HoursPerStandardHour"
+      ],
+      "rows": [
+        [
+          "2024",
+          "Direct Manufacturing",
+          60449.0,
+          70871.0,
+          0.85
+        ],
+        [
+          "2024",
+          "Indirect Manufacturing",
+          23188.0,
+          70871.0,
+          0.33
+        ],
+        [
+          "2025",
+          "Direct Manufacturing",
+          57575.0,
+          66109.0,
+          0.87
+        ],
+        [
+          "2025",
+          "Indirect Manufacturing",
+          35815.0,
+          66109.0,
+          0.54
+        ],
+        [
+          "2026",
+          "Direct Manufacturing",
+          62764.0,
+          66998.0,
+          0.94
+        ],
+        [
+          "2026",
+          "Indirect Manufacturing",
+          38473.0,
+          66998.0,
+          0.57
+        ]
+      ]
+    },
+    "variance_parts": {
+      "columns": [
+        "CloseYear",
+        "LaborVariance",
+        "OverheadVariance",
+        "ConversionVariance"
+      ],
+      "rows": [
+        [
+          "2024",
+          -290882.15,
+          1472056.71,
+          1181174.56
+        ],
+        [
+          "2025",
+          -167921.7,
+          1927043.51,
+          1759121.81
+        ],
+        [
+          "2026",
+          -14074.81,
+          2173212.84,
+          2159138.03
+        ]
+      ]
+    }
+  }
+}

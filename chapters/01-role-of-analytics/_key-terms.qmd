@@ -2,7 +2,7 @@
 
 ## Key Terms
 
-**Accounting analytics.** The application of data extraction, preparation, analysis, and visualization techniques to financial and operational data for the purpose of supporting financial reporting, managerial decision-making, and audit assurance.
+{{< include /shared/fragments/_accounting-analytics.qmd >}}
 
 **Analytics workflow.** The sequence of stages that an accounting analytics project follows, from defining the question through communicating findings. The six stages are question definition, data identification and access, data preparation, analysis, visualization, and communication.
 
@@ -38,7 +38,7 @@
 
 **Relational database.** A system that stores data in tables connected to one another through primary and foreign keys. The Charles River dataset is provided as a relational database in SQLite format, as well as in Excel workbook and CSV formats.
 
-**Source-to-ledger traceability.** The ability to trace a general ledger entry back to the business document that created it. In the Charles River database, the SourceDocumentType, SourceDocumentID, and SourceLineID columns in GLEntry provide this traceability.
+{{< include /shared/fragments/_source-to-ledger-traceability.qmd >}}
 
 **SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. Part III of this book teaches SQL using the Charles River SQLite database.
 

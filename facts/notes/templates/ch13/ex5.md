@@ -2,9 +2,10 @@
      the top 1,000; PriceOverrideApprovalID empty {{ override|count }} ({{ (override / n)|pct }}) against {{ override_top }} of 1,000; PriceListLineID and ShipmentLineID empty on {{ base }}
      lines ({{ (base / n)|pct }}, the Base List design-service lines) against {{ base_top }} of 1,000; PricingMethod {{ methods }} distinct values on both bases; Discount {{ discounts }}
      distinct on the entire set, {{ discounts_top }} (zero) on the top 1,000; Quantity is fractional on {{ fractional|count }} lines (Chapter 5's validity check).
-     Profile_Invoices ({{ invoices|count }}): PaymentDate empty on {{ unpaid }} (open invoices) against {{ unpaid_top }} of 1,000; Status {{ statuses|length }} distinct ({{ statuses|join(', ') }}) against {{ top_statuses|length }} ({{ top_statuses|join(', ') }}) on the top 1,000, because the earliest invoices were all paid. Profile_Items ({{ items }}; {{ sellable }}
+     Profile_Invoices ({{ invoices|count }}): PaymentDate empty on {{ unpaid }} ({{ unpaid_open }} open invoices, {{ unpaid_settled }} Settled) against {{ unpaid_top }} of 1,000; Status {{ statuses|length }} distinct ({{ statuses|join(', ') }}) against {{ top_statuses|length }} ({{ top_statuses|join(', ') }}) on the top 1,000, because the earliest invoices are all {{ top_statuses|join(', ') }}. Profile_Items ({{ items }}; {{ sellable }}
      with a ListPrice): ListPrice empty on {{ unpriced }} items bought, not sold; CollectionName empty on {{ blank }} of the sellable items (all {{ acc }} Accessories,
      {{ fur }} Furniture, the {{ svc }} services). Profile_Customers ({{ customers }}): no empty values; CustomerName has {{ names }} distinct values ({{ dup|join(' and ') }}
-     twice). The first rows are the earliest records, before promotions, overrides, and unpaid invoices existed. Meaningful blanks:
+     twice). The first rows are almost all the earliest records (lines to {{ first_line }}, invoices to {{ first_invoice }}; only {{ later_lines }} later lines and {{ later_invoices }} later invoices are dated earlier),
+     before the first promotion and with almost every invoice paid; overrides already occur ({{ ((1000 - override_top) / 1000)|pct }} of the top 1,000 against {{ ((n - override) / n)|pct }} overall). Meaningful blanks:
      PromotionID (no promotion), PaymentDate (unpaid), PriceListLineID on Base List lines; follow-up: CollectionName on the {{ fur_word }}
      Furniture items (the Part II case found one of them, {{ item }}, ordered under the {{ collection }} promotion). -->

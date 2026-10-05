@@ -43,6 +43,7 @@ Create a new workbook named `Charles River Promotion Case.xlsx` in the same fold
 
 Follow the Power Query conventions of Part II:
 
+- check the data types in each Changed Type step: Discount in `OrderLines` and `BilledLines` must be a decimal number, as in Tutorial 4.1 Step 6;
 - expand merged columns without the prefix;
 - import T3_GLEntry with **Transform Data**, and filter it before anything is loaded;
 - clear **Enable Load** for queries that only feed others;
@@ -58,10 +59,10 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 
 **Requirement 1: Build and validate the case workbook (Chapters 4 and 5).**
 
-- Start the workbook with a Documentation sheet laid out as in Tutorial 4.3. Add a Parameters sheet that holds the proposal's three discount rates and the 2026 commission rate from Tutorial 7.3 as named cells (`HarborRate`, `FurnitureRate`, `DesignTradeRate`, and `CommissionRate`), with the inputs in blue.
+- Start the workbook with a Documentation sheet laid out as in Tutorial 4.3. Add a Parameters sheet that holds the proposal's three discount rates and the 2026 commission rate you calculated in Tutorial 7.3 as named cells (`HarborRate`, `FurnitureRate`, `DesignTradeRate`, and `CommissionRate`), with the inputs in blue.
 - Build the queries listed above. In `OrderLines`, bring in the OrderDate and CustomerID from `Orders`, and the ItemCode, ItemName, ItemGroup, CollectionName, and StandardCost from `Items`. Add the CustomerSegment from `Customers`, and the scope, rate, and effective dates from `Promotions`. Then add columns for OrderYear and OrderMonth, and three amounts: ListAmount (Quantity times BaseListPrice), GrossAmount (Quantity times UnitPrice), and DiscountAmount (GrossAmount times Discount).
 - Give `BilledLines` the same three amounts, the InvoiceDate with its year and quarter, and the ItemGroup and StandardCost of each item.
-- Show that the queries are complete before you use them. Compare each loaded query's row count with its source Table, and compare the total LineTotal of `OrderLines` with the total OrderTotal of `Orders`. Confirm that no line without a PromotionID carries a discount. Record the checks on the Documentation sheet.
+- Show that the queries are complete before you use them. Compare the row count of each loaded query that keeps every row of its source Table with that Table, and state what the filters of `RevenuePostings` and `BudgetPrices` keep. Compare the total LineTotal of `OrderLines` with the total OrderTotal of `Orders`. Confirm that no line without a PromotionID carries a discount. Record the checks on the Documentation sheet.
 
 <!-- notes: case2.r1 -->
 <!-- Instructor notes, Requirement 1: OrderLines has 22,269 rows and a LineTotal of 87,500,091.56, equal to the OrderTotal of the 5,819
@@ -114,8 +115,7 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
      Requirement 5). The list amount holds price constant, so it moves only with quantity and mix; the net amount falls by the discount itself.
      Volume in the promotion's months against the average of the other months of the same year (against the same months a year earlier),
      with the other months' standard deviation (STDEV.S) as a percentage of their mean: 1 Alder -3.3% (sd 14.2%); 2 Accessories +11.9% (10.2%); 3 Strategic -20.7% (18.4%); 4 Brookside -15.4% (-9.8%; 19.2%); 5 Textiles -5.8% (-5.9%; 10.3%); 6 Wholesale +2.5% (+0.9%; 9.5%); 7 Harbor +0.4% (-21.1%; 14.3%); 8 Furniture +0.3% (+2.9%; 4.6%); 9 Design Trade +3.1% (-17.1%; 18.0%). No difference is
-     unusual: the largest, promotion 2's +11.9%, is about 1.6 standard deviations of a two-month total (the monthly sd times the square
-     root of 2), and promotion 3's fall is within the Strategic segment's normal swings. Every difference is far below the promotion's
+     unusual: the largest, promotion 2's +11.9%, is about 1.6 standard deviations of a two-month total (the monthly sd times the square root of 2), and promotion 3's fall is within the Strategic segment's normal swings. Every difference is far below the promotion's
      break-even increase (Requirement 4). New customers: 211 customers ordered, and no customer's first order in the data included a promotion
      line. First orders cluster in January to April 2024 only because the data begins in January 2024, and just seven first orders came after
      June 2024 (the last in July 2025). Students should not rely on CustomerSince: for 27 of the 31 customers with a CustomerSince in 2024
@@ -124,7 +124,7 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 **Requirement 4: Model the proposed 2027 calendar (Chapter 7; managerial accounting).**
 
 - Extend the contribution margin model of Tutorial 7.3 to the three promotions in the proposal, with one column for each. Use the units, price before discount, and standard cost of each promotion's 2026 billed lines, together with the rates and the commission rate on your Parameters sheet. Find each promotion's break-even lift, the increase in volume at which it just pays for itself.
-- Build a data table of the Furniture promotion's difference in contribution for discount rates of 5, 8, 10, and 12 percent and increases in volume from 0 to 40 percent. Then use Goal Seek to find the Furniture discount at which the largest increase you measured in Requirement 3 would just pay for the promotion.
+- Build a data table of the Furniture promotion's difference in contribution for discount rates of 5, 8, 10, and 12 percent and increases in volume from 0 to 40 percent in steps of 5 points. Then use Goal Seek to find the Furniture discount at which the largest increase you measured in Requirement 3 would just pay for the promotion.
 - Show from `BudgetPrices` how the budgets for 2024 through 2026 planned their promotions, and whether the 2027 budget plans any. Compare each month's budgeted revenue with its budgeted quantity at list price.
 - Estimate what the proposed calendar would cost Charles River in 2027 against a budget without promotions, and in which quarters the cost would appear. State the volume you base the estimate on, and explain why you did not use the quantities in the budget.
 

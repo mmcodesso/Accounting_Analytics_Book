@@ -1,0 +1,6 @@
+```sql
+SELECT WorkOrderCloseID, TotalVarianceAmount
+FROM WorkOrderClose
+WHERE ROUND(MaterialVarianceAmount + ConversionVarianceAmount
+    - TotalVarianceAmount, 2) <> 0;
+```

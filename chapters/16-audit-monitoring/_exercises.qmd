@@ -30,9 +30,9 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 <!-- Instructor notes, Exercise 16.1 (SQL; Chapter 8 and Exercise 12.2): open balance = GrandTotal - applications - credit memos
      (on OriginalSalesInvoiceID), both dated <= 2026-12-31, rounded, kept if > 0: 1,079 invoices, 4,418,804.32 (203 customers).
      Buckets by DueDate at 2026-12-31: Current 3,655,971.50; 1-30 745,674.84; 31-60 16,711.26; 61-90 405.41; over 90 41.31
-     (mostly cent residuals). GL 1020 at 2026-12-31: 4,798,804.32; the difference, 380,000.00, is the receivables line of the
+     (3 small residuals of invoices paid almost in full, the largest 40.85). GL 1020 at 2026-12-31: 4,798,804.32; the difference, 380,000.00, is the receivables line of the
      opening entry JE-2024-000001, unsupported by any invoice (the author's decision: an audit finding). (5) 225 invoices have a
-     negative balance, -220,131.88: credit memos on paid invoices, credited to 2060 and refunded (Chapter 8). -->
+     negative balance, -220,131.88: credit memos on paid invoices, credited to 2060 and refunded on 222 of them (Chapter 8). -->
 
 **Exercise 16.2: Cutoff as a Monthly Test**
 
@@ -86,9 +86,9 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 <!-- notes: ch16.ex3 -->
 <!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the
-     first is 2024-05-31, then several a month from July 2024, up to 7 in October 2026; every surge day has all 64 hourly
+     first is 2024-05-31, then surge days in 26 of the 30 months from July 2024 (about 3 a month), up to 7 in October 2026; every surge day has all 64 hourly
      manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705
-     of the year's manufacturing overtime; overtime on other days is flat (6,273, 6,426, 5,918). All 5,952 surge entries
+     of the year's manufacturing overtime; overtime on other days did not grow (6,273, 6,426, 5,918). All 5,952 surge entries
      were approved by the Production Manager on the work date. Distinct values of total hours: Group By with "Count Distinct Rows"
      on the hours column; one value means everyone clocked the same hours. (5) The production manager approved every entry the
      test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found

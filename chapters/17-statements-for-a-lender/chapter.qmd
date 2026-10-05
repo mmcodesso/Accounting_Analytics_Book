@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-17"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is July 2027. In June the controller showed the audit committee where fiscal 2026's cash had gone: into inventories, materials above all, while growing payables and sales tax with no recorded remittance held the cash balance up. The CFO has since applied to the company's bank for a revolving line of credit to carry the working capital until the materials are used. The bank's relationship manager has replied with what its credit committee needs before it can consider the request: complete financial statements for fiscal 2026, prepared under U.S. generally accepted accounting principles (GAAP), with fiscal 2025 for comparison and full notes. The credit committee meets in mid-August, so the package is due at the end of July.
@@ -202,7 +205,7 @@ Account 2040 Accrued Expenses has grown every year. Apart from its opening line,
      days, median 39; four cleared at exactly 62
      days, so "older than 62 days" is the rule; a rule of "older than the last two month-ends" would wrongly flag JE-2025-000188, 61 days
      old at the end of 2025 and cleared on 2026-01-01 by ASV0050-2025-040073. Composition of 2040 at 2024 / 2025 / 2026 year-ends: opening
-     line 85,000.00 (no document); freight not yet settled 48,797.21 / 47,290.49 / 44,423.87 (December's freight 45,381.01 / 41,564.67 / 40,704.22 plus estimates above settlements 3,416.20 / 5,725.82 / 3,719.65; settlements post on the 1st of the next month, so
+     line 85,000.00 (no document); freight not yet settled 48,797.21 / 47,290.49 / 44,423.87 (December's freight 45,381.01 / 41,564.67 / 40,704.22 plus estimates above settlements 3,416.20 / 5,725.82 / 3,719.65; settlements post on the first weekday of the next month, so
      December 2026's falls outside the data; shipment credits to 2040 equal the 5050 debits, 1,477,398.06; 35 settlements, 1,432,974.19);
      open accruals 62 days old or less 152,347.13 / 168,648.64 / 193,781.70; open accruals more than 62 days old 39,028.43 (7) / 96,049.58 (15) / 157,346.79 (22); total 325,172.77 / 396,988.71 / 480,552.36, equal to the ledger. The 22 old items at 2026 were
      never invoiced; 3 were partly cleared by "Partial cleanup" adjustments with no invoice (JE-2024-000264, JE-2025-000286, JE-2026-000295). By year recorded 2024 68,844.44 (11), 2025 32,795.49 (5), 2026 55,706.86 (6); by expense account 6110 22,616.85, 6120 26,261.26, 6140 5,572.08, 6160 17,895.82, 6180 9,569.93, 6190 10,368.12, 6200 15,120.25, 6210 25,601.55, 6220 24,340.93. Of the
@@ -226,7 +229,7 @@ Chapter 12 tested revenue and payroll cutoff, and Exercise 12.1 measured it at e
 <!-- Instructor notes, Requirement 4: revenue, by the latest DeliveryDate of each invoice's shipments against the year of its posting
      (SubTotal; these invoices carry no freight): 15 invoices for 2024 deliveries posted in 2025, 90,138.93 (Strategic 35,325.32, Wholesale 54,813.61; Furniture 76,792.75, Lighting 4,836.07, Textiles 8,510.11; tax 5,859.04); 8 for 2025 deliveries posted in 2026,
      19,540.86 (Strategic 13,241.85, Wholesale 6,299.01; Furniture 12,288.72, Lighting 3,065.83, Textiles 1,784.83, Accessories 2,401.48;
-     tax 1,270.17; includes SI-2026-013742); 9 December 2026 shipment lines never invoiced, 44,481.11 at order price (Quantity shipped x
+     tax 1,270.17; includes SI-2026-013742, dated in 2025); 9 December 2026 shipment lines never invoiced, 44,481.11 at order price (Quantity shipped x
      UnitPrice x (1 - Discount); Strategic 20,022.95, Wholesale 24,458.16; Furniture 34,792.95, Lighting 2,432.78, Textiles 3,494.67, Accessories 3,760.71), whose standard cost (22,895.78) is already in cost of goods sold. Sales tax is recorded on invoicing and is not
      adjusted; the tax on the unbilled lines is not known. Payroll (PayrollRegister gross pay plus employer taxes and benefits; working
      days identical in every work center): end of 2024, period 26 (2024-12-16 to 12-29, paid 2025-01-03) in full, 242,165.92, plus 2 of
@@ -237,9 +240,10 @@ Chapter 12 tested revenue and payroll cutoff, and Exercise 12.1 measured it at e
      336,456.34, taxes 25,738.93, benefits 20,849.55; manufacturing 197,970.68, other 185,074.14). The manufacturing part goes to 1090
      and, with no completion to absorb it, ends in 5080 and cost of goods sold; the rest goes to the cost centers' salary accounts and
      6060. Exercise 12.1 allocated hourly labor by the hours worked and got about 296,000 (2024) and 335,000 (2025); either method is
-     acceptable if it is applied at every year-end and the 2026 estimate uses the same one. Interest (2080 has never been used; each payment's interest covers the month before it): end of 2024, note 1's payment of
-     2025-01-01, 1,838.58; end of 2025, note 1's payment of 2026-01-01, 1,369.27; end of 2026, note 1's 867.27 (2027-01-01) plus 30 of
-     the 33 days of note 2's 1,253.99 (2026-12-02 to 2027-01-04), 1,139.99, total 2,007.26 (29 days gives 1,969.26; accept either with
+     acceptable if it is applied at every year-end and the 2026 estimate uses the same one. Interest (2080 has never been used; each payment's interest covers the month before it): end of 2024,
+     note 1's payment of 2025-01-01, 1,838.58; end of 2025,
+     note 1's payment of 2026-01-01, 1,369.27; end of 2026,
+     note 1's payment of 2027-01-01, 867.27 plus 30 of the 33 days of note 2's 1,253.99 (2026-12-02 to 2027-01-04), 1,139.99, total 2,007.26 (29 days gives 1,969.26; accept either with
      the convention stated). -->
 
 **Requirement 5: Classify, measure, and judge the adjustments (Chapters 4, 6, and 8).**
@@ -278,9 +282,7 @@ An estimate that later proves wrong is not an error. If the facts available at t
      sold +17,295.54, operating expense -171.91); A2 revenue cutoff +90,138.93 / -70,598.07 / +24,940.25 (4010 +22,504.23, 4020 -633.05, 4030 +1,709.84, 4040 +1,359.23); A3 old accruals +39,028.43 / +57,021.15 / +61,297.21; A4 interest -1,838.58 / +469.31 / -637.99.
      Totals -175,240.12 / -76,459.90 / +68,475.84; equity effect at 2025 / 2026 year-ends -251,700.02 / -183,224.18. Adjusted net income
      2025 5,057,894.81, 2026 4,572,087.08 (recorded 4,503,611.24 + 68,475.84). Entries at 2026-12-31 (debits =
-     credits): A1 Dr retained earnings 365,921.19, Dr 5080 17,295.54, Cr operating expense 171.91, Cr 2030 336,456.34, Cr 2032
-     25,738.93, Cr 2033 20,849.55; A2 Dr 1020 44,481.11, Cr retained earnings 19,540.86, Cr revenue 24,940.25; A3 Dr 2040 157,346.79, Cr
-     retained earnings 96,049.58, Cr operating expense 61,297.21; A4 Dr retained earnings 1,369.27, Dr 7030 637.99, Cr 2080 2,007.26.
+     credits): A1 Dr retained earnings 365,921.19, Dr 5080 17,295.54, Cr operating expense 171.91, Cr 2030 336,456.34, Cr 2032 25,738.93, Cr 2033 20,849.55; A2 Dr 1020 44,481.11, Cr retained earnings 19,540.86, Cr revenue 24,940.25; A3 Dr 2040 157,346.79, Cr retained earnings 96,049.58, Cr operating expense 61,297.21; A4 Dr retained earnings 1,369.27, Dr 7030 637.99, Cr 2080 2,007.26.
      Reclassifications: R1 the current portion of the notes, 89,243.61 at 2025 (note 1 only; note 2 began in 2026) and 147,503.76 at
      2026; R2 the credit balance of 1090 (-49,102.81 / -46,730.55) netted into work in process (1046 63,392.97 / 61,095.34). Materiality
      225,180.56 (2026, on recorded income as the controller set it) and 256,717.74 (2025). Judgment: 2026's income effect is 30% of
@@ -288,10 +290,11 @@ An estimate that later proves wrong is not an error. If the facts available at t
      reclassification and working capital falls by 330,727.94 after it; at 2025 current liabilities were understated by 271,240.88, above
      2025 materiality, and the missing payroll accrual recurs every year. Record A1-A4, R1, and R2, and present 2025 as restated, with
      the Topic 250 disclosures, because the shareholders received 2025 statements (a reasoned "revised" presentation is acceptable).
-     Passed items, effect on 2026 income: P1 an allowance at Chapter 8's rates, -34,106.25; P2 expected returns, from 2026's returns of
-     2025 deliveries (14 returns, 16,319.03 of revenue less 9,545.90 of cost; 13 in 2025 for 2024 deliveries, 13,985.96), about
-     -6,773.13; P3 a write-down of the Damaged and Quality Concern returns of 2026 restocked at full standard cost, -61,146.00 (137,606.43
-     since 2024: 24,429.94 / 52,030.49 / 61,146.00); aggregate -102,025.38, 45% of materiality. Pass all three and list them for the
+     Passed items, at the 2026 year-end and, for the two estimates, on 2026 income once the same estimate at the end of 2025 reverses: P1 an
+     allowance at Chapter 8's rates, -34,106.25 (-34,659.34 at the end of 2025, so +553.09 on 2026 income); P2 expected returns, from 2026's returns of
+     2025 deliveries (14 returns, 16,319.03 of revenue less 9,545.90 of cost; 13 in 2025 for 2024 deliveries, 13,985.96 less 8,113.31), about
+     -6,773.13 (about -900.48 on 2026 income); P3 a write-down of the Damaged and Quality Concern returns of 2026 restocked at full standard cost, -61,146.00 (137,606.43
+     since 2024: 24,429.94 / 52,030.49 / 61,146.00); aggregate -102,025.38, 45% of materiality (-61,493.39 on 2026 income). Pass all three and list them for the
      CFO's approval; list the freight residual of 3,719.65 as trivial, since the controller wants every adjustment listed. -->
 
 ### Phase 3: The Statements and Notes
@@ -402,7 +405,7 @@ Assemble the statements and notes as a PDF produced from the workbook, and write
 <!-- Instructor notes, Requirement 9: (1) Tax status (ASC Topic 740): no tax account and no tax recorded in three years; equity is common
      stock with no distributions. Evidence: the entity's legal form or tax election, its returns, and its payments. If it is a C
      corporation, the omitted provision is several times materiality (21% federal on 4,572,087.08 alone is about 960,000), so state it;
-     do not record a number. (2) Leases (ASC Topic 842): office and warehouse rent is paid on the 1st of each month straight from cash
+     do not record a number. (2) Leases (ASC Topic 842): office and warehouse rent is paid on the first weekday of each month straight from cash
      (467,525.63 / 484,969.91 / 504,245.32), in amounts that vary slightly from month to month; 2120 and 1140 are unused and no lessor
      appears among the suppliers. Evidence: the agreements (term, options, escalation, discount rate). Likely effect: right-of-use assets
      and lease liabilities, which would move the bank's ratios. (3) Sales tax: 5,620,840.66 collected with no remittance recorded (2050

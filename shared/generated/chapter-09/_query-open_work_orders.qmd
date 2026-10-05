@@ -1,0 +1,7 @@
+```sql
+SELECT WorkOrderNumber, Status, ReleasedDate, DueDate,
+    COALESCE(CompletedDate, 'not completed') AS Completed,
+    CAST(SUBSTR(WorkOrderNumber, 4, 4) AS INTEGER) AS ReleaseYear
+FROM WorkOrder
+WHERE ClosedDate IS NULL;
+```

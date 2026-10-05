@@ -1,5 +1,5 @@
 <!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at {{ asof }} (GLEntry with PostingDate before {{ d.N }}-01-01, without
-     {{ close1 }} and {{ close2 }}, {{ close_rows }} rows) has {{ accounts }} accounts, {{ zero }} of them with a zero balance; debit and credit balances are both
+     the {{ close_rows }} GL rows of the closes {{ close1 }} and {{ close2 }}) has {{ accounts }} accounts, {{ zero }} of them with a zero balance; debit and credit balances are both
      {{ debits|money }}. Revenue and expense accounts show only fiscal {{ d.C }} because the {{ d.F }} and {{ d.P }} closing entries zeroed them.
      Income statement: operating revenue {{ opr|money }} ({{ (opr / net_rev)|pct(2) }} of net revenue); sales returns and allowances {{ contra|money }} (4060); net
      revenue {{ net_rev|money }}; cost of goods sold {{ cogs|money }} ({{ (-cogs / net_rev)|pct(2) }}; includes freight-out 5050, purchase price variance 5060, and
@@ -12,6 +12,7 @@
      {% for i in invoices %}{{ 'and ' if loop.last and not loop.first }}{{ i.number }} ({{ i.group }}, {{ 'dated ' if loop.first }}{{ i.date }}){{ ', ' if not loop.last }}{% endfor %},
      dated in {{ d.P }} with the next year's number and posted {{ posted }}. InvoiceLines assigns them to fiscal {{ d.P }} by their invoice dates,
      the ledger to fiscal {{ d.C }}. The date that determines the period is the delivery of the goods, not the invoice date or number (every
-     shipment is delivered in the year it ships). Only {{ early.number }} shipped in {{ d.P }} (on {{ early.shipped }}), so its {{ early.amount|money }} is a revenue cutoff error; the other
-     {{ others }} shipped on {{ others_shipped }}, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for
+     shipment is delivered in the year it ships). {% if early.part %}Only {{ early.number }} shipped in part in {{ d.P }} ({{ early.cut|money }} on {{ early.shipped }}), so that {{ early.cut|money }} is a revenue cutoff error; the rest of it ({{ early.rest|money }}) and the other
+     {{ others }} shipped {{ others_shipped }}{% else %}Only {{ early.number }} shipped in {{ d.P }} (on {{ early.shipped }}), so its {{ early.amount|money }} is a revenue cutoff error; the other
+     {{ others }} shipped {{ others_shipped }}{% endif %}, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for
      every invoice. Freight revenue (4050, {{ freight|money }}) has no invoice line. -->

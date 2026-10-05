@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the first part of the controller's request: a statistical profile of the invoice lines billed in fiscal 2026 and a summary of revenue by product line. You will store the fiscal year in a named cell, so that one change updates every number, calculate statistics with and without criteria, and compare the product lines with a control total. The comparison will find something the product-line list leaves out. Finally, you will chart the distribution of the line totals as a histogram.
 
-**Prerequisites.** You need the analysis workbook from Chapter 5, with the InvoiceLines Table loaded by Power Query and the Parameters worksheet from Chapter 4.
+**Prerequisites.** You need the analysis workbook from Chapter 5, with the InvoiceLines Table loaded by Power Query and the Parameters worksheet from Chapter 4. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Chapter 5 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-15"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is April 2027, and the controller wants Charles River Reports to become the company's monthly reporting package. "Three people will open it first," she says. The sales manager wants to know what the promotions of fiscal 2026 cost and which ones cost the most. The department managers want to see how their spending compared with the budget the CFO approved. The production manager wants to know whether the plant's hours are under control, the question Part III answered with queries. A first look at the budget already shows why the package needs care: one department spent far less than its budget and another far more, and neither result means what it seems to mean.

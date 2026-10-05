@@ -130,10 +130,11 @@ def ex1(d, claim):
               for i in late), "every late invoice is for a December delivery posted in January of the next year")
     g1 = [i for i in late if int(i["delivered"][:4]) == d.F]
     g2 = [i for i in late if int(i["delivered"][:4]) == d.P]
-    claim(all(i["date"][:7] == f"{d.P}-01" for i in g1), f"the {d.F} deliveries were invoiced (dated) in January {d.P}")
-    odd = [i for i in g2 if i["date"][:4] != i["posted"][:4]]
-    claim(len(odd) == 1, f"one invoice for December {d.P} deliveries is dated in {d.P} and posted in {d.C}")
-    odd = odd[0] if odd else g2[0]
+    # The late invoices dated in the year of delivery (before the year-end) but posted in the next: the revenue cutoff
+    # errors of the invoice-date comparisons. The others were dated, like posted, in January.
+    odd1 = [i for i in g1 if i["date"][:4] != i["posted"][:4]]
+    odd2 = [i for i in g2 if i["date"][:4] != i["posted"][:4]]
+    odd_numbers = {i["number"] for i in odd1 + odd2}
     unbilled = d.q("SELECT s.ShipmentID, s.ShipmentDate, ROUND(sl.ExtendedStandardCost, 2), "
                    "ROUND(sl.QuantityShipped * sol.UnitPrice * (1 - sol.Discount), 2) FROM ShipmentLine sl "
                    "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID JOIN SalesOrderLine sol ON sol.SalesOrderLineID = "
@@ -156,17 +157,18 @@ def ex1(d, claim):
     ex52 = {r[0] for r in d.q("SELECT InvoiceNumber FROM SalesInvoice WHERE substr(InvoiceNumber, 4, 4) <> substr(InvoiceDate, 1, 4)")} | \
         {r[0] for r in d.q("SELECT si.InvoiceNumber FROM SalesInvoice si JOIN SalesOrder so ON so.SalesOrderID = si.SalesOrderID "
                            "WHERE si.InvoiceDate < so.OrderDate")}
-    claim({i["number"] for i in before} == ex52 - {odd["number"]} and odd["number"] in ex52,
-          "the invoices dated before shipment are Exercise 5.2's invoices except the cutoff invoice")
+    numbers = {i["number"] for i in before}
+    only_ex52, only_before = sorted(ex52 - numbers), sorted(numbers - ex52)
+    claim(set(only_ex52) <= odd_numbers, "the Exercise 5.2 invoices missing from the list are revenue cutoff errors")
     differences = [i for i in invoices if int(i["posted"][:4]) == d.C and i["date"][:4] != i["posted"][:4]]
-    claim([i["number"] for i in differences if i["late"]] == [odd["number"]],
-          f"of the {d.C} invoice-date differences, only one is a revenue cutoff error")
-    claim(d.one("SELECT COUNT(*) FROM GLEntry g JOIN PurchaseInvoice p ON p.PurchaseInvoiceID = g.SourceDocumentID "
-                "WHERE g.SourceDocumentType = 'PurchaseInvoice' AND g.PostingDate <> p.ReceivedDate") == 0,
-          "supplier invoices post on their ReceivedDate")
-    crossing = d.q("SELECT InvoiceNumber, InvoiceDate, ReceivedDate, GrandTotal, SupplierID FROM PurchaseInvoice "
-                   "WHERE substr(InvoiceDate, 1, 4) <> substr(ReceivedDate, 1, 4)")
-    claim(len(crossing) == 1, "one supplier invoice crosses a year-end")
+    cutoff_errors = [i["number"] for i in differences if i["late"]]
+    late_pi = [dict(number=r[0], received=r[1], posted=r[2]) for r in d.q(
+        "SELECT p.InvoiceNumber, p.ReceivedDate, MIN(g.PostingDate) FROM GLEntry g JOIN PurchaseInvoice p "
+        "ON p.PurchaseInvoiceID = g.SourceDocumentID WHERE g.SourceDocumentType = 'PurchaseInvoice' "
+        "AND g.PostingDate <> p.ReceivedDate GROUP BY p.PurchaseInvoiceID ORDER BY 1")]
+    crossing = [dict(zip(("number", "date", "received", "total", "id"), r)) for r in d.q(
+        "SELECT InvoiceNumber, InvoiceDate, ReceivedDate, GrandTotal, SupplierID FROM PurchaseInvoice "
+        "WHERE substr(InvoiceDate, 1, 4) <> substr(ReceivedDate, 1, 4) ORDER BY ReceivedDate, InvoiceNumber")]
     hourly = d.q("SELECT CAST(substr(lt.WorkDate, 1, 4) AS INTEGER), pp.FiscalYear, SUM(lt.ExtendedLaborCost), "
                  "SUM(CASE WHEN lt.LaborType <> 'NonManufacturing' THEN lt.ExtendedLaborCost ELSE 0 END) "
                  "FROM LaborTimeEntry lt JOIN PayrollPeriod pp ON pp.PayrollPeriodID = lt.PayrollPeriodID "
@@ -217,11 +219,12 @@ def ex1(d, claim):
                 accrued, entry) == 0, "the only journal entry to 2030 is the opening entry")
     claim(set(sources) <= {"PayrollSummary", "PayrollPayment"} and abs(sum(sources.values())) < 0.005,
           "the payroll summaries and payments net to zero in 2030")
-    return dict(g1=dict(word=word(len(g1)).capitalize(), sub=s1), g2=dict(word=word(len(g2)), sub=s2),
-                odd=odd, n_unbilled=word(len(unbilled)).capitalize(), cost=cost, value=value,
+    return dict(g1=dict(word=word(len(g1)).capitalize(), sub=s1, odd=odd1), g2=dict(word=word(len(g2)), sub=s2, odd=odd2),
+                n_unbilled=word(len(unbilled)).capitalize(), cost=cost, value=value,
                 eff1=s1, eff2=s1 - s2, eff3=round(value - s2, -1),
                 n_before=word(len(before)).capitalize(), before=runs([i["number"] for i in before]),
-                n_differences=word(len(differences)), supplier=dict(zip(("number", "date", "received", "total", "id"), crossing[0])),
+                only_ex52=only_ex52, only_before=only_before, cutoff_errors=cutoff_errors,
+                n_differences=word(len(differences)), late_pi=late_pi, crossing=crossing, n_crossing=word(len(crossing)),
                 hourly=[dict(work=r[0], paid=r[1], total=r[2], mfg=r[3]) for r in hourly],
                 full=[thousands(late_december_cost(d, y)) for y in (d.F, d.P)],
                 first=int(processed[0][1][-3:]), last=int(processed[-1][1][-3:]),
@@ -263,7 +266,10 @@ def ex2(d, claim):
     claim(to_2060 == len(negative), "every invoice with a negative balance has a credit memo posted to account 2060")
     claim(all(r[4] > 0 for r in negative), "every invoice with a negative balance has been paid")
     refunded = d.one(f"SELECT COUNT(DISTINCT cm.OriginalSalesInvoiceID) FROM CreditMemo cm JOIN CustomerRefund r "
-                     f"ON r.CreditMemoID = cm.CreditMemoID WHERE cm.OriginalSalesInvoiceID IN ({ids})")
+                     f"ON r.CreditMemoID = cm.CreditMemoID WHERE cm.OriginalSalesInvoiceID IN ({ids}) AND r.RefundDate <= ?", end)
+    paid_in_full = d.one(f"SELECT COUNT(*) FROM SalesInvoice si WHERE si.SalesInvoiceID IN ({ids}) AND si.GrandTotal - 0.005 <= "
+                         f"(SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a WHERE a.SalesInvoiceID = si.SalesInvoiceID "
+                         f"AND a.ApplicationDate <= ?)", end)
     claim(refunded >= 0.95 * len(negative), "the credits on those invoices are (almost all) refunded")
     by_customer = defaultdict(float)
     for r in positive:
@@ -296,6 +302,7 @@ def ex2(d, claim):
     claim(len(old) >= 2, "receipts of more than one month are more than two months old")
     return dict(asof=end, n=len(positive), total=total, customers=len(by_customer), b=buckets, ar=ar, ledger=ledger,
                 difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
+                paid_in_full=paid_in_full, refunded=refunded,
                 strata=strata, key_share=strata[-1]["amount"] / total, grni_lines=len(grni), grni=grni_total, gl2020=gl2020,
                 rounding=abs(grni_total - gl2020),
                 months=[(m, months[m][1], months[m][0]) for m in sorted(months, reverse=True)],
@@ -329,39 +336,52 @@ def ex3(d, claim):
                "JOIN (SELECT WorkOrderID, MAX(OperationSequence) AS m FROM WorkOrderOperation GROUP BY WorkOrderID) x "
                "ON x.WorkOrderID = op.WorkOrderID AND x.m = op.OperationSequence GROUP BY 1")
     claim([r[0] for r in last] == [packing], "Packing is the last operation of every routing")
-    # January to July of the first year (the exercise's months)
-    months = [f"{d.F}-{m:02d}" for m in range(1, 8)]
+    # The first months of the first year: the start-up January, the build (each month from February in which the plant
+    # completed more than it shipped), and the month after it.
     released = dict(d.q("SELECT strftime('%Y-%m', ReleasedDate), COUNT(*) FROM WorkOrder GROUP BY 1"))
     completed = dict(d.q("SELECT strftime('%Y-%m', pc.CompletionDate), ROUND(SUM(pcl.QuantityCompleted)) FROM ProductionCompletionLine pcl "
                          "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID GROUP BY 1"))
     shipped = dict(d.q("SELECT strftime('%Y-%m', s.ShipmentDate), ROUND(SUM(sl.QuantityShipped)) FROM ShipmentLine sl "
                        "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID JOIN Item i ON i.ItemID = sl.ItemID "
                        "WHERE i.SupplyMode = 'Manufactured' GROUP BY 1"))
-    build = [m for m in months if completed.get(m, 0) > shipped.get(m, 0)]
-    claim(build == months[1:6], "the plant completed more than it shipped in February to June, and not in January or July")
-    claim(released[months[6]] < released[months[5]], "releases fell in July")
+    year = [f"{d.F}-{m:02d}" for m in range(1, 13)]
+    claim(completed.get(year[0], 0) < shipped.get(year[0], 0), "the plant completed less than it shipped in the start-up January")
+    build = []
+    for m in year[1:]:
+        if completed.get(m, 0) <= shipped.get(m, 0):
+            break
+        build.append(m)
+    claim(3 <= len(build) <= 9, "the plant completed more than it shipped for several months from February (the stock build)")
+    after = year[min(len(build) + 1, 11)]
+    months = year[:year.index(after) + 1]                   # January through the month after the build
+    claim(released.get(after, 0) < sum(released.get(m, 0) for m in build) / max(len(build), 1),
+          "releases after the build fell below their level during it")
     surplus = sum(completed[m] - shipped[m] for m in build)
+    staff_months = year[1:year.index(after) + 2]             # February through the month after that
     staff = [{r[0] for r in d.q("SELECT DISTINCT EmployeeID FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' "
-                                "AND substr(WorkDate, 1, 7) = ?", m)} for m in months[1:] + [f"{d.F}-08"]]
-    claim(all(s == staff[0] for s in staff), "the same employees recorded manufacturing time from February through August")
+                                "AND substr(WorkDate, 1, 7) = ?", m)} for m in staff_months]
+    claim(all(staff[0] <= s for s in staff), "the employees who recorded manufacturing time in February still did, every month "
+                                            "through the month after the build ended")
     late = dict(d.q("SELECT substr(lt.WorkDate, 1, 7), SUM(CASE WHEN lt.WorkDate > op.ActualEndDate THEN lt.RegularHours + "
                     "lt.OvertimeHours ELSE 0 END) / SUM(lt.RegularHours + lt.OvertimeHours) FROM LaborTimeEntry lt "
                     "JOIN WorkOrderOperation op ON op.WorkOrderOperationID = lt.WorkOrderOperationID "
                     "WHERE lt.LaborType = 'Direct Manufacturing' GROUP BY 1"))
-    first = next(m for m in sorted(late) if late[m] > 0.25)
-    claim(first == months[6], "July is the first month in which the late share passed a quarter")
+    # The month surge days began in earnest (more than one a month), and the late share before and in it.
     per_month = Counter(s[:7] for s in surge_days(d))
-    earnest = next(m for m in sorted(per_month) if per_month[m] > 1)
-    claim(earnest == first, "surge days began in earnest (more than one a month) in the same month")
+    first = next((m for m in sorted(per_month) if per_month[m] > 1), None)
+    claim(first is not None and first[:4] == str(d.F), "surge days began in earnest (more than one a month) in the first year")
+    first = first or year[6]
     early = [late[m] for m in sorted(late) if m < first]
+    claim(bool(early) and late.get(first, 0) > max(early), "the late share in that month is higher than in any month before it")
     return dict(cutoff=cutoff, centers=[short(c) for c in centers],
                 now=[ratio[(d.C, c)]["open"] for c in centers], now_all=[ratio[(d.C, c)]["all"] for c in centers],
-                then=[ratio[(d.F, c)]["open"] for c in centers],
-                released=[released[m] for m in months], completed=[completed[m] for m in months],
-                shipped=[shipped[m] for m in months], build_from=MONTHS[int(build[0][5:]) - 1],
-                build_to=MONTHS[int(build[-1][5:]) - 1], surplus=thousands(surplus), staff=len(staff[0]),
-                late_low=min(early), late_high=max(early), before=MONTHS[int(first[5:]) - 2], before_year=first[:4],
-                late_first=late[first], first=MONTHS[int(first[5:]) - 1], first_year=first[:4])
+                then=[ratio[(d.F, c)]["open"] for c in centers], months_to=MONTHS[int(months[-1][5:]) - 1],
+                released=[released.get(m, 0) for m in months], completed=[completed.get(m, 0) for m in months],
+                shipped=[shipped.get(m, 0) for m in months], build_from=MONTHS[int(build[0][5:]) - 1] if build else "?",
+                build_to=MONTHS[int(build[-1][5:]) - 1] if build else "?", after=MONTHS[int(after[5:]) - 1],
+                surplus=thousands(surplus), staff=len(staff[0]),
+                late_low=min(early, default=0), late_high=max(early, default=0), before=MONTHS[int(first[5:]) - 2],
+                before_year=first[:4], late_first=late.get(first, 0), first=MONTHS[int(first[5:]) - 1], first_year=first[:4])
 
 
 # --- Exercise 12.4 --------------------------------------------------------------------------------
@@ -395,12 +415,13 @@ def ex4(d, claim):
         f"WHERE cc.CostCenterName = 'Manufacturing' GROUP BY 1, 2")}
     other = [overtime.get((y, 0), 0.0) for y in d.years]
     on_surge = [overtime.get((y, 1), 0.0) for y in d.years]
-    claim(max(other) / min(other) < 1.1, "overtime on other days stayed about the same")
+    flat = max(other) / min(other) < 1.1
+    claim(flat or other[-1] <= other[0], "overtime on other days stayed about the same, or at least did not grow")
     claim(on_surge == sorted(on_surge) and on_surge[-1] - on_surge[0] >= (on_surge[-1] + other[-1]) - (on_surge[0] + other[0]),
           "overtime on surge days grew every year and holds all the growth")
     return dict(n=len(approvals), n_reasons=word(len(reasons)), reasons=reasons, manager_n=approvers[0][1],
                 manager_share=approvers[0][1] / len(approvals), entries=len(entries), days=len(surge),
-                other=other, surge=on_surge)
+                other=other, surge=on_surge, other_trend="stayed about the same" if flat else "did not grow")
 
 
 # --- Exercise 12.5 --------------------------------------------------------------------------------
@@ -425,6 +446,12 @@ def ex5(d, claim):
           "the gross pay is the amount of the chief executive's register")
     charged = {r[9] for r in after}
     claim(len(charged) == 1 and center not in charged, "all are charged to one cost center, not the employee's own")
+    ceo_periods = {r[0] for r in d.q("SELECT DISTINCT PayrollPeriodID FROM PayrollRegister WHERE EmployeeID = ?", ceo)}
+    after_periods = {r[0] for r in d.q("SELECT PayrollPeriodID FROM PayrollRegister WHERE PayrollRegisterID IN (%s)"
+                                       % ",".join(str(r[0]) for r in after))}
+    processed_periods = {r[0] for r in d.q("SELECT DISTINCT PayrollPeriodID FROM PayrollRegister")}
+    claim(not ceo_periods & after_periods and ceo_periods | after_periods == processed_periods,
+          "the chief executive has no register in the periods of the post-termination registers, and one in every other period")
     final = [r for r in after if r[5] <= terminated <= r[6]]
     claim(len(final) == 1 and final[0] is after[0], "only the first register's period includes the termination date")
     unpaid = [r[0] for r in after if r[10] == 0]

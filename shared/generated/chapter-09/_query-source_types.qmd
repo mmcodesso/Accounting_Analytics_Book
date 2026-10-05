@@ -1,0 +1,5 @@
+```sql
+SELECT DISTINCT SourceDocumentType
+FROM GLEntry
+WHERE AccountID = 93 AND FiscalYear = 2026;
+```

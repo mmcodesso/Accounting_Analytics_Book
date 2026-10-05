@@ -9,7 +9,8 @@ from collections import defaultdict
 from functools import lru_cache
 
 import excel as xl
-from data import one, q, require_columns
+from data import connection, one, q, require_columns
+from shared.calculations.excel_analysis import (forecast_backtest, _betacf, _betai, t_two_sided, t_critical, regression, monthly_revenue as shared_monthly_revenue, flex as shared_flex, promotion_model as shared_promotion_model)
 from drawio import (BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, ROW_H, RULE, SMALL, TEAL,
                     TEAL_TINT, WHITE, Diagram, esc)
 
@@ -19,67 +20,6 @@ CLOSE_2026 = "JE-2026-000296"
 
 
 # -- statistics without third-party packages ------------------------------------------
-
-def _betacf(a: float, b: float, x: float) -> float:
-    """Continued fraction for the incomplete beta function (Numerical Recipes)."""
-    qab, qap, qam = a + b, a + 1, a - 1
-    c, d = 1.0, 1 - qab * x / qap
-    d = 1 / (d if abs(d) > 1e-300 else 1e-300)
-    h = d
-    for m in range(1, 300):
-        m2 = 2 * m
-        aa = m * (b - m) * x / ((qam + m2) * (a + m2))
-        d = 1 + aa * d; c = 1 + aa / c
-        d = 1 / (d if abs(d) > 1e-300 else 1e-300); h *= d * c
-        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
-        d = 1 + aa * d; c = 1 + aa / c
-        d = 1 / (d if abs(d) > 1e-300 else 1e-300); delta = d * c; h *= delta
-        if abs(delta - 1) < 1e-14:
-            break
-    return h
-
-
-def _betai(a: float, b: float, x: float) -> float:
-    if x <= 0 or x >= 1:
-        return 0.0 if x <= 0 else 1.0
-    bt = math.exp(math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log(1 - x))
-    return bt * _betacf(a, b, x) / a if x < (a + 1) / (a + b + 2) else 1 - bt * _betacf(b, a, 1 - x) / b
-
-
-def t_two_sided(t: float, df: int) -> float:
-    return _betai(df / 2, 0.5, df / (df + t * t))
-
-
-def t_critical(df: int, level: float = 0.95) -> float:
-    lo, hi = 0.0, 50.0
-    for _ in range(200):
-        mid = (lo + hi) / 2
-        if t_two_sided(mid, df) > 1 - level:
-            lo = mid
-        else:
-            hi = mid
-    return (lo + hi) / 2
-
-
-def regression(xs: list[float], ys: list[float]) -> dict:
-    """The quantities the Data Analysis ToolPak's Regression tool reports for one X variable."""
-    n = len(xs)
-    mx, my = statistics.mean(xs), statistics.mean(ys)
-    sxx = sum((x - mx) ** 2 for x in xs)
-    b = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
-    a = my - b * mx
-    sst = sum((y - my) ** 2 for y in ys)
-    sse = sum((y - (a + b * x)) ** 2 for x, y in zip(xs, ys))
-    ssr = sst - sse
-    df = n - 2
-    se = math.sqrt(sse / df)
-    se_b = se / math.sqrt(sxx)
-    se_a = se * math.sqrt(1 / n + mx * mx / sxx)
-    tcrit = t_critical(df)
-    return dict(n=n, a=a, b=b, r2=ssr / sst, adj=1 - (1 - ssr / sst) * (n - 1) / df, se=se, ssr=ssr,
-                sse=sse, sst=sst, df=df, se_a=se_a, se_b=se_b, t_a=a / se_a, t_b=b / se_b,
-                p_a=t_two_sided(a / se_a, df), p_b=t_two_sided(b / se_b, df), f=ssr / (sse / df),
-                tcrit=tcrit)
 
 
 def general(value: float, digits: int = 10) -> str:
@@ -98,76 +38,17 @@ def general(value: float, digits: int = 10) -> str:
 
 @lru_cache(maxsize=1)
 def monthly_revenue() -> list[tuple[str, float]]:
-    require_columns("SalesInvoiceLine", ["SalesInvoiceID", "LineTotal"])
-    rows = q("SELECT substr(si.InvoiceDate, 1, 7), SUM(l.LineTotal) FROM SalesInvoiceLine l "
-             "JOIN SalesInvoice si USING (SalesInvoiceID) GROUP BY 1 ORDER BY 1")
-    assert len(rows) == 36 and rows[0][0] == "2024-01" and rows[-1][0] == "2026-12", rows[:2]
-    return rows
+    return shared_monthly_revenue(connection())
 
 
 @lru_cache(maxsize=1)
 def flex() -> dict:
-    """Tutorial 7.2: static budget, flexible budget, and actual for fiscal 2026 by product line.
-    The flexible budget prices each 2026 invoice line at the budget's planned net price for its item
-    and month; lines the budget did not plan keep their actual amount."""
-    require_columns("BudgetLine", ["FiscalYear", "Month", "ItemID", "Quantity", "UnitAmount",
-                                   "BudgetAmount", "BudgetCategory", "AccountID", "CostCenterID"])
-    plan = {}
-    for y, m, iid, ua in q("SELECT FiscalYear, Month, ItemID, UnitAmount FROM BudgetLine "
-                           "WHERE BudgetCategory = 'Revenue'"):
-        assert (y, m, iid) not in plan, "one planned price per item and month"
-        plan[(y, m, iid)] = ua
-    grp = dict(q("SELECT ItemID, ItemGroup FROM Item"))
-    sc = dict(q("SELECT ItemID, StandardCost FROM Item"))
-    out = defaultdict(float)
-    for iid, cat, qty, amt in q("SELECT ItemID, BudgetCategory, Quantity, BudgetAmount FROM BudgetLine "
-                                "WHERE FiscalYear = 2026 AND BudgetCategory IN ('Revenue', 'COGS')"):
-        out[(grp[iid], "static " + cat)] += amt
-        if cat == "Revenue":
-            out[(grp[iid], "static units")] += qty
-    unmatched = 0
-    for iid, d, qty, lt, lp, up, disc in q(
-            "SELECT l.ItemID, si.InvoiceDate, l.Quantity, l.LineTotal, l.BaseListPrice, l.UnitPrice, l.Discount "
-            "FROM SalesInvoiceLine l JOIN SalesInvoice si USING (SalesInvoiceID) "
-            "WHERE si.InvoiceDate LIKE '2026%'"):
-        g = grp[iid]
-        if g == "Services":
-            continue
-        m = int(d[5:7])
-        p = plan.get((2026, m, iid))
-        unmatched += p is None
-        values = dict(flex=lt if p is None else qty * p, actual=lt, cost=qty * sc[iid],
-                      discount=qty * up * disc, units=qty, list=qty * lp)
-        for k, v in values.items():
-            out[(g, k)] += v
-            out[(g, m, k)] += v
-    out["unmatched"] = unmatched
-    # Every COGS line is budgeted at the item's standard cost, so flexing cost uses standard cost.
-    assert one("SELECT COUNT(*) FROM BudgetLine bl JOIN Item i USING (ItemID) WHERE bl.BudgetCategory = 'COGS' "
-               "AND abs(bl.UnitAmount - i.StandardCost) > 0.005")[0] == 0
-    return out
+    return shared_flex(connection())
 
 
 @lru_cache(maxsize=1)
 def promotion_model() -> dict:
-    u, r, dsc, sc = one("SELECT SUM(l.Quantity), SUM(l.LineTotal), SUM(l.Quantity * l.UnitPrice * l.Discount), "
-                        "SUM(l.Quantity * i.StandardCost) FROM SalesInvoiceLine l JOIN Item i USING (ItemID) "
-                        "WHERE l.PromotionID = 8")
-    commission = one("SELECT SUM(g.Debit - g.Credit) FROM GLEntry g JOIN Account a USING (AccountID) "
-                     "WHERE g.FiscalYear = 2026 AND a.AccountNumber = 6290 AND g.VoucherNumber <> ?",
-                     CLOSE_2026)[0]
-    revenue = one("SELECT SUM(l.LineTotal) FROM SalesInvoiceLine l JOIN SalesInvoice si USING (SalesInvoiceID) "
-                  "WHERE si.InvoiceDate LIKE '2026%'")[0]
-    m = dict(units=u, price=(r + dsc) / u, cost=sc / u, rate=commission / revenue)
-
-    def with_promo(d: float, lift: float) -> float:
-        return m["units"] * (1 + lift) * (m["price"] * (1 - d) * (1 - m["rate"]) - m["cost"])
-
-    m["without"] = m["units"] * (m["price"] * (1 - m["rate"]) - m["cost"])
-    m["with"] = with_promo
-    m["breakeven"] = (m["price"] * (1 - m["rate"]) - m["cost"]) / (m["price"] * 0.9 * (1 - m["rate"]) - m["cost"]) - 1
-    assert 0.25 < m["breakeven"] < 0.35, m["breakeven"]
-    return m
+    return shared_promotion_model(connection())
 
 
 # -- drawing helpers --------------------------------------------------------------------
@@ -302,14 +183,8 @@ def fig_07_02() -> Diagram:
 
 def fig_07_03() -> Diagram:
     d = Diagram("Backtesting Three Forecasts of the Fourth Quarter of 2026")
-    rows = monthly_revenue()
-    ys = [v for _, v in rows]
-    fit = regression(list(range(2, 34)), ys[1:33])
-    actual = ys[33:]
-    methods = [("Trend", [fit["a"] + fit["b"] * x for x in (34, 35, 36)]),
-               ("Mean", [statistics.mean(ys[1:33])] * 3),
-               ("Same quarter last year", ys[21:24])]
-    assert [m for m, _ in rows[21:24]] == ["2025-10", "2025-11", "2025-12"]
+    backtest = forecast_backtest(connection())
+    actual, methods = backtest["actual"], backtest["methods"]
     body = [("40", ["Method", "Oct 2026", "Nov 2026", "Dec 2026", "Quarter", "Error", "Monthly error"])]
     body.append(("41", ["Actual", *(xl.num(v, 0) for v in actual), xl.num(sum(actual), 0), "", ""]))
     errors = {}

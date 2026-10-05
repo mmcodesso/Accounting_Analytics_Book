@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will start internal audit's monitoring report, a new file of its own. You will rebuild Chapter 8's five journal entry tests as flag columns in Power Query, add up each entry's risk score, and look at the entries with the highest scores together with the ledger lines behind them. Then you will turn the flags into a table of exceptions, the first part of the exception register, and reconcile the population of entries to the ledger before relying on any test.
 
-**Prerequisites.** You need Power BI Desktop and CharlesRiver.xlsx. Tutorial 14.1 created the Date table and Tutorial 14.2 the Measures table; this tutorial repeats both briefly in a new file.
+**Prerequisites.** You need Power BI Desktop and CharlesRiver.xlsx. Tutorial 14.1 created the Date table and Tutorial 14.2 the Key Measures table; this tutorial repeats both briefly in a new file.
 
 **Step-by-step instructions.**
 
@@ -96,7 +96,7 @@ The relationship to Employee runs through the approver, so a visual of entries b
 
 **Step 7. Score the entries.**
 
-a. Create a Measures table with **Home > Enter data**, as in Tutorial 14.2, and add the two measures below.
+a. Create a Key Measures table with **Home > Enter data**, as in Tutorial 14.2, and add the two measures below.
 b. On a page named `Journal Entries`, add a matrix with RiskScore on **Rows** and Entries and Entry Amount as **Values**.
 
 <!-- dax-check: measure -->
@@ -107,11 +107,12 @@ Entry Amount = SUM ( JournalEntry[TotalAmount] )
 
 The matrix reproduces Chapter 8's distribution: most entries score 0, a couple of dozen score 1, a handful score 2, none score 3, and one scores 4.
 
-**Step 8. List the riskiest entries.**
+**Step 8. List the riskiest entries.** A risk score describes one entry and is not meant to be added up, so you first tell Power BI not to summarize it; the visual's filter can then test each entry's score.
 
-a. Add a table visual with EntryNumber, PostingDate, EntryType, and RiskScore.
-b. In the **Filters** pane, under **Filters on this visual**, set RiskScore to **Advanced filtering**, show items when the value is greater than or equal to 2, and click **Apply filter**.
-c. Sort the table by RiskScore, descending.
+a. Select RiskScore in the **Data** pane, and on the **Column tools** tab, set **Summarization** to **Don't summarize**.
+b. Add a table visual with EntryNumber, PostingDate, EntryType, and RiskScore.
+c. In the **Filters** pane, under **Filters on this visual**, set RiskScore to **Advanced filtering**, show items when the value is greater than or equal to 2, and click **Apply filter**.
+d. Sort the table by RiskScore, descending.
 
 The table lists the entries that failed two tests or more. At the top is the opening balance entry of January 2024, which failed four. Five of the others were posted on the first day of a year and keyed on the first Saturday after it, and two are the round debt reclassifications that Chapter 8 found above the controller's limit.
 

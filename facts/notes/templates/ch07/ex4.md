@@ -2,4 +2,5 @@
      Commission rate {{ rate|pct(3) }}. Hours needed to meet all demand relative to half of {{ d.C }} capacity: {% for name, r in need %}{{ name }} {{ r|num(2) }}{{ ', ' if not loop.last }}{% endfor %}. Optimum: total contribution {{ optimum|money }} against {{ full|money }} if all demand were met (a loss
      of {{ loss|money }}). Only Assembly binds ({{ bind_cap|num }} hours), with a shadow price of about {{ shadow|money }} per hour; Finishing uses {{ fin_used|num }} of {{ fin_cap|num }} hours.
      Items reduced: {% for code, x, q in reduced %}{{ code }} ({% if x < 0.05 %}0{% else %}{{ x|num(1) }}{% endif %} of {{ q|num(1) }}{{ ' units' if loop.first }}){{ ', ' if not loop.last }}{% endfor %}: the items with the lowest contribution per Assembly
-     hour. Setup hours are ignored; students who include them should get a similar pattern. -->
+     hour. Setup hours are ignored; spread over each item's average {{ d.C }} work-order quantity, they leave Assembly the only binding
+     center and raise the contribution lost to about {{ setup_loss|num }}. -->

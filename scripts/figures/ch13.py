@@ -14,54 +14,31 @@ from functools import lru_cache
 import excel as xl
 import powerbi as pbi
 from data import one, q, require_columns
+from data import connection
+from shared.calculations import bi_ch13 as public_calculations
 from drawio import (AMBER, BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, RULE, SMALL, TEAL,
                     TEAL_TINT, WHITE, Diagram, esc)
 
 GROUPS = ["Accessories", "Furniture", "Lighting", "Services", "Textiles"]
-MONTHS_2026 = [f"2026-{m:02d}" for m in range(1, 13)]
+MONTHS_2026 = public_calculations.MONTHS_2026
 QUARTERS_2026 = [f"2026-Q{n}" for n in range(1, 5)]
 
 
 @lru_cache(maxsize=1)
 def lines() -> list[dict]:
-    """The invoice lines with what the tutorials' model relates to them."""
-    require_columns("SalesInvoiceLine", ["SalesInvoiceLineID", "SalesInvoiceID", "ItemID", "Quantity",
-                                         "BaseListPrice", "UnitPrice", "Discount", "LineTotal",
-                                         "PromotionID", "PricingMethod"])
-    require_columns("SalesInvoice", ["SalesInvoiceID", "InvoiceNumber", "InvoiceDate", "CustomerID"])
-    require_columns("Item", ["ItemID", "ItemCode", "ItemGroup", "ListPrice", "StandardCost"])
-    require_columns("Customer", ["CustomerID", "CustomerName", "CustomerSegment", "Region"])
-    rows = q("SELECT l.SalesInvoiceLineID, l.SalesInvoiceID, si.InvoiceDate, i.ItemGroup, "
-             "substr(i.ItemCode, 5, 3), c.CustomerSegment, c.Region, l.LineTotal, "
-             "l.Quantity * l.BaseListPrice, l.Quantity * l.UnitPrice * l.Discount, i.ListPrice "
-             "FROM SalesInvoiceLine l JOIN SalesInvoice si USING (SalesInvoiceID) "
-             "JOIN Item i USING (ItemID) JOIN Customer c ON c.CustomerID = si.CustomerID")
-    total = one("SELECT COUNT(*) FROM SalesInvoiceLine")[0]
-    assert len(rows) == total, "every line finds its invoice, item, and customer"
-    assert all(r[10] is not None for r in rows), "no line refers to an item without a list price"
-    out = []
-    for r in rows:
-        date = r[2]
-        out.append(dict(id=r[0], inv=r[1], fy=int(date[:4]), month=date[:7],
-                        period=f"{date[:4]}-Q{(int(date[5:7]) + 2) // 3}", grp=r[3], pt=r[4],
-                        seg=r[5], reg=r[6], rev=r[7], list=r[8], disc=r[9]))
-    return out
+    return public_calculations.lines(connection())
 
 
 def total(field: str, **match) -> float:
-    return sum(r[field] for r in lines() if all(r[k] == v for k, v in match.items()))
+    return public_calculations.total(connection() ,field, **match)
 
 
 def count(**match) -> int:
-    return sum(1 for r in lines() if all(r[k] == v for k, v in match.items()))
+    return public_calculations.count(connection() ,**match)
 
 
 def monthly(field: str, year: int = 2026, **match) -> list[float]:
-    by = defaultdict(float)
-    for r in lines():
-        if r["fy"] == year and all(r[k] == v for k, v in match.items()):
-            by[r["month"]] += r[field]
-    return [by[m] for m in MONTHS_2026]
+    return public_calculations.monthly(connection() ,field, year, **match)
 
 
 def short(month: str) -> str:
@@ -183,14 +160,7 @@ def fig_13_02() -> Diagram:
 # -- fig-13-03 --------------------------------------------------------------------------------
 
 def _profile(sample: int | None) -> dict:
-    """Column quality and distribution of SalesInvoiceLine on the first rows or all of them."""
-    src = ("(SELECT * FROM SalesInvoiceLine ORDER BY SalesInvoiceLineID LIMIT {})".format(sample)
-           if sample else "SalesInvoiceLine")
-    n, promo_empty, d_distinct, lt_distinct = one(
-        f"SELECT COUNT(*), SUM(PromotionID IS NULL), COUNT(DISTINCT Discount), COUNT(DISTINCT LineTotal) FROM {src}")
-    d_unique = one(f"SELECT COUNT(*) FROM (SELECT Discount FROM {src} GROUP BY Discount HAVING COUNT(*) = 1)")[0]
-    first = q(f"SELECT Discount, PromotionID, LineTotal FROM {src} ORDER BY SalesInvoiceLineID LIMIT 4")
-    return dict(n=n, promo_empty=promo_empty, d_distinct=d_distinct, d_unique=d_unique, first=first)
+    return public_calculations._profile(connection() ,sample)
 
 
 def _pct(part: int, whole: int) -> str:

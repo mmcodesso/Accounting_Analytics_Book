@@ -8,19 +8,24 @@ check_figures.py can recompute and compare them later.
 from __future__ import annotations
 
 import sqlite3
+import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 
 from drawio import AMBER, CROSS_WIDTH, GRAY, Diagram
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DB_PATH = REPO_ROOT / "datasets" / "CharlesRiver.sqlite"
+sys.path.insert(0, str(REPO_ROOT))
+from shared.calculations.foundations import relationship
+DB_PATH = (Path(os.environ.get("CHARLESRIVER_DATA", REPO_ROOT / "datasets"))
+           / "CharlesRiver.sqlite").resolve()
 
 
 @lru_cache(maxsize=1)
 def connection() -> sqlite3.Connection:
     if not DB_PATH.is_file():
-        raise SystemExit(f"Dataset not found: {DB_PATH}. The generator reads datasets/CharlesRiver.sqlite.")
+        raise SystemExit(f"Dataset not found: {DB_PATH}. Put it in datasets/ or set CHARLESRIVER_DATA.")
     return sqlite3.connect(f"{DB_PATH.as_uri()}?mode=ro", uri=True)
 
 
@@ -53,13 +58,7 @@ def _child_end(minimum: int, maximum: int) -> str:
 
 def cardinality(parent: str, pk: str, child: str, fk: str) -> tuple[str, str]:
     """Return the (parent end, child end) Draw.io ER markers implied by the data."""
-    null_fk = q(f"SELECT COUNT(*) FROM {child} WHERE {fk} IS NULL")[0][0]
-    minimum, maximum = q(
-        f"SELECT MIN(COALESCE(x.c, 0)), MAX(COALESCE(x.c, 0)) FROM {parent} p LEFT JOIN "
-        f"(SELECT {fk} AS k, COUNT(*) AS c FROM {child} WHERE {fk} IS NOT NULL GROUP BY {fk}) x "
-        f"ON x.k = p.{pk}"
-    )[0]
-    return ("ERzeroToOne" if null_fk else "ERmandOne"), _child_end(minimum, maximum)
+    return relationship(connection(), parent, pk, child, fk)
 
 
 def trace_card(source: str, pk: str) -> tuple[str, str]:

@@ -1,0 +1,7 @@
+| Journal-entry rule | Flagged entries |
+| --- | --- |
+| Weekend | 17 |
+| Backdated | 6 |
+| SelfApproved | 7 |
+| AboveLimit | 9 |
+| RoundAmount | 4 |

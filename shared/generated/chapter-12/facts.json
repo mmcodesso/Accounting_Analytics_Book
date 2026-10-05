@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/sql_ch09.py": "d338c93f4573862c5e4ef7902ddf3084de710be1377c1f15589a89fc7b195e1b",
+    "shared/calculations/sql_ch10.py": "14dac1338eae9334a0f930153b044521b4eb63564ac8cbddf8bc2eee7c482ed4",
+    "shared/calculations/sql_ch11.py": "7db3e595a00ddc9899a04f4a00a203da98dca20068bfab181580c6b4d8e54574",
+    "shared/calculations/sql_ch12.py": "ed51b4e43be562778768dbb5cac07557ff03cf0851f59eea53684545ae3ec000",
+    "scripts/slides/refresh_sql.py": "56f6a9aeec3756598ddfb3ba6fbc0053e9d1ca980122ed1fd86984ab0bb7024b",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/slides/refresh_excel.py": "df19257d870f29aaf80ff25fceb3927afe5cc68f332f212a24280dc552a463e9",
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd"
+  },
+  "artifact_sha256": {
+    "_journal-control.qmd": "470ba00da74d29352b9e5ee073e945e4e1ba6df030056d2541bc4fab9aed6f9b",
+    "_payroll-control.qmd": "8e06a3a01283440332a2f4baea4591eb0e8855158173ec5d22a2e3979152b4a0",
+    "_trace.qmd": "f94a783278cd1fba0f9d41de78427b412826f52a92576b4c4d54578a339de9e0",
+    "_match.qmd": "bf7ecb825fa785fe2895e67384b3dd062f8fb26208c41c3ecc5cf34cc7fa1675",
+    "_price.qmd": "1c391719654cb2097ff635714b7f0d32d3579b07df3c82bc8f83b3adb0c6232b",
+    "_grni.qmd": "32428246939fad19873c7f952bbf648d69ba77d7c24d37b2d8e372efd3919f15",
+    "_approvals.qmd": "cb49cc22d1edc31614af70c831243dc93f8155cb3ffcd0d3f8a45b8d29b034d0",
+    "_time-profile.qmd": "b304cd428b61d38e686545cca6928a79eebd82e8534de34e2e448568072c86df",
+    "_pay-expectation.qmd": "a681635c2ff6937d389def1d9ebfaed488f7d31b149aee27b26ac5b12c491572",
+    "_surge.qmd": "27aa41e64650f09ef284542f31ce97ff170455080000bb867c0cc046980a0052",
+    "_late.qmd": "d657ac5394db80db793d5e6f88a021ba53dc311cc18bb35cd853819be87a3bf3",
+    "_query-trace.qmd": "227e812dc83acef634420e4d4253e8802c3e5226e6f3d69874c912b5be12c97d",
+    "_query-unbilled_shipments.qmd": "f08057066c77278af5c6b65756d1b789c8119c3cb6a2eb8dfe41c15c7a6d3942",
+    "_query-approval_summary.qmd": "d482985f86e2069cc0ec2cc98fb77af55b77e4797477c31f63e9226fa99269ff"
+  },
+  "queries": {
+    "je_population": {
+      "columns": [
+        "Entries",
+        "EntryTotal",
+        "PostedEntries",
+        "PostedDebits"
+      ],
+      "rows": [
+        [
+          851,
+          129860610.27,
+          851,
+          129860610.27
+        ]
+      ]
+    },
+    "payroll_population": {
+      "columns": [
+        "FiscalYear",
+        "RegisterCost",
+        "LedgerCost",
+        "Difference"
+      ],
+      "rows": [
+        [
+          2024,
+          2860072.05,
+          2860072.05,
+          0.0
+        ],
+        [
+          2025,
+          3349880.59,
+          3349880.59,
+          0.0
+        ],
+        [
+          2026,
+          3815397.14,
+          3815397.14,
+          0.0
+        ]
+      ]
+    },
+    "trace": {
+      "columns": [
+        "Test",
+        "RecordID",
+        "RecordDate",
+        "Amount"
+      ],
+      "rows": [
+        [
+          "Posting with no payroll payment",
+          7231,
+          "2024-01-19",
+          7971.1
+        ],
+        [
+          "Posting with no payroll payment",
+          7232,
+          "2024-01-19",
+          7971.1
+        ],
+        [
+          "Posting with no payroll payment",
+          12521,
+          "2025-01-03",
+          7971.1
+        ],
+        [
+          "Posting with no payroll payment",
+          12522,
+          "2025-01-03",
+          7971.1
+        ],
+        [
+          "Posting with no payroll payment",
+          18069,
+          "2026-01-02",
+          7971.1
+        ],
+        [
+          "Posting with no payroll payment",
+          18070,
+          "2026-01-02",
+          7971.1
+        ]
+      ]
+    },
+    "match_status": {
+      "columns": [
+        "MatchStatus",
+        "POLines"
+      ],
+      "rows": [
+        [
+          "Matched",
+          23375
+        ],
+        [
+          "Received, not fully invoiced",
+          1100
+        ],
+        [
+          "Not yet received",
+          277
+        ],
+        [
+          "Partly received",
+          90
+        ]
+      ]
+    },
+    "price_tolerance": {
+      "columns": [
+        "InvoiceLines",
+        "AboveThreePercent",
+        "AboveTwoPercent",
+        "LargestIncrease",
+        "LargestDecrease"
+      ],
+      "rows": [
+        [
+          40293,
+          0,
+          5109,
+          0.0257,
+          -0.017
+        ]
+      ]
+    },
+    "grni": {
+      "columns": [
+        "NotInvoicedValue",
+        "LedgerBalance"
+      ],
+      "rows": [
+        [
+          1020992.8,
+          1020992.06
+        ]
+      ]
+    },
+    "approval_summary": {
+      "columns": [
+        "Test",
+        "Orders",
+        "OrderValue"
+      ],
+      "rows": [
+        [
+          "Above approver limit",
+          13,
+          705779.39
+        ],
+        [
+          "Self-approved",
+          9,
+          651830.75
+        ],
+        [
+          "Approved after termination",
+          3,
+          15419.28
+        ]
+      ]
+    },
+    "time_profile": {
+      "columns": [
+        "Entries",
+        "NotApproved",
+        "NoClockOut",
+        "Employees",
+        "FirstWorkDate",
+        "LastWorkDate"
+      ],
+      "rows": [
+        [
+          52967,
+          5,
+          3,
+          76,
+          "2024-01-01",
+          "2026-12-11"
+        ]
+      ]
+    },
+    "pay_expectation": {
+      "columns": [
+        "FiscalYear",
+        "EarningsPaid",
+        "Expected",
+        "Difference",
+        "LinesAboveOneCent"
+      ],
+      "rows": [
+        [
+          2024,
+          2630917.49,
+          2630912.2,
+          5.29,
+          0
+        ],
+        [
+          2025,
+          3062806.91,
+          3062802.1,
+          4.81,
+          0
+        ],
+        [
+          2026,
+          3482685.6,
+          3482681.37,
+          4.23,
+          0
+        ]
+      ]
+    },
+    "surge_days": {
+      "columns": [
+        "WorkYear",
+        "SurgeDays",
+        "EmployeesPerDay",
+        "SurgeOvertime",
+        "SurgeShare"
+      ],
+      "rows": [
+        [
+          "2024",
+          12,
+          64,
+          3456.0,
+          0.355
+        ],
+        [
+          "2025",
+          32,
+          64,
+          9216.0,
+          0.589
+        ],
+        [
+          "2026",
+          49,
+          64,
+          14112.0,
+          0.705
+        ]
+      ]
+    },
+    "late_by_year": {
+      "columns": [
+        "WorkYear",
+        "DirectHours",
+        "AfterEnd",
+        "ShareAfterEnd",
+        "AfterEndOnSurgeDays"
+      ],
+      "rows": [
+        [
+          "2024",
+          60442.0,
+          11765.0,
+          0.195,
+          8693.0
+        ],
+        [
+          "2025",
+          57557.0,
+          28687.0,
+          0.498,
+          23393.0
+        ],
+        [
+          "2026",
+          62742.0,
+          41265.0,
+          0.658,
+          36289.0
+        ]
+      ]
+    }
+  }
+}

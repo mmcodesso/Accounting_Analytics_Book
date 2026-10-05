@@ -38,7 +38,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      cutoff error; they are Exercise 5.2's invoices except SI-2026-013742. Exercises 6.1 and 10.1 compared InvoiceLines, built on invoice
      dates, with the ledger: of their three 2026 differences, only SI-2026-013742 is a revenue cutoff error. Supplier invoices post on their
      ReceivedDate (no exception); one, ASV0050-2025-040073 (dated 2025-12-30, received 2026-01-01, 3,266.27, supplier 50), crosses the
-     year-end. Payroll: hourly labor of 2024 work paid in fiscal 2025, 117,073.89 (manufacturing 98,041.68); of 2025 work paid in fiscal 2026, 138,290.66 (manufacturing 117,800.12). With salaries and employer taxes and benefits allocated by working day, the full cost of
+     year-end. Payroll: hourly labor of 2024 work paid in fiscal 2025, 117,073.89 (manufacturing 98,041.68); of 2025 work paid in fiscal 2026, 138,290.66 (manufacturing 117,800.12). With salaries allocated by working day and employer taxes and benefits applied as a rate on gross pay, the full cost of
      late-December work is about 296,000 (2024) and 335,000 (2025). Periods 70-77 average 287,283.61 (manufacturing 148,478.01); the 13
      working days of 14-31 December 2026 cost about 383,000-392,000 (manufacturing about 198,000-199,000), never recorded. Account 2030
      holds only the opening 95,000, so no year-end accrues the wages; each year-end's liability is understated by the amounts above. -->
@@ -74,7 +74,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
      41.31, the aging of
      Tutorial 8.2. Account 1020 (AccountID 3) at 2026-12-31 is 4,798,804.32; the 380,000.00 difference is the opening-balance line of
      JE-2024-000001, which no invoice supports (Chapter 8's finding). 225 invoices have a negative balance (-220,131.88 in all):
-     credit memos on paid invoices, which post to account 2060 and are refunded, so they are not receivables. Strata by customer:
+     credit memos on invoices already paid (197 of them in full), which post to account 2060 and are refunded (222 of the 225 by 2026-12-31),
+     so they are not receivables. Strata by customer:
      under 1,000, 32 customers, 11,266.04; 1,000-9,999, 65, 330,518.49; 10,000-49,999, 83, 2,206,317.97; 50,000 and over, 23,
      1,870,701.82, 42.3% of the balance, the key items of Tutorial 8.2. Receipts not invoiced: 1,150 receipt lines, 1,020,992.80 (account
      2020 is 1,020,992.06; the 0.74 is the rounding of each invoice line's clearing amount). By receipt month: 2026-12 804,428.99 (736 lines); 2026-11 188,895.56 (327); 2026-10 23,921.61 (75); 2026-09 2,836.29 (11); 2026-08 910.34 (1). Largest suppliers: 17 (59 lines,
@@ -109,7 +110,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 <!-- notes: ch12.ex3 -->
 <!-- Instructor notes, Exercise 12.3: counting only the time recorded while the operation was open, every work center falls below plan in
      fiscal 2026: Assembly 0.34, Cutting 0.29, Finishing and Test 0.39, Packing 0.22, Quality Assurance 0.81 (against all-hours ratios of
-     0.40, 0.41, 0.56, 4.19, 4.01; operations that ended by 2026-12-11, the last day with time records, as in Tutorial 11.2). In 2024 the
+     0.40, 0.41, 0.56, 4.19, 4.01; operations that ended by 2026-12-11, the last day with time records, with hours rounded before dividing, as in
+     Tutorial 11.2; the in-window ratios divide unrounded hours). In 2024 the
      in-window ratios were 0.62, 0.55, 0.68, 0.38, 1.28. The Packing excess disappears, which shows that it came from time charged after the
      operation ended; Packing is the last operation of every routing, so late time lands there. January to July 2024: work orders released
      336, 568, 680, 524, 515, 460, 328; units completed 348, 6,110, 6,280, 6,673, 4,524, 5,877, 3,201; manufactured units shipped 2,018, 3,331, 3,182, 3,539, 3,673, 3,686, 3,311. From February to June the plant completed about 12,000 more units than it shipped, an
@@ -173,7 +175,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 <!-- notes: ch12.ex5 -->
 <!-- Instructor notes, Exercise 12.5: (1) three registers pay the Account Executive (employee 81, Sales cost center, terminated
      2024-04-26) after the termination: 840 (period from 2024-04-22, paid 2024-05-10), 2646 (paid 2025-01-03), and 5420 (paid 2026-01-02), 9,424.91 gross each, about four times the employee's usual gross pay (2,217.25) and the amount of the chief
-     executive's register, all charged to the Executive cost center. Only 840, whose period includes the termination date, could be a
+     executive's register, all charged to the Executive cost center. The chief executive has a register in every other pay period but none in
+     these three, so the chief executive's pay for them appears to have gone to employee 81. Only 840, whose period includes the termination date, could be a
      final paycheck, and even it pays four times the usual amount. 2646 and 5420 are the registers of Tutorial 12.1 with no payment
      record. (2) One person, the Accounting Manager (employee 5), approved all 8,197 registers, each on its pay date. (3) 77 registers,
      net pay 282,646.21, are the Accounting Manager's own; three payments (2, 2647, and 5421, 23,099.19 net) pay the chief financial

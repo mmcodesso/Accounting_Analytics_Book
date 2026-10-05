@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import statistics
+import sys
 from collections import defaultdict
 from functools import lru_cache
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from shared.calculations.invoice_margin import invoice_lines, period
 
 import excel as xl
-from data import one, q, require_columns
+from data import connection, one, q, require_columns
+from shared.calculations.excel_analysis import margin_bridge as shared_margin_bridge
 from drawio import (BLUE, BLUE_TINT, CORAL, CORAL_TINT, GRAY, GRAY_TINT, INK, ROW_H, RULE, SMALL,
                     TEAL, TEAL_TINT, WHITE, Diagram, esc)
 
@@ -16,10 +22,6 @@ TYPED_GROUPS = ["Furniture", "Lighting", "Textiles", "Accessories"]  # the four 
 QUARTERS = ["2026-Q1", "2026-Q2", "2026-Q3", "2026-Q4"]
 NBSP = "&nbsp;&nbsp;&nbsp;"
 PROMO_COLUMNS = [r[1] for r in q("PRAGMA table_info(PromotionProgram)")]
-
-
-def period(date_text: str) -> str:
-    return f"{date_text[:4]}-Q{(int(date_text[5:7]) + 2) // 3}"
 
 
 @lru_cache(maxsize=1)
@@ -33,12 +35,7 @@ def lines() -> list[dict]:
     require_columns("SalesInvoice", ["SalesInvoiceID", "InvoiceDate", "CustomerID"])
     require_columns("Item", ["ItemID", "ItemGroup", "StandardCost"])
     require_columns("Customer", ["CustomerID", "CustomerSegment"])
-    rows = q("SELECT l.SalesInvoiceLineID, l.Quantity, l.BaseListPrice, l.UnitPrice, l.Discount, "
-             "l.LineTotal, l.PromotionID, si.InvoiceDate, i.ItemGroup, i.StandardCost, c.CustomerSegment "
-             "FROM SalesInvoiceLine l JOIN SalesInvoice si USING (SalesInvoiceID) JOIN Item i USING (ItemID) "
-             "JOIN Customer c ON c.CustomerID = si.CustomerID")
-    return [dict(id=r[0], U=r[1], L=r[1] * r[2], R=r[5], D=r[1] * r[3] * r[4], C=r[1] * r[9],
-                 promo=r[6], per=period(r[7]), fy=int(r[7][:4]), grp=r[8], seg=r[10]) for r in rows]
+    return invoice_lines(connection())
 
 
 def total(field: str, **match) -> float:
@@ -64,31 +61,7 @@ def signed_pct(value: float) -> str:
 
 @lru_cache(maxsize=1)
 def bridge() -> dict:
-    """The Furniture margin bridge of Tutorial 6.3, from the driver PivotTable's totals."""
-    t = {}
-    for p in ("2026-Q3", "2026-Q4"):
-        t[p] = {k: total(k, grp="Furniture", per=p) for k in "ULRDC"}
-    a, b = t["2026-Q3"], t["2026-Q4"]
-    list_margin = lambda s: (s["L"] - s["C"]) / s["U"]
-    price_list = lambda s: (s["L"] - s["R"] - s["D"]) / s["U"]
-    discount = lambda s: s["D"] / s["U"]
-    margin = lambda s: (s["R"] - s["C"]) / s["U"]
-    out = {
-        "q3": a["R"] - a["C"], "q4": b["R"] - b["C"],
-        "volume": (b["U"] - a["U"]) * margin(a),
-        "mix": b["U"] * (list_margin(b) - list_margin(a)),
-        "price lists": -b["U"] * (price_list(b) - price_list(a)),
-        "promotions": -b["U"] * (discount(b) - discount(a)),
-        "cost": 0.0, "drivers": t,
-    }
-    change = out["q4"] - out["q3"]
-    parts = out["volume"] + out["mix"] + out["price lists"] + out["promotions"] + out["cost"]
-    assert abs(change - parts) < 0.01, (change, parts)
-    # The story the chapter tells: flat volume and list price, a price effect from promotions.
-    assert abs(b["U"] / a["U"] - 1) < 0.01 and abs(out["promotions"]) > 0.9 * abs(change), out
-    # Every item carries one standard cost, so a cost effect at standard is zero by construction.
-    assert one("SELECT COUNT(*) FROM Item")[0] == one("SELECT COUNT(DISTINCT ItemID) FROM Item")[0]
-    return out
+    return shared_margin_bridge(connection())
 
 
 def pivot_style(header_rows: set[int], bold_rows: set[int], total_rows: set[int],

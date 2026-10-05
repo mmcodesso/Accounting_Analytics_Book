@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on these exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch15 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 15.1`), and put the measures it asks for in a display folder of the Measures table with the same name. Do not change the queries, relationships, measures, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
+Work on these exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch15 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 15.1`), and put the measures it asks for in a display folder of the Key Measures table with the same name. Do not change the queries, relationships, measures, or pages the tutorials created. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
 
 ### Financial Accounting Exercises
 
@@ -27,10 +27,10 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 **Deliverable.** The Ledger Detail page, the query, and a short note answering requirements (2), (4), and (5).
 
 <!-- notes: ch15.ex1 -->
-<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds 7020 Gain or Loss on Asset Disposal and 7040 Foreign Exchange Gain or Loss (no postings); only 7020 has entries. 2026: JE-2026-000115, 2026-06-05, "Recognize loss on asset disposal": Dr 7020 92,500.00, Dr 1186
+<!-- Instructor notes, Exercise 15.1 (SQL and the CR15 reference model): Other Income or Expense holds 7020 Gain or Loss on Asset Disposal and 7040 Foreign Exchange Gain or Loss (no postings); only 7020 has entries. 2026: JE-2026-000115, 2026-06-05, "Dispose Packing Line Conveyors And Sealers": Dr 7020 92,500.00 (line "Recognize loss on asset disposal"), Dr 1186
      Accumulated Depreciation - Manufacturing Equipment 117,500.00, Cr 1185 Manufacturing Equipment 210,000.00; FixedAssetEvent 20,
      asset 4, "Retirement Of Obsolete Packing Line Conveyor", proceeds 0; loss = cost 210,000 - accumulated depreciation 117,500 -
-     proceeds 0. 2025: JE-2025-000028, 2025-02-12: Dr 7020 42,000.00, Dr 1010 Cash 28,000.00, Dr 1160 98,000.00, Cr 1120 Warehouse Equipment 168,000.00 (asset 6, "Disposal Of Replaced Forklift A"); loss = 168,000 - 98,000 - 28,000 proceeds. The closes
+     proceeds 0. 2025: JE-2025-000028, 2025-02-12: Dr 7020 42,000.00, Dr 1010 Cash and Cash Equivalents 28,000.00, Dr 1160 98,000.00, Cr 1120 Warehouse Equipment 168,000.00 (asset 6, "Disposal Of Replaced Forklift A"); loss = 168,000 - 98,000 - 28,000 proceeds. The closes
      JE-2026-000296 and JE-2025-000287 credit 7020 but are excluded by GL Amount, so the drill-through shows only the loss entries.
      (5) Drill-through passes the filters of the selected data point, the row (AccountSubType) and the column (Year); without the year
      the page would list both years' entries. -->
@@ -59,8 +59,8 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 <!-- Instructor notes, Exercise 15.2 (CR15 reference model): 2026 net income by month: Jan 310,849.93; Feb 341,046.27; Mar 447,271.03; Apr 442,726.36; May 485,708.78; Jun 325,069.56; Jul 114,521.97; Aug 403,445.66; Sep 468,714.44; Oct 255,812.14; Nov 405,751.40; Dec 502,693.70; YTD at June 2,352,671.93, December 4,503,611.24 (equal to JE-2026-000297). Visual calculations:
      YTD = RUNNINGSUM ( [Net Income] ); Change = [Net Income] - PREVIOUS ( [Net Income] ). (3) Filtered to July-December, the running
      sum starts at July and reaches 2,150,939.31 in December, while TOTALYTD still shows 2,467,193.90 in July and 4,503,611.24 in
-     December, because the measure reads the model and the visual calculation only the visual's rows. (4) July is the month with three
-     pay dates (Chapters 11 and 14) and the low point; October has Furniture revenue 22.7% below October 2025 (Chapter 11) at the peak
+     December, because the measure reads the model and the visual calculation only the visual's rows. (4) July, the low point, has three
+     pay dates, as does January (Chapters 11 and 14); October has Furniture revenue 22.7% below October 2025 (Chapter 11) at the peak
      of the promotion's discounts. (5) The measure, which is right whatever the visual shows and can be exported. -->
 
 ### Managerial Accounting Exercises
@@ -89,7 +89,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 <!-- Instructor notes, Exercise 15.3 (CR15 reference model): Labor Cost per Standard Hour = DIVIDE ( CALCULATE ( SUM (
      LaborTimeEntry[ExtendedLaborCost] ), KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" ) ), [Standard Hours to Cut-off] ).
      By year: hours per standard hour 1.18, 1.41, 1.51; overtime share 0.116, 0.167, 0.198; labor cost per standard hour 33.18, 40.71, 44.21 (manufacturing labor cost 2,351,220.56; 2,691,548.63; 2,961,742.51). (4) Cost per standard hour = hours per standard
-     hour x cost per hour; overtime hours cost a premium, and the overtime share grew, so the cost per hour rose too (rates also rose).
+     hour x cost per hour; overtime hours cost a premium, and the overtime share grew, so the cost per hour rose too (the straight-time rate moved little: 26.57, 26.59, 26.62).
      (5) Learn: field parameters cannot be the linked fields of a drill-through or tooltip page; link the underlying fields instead. -->
 
 **Exercise 15.4: What Would the Design Trade Promotion Need?**
@@ -149,7 +149,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
      3.65%), same quarter last year +0.32% (11.48% monthly). Power BI's forecast is computed in the visual (exponential smoothing,
      Microsoft 2014) and its values cannot be read from the model; students read them from the forecast's tooltip. A good answer
      reports the forecast's quarter error beside the benchmarks, notes that a seasonal pattern needs more than three years to detect
-     reliably, and checks the effect of the half-size January 2024 on the fit (requirement 5). The note should require any forecast
+     reliably, and checks the effect of the start-up month, January 2024 at 60% of the year's other months, on the fit (requirement 5). The note should require any forecast
      shown to managers to carry its hindcast error and the benchmark it beat or did not beat. -->
 
 **Exercise 15.6: Which Work Center Did the Time Belong To?**
@@ -176,10 +176,10 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 <!-- notes: ch15.ex6 -->
 <!-- Instructor notes, Exercise 15.6 (SQL): direct lines that join both an operation and a clock entry: 51,097. Disagreements by year
-     (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.5; 15,522 in
-     all. 2026 matrix (hours): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9, Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8; Finishing operations at Finishing 8,101.6, at Assembly
-     1,354.8; Cutting at Cutting 3,696.8; QA at QA 674.9, at Assembly 420.8. After the operation's end: 2,243 of the 3,137 disagreeing
-     lines (72%) against 5,823 of 13,905 direct lines (42%), so the disagreement concentrates in the late time of Chapter 12. Indirect
+     (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.6; 15,522 in
+     all. 2026 matrix (hours; the first row in full, the others with their largest off-diagonal cell): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9, Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8, at Finishing and Test 698.3; Finishing operations at Finishing 8,101.6, at Assembly 1,354.8; Cutting operations at Cutting 3,696.8, at Assembly 573.9; QA operations at QA 674.9, at Assembly 420.8.
+     After the operation's end: 2,243 of the 3,137 disagreeing
+     lines (72%) against 5,823 of the 13,905 direct lines that join both paths (42%; 13,913 direct lines in all), so the disagreement concentrates in the late time of Chapter 12. Indirect
      2026 by clock work center: Assembly 16,830.0, Finishing and Test 9,561.6, Cutting 7,477.9, Packing 3,354.4, QA 1,249.0. Conclusion:
      the operation path answers "what work was the time charged to"; the clock path "where the employee was"; neither alone supports
      the Packing finding, which needs corroboration (Chapter 12). -->

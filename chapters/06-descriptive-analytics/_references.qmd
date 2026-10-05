@@ -2,7 +2,7 @@
 
 ## References
 
-Anscombe, F. J. (1973). Graphs in statistical analysis. *The American Statistician*, *27*(1), 17–21. <https://doi.org/10.1080/00031305.1973.10478966>
+{{< include /shared/fragments/_reference-anscombe-1973.qmd >}}
 
 Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
 

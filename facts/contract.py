@@ -61,6 +61,38 @@ def s1(d):
     return ok, f"{len(now)} tables; missing {missing or 'none'}; changed {changed or 'none'}; added {added or 'none'}"
 
 
+# Power Query types each column of an Excel source from its first 200 rows (Microsoft Learn, "Data types in Power
+# Query"). A numeric column that is whole in those rows but fractional later becomes a whole number and is rounded; a
+# column empty in those rows gets no type. Tutorials 4.1 and 13.1, Exercises 8.6, 13.1 and 13.5, and the Part II case tell
+# readers to correct the columns below. A roll that adds a column to these lists needs the same treatment in the text.
+TYPE_TRAPS_WHOLE = {"SalesInvoiceLine.Discount", "SalesOrderLine.Discount", "SalesInvoice.FreightAmount",
+                    "MaterialRequirementPlan.NetRequirementQuantity", "MaterialRequirementPlan.RecommendedOrderQuantity"}
+TYPE_TRAPS_EMPTY = {"GLEntry.SourceLineID", "JournalEntry.ReversesJournalEntryID", "LaborTimeEntry.WorkOrderID",
+                    "LaborTimeEntry.WorkOrderOperationID", "OvertimeApproval.WorkOrderID",
+                    "OvertimeApproval.WorkOrderOperationID", "PayrollRegisterLine.Hours", "PayrollRegisterLine.Rate",
+                    "PayrollRegisterLine.WorkOrderID", "PayrollRegisterLine.LaborTimeEntryID",
+                    "PurchaseInvoiceLine.AccrualJournalEntryID", "SalesInvoiceLine.PromotionID",
+                    "SalesOrderLine.PromotionID", "TimeClockEntry.WorkOrderID", "TimeClockEntry.WorkOrderOperationID",
+                    "TimeClockPunch.WorkCenterID"}
+
+
+@check("S2", "4, 8, 13, Part II case", "Power Query's 200-row type detection mistypes only the columns the text corrects")
+def s2(d):
+    whole, empty = set(), set()
+    for (t,) in d.q("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"):
+        for col in [r[1] for r in d.q(f"PRAGMA table_info({t})")]:
+            head = [r[0] for r in d.q(f"SELECT {col} FROM {t} ORDER BY rowid LIMIT 200")]
+            values = [v for v in head if v is not None]
+            if not values:
+                if d.one(f"SELECT COUNT(*) FROM {t} WHERE {col} IS NOT NULL"):
+                    empty.add(f"{t}.{col}")
+            elif all(isinstance(v, (int, float)) and float(v).is_integer() for v in values):
+                if d.one(f"SELECT COUNT(*) FROM {t} WHERE typeof({col}) = 'real' AND {col} <> CAST({col} AS INTEGER)"):
+                    whole.add(f"{t}.{col}")
+    new = sorted((whole - TYPE_TRAPS_WHOLE) | (empty - TYPE_TRAPS_EMPTY))
+    return not new, f"whole in the first 200 rows, fractional later: {len(whole)}; empty, filled later: {len(empty)}; new: {new or 'none'}"
+
+
 @check("W1", "1, 8, 17, Part IV case", "three fiscal years of sales; fiscal N holds only supplier payments, early in the year")
 def w1(d):
     types = d.q("SELECT DISTINCT SourceDocumentType FROM GLEntry WHERE FiscalYear = ?", d.N)
@@ -93,6 +125,20 @@ def w4(d):
     n = d.one("SELECT COUNT(*) FROM GLEntry g JOIN JournalEntry j ON j.JournalEntryID = g.SourceDocumentID "
               "WHERE g.SourceDocumentType = 'JournalEntry' AND g.AccountID = ? AND j.EntryType <> 'Opening'", d.account("2030"))
     return n == 0, f"{n} non-opening journal rows to 2030"
+
+
+DOCUMENT_DATES = [("SalesOrder", "OrderDate"), ("SalesInvoice", "InvoiceDate"), ("Shipment", "ShipmentDate"),
+                  ("CashReceipt", "ReceiptDate"), ("PurchaseOrder", "OrderDate"), ("PurchaseInvoice", "InvoiceDate"),
+                  ("GoodsReceipt", "ReceiptDate"), ("JournalEntry", "PostingDate")]
+
+
+@check("W5", "4, 5, 13, 14, 15, 16", "no document is dated before the first fiscal year (the Date tables start there)")
+def w5(d):
+    # Found in the robustness pass (2026-10-03): the pinned fiscal 2025-2027 build dates 2 sales invoices 2024-12-31,
+    # the planted invoices dated before their shipment, pushed across the window's start.
+    early = {f"{t}.{c}": d.one(f"SELECT COUNT(*) FROM {t} WHERE {c} < ?", f"{d.F}-01-01") for t, c in DOCUMENT_DATES}
+    early = {k: n for k, n in early.items() if n}
+    return not early, f"dated before {d.F}-01-01: {early or 'none'}"
 
 
 # --- Parts I and II: the Furniture margin -----------------------------------------------------

@@ -26,7 +26,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (3) On a worksheet named `IncomeStatement`, build the income statement of @fig-06-07 with one SUMIFS formula per line on the Balance column by AccountSubType: operating revenue (the Operating Revenue subtype, with the sign reversed), sales returns and allowances (Contra Revenue), net revenue, cost of goods sold (COGS), gross margin, operating expenses (Operating Expense), operating income, other income and expense (the Other Income or Expense and Other Expense subtypes), and net income. Add a column that expresses every line as a percentage of net revenue.
 
-(4) Check the statement in two ways. First, compare net income with the TotalAmount of JE-2026-000297, the entry that closed the income summary to retained earnings. Second, use SUMIFS by AccountType to show that the assets equal the liabilities and equity once net income is added to equity.
+(4) Check the statement in two ways. First, compare net income with the TotalAmount of JE-2026-000297, the entry that closed the income summary to retained earnings. The analysis workbook has no journal entry Table, so import the T2_JournalEntry Table as a query named `JournalEntries`, or read the entry's TotalAmount on the JournalEntry worksheet of CharlesRiver.xlsx. Second, use SUMIFS by AccountType to show that the assets equal the liabilities and equity once net income is added to equity.
 
 (5) Compare the balances of the product revenue accounts, 4010 to 4040 and 4080, with the fiscal 2026 revenue of their item groups in InvoiceLines. Three accounts differ by small amounts. Identify the invoices responsible, using what you found in Exercise 5.2 about invoices numbered in one fiscal year and dated in another, and explain which date should determine the period of their revenue.
 
@@ -36,7 +36,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 <!-- notes: ch06.ex1 -->
 <!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at 2026-12-31 (GLEntry with PostingDate before 2027-01-01, without
-     JE-2026-000296 and JE-2026-000297, 45 rows) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both
+     the 45 GL rows of the closes JE-2026-000296 and JE-2026-000297) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both
      67,107,722.36. Revenue and expense accounts show only fiscal 2026 because the 2024 and 2025 closing entries zeroed them.
      Income statement: operating revenue 29,973,822.48 (100.82% of net revenue); sales returns and allowances -242,764.56 (4060); net
      revenue 29,731,057.92; cost of goods sold -18,634,303.63 (62.68%; includes freight-out 5050, purchase price variance 5060, and
@@ -68,17 +68,17 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (1) Build a PivotTable from InvoiceLines with CustomerSegment in the Rows area, ItemGroup in the Columns area, and LineTotal in the Values area, filtered to fiscal 2026. Show the values as % of Grand Total and identify the three largest combinations of segment and product line.
 
-(2) Add FiscalYear to the Columns area, above ItemGroup, show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest increases and the two largest decreases among the combinations with at least $500,000 of revenue in 2025.
+(2) Keep that PivotTable, and build a second one with the same fields, adding FiscalYear to the Columns area, above ItemGroup. Show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest increases and the two largest decreases among the combinations with at least $500,000 of revenue in 2025.
 
-(3) Repeat the year-over-year comparison by Region instead of by segment.
+(3) Repeat the year-over-year comparison in a third PivotTable, by Region instead of by segment.
 
 (4) Write a disclosure-style paragraph of four to six sentences that presents the disaggregation you would recommend, states why you chose its categories, and summarizes the changes from the previous year.
 
-**Deliverable.** Two PivotTables, a list of the largest combinations and changes, and a disclosure paragraph.
+**Deliverable.** Three PivotTables, a list of the largest combinations and changes, and a disclosure paragraph.
 
 <!-- notes: ch06.ex2 -->
 <!-- Instructor notes, Exercise 6.2: 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24% (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes
-     from 2025 for combinations over $500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4% (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the
+     from 2025 for combinations with at least $500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4% (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the
      segment and the product line coincide there. A nonpublic entity may elect not to give the quantitative disaggregation
      (ASC 606-10-50-7); the exercise treats the disclosure as if it were required. -->
 
@@ -139,7 +139,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 <!-- Instructor notes, Exercise 6.4: Furniture margin 1,810,257.09 (Q3) to 1,695,211.02 (Q4), change -115,046.07. Product-type bridge:
      price -183,737.35, cost +43,345.66, volume +7,885.63, mix +17,459.98 (sums exactly). The cost effect is not zero because each type's
      average standard cost per unit depends on which of its items were sold: DSK (desks) price per unit 731.85 to 628.50 and cost per unit
-     406.55 to 359.63, as cheaper desks made up more of the quarter; TBL, BNH, and others move the same way. At this level, within-type item
+     406.55 to 359.63, as cheaper desks made up more of the quarter; TBL and BNH move the same way, and price and cost per unit rose together for CON and BKC. At this level, within-type item
      mix appears as price and cost; the price effect also contains the promotional discount (about -119,800 at this level). Units by type
      Q3 to Q4: NGT 905.06 to 734.14 and SDB 1,072.57 to 958.22 fell; DSK 1,050.73 to 1,195.45 and TBL 1,280.52 to 1,385.62 rose. Tutorial
      6.3's Furniture-level bridge is the better headline because each of its effects has one meaning (cost zero, mix at the item level),
@@ -173,8 +173,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
      Not flagged: Furniture Q4 -315,983.47 (-7.1%), the largest dollar difference, and Furniture Q2 +266,724.77 (+6.2%). A percentage test
      alone misses large dollar differences in the largest product line; a tolerable amount based on materiality, or an expectation that
      reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it
-     ignores growth and known events, which students may note. Follow-up examples: for Furniture Q4, the promotion discounts (Tutorial 6.3)
-     and the late-invoiced promotion lines (Tutorial 5.2); for Services, engagement and time records by quarter. -->
+     ignores growth and known events, which students may note. Follow-up examples: Lighting Q1, the largest flagged
+     difference, is mostly volume (units +15.2%, price per unit +0.6%), so the evidence is its invoice lines
+     by customer and item, traced to their orders and shipping documents, and the question is which customers bought more and why; for
+     Services, engagement and time records by quarter. Furniture Q4, which the threshold misses, would still call for the promotion
+     discounts (Tutorial 6.3) and the late-invoiced promotion lines (Tutorial 5.2). -->
 
 
 **Exercise 6.6: A Descriptive Profile of the Revenue Population**
@@ -202,7 +205,7 @@ FILTER(InvoiceLines[LineTotal],(InvoiceLines[FiscalYear]=2026)*(InvoiceLines[Ite
 **Deliverable.** A profile workbook with the four summaries and a written profile suitable for the audit workpapers.
 
 <!-- notes: ch06.ex6 -->
-<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08; Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.89; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66, 923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of
+<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08; Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.90; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66, 923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of
      revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez, Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816), Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10, 662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:
-     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, 2025) and 6 (Wholesale, November 2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are
+     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, September to October 2025) and 6 (Wholesale, November 2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are
      left for the audit work later in Part II. -->

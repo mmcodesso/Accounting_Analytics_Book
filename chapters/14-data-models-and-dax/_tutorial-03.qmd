@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will add the general ledger to the model as a second star that shares the Date table. You will flag the year-end closing entries in Power Query, write the ledger's measures, and build an income statement by year that ties to the net income of each closing entry. Then you will use time intelligence to compare each month's operating expenses with the months before it, and add a trial-balance test to the Tests tab.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorials 14.1 and 14.2. GLEntry holds hundreds of thousands of rows, so loading it takes several minutes.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorials 14.1 and 14.2. If you start here, download Charles River Reports as it stands at the end of Tutorial 14.2 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains. GLEntry holds hundreds of thousands of rows, so loading it takes several minutes.
 
 **Step-by-step instructions.**
 
@@ -47,7 +47,7 @@ The Date table now filters two fact tables, the invoice lines and the ledger, as
 
 **Step 5. Write the ledger's measures.**
 
-a. Add the measures below to the Measures table, and format each as an amount.
+a. Add the measures below to the Key Measures table, and format each as an amount.
 
 <!-- dax-check: measure -->
 ```
@@ -93,7 +93,7 @@ CALCULATE (
 
 **Step 7. Write the expectation.** An expectation built from the three months before a month, not including it, cannot hide a spike in the month itself.
 
-a. Add the measures below to the Measures table.
+a. Add the measures below to the Key Measures table.
 b. Format the first two as amounts and the third as a percentage with one decimal.
 
 <!-- dax-check: measure -->

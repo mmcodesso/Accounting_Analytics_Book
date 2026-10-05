@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-09"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is early 2027, and the controller has put the promotion question behind her. You are still the staff accountant who worked through that question with her in Part II, and she brings you the next one. Her attention has moved down the income statement to cost of goods sold. One line in it, manufacturing variance, has grown in every year of the data. It is now about three-quarters larger than in fiscal 2024, while sales grew by less than a tenth. Manufacturing variance is the difference between what production actually cost and the standard cost that Charles River assigns to the items it makes. A variance that grows year after year means either that production is becoming less efficient or that the standards no longer describe how the plant works. She wants to know which.

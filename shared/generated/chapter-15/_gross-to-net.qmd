@@ -1,0 +1,6 @@
+| Fiscal 2026 bridge | Amount |
+| --- | --- |
+| List amount | $33,589,137.45 |
+| Price changes before discount | ($3,470,607.31) |
+| Discount to invoiced net | ($362,110.06) |
+| Invoiced revenue | $29,756,420.08 |

@@ -11,6 +11,10 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 ANOMALY_LOG_REFERENCES = 6      # duplicate payment references in the generator's AnomalyLog (outside the database)
 
 
+def word(n: int) -> str:
+    return WORDS[n] if 0 <= n < len(WORDS) else f"{n:,}"
+
+
 def and_join(items) -> str:
     items = [str(i) for i in items]
     return items[0] if len(items) == 1 else (" and ".join(items) if len(items) == 2
@@ -35,10 +39,11 @@ def ex6(d, claim):
     claim(all(int(p[0][3][:4]) == int(p[1][3][:4]) for p in pairs.values())
           and set(per_year) == {(s, y) for s in suppliers for y in d.years} and set(per_year.values()) == {1},
           "each of those suppliers has one pair in each fiscal year")
-    claim(all(p[0][3] != p[1][3] for p in pairs.values()), "the two invoices of each pair have different dates")
+    claim(len(pairs) > 0, "some supplier invoice numbers repeat for the same supplier")
+    dated_apart = sum(1 for p in pairs.values() if p[0][3] != p[1][3])     # pairs whose two invoices have different dates
     claim(all(p[0][4] != p[1][4] for p in pairs.values()), "the two invoices of each pair have different amounts")
     claim(all(r[5] == 1 for r in invoices), "each invoice of the pairs was paid once")
-    example = max(invoices, key=lambda r: r[4])[1]          # the pair with the largest invoice
+    example = max(invoices, key=lambda r: r[4])[1] if invoices else None          # the pair with the largest invoice
 
     # (2) SupplierID and CheckNumber that appear more than once in DisbursementPayment
     checks = d.q(
@@ -49,10 +54,9 @@ def ex6(d, claim):
     by_check: dict[str, list] = {}
     for r in checks:
         by_check.setdefault(r[1], []).append(r)
-    claim(len(by_check) > 1, "more than one check number repeats (the wording is plural: check numbers, each pair)")
+    claim(len(by_check) > 0, "some check numbers repeat for the same supplier")
     claim(all(len(p) == 2 for p in by_check.values()), "each repeated check number is on exactly two payments")
     check_suppliers = sorted({r[0] for r in checks})
-    claim(len(check_suppliers) == 1, "the repeated check numbers all belong to one supplier")
     claim(all(p[0][3] != p[1][3] and p[0][4] != p[1][4] and p[0][5] != p[1][5] for p in by_check.values()),
           "each pair of payments pays two different invoices of different amounts")
     claim(len(by_check) < ANOMALY_LOG_REFERENCES,
@@ -64,6 +68,8 @@ def ex6(d, claim):
     claim(not any(s > total + 0.005 for total, s, _ in paid), "no invoice is paid above its GrandTotal")
     installments = sum(1 for _, _, n in paid if n > 1)
 
-    return dict(invoice_numbers=WORDS[len(pairs)], suppliers=and_join(suppliers), example=example,
-                checks=WORDS[len(by_check)], check_supplier=check_suppliers[0],
+    return dict(invoice_numbers=word(len(pairs)), suppliers=and_join(suppliers) if suppliers else "", example=example,
+                pairs=len(pairs), dated_apart=word(dated_apart), all_dated_apart=dated_apart == len(pairs),
+                checks=word(len(by_check)), n_checks=len(by_check),
+                check_suppliers=and_join(check_suppliers) if check_suppliers else "", n_check_suppliers=len(check_suppliers),
                 check_pairs=[(c, [r[2] for r in p]) for c, p in by_check.items()], installments=installments)

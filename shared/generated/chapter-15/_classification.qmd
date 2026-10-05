@@ -1,0 +1,4 @@
+| Cost center | Depreciation classification effect |
+| --- | --- |
+| Administration | ($101,828.64) |
+| Warehouse | $101,828.64 |

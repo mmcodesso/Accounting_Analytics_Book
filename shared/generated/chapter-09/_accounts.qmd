@@ -1,0 +1,4 @@
+| AccountID | Account number | Name |
+| --- | --- | --- |
+| 92 | 1090 | Manufacturing Cost Clearing |
+| 93 | 5080 | Manufacturing Variance |

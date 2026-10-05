@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will explain how fiscal 2026 compared with the budget. You will import the budget lines, price every 2026 invoice line at the budget's planned net price for its item and month, and build a report that compares the static budget, the flexible budget, and the actual results for each product line. You will then split the price variance into promotional discounts and the rest, chart when the Furniture discounts arrived compared with when the budget planned them, and compare the operating expenses with their budget.
 
-**Prerequisites.** You need the analysis workbook from Tutorial 7.1, with the InvoiceLines query and its StdCostAmount, ListAmount, and DiscountAmount columns from Chapter 6, and the Item query from Chapter 4.
+**Prerequisites.** You need the analysis workbook from Tutorial 7.1, with the InvoiceLines query and its StdCostAmount, ListAmount, and DiscountAmount columns from Chapter 6, and the Item query from Chapter 4. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 7.1 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

@@ -2,8 +2,8 @@
 
 ## References
 
-Datar, S. M., & Rajan, M. V. (2021). *Horngren's cost accounting: A managerial emphasis* (17th ed.). Pearson. <https://www.pearson.com/en-us/pearsonplus/p/9780136713845>
+{{< include /shared/fragments/_reference-datar-2021.qmd >}}
 
 SQLite. (n.d.-a). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.org/quirks.html>
 
-SQLite. (n.d.-b). *SELECT*. <https://www.sqlite.org/lang_select.html>
+{{< include /shared/fragments/_reference-sqlite-select.qmd >}}

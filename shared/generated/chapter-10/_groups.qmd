@@ -1,0 +1,5 @@
+| Item group | Closes | Variance |
+| --- | --- | --- |
+| Furniture | 2,588 | $1,579,134.23 |
+| Lighting | 1,153 | $521,135.80 |
+| Textiles | 219 | $165,366.85 |

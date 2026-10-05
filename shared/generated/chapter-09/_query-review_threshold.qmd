@@ -1,0 +1,7 @@
+```sql
+SELECT WorkOrderCloseID, CloseDate, TotalVarianceAmount
+FROM WorkOrderClose
+WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
+    AND ABS(TotalVarianceAmount) > 1000
+ORDER BY TotalVarianceAmount;
+```

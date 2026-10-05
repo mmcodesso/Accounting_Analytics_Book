@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-12"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 In Chapters 9 to 11 you worked as the controller's staff accountant. This chapter puts you back on the internal audit team of Chapter 8. In practice the analyst and the auditor would be different people, because auditors do not test their own work, so read the analysis of Chapters 9 to 11 as the work of a colleague whose conclusions you must test. The audit committee has read it. The plant recorded about half as many hours again as the standard hours of its output. The change began in the middle of fiscal 2024, when indirect time appeared in the records and overtime on direct labor started to climb; since the middle of fiscal 2025 indirect time has been roughly flat, while direct hours and their overtime kept rising. Before it accepts that explanation, the committee wants to know whether the records behind it can be trusted. Were the hours worked, approved, recorded against the right operations, and paid correctly? And why does indirect time almost vanish from the records for four months of 2024? The chief audit executive has given you three assignments, all to be done in the database this time.

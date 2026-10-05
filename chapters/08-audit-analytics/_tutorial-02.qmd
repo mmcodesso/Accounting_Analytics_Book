@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will age Charles River's receivables at the end of fiscal 2026 and reconcile the aged invoices to the accounts receivable account in the general ledger. You will calculate each invoice's open balance from the receipts and credit memos recorded by the as-of date, classify the open invoices by days past due, and compare their total with the ledger. You will then investigate the difference, select customer balances for confirmation, and record what the work means for the audit.
 
-**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.1.
+**Prerequisites.** You need the AuditAnalytics.xlsx workbook from Tutorial 8.1. If you start here, download AuditAnalytics.xlsx as it stands at the end of Tutorial 8.1 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 
@@ -77,7 +77,7 @@ a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesR
 b. Name the query `LedgerAR`. Open the filter list of AccountID, choose **Number Filters > Equals**, and select **Advanced**.
 c. Add three clauses joined by **Or**: AccountID equals `3`, equals `4`, and equals `74`, and click **OK**.
 d. Filter PostingDate to dates before `2027-01-01`.
-e. Use **Home > Choose Columns** to keep GLEntryID, PostingDate, AccountID, VoucherNumber, SourceDocumentType, Description, Debit, and Credit.
+e. Use **Home > Choose Columns** to keep GLEntryID, PostingDate, AccountID, Debit, Credit, VoucherNumber, SourceDocumentType, and Description, which stay in that order.
 f. Add a custom column `Amount` with the formula `[Debit] - [Credit]`, and set its type to **Decimal Number**.
 g. Choose **Home > Close & Load**, and rename the new worksheet `LedgerAR`.
 h. On the Aging worksheet, type `Open invoices (sub-ledger)`, `Account 1020 (AccountID 3)`, and `Difference` in A11:A13.

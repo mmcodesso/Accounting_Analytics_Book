@@ -18,6 +18,9 @@ These files are automatically updated whenever the book is rebuilt.
 - [Download DOCX (latest)](/downloads/book-latest.docx)
 
 
+::: {.chapter-slides-list}
+:::
+
 ## Charles River Accounting Dataset
 
 The Charles River Accounting Dataset supports every chapter of the book across Excel, SQL, and Power BI.

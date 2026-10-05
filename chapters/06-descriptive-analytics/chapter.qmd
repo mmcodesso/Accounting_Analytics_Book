@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-06"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 InvoiceLines is ready, and the controller has three requests for the quarterly management meeting. First, she wants a profile of what Charles River billed in fiscal 2026: how many invoice lines, how large they were, how widely they varied, and a total that ties to the figures she already trusts. Second, she wants revenue and gross margin by product line and quarter, so that the management team can see how the Furniture decline compares with the company's other lines, together with the year's income statement from the ledger. Third, and most important, she wants the answer to the question she asked in your first week: why did the Furniture margin fall from the third quarter to the fourth?

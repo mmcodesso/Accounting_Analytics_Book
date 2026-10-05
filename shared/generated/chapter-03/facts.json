@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "edition": "2026",
+    "version": "v2026.1",
+    "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
+  },
+  "generator_sha256": {
+    "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
+    "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
+    "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04"
+  },
+  "artifact_sha256": {
+    "customer-orders.svg": "06924754700645aac4db638dd083c63d38d85e56efc616b952facc6d236558cf",
+    "customer-orders.png": "ba7a68be943b9c0872ab03c0dee0940ead9b84f41f60ef3701d1b589d7323e85",
+    "order-lines.svg": "064df39b9f06506502bc74e5a84b877f502697fe976b421601cba80ce25d8426",
+    "order-lines.png": "d3fefb865590530ccd69a4d4f6d2c646d2e04baea1285aebc39fd0695d41d3cc",
+    "shipment-invoice.svg": "4995735c69281da2a3fc8f6e94b62b524f47800f721c569dd980652cf3729594",
+    "shipment-invoice.png": "8da420bcdf0d4e2374b762422c475c98b87461f65d2c443fcd3aea9d1bc79997",
+    "cash-applications.svg": "0fac04ddfc1544f3c6412804c21f9f540fe866bc1181e40ffffac89118e32dcc",
+    "cash-applications.png": "4bedd5a2ecf2ad4fbec47522d4fae81905a44a9dd08de069eacea10554343385",
+    "account-ledger.svg": "de61c203f7d94fcf02b14d8ccff539b235126704021bf73606b600b33fb88b08",
+    "account-ledger.png": "127e0ff7ab5c71bc1cb26a85d4e59fe193d6232e6629497332a1a0f3152a44f7",
+    "work-order-close.svg": "5c12eaffb962dbd8e2e3bcc50c4096181676d233dbb5fdafa854fa0f1959ccc8",
+    "work-order-close.png": "1a5e3536ba990cd841dd56e34b1795bc36333f29e91bf605c0760c0a0f8822ad",
+    "crow-foot.svg": "57ef9f79e9638864e4bf822edf8699a120201ec3d5652203f2fdbb51e41922e2",
+    "crow-foot.png": "ba0c3eb82920211cdfc4a04ec307ac9aeba6068a66bb1d91eec89e13fdbbac31",
+    "_keys.qmd": "ccac7cff618cb388d914f545c7706c6e3d47a618f25204f4addd20641f18c92d",
+    "_invoice-postings.qmd": "eb82f508b95d04fb3a13f389d9085fd9fd9ebd78849315688bad2dc587d3abcd",
+    "_shipment-postings.qmd": "cff51a621a1a3a5cba0c2be37761c5594c5ae88ff9d95bc06dcf94e1484a1d9e",
+    "_invoice-parts.qmd": "6361bced40e9ec0c4a9d633856cd86a238fcdf3935ea3581d1cf226363e1da1d"
+  },
+  "variables": {
+    "invoice_id": 7947,
+    "invoice_number": "SI-2025-007947",
+    "invoice_date": "2025-03-05",
+    "order_id": 1697,
+    "customer_id": 135,
+    "customer_name": "Sullivan-Mcdonald",
+    "invoice_total": "$787.48",
+    "line_id": 10645,
+    "order_line_id": 6522,
+    "shipment_line_id": 10449,
+    "item_id": 218,
+    "quantity": "2",
+    "unit_price": "$344.21",
+    "line_total": "$688.42",
+    "shipment_id": 3603,
+    "shipment_number": "SH-2025-003603",
+    "shipment_date": "2025-03-02",
+    "order_number": "SO-2024-001697",
+    "order_date": "2024-11-21",
+    "item_code": "FUR-DSK-0075",
+    "item_name": "Alder Desk Ash Whitewash 84 in",
+    "standard_cost": "$229.66",
+    "extended_cost": "$459.32",
+    "application_id": 10686,
+    "receipt_id": 3043,
+    "applied_amount": "$787.48",
+    "application_date": "2025-04-17",
+    "receipt_number": "CR-2025-003043",
+    "receipt_amount": "$23,870.99",
+    "receipt_invoices": 7
+  },
+  "key_example": {
+    "orders": [
+      [
+        62,
+        "SO-2024-000062",
+        1
+      ],
+      [
+        85,
+        "SO-2024-000085",
+        1
+      ],
+      [
+        59,
+        "SO-2024-000059",
+        4
+      ]
+    ],
+    "customers": [
+      [
+        1,
+        "Walters PLC"
+      ],
+      [
+        4,
+        "Edwards, Stanley and Rivera"
+      ]
+    ]
+  },
+  "sale_trace": {
+    "inv": [
+      7947,
+      "SI-2025-007947",
+      "2025-03-05",
+      1697,
+      135,
+      787.48
+    ],
+    "sil": [
+      10645,
+      6522,
+      10449,
+      218,
+      2.0,
+      344.21,
+      688.42
+    ],
+    "shl": [
+      10449,
+      3603,
+      2.0
+    ],
+    "shp": [
+      "SH-2025-003603",
+      "2025-03-02"
+    ],
+    "sol": [
+      6522,
+      1697
+    ],
+    "so": [
+      "SO-2024-001697",
+      "2024-11-21"
+    ],
+    "cus": [
+      135,
+      "Sullivan-Mcdonald"
+    ],
+    "itm": [
+      "FUR-DSK-0075",
+      "Alder Desk Ash Whitewash 84 in",
+      229.66
+    ],
+    "glr": [
+      [
+        1020,
+        "Accounts Receivable",
+        787.48,
+        0.0,
+        null,
+        "Asset",
+        3
+      ],
+      [
+        4010,
+        "Sales Revenue - Furniture",
+        0.0,
+        688.42,
+        10645,
+        "Revenue",
+        42
+      ],
+      [
+        4050,
+        "Freight Revenue",
+        0.0,
+        51.0,
+        null,
+        "Revenue",
+        46
+      ],
+      [
+        2050,
+        "Sales Tax Payable",
+        0.0,
+        48.06,
+        null,
+        "Liability",
+        26
+      ]
+    ],
+    "gls": [
+      [
+        5010,
+        "COGS - Furniture",
+        459.32,
+        0.0
+      ],
+      [
+        1040,
+        "Inventory - Finished Goods",
+        0.0,
+        459.32
+      ]
+    ],
+    "app": [
+      10686,
+      3043,
+      787.48,
+      "2025-04-17"
+    ],
+    "rct": [
+      "CR-2025-003043",
+      23870.99
+    ]
+  },
+  "relationship_markers": {
+    "customer-orders": [
+      "ERmandOne",
+      "ERzeroToMany"
+    ],
+    "order-lines": [
+      "ERmandOne",
+      "ERoneToMany"
+    ],
+    "item-lines": [
+      "ERmandOne",
+      "ERzeroToMany"
+    ],
+    "shipment-invoice": [
+      "ERzeroToOne",
+      "ERzeroToOne"
+    ],
+    "cash-applications": [
+      "ERmandOne",
+      "ERoneToMany"
+    ],
+    "invoice-applications": [
+      "ERmandOne",
+      "ERzeroToMany"
+    ],
+    "account-ledger": [
+      "ERmandOne",
+      "ERzeroToMany"
+    ],
+    "work-order-close": [
+      "ERmandOne",
+      "ERzeroToOne"
+    ]
+  }
+}

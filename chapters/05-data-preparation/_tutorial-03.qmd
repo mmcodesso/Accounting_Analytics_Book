@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the table the rest of Part II analyzes. Instead of adding more formula columns, you will create a new Power Query query, InvoiceLines, that starts from the invoice lines, merges in the invoice, item, and customer details, and calculates the fiscal period, the product type, and a quantity check as custom columns. You will load it as a Table, reconcile it with the source and with the lookups from Tutorial 5.2, and record it on the Documentation worksheet. Because it is a query, it rebuilds itself whenever you refresh the workbook.
 
-**Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, and Item queries.
+**Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, and Item queries. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 5.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 

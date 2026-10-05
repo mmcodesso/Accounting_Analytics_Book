@@ -1,0 +1,810 @@
+{
+  "version": 1,
+  "book_url": "https://aa.accountinganalyticshub.com/",
+  "toolchain": {
+    "quarto": "1.9.36",
+    "drawio": "29.6.6",
+    "python": "3.13"
+  },
+  "chapters": [
+    {
+      "id": "chapter-01",
+      "number": 1,
+      "title": "The Role of Analytics in Accounting",
+      "source": "chapter-01/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/01-role-of-analytics/_key-terms.qmd",
+        "chapters/01-role-of-analytics/_references.qmd",
+        "chapters/01-role-of-analytics/_summary.qmd",
+        "chapters/01-role-of-analytics/_tutorial-01.qmd",
+        "chapters/01-role-of-analytics/chapter.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/01-role-of-analytics/_key-terms.qmd": "41517c74b7e2aad9e77f30d70ef38c140f33ba912cdd16310204e525bcd4de22",
+        "chapters/01-role-of-analytics/_references.qmd": "67175a9c9879b1b73d4ded4340f3fe584e467de276a4cef3b81ee628cb107413",
+        "chapters/01-role-of-analytics/_summary.qmd": "fda4c40a51aef40de02257cb51be430b788cfbbcc24707098b2b9d55bb5027c8",
+        "chapters/01-role-of-analytics/_tutorial-01.qmd": "3789d3b88f6c5892daa35493510b5bd76481c54553947346ee981e765fd6066d",
+        "chapters/01-role-of-analytics/chapter.qmd": "008d50d583cc500954fb2fdbdd0cf8b39399244f27679e5a83caf43eb4a4e366"
+      },
+      "approval_note": "Author approved the revised spacing and progressive disclosure on 2026-10-04 and authorized rollout."
+    },
+    {
+      "id": "chapter-02",
+      "number": 2,
+      "title": "Understanding Data in Accounting",
+      "source": "chapter-02/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/02-understanding-data/chapter.qmd",
+        "chapters/02-understanding-data/_key-terms.qmd",
+        "chapters/02-understanding-data/_summary.qmd",
+        "chapters/02-understanding-data/_tutorial-01.qmd",
+        "chapters/02-understanding-data/_tutorial-02.qmd",
+        "chapters/02-understanding-data/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/02-understanding-data/chapter.qmd": "09072df5848037ff06f03937acfeaf3b53376a3bdb51adb9636b0a0d5e42d09c",
+        "chapters/02-understanding-data/_key-terms.qmd": "813d055e3d87eba4560de00bffd5ee4479cdda84c298633a6ffd479f9e352941",
+        "chapters/02-understanding-data/_summary.qmd": "d6307e571729e0625074a8d49534d44f34bdef515a6c6a509e14afb7d47d21b0",
+        "chapters/02-understanding-data/_tutorial-01.qmd": "1274630f2afa32bf0bb976ecf86bb7666959366b902ef838716ff9507b0d6f20",
+        "chapters/02-understanding-data/_tutorial-02.qmd": "c8dbf8657eda92134cf9fc9deef27ff5fa473d6bab02cef34fa6cced20fb9e07",
+        "chapters/02-understanding-data/_references.qmd": "7aaf7accc011525dc4b1973937bdb0b267630133896196f6517c20d205259b8e"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author authorized proceeding to Chapters 4-8 after the Chapters 2-3 review handoff on 2026-10-04."
+    },
+    {
+      "id": "chapter-03",
+      "number": 3,
+      "title": "The Accounting Data Environment",
+      "source": "chapter-03/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/03-accounting-data-environment/chapter.qmd",
+        "chapters/03-accounting-data-environment/_key-terms.qmd",
+        "chapters/03-accounting-data-environment/_summary.qmd",
+        "chapters/03-accounting-data-environment/_tutorial-01.qmd",
+        "chapters/03-accounting-data-environment/_tutorial-02.qmd",
+        "chapters/03-accounting-data-environment/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/03-accounting-data-environment/chapter.qmd": "e169c598ce6f1ba984ea6f4d401fbfa22e954f740999e9075b4847e18b607e2e",
+        "chapters/03-accounting-data-environment/_key-terms.qmd": "25824cc9c794f277e30afd2d1515a6a5b9bcedff52ec7b078fbb36d4334d5f37",
+        "chapters/03-accounting-data-environment/_summary.qmd": "4f70b1d0309faa9148ab8ad42cbc5020ffb9952d1fd4a00e46361e1800f02e22",
+        "chapters/03-accounting-data-environment/_tutorial-01.qmd": "b73958b9c8f3eb6f9a7d0592030ca2cfb388cb11f981fed8440ff70462c2616a",
+        "chapters/03-accounting-data-environment/_tutorial-02.qmd": "f78ad3cde9a049d584634e9680247e03a1a88941bd3323a92723b8b36c190da0",
+        "chapters/03-accounting-data-environment/_references.qmd": "872136ad3f2edfbc7ec28a06319a3a96a44abb7c3e6ab554e9d2efd3b7b95294"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author authorized proceeding to Chapters 4-8 after the Chapters 2-3 review handoff on 2026-10-04."
+    },
+    {
+      "id": "chapter-04",
+      "number": 4,
+      "title": "Excel Essentials for Accounting Analytics",
+      "source": "chapter-04/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/04-excel-essentials/chapter.qmd",
+        "chapters/04-excel-essentials/_key-terms.qmd",
+        "chapters/04-excel-essentials/_summary.qmd",
+        "chapters/04-excel-essentials/_tutorial-01.qmd",
+        "chapters/04-excel-essentials/_tutorial-02.qmd",
+        "chapters/04-excel-essentials/_tutorial-03.qmd",
+        "chapters/04-excel-essentials/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/04-excel-essentials/chapter.qmd": "5814a56e915a31f3ce7b50f5fbae853f1d653451ae180f43a50d9cee33334cd9",
+        "chapters/04-excel-essentials/_key-terms.qmd": "629d79a7490e9fa9f0b9bffc807ef6a76760db9b00376cf02d506a437633ed23",
+        "chapters/04-excel-essentials/_summary.qmd": "cec6ea90d4810c8e69bb19bf3194e00195b67bb64d7a2a33faec1282ef5a3a95",
+        "chapters/04-excel-essentials/_tutorial-01.qmd": "61463515aa2fc97e309de3a86640b8a80476ba68315244856b59fc8cd14c4a6e",
+        "chapters/04-excel-essentials/_tutorial-02.qmd": "7fa54b0c3df2ebcb4b6487449365a29444cf303ad125a3e21ab9ef36ac0c026b",
+        "chapters/04-excel-essentials/_tutorial-03.qmd": "5fb0ae600a679ac0a233f319ffa17b58e1635e52de88dc43d3c5437a82576862",
+        "chapters/04-excel-essentials/_references.qmd": "3165c0459658bab35ad4808b6748782f24361e31e5302e9561c41ff0b75c01fd"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-05",
+      "number": 5,
+      "title": "Data Preparation and Cleaning in Excel",
+      "source": "chapter-05/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/05-data-preparation/chapter.qmd",
+        "chapters/05-data-preparation/_key-terms.qmd",
+        "chapters/05-data-preparation/_summary.qmd",
+        "chapters/05-data-preparation/_tutorial-01.qmd",
+        "chapters/05-data-preparation/_tutorial-02.qmd",
+        "chapters/05-data-preparation/_tutorial-03.qmd",
+        "chapters/05-data-preparation/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/05-data-preparation/chapter.qmd": "04a76c2a731f6c06ee8cbef70f5bf038981261d144803051bac713a2d81ec4b4",
+        "chapters/05-data-preparation/_key-terms.qmd": "7ae0b6e957dba713756c3dab814321b2ff7b951ffdda0c2a5fa4aab10e091981",
+        "chapters/05-data-preparation/_summary.qmd": "6582fe7733d18619c136699fc6d779da10b2c11cbc316c53f756f86902b08386",
+        "chapters/05-data-preparation/_tutorial-01.qmd": "760f43e3bff8fd6d14dae7349f74b884a6b9b4dfe12ac0440be953a9b307e8fa",
+        "chapters/05-data-preparation/_tutorial-02.qmd": "30b42dae408dae666f5896440930959ac949f24efbda41fc0f7098b34767aa2e",
+        "chapters/05-data-preparation/_tutorial-03.qmd": "500bca798b13de6032d501be24f770224bc91dc91b9dd182266ddff0d5fe227b",
+        "chapters/05-data-preparation/_references.qmd": "c03e6b6ae711874b685131c3872236a766423bcaf23e42c714dc124091411508"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-06",
+      "number": 6,
+      "title": "Descriptive and Diagnostic Analytics in Excel",
+      "source": "chapter-06/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/06-descriptive-analytics/chapter.qmd",
+        "chapters/06-descriptive-analytics/_key-terms.qmd",
+        "chapters/06-descriptive-analytics/_summary.qmd",
+        "chapters/06-descriptive-analytics/_tutorial-01.qmd",
+        "chapters/06-descriptive-analytics/_tutorial-02.qmd",
+        "chapters/06-descriptive-analytics/_tutorial-03.qmd",
+        "chapters/06-descriptive-analytics/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/06-descriptive-analytics/chapter.qmd": "90e4be1b145a29720767812c8fdf95f4ae21596f6e1c2c272109e32857d3c66c",
+        "chapters/06-descriptive-analytics/_key-terms.qmd": "d44b037b6e06daebfe7ee2f5526d33af7c9854c72253a2c4f09a0bd52b95f13e",
+        "chapters/06-descriptive-analytics/_summary.qmd": "57b3fca16aa85796f7333abb0fc27bb8b0b9a702d29b0ed10e1fa181e4e30c56",
+        "chapters/06-descriptive-analytics/_tutorial-01.qmd": "922b21814dc3b4a6c72936097177794f02cdac769721a1cb1aaefde6972a725c",
+        "chapters/06-descriptive-analytics/_tutorial-02.qmd": "75248485cacea34a3df01b129c8598d2d938b70415d0a64118b1049f10005586",
+        "chapters/06-descriptive-analytics/_tutorial-03.qmd": "ee698e281b669feef930cd0d64013ea0077db7514e979719bc695b6d38f4342c",
+        "chapters/06-descriptive-analytics/_references.qmd": "5394aca5733a8b4078305951290b0d1bd740bb846dd929a3ef1d840039bdbf9c"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-07",
+      "number": 7,
+      "title": "Forecasting, Budgeting, and What-If Analysis in Excel",
+      "source": "chapter-07/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/07-analysis-and-modeling/chapter.qmd",
+        "chapters/07-analysis-and-modeling/_key-terms.qmd",
+        "chapters/07-analysis-and-modeling/_summary.qmd",
+        "chapters/07-analysis-and-modeling/_tutorial-01.qmd",
+        "chapters/07-analysis-and-modeling/_tutorial-02.qmd",
+        "chapters/07-analysis-and-modeling/_tutorial-03.qmd",
+        "chapters/07-analysis-and-modeling/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/07-analysis-and-modeling/chapter.qmd": "46e8adf112a046cd31bc34bfc85d945de236f1b8fdf666512434fd6537e8010b",
+        "chapters/07-analysis-and-modeling/_key-terms.qmd": "79ba4394b3b83aab5b105db09872e1eb9375d71412f7109e28fd88bf55610aaf",
+        "chapters/07-analysis-and-modeling/_summary.qmd": "448dc81e58a300027cf2c4515bd5ac44317bc1c8f95e3c5bcf7998a1614e11f5",
+        "chapters/07-analysis-and-modeling/_tutorial-01.qmd": "0db5e3d7c2b59a8478de4376e0bb27e08af7aaffdc145221b0afaf3edd101b41",
+        "chapters/07-analysis-and-modeling/_tutorial-02.qmd": "f9a84f96e4bc37c4be0bff2630a5cbb23d362715e83c63e7cf3023e0b7a69c11",
+        "chapters/07-analysis-and-modeling/_tutorial-03.qmd": "d0ec35364c985bae67e311bbc0f3232210053b9d4a80a4d39ff80c0c859956e7",
+        "chapters/07-analysis-and-modeling/_references.qmd": "eb9831d3da899ef6488bc7f88b6d8d90a89fb157f945ee81529a11088e016e60"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-08",
+      "number": 8,
+      "title": "Audit Analytics in Excel",
+      "source": "chapter-08/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/08-audit-analytics/chapter.qmd",
+        "chapters/08-audit-analytics/_key-terms.qmd",
+        "chapters/08-audit-analytics/_summary.qmd",
+        "chapters/08-audit-analytics/_tutorial-01.qmd",
+        "chapters/08-audit-analytics/_tutorial-02.qmd",
+        "chapters/08-audit-analytics/_tutorial-03.qmd",
+        "chapters/08-audit-analytics/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/08-audit-analytics/chapter.qmd": "637bf221b4193d62028b8f81f94c7d1c71e81fd05e271e878521ff4f32bdb394",
+        "chapters/08-audit-analytics/_key-terms.qmd": "0be3e811358f97e6ee139879cceaae9eedb4846ca73c4e5521cb3faaa7eb41e3",
+        "chapters/08-audit-analytics/_summary.qmd": "9edcee18282286b1ec9ef42c9fa95d05baffa3e515f0ef9ce9cabeb1de6f4a90",
+        "chapters/08-audit-analytics/_tutorial-01.qmd": "af96d4b45fb8c74d941821d6ac08889d80772814fb659669ba8b70b8304917c7",
+        "chapters/08-audit-analytics/_tutorial-02.qmd": "78031ebc3acf3f8e03434bd21add119f17a2c278ff9e4158317584eed82059a9",
+        "chapters/08-audit-analytics/_tutorial-03.qmd": "c8bf5876e69ca33419f25efa09800a37803b81188fea96f8627b67e47b21fe8d",
+        "chapters/08-audit-analytics/_references.qmd": "bc24457dede8c8699877f4515a881bfb593c19892370dde7860b67bc25849a83"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-09",
+      "number": 9,
+      "title": "SQL Essentials for Accounting Analytics",
+      "source": "chapter-09/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/09-sql-essentials/chapter.qmd",
+        "chapters/09-sql-essentials/_key-terms.qmd",
+        "chapters/09-sql-essentials/_summary.qmd",
+        "chapters/09-sql-essentials/_tutorial-01.qmd",
+        "chapters/09-sql-essentials/_tutorial-02.qmd",
+        "chapters/09-sql-essentials/_tutorial-03.qmd",
+        "chapters/09-sql-essentials/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/09-sql-essentials/chapter.qmd": "e29bd42e6713236ac7a1352a4810f5ae5c80c6b1a1a929b533ebabe11d451d93",
+        "chapters/09-sql-essentials/_key-terms.qmd": "97a25f7b78520d0d9acedf79ae21741cd494a33576a77a95477cc3a8d4ef602b",
+        "chapters/09-sql-essentials/_summary.qmd": "a489501845e0958d4f93d853c350bda335448884c020401fcf795e6e5b166d76",
+        "chapters/09-sql-essentials/_tutorial-01.qmd": "51d7e076c65042c004eaca34e2d82fb382982ba2e8082e003019edaef33a2a51",
+        "chapters/09-sql-essentials/_tutorial-02.qmd": "f659df5a980147169d44e34d32f532ef88e17cd8dac50cd7ded3e1f5e51f9173",
+        "chapters/09-sql-essentials/_tutorial-03.qmd": "e88d7d130d0237d74325aac49b78e11fa67d4a327f385640c9b500b3df2469df",
+        "chapters/09-sql-essentials/_references.qmd": "161a046b0609043500ba38fad0de46eda18347e726f82c526bc4249a56d98ebb"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": false
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-10",
+      "number": 10,
+      "title": "Joining and Summarizing Data in SQL",
+      "source": "chapter-10/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/10-joining-and-summarizing/chapter.qmd",
+        "chapters/10-joining-and-summarizing/_key-terms.qmd",
+        "chapters/10-joining-and-summarizing/_summary.qmd",
+        "chapters/10-joining-and-summarizing/_tutorial-01.qmd",
+        "chapters/10-joining-and-summarizing/_tutorial-02.qmd",
+        "chapters/10-joining-and-summarizing/_tutorial-03.qmd",
+        "chapters/10-joining-and-summarizing/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/10-joining-and-summarizing/chapter.qmd": "59705b752d7766b8490c281e49cf6a7f0f17e4cda2f80bc5372634cb52a7245e",
+        "chapters/10-joining-and-summarizing/_key-terms.qmd": "65771d1590f691a0e8df82f073c3a61bc639e3f092c1a8c9ba46e65289d22526",
+        "chapters/10-joining-and-summarizing/_summary.qmd": "07ae19ed611fda42f4bd579ac9de0ad01a34ad0b88b0f32c2898b8a915e56096",
+        "chapters/10-joining-and-summarizing/_tutorial-01.qmd": "629a1cd4b727803151e308afb14d46ad28a9c0818ee369cc0468455e8a479d74",
+        "chapters/10-joining-and-summarizing/_tutorial-02.qmd": "b454dd434ff6d4467ad53fc6df7189258f1bf94f5769be618b99f6bbb8a79645",
+        "chapters/10-joining-and-summarizing/_tutorial-03.qmd": "9336f4ac4393fc4c11df9f77a1db5afb7302c69d9ef40ca83dbd8058f4c7105c",
+        "chapters/10-joining-and-summarizing/_references.qmd": "0311eecb05e9b1e366128b5e6d56d8a0c9633c6a4c2e36464011d7aeb9dd73de"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-11",
+      "number": 11,
+      "title": "Analytical Queries in SQL",
+      "source": "chapter-11/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/11-analytical-queries/chapter.qmd",
+        "chapters/11-analytical-queries/_key-terms.qmd",
+        "chapters/11-analytical-queries/_summary.qmd",
+        "chapters/11-analytical-queries/_tutorial-01.qmd",
+        "chapters/11-analytical-queries/_tutorial-02.qmd",
+        "chapters/11-analytical-queries/_tutorial-03.qmd",
+        "chapters/11-analytical-queries/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/11-analytical-queries/chapter.qmd": "188f8041800aa44db5ec4142a9d81228da05396c80f6bc4daf9aca7bc9e9861e",
+        "chapters/11-analytical-queries/_key-terms.qmd": "1a2fcc4b2501cd9fab7ff60454855bbb4bded91b7baa56bb37ca5a3795b9bd08",
+        "chapters/11-analytical-queries/_summary.qmd": "728131db0fcf11026b5a5d93581a1fd5353be7103a03f846a1dec6ba2bdb2d6a",
+        "chapters/11-analytical-queries/_tutorial-01.qmd": "4f8235cdf07cd556b43e2b530e599f7570f05677dbb44622df77526fe0d98602",
+        "chapters/11-analytical-queries/_tutorial-02.qmd": "6906adccd57270920e7afc84655ea1ac865cbb2af09b8844026c330ed2388988",
+        "chapters/11-analytical-queries/_tutorial-03.qmd": "9b9d5a4d459fadfcf3d5aeb85641b1459bdf837aa8888bcd23883e53180ec11a",
+        "chapters/11-analytical-queries/_references.qmd": "87c8b6ae995182c8424e732fe61d24e3a52ff150114c8064a226506379a2e50a"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-12",
+      "number": 12,
+      "title": "Audit Analytics in SQL",
+      "source": "chapter-12/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/12-sql-audit-analytics/chapter.qmd",
+        "chapters/12-sql-audit-analytics/_key-terms.qmd",
+        "chapters/12-sql-audit-analytics/_summary.qmd",
+        "chapters/12-sql-audit-analytics/_tutorial-01.qmd",
+        "chapters/12-sql-audit-analytics/_tutorial-02.qmd",
+        "chapters/12-sql-audit-analytics/_tutorial-03.qmd",
+        "chapters/12-sql-audit-analytics/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/12-sql-audit-analytics/chapter.qmd": "0ef7f6ab5a527479c3fe47a65486a35ab8bc6de64347f06c2feacbb1d86a0d6d",
+        "chapters/12-sql-audit-analytics/_key-terms.qmd": "53b3061e90e400363cbc3813b2bece8dbe700f41f45cafb38e213c076c732294",
+        "chapters/12-sql-audit-analytics/_summary.qmd": "bda8a62429d96314d50bacf78cb95c1c32e84cf99ce8839754692e1894a8b83a",
+        "chapters/12-sql-audit-analytics/_tutorial-01.qmd": "8e6b396667639200ff0be2342d9baa631dd884834de4cb61601ff0897ca59076",
+        "chapters/12-sql-audit-analytics/_tutorial-02.qmd": "a72ba491df6b02c13487ccc16f14bde730575d5396a54c8a64a7963dabb6c101",
+        "chapters/12-sql-audit-analytics/_tutorial-03.qmd": "b9d32ec75b59432f2ef27c7249221aed0142c8ac58c16e60ae4404cf5babc965",
+        "chapters/12-sql-audit-analytics/_references.qmd": "44a219d951daf0752b188703aad7996a5055c0c23ad9650b44fee6b5829e9049"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": false
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-13",
+      "number": 13,
+      "title": "Power BI Essentials for Accounting Analytics",
+      "source": "chapter-13/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/13-power-bi-essentials/chapter.qmd",
+        "chapters/13-power-bi-essentials/_key-terms.qmd",
+        "chapters/13-power-bi-essentials/_summary.qmd",
+        "chapters/13-power-bi-essentials/_tutorial-01.qmd",
+        "chapters/13-power-bi-essentials/_tutorial-02.qmd",
+        "chapters/13-power-bi-essentials/_tutorial-03.qmd",
+        "chapters/13-power-bi-essentials/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/13-power-bi-essentials/chapter.qmd": "ac621d4b5278fe5d83d1b5632dcbaae046ae91876c18c22b0c7fc66f081ad76c",
+        "chapters/13-power-bi-essentials/_key-terms.qmd": "98a37d5dcbff9387c321397d8f5ebd83646ebf31ee26b6caed4b553def32e68b",
+        "chapters/13-power-bi-essentials/_summary.qmd": "ca6bae6cec3f4dc72cf30faca4e6ca3c477fc6a5739e0ff29608a17340ad5b4d",
+        "chapters/13-power-bi-essentials/_tutorial-01.qmd": "c54df6a8ade9378ab9d60f5436fde3da15e162ba50ed319e13eecd76f0e69b38",
+        "chapters/13-power-bi-essentials/_tutorial-02.qmd": "5bc04ffcbe6a168c3103fb3a130188e2ca55f22bc3d78143285f8dc13a6246e3",
+        "chapters/13-power-bi-essentials/_tutorial-03.qmd": "9f3b7b14cc9cba59d40b0425093be34e9c5e2ac87410cd918c540c1271f28b7d",
+        "chapters/13-power-bi-essentials/_references.qmd": "01617ef8002cb9d5b92a005596c50376176c226da31543a4f38a1c1d0caaa82a"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-14",
+      "number": 14,
+      "title": "Data Models and DAX Measures",
+      "source": "chapter-14/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/14-data-models-and-dax/chapter.qmd",
+        "chapters/14-data-models-and-dax/_key-terms.qmd",
+        "chapters/14-data-models-and-dax/_summary.qmd",
+        "chapters/14-data-models-and-dax/_tutorial-01.qmd",
+        "chapters/14-data-models-and-dax/_tutorial-02.qmd",
+        "chapters/14-data-models-and-dax/_tutorial-03.qmd",
+        "chapters/14-data-models-and-dax/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/14-data-models-and-dax/chapter.qmd": "8fc9b33359a7afb8d275b3759ba0ad4e64e45457241d33c5e23576ae474dfd9d",
+        "chapters/14-data-models-and-dax/_key-terms.qmd": "e3a5fbaac9fec6bceecac72c9be333505bef143c0f1c078375f1b7ce612e05d0",
+        "chapters/14-data-models-and-dax/_summary.qmd": "b896645900d63d3400c3df7e04e5c027d56f3d3ae0ceceb154ff0bb1ca3d0ff9",
+        "chapters/14-data-models-and-dax/_tutorial-01.qmd": "57e7b8102cf13fab092ab70581b460e64250505edcbcbccf0272464db33afc9c",
+        "chapters/14-data-models-and-dax/_tutorial-02.qmd": "34885ab0c144c446478fab89bdb8d0697b7e5437a28ab939882db09a10bbd541",
+        "chapters/14-data-models-and-dax/_tutorial-03.qmd": "cd8d12dfb9800ef4802adb5511e26ac2966ff640d202e3461e029925929576bb",
+        "chapters/14-data-models-and-dax/_references.qmd": "42f42b1a10dd69263bffff5bd6822261915a9a8a2e1e155d04291beee8b7b451"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-15",
+      "number": 15,
+      "title": "Reports for Management Decisions",
+      "source": "chapter-15/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/15-management-reports/chapter.qmd",
+        "chapters/15-management-reports/_key-terms.qmd",
+        "chapters/15-management-reports/_summary.qmd",
+        "chapters/15-management-reports/_tutorial-01.qmd",
+        "chapters/15-management-reports/_tutorial-02.qmd",
+        "chapters/15-management-reports/_tutorial-03.qmd",
+        "chapters/15-management-reports/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/15-management-reports/chapter.qmd": "2c80ef3e5eafef62fc70d90e64171792bf8bde4f3e4a96369febaad22ecc0074",
+        "chapters/15-management-reports/_key-terms.qmd": "cc819a9f47481fc94429a2f17906c06315a2d3c45cc6b27c7a359903c2936b04",
+        "chapters/15-management-reports/_summary.qmd": "c05860e58ece91ce486e89efb85d5463023fa2bd130c02f9efe5c9b789c00bfe",
+        "chapters/15-management-reports/_tutorial-01.qmd": "743b9b8bfaf56c90ddc9ddaaaf1c0050b57c3a876ac42100306e3e86439ca1ae",
+        "chapters/15-management-reports/_tutorial-02.qmd": "76fa548564de4d017467a03817135d12ffa1017ef293e776d88e54b74716a20a",
+        "chapters/15-management-reports/_tutorial-03.qmd": "eac71c34ff23c28da8382613720e780f5e22a17fb6c64fdfb12b97bb13041039",
+        "chapters/15-management-reports/_references.qmd": "1dc88fe05bc934fd9914445402a3262cc144cdac61021a052e237a576f1aad69"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-16",
+      "number": 16,
+      "title": "Audit Monitoring and Report Assurance",
+      "source": "chapter-16/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/16-audit-monitoring/chapter.qmd",
+        "chapters/16-audit-monitoring/_key-terms.qmd",
+        "chapters/16-audit-monitoring/_summary.qmd",
+        "chapters/16-audit-monitoring/_tutorial-01.qmd",
+        "chapters/16-audit-monitoring/_tutorial-02.qmd",
+        "chapters/16-audit-monitoring/_tutorial-03.qmd",
+        "chapters/16-audit-monitoring/_references.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/16-audit-monitoring/chapter.qmd": "ca876cb4274d999f0ec5ea65b123d3b926db2f2b1609f1629f3e309899693779",
+        "chapters/16-audit-monitoring/_key-terms.qmd": "8428842fa90b4d7c2b49406373c558a16794616299e5e691ca115cde6fbc0535",
+        "chapters/16-audit-monitoring/_summary.qmd": "321f9a95879bd240f35727221617843abf5cbbd63cf13a89eb731694c1f2484d",
+        "chapters/16-audit-monitoring/_tutorial-01.qmd": "dea4b1990d5389553b59b1c595d1c6e53d5e7eeefb10ed3d498d1001ff931ec6",
+        "chapters/16-audit-monitoring/_tutorial-02.qmd": "8a3cbaf88fe2ab1a6b03375cf86b4f18666b46315e8971b6749ad258cb0eb4a8",
+        "chapters/16-audit-monitoring/_tutorial-03.qmd": "5d9b91c178677c8711221c21d780601beca5209e0569874c1dab302c7f0fdfd9",
+        "chapters/16-audit-monitoring/_references.qmd": "74de5a98f0c2cf753d154625e56d36e32e06ec20802d2f896ec535598a56d8c5"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-17",
+      "number": 17,
+      "title": "Financial Statements for a Lender",
+      "source": "chapter-17/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/17-statements-for-a-lender/chapter.qmd",
+        "chapters/17-statements-for-a-lender/_references.qmd",
+        "chapters/17-statements-for-a-lender/_further-reading.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/17-statements-for-a-lender/chapter.qmd": "e28f9bfaf45bba510e0d4d84ee6ac84a7ab8e306e27281febbb25b7aa3de5d8e",
+        "chapters/17-statements-for-a-lender/_references.qmd": "db16624d97c42dcd98d559203dfbc7df64a14bc21d71effb2fc1674ed174f936",
+        "chapters/17-statements-for-a-lender/_further-reading.qmd": "fba43fc82fdfc77bb7f3b0e660c62727d6237be4978bf6cbf8fad793f93cf0de"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": false
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-18",
+      "number": 18,
+      "title": "Make, Buy, or Reprice",
+      "source": "chapter-18/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/18-make-buy-or-reprice/chapter.qmd",
+        "chapters/18-make-buy-or-reprice/_references.qmd",
+        "chapters/18-make-buy-or-reprice/_further-reading.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/18-make-buy-or-reprice/chapter.qmd": "0f76da5c99819566244c182fb7ac214d902f18bf8ec84c2de233425218a4b74b",
+        "chapters/18-make-buy-or-reprice/_references.qmd": "e73f59acce398d152ae06e63eb411795339fcaf1575e268855e9b7577bc3e86e",
+        "chapters/18-make-buy-or-reprice/_further-reading.qmd": "bc3703278ee15a2fe85eca6511b1e1a2159703b6a3afc84009fcce23f78db15a"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": false
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    },
+    {
+      "id": "chapter-19",
+      "number": 19,
+      "title": "Auditing the Customer Credits Cycle",
+      "source": "chapter-19/index.qmd",
+      "status": "approved",
+      "book_sources": [
+        "chapters/19-customer-credits-audit/chapter.qmd",
+        "chapters/19-customer-credits-audit/_references.qmd",
+        "chapters/19-customer-credits-audit/_further-reading.qmd"
+      ],
+      "reviewed_source_hashes": {
+        "chapters/19-customer-credits-audit/chapter.qmd": "3f0c779b63bd73adfb73a683aa64ab6e3ef7724d9040170cb518348853be961d",
+        "chapters/19-customer-credits-audit/_references.qmd": "48d9c13f5f798a774f29ac8b5beff1b9c93267db24b24f5c6d9a5c3bae1b4e1e",
+        "chapters/19-customer-credits-audit/_further-reading.qmd": "c1770df164a3596d8636d09f13769519cff62f534d12bff42fe96fa1fc73e059"
+      },
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": false
+      },
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation."
+    }
+  ],
+  "public_assets": [
+    "shared/generated/chapter-01/_furniture-table.qmd",
+    "shared/generated/chapter-01/facts.json",
+    "shared/generated/chapter-01/furniture-margin.csv",
+    "shared/generated/chapter-01/furniture-margin.png",
+    "shared/generated/chapter-01/furniture-margin.svg",
+    "shared/generated/chapter-01/salesorder-focus.png",
+    "shared/generated/chapter-01/salesorder-focus.svg",
+    "shared/generated/chapter-01/source-trace.png",
+    "shared/generated/chapter-01/source-trace.svg",
+    "shared/generated/chapter-01/workflow.png",
+    "shared/generated/chapter-01/workflow.svg",
+    "shared/generated/chapter-02/freight-comparison.svg",
+    "shared/generated/chapter-02/freight-comparison.png",
+    "shared/generated/chapter-02/_missing.qmd",
+    "shared/generated/chapter-02/_status.qmd",
+    "shared/generated/chapter-02/_duplicates.qmd",
+    "shared/generated/chapter-02/_budget-wide.qmd",
+    "shared/generated/chapter-02/_budget-long.qmd",
+    "shared/generated/chapter-02/facts.json",
+    "shared/generated/chapter-03/customer-orders.svg",
+    "shared/generated/chapter-03/customer-orders.png",
+    "shared/generated/chapter-03/order-lines.svg",
+    "shared/generated/chapter-03/order-lines.png",
+    "shared/generated/chapter-03/shipment-invoice.svg",
+    "shared/generated/chapter-03/shipment-invoice.png",
+    "shared/generated/chapter-03/cash-applications.svg",
+    "shared/generated/chapter-03/cash-applications.png",
+    "shared/generated/chapter-03/account-ledger.svg",
+    "shared/generated/chapter-03/account-ledger.png",
+    "shared/generated/chapter-03/work-order-close.svg",
+    "shared/generated/chapter-03/work-order-close.png",
+    "shared/generated/chapter-03/crow-foot.svg",
+    "shared/generated/chapter-03/crow-foot.png",
+    "shared/generated/chapter-03/_keys.qmd",
+    "shared/generated/chapter-03/_invoice-postings.qmd",
+    "shared/generated/chapter-03/_shipment-postings.qmd",
+    "shared/generated/chapter-03/_invoice-parts.qmd",
+    "shared/generated/chapter-03/facts.json",
+    "shared/generated/chapter-04/relative.svg",
+    "shared/generated/chapter-04/relative.png",
+    "shared/generated/chapter-04/absolute.svg",
+    "shared/generated/chapter-04/absolute.png",
+    "shared/generated/chapter-04/mixed.svg",
+    "shared/generated/chapter-04/mixed.png",
+    "shared/generated/chapter-04/_control-totals.qmd",
+    "shared/generated/chapter-04/facts.json",
+    "shared/generated/chapter-05/lookup.svg",
+    "shared/generated/chapter-05/lookup.png",
+    "shared/generated/chapter-05/_merge-check.qmd",
+    "shared/generated/chapter-05/facts.json",
+    "shared/generated/chapter-06/histogram.svg",
+    "shared/generated/chapter-06/histogram.png",
+    "shared/generated/chapter-06/histogram.csv",
+    "shared/generated/chapter-06/bridge.svg",
+    "shared/generated/chapter-06/bridge.png",
+    "shared/generated/chapter-06/_profile.qmd",
+    "shared/generated/chapter-06/_bridge.qmd",
+    "shared/generated/chapter-06/_driver-totals.qmd",
+    "shared/generated/chapter-06/_margin-rates.qmd",
+    "shared/generated/chapter-06/facts.json",
+    "shared/generated/chapter-07/monthly.svg",
+    "shared/generated/chapter-07/monthly.png",
+    "shared/generated/chapter-07/monthly.csv",
+    "shared/generated/chapter-07/_regressions.qmd",
+    "shared/generated/chapter-07/_backtest.qmd",
+    "shared/generated/chapter-07/_budget.qmd",
+    "shared/generated/chapter-07/_scenarios.qmd",
+    "shared/generated/chapter-07/facts.json",
+    "shared/generated/chapter-08/benford.svg",
+    "shared/generated/chapter-08/benford.png",
+    "shared/generated/chapter-08/benford.csv",
+    "shared/generated/chapter-08/_payment-control.qmd",
+    "shared/generated/chapter-08/_benford.qmd",
+    "shared/generated/chapter-08/_aging.qmd",
+    "shared/generated/chapter-08/_ar-reconcile.qmd",
+    "shared/generated/chapter-08/_scores.qmd",
+    "shared/generated/chapter-08/facts.json",
+    "visuals/src/fig-04-05-cell-reference-types.drawio",
+    "visuals/svg/fig-04-05-cell-reference-types.svg",
+    "shared/generated/chapter-09/_accounts.qmd",
+    "shared/generated/chapter-09/_checks.qmd",
+    "shared/generated/chapter-09/_largest.qmd",
+    "shared/generated/chapter-09/_query-account_columns.qmd",
+    "shared/generated/chapter-09/_query-variance_check.qmd",
+    "shared/generated/chapter-09/_query-accounts_by_number.qmd",
+    "shared/generated/chapter-09/_query-source_types.qmd",
+    "shared/generated/chapter-09/_query-check_failures.qmd",
+    "shared/generated/chapter-09/_query-open_work_orders.qmd",
+    "shared/generated/chapter-09/_query-top_ten-columns.qmd",
+    "shared/generated/chapter-09/_query-top_ten-order.qmd",
+    "shared/generated/chapter-09/_query-review_threshold.qmd",
+    "shared/generated/chapter-09/facts.json",
+    "shared/generated/chapter-10/_groups.qmd",
+    "shared/generated/chapter-10/_ledger.qmd",
+    "shared/generated/chapter-10/_output.qmd",
+    "shared/generated/chapter-10/_hours.qmd",
+    "shared/generated/chapter-10/_parts.qmd",
+    "shared/generated/chapter-10/_query-closes_to_work_orders.qmd",
+    "shared/generated/chapter-10/_query-variance_by_group.qmd",
+    "shared/generated/chapter-10/_query-ledger_variance.qmd",
+    "shared/generated/chapter-10/item-workorder.svg",
+    "shared/generated/chapter-10/item-workorder.png",
+    "shared/generated/chapter-10/facts.json",
+    "shared/generated/chapter-11/_categories.qmd",
+    "shared/generated/chapter-11/_payroll.qmd",
+    "shared/generated/chapter-11/_early-months.qmd",
+    "shared/generated/chapter-11/_ranked-gap.qmd",
+    "shared/generated/chapter-11/_view.qmd",
+    "shared/generated/chapter-11/_query-payroll_categories.qmd",
+    "shared/generated/chapter-11/_query-end_of_records.qmd",
+    "shared/generated/chapter-11/_query-hours_by_month.qmd",
+    "shared/generated/chapter-11/_query-query_view.qmd",
+    "shared/generated/chapter-11/trailing.svg",
+    "shared/generated/chapter-11/trailing.png",
+    "shared/generated/chapter-11/trailing.csv",
+    "shared/generated/chapter-11/facts.json",
+    "shared/generated/chapter-12/_journal-control.qmd",
+    "shared/generated/chapter-12/_payroll-control.qmd",
+    "shared/generated/chapter-12/_trace.qmd",
+    "shared/generated/chapter-12/_match.qmd",
+    "shared/generated/chapter-12/_price.qmd",
+    "shared/generated/chapter-12/_grni.qmd",
+    "shared/generated/chapter-12/_approvals.qmd",
+    "shared/generated/chapter-12/_time-profile.qmd",
+    "shared/generated/chapter-12/_pay-expectation.qmd",
+    "shared/generated/chapter-12/_surge.qmd",
+    "shared/generated/chapter-12/_late.qmd",
+    "shared/generated/chapter-12/_query-trace.qmd",
+    "shared/generated/chapter-12/_query-unbilled_shipments.qmd",
+    "shared/generated/chapter-12/_query-approval_summary.qmd",
+    "shared/generated/chapter-12/facts.json",
+    "shared/generated/chapter-13/facts.json",
+    "shared/generated/chapter-13/_profile.qmd",
+    "shared/generated/chapter-13/_validation.qmd",
+    "shared/generated/chapter-13/_selection.qmd",
+    "shared/generated/chapter-13/_discount-rate.qmd",
+    "shared/generated/chapter-13/filter-path.svg",
+    "shared/generated/chapter-13/filter-path.png",
+    "shared/generated/chapter-14/facts.json",
+    "shared/generated/chapter-14/_merge.qmd",
+    "shared/generated/chapter-14/_margin.qmd",
+    "shared/generated/chapter-14/_filter-context.qmd",
+    "shared/generated/chapter-14/_income.qmd",
+    "shared/generated/chapter-14/star.svg",
+    "shared/generated/chapter-14/star.png",
+    "shared/generated/chapter-15/facts.json",
+    "shared/generated/chapter-15/_gross-to-net.qmd",
+    "shared/generated/chapter-15/_budget-bridge.qmd",
+    "shared/generated/chapter-15/_classification.qmd",
+    "shared/generated/chapter-15/_window.qmd",
+    "shared/generated/chapter-15/window.svg",
+    "shared/generated/chapter-15/window.png",
+    "shared/generated/chapter-15/window.csv",
+    "shared/generated/chapter-16/facts.json",
+    "shared/generated/chapter-16/_flags.qmd",
+    "shared/generated/chapter-16/_register.qmd",
+    "shared/generated/chapter-16/_rates.qmd",
+    "shared/generated/chapter-16/_review.qmd",
+    "shared/generated/chapter-16/monitoring.svg",
+    "shared/generated/chapter-16/monitoring.png"
+  ],
+  "public_fragments": [
+    "shared/fragments/_accounting-analytics.qmd",
+    "shared/fragments/_reference-earley-2015.qmd",
+    "shared/fragments/_reference-vasarhelyi-2015.qmd",
+    "shared/fragments/_source-to-ledger-traceability.qmd",
+    "shared/fragments/_reference-wang-strong-1996.qmd",
+    "shared/fragments/_reference-wickham-2014.qmd",
+    "shared/fragments/_reference-codd-1970.qmd",
+    "shared/fragments/_reference-powell-2009a.qmd",
+    "shared/fragments/_reference-fernandes-2023.qmd",
+    "shared/fragments/_reference-anscombe-1973.qmd",
+    "shared/fragments/_reference-hyndman-2021.qmd",
+    "shared/fragments/_reference-nigrini-2012.qmd",
+    "shared/fragments/_reference-datar-2021.qmd",
+    "shared/fragments/_reference-sqlite-select.qmd",
+    "shared/fragments/_reference-sqlite-windows.qmd",
+    "shared/fragments/_reference-sqlite-with.qmd",
+    "shared/fragments/_reference-pcaob-2305.qmd"
+  ],
+  "public_build_files": [
+    "tests/test_slide_build.py",
+    "tests/test_slide_publication.py",
+    "tests/test_slide_public_assets.py",
+    "scripts/slides/__init__.py",
+    "scripts/slides/refresh.py",
+    "scripts/slides/refresh_book_figures.py",
+    "scripts/slides/browser_check.py",
+    "scripts/slides/propagation_check.py",
+    "scripts/slides/layout_smoke.py",
+    "scripts/slides/powerpoint_check.ps1",
+    "scripts/slides/requirements-review.txt",
+    "slides/filters/images.lua",
+    "slides/filters/teaching.lua",
+    "shared/calculations/chapter01.py",
+    "shared/calculations/invoice_margin.py",
+    "scripts/figures/ch01.py",
+    "scripts/figures/ch06.py",
+    "scripts/figures/excel.py",
+    "scripts/figures/data.py",
+    "scripts/figures/drawio.py",
+    "shared/calculations/foundations.py",
+    "scripts/slides/refresh_foundations.py",
+    "scripts/figures/ch02.py",
+    "scripts/figures/ch03.py",
+    "slides/README.md",
+    "tests/test_slide_foundations.py",
+    "shared/calculations/excel_analysis.py",
+    "scripts/slides/refresh_excel.py",
+    "scripts/figures/ch04.py",
+    "scripts/figures/ch07.py",
+    "scripts/figures/ch08.py",
+    "scripts/figures/check_figures.py",
+    "tests/test_slide_excel.py",
+    "scripts/slides/refresh_sql.py",
+    "tests/test_slide_sql.py",
+    "scripts/figures/dbbrowser.py",
+    "shared/calculations/sql_ch09.py",
+    "shared/calculations/sql_ch10.py",
+    "shared/calculations/sql_ch11.py",
+    "shared/calculations/sql_ch12.py",
+    "scripts/figures/ch09.py",
+    "scripts/figures/ch10.py",
+    "scripts/figures/ch11.py",
+    "scripts/figures/ch12.py",
+    "scripts/slides/refresh_bi.py",
+    "tests/test_slide_bi.py",
+    "scripts/figures/powerbi.py",
+    "shared/calculations/bi_ch13.py",
+    "shared/calculations/bi_ch14.py",
+    "shared/calculations/bi_ch15.py",
+    "shared/calculations/bi_ch16.py",
+    "scripts/figures/ch13.py",
+    "scripts/figures/ch14.py",
+    "scripts/figures/ch15.py",
+    "scripts/figures/ch16.py"
+  ],
+  "public_book_files": [
+    "_quarto.yml",
+    "filters/strip-comments.lua",
+    "filters/pdf-figures.lua",
+    "filters/slide-links.lua",
+    ".github/workflows/publish.yml",
+    "front-matter/downloads.qmd",
+    "chapters/01-role-of-analytics/chapter.qmd",
+    "chapters/02-understanding-data/chapter.qmd",
+    "chapters/03-accounting-data-environment/chapter.qmd",
+    "chapters/04-excel-essentials/chapter.qmd",
+    "chapters/05-data-preparation/chapter.qmd",
+    "chapters/06-descriptive-analytics/chapter.qmd",
+    "chapters/07-analysis-and-modeling/chapter.qmd",
+    "chapters/08-audit-analytics/chapter.qmd",
+    "chapters/09-sql-essentials/chapter.qmd",
+    "chapters/10-joining-and-summarizing/chapter.qmd",
+    "chapters/11-analytical-queries/chapter.qmd",
+    "chapters/12-sql-audit-analytics/chapter.qmd",
+    "chapters/13-power-bi-essentials/chapter.qmd",
+    "chapters/14-data-models-and-dax/chapter.qmd",
+    "chapters/15-management-reports/chapter.qmd",
+    "chapters/16-audit-monitoring/chapter.qmd",
+    "chapters/17-statements-for-a-lender/chapter.qmd",
+    "chapters/18-make-buy-or-reprice/chapter.qmd",
+    "chapters/19-customer-credits-audit/chapter.qmd"
+  ]
+}

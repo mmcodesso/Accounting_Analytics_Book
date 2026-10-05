@@ -11,6 +11,12 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 BLANK_TRACKING = "(TrackingNumber IS NULL OR TrackingNumber = '')"
 
 
+def and_join(items) -> str:
+    """'a', 'a and b', or 'a, b, and c'."""
+    items = [str(i) for i in items]
+    return " and ".join(items) if len(items) <= 2 else ", ".join(items[:-1]) + ", and " + items[-1]
+
+
 def xround(value: float, places: int = 2) -> float:
     """Round half away from zero, as Excel's ROUND does (the rule of scripts/figures/excel.py's xround)."""
     text = repr(float(f"{value:.15g}"))
@@ -29,11 +35,20 @@ def ex1(d, claim):
     by_year = {int(y): r for y, *r in d.q(
         "SELECT substr(InvoiceDate, 1, 4), COUNT(*), ROUND(SUM(SubTotal), 2), ROUND(SUM(FreightAmount), 2), "
         "ROUND(SUM(TaxAmount), 2), ROUND(SUM(GrandTotal), 2) FROM SalesInvoice GROUP BY 1")}
-    invoices, subtotal = d.q("SELECT COUNT(*), ROUND(SUM(SubTotal), 2) FROM SalesInvoice")[0]
-    claim(set(by_year) == set(d.years), "the invoices fall in the fiscal years of the window, so the grid's total row "
-                                        "equals the totals of the entire SalesInvoice Table")
+    claim(set(d.years) <= set(by_year), "every fiscal year of the window has invoices")
+    # the grid covers the window's fiscal years; invoices dated outside them (if any) are named separately
+    invoices = sum(by_year.get(y, (0,))[0] for y in d.years)
+    subtotal = round(sum(by_year.get(y, (0, 0.0))[1] for y in d.years), 2)
+    outside = d.q("SELECT COUNT(*), ROUND(SUM(SubTotal), 2), MIN(InvoiceDate), MAX(InvoiceDate) FROM SalesInvoice "
+                  "WHERE substr(InvoiceDate, 1, 4) NOT IN (" + ",".join(f"'{y}'" for y in d.years) + ")")[0]
     claim(d.one("SELECT COUNT(*) FROM SalesInvoice WHERE ABS(SubTotal + FreightAmount + TaxAmount - GrandTotal) > 0.005") == 0,
           "SubTotal + Freight + Tax = GrandTotal on every invoice")
+    # the Excel Table keeps the SQLite column order (Tutorial 4.1 keeps every SalesInvoice column)
+    columns = [r[1] for r in d.q("PRAGMA table_info(SalesInvoice)")]
+    amounts = ["SubTotal", "FreightAmount", "TaxAmount", "GrandTotal"]
+    start = columns.index("SubTotal") if "SubTotal" in columns else -1
+    claim(start >= 0 and columns[start:start + 4] == amounts,
+          "SubTotal, FreightAmount, TaxAmount, and GrandTotal are adjacent, in that order, so filling across shifts SubTotal to them")
     memos = {int(y): (n, s) for y, n, s in d.q(
         "SELECT substr(CreditMemoDate, 1, 4), COUNT(*), ROUND(SUM(SubTotal), 2) FROM CreditMemo GROUP BY 1")}
     claim(set(memos) <= set(d.years), "the credit memos fall in the fiscal years of the window")
@@ -48,6 +63,7 @@ def ex1(d, claim):
           "the sales tax on the invoices is credited to a liability account")
     years = d.years
     return dict(years=years, n=[by_year[y][0] for y in years], invoices=invoices, sub=[by_year[y][1] for y in years],
+                outside=dict(n=outside[0], sub=outside[1], first=outside[2], last=outside[3]) if outside[0] else None,
                 sub_total=subtotal, frt=[by_year[y][2] for y in years], tax=[by_year[y][3] for y in years],
                 gt=[by_year[y][4] for y in years], cm_n=[memos.get(y, (0, 0.0))[0] for y in years],
                 cm_sub=[memos.get(y, (0, 0.0))[1] for y in years])
@@ -76,10 +92,11 @@ def ex2(d, claim):
           "every promotion line's PromotionID is in the PromotionProgram Table")
     backwards = [pid for pid, _, start, end in programs if end < start]
     single = [pid for pid, _, start, end in programs if end == start]
-    claim(len(backwards) >= 2, "two or more promotions have an EffectiveEndDate earlier than their EffectiveStartDate")
-    claim(len(single) == 1, "one promotion is effective for a single day")
+    claim(len(backwards) + len(single) > 0,
+          "some promotions have an EffectiveEndDate earlier than, or equal to, their EffectiveStartDate")
     return dict(promos=promos, lines=len(lines), discount=discount,
-                top=dict(id=top["id"], share=top["discount"] / discount), backwards=backwards, single=single)
+                top=dict(id=top["id"], share=top["discount"] / discount), backwards=and_join(backwards),
+                n_backwards=len(backwards), single=and_join(single), n_single=len(single))
 
 
 @note("ch04.ex3", EXERCISES)
@@ -157,8 +174,8 @@ def ex5(d, claim):
     late = d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate < ?", review)
     late2 = d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate < ?", review2)
     on_review = d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate = ?", review)
-    claim(transit - late == 1 and on_review == 1, "of the In Transit shipments, all but one are due before the review "
-                                                  "date, and the other is due on the review date itself")
+    claim(late < transit and late2 <= late, "some In Transit shipments are not yet due at the review date")
+    others = transit - late             # In Transit shipments due on the review date itself or after it
     claim(d.one(f"SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND {BLANK_TRACKING} AND DeliveryDate < ?",
                 review) == blank.get("In Transit", 0) > 0,
           "all In Transit shipments with a blank tracking number are in both categories")
@@ -166,8 +183,9 @@ def ex5(d, claim):
                 "OR DeliveryDate = ''") == 0, "no ShipmentDate or DeliveryDate is blank")
     return dict(shipments=shipments, blank=sum(blank.values()), blank_delivered=blank.get("Delivered", 0),
                 blank_transit=blank.get("In Transit", 0), transit=transit,
-                transit_by_year=[(y, by_year[y]) for y in d.years], review=review, review2=review2,
-                late=late, late2=late2)
+                transit_by_year=[(y, by_year.get(y, 0)) for y in d.years], review=review, review2=review2,
+                late=late, late2=late2, others=others, others_word=WORDS[others] if others < len(WORDS) else f"{others:,}",
+                on_review=on_review, after_review=others - on_review)
 
 
 @note("ch04.ex6", EXERCISES)
@@ -185,8 +203,9 @@ def ex6(d, claim):
     claim(all(r[3] is None and r[4] is None for r in pending), "the Pending requests have no approver or approval date")
     own = [r for r in rows if r[2] == approver]
     self_approved = sum(1 for r in own if r[3] == approver)
-    claim([r[0] for r in own if r[3] != approver] == [r[0] for r in pending],
-          "the approver's other requests are exactly the Pending ones")
+    own_other = [r for r in own if r[3] != approver]
+    claim(all(r[5] == "Pending" for r in own_other), "the approver's other requests are Pending")
+    pending_requesters = sorted({r[2] for r in pending})
     claim(len(pending) >= 2, "there are two or more Pending requests (the list of IDs is plural)")
     requesters = sorted({r[2] for r in rows})
     claim(approver in requesters, "the only approver is also a requester")
@@ -204,5 +223,7 @@ def ex6(d, claim):
     return dict(requests=len(rows), approved=len(approved), pending=len(pending), pending_word=WORDS[len(pending)],
                 approver=dict(id=approver, name=name, title=title),
                 by_requester=[(e, sum(1 for r in rows if r[2] == e)) for e in requesters],
-                self_approved=self_approved, own=len(own), ids=[r[0] for r in pending], lines=[r[1] for r in pending],
+                self_approved=self_approved, own=len(own), own_other=len(own_other),
+                all_pending_own=len(own_other) == len(pending), pending_requesters=and_join(pending_requesters),
+                ids=and_join(r[0] for r in pending), lines=[r[1] for r in pending],
                 low=min(r[6] for r in rows), high=max(r[6] for r in rows))

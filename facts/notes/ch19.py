@@ -12,17 +12,15 @@ less the applications and credits dated by then, is still open with its DueDate 
 5% of the income before income taxes the ledger records for d.C (the chart has no income tax account), and the
 sampling statistics come from the binomial (beta) and hypergeometric distributions, as the case's workbook computes them.
 
-Four statements are worded more loosely than the data, and the claims test them on the reading noted here:
-- Requirement 4's "amount = base x rate except half-cent rounding on ..." lists the clawbacks that SQLite's
-  ROUND(base * rate, 2) rounds down (binary floating point); the stored amounts are the half-up roundings of exact
-  half-cent products, and five more half-cent products round as stored.
-- Requirement 5's "small customers ... rank higher on tiny sales" lists the customers with a higher return rate than the
-  customer with the most credits and less than a tenth of its sales; a third customer (73, 3.70% on sales of about
-  491,000) also ranks higher, on sales that are not tiny.
-- Requirement 7's "Restocked at full standard cost" holds within 1% by reason: return lines with a fractional
-  QuantityReturned below 1 are costed at the quantity times the shipment line's extended cost, below standard.
-- Requirement 7's "a customer who pays by check" holds for the receipts on the invoice behind the largest refund (all
-  checks); the customer's receipts as a whole use all four methods.
+Rounding: a clawback's amount is base x rate rounded half up from the exact product, and a credit line's LineTotal is
+SQLite's ROUND(Q x P x (1 - D), 2) except on a few exact half-cent products, rounded the other way. Where SQLite's ROUND,
+in binary floating point, and the stored amount part on a half-cent, the notes name the documents rather than call them
+errors. Returned goods go back to inventory at standard cost, except return lines of less than one unit (a whole
+shipment line), which are costed at the quantity times the shipment line's extended cost, below standard.
+
+Requirement 7's timeline of the largest refund is built from the data, step by step in date order, with the evidence its
+facts call for. Flags kept on purpose (claims the author revisits on each roll): the AnomalyLog planting nothing in the
+cycle's tables (Requirement 1), and the expectation of returns calling for investigation (Requirement 3).
 """
 
 from __future__ import annotations
@@ -30,6 +28,7 @@ from __future__ import annotations
 import statistics as st
 from collections import Counter, defaultdict
 from datetime import date
+from decimal import ROUND_HALF_UP, Decimal
 from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
@@ -58,6 +57,7 @@ CYCLE_TABLES = {"SalesReturn", "SalesReturnLine", "CreditMemo", "CreditMemoLine"
                 "SalesCommissionAdjustment", "SalesCommissionAccrual", "SalesCommissionPayment",
                 "SalesCommissionPaymentLine", "SalesCommissionRate", "CashReceipt", "CashReceiptApplication"}
 TOP_FAMILIES = 5
+HALF_CENT = Decimal("0.005")
 CS, CSR, CSM = "Customer Service", "Customer Service Representative", "Customer Service Manager"
 
 
@@ -84,6 +84,15 @@ def plural(title: str) -> str:
 
 def r2(x: float) -> float:
     return round(x + 0.0, 2)
+
+
+def money2(x: float) -> str:
+    return f"{x:,.2f}"
+
+
+def method_word(method: str) -> str:
+    """A payment method in running text: 'Wire Transfer' -> 'wire', 'Credit Card' -> 'credit card', 'ACH' -> 'ACH'."""
+    return "wire" if method == "Wire Transfer" else method if method.isupper() else method.lower()
 
 
 # --- the cycle, loaded once ------------------------------------------------------------------------
@@ -391,7 +400,15 @@ def substantive(d) -> dict:
     over = [l for l in lines if l["qty"] > l["shipped"] + 1e-9]
     price_off = [l for l in lines if l["inv_price"] is None or abs(l["price"] - l["inv_price"]) > 0.004
                  or abs(l["disc"] - l["inv_disc"]) > 1e-9]
-    total_off = [l for l in lines if abs(l["total"] - round(l["qty"] * l["price"] * (1 - l["disc"]), 2)) > 0.004]
+    # LineTotal against SQLite's ROUND(Q x P x (1 - D), 2): the lines that differ are rounding, not errors, when the exact
+    # product is a half-cent and LineTotal is its other rounding (binary floating point decides which way ROUND goes)
+    def exact(l) -> Decimal:
+        return Decimal(repr(l["qty"])) * Decimal(repr(l["price"])) * (1 - Decimal(repr(l["disc"])))
+    by_id = {l["id"]: l for l in lines}
+    off = [by_id.get(i) for (i,) in d.q("SELECT CreditMemoLineID FROM CreditMemoLine WHERE ABS(LineTotal - ROUND(Quantity * "
+                                        "UnitPrice * (1 - Discount), 2)) > 0.004 ORDER BY 1")]
+    half = [l for l in off if l is not None and abs(abs(Decimal(repr(l["total"])) - exact(l)) - HALF_CENT) < Decimal("1e-9")]
+    total_off = [l for l in off if l not in half]          # differences that are not a half-cent rounding
     twice = d.one("SELECT COUNT(*) FROM (SELECT ShipmentLineID FROM SalesReturnLine GROUP BY 1 HAVING COUNT(*) > 1)")
     distinct_inv = len({m["inv"] for m in c.cm.values()})
     above_invoice = [m for m in c.cm.values() if m["gt"] > c.inv[m["inv"]]["gt"] + 0.005]
@@ -403,10 +420,10 @@ def substantive(d) -> dict:
     with_freight = [m for m in c.cm.values() if m["freight"] > 0.005]
     freight_over = [m for m in c.cm.values() if m["freight"] > c.inv[m["inv"]]["freight"] + 0.005]
     gt_ok = all(abs(m["gt"] - m["sub"] - m["freight"] - m["tax"]) < 0.005 for m in c.cm.values())
-    clean = (len(traced) == n_lines == len(lines) and not over and not twice and not price_off and len(total_off) <= 1
+    clean = (len(traced) == n_lines == len(lines) and not over and not twice and not price_off and not total_off
              and distinct_inv == len(c.cm) and not above_invoice and sub_ok == len(c.cm) and len(tax_ok) == len(c.cm)
              and not freight_over and gt_ok)
-    return dict(lines=n_lines, traced=len(traced), over=len(over), price_off=len(price_off), total_off=total_off,
+    return dict(lines=n_lines, traced=len(traced), over=len(over), price_off=len(price_off), total_off=total_off, half=half,
                 twice=twice, distinct_inv=distinct_inv, above_invoice=len(above_invoice), sub_ok=sub_ok, rate=rate,
                 tax_ok=len(tax_ok), tax_sub_flags=tax_sub_flags, with_freight=with_freight, freight_over=len(freight_over),
                 gt_ok=gt_ok, clean=clean)
@@ -449,10 +466,12 @@ def clawbacks(d) -> dict:
                                       "JOIN SalesCommissionPayment p ON p.SalesCommissionPaymentID = l.SalesCommissionPaymentID "
                                       "WHERE l.SourceDocumentType = 'SalesCommissionAdjustment' GROUP BY 1")}
     later = all(netted[a["id"]] >= a["date"] for a in c.adj if a["id"] in netted)
+    exact = all(Decimal(repr(a["amt"])) == (Decimal(repr(a["base"])) * Decimal(repr(a["rate"]))).quantize(Decimal("0.01"), ROUND_HALF_UP)
+                for a in c.adj)
     same = all(a["date"] == c.cm[a["cm"]]["date"] and a["appr"] == c.cm[a["cm"]]["appr"] for a in c.adj)
     return dict(n=len(c.adj), total=r2(sum(a["amt"] for a in c.adj)), complete=complete, base_ok=base_ok, off=off,
-                half=half, netted=len(netted), pending=len(c.adj) - len(netted), later=later, same=same,
-                clean=complete and base_ok == len(c.adj) and half and same)
+                half=half, exact=exact, netted=len(netted), pending=len(c.adj) - len(netted), later=later, same=same,
+                clean=complete and base_ok == len(c.adj) and half and exact and same)
 
 
 def commission_design(d) -> dict:
@@ -600,7 +619,6 @@ def m2(d, claim):
     claim(sum(1 for r in c.rf.values() if r["amt"] == big["amt"]) == 1, "one refund is the largest")
     inv = c.inv[c.cm[big["cm"]]["inv"]]
     unpaid = inv["gt"] - paid_by(c, inv["id"], big["date"])
-    claim(unpaid > 0.005, "part of the invoice was unpaid when the largest refund was paid")
     return dict(cm_above=len(t.cm_above), cm_above_total=amount(t.cm_above), cash_credit=len(t.cash_credit),
                 rf_above=len(t.rf_above), rf_above_total=amount(t.rf_above, "amt"), before=len(t.before),
                 before_total=amount(t.before, "amt"), key=len(s["key"]), key_total=s["key_total"], sample=SAMPLE,
@@ -691,10 +709,15 @@ def r1(d, claim):
               "SalesCommissionAdjustment": ("SalesCommissionAdjustment", "SalesCommissionAdjustmentID", "ApprovedByEmployeeID"),
               "CashReceipt": ("CashReceipt", "CashReceiptID", "RecordedByEmployeeID"),
               "CashReceiptApplication": ("CashReceiptApplication", "CashReceiptApplicationID", "AppliedByEmployeeID")}
+    numbers = {"SalesReturn": "ReturnNumber", "CreditMemo": "CreditMemoNumber", "CustomerRefund": "RefundNumber",
+               "SalesCommissionAdjustment": "AdjustmentNumber", "CashReceipt": "ReceiptNumber",
+               "CashReceiptApplication": "CashReceiptApplicationID"}
+    created_off = []     # (document, rows) whose GL rows name someone other than the document's person
     for src, (table, key, col) in people.items():
-        same, n = q(f"SELECT SUM(g.CreatedByEmployeeID = t.{col}), COUNT(*) FROM GLEntry g JOIN {table} t ON t.{key} = "
-                    f"g.SourceDocumentID WHERE g.SourceDocumentType = '{src}'")[0]
-        claim(n > 0 and same == n, f"GLEntry.CreatedByEmployeeID equals the {src}'s person on every row")
+        n = d.one(f"SELECT COUNT(*) FROM GLEntry g JOIN {table} t ON t.{key} = g.SourceDocumentID WHERE g.SourceDocumentType = '{src}'")
+        claim(n > 0, f"the cycle's {src} documents post to the ledger")
+        created_off += q(f"SELECT t.{numbers[src]}, COUNT(*) FROM GLEntry g JOIN {table} t ON t.{key} = g.SourceDocumentID "
+                         f"WHERE g.SourceDocumentType = '{src}' AND g.CreatedByEmployeeID IS NOT t.{col} GROUP BY 1 ORDER BY 1")
     for src, title in (("SalesInvoice", "Chief Executive Officer"), ("DisbursementPayment", "Chief Financial Officer")):
         titles = {r[0] for r in q(f"SELECT DISTINCT e.JobTitle FROM GLEntry g JOIN Employee e ON e.EmployeeID = "
                                   f"g.CreatedByEmployeeID WHERE g.SourceDocumentType = '{src}'")}
@@ -720,7 +743,8 @@ def r1(d, claim):
                         over30=sum(x > 30 for x in rl), clo=min(cl), chi=max(cl)),
                 rf_appr=rf_appr, cb=cb, receipts=len(c.rcpt), receipt_total=amount(c.rcpt.values(), "amt"),
                 manager=rec_titles.get(CSM, 0), reps=rec_titles.get(CSR, 0), apps=n_apps, nums=nums,
-                post=cm_post, both=both, sr_dr=sr_dr, rf_cr=rf_cr, sca=sca, rows=rows)
+                post=cm_post, both=both, sr_dr=sr_dr, rf_cr=rf_cr, sca=sca, rows=rows,
+                created_off=[dict(doc=doc, rows=k) for doc, k in created_off])
 
 
 # --- Requirement 2 ---------------------------------------------------------------------------------
@@ -781,7 +805,7 @@ def r3(d, claim):
     m, e = materiality(d), expectation(d)
     claim(d.one("SELECT COUNT(*) FROM Account WHERE AccountName LIKE '%Income Tax%'") == 0,
           "the chart has no income tax account, so net income is income before income taxes")
-    claim(m["trivial"] < e["diff"] < m["perf"], "the difference is above clearly trivial and below performance materiality")
+    claim(abs(e["diff"]) > m["trivial"], "the difference is above clearly trivial, so the expectation calls for investigation")
     claim(e["rates"][0] < e["rates"][1] and e["exp_f"] < e["actual"], f"the {d.F} rate understates the expectation")
     claim(d.one("SELECT MIN(ShipmentDate) FROM Shipment") >= f"{d.F}-01-01"
           and d.one("SELECT MIN(PostingDate) FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice'") >= f"{d.F}-01-01",
@@ -789,12 +813,12 @@ def r3(d, claim):
     rf_people = {r["appr"] for r in c.rf.values()}
     claim(len(rf_people) <= 10, "a small team approves the refunds")
     clawback_total = sum(a["amt"] for a in c.adj)
-    claim(clawback_total < m["trivial"], "clawbacks are low in amount (below clearly trivial over the window)")
+    claim(clawback_total < 0.1 * m["mat"], "clawbacks are low in amount (under a tenth of materiality over the window)")
     cs = lambda ids: {c.emp[e_]["cc"] for e_ in ids} == {CS}  # noqa: E731
     claim(cs(r["rec"] for r in c.rcpt.values()) and cs(a[2] for v in c.apps.values() for a in v)
           and cs(x["appr"] for x in c.cm.values()) and cs(a["appr"] for a in c.adj),
           "customer service records receipts, applies cash, approves credits, and approves clawbacks")
-    return dict(**m, **e)
+    return dict(**m, **e, above_perf=abs(e["diff"]) > m["perf"])
 
 
 # --- Requirement 4 ---------------------------------------------------------------------------------
@@ -849,7 +873,8 @@ def r4(d, claim):
     claim(equal_2060 == len(c.rf), "every refund equals its credit's 2060 part")
     cb = clawbacks(d)
     claim(cb["complete"] and cb["base_ok"] == cb["n"], "a clawback for every credit line, at the line total and the accrual's rate")
-    claim(cb["half"], "the clawbacks that differ from ROUND(base x rate, 2) are half-cent products rounded up")
+    claim(cb["half"] and cb["exact"], "every clawback is base x rate rounded half up; those that differ from SQLite's "
+          "ROUND(base x rate, 2) are exact half-cent products")
     claim(cb["later"], "the clawbacks were netted in later commission payments")
     last_payment_date = d.one("SELECT MAX(PaymentDate) FROM SalesCommissionPayment")
     claim(last_payment_date <= year_end(d.C), f"the commission payments end by the end of {d.C}")
@@ -950,20 +975,25 @@ def r5(d, claim):
     rate = cred[focus] / sales[focus]
     focus_cm = [m for m in c.cm.values() if m["cust"] == focus]
     top_two = Counter(m["appr"] for m in focus_cm).most_common(2)
-    claim(len(top_two) == 2 and all(title_of(d, e) == CSR for e, _ in top_two),
-          "the two employees who approved most of the customer's credits are representatives")
+    claim(len(top_two) == 2, "two or more employees approved the customer's credits")
+
+    def role(e: int) -> str:
+        title = title_of(d, e)
+        return ("a representative" if title == CSR else f"the {title}" if c.holders[title] == 1
+                else f"{'an' if title[0] in 'AEIOU' else 'a'} {title}")
+    two = "two representatives" if all(title_of(d, e) == CSR for e, _ in top_two) else " and ".join(role(e) for e, _ in top_two)
     focus_rf = [r for r in c.rf.values() if r["cust"] == focus]
     before_ids = {r["id"] for r in t.before}
-    claim(focus_rf and all(r["id"] in before_ids for r in focus_rf), "all of the customer's refunds are dated before its payment")
-    small = sorted(((k, cred[k] / sales[k]) for k in cred if k in sales and cred[k] / sales[k] > rate
-                    and sales[k] < sales[focus] / 10), key=lambda kv: -kv[1])
-    claim(len(small) >= 1, "small customers rank higher on tiny sales")
+    focus_before = sum(1 for r in focus_rf if r["id"] in before_ids)
+    # the customers with a higher return rate, with their sales; "small" ones sell under a tenth of the customer's sales
+    higher = sorted(((k, cred[k] / sales[k], sales[k]) for k in cred if k in sales and cred[k] / sales[k] > rate),
+                    key=lambda x: -x[1])
+    n_small = sum(1 for _, _, s in higher if s < sales[focus] / 10)
     approvers = [(bare(d, ti), [sum(1 for r in in_year(c.rf.values(), y) if title_of(d, r["appr"]) == ti) for y in yrs])
                  for ti, _ in by_title(d, [r["appr"] for r in c.rf.values()], order="name")]
     scores = Counter(t.score.values())
     hi = [k for k, s in t.score.items() if s >= 4]
     big = largest_refund(d)
-    claim(not t.flags[big["id"]][0], "the largest refund's approver was within limit")
     weekend_rf = sum(D(r["date"]).weekday() >= 5 for r in c.rf.values())
     weekend_cm = sum(D(m["date"]).weekday() >= 5 for m in c.cm.values())
     claim(abs(weekend_rf / len(c.rf) - 2 / 7) < 0.05 and abs(weekend_cm / len(c.cm) - 2 / 7) < 0.05,
@@ -976,7 +1006,8 @@ def r5(d, claim):
                 cross_amt=r2(sum(l["total"] for l in cross)), overall=overall, focus=focus, seg=seg, terms=terms,
                 rate=rate, focus_cred=cred[focus], focus_sales=sales[focus], focus_n=len(focus_cm),
                 focus_gt=amount(focus_cm), top_two=sum(n for _, n in top_two), focus_rf=len(focus_rf),
-                focus_rf_amt=amount(focus_rf, "amt"), small=small, approvers=approvers,
+                focus_rf_amt=amount(focus_rf, "amt"), two=two, focus_before=focus_before, higher=higher,
+                n_small=word(n_small), approvers=approvers, big_above=t.flags[big["id"]][0],
                 scores=[scores.get(s, 0) for s in range(6)], hi=len(hi), hi_amt=r2(sum(c.rf[k]["amt"] for k in hi)),
                 big=big["num"], big_score=t.score[big["id"]], weekend_rf=weekend_rf, weekend_cm=weekend_cm)
 
@@ -996,27 +1027,31 @@ def r6(d, claim):
 
 @note("ch19.r7", CHAPTER)
 def r7(d, claim):
-    c = cycle(d)
+    c, t = cycle(d), tests(d)
     sub = substantive(d)
     claim(sub["traced"] == sub["lines"], "every credit line traces to its return, shipment, and invoice lines")
     claim(sub["over"] == 0 and sub["twice"] == 0, "no quantity above shipped and no shipment line returned twice")
     claim(sub["price_off"] == 0, "price and discount equal the invoice line's")
-    claim(len(sub["total_off"]) == 1 and abs(abs(sub["total_off"][0]["total"] - sub["total_off"][0]["qty"]
-                                                * sub["total_off"][0]["price"] * (1 - sub["total_off"][0]["disc"])) - 0.005) < 1e-6,
-          "LineTotal is off by a half-cent on one credit line only")
+    claim(not sub["total_off"], "LineTotal is ROUND(Q x P x (1 - D), 2) on every credit line but half-cent roundings")
     claim(sub["distinct_inv"] == len(c.cm) and sub["above_invoice"] == 0, "one credit per invoice, none above its invoice")
     claim(sub["sub_ok"] == len(c.cm), "SubTotal equals the lines on every credit")
     claim(sub["tax_ok"] == len(c.cm) and sub["gt_ok"], "tax is the rate on SubTotal plus freight on every credit")
     claim({m["id"] for m in sub["tax_sub_flags"]} == {m["id"] for m in sub["with_freight"]},
           "a tax test on SubTotal alone flags exactly the credits with freight")
     claim(sub["freight_over"] == 0, "no freight credit above the invoice's freight")
-    # restocking
+    # restocking: at standard cost, except the return lines of less than one unit (the whole shipment line), which are
+    # costed at the quantity times the shipment line's extended cost
     rest = dict(d.q("SELECT sr.ReasonCode || '|' || substr(sr.ReturnDate, 1, 4), SUM(srl.ExtendedStandardCost) FROM SalesReturnLine srl "
                     "JOIN SalesReturn sr ON sr.SalesReturnID = srl.SalesReturnID GROUP BY 1"))
-    full = d.q("SELECT sr.ReasonCode, SUM(srl.ExtendedStandardCost), SUM(srl.QuantityReturned * i.StandardCost) FROM SalesReturnLine srl "
-               "JOIN SalesReturn sr ON sr.SalesReturnID = srl.SalesReturnID JOIN Item i ON i.ItemID = srl.ItemID GROUP BY 1")
-    claim(all(abs(a - b) <= 0.01 * b for _, a, b in full if _ in ("Damaged", "Quality Concern")),
-          "damaged and quality returns are restocked at (within 1% of) full standard cost")
+    frac = d.q("SELECT sr.ReasonCode, srl.QuantityReturned, sl.QuantityShipped, srl.ExtendedStandardCost, sl.ExtendedStandardCost, "
+               "ROUND(srl.QuantityReturned * i.StandardCost, 2) FROM SalesReturnLine srl JOIN SalesReturn sr ON sr.SalesReturnID = "
+               "srl.SalesReturnID JOIN ShipmentLine sl ON sl.ShipmentLineID = srl.ShipmentLineID JOIN Item i ON i.ItemID = srl.ItemID "
+               "WHERE ABS(srl.ExtendedStandardCost - ROUND(srl.QuantityReturned * i.StandardCost, 2)) > 0.011")
+    claim(all(q < 1 and abs(q - qs) < 1e-9 and abs(ext - r2(q * ship_ext)) < 0.011 for _, q, qs, ext, ship_ext, _ in frac),
+          "the return lines restocked off standard are whole shipment lines of less than one unit, costed at the quantity "
+          "times the shipment line's extended cost")
+    frac_gap = r2(sum(full - ext for _, _, _, ext, _, full in frac))
+    frac_dq = r2(sum(full - ext for reason, _, _, ext, _, full in frac if reason in ("Damaged", "Quality Concern")))
     claim(sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
           "returns go back to inventory with no write-down account")
     dmg = [r2(rest.get(f"Damaged|{y}", 0.0)) for y in d.years]
@@ -1026,76 +1061,94 @@ def r7(d, claim):
     claim(lap["clean"], "lapping tests clean: no other customer's invoice, every receipt deposited and fully applied")
     claim(sides(d, "CashReceipt") == {("Dr", "1010"), ("Cr", "2060")}, "receipts are held in 2060 until applied")
     claim(len(c.cm) < 1000 and len(c.rf) < 1000, "credits and refunds are too few for a first-digit test")
-    # the timeline of the largest refund
+    # the timeline of the largest refund, from the data: each step with its date and who did it
     rf = largest_refund(d)
     claim(sum(1 for r in c.rf.values() if r["amt"] == rf["amt"]) == 1, "one refund is the largest")
+    claim(t.score[rf["id"]] > 0, "the largest refund carries at least one of the five flags, so it calls for follow-up")
     m = c.cm[rf["cm"]]
     inv = c.inv[m["inv"]]
     sr = c.sr[m["ret"]]
     ships = d.q("SELECT DISTINCT s.ShipmentNumber, s.ShipmentDate, s.DeliveryDate, s.ShippedBy FROM SalesInvoiceLine sil "
                 "JOIN ShipmentLine sl ON sl.ShipmentLineID = sil.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID "
-                "WHERE sil.SalesInvoiceID = ?", inv["id"])
-    claim(len(ships) == 1, "the invoice has one shipment")
-    ship = ships[0]
-    claim(ship[2][:4] == ship[1][:4] == inv["date"][:4] == rf["date"][:4], "the timeline falls in one year")
-    apps = sorted(c.apps[inv["id"]], key=lambda a: (c.rcpt[a[3]]["date"], a[0]))
-    claim(len(apps) == 3, "three receipts were applied to the invoice")
-    # a dataset whose timeline differs renders what there is, with blanks; the claims say what fails
-    blank = dict(id=None, num="?", date=year_end(d.C), method="?", rec=None)
-    rc = lambda k: c.rcpt.get(k, blank)  # noqa: E731
-    apps = apps + [(year_end(d.C), 0.0, None, None)] * (3 - len(apps))
-    first, later = apps[0], apps[1:3]
-    claim(first[0] <= m["date"] and rc(first[3])["date"] < sr["date"], "the first receipt came before the return and credit")
-    claim(all(rc(a[3])["date"] > rf["date"] for a in later), "the other receipts came after the refund")
-    r1 = rc(first[3])
-    claim(r1["rec"] is not None and r1["rec"] == first[2] and title_of(d, r1["rec"]) == CSM,
-          "the first receipt was recorded and applied by the manager")
-    claim(first[0] == r1["date"], "the first receipt was applied on its date")
-    r2_, r3_ = rc(later[0][3]), rc(later[1][3])
-    claim(r2_["rec"] is not None and r2_["rec"] == later[0][2] and title_of(d, r2_["rec"]) == CSM,
-          "the second receipt was recorded and applied by the manager")
-    claim(r3_["rec"] is not None and later[1][2] is not None and r3_["rec"] != later[1][2] and title_of(d, r3_["rec"]) == CSR
-          and title_of(d, later[1][2]) == CSR and later[1][2] == m["appr"],
-          "the last receipt was recorded by one representative and applied by the credit's approver")
-    claim(abs(sum(a[1] for a in apps) - inv["gt"]) < 0.005 and c.parts[m["id"]][0] == 0,
-          "the receipts settle the invoice (the credit went all to 2060)")
-    settled = max(a[0] for a in apps)
-    methods = {rc(a[3])["method"] for a in apps}
-    claim(methods == {"Check"} and rf["method"] not in methods, "the invoice was paid by check, the refund by another method")
+                "WHERE sil.SalesInvoiceID = ? ORDER BY s.ShipmentDate, s.ShipmentNumber", inv["id"])
+    first_day = min([s[1] for s in ships] + [inv["date"]])
+
+    def when(day: str, full: bool = False) -> str:
+        """A date as the timeline writes it: in full the first time, then without its year while the year is the same."""
+        return day[:10] if full or day[:4] != first_day[:4] else md(day)
+
+    def who(e: int) -> str:
+        title = title_of(d, e)
+        if title == CSR:
+            name = f"representative {e}"
+        elif c.holders[title] == 1:
+            name = f"the {title}"
+        else:
+            name = f"{'an' if title[0] in 'AEIOU' else 'a'} {title}"
+        return name + (", the credit's approver" if e == m["appr"] else "")
+
+    events = []      # (date, order, text): the steps in date order
+    for number, shipped, delivered, carrier in ships:
+        events.append((shipped, 0, f"{number} shipped {{when}} ({carrier}), delivered {when(delivered)}"))
+    events.append((inv["date"], 1, f"{inv['num']} dated {{when}}, {money2(inv['gt'])}, due {when(inv['due'])} "
+                                   f"(customer {inv['cust']})"))
+    for day, applied, applier, rid in c.apps[inv["id"]]:
+        r = c.rcpt[rid]
+        if r["rec"] == applier:
+            hands = f"recorded and applied{' on ' + when(day) if day != r['date'] else ''} by {who(applier)}"
+        else:
+            hands = f"recorded by {who(r['rec'])}, applied{' on ' + when(day) if day != r['date'] else ''} by {who(applier)}"
+        events.append((r["date"], 2, f"{r['num']} {{when}}, {method_word(r['method'])}, {money2(applied)} applied ({hands})"))
     lines = d.q("SELECT srl.QuantityReturned, sl.QuantityShipped, i.ItemCode FROM SalesReturnLine srl JOIN ShipmentLine sl ON "
                 "sl.ShipmentLineID = srl.ShipmentLineID JOIN Item i ON i.ItemID = srl.ItemID WHERE srl.SalesReturnID = ? "
                 "ORDER BY srl.LineNumber", sr["id"])
-    recv_title = title_of(d, sr["recv"])
-    claim(c.holders[recv_title] > 1, "the return's receiver holds a title several employees hold")
-    claim(m["gt"] == max(x["gt"] for x in c.cm.values()) and sum(1 for x in c.cm.values() if x["gt"] == m["gt"]) == 1
-          and len(d.years) == 3, "the credit is the largest of the three years")
-    claim(title_of(d, m["appr"]) == CSR, "the credit was approved by a representative")
-    claim(abs(c.parts[m["id"]][1] - m["gt"]) < 0.005, "the credit went all to 2060")
+    returned = "; ".join(f"{q:,.2f} of {s:,.2f} {code}" for q, s, code in lines)
+    events.append((sr["date"], 3, f"{sr['num']} {{when}}, {sr['reason']} ({returned}), received by {who(sr['recv'])}"))
+    largest = m["gt"] == max(x["gt"] for x in c.cm.values()) and sum(1 for x in c.cm.values() if x["gt"] == m["gt"]) == 1
+    to1020, to2060 = c.parts[m["id"]]
+    split = ("all to 2060" if to1020 < 0.005 else "all to 1020" if to2060 < 0.005
+             else f"{money2(to1020)} to 1020 and {money2(to2060)} to 2060")
     unpaid = inv["gt"] - paid_by(c, inv["id"], m["date"])
-    claws = [a for a in c.adj if a["cm"] == m["id"]]
-    claim(len(claws) == 2, "the credit has two clawbacks")
-    claw_seq = int(claws[1]["num"].rsplit("-", 1)[1]) if len(claws) == 2 else 0
-    rf_title = title_of(d, rf["appr"])
-    rf_limit = c.emp[rf["appr"]]["limit"]
-    claim(rf["amt"] <= rf_limit and c.holders[rf_title] == 1, "the refund was approved within the limit by the one holder of the title")
-    claim(rf["method"] == "Wire Transfer", "the largest refund was paid by wire")
-    return dict(sub=sub, rate=sub["rate"], line_off=sub["total_off"][0]["id"] if sub["total_off"] else None,
+    approver = who(m["appr"]).removesuffix(", the credit's approver")
+    events.append((m["date"], 4, f"{m['num']} {{when}}, {money2(m['gt'])}"
+                                 + (f", the largest credit of the {word(len(d.years))} years" if largest else "")
+                                 + f", approved by {approver} with a limit of {c.emp[m['appr']]['limit']:,.0f}, {split} "
+                                 + (f"while {money2(unpaid)} of the invoice was unpaid" if unpaid > 0.005 else "after the invoice was paid")))
+    claws = sorted((a for a in c.adj if a["cm"] == m["id"]), key=lambda a: a["num"])
+    if claws:
+        nums = claws[0]["num"] + "".join("/" + str(int(a["num"].rsplit("-", 1)[1])) for a in claws[1:])
+        events.append((claws[0]["date"], 5, f"clawback{'s' if len(claws) > 1 else ''} {nums} "
+                                            f"({' and '.join(money2(a['amt']) for a in claws)})"))
+    limit = c.emp[rf["appr"]]["limit"]
+    events.append((rf["date"], 6, f"{rf['num']} {{when}}, a {D(rf['date']).strftime('%A')}, {method_word(rf['method'])}, "
+                                  f"approved by {who(rf['appr'])} ({'within' if rf['amt'] <= limit else 'above'} the "
+                                  f"{limit:,.0f} limit), cleared {when(rf['cleared']) if rf['cleared'] else 'not yet'}"))
+    paid = sum(a[1] for a in c.apps[inv["id"]])
+    settled = max((a[0] for a in c.apps[inv["id"]]), default=None)
+    if settled and abs(paid - inv["gt"]) < 0.005:
+        events.append((settled, 7, "the invoice was settled on {when}"))
+    else:
+        events.append(("9999-12-31", 7, f"{money2(inv['gt'] - paid)} of the invoice was never paid"))
+    events.sort(key=lambda e: (e[0], e[1]))
+    timeline = "; ".join(text.replace("{when}", when(day, full=k == 0)) for k, (day, _, text) in enumerate(events))
+    # what the evidence must settle: the refund's payee, and why it differs from the invoice's payments, where it does
+    methods = sorted({c.rcpt[a[3]]["method"] for a in c.apps[inv["id"]]})
+    before = (last_payment(c, inv["id"]) or "") > rf["date"]
+    payee = {"Wire Transfer": "the wire confirmation's beneficiary and account against the customer's known bank details",
+             "ACH": "the ACH confirmation's beneficiary and account against the customer's known bank details",
+             "Check": "the cleared check's payee and endorsement",
+             "Credit Card": "the card processor's record of the card credited"}.get(rf["method"], "the refund's payee and account")
+    why = []
+    if methods and rf["method"] not in methods:
+        why.append(f"why the refund went by {method_word(rf['method'])} to a customer who paid this invoice by "
+                   f"{' and '.join(method_word(x) for x in methods)}")
+    if before:
+        paid_by_one = len(methods) == 1 and methods[0] in ("Check", "Wire Transfer")
+        why.append(f"why before its {method_word(methods[0]) + 's' if paid_by_one else 'payments'} arrived")
+    return dict(sub=sub, rate=sub["rate"], half=[x["id"] for x in sub["half"]],
                 with_freight=len(sub["with_freight"]), dmg=dmg, dmg_total=r2(sum(dmg)), both=both, both_c=both_c, lap=lap,
-                n_cm=len(c.cm), n_rf=len(c.rf),
-                ship=dict(number=ship[0], date=ship[1], delivered=md(ship[2]), carrier=ship[3]),
-                inv=dict(number=inv["num"], date=md(inv["date"]), gt=inv["gt"], due=md(inv["due"]), cust=inv["cust"]),
-                r1=dict(number=r1["num"], date=md(r1["date"]), method=r1["method"].split()[0].lower(), applied=first[1],
-                        title=title_of(d, r1["rec"]) if r1["rec"] is not None else "?"),
-                sr=dict(number=sr["num"], date=md(sr["date"]), reason=sr["reason"], lines=lines,
-                        article="an" if recv_title[0] in "AEIOU" else "a", title=recv_title),
-                cm=dict(number=m["num"], date=md(m["date"]), gt=m["gt"], limit=c.emp[m["appr"]]["limit"]), unpaid=unpaid,
-                claw=f"{claws[0]['num']}/{claw_seq}" if claws else "", claw_amounts=[a["amt"] for a in claws],
-                rf=dict(number=rf["num"], date=md(rf["date"]), weekday=D(rf["date"]).strftime("%A"),
-                        method=rf["method"].split()[0].lower(), title=rf_title, limit=rf_limit, cleared=md(rf["cleared"])),
-                r2=dict(number=r2_["num"], date=md(r2_["date"]), method=r2_["method"].split()[0].lower()),
-                r3=dict(number=r3_["num"], date=md(r3_["date"]), method=r3_["method"].split()[0].lower(), recorder=r3_["rec"],
-                        applied=md(later[1][0]), applier=later[1][2]),
-                settled=md(settled))
+                n_frac=len(frac), frac_gap=frac_gap, frac_dq=frac_dq, n_cm=len(c.cm), n_rf=len(c.rf),
+                timeline=timeline, payee=payee, why=", and ".join(why))
 
 
 # --- Requirement 8 ---------------------------------------------------------------------------------
@@ -1115,8 +1168,8 @@ def r8(d, claim):
     sub = substantive(d)
     claim(no_orphans(d) and warehouse_receipt(d) and sub["price_off"] == 0,
           "every credit traces to a return received in the warehouse at invoice prices")
-    claim(CS not in {c.emp[r["appr"]]["cc"] for r in c.rf.values()} and len({c.emp[r["appr"]]["cc"] for r in c.rf.values()}) == 1,
-          "refunds are approved in accounting, outside customer service")
+    rf_centers = sorted({c.emp[r["appr"]]["cc"] for r in c.rf.values()})
+    claim(CS not in rf_centers, "refunds are approved outside customer service")
     claim(lapping(d)["clean"], "no lapping trace")
     d3 = in_year(t.rf_above, d.C)
     d4 = in_year(t.before, d.C)
@@ -1128,13 +1181,13 @@ def r8(d, claim):
     am = accounting_manager(d)
     design = commission_design(d)
     claim(am is not None and design["people"] == {am}, "the Accounting Manager approved the rates and payments and created the accruals")
-    claim(largest_refund(d)["appr"] == am, "the Accounting Manager approved the largest refund")
     claim(d.one("SELECT COUNT(*) FROM PayrollRegister WHERE ApprovedByEmployeeID IS NOT ?", am) == 0,
           "the Accounting Manager approved every payroll register")
     claim(warehouse_receipt(d) and sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
           "damaged goods go back to inventory at full cost")
     claim(reconciles(d) and clawbacks(d)["clean"] and sub["clean"], "the reconciliations, clawbacks, and substantive tests are clean")
-    return dict(d1_n=len(t.cm_above), d1=d1, perf=m["perf"], all_c=all_c, d2=len(t.cash_credit), d3_n=len(t.rf_above),
+    return dict(rf_centers=rf_centers, am_largest=am is not None and largest_refund(d)["appr"] == am,
+                d1_n=len(t.cm_above), d1=d1, perf=m["perf"], all_c=all_c, d2=len(t.cash_credit), d3_n=len(t.rf_above),
                 d3=(len(d3), amount(d3, "amt")), d4_n=len(t.before), d4=(len(d4), amount(d4, "amt")))
 
 

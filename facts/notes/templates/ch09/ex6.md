@@ -1,6 +1,6 @@
 {%- macro sep(loop) -%}{% if loop.revindex == 2 %}{{ ',' if loop.length > 2 }} and {% elif not loop.last %}, {% endif %}{%- endmacro -%}
 <!-- Instructor notes, Exercise 9.6: {{ n_labor }} Direct Manufacturing labor rows have no WorkOrderOperationID: LaborTimeEntryIDs {% for r in labor %}{{ r.id }} (employee
-     {{ r.employee }}, work order {{ r.work_order }}, {{ r.date }}, {{ r.hours|num(2) }} hours){{ sep(loop) }}{% endfor %}; employees {% for e in employees %}{{ e }}{{ sep(loop) }}{% endfor %} are {{ title }}. They are planted anomalies (invalid direct labor operation
+     {{ r.employee }}, work order {{ r.work_order }}, {{ r.date }}, {{ r.hours|num(2) }} hours){{ sep(loop) }}{% endfor %}; employee{{ 's' if employees|length > 1 }} {% for e in employees %}{{ e }}{{ sep(loop) }}{% endfor %} {{ 'are' if employees|length > 1 else 'is' }} {{ title }}. They are planted anomalies (invalid direct labor operation
      link). ClockStatus values: {% for s, k in clock %}{{ s }} ({{ k|count }}){{ ' and ' if not loop.last }}{% endfor %}. {{ n_missing }} entries have no ClockOutTime, all for employee {{ clock_employee }} ({{ clock_title }}) on January 1 of {{ d.F }}, {{ d.P }}, and {{ d.C }}, with Pending status (planted missing clock-out). {{ terminated }} employees have a
      TerminationDate; all are Terminated with IsActive 0, so the three columns agree. Missing links mean labor cost that cannot be traced
      to an operation; missing clock-outs mean paid hours without a complete time record. -->

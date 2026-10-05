@@ -1,0 +1,4 @@
+| Fiscal 2026 filter | Revenue | Invoices from lines |
+| --- | --- | --- |
+| All item groups | $29,756,420.08 | 7,171 |
+| Furniture | $17,395,054.38 | 3,093 |

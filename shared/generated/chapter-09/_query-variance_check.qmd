@@ -1,0 +1,9 @@
+```sql
+SELECT WorkOrderCloseID, CloseDate,
+    MaterialVarianceAmount AS Material,
+    ConversionVarianceAmount AS Conversion,
+    TotalVarianceAmount AS Total,
+    ROUND(MaterialVarianceAmount + ConversionVarianceAmount
+        - TotalVarianceAmount, 2) AS CheckDifference
+FROM WorkOrderClose;
+```

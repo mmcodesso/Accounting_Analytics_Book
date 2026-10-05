@@ -407,14 +407,16 @@ def r2(d, claim):
                                 "CASE p.PunchType WHEN 'Clock In' THEN tc.ClockInTime ELSE tc.ClockOutTime END")}
     excepted = {r[0] for r in d.q("SELECT TimeClockEntryID FROM AttendanceException")}
     claim(differ <= excepted, "clock punches equal their clock entry's times except on the entries the exceptions cite")
+    claim(bool(differ), "some punches differ from their clock entry (the wording names the exceptions)")
     rosters = d.q(PLANT + "SELECT r.ScheduledHours, r.ScheduledStartTime, r.ScheduledEndTime, r.CreatedByEmployeeID, "
                   "julianday(r.RosterDate) - julianday(r.CreatedDate), COUNT(*) FROM PlantEntries pe JOIN EmployeeShiftRoster r "
                   "ON r.EmployeeShiftRosterID = pe.EmployeeShiftRosterID WHERE pe.DayType = 'Surge' GROUP BY 1, 2, 3, 4, 5 ORDER BY 2")
     shifts = sorted({(r[1], r[2]) for r in rosters})
     claim(len({r[0] for r in rosters}) == 1, "every surge entry is rostered for the same hours")
     claim(len(shifts) == 2, "the surge entries are rostered on two shifts")
-    claim(len({r[3] for r in rosters}) == 1 and len({r[4] for r in rosters}) == 1,
-          "every surge roster was created by one employee the same number of days ahead")
+    claim(len({r[3] for r in rosters}) == 1, "every surge roster was created by one employee")
+    leads = sorted({int(r[4]) for r in rosters})
+    claim(leads[0] > 0, "every surge roster was created before the day it covers")
     creator = rosters[0][3]
     title = d.one("SELECT JobTitle FROM Employee WHERE EmployeeID = ?", creator)
     claim(title == "Production Manager", "the surge rosters were created by the Production Manager")
@@ -478,8 +480,9 @@ def r2(d, claim):
         "SUM(PlannedLoadHours) AS L FROM RoughCutCapacityPlan GROUP BY 1) "
         "SELECT substr(Load.W, 1, 4), Weeks.W IS NOT NULL, SUM(L) / SUM(A) FROM Load JOIN Available USING (W) "
         "LEFT JOIN Weeks USING (W) WHERE Load.W <= ? GROUP BY 1, 2", through)}
-    claim(all(load[(y, True)] < load[(y, False)] for y in d.years), "each year, surge weeks had a lower planned load than other weeks")
     claim(all(v < 1 for v in load.values()), "no group of weeks was planned above its available hours")
+    claim(all(load[(y, True)] < load[(y, False)] + 0.05 for y in d.years),
+          "each year, surge weeks were planned no more heavily than other weeks, give or take a few points (not planned overloads)")
     reasons = d.q(PLANT + "SELECT oa.ReasonCode, COUNT(*), COUNT(DISTINCT oa.ApprovedByEmployeeID), MIN(oa.ApprovedByEmployeeID) "
                   "FROM PlantEntries pe JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = pe.OvertimeApprovalID "
                   "WHERE pe.DayType = 'Surge' GROUP BY 1")
@@ -494,17 +497,17 @@ def r2(d, claim):
     weekdays = dict((int(w), n) for w, n in d.q("WITH " + SURGE + " SELECT strftime('%w', WorkDate), COUNT(*) FROM SurgeDays GROUP BY 1"))
     claim(set(weekdays) <= {1, 2, 3, 4, 5}, "no surge day falls on a weekend")
     counts = [weekdays.get(k, 0) for k in range(1, 6)]
-    claim(all(a <= b for a, b in zip(counts, counts[1:])) and counts[3] + counts[4] > sum(counts) / 2,
-          "surge days fall mostly late in the week, more on each later weekday")
+    late_week = all(a <= b for a, b in zip(counts, counts[1:])) and counts[3] + counts[4] > sum(counts) / 2
     claim(d.one("SELECT COUNT(*) FROM EmployeeAbsence a JOIN Employee e ON e.EmployeeID = a.EmployeeID JOIN CostCenter c "
                 "ON c.CostCenterID = e.CostCenterID WHERE c.CostCenterName = 'Manufacturing'") == 0,
           "no absence is recorded in Manufacturing in any year")
     current = [w for w in weeks(d) if w["week"][:4] == str(d.C)]
     claim(st.mean(w["std"] for w in current if w["surge"]) > st.mean(w["std"] for w in current if not w["surge"]),
           "weeks with surge days completed more output (Requirement 3)")
-    return dict(s=s, o=o, plant=plant, meals=meals, source=sources[0],
+    return dict(s=s, o=o, plant=plant, meals=meals, source=sources[0], n_differ=word(len(differ)),
                 hours=word(int(rosters[0][0])),
-                shifts=[f"{a[:5]}-{b[:5]}" for a, b in shifts], lead=word(int(rosters[0][4])), creator_title=title,
+                shifts=[f"{a[:5]}-{b[:5]}" for a, b in shifts],
+                lead=word(leads[0]) if len(leads) == 1 else f"{word(leads[0])} to {word(leads[-1])}", creator_title=title,
                 clocks=[f"{c[0]}-{c[1]}" for c in clocks], early=int(clocks[0][3]), late=late, clocked=clocks[0][2],
                 rostered=rosters[0][0], equal=equal, n_off=word(len(off)), threshold=threshold,
                 off_in=off[0][1], off_start=off[0][2], late_hours=word(late // 60), beyond=beyond,
@@ -512,7 +515,7 @@ def r2(d, claim):
                 maintenance=maintenance, reduced=reduced, through=through,
                 load=[(load[(y, True)], load[(y, False)]) for y in d.years],
                 n_reasons=word(len(reasons)), per_reason=reasons[0][1], cite=cite,
-                weekdays=[(WEEKDAYS[k], weekdays.get(k, 0)) for k in range(1, 6)])
+                weekdays=[(WEEKDAYS[k], weekdays.get(k, 0)) for k in range(1, 6)], late_week=late_week)
 
 
 # --- Requirement 3 -------------------------------------------------------------------------------
@@ -523,7 +526,10 @@ def r3(d, claim):
     first, cur = ys[0], ys[-1]
     claim(max(y["std"] for y in ys) / min(y["std"] for y in ys) < 1.1, "output was flat (within a tenth across the years)")
     growth = cur["surge"]["overtime"] / first["surge"]["overtime"]
-    claim(3.5 <= growth < 4.5, "surge overtime quadrupled")
+    claim(growth >= 1.5, "surge overtime grew severalfold")
+    times = round(growth)
+    grew = {2: "doubled", 3: "tripled", 4: "quadrupled"}.get(times, f"grew about {word(times)}fold" if times <= 12 else
+                                                            f"grew about {times}-fold")
     current = [w for w in weeks(d) if w["week"][:4] == str(d.C)]
     none = week_group([w for w in current if not w["surge"]])
     some = week_group([w for w in current if w["surge"]])
@@ -532,7 +538,6 @@ def r3(d, claim):
     since = monday((date.fromisoformat(monday(surge_days(d)[0])) + timedelta(days=7)).isoformat())
     later = week_group([w for w in weeks(d) if w["week"] >= since and not w["surge"]])
     claim(some["std"] > none["std"], "surge weeks complete more")
-    claim(some["ratio"] < none["ratio"], "surge weeks complete less in proportion to the hours")
     claim(some["next"] < none["next"], "the weeks after surge weeks complete less")
     lead = d.one("SELECT AVG(julianday(CompletedDate) - julianday(ReleasedDate)) FROM WorkOrder WHERE substr(ClosedDate, 1, 4) = ?",
                  str(d.C))
@@ -568,6 +573,7 @@ def r3(d, claim):
     together = calendar + beyond_cost + premium_growth
     claim(together > bridge["payroll"], "the three measures exceed the payroll line")
     return dict(cutoff=last_work(d), ys=ys, other=none, surge=some, detail=detail, since=MONTHS[int(since[5:7]) - 1] + " " + since[:4],
+                grew=grew, in_proportion=some["ratio"] >= none["ratio"],
                 later=later, lead=lead, burden=b,
                 lf=lf, lc=lc, bridge=bridge, released_word="less" if bridge["released"] > 0 else "more",
                 pay_month=MONTHS[int(pay[2][5:7]) - 1], pay_amount=pay[3], je=direct[1][1], je_amount=direct[1][3],
@@ -694,10 +700,13 @@ def r5(d, claim):
     claim(p["left_start"][:8] == f"{d.C}-12-", f"the days left after the last processed period are in December {d.C}")
     claim(d.one("SELECT COUNT(*) FROM (SELECT CalendarDate FROM WorkCenterCalendar GROUP BY 1 "
                 "HAVING SUM(IsWorkingDay) NOT IN (0, COUNT(*)))") == 0, "every work center has the same working days")
-    holiday = d.q("SELECT ExceptionReason, strftime('%w', CalendarDate) FROM WorkCenterCalendar WHERE WorkCenterID = ? "
-                  "AND CalendarDate = ?", calendar_wc(d), f"{d.C}-12-25")
-    claim(holiday and holiday[0][0] == "Holiday" and holiday[0][1] not in ("0", "6"),
-          f"25 December {d.C} is a holiday on a weekday")
+    holidays = [r[0] for r in d.q("SELECT CalendarDate FROM WorkCenterCalendar WHERE WorkCenterID = ? AND ExceptionReason = 'Holiday' "
+                                  "AND strftime('%w', CalendarDate) NOT IN ('0', '6') AND CalendarDate BETWEEN ? AND ? ORDER BY 1",
+                                  calendar_wc(d), p["left_start"], f"{d.C}-12-31")]
+    claim(d.one("SELECT COUNT(*) FROM WorkCenterCalendar WHERE WorkCenterID = ? AND IsWorkingDay = 0 AND CalendarDate BETWEEN ? AND ? "
+                "AND strftime('%w', CalendarDate) NOT IN ('0', '6') AND ExceptionReason <> 'Holiday'",
+                calendar_wc(d), p["left_start"], f"{d.C}-12-31") == 0,
+          "the only weekdays without work among the days left are holidays")
     accounts = {}
     for center, number, debit in d.q("SELECT c.CostCenterName, a.AccountNumber, SUM(g.Debit) FROM GLEntry g JOIN Account a "
                                      "ON a.AccountID = g.AccountID JOIN CostCenter c ON c.CostCenterID = g.CostCenterID "
@@ -747,25 +756,32 @@ def r5(d, claim):
                "AND a.AccountName = 'Retained Earnings'", close)
     claim(d.one("SELECT COUNT(*) FROM Account WHERE AccountName LIKE '%Income Tax%'") == 0, "the ledger records no income tax")
     effect = net_rev - change
-    claim(abs(effect) / ni < 0.002, "the effect on income is under 0.2%")
-    asv = d.q("SELECT PurchaseInvoiceID, InvoiceNumber, GrandTotal, ReceivedDate FROM PurchaseInvoice WHERE substr(InvoiceDate, 1, 4) = ? "
-              "AND substr(ReceivedDate, 1, 4) = ?", str(d.P), str(d.C))
-    claim(len(asv) == 1, f"one supplier invoice dated in {d.P} was received in {d.C}")
-    pid, number, total, received = asv[0]
-    accruals = d.q("SELECT DISTINCT j.EntryNumber, j.PostingDate FROM PurchaseInvoiceLine l JOIN JournalEntry j ON j.JournalEntryID = "
-                   "l.AccrualJournalEntryID WHERE l.PurchaseInvoiceID = ?", pid)
-    claim(len(accruals) == 1 and accruals[0][1] <= f"{d.P}-12-31", "the invoice was accrued before the year-end")
+    share = abs(effect) / ni
+    claim(share < 0.01, "the effect on income is well under 1% and immaterial")
+    # The supplier invoices dated in the prior year and received in this one: each must have been accrued before the
+    # year-end for the wording ("not a payables cutoff item") to hold.
     a2040 = d.account("2040")
-    claim(d.one("SELECT SUM(Credit) FROM GLEntry WHERE VoucherNumber = ? AND AccountID = ?", accruals[0][0], a2040) > 0
-          and d.one("SELECT SUM(Debit) FROM GLEntry WHERE SourceDocumentType = 'PurchaseInvoice' AND SourceDocumentID = ? "
-                    "AND AccountID = ?", pid, a2040) > 0,
-          "its accrual credited 2040, and the invoice cleared it, so the accrual carried the liability at the year-end")
+    asv = []
+    for pid, number, total, received in d.q("SELECT PurchaseInvoiceID, InvoiceNumber, GrandTotal, ReceivedDate FROM PurchaseInvoice "
+                                            "WHERE substr(InvoiceDate, 1, 4) = ? AND substr(ReceivedDate, 1, 4) = ? ORDER BY 2",
+                                            str(d.P), str(d.C)):
+        accruals = d.q("SELECT DISTINCT j.EntryNumber, j.PostingDate FROM PurchaseInvoiceLine l JOIN JournalEntry j "
+                       "ON j.JournalEntryID = l.AccrualJournalEntryID WHERE l.PurchaseInvoiceID = ?", pid)
+        claim(len(accruals) == 1 and accruals[0][1] <= f"{d.P}-12-31", f"{number} was accrued before the year-end")
+        if len(accruals) != 1:
+            continue
+        claim((d.one("SELECT SUM(Credit) FROM GLEntry WHERE VoucherNumber = ? AND AccountID = ?", accruals[0][0], a2040) or 0) > 0
+              and (d.one("SELECT SUM(Debit) FROM GLEntry WHERE SourceDocumentType = 'PurchaseInvoice' AND SourceDocumentID = ? "
+                         "AND AccountID = ?", pid, a2040) or 0) > 0,
+              f"{number}'s accrual credited 2040, and the invoice cleared it, so the accrual carried the liability at the year-end")
+        asv.append(dict(number=number, total=total, received=received, je=accruals[0][0],
+                        month=MONTHS[int(accruals[0][1][5:7]) - 1], year=accruals[0][1][:4]))
     return dict(p=p, left_day=int(p["left_start"][8:]), prior=prior, change=change, hours=round(hour_based(d, d.P), -3),
                 opening=opening, entry=entry, actual_rate=(led["payroll"] + led["je"]) / std, std_rate=led["released"] / std,
                 fg=fg, delivered=delivered[1], n_uninv=n_uninv, uninv=uninv, uninv_std=uninv_std, net_rev=net_rev, ni=ni,
-                adj_ni=ni - change + net_rev, about=round(p["accrual"], -3),
-                asv=dict(number=number, total=total, received=received, je=accruals[0][0],
-                         month=MONTHS[int(accruals[0][1][5:7]) - 1], year=accruals[0][1][:4]))
+                adj_ni=ni - change + net_rev, about=round(p["accrual"], -3), share=share,
+                share_under=next(x for x in (0.002, 0.005, 0.01) if share < x) if share < 0.01 else 0.01,
+                holidays=[day_month(h) for h in holidays], asv=asv)
 
 
 # --- Requirement 6 -------------------------------------------------------------------------------

@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-10"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 Your queries in Chapter 9 gave the controller a first look at the manufacturing variance. It is recorded when a work order closes, and in the largest closes of fiscal 2026 most of it is overhead. She comes back to you, her staff accountant, with three follow-up questions. Which products carry the variance? How much of it arose in each of the three years? And is it a matter of volume, with the plant making fewer units over which to spread its costs, or of the cost itself?

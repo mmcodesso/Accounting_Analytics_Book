@@ -1,0 +1,10 @@
+```sql
+SELECT 'Posting with no payroll payment' AS Test,
+    gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,
+    gl.Debit + gl.Credit AS Amount
+FROM GLEntry AS gl
+    LEFT JOIN PayrollPayment AS pp
+        ON pp.PayrollPaymentID = gl.SourceDocumentID
+WHERE gl.SourceDocumentType = 'PayrollPayment'
+    AND pp.PayrollPaymentID IS NULL
+```

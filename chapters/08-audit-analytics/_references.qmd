@@ -16,7 +16,7 @@ Financial Accounting Standards Board. (2016). *Financial instruments—Credit lo
 
 Newcomb, S. (1881). Note on the frequency of use of the different digits in natural numbers. *American Journal of Mathematics*, *4*(1), 39–40. <https://doi.org/10.2307/2369148>
 
-Nigrini, M. J. (2012). *Benford's Law: Applications for forensic accounting, auditing, and fraud detection*. Wiley. <https://doi.org/10.1002/9781119203094>
+{{< include /shared/fragments/_reference-nigrini-2012.qmd >}}
 
 Nigrini, M. J. (2017). Audit sampling using Benford's Law: A review of the literature with some new perspectives. *Journal of Emerging Technologies in Accounting*, *14*(2), 29–46. <https://doi.org/10.2308/jeta-51783>
 

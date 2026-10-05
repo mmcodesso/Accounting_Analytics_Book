@@ -33,8 +33,10 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
      SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted (158 / 232 / 222 credit memos,
      SubTotal 145,655.35 / 201,104.38 / 242,764.56), sales tax is a liability collected for the government rather than revenue, and freight
      billed is recorded in its own revenue account (4050). Grid formula, for example
-     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[InvoiceDate],">="&DATE($A5,1,1),SalesInvoice[InvoiceDate],"<="&DATE($A5,12,31)),
-     pasted (not filled) across, with the sum column changed per measure or locked with [[Col]:[Col]]. -->
+     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[[InvoiceDate]:[InvoiceDate]],">="&DATE($A5,1,1),SalesInvoice[[InvoiceDate]:[InvoiceDate]],"<="&DATE($A5,12,31)),
+     entered once and filled right and down: filling across shifts SubTotal to the adjacent FreightAmount, TaxAmount, and GrandTotal
+     columns, as the grid needs, while the locked [[InvoiceDate]:[InvoiceDate]] and the mixed $A5 stay put (the Watch out on structured
+     references). Pasted instead of filled, the formula keeps SubTotal in every column. -->
 
 
 **Exercise 4.2: Reviewing Promotional Discounts**
@@ -123,7 +125,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 <!-- Instructor notes, Exercise 4.4: 9,707 shipments. FreightTerms values are Prepaid (5,024 shipments) and Prepaid and Add (4,683).
      Every Prepaid shipment has BillableFreightAmount 0, so all are negative by design: FreightMargin -849,739.09 (average FreightCost 169.14).
      Prepaid and Add shipments bill freight: 2,070 above cost, 2,608 below, 5 equal; FreightMargin -6,391.63 (average FreightCost 134.03;
-     billed freight averages about 96 percent of cost). Total FreightMargin -856,130.72; 7,632 negative shipments. FreightCost ranges from
+     billed freight totals about 99 percent of cost, while the shipments' ratios average about 96 percent). Total FreightMargin -856,130.72; 7,632 negative shipments. FreightCost ranges from
      23.24 to 873.95. The finding: freight is absorbed by design on Prepaid orders, and freight billed under Prepaid and Add recovers most but
      not all of the carrier cost. -->
 
@@ -146,7 +148,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (4) On an Analysis worksheet, use COUNTIFS to count the shipments in each exception category, the blank tracking numbers by Status, and the shipments in both categories.
 
-(5) Add a slicer on Status and confirm your counts with SUBTOTAL. Then change ReviewDate to December 1, 2026, and explain how the second count changes.
+(5) Add a slicer on Status and confirm your counts with SUBTOTAL. Then change ReviewDate to December 1, 2026, explain how the second count changes, and set ReviewDate back to December 31, 2026.
 
 (6) Prepare a brief memo for your senior (one half page) describing each exception, its likely cause, and the evidence you would request.
 
@@ -172,7 +174,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (2) Add a calculated column, DiscountFromReference, equal to one minus ApprovedUnitPrice divided by ReferenceUnitPrice, formatted as a percentage.
 
-(3) Apply formula-based conditional formatting rules that highlight, in different colors, requests with a blank ApprovedByEmployeeID and requests whose RequestedByEmployeeID equals the ApprovedByEmployeeID. Use COUNTIFS to count each group, and use a slicer on Status to see how the groups relate to it.
+(3) Apply formula-based conditional formatting rules that highlight, in different colors, requests with a blank ApprovedByEmployeeID and requests whose RequestedByEmployeeID equals the ApprovedByEmployeeID. COUNTIFS cannot compare two columns of the same row, so add a calculated column, `SelfApproved`, with the formula `=[@RequestedByEmployeeID]=[@ApprovedByEmployeeID]`. Use COUNTIFS to count each group, and use a slicer on Status to see how the groups relate to it.
 
 (4) Build a small grid with the requesting employees as rows and, as columns, the number of requests, the number approved by someone other than the requester, and the number approved by the requester. Look up the requesters' names and job titles in the Employee worksheet of CharlesRiver.xlsx.
 

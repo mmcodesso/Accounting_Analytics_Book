@@ -6,6 +6,7 @@ from notes import note
 
 CASE = "cases/part-1-case.qmd"
 GROUP = "Furniture"
+WORDS = ["none", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
 
 def quarter(year: int, q: int) -> tuple[str, str]:
@@ -64,6 +65,12 @@ def r2(d, claim):
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType = 'CreditMemo' AND AccountID IN "
                 "(SELECT RevenueAccountID FROM Item WHERE RevenueAccountID IS NOT NULL)") == 0,
           "no CreditMemo posts to a product line's revenue account (the revenue side is not by product line)")
+    # credit memos also reverse billed freight, in an operating-revenue account that is not a product line's
+    freight = d.q("SELECT a.AccountNumber, a.AccountName, COUNT(*), SUM(g.Credit > 0) FROM GLEntry g JOIN Account a "
+                  "ON a.AccountID = g.AccountID WHERE g.SourceDocumentType = 'CreditMemo' "
+                  "AND a.AccountType = 'Revenue' AND a.AccountSubType <> 'Contra Revenue' GROUP BY 1, 2")
+    claim(len(freight) <= 1 and all(cr == 0 for *_, cr in freight),
+          "apart from the contra-revenue account, CreditMemo postings debit at most one other revenue account (freight)")
     groups = d.one("SELECT COUNT(DISTINCT t.ItemGroup) FROM CreditMemoLine l JOIN Item t ON t.ItemID = l.ItemID")
     claim(groups > 1, "the credit memos (and so the returns account) span several product lines")
     discounts = d.account("4070")
@@ -71,7 +78,9 @@ def r2(d, claim):
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ?", discounts) == 0,
           f"account 4070 {discount_name} has no postings")
     return dict(items=items, revenue=revenue, cogs=cogs, inventory=inventory, joins=joins,
-                returns=dict(number=memo[0][1], name=memo[0][2]), discounts=discount_name)
+                returns=dict(number=memo[0][1], name=memo[0][2]) if memo else dict(number="", name=""),
+                freight=dict(number=freight[0][0], name=freight[0][1], rows=freight[0][2]) if freight else None,
+                discounts=discount_name)
 
 
 def before_shipment(d):
@@ -102,14 +111,17 @@ def r3(d, claim):
     window = (quarter(d.C, 3)[0], quarter(d.C, 4)[1])
     claim(furniture and not any(window[0] <= x <= window[1] for r in furniture for x in (r[1], r[2], r[4])),
           f"none of the Furniture invoices is dated, shipped, or posted in {d.C} Q3 or Q4")
-    claim(all(quarter_of(r[1]) == quarter_of(r[2]) for r in furniture),
-          "each Furniture invoice is dated in the same quarter as its order's first shipment")
+    claim(all(r[4] is not None for r in furniture), "each of the Furniture invoices is posted")
+    # the ones whose shipment or posting falls in a later quarter than the invoice date (a cutoff matter)
+    crossing = [dict(number=r[0], dated=r[1], shipped=r[2], posted=r[4]) for r in furniture
+                if r[4] is not None and len({quarter_of(r[1]), quarter_of(r[2]), quarter_of(r[4])}) > 1]
     claim(d.one("SELECT COUNT(*) FROM (SELECT CustomerName FROM Customer GROUP BY 1 HAVING COUNT(*) > 1)") > 0,
           "some customers share a name")
     blank = d.q("SELECT ItemGroup, SupplyMode FROM Item WHERE ListPrice IS NULL")
     claim(blank and not any(g == GROUP for g, _ in blank), "no Furniture item has a blank list price")
     claim(all(m == "Purchased" for _, m in blank), "every item with a blank list price is purchased")
-    return dict(last_invoice=last_invoice, last_gl=last_gl, invoices=len(rows), furniture=[r[0] for r in furniture])
+    return dict(last_invoice=last_invoice, last_gl=last_gl, invoices=len(rows), furniture=[r[0] for r in furniture],
+                crossing=crossing, crossing_word=WORDS[len(crossing)] if len(crossing) < len(WORDS) else f"{len(crossing):,}")
 
 
 def quarters(d):
@@ -177,10 +189,14 @@ def r5(d, claim):
     naive_q4 = margin(rev_all, cogs_all)
     rev4, cogs4 = rev_all + rev_dr, cogs_all + cogs_cr
     m3, m4 = margin(q3["rev"]["SalesInvoice"], q3["cogs"]["Shipment"] + q3["cogs"]["SalesReturn"]), margin(rev4, cogs4)
-    claim(abs(naive_q4 - naive_q3) < 0.005, "the naive Q4 margin is almost identical to Q3's (within half a point)")
+    # the naive Q4 ratio looks normal: it does not show the decline (the wording names how it compares with Q3)
+    claim(naive_q4 > naive_q3 - 0.005, "the naive Q4 margin does not show the decline (it is not below Q3's by half a point or more)")
+    naive_vs_q3 = ("almost identical to" if abs(naive_q4 - naive_q3) < 0.005
+                   else "above" if naive_q4 > naive_q3 else "slightly below")
     claim(m4 < m3, "excluding the close, the margin falls from Q3 to Q4")
     s3, s4 = margin(q3["lines"], q3["std"]), margin(q4["lines"], q4["std"])
     claim(s4 < s3, "the sub-ledger margin at standard cost also falls")
     return dict(rev_all=rev_all, cogs_all=cogs_all, close=close, entry_type=entry_type, posted=posted,
                 revenue=revenue, cogs=cogs, close_debit=rev_dr, close_credit=cogs_cr, naive_q4=naive_q4, naive_q3=naive_q3,
+                naive_vs_q3=naive_vs_q3,
                 rev4=rev4, cogs4=cogs4, m3=m3, m4=m4, s3=s3, s4=s4)

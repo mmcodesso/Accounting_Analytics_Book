@@ -2,7 +2,7 @@
 
 ## References
 
-Fernandes, A. A. A., Koehler, M., Konstantinou, N., Pankin, P., Paton, N. W., & Sakellariou, R. (2023). Data preparation: A technological perspective and review. *SN Computer Science*, *4*(4), Article 425. <https://doi.org/10.1007/s42979-023-01828-8>
+{{< include /shared/fragments/_reference-fernandes-2023.qmd >}}
 
 Hunter, K., Alberti, C. T., Boss, S. R., & Thibodeau, J. C. (2020). IntelliClean: A teaching case designed to integrate data cleaning and spreadsheet skills into the audit curriculum. *Journal of Emerging Technologies in Accounting*, *17*(2), 17–24. <https://doi.org/10.2308/jeta-2020-025>
 

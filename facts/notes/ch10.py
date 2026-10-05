@@ -57,9 +57,12 @@ def ex1(d, claim):
                       f"AND g.FiscalYear = ? AND g.AccountID IN ({ids}) AND s.InvoiceDate < ? "
                       f"ORDER BY s.InvoiceNumber, a.AccountNumber", d.C, first)
     cutoff = []
-    for number, dated, posted, _, _ in cutoff_rows:
+    for number, dated, posted, account, amount in cutoff_rows:
         if not cutoff or cutoff[-1]["number"] != number:
-            cutoff.append(dict(number=number, date=dated, posted=posted))
+            cutoff.append(dict(number=number, date=dated, posted=posted, accounts={}))
+        cutoff[-1]["accounts"][account] = cutoff[-1]["accounts"].get(account, 0.0) + amount
+    for c in cutoff:
+        c["accounts"] = sorted(c["accounts"].items())
     by_account = {}
     for _, _, _, account, amount in cutoff_rows:
         by_account[account] = by_account.get(account, 0.0) + amount
@@ -78,7 +81,7 @@ def ex1(d, claim):
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND SourceLineID IS NOT NULL", d.account("4050")) == 0,
           "freight postings to 4050 carry no SourceLineID (no line to match)")
     return dict(rows=rows, groups=groups, lines_total=lines_total, ledger=ledger, ledger_total=ledger_total, diff=diff,
-                n_cutoff=word(len(cutoff)), posted=cutoff[0]["posted"], cutoff=cutoff, by_account=sorted(by_account.items()))
+                n_cutoff=word(len(cutoff)), posted=cutoff[0]["posted"], cutoff=cutoff)
 
 
 # --- Exercise 10.2 -------------------------------------------------------------------------------
@@ -105,7 +108,6 @@ def ex2(d, claim):
     line_id = with_line[0][6]
     item, qty, price = d.q("SELECT i.ItemName, l.Quantity, l.UnitPrice FROM SalesInvoiceLine l JOIN Item i ON i.ItemID = l.ItemID "
                            "WHERE l.SalesInvoiceLineID = ? AND l.SalesInvoiceID = ?", line_id, TRACED_SALE_ID)[0]
-    claim(float(qty).is_integer(), "the traced line's quantity is a whole number of units")
     tested = d.one("SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice' AND FiscalYear = ? "
                    "AND SourceLineID IS NOT NULL", d.C)
     orphans = d.one("SELECT COUNT(*) FROM GLEntry g LEFT JOIN SalesInvoiceLine l ON l.SalesInvoiceLineID = g.SourceLineID "
@@ -122,7 +124,8 @@ def ex2(d, claim):
     return dict(inv=dict(number=number, id=TRACED_SALE_ID, date=dated, customer=customer, customer_name=name,
                          subtotal=subtotal, freight=freight, tax=tax),
                 n_rows=word(len(gl)), posted=gl[0][1], rows=rows, debits=debits, credits=credits,
-                line=dict(id=line_id, name=item, qty=qty, price=price), tested=tested,
+                line=dict(id=line_id, name=item, qty=f"{qty:,.0f}" if float(qty).is_integer() else f"{qty:,.2f}", price=price),
+                tested=tested,
                 trap_rows=trap_rows, trap_types=trap_types)
 
 
@@ -196,7 +199,7 @@ def ex4(d, claim):
                                        f"SUM(l.Quantity * (l.UnitCost - pol.UnitCost)) {LINES} "
                                        f"WHERE pi.InvoiceDate BETWEEN ? AND ?", *year_range(y))[0]
         years.append(dict(year=y, amount=amount, variance=variance, rate=variance / amount, line_gap=abs(totals - amount)))
-    claim(all(0.5 <= y["line_gap"] < 2.5 for y in years), "SUM(LineTotal) differs by one or two dollars in every year")
+    claim(all(y["line_gap"] < 5 for y in years), "SUM(LineTotal) differs from the unrounded amount by a few dollars at most (rounding)")
     rates = [y["rate"] for y in years]
     claim(max(rates) - min(rates) < 0.0005, "the variance rate is steady (within 0.05 percentage points)")
     claim(all(a["amount"] < b["amount"] and a["variance"] < b["variance"] for a, b in zip(years, years[1:])),
@@ -206,6 +209,7 @@ def ex4(d, claim):
     claim(set(others) == {"Record nonrecoverable purchase tax"}, "the rest of account 5060 is nonrecoverable purchase tax")
     return dict(gl=gl, top=[dict(id=s, name=nm, amount=a) for s, nm, a in suppliers[:5]], lines=lines, gap=abs(gap),
                 supplier_gap=supplier_gap, n_lines=n, above=above, below=below, at=at, low=-low, high=high, years=years,
+                line_gap_low=min(y["line_gap"] for y in years), line_gap_high=max(y["line_gap"] for y in years),
                 tax=others.get("Record nonrecoverable purchase tax", 0.0))
 
 
@@ -236,7 +240,8 @@ def ex5(d, claim):
           "the time records end just before the open pay periods begin")
     claim(end < f"{d.C}-12-31", "the time records end before the year does")
     indirect_last = profile[INDIRECT]["last"]
-    claim((date.fromisoformat(end) - date.fromisoformat(indirect_last)).days == 7, "indirect time ends a week earlier")
+    gap = (date.fromisoformat(end) - date.fromisoformat(indirect_last)).days
+    claim(gap > 0, "indirect time ends earlier than the other time records")
     claim({r[0] for r in d.q("SELECT DISTINCT LaborType FROM LaborTimeEntry WHERE WorkDate > ?", indirect_last)} == {DIRECT, NONMFG},
           "the last week holds only direct and non-manufacturing time")
     # (2) ledger rows that point to no payroll payment
@@ -284,6 +289,7 @@ def ex5(d, claim):
     claim(set(by_wo) == {r[1] for r in work_orders}, "the orphaned keys are on the work orders without operations")
     return dict(direct=profile[DIRECT], indirect=profile[INDIRECT], nonmfg=profile[NONMFG], no_op=no_op,
                 no_op_word=word(no_op).capitalize(), end_text=long_date(end),
+                indirect_gap="a week" if gap == 7 else f"{word(gap)} day{'' if gap == 1 else 's'}",
                 n_orphans=word(len(rows)), pairs=pairs, amount=amounts.pop(), debit_text=debit_texts.pop(),
                 credit_text=credit_texts.pop(), total=sum(r[3] for r in rows),
                 n_customers=word(len(customers)).capitalize(), n_wo=word(len(work_orders)).capitalize(),
@@ -319,9 +325,10 @@ def ex6(d, claim):
           f"the matching suppliers' invoices are all dated through {end}")
     payments = d.q(f"SELECT SupplierID, COUNT(*), SUM(Amount) FROM DisbursementPayment WHERE SupplierID IN ({ids}) "
                    f"AND PaymentDate <= ? GROUP BY 1 ORDER BY 1", end)
-    # The fan-out of a join of invoices to payments on the supplier, for the first matching supplier (all dates).
+    # The fan-out of a join of invoices to payments on the supplier, for the first matching supplier, with the
+    # exercise's date filter on both.
     fan = d.one("SELECT COUNT(*) FROM PurchaseInvoice pi JOIN DisbursementPayment p ON p.SupplierID = pi.SupplierID "
-                "WHERE pi.SupplierID = ?", suppliers[0])
+                "WHERE pi.SupplierID = ? AND pi.InvoiceDate <= ? AND p.PaymentDate <= ?", suppliers[0], end, end)
     capital = capital_invoices(d)
     cap = [dict(id=r[0], number=r[1], supplier=r[2], total=r[3]) for r in d.q(
         "SELECT PurchaseInvoiceID, InvoiceNumber, SupplierID, GrandTotal FROM PurchaseInvoice WHERE PurchaseInvoiceID IN (%s)"
@@ -330,11 +337,11 @@ def ex6(d, claim):
     owner = cap[0]["supplier"]
     claim(len({c["supplier"] for c in cap}) == 1 and owner in suppliers,
           "the Debt Reclass invoices belong to one of the matching suppliers")
-    claim(d.one("SELECT COUNT(*) FROM DisbursementPayment WHERE PurchaseInvoiceID IN (%s)" % ",".join(str(c) for c in capital)) == 0,
-          "the Debt Reclass invoices are still open in full")
+    claim(d.one("SELECT COUNT(*) FROM DisbursementPayment WHERE PurchaseInvoiceID IN (%s) AND PaymentDate <= ?"
+                % ",".join(str(c) for c in capital), end) == 0, f"the Debt Reclass invoices are still open in full at {end}")
     still_open = d.one("SELECT SUM(b) FROM (SELECT pi.GrandTotal - COALESCE((SELECT SUM(p.Amount) FROM DisbursementPayment p "
-                       "WHERE p.PurchaseInvoiceID = pi.PurchaseInvoiceID), 0) AS b FROM PurchaseInvoice pi "
-                       "WHERE pi.SupplierID = ?) WHERE b > 0.005", owner)
+                       "WHERE p.PurchaseInvoiceID = pi.PurchaseInvoiceID AND p.PaymentDate <= ?1), 0) AS b FROM PurchaseInvoice pi "
+                       "WHERE pi.SupplierID = ?2 AND pi.InvoiceDate <= ?1) WHERE b > 0.005", end, owner)
     shared = []
     for (name,) in d.q("SELECT CustomerName FROM Customer GROUP BY CustomerName HAVING COUNT(*) > 1 ORDER BY 1"):
         members = d.q("SELECT CustomerID, CustomerSegment FROM Customer WHERE CustomerName = ? ORDER BY CustomerID", name)

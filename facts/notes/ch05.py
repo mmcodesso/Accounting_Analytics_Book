@@ -14,6 +14,8 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 # Book constants: the Furniture product types of Tutorial 5.1 (tbl-05-03), and the examples the chapter's prose uses
 # (chapter.qmd and Tutorial 5.1 name them), which the notes repeat.
 PRODUCT_TYPES = ["BKC", "BNH", "CON", "CTB", "DSK", "NGT", "SDB", "TBL"]
+TYPE_NAMES = dict(BKC="bookcases", BNH="benches", CON="consoles", CTB="coffee tables", DSK="desks", NGT="nightstands",
+                  SDB="sideboards", TBL="dining tables")        # tbl-05-03's names, in the plural the notes use
 CHAPTER_SIDEBOARD = "FUR-SDB-0002"
 PROPER_EXAMPLES = ["Watson, Mitchell and Chen", "Donaldson LLC"]
 
@@ -112,17 +114,21 @@ def ex2(d, claim):
     before_order = d.q("SELECT si.InvoiceNumber, si.InvoiceDate, so.OrderDate FROM SalesInvoice si "
                        "JOIN SalesOrder so ON so.SalesOrderID = si.SalesOrderID WHERE si.InvoiceDate < so.OrderDate "
                        "ORDER BY si.InvoiceNumber")
-    before_shipment = {r[0] for r in d.q(
-        "SELECT si.InvoiceNumber FROM SalesInvoice si JOIN (SELECT SalesOrderID, MIN(ShipmentDate) AS FirstShipment "
-        "FROM Shipment GROUP BY SalesOrderID) s ON s.SalesOrderID = si.SalesOrderID WHERE si.InvoiceDate < s.FirstShipment")}
+    shipped = {r[0]: r[1:] for r in d.q(
+        "SELECT si.InvoiceNumber, si.InvoiceDate, s.FirstShipment FROM SalesInvoice si JOIN (SELECT SalesOrderID, "
+        "MIN(ShipmentDate) AS FirstShipment FROM Shipment GROUP BY SalesOrderID) s ON s.SalesOrderID = si.SalesOrderID "
+        "WHERE si.InvoiceDate < s.FirstShipment")}
+    before_shipment = set(shipped)
     flagged = {r[0] for r in prefix} | {r[0] for r in before_order}
-    claim(flagged == before_shipment, "the invoices flagged by either test are exactly the invoices dated before their first "
-                                      "shipment (Tutorial 2.1)")
+    claim(flagged and flagged <= before_shipment, "every invoice flagged by either test is dated before its first shipment "
+                                                  "(Tutorial 2.1)")
+    both = {r[0] for r in prefix} & {r[0] for r in before_order}
+    missed = [(n, *shipped[n]) for n in sorted(before_shipment - flagged)]     # dated before shipment, but neither test finds it
     claim(d.one("SELECT COUNT(*) FROM SalesOrder WHERE substr(OrderNumber, 4, 4) <> substr(OrderDate, 1, 4)") == 0 and
           d.one("SELECT COUNT(*) FROM Shipment WHERE substr(ShipmentNumber, 4, 4) <> substr(ShipmentDate, 1, 4)") == 0,
           "order and shipment numbers always carry the year of their date")
     return dict(prefix=prefix, before_order=before_order, w_prefix=word(len(prefix)), w_order=word(len(before_order)),
-                w_both=word(len(flagged)))
+                w_both=word(len(flagged)), w_overlap=word(len(both)), w_shipment=word(len(before_shipment)), missed=missed)
 
 
 @note("ch05.ex3", EXERCISES)
@@ -143,18 +149,19 @@ def ex3(d, claim):
     total3, total4 = sum(get(c, 3)[0] for c in codes), sum(get(c, 4)[0] for c in codes)
     change = {c: get(c, 4)[0] - get(c, 3)[0] for c in codes}
     share = {c: get(c, 4)[0] / total4 - get(c, 3)[0] / total3 for c in codes}
-    losers = sorted(codes, key=lambda c: change[c])[:2]
-    gainers = sorted(codes, key=lambda c: -change[c])[:2]
-    claim(set(losers) == {"NGT", "SDB"}, "nightstands and sideboards lost the most revenue")
-    claim(set(gainers) == {"CON", "BKC"}, "consoles and bookcases gained the most revenue")
-    largest = sorted(codes, key=lambda c: -abs(share[c]))[:4]
-    claim(set(largest) == set(losers) | set(gainers) and all(share[c] < 0 for c in losers) and all(share[c] > 0 for c in gainers),
-          "the four largest share changes are the two losers (down) and the two gainers (up)")
-    claim(all(abs(s) <= 0.02 for s in share.values()), "no share changes by more than two points, so the threshold highlights none")
+    losers = sorted((c for c in codes if change[c] < 0), key=lambda c: change[c])      # largest loss first
+    gainers = sorted((c for c in codes if change[c] > 0), key=lambda c: -change[c])    # largest gain first
     claim(fractional > lines / 2, "quantities are fractional on most of the Furniture lines")
-    shifts = [(c, f"{100 * share[c]:+.1f}") for c in sorted(losers, key=lambda c: share[c]) + sorted(gainers, key=lambda c: -share[c])]
+    # the four largest share changes, falls first (largest first), then rises (largest first)
+    largest = sorted(codes, key=lambda c: -abs(share[c]))[:4]
+    shifts = [(c, f"{100 * share[c]:+.1f}") for c in sorted((c for c in largest if share[c] < 0), key=lambda c: share[c])
+              + sorted((c for c in largest if share[c] >= 0), key=lambda c: -share[c])]
+    highlighted = sorted((c for c in codes if abs(share[c]) > 0.02), key=lambda c: share[c])
+    names = lambda cs: series(TYPE_NAMES.get(c, c) for c in cs)
     return dict(types=[(c, get(c, 3)[0], get(c, 4)[0], get(c, 3)[1], get(c, 4)[1]) for c in codes],
-                total3=total3, total4=total4, shifts=shifts)
+                total3=total3, total4=total4, shifts=shifts,
+                lost=names(losers[:2]), n_losers=len(losers), gained=names(gainers[:2]), also_gained=names(gainers[2:]), n_gainers=len(gainers),
+                highlighted=series(f"{c} ({100 * share[c]:+.1f} pts)" for c in highlighted))
 
 
 @note("ch05.ex4", EXERCISES)
@@ -179,11 +186,12 @@ def ex4(d, claim):
     wrong = [p for p in promos if p[2] <= p[1]]
     claim([p[0] for p in every] == [p[0] for p in wrong], "the promotions with every line after the end date are exactly those "
                                                           "whose end date is on or before their start date")
-    claim(sum(p[2] == p[1] for p in every) == 1 and sum(p[2] < p[1] for p in every) == 2,
-          "one of them is a one-day promotion and two end before they start")
+    claim(len(every) > 0, "some promotions have every line invoiced after the end date")
+    one_day, backwards = sum(p[2] == p[1] for p in every), sum(p[2] < p[1] for p in every)
     negative = sum(x < 0 for x in all_lags)
     return dict(invoices=len(rows), median=days(median), mean=mean, p90=days(percentile_inc(all_lags, 0.9)), quarters=quarters,
-                promos=[(p[0], p[3], p[4]) for p in promos], every=series(p[0][-3:] for p in every),
+                promos=[(p[0], p[3], p[4]) for p in promos], every=series(p[0][-3:] for p in every), n_every=len(every), w_every=word(len(every)),
+                one_day=one_day, w_one_day=word(one_day), backwards=backwards, w_backwards=word(backwards),
                 negative=word(negative).capitalize())
 
 
@@ -233,9 +241,8 @@ def ex6(d, claim):
                    "WHERE i.IsActive = 0 GROUP BY i.ItemID ORDER BY i.ItemID")
     claim(all(r[2] == "Discontinued" for r in inactive), "the inactive items still invoiced are all Discontinued")
     claim(all(r[5] == len(d.years) for r in inactive), "each of them was invoiced in every fiscal year")
-    claim(len({r[4] for r in inactive}) == 1, "they share the same latest invoice date")
-    claim(inactive[-1][1] == CHAPTER_SIDEBOARD and inactive[-1][1][4:7] == "SDB",
-          "the last of them is the sideboard the chapter uses as an example")
+    claim(len(inactive) > 0, "some inactive items are still invoiced")
+    latest = sorted({r[4] for r in inactive})           # their last invoice dates (one date when they all end together)
     prelaunch = d.q("SELECT i.ItemID, i.ItemCode, i.LaunchDate, COUNT(*), MIN(si.InvoiceDate), MAX(si.InvoiceDate), "
                     "ROUND(SUM(l.LineTotal), 2) FROM Item i JOIN SalesInvoiceLine l ON l.ItemID = i.ItemID "
                     "JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID WHERE si.InvoiceDate < i.LaunchDate "
@@ -246,17 +253,17 @@ def ex6(d, claim):
           "the inactive items still invoiced are the AnomalyLog's discontinued_item_in_new_activity items")
     logged = anomalies(d, "prelaunch_item_in_new_activity")
     extra = [i for i in logged if i not in {r[0] for r in prelaunch}]
-    claim({r[0] for r in prelaunch} <= set(logged) and len(extra) == 1,
-          "the items invoiced before launch are among the AnomalyLog's prelaunch items, which name one item more")
+    claim({r[0] for r in prelaunch} <= set(logged), "the items invoiced before launch are among the AnomalyLog's prelaunch items")
     return dict(changed=len(changed), suppliers=len(names), examples=[(e, proper(e)) for e in PROPER_EXAMPLES],
                 w_unapproved=word(len(unapproved)).capitalize(), unapproved_first=unapproved[0], unapproved_last=unapproved[-1],
                 w_high=word(len(high)).capitalize(), high=series(s for s, _ in high), w_high_approved=word(len(high_approved)),
                 w_related=word(len(related_parties(d))),
                 w_conflict=word(len(conflict)), conflict_ids=", ".join(str(r[0]) for r in conflict),
                 conflict_codes=", ".join(r[1] for r in conflict),
-                w_inactive=word(len(inactive)).capitalize(), latest=inactive[0][4],
-                inactive=[(r[1], r[3]) for r in inactive],
+                w_inactive=word(len(inactive)).capitalize(), latest=latest[-1] if latest else None,
+                earliest_latest=latest[0] if latest else None,
+                inactive=[(r[1], r[3]) for r in inactive], sideboard=CHAPTER_SIDEBOARD,
                 w_prelaunch=word(len(prelaunch)).capitalize(),
                 prelaunch=[dict(code=r[1], launch=r[2], lines=r[3], first=r[4], last=r[5]) for r in prelaunch],
                 prelaunch_lines=sum(r[3] for r in prelaunch), prelaunch_amount=round(sum(r[6] for r in prelaunch), 2),
-                extra=extra[0] if extra else None)
+                extra=series(extra), n_extra=len(extra))

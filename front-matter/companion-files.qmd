@@ -10,7 +10,7 @@ and Browse), the "Apply changes" bar after a source change, and whether Excel fo
 
 # Companion Files {#sec-companion-files .unnumbered}
 
-Many tutorials build on a file that an earlier tutorial started. The Excel chapters grow one analysis workbook from Chapter 4 to Chapter 7, the SQL chapters build a script in each chapter, and the Power BI chapters grow one reporting package from Chapter 13 to Chapter 15. If you start a tutorial without that file, download its start file from this page. A start file holds the work as it stands at the end of the previous tutorial, so it also lets you check your own work against it. Each chapter also has a chapter-end file, the copy its exercises start from.
+Many tutorials build on a file that an earlier tutorial started. The Excel chapters grow one analysis workbook from Chapter 4 to Chapter 7, the SQL chapters build a script in each chapter, and the Power BI chapters grow one reporting package from Chapter 13 to Chapter 15. If you start a tutorial without that file, download its start file from this page. A start file holds the work as it stands at the end of the previous tutorial, so it also lets you check your own work against it. Each chapter also has a chapter-end file.
 
 ## What Each File Contains
 
@@ -18,7 +18,7 @@ Every file states the dataset release it was built from, and it explains itself:
 
 - An Excel workbook has a **Solution Notes** worksheet. It lists the queries, worksheets, and named cells the workbook holds and the steps completed so far. It compares each control total with the value the book expects, and it says what the results mean.
 - A SQL script opens with the header comment the SQL chapters use. Each query keeps its two comment lines, and a result line gives the rows it returns.
-- A Power BI file has a **Notes** page with the same sections as the Solution Notes worksheet, next to the **Validation** page and the tests the chapters build.
+- A Power BI file has a **Notes** page with the same sections as the Solution Notes worksheet, next to the **Validation** page and the tests the chapters build. Its **Checks** query, in DAX query view, compares each control total with the value the book expects.
 
 Solutions to the exercises, the comprehensive cases, and the capstone cases will be available to instructors.
 
@@ -28,7 +28,7 @@ The files are built from dataset release {{< var dataset.version >}}, the releas
 
 ## Point a File at Your Copy of the Dataset
 
-The Excel and Power BI files read CharlesRiver.xlsx with Power Query from the folder where they were built. Point each file at your own copy once, before you refresh it.
+The Excel and Power BI files read CharlesRiver.xlsx with Power Query from the folder `C:\CharlesRiver`. If you keep your copy of CharlesRiver.xlsx in that folder, a file is ready to refresh. Otherwise, point each file at your own copy once, before you refresh it.
 
 In Excel:
 
@@ -37,12 +37,14 @@ In Excel:
 3. Browse to your copy of CharlesRiver.xlsx, select **OK**, and close the dialog.
 4. Select **Data > Refresh All**.
 
-In Power BI Desktop:
+The Power BI files come as Power BI projects: a .pbip file and two folders with the same name, which hold the model and the report as text files. A project holds no data until you refresh it, which keeps the download small. In Power BI Desktop:
 
-1. Open the file and select **Home > Transform data > Data source settings**.
-2. Select the CharlesRiver.xlsx source and select **Change Source**.
-3. Browse to your copy of CharlesRiver.xlsx, select **OK**, and close the dialog.
-4. If a bar reports pending changes, select **Apply changes**. Otherwise, select **Refresh** on the **Home** tab.
+1. Copy the project (the .pbip file and its two folders) into a folder of your own, and open the .pbip file.
+2. Select **Home > Transform data > Data source settings**.
+3. Select the CharlesRiver.xlsx source and select **Change Source**.
+4. Browse to your copy of CharlesRiver.xlsx, select **OK**, and close the dialog.
+5. If a bar reports pending changes, select **Apply changes**. Otherwise, select **Refresh** on the **Home** tab.
+6. Select **File > Save as** and save the file as a .pbix file with the name the tutorials use, such as Charles River Reports.pbix. Continue the tutorial in that file.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -54,7 +56,17 @@ The SQL scripts need no change of source. Make your working copy CharlesRiver_Wo
 
 ## Files by Part
 
-The files for the SQL chapters are ready. The files for the Excel and Power BI chapters will be added here.
+The files for the Excel, SQL, and Power BI chapters are ready.
+
+### Part II: Excel
+
+Chapters 4 to 7 build one workbook, Charles River Furniture Analysis.xlsx, and Chapter 8 starts a second one, AuditAnalytics.xlsx. Each chapter's download holds the workbook at the start of each tutorial that continues it and at the end of the chapter. Point a workbook at your copy of CharlesRiver.xlsx before you refresh it, as described above.
+
+- [Chapter04-companion.zip]({{< var companion.download >}}/Chapter04-companion.zip): Charles River Furniture Analysis.xlsx at the start of Tutorials 4.2 and 4.3, and at the end of Chapter 4.
+- [Chapter05-companion.zip]({{< var companion.download >}}/Chapter05-companion.zip): the same workbook at the start of Tutorials 5.1, 5.2, and 5.3, and at the end of Chapter 5.
+- [Chapter06-companion.zip]({{< var companion.download >}}/Chapter06-companion.zip): the same workbook at the start of Tutorials 6.1, 6.2, and 6.3, and at the end of Chapter 6.
+- [Chapter07-companion.zip]({{< var companion.download >}}/Chapter07-companion.zip): the same workbook at the start of Tutorials 7.1, 7.2, and 7.3, and at the end of Chapter 7.
+- [Chapter08-companion.zip]({{< var companion.download >}}/Chapter08-companion.zip): AuditAnalytics.xlsx at the start of Tutorials 8.2 and 8.3, and at the end of Chapter 8. Tutorial 8.1 starts the workbook, so it needs only CharlesRiver.xlsx.
 
 ### Part III: SQL
 
@@ -66,4 +78,12 @@ Each chapter's download holds its script at the start of each tutorial after the
 - [Chapter12-companion.zip]({{< var companion.download >}}/Chapter12-companion.zip): Audit.sql at the start of Tutorials 12.2 and 12.3, and at the end of Chapter 12.
 - [Setup_Part3_Views.sql]({{< var companion.download >}}/Setup_Part3_Views.sql): recreates the view MonthlyLaborEfficiency of Tutorial 11.3 in your working copy, for the Part III case.
 
-<!-- Part II arrives in Phase 4 and Part IV in Phase 5, from scripts/companion/manifest.yml. -->
+### Part IV: Power BI
+
+Chapters 13 to 15 build one reporting package, Charles River Reports, and Chapter 16 starts internal audit's own file, Audit Monitoring. Each comes as a Power BI project: open it, point it at your copy of CharlesRiver.xlsx, refresh it, and save it as the .pbix file the tutorials use, as described above.
+
+- [Chapter13-companion.zip]({{< var companion.download >}}/Chapter13-companion.zip): Charles River Reports at the start of Tutorials 13.2 and 13.3, and at the end of Chapter 13.
+- [Chapter14-companion.zip]({{< var companion.download >}}/Chapter14-companion.zip): the same project at the start of Tutorials 14.1, 14.2, and 14.3, and at the end of Chapter 14.
+- [Chapter15-companion.zip]({{< var companion.download >}}/Chapter15-companion.zip): the same project at the start of Tutorials 15.1, 15.2, and 15.3, and at the end of Chapter 15.
+- [Chapter16-companion.zip]({{< var companion.download >}}/Chapter16-companion.zip): Audit Monitoring at the start of Tutorials 16.2 and 16.3, and at the end of Chapter 16. Tutorial 16.1 starts the file, so it needs only CharlesRiver.xlsx. The folder for Tutorial 16.3 also holds Charles River Reports as it stands at the end of Chapter 15, which that tutorial tests.
+- [AppendixA-companion.zip]({{< var companion.download >}}/AppendixA-companion.zip): for [the appendix on publishing and security](#sec-appendix-publishing), Charles River Reports and Audit Monitoring at the start of its first tutorial, and Charles River Reports at the start of its second.

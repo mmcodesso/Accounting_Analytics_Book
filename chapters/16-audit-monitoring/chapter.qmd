@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-16"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 It is May 2027, and you are back on the internal audit team of Chapters 8 and 12. The chief audit executive brings three requests. The first comes from the audit committee. The tests of Chapters 8 and 12 found journal entries approved by the people who created them, purchase orders approved after the approver had left the company, and pay approved by the employee being paid. The committee wants to know every month whether such exceptions recur, rather than wait for the next annual review. The second is the chief audit executive's own. A monthly report is useful only if each exception is reviewed once and the conclusion kept, so that next month's review starts from the exceptions still open rather than from the beginning. The third comes from the controller, who now presents Charles River Reports, the package of Chapters 13 to 15, at the managers' monthly meeting, plans to give each manager access of their own, and asks whether internal audit can rely on it too.

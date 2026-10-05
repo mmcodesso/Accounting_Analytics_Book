@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will use the techniques from the last four sections to finish the analysis workbook. You will protect the threshold parameter with data validation, highlight the invoice lines that carry a promotional discount, sort and slice the lines to compare the promotions, and use SUBTOTAL to measure the lines in view. You will then look up the promotion that stands out and record what you found, and what remains open, on a documentation worksheet.
 
-**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorials 4.1 and 4.2.
+**Prerequisites.** You need the Charles River Furniture Analysis workbook from Tutorials 4.1 and 4.2. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 4.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
 **Step-by-step instructions.**
 
@@ -83,7 +83,7 @@ a. In column B, beside each label, enter the information for your workbook:
 
    - Purpose: diagnose the decline in Furniture gross margin from the third to the fourth quarter of fiscal 2026, as requested by the controller.
    - Source: CharlesRiver.xlsx and its folder location; Tables T16_SalesInvoice, T17_SalesInvoiceLine, T44_Item, and T7_PromotionProgram, imported with Power Query.
-   - Query steps: Item keeps only items with a list price, and eleven columns; SalesInvoice has its date columns set to the Date type; the other queries keep every row and column.
+   - Query steps: Item keeps only items with a list price, and eleven columns; SalesInvoice has its date columns set to the Date type; FreightAmount and Discount have the decimal number type in their Changed Type steps; the other queries keep every row and column.
    - Last refreshed: the date of your last Refresh All.
    - Parameters: ThresholdPercentile (Parameters!B3, an input validated between 0.5 and 0.99) and LargeLineThreshold (Parameters!B4, a formula).
    - Calculated columns: ListAmount and DiscountAmount on the SalesInvoiceLine Table, with their formulas.

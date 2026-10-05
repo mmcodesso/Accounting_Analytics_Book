@@ -17,6 +17,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-14"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 The report you built in Chapter 13 has been in use for a few weeks, and the questions it raises have outgrown it. The sales manager wants to know what the autumn discounts cost in margin, not only in dollars. The marketing manager asks how each month compares with the same month last year. A product manager noticed that the invoice count on a draft page did not change when Furniture was selected and asked which number was right. Each of these is a calculation the report cannot yet make: a ratio of totals, a comparison across periods, and a count that depends on how the tables are joined.
@@ -91,7 +94,7 @@ Chapter 13's visuals summarized columns with implicit measures. An explicit meas
 
 DAX can also add a calculated column to a table. A calculated column is evaluated once for each row when the model is refreshed and is stored like any other column, so it can be used to filter, group, or sort. A measure is evaluated when a visual asks for it and is never stored. The rule of thumb follows: if the value belongs to each row and you want to slice by it, it is a column; if it is a total, a ratio of totals, or anything that should change with the reader's selection, it is a measure. A column that can be computed from the row itself, such as the list amount of an invoice line, is usually better added in Power Query, where it is part of the documented preparation steps, as in Chapter 13. A DAX column is the tool for values that need the model, such as a value from a related table.
 
-A model with many measures needs order. A common practice is to keep the measures in a table of their own, created with Enter data and named Measures, so that they appear together at the top of the Data pane. Each measure should have a format, such as two decimals with a thousands separator or a percentage, and a description, which Power BI shows to anyone who points at the measure. Display folders group related measures within a table.
+A model with many measures needs order. A common practice is to keep the measures in a table of their own, created with Enter data, so that they appear together at the top of the Data pane. This book names it Key Measures, because Power BI Desktop does not accept a table named Measures. Each measure should have a format, such as two decimals with a thousands separator or a percentage, and a description, which Power BI shows to anyone who points at the measure. Display folders group related measures within a table.
 
 
 ## Evaluation Context

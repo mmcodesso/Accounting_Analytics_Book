@@ -156,9 +156,16 @@ def t1(d, claim):
         rows = pick(d, year=y)
         years.append(dict(year=y, lines=len(rows), revenue=total(rows, "rev"), list=total(rows, "list"),
                           discounts=total(rows, "disc"), invoices=len({r["invoice"] for r in rows})))
-    claim(sum(y["lines"] for y in years) == n_lines, "every invoice line falls in a fiscal year of the window")
+    # Lines dated outside the window: a year row of their own inside the Date table, (Blank) before or after it.
+    outside = []
+    for y in sorted({r["year"] for r in lines(d)} - set(d.years)):
+        rows = pick(d, year=y)
+        outside.append(dict(label=str(y) if first.year <= y <= last.year else "(Blank)", lines=len(rows),
+                            revenue=total(rows, "rev"), list=total(rows, "list"), discounts=total(rows, "disc"),
+                            invoices=len({r["invoice"] for r in rows}), dates=dates([r["date"] for r in rows])))
+    claim(sum(y["lines"] for y in years) + sum(o["lines"] for o in outside) == n_lines, "every invoice line has a year row")
     return dict(days=(last - first).days + 1, first=first.isoformat(), last=last.isoformat(), n_lines=n_lines,
-                years=years)
+                years=years, outside=outside)
 
 
 # --- Tutorial 14.2 ---------------------------------------------------------------------------------
@@ -348,6 +355,7 @@ def ex2(d, claim):
     claim(d.one("SELECT COUNT(*) FROM Shipment WHERE substr(DeliveryDate, 1, 4) <> substr(ShipmentDate, 1, 4)") == 0,
           "every shipment is delivered in the year it ships")
     by_invoice = [total(pick(d, year=y), "rev") for y in d.years]
+    before = [r for r in rows if r["year"] < d.F]       # dated before the Date table: (Blank) on the active relationship
     by_ship = [sum(r["rev"] for r in shipped if int(r["shipped"][:4]) == y) for y in d.years]
     by_services = [total(pick(d, year=y, group="Services"), "rev") for y in d.years]
     for y, inv, shp, srv in zip(d.years, by_invoice, by_ship, by_services):
@@ -370,25 +378,34 @@ def ex2(d, claim):
             claim(len({r["shipped"] for r in group}) == 1, f"the invoices dated before their {y} shipment all shipped on one date")
             claim(all(int(r["number"][3:7]) == r["year"] + 1 for r in group),
                   "the invoices dated before their shipment carry the next year's prefix")
-            claim(len({r["invoice"] for r in group}) == len(group) and len(runs([r["number"] for r in group])) == 1,
-                  "each invoice dated before its shipment has one crossing line, and their numbers form one run a year")
-            early.append(dict(lines=len(group), numbers=runs(sorted({r["number"] for r in group}))[0],
+            early.append(dict(lines=len(group), invoices=len({r["invoice"] for r in group}),
+                              numbers=runs(sorted({r["number"] for r in group}))[0],
                               dates=dates([r["date"] for r in group]), shipped=group[0]["shipped"], amount=total(group, "rev")))
     claim([g["ship_year"] for g in late] == [d.F, d.P], "the late invoices are for shipments of the first and prior years")
+    # Chapter 12's test dates an invoice by its last delivery and its first posting, so against this exercise's late
+    # invoices of the current year it adds the invoices dated in the prior year and posted in the current one, and
+    # leaves out an invoice whose lines were also delivered in the current year.
     ch12 = posted_late(d, d.P)
-    odd = [i for i in ch12 if i["date"][:4] == str(d.P)]
-    claim(len(odd) == 1 and odd[0]["posted"] == f"{d.C}-01-01",
-          f"Chapter 12's invoices for {d.P} add one invoice dated in {d.P} and posted on the first day of {d.C}")
-    odd = odd[0] if odd else (ch12 or [dict(number="", posted="", sub=0.0)])[0]
     numbers = {r["number"] for r in cross if r["year"] == d.C and r["shipped"][:4] < r["date"][:4]}
-    claim({i["number"] for i in ch12} == numbers | {odd["number"]},
-          "Chapter 12's invoices are this exercise's plus the one invoice that crosses by posting date")
-    claim(abs(sum(i["sub"] for i in ch12) - sum(r["rev"] for r in cross if r["number"] in numbers) - odd["sub"]) < 0.005,
-          "Chapter 12's SubTotal is the crossing lines' amount plus the added invoice's")
+    added = [i for i in ch12 if i["number"] not in numbers]
+    claim(all(i["date"][:4] == str(d.P) and i["posted"][:4] == str(d.C) for i in added),
+          f"the invoices Chapter 12 adds are dated in {d.P} and posted in {d.C}")
+    dropped = sorted(numbers - {i["number"] for i in ch12})
+    last = dict(d.q("WITH s AS (SELECT si.InvoiceNumber, MAX(sh.DeliveryDate) AS last FROM SalesInvoice si "
+                    "JOIN SalesInvoiceLine l ON l.SalesInvoiceID = si.SalesInvoiceID JOIN ShipmentLine sl "
+                    "ON sl.ShipmentLineID = l.ShipmentLineID JOIN Shipment sh ON sh.ShipmentID = sl.ShipmentID "
+                    "GROUP BY 1) SELECT InvoiceNumber, last FROM s"))
+    claim(all(last[n][:4] == str(d.C) for n in dropped),
+          f"the invoices Chapter 12 leaves out also have lines delivered in {d.C}")
+    kept = numbers - set(dropped)
+    claim(abs(sum(i["sub"] for i in ch12) - sum(r["rev"] for r in cross if r["number"] in kept)
+              - sum(i["sub"] for i in added)) < 0.005,
+          "Chapter 12's SubTotal is the crossing lines' amount of the invoices it keeps plus the added invoices'")
     return dict(by_invoice=by_invoice, by_ship=by_ship, blank=total(blank, "rev"), n_services=len(services),
                 by_services=by_services, all=total(rows, "rev"), n_shipped=len(shipped), n_cross=len(cross), late=late,
-                ch12=dict(n=len(ch12), sub=sum(i["sub"] for i in ch12)),
-                odd=dict(number=odd["number"], posted=odd["posted"]), early=early)
+                before=dict(n=len(before), rev=total(before, "rev")), ch12=dict(n=len(ch12), sub=sum(i["sub"] for i in ch12)),
+                added=[dict(number=i["number"], posted=i["posted"]) for i in added], dropped=runs(dropped) if dropped else [],
+                early=early)
 
 
 # --- Exercise 14.3 ---------------------------------------------------------------------------------
@@ -410,23 +427,27 @@ def swing(d, group: str) -> dict:
 def ex3(d, claim):
     now, before = monthly(d, "Furniture", d.C), monthly(d, "Furniture", d.P)
     yoy = [a / b - 1 for a, b in zip(now, before)]
-    claim(min(range(12), key=lambda i: yoy[i]) == 9 and max(range(12), key=lambda i: yoy[i]) == 10,
-          "Furniture's largest decline is October and its largest increase November")
+    low, high = min(range(12), key=lambda i: yoy[i]), max(range(12), key=lambda i: yoy[i])
     ledger = {(int(y), int(m)): v for y, m, v in d.q(
         "SELECT substr(PostingDate, 1, 4), substr(PostingDate, 6, 2), SUM(Credit) - SUM(Debit) FROM GLEntry "
         "WHERE AccountID = ? AND SourceDocumentType <> 'JournalEntry' GROUP BY 1, 2", d.account("4010"))}
     gap = [ledger.get((d.C, m + 1), 0.0) - now[m] for m in range(12)]
-    claim(all(abs(ledger.get((y, m), 0.0) - v[m - 1]) < 0.005 for y, v in ((d.C, now), (d.P, before)) for m in (10, 11)),
-          "October and November of both years equal the ledger's (Exercise 11.2)")
     claim(all(abs(g) < 0.005 for g in gap[1:]), f"the ledger's Furniture revenue of {d.C} differs from the lines only in January")
-    crossing = d.q("SELECT si.InvoiceNumber, SUM(g.Credit) - SUM(g.Debit) FROM GLEntry g JOIN SalesInvoice si "
+    crossing = d.q("SELECT si.InvoiceNumber, SUM(g.Credit) - SUM(g.Debit), MIN(si.InvoiceDate) FROM GLEntry g JOIN SalesInvoice si "
                    "ON si.SalesInvoiceID = g.SourceDocumentID WHERE g.SourceDocumentType = 'SalesInvoice' AND g.AccountID = ? "
                    "AND substr(si.InvoiceDate, 1, 4) = ? AND substr(g.PostingDate, 1, 4) = ? GROUP BY 1",
                    d.account("4010"), str(d.P), str(d.C))
     claim(len(crossing) == 1 and abs(crossing[0][1] - gap[0]) < 0.005,
           f"the January difference is the one Furniture invoice dated in {d.P} and posted in {d.C}")
+    crossed = int(crossing[0][2][5:7]) - 1 if crossing else None        # the prior-year month the ledger moves it from
+    extremes = []
+    for i in sorted({low, high}):
+        before_ledger = ledger.get((d.P, i + 1), 0.0)
+        on_ledger = ledger.get((d.C, i + 1), 0.0) / before_ledger - 1 if before_ledger else 0.0
+        same = abs(on_ledger - yoy[i]) < 0.0005
+        claim(same or i == crossed, f"{MONTHS[i]}'s change differs from the ledger's only through the invoice that crosses")
+        extremes.append(dict(name=MONTHS[i], same=same, ledger=on_ledger))
     ytd = [sum(now[:m + 1]) / sum(before[:m + 1]) - 1 for m in range(12)]
-    claim(all(v > 0 for v in ytd[:9]), "Furniture's year-to-date change is positive from January to September")
     by_group = [dict(group=g, now=total(pick(d, group=g, year=d.C), "rev"), before=total(pick(d, group=g, year=d.P), "rev"))
                 for g in groups(d)]
     swings = sorted(groups(d), key=lambda g: -swing(d, g)["spread"])
@@ -437,8 +458,12 @@ def ex3(d, claim):
     claim(design_services(d), "the Services lines are design services")
     claim(d.one("SELECT COUNT(*) FROM SalesInvoice WHERE substr(InvoiceDate, 1, 4) = ?", str(d.N)) == 0,
           f"no invoice is dated in {d.N}, so the {d.N} row has no revenue")
-    return dict(months=[dict(name=MONTHS[m], yoy=yoy[m], now=now[m], before=before[m]) for m in range(12)],
-                crossing=crossing[0][0] if crossing else "", ytd=ytd, by_group=by_group,
+    return dict(months=[dict(name=MONTHS[m], yoy=yoy[m], now=now[m], before=before[m], detail=m >= 9 or m in (low, high))
+                        for m in range(12)],
+                low=MONTHS[low], high=MONTHS[high], extremes=extremes,
+                crossing=crossing[0][0] if crossing else "", crossed=MONTHS[crossed] if crossing else "",
+                ytd=ytd, ytd_sign="positive" if all(v > 0 for v in ytd[:9]) else "negative" if all(v < 0 for v in ytd[:9]) else "",
+                by_group=by_group,
                 now_total=sum(g["now"] for g in by_group), before_total=sum(g["before"] for g in by_group),
                 services=swing(d, "Services"), textiles=swing(d, "Textiles"),
                 lines_low=min(len(p) for p in per_month), lines_high=max(len(p) for p in per_month),
@@ -486,14 +511,17 @@ def ex4(d, claim):
     claim(q3["units"] < q3["pq_units"] and q3["volume"] < 0 and q3["promotions"] < 0,
           "the third quarter has fewer units than the second (volume) and a negative promotion effect")
     decline = q4["pq"] - q4["gm"]
-    claim(-q4["promotions"] > decline > 0, "in the fourth quarter, the promotion effect is larger than the whole decline")
-    claim(all(abs(q4[k]) < 0.1 * abs(q4["promotions"]) for k in ("volume", "mix", "lists")),
-          "in the fourth quarter, volume, mix and price lists are small beside the promotions")
+    # Chapter 6's storyline (Part II): the fourth quarter's decline is a promotion (price) effect.
+    claim(-q4["promotions"] > decline > 0 and all(abs(q4[k]) < 0.1 * abs(q4["promotions"]) for k in ("volume", "mix", "lists")),
+          "in the fourth quarter, the promotion effect is larger than the whole decline, and volume, mix and price lists "
+          "are small beside it (Chapter 6's storyline)")
     lighting = bridge(d, "Lighting", d.C, 4)
     claim(abs(lighting["check"]) < 0.005, "the Lighting bridge checks")
-    claim(lighting["volume"] < 0 and all(abs(lighting["volume"]) > abs(lighting[k]) for k in ("mix", "lists", "promotions")),
-          "Lighting's fourth-quarter change is mainly a volume decline")
-    return dict(quarters=quarters, promotion=pid, start_month=MONTHS[int(start[5:7]) - 1], lighting=lighting)
+    names = dict(volume="volume", mix="mix", lists="price-list", promotions="promotion")
+    main = max(names, key=lambda k: abs(lighting[k]))
+    return dict(quarters=quarters, promotion=pid, start_month=MONTHS[int(start[5:7]) - 1], lighting=lighting,
+                main=dict(name=names[main], direction="decline" if lighting[main] < 0 else "increase",
+                          price=main in ("lists", "promotions")))
 
 
 # --- Exercise 14.5 ---------------------------------------------------------------------------------
@@ -528,10 +556,13 @@ def ex5(d, claim):
     every = total(lines(d), "rev")
     shares = [dict(group=g, rf=total([r for r in now if r["group"] == g], "rev") / rev,
                    all=total([r for r in now if r["group"] == g], "rev") / every) for g in groups(d)]
-    claim({r["year"] for r in lines(d)} == set(d.years), "the invoice lines span the fiscal years of the window")
+    outside = [r for r in lines(d) if r["year"] not in d.years]
+    claim({r["year"] for r in lines(d)} >= set(d.years) and total(outside, "rev") < 0.001 * every,
+          "the invoice lines span the fiscal years of the window, but for a few dated outside it")
     return dict(customers=customers, invoiced=invoiced, n_invoiced=len({r["customer"] for r in now}), opex=opex,
                 others=others, services=services, services_word=word(services["days"]), year_days=year_days,
-                shares=shares, all_total=rev / every, every=every, years=word(len(d.years)))
+                shares=shares, all_total=rev / every, every=every, years=word(len(d.years)),
+                outside=dict(n=len(outside), dates=dates([r["date"] for r in outside])) if outside else None)
 
 
 # --- Exercise 14.6 ---------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the production manager's page and finish the package. You will add the labor time and the production completions as two more fact tables, with the employee, the work center, the item, and the date as their dimensions, the cross-group model that Chapter 1 promised. You will measure the plant's hours per standard hour over a trailing twelve months, as Chapter 11 did in SQL, and compare the measure with a visual calculation that looks simpler but answers a different question when the chart is filtered. Then you will add an About page and a page navigator, and test the plant measures against Chapter 11.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorial 15.2. The labor and production Tables hold tens of thousands of rows each, so the refresh at the end of Step 3 takes several minutes.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 15.2. If you start here, download Charles River Reports as it stands at the end of Tutorial 15.2 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains. The labor and production Tables hold tens of thousands of rows each, so the refresh at the end of Step 3 takes several minutes.
 
 **Step-by-step instructions.**
 
@@ -25,7 +25,7 @@ e. In **Employee**, keep EmployeeID, EmployeeName, JobTitle, and PayClass, and i
 a. Select **LaborTimeEntry**, merge it with **WorkOrderOperation** on WorkOrderOperationID with a left outer join, and expand only WorkCenterID, without the prefix.
 b. Select **ProductionCompletionLine**, merge it with **ProductionCompletion** on ProductionCompletionID, and expand only CompletionDate, without the prefix.
 c. Clear **Enable load** on WorkOrderOperation and ProductionCompletion.
-d. Select the **Item** query, choose **Home > Choose Columns**, and add StandardLaborHoursPerUnit.
+d. Select the **Item** query, click the settings icon beside its **Removed Other Columns** step under **Applied Steps** to reopen **Choose Columns**, and select StandardLaborHoursPerUnit as well.
 e. Choose **Home > Close & Apply**.
 
 A labor line takes the work center of the operation it was recorded against. Only direct manufacturing time is recorded against an operation, so indirect time, and the handful of direct lines that Chapter 10 found without a matching operation, have no work center. In a visual grouped by work center they appear under (Blank), another meaningful blank.
@@ -40,7 +40,7 @@ The Date table now filters five fact tables: the invoice lines, the ledger, the 
 
 **Step 5. Write the hours measures.**
 
-a. Add the measures below to the Measures table, formatting the hours as whole numbers.
+a. Add the measures below to the Key Measures table, formatting the hours as whole numbers.
 
 <!-- dax-check: measure -->
 ```

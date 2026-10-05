@@ -58,20 +58,27 @@ def note(key: str, file: str, template: str | None = None):
 
 # --- formatting --------------------------------------------------------------------------------
 
+def _half_up(x: float, places: int):
+    """x rounded as Excel shows it: to 15 significant digits, then half away from zero (2,006.895 is 2,006.90, where
+    Python's formatting of the binary float 2,006.894999... gives 2,006.89)."""
+    from decimal import ROUND_HALF_UP, Decimal
+    return Decimal(repr(float(f"{x:.15g}"))).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
+
+
 def money(x: float) -> str:
-    return f"{x:,.2f}"
+    return f"{_half_up(x, 2):,.2f}"
 
 
 def num(x: float, places: int = 0) -> str:
-    return f"{x:,.{places}f}"
+    return f"{_half_up(x, places):,.{places}f}"
 
 
 def pct(x: float, places: int = 1) -> str:
-    return f"{100 * x:.{places}f}%"
+    return f"{_half_up(100 * x, places):.{places}f}%"
 
 
 def spct(x: float, places: int = 1) -> str:
-    return f"{100 * x:+.{places}f}%"
+    return f"{_half_up(100 * x, places):+.{places}f}%"
 
 
 def count(x: int) -> str:

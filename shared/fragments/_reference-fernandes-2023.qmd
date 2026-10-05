@@ -1,0 +1,1 @@
+Fernandes, A. A. A., Koehler, M., Konstantinou, N., Pankin, P., Paton, N. W., & Sakellariou, R. (2023). Data preparation: A technological perspective and review. *SN Computer Science*, *4*(4), Article 425. <https://doi.org/10.1007/s42979-023-01828-8>

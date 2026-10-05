@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from shared.calculations.chapter01 import SALESORDER_COLUMNS, TRACE_GLENTRY_ID, WORKFLOW_STAGES
+
 import excel as xl
 from data import one, q, require_columns
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CROSS_WIDTH, GRAY, GRAY_TINT, HEAD, HIGHLIGHT,
@@ -38,14 +44,7 @@ def fig_01_01() -> Diagram:
 
 def fig_01_02() -> Diagram:
     d = Diagram("The Accounting Analytics Workflow")
-    stages = [
-        ("1. Define the question", "Translate the business need into a specific analytical question"),
-        ("2. Access the data", "Identify sources, extract relevant tables and columns"),
-        ("3. Prepare and clean", "Resolve missing values, duplicates, inconsistent formatting"),
-        ("4. Analyze", "Summarize, compare, model, detect anomalies"),
-        ("5. Visualize and present", "Charts, dashboards, interactive reports for stakeholders"),
-        ("6. Communicate findings", "Memoranda, presentations, and reports to decision makers"),
-    ]
+    stages = WORKFLOW_STAGES
     spots = [(0, 0), (310, 0), (620, 0), (620, 150), (310, 150), (0, 150)]
     fills = [BLUE, BLUE, BLUE, TEAL, TEAL, HIGHLIGHT]
     ids = []
@@ -205,7 +204,7 @@ def fig_01_05() -> Diagram:
 def fig_01_06() -> Diagram:
     d = Diagram("One Ledger Posting Traced to Its Source")
     gl = one("SELECT GLEntryID, PostingDate, AccountID, Debit, Credit, SourceDocumentType, "
-             "SourceDocumentID, SourceLineID FROM GLEntry WHERE GLEntryID = 126312")
+             "SourceDocumentID, SourceLineID FROM GLEntry WHERE GLEntryID = ?", TRACE_GLENTRY_ID)
     assert gl[5:] == ("SalesInvoice", 7947, 10645), gl
     acc = one("SELECT AccountID, AccountNumber, AccountName, AccountType FROM Account "
               "WHERE AccountID = ?", gl[2])
@@ -308,8 +307,7 @@ def fig_01_08() -> Diagram:
 
 def fig_01_07() -> Diagram:
     d = Diagram("The Charles River SalesOrder Worksheet")
-    cols = ["SalesOrderID", "OrderNumber", "OrderDate", "CustomerID", "RequestedDeliveryDate",
-            "Status", "SalesRepEmployeeID"]
+    cols = list(SALESORDER_COLUMNS)
     require_columns("SalesOrder", cols)
     table_cols = [r[1] for r in q("PRAGMA table_info(SalesOrder)")]
     assert table_cols[:len(cols)] == cols, table_cols

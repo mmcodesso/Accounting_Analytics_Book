@@ -1,0 +1,5 @@
+| Control | Amount |
+| --- | --- |
+| Invoice lines | $86,446,845.84 |
+| Invoice subtotals | $86,446,845.84 |
+| Difference, rounded to cents | $0.00 |

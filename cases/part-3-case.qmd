@@ -82,7 +82,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
      against 62.8, and 573 of the 652 ordinary days also had all 64, so attendance says little. Different clock-in times per day 2.0 against
      22.4; the largest group sharing one clock-in timestamp is 32 or 33 on every surge day (COUNT(*) OVER (PARTITION BY WorkDate,
      ClockInTime)), against 13.2 on average and 25 at most on ordinary days. Every surge entry (5,952) has meal punches, against 17,707 of the
-     40,974 ordinary entries (43.2%). The punches are all Badge punches whose timestamps equal the clock entry's, so they repeat the
+     40,974 ordinary entries (43.2%). The punches are all Badge punches whose timestamps equal the clock entry's (except on nine entries, all cited by
+     attendance exceptions), so they repeat the
      timekeeping record rather than corroborate it. Rosters: every surge entry is rostered for a normal eight-hour shift, 07:00-15:30 or
      15:00-23:30, created seven days ahead by the Production Manager, who creates every manufacturing roster; the clock shows 06:30-19:30 or
      14:30-03:30, 30 minutes early and 240 minutes late, 12.5 hours against 8.0. On ordinary days the rostered hours equal the clocked hours
@@ -122,7 +123,7 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
      onward: 102 weeks without surge days, 1,500 and 1,108 (0.74). Surge weeks complete more but not in proportion to the hours, and the
      weeks after them complete less, which looks like work pulled forward rather than more work; completions lag the work by weeks (lead
      times of about 40 days in 2026) and post on weekends, so a week cannot be matched exactly to its output. Capacity on ordinary days:
-     4.92, 4.79, and 5.26 clocked hours per employee per day; unused straight-time hours (8 less regular hours) 52,606, 51,956, and 38,417,
+     4.92, 4.79, and 5.26 clocked hours per employee per day; unused straight-time hours (8 less regular hours, on entries with fewer than 8) 52,606, 51,956, and 38,417,
      against surge overtime of 3,456, 9,216, and 14,112, so the 2026 surge overtime would have fit more than twice over into straight time.
      Cost at base rates: premium 46,055.52, 122,814.72, 188,060.04 (214,651.73 with the 14.14% burden in 2026); full overtime 138,166.56, 368,444.16, 564,180.12 (643,955.19 with burden in 2026). Bridge (ledger, closes excluded): 5080 rose from 1,317,927.32 to 2,265,636.88,
      +947,709.56 = payroll to 1090 +966,846.03 (2,848,551.11 to 3,815,397.14) + journal entries -8,473.29 (1,621,008.98 to 1,612,535.69) +
@@ -149,7 +150,7 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 
 <!-- notes: case3.r4 -->
 <!-- Instructor notes, Requirement 4: volume: 2026 completions of 68,912.79 standard hours, whose standard conversion cost, 3,266,422.54, is
-     what completions released to 1090 (47.40 per standard hour); the budget plans about three times actual volume and the demand forecast
+     what completions released to 1090 (47.40 per standard hour); the budget plans about three times the units the plant completed and the demand forecast
      two to three times (Chapter 7), and no year has a manufacturing labor or overhead budget, only cost of goods sold at standard. Rate:
      26.62 an hour (2026, hours-weighted base rate), burden 14.14%; salaried manufacturing staff 263,191.24 gross (Production Manager, Planner, Supervisor). Factory Overhead entries 1,308,869.06 in 2026. Depreciation: monthly OriginalCost / UsefulLifeMonths from the
      month after the in-service date, through the month before disposal, for assets whose DepreciationDebitAccountID is 92 (account 1090):
@@ -158,7 +159,7 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
      Tutorial 12.2. Capacity: 64 employees x 8 hours x 256 working days = 131,072 regular hours (the calendar's available hours were
      128,833.25 in 2026); the plan needs 68,913 hours at 1.0, 81,317 at 1.18, and 104,127 at the 2026 level of 1.511, so no scenario needs
      overtime for capacity, and the plan should allow none as a routine. Conversion cost and expected variance: at 1.0, 3,996,855 and
-     730,432; at 1.18, 4,373,789 and 1,107,366; at the 2026 level with its overtime premium (266,521.04 with burden), 5,371,136 and
+     730,432; at 1.18, 4,373,789 and 1,107,366; at the 2026 level with its overtime premium (266,521.04, 304,207.11 with burden), 5,371,136 and
      2,104,714, close to the 2,159,138.03 conversion variance of 2026. The variance left at standard hours comes from the labor rate with
      burden above the standard rate (30.39 against 28.28 an hour, about 145,000), and from overhead of 1,902,776 (salaried staff, factory
      overhead, depreciation) against 1,317,563 applied at 19.12 per standard hour (about 585,000): the plant makes about 53% of its regular

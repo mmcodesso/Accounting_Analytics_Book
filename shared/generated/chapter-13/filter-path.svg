@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 570" width="1280" height="570" role="img" aria-labelledby="title desc">
+<title id="title">The four-table sales model</title>
+<desc id="desc">Customer filters invoices, invoices filter lines, and Item filters lines. Each relationship is one to many.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10" fill="none" stroke="#5D6D7E" stroke-width="1.5"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<g font-family="Arial, Liberation Sans, sans-serif">
+<defs><marker id="filter-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="#117A65"/></marker></defs>
+<rect x="30" y="30" width="420" height="160" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="30" y="30" width="420" height="54" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="46" y="68" font-size="32" fill="#FFFFFF" font-weight="bold" text-anchor="start">Customer</text>
+<text x="46" y="124" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">CustomerID</text>
+<text x="46" y="168" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">CustomerSegment</text>
+<rect x="830" y="30" width="420" height="160" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="830" y="30" width="420" height="54" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="846" y="68" font-size="32" fill="#FFFFFF" font-weight="bold" text-anchor="start">SalesInvoice</text>
+<text x="846" y="124" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">SalesInvoiceID</text>
+<text x="846" y="168" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">CustomerID</text>
+<rect x="30" y="310" width="420" height="160" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="30" y="310" width="420" height="54" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="46" y="348" font-size="32" fill="#FFFFFF" font-weight="bold" text-anchor="start">Item</text>
+<text x="46" y="404" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">ItemID</text>
+<text x="46" y="448" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">ItemGroup</text>
+<rect x="830" y="310" width="420" height="160" rx="0" fill="#FFFFFF" stroke="#CAD3DA" stroke-width="2"/>
+<rect x="830" y="310" width="420" height="54" rx="0" fill="#1A5276" stroke="#1A5276" stroke-width="2"/>
+<text x="846" y="348" font-size="32" fill="#FFFFFF" font-weight="bold" text-anchor="start">SalesInvoiceLine</text>
+<text x="846" y="404" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">SalesInvoiceID</text>
+<text x="846" y="448" font-size="31" fill="#2C3E50" font-weight="normal" text-anchor="start">ItemID</text>
+<path d="M456 110 L816 110" stroke="#117A65" stroke-width="4" fill="none" marker-end="url(#filter-arrow)"/>
+<path d="M456 390 L816 390" stroke="#117A65" stroke-width="4" fill="none" marker-end="url(#filter-arrow)"/>
+<path d="M1040 196 L1040 296" stroke="#117A65" stroke-width="4" fill="none" marker-end="url(#filter-arrow)"/>
+<text x="475" y="90" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">1</text>
+<text x="782" y="90" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">*</text>
+<text x="475" y="370" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">1</text>
+<text x="782" y="370" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">*</text>
+<text x="1064" y="223" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">1</text>
+<text x="1064" y="283" font-size="34" fill="#2C3E50" font-weight="bold" text-anchor="start">*</text>
+<text x="30" y="535" font-size="30" fill="#5D6D7E" font-weight="normal" text-anchor="start">Arrows show single-direction filters; the line table holds the amounts.</text>
+</g>
+</svg>

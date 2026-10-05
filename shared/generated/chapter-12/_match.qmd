@@ -1,0 +1,6 @@
+| Purchase-order-line status | Lines |
+| --- | --- |
+| Matched | 23,375 |
+| Received, not fully invoiced | 1,100 |
+| Not yet received | 277 |
+| Partly received | 90 |

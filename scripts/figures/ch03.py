@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from data import cardinality, one, q, relate, require_columns, trace
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from shared.calculations.foundations import key_example, sale_trace
+
+from data import cardinality, connection, one, q, relate, require_columns, trace
 from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, CROSS_WIDTH, GRAY, GRAY_TINT, HEAD,
                     INK, LINE_WIDTH, RULE, ROW_H, SMALL, TEAL, WHITE, Diagram, Table, esc, money)
 
@@ -74,10 +80,8 @@ def fig_03_01() -> Diagram:
 
 def fig_03_02() -> Diagram:
     d = Diagram("Primary Keys and Foreign Keys")
-    so = q("SELECT SalesOrderID, OrderNumber, CustomerID FROM SalesOrder "
-           "WHERE SalesOrderID IN (59, 62, 85) ORDER BY CustomerID, SalesOrderID")
-    cu = q("SELECT CustomerID, CustomerName FROM Customer WHERE CustomerID IN (1, 4) "
-           "ORDER BY CustomerID")
+    sample = key_example(connection())
+    so, cu = sample['orders'], sample['customers']
     SX, SW, CX, CW = 0, [115, 140, 110], 545, [110, 205]
     so_bar = d.header_box("SalesOrder", SX, 30, sum(SW))
     cu_bar = d.header_box("Customer", CX, 30, sum(CW))
@@ -431,30 +435,10 @@ def fig_03_09() -> Diagram:
 
 
 def fig_03_10() -> Diagram:
-    sid = 7947
-    inv = one("SELECT SalesInvoiceID, InvoiceNumber, InvoiceDate, SalesOrderID, CustomerID, "
-              "GrandTotal FROM SalesInvoice WHERE SalesInvoiceID = ?", sid)
-    sil = one("SELECT SalesInvoiceLineID, SalesOrderLineID, ShipmentLineID, ItemID, Quantity, "
-              "UnitPrice, LineTotal FROM SalesInvoiceLine WHERE SalesInvoiceID = ?", sid)
-    shl = one("SELECT ShipmentLineID, ShipmentID, QuantityShipped FROM ShipmentLine "
-              "WHERE ShipmentLineID = ?", sil[2])
-    shp = one("SELECT ShipmentNumber, ShipmentDate FROM Shipment WHERE ShipmentID = ?", shl[1])
-    sol = one("SELECT SalesOrderLineID, SalesOrderID FROM SalesOrderLine "
-              "WHERE SalesOrderLineID = ?", sil[1])
-    so = one("SELECT OrderNumber, OrderDate FROM SalesOrder WHERE SalesOrderID = ?", sol[1])
-    cus = one("SELECT CustomerID, CustomerName FROM Customer WHERE CustomerID = ?", inv[4])
-    itm = one("SELECT ItemCode, ItemName, StandardCost FROM Item WHERE ItemID = ?", sil[3])
-    glr = q("SELECT a.AccountNumber, a.AccountName, g.Debit, g.Credit, g.SourceLineID, "
-            "a.AccountType, g.AccountID FROM GLEntry g JOIN Account a USING (AccountID) "
-            "WHERE SourceDocumentType = 'SalesInvoice' AND SourceDocumentID = ? ORDER BY GLEntryID",
-            sid)
-    gls = q("SELECT a.AccountNumber, a.AccountName, g.Debit, g.Credit FROM GLEntry g "
-            "JOIN Account a USING (AccountID) WHERE SourceDocumentType = 'Shipment' "
-            "AND SourceDocumentID = ? AND SourceLineID = ? ORDER BY GLEntryID", shl[1], shl[0])
-    app = one("SELECT CashReceiptApplicationID, CashReceiptID, AppliedAmount, ApplicationDate "
-              "FROM CashReceiptApplication WHERE SalesInvoiceID = ?", sid)
-    rct = one("SELECT ReceiptNumber, Amount FROM CashReceipt WHERE CashReceiptID = ?", app[1])
-    assert sum(r[2] for r in glr) == sum(r[3] for r in glr) == inv[5]
+    sample = sale_trace(connection())
+    inv, sil, shl, shp, sol, so, cus, itm, glr, gls, app, rct = (
+        sample[key] for key in ('inv','sil','shl','shp','sol','so','cus','itm','glr','gls','app','rct'))
+    sid = inv[0]
 
     def dc(r) -> str:
         return (f"Dr {r[0]} {esc(r[1])} {money(r[2])}" if r[2]

@@ -12,7 +12,7 @@ Panko, R. R. (1998). What we know about spreadsheet errors. *Journal of Organiza
 
 Powell, S. G., Baker, K. R., & Lawson, B. (2008). A critical review of the literature on spreadsheet errors. *Decision Support Systems*, *46*(1), 128–138. <https://doi.org/10.1016/j.dss.2008.06.001>
 
-Powell, S. G., Baker, K. R., & Lawson, B. (2009a). Errors in operational spreadsheets. *Journal of Organizational and End User Computing*, *21*(3), 24–36. <https://doi.org/10.4018/joeuc.2009070102>
+{{< include /shared/fragments/_reference-powell-2009a.qmd >}}
 
 Powell, S. G., Baker, K. R., & Lawson, B. (2009b). Impact of errors in operational spreadsheets. *Decision Support Systems*, *47*(2), 126–132. <https://doi.org/10.1016/j.dss.2009.02.002>
 

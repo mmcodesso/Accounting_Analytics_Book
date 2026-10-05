@@ -53,13 +53,13 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Requirements.**
 
-(1) Import the T37_PurchaseInvoice Table again as a new query named `OpenPayables`, filtered to invoices dated before `2027-01-01`. Create a query named `PaidByInvoice` that references the Payments query of Tutorial 8.1, which already holds the payments dated before `2027-01-01`, and group it by PurchaseInvoiceID with the sum of Amount as `PaidTotal`. Merge PaidByInvoice into OpenPayables, replace the nulls with 0, calculate each invoice's open balance, and keep the invoices with a balance greater than zero.
+(1) Import the T37_PurchaseInvoice Table again as a new query named `OpenPayables`, filtered to invoices dated before `2027-01-01`. Create a query named `PaidByInvoice` that references the Payments query of Tutorial 8.1, which already holds the payments dated before `2027-01-01`, and group it by PurchaseInvoiceID with the sum of Amount as `PaidTotal`. Merge PaidByInvoice into OpenPayables, replace the nulls with 0, and calculate each invoice's open balance. Round it to 2 decimal places, as in Tutorial 8.2 Step 2, so that a fully paid invoice does not keep a residue of a fraction of a cent, and keep the invoices with a balance greater than zero.
 
 (2) Import the T3_GLEntry Table again as a new query named `LedgerAP`, clicking **Transform Data**, and filter it to AccountID 22 and to PostingDate before `2027-01-01`. Calculate the balance of account 2010 at the end of fiscal 2026. For a liability account, the balance is the credits minus the debits.
 
 (3) Build a PivotTable of the account 2010 rows by SourceDocumentType, and use **Show Details** to list the JournalEntry rows. Identify each reconciling item between the ledger and the open invoices.
 
-(4) For each reconciling item, explain what it is and whether the correction belongs in the ledger, in the invoice detail, or in neither. Import the T33_PurchaseOrder Table, look up the purchase orders behind any invoices the reconciliation involves, and note who created and approved them.
+(4) For each reconciling item, explain what it is and whether the correction belongs in the ledger, in the invoice detail, or in neither. Import the T33_PurchaseOrder Table as a query named `PurchaseOrders`, look up the purchase orders behind any invoices the reconciliation involves, and note who created and approved them.
 
 (5) Prepare a reconciliation workpaper that shows the ledger balance, the open invoices, each reconciling item with its explanation, and any unexplained difference.
 
@@ -117,11 +117,11 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Requirements.**
 
-(1) Add SupplierCategory to the columns kept in the Suppliers query and DueDate to those kept in the PurchaseInvoices query of Tutorial 8.1, and select them in the two steps of the Payments query that expand those queries. Refresh the Payments query. Build a PivotTable of fiscal 2026 payments by SupplierName, sorted from largest to smallest, and use **Show Values As > % Running Total In** to show the cumulative share of spending.
+(1) Add SupplierCategory to the columns kept in the Suppliers query and DueDate to those kept in the PurchaseInvoices query of Tutorial 8.1, and select them in the two steps of the Payments query that expand those queries. Refresh the Payments query. The Payments Table holds three fiscal years, so add a column `FiscalYear` with the formula `=YEAR([@PaymentDate])`. Build a PivotTable of the payments by SupplierName, with FiscalYear in the **Filters** area set to 2026, sorted from largest to smallest, and use **Show Values As > % Running Total In** to show the cumulative share of spending.
 
 (2) Report how many suppliers account for 50 percent, 80 percent, and 90 percent of the spending, and summarize the spending by SupplierCategory.
 
-(3) Add a column `DaysAfterDue` equal to the PaymentDate minus the invoice's DueDate. For fiscal 2026, count the payments made before, on, and after the due date, calculate the median days after due, and count the payments made more than 30 days late.
+(3) Add a column `DaysAfterDue` equal to the PaymentDate minus the invoice's DueDate, and format it as a whole number, because Excel shows the difference of two dates as a date until you do. For fiscal 2026, count the payments made before, on, and after the due date, calculate the median days after due, and count the payments made more than 30 days late.
 
 (4) Write a memo of one half to one page to the treasurer on what the concentration and the timing mean for supplier risk and for cash management, including what the company gains and loses by paying early or late.
 
@@ -147,7 +147,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Requirements.**
 
-(1) Import the T33_PurchaseOrder Table, and import the T74_Employee Table again as a query named `Approvers` that keeps EmployeeID, EmployeeName, JobTitle, MaxApprovalAmount, and TerminationDate. Merge Approvers into the purchase orders twice, once for the approver's name, JobTitle, MaxApprovalAmount, and TerminationDate, and once for the creator's name.
+(1) Import the T33_PurchaseOrder Table as a query named `POApprovals`, and import the T74_Employee Table again as a query named `Approvers` that keeps EmployeeID, EmployeeName, JobTitle, MaxApprovalAmount, and TerminationDate. Merge Approvers into POApprovals twice, once for the approver's name, JobTitle, MaxApprovalAmount, and TerminationDate, and once for the creator's name.
 
 (2) Add three flags and a risk score: `SelfApproved` when the creator and the approver are the same employee, `AboveLimit` when OrderTotal exceeds the approver's limit, and `AfterTermination` when the approver's TerminationDate is filled in and earlier than the OrderDate. Count the flagged orders and record a disposition for each one, as in Tutorial 8.3.
 
@@ -180,15 +180,14 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
      (PO-2024-000474, PO-2025-003922, PO-2026-010467), all approved by Daniel Diaz, an Account Executive terminated on 2024-04-26. Risk
      scores: 11 orders score 2 and 3 score 1. Requisition bands from 4,800: 7, 8, 4, 18, 9, 4, 9, 4, so the 4,950-4,999.99 band has twice
      the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714, -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are
-     three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different
-     requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO
+     three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO
      approved 40,196 of 40,204; the other 8 are PI 7038, 7047, 20345, and 20399 (200.69, 3,102.49, 794.96, 23.20), approved by Melinda Murphy,
      a Product Analyst with a limit of 0; PI 7122 and 20452 (1,301.21, 1,269.12), approved by Daniel Odom, a Production Supervisor,
      within the 5,000 limit but outside the purchasing and accounting roles;
      and PI 3160 and 21692 (360,000.00 and 280,000.00), approved by Jennifer Cole,
      the Purchasing Manager, above the 25,000 limit, the note-financed capital invoices of
      Exercise 8.2. Near-duplicates, payments dated before 2027-01-01: SameAmount flags 226 payments in 113 pairs (no group larger than
-     two; 13 pairs within 30 days); SameInvoice flags none, so every pair pays two different invoices and no invoice was paid twice.
+     two; 13 pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices and no invoice was paid twice.
      Gap test: PO-2024 runs 1 to 3,921 (3,921 orders), PO-2025 3,922 to 10,466 (6,545), PO-2026 10,467 to 18,832 (8,366); no numbers
      are missing, and the sequence continues across years rather than restarting. -->
 
@@ -203,7 +202,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 (1) Import the T7_PromotionProgram Table as a query named `Promotions`, and add a flag for promotions whose EffectiveEndDate is on or before their EffectiveStartDate. List the flagged promotions with their approver and approval date.
 
-(2) Import the T17_SalesInvoiceLine, T16_SalesInvoice, and T9_SalesOrder Tables as queries named `InvoiceLines`, `InvoiceHeaders`, and `Orders`. For the invoice lines of the flagged promotions, bring in each line's OrderDate from Orders through the SalesOrderID of InvoiceHeaders, and compare it with the promotion's effective dates. By promotion, count the lines and total the discount, calculated as Quantity times UnitPrice times Discount.
+(2) Import the T17_SalesInvoiceLine, T16_SalesInvoice, and T9_SalesOrder Tables as queries named `InvoiceLines`, `InvoiceHeaders`, and `Orders`, and make sure Discount in InvoiceLines has the decimal number type, as in Tutorial 4.1 Step 6. For the invoice lines of the flagged promotions, bring in each line's OrderDate from Orders through the SalesOrderID of InvoiceHeaders, and compare it with the promotion's effective dates. By promotion, count the lines and total the discount, calculated as Quantity times UnitPrice times Discount.
 
 (3) Import the T8_PriceOverrideApproval Table and filter it to the Pending requests. Find the invoice lines of their SalesOrderLineIDs, and compare each line's UnitPrice with the request's ReferenceUnitPrice and ApprovedUnitPrice. Note the PricingMethod and PriceOverrideApprovalID recorded on the lines, and calculate the amount billed below the reference price.
 

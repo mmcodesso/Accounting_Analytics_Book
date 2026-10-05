@@ -14,7 +14,7 @@ c. In the **Navigator**, select the **T39_DisbursementPayment**, **T37_PurchaseI
 d. Rename the queries `Payments`, `PurchaseInvoices`, and `Suppliers`.
 e. In PurchaseInvoices, use **Home > Choose Columns** to keep PurchaseInvoiceID, InvoiceNumber, and GrandTotal, and in Suppliers, keep SupplierID and SupplierName.
 f. Right-click PurchaseInvoices and then Suppliers in the **Queries** pane, and clear **Enable Load** for each.
-g. In Payments, open the filter list of PaymentDate, choose **Date Filters > Before**, and enter `2027-01-01`, so that the query keeps the payments of fiscal 2024 through 2026.
+g. In Payments, open the filter list of PaymentDate, choose **Date/Time Filters > Before**, and enter `2027-01-01`, so that the query keeps the payments of fiscal 2024 through 2026.
 h. Merge Payments with **PurchaseInvoices** on PurchaseInvoiceID, with a left outer join, and expand InvoiceNumber and GrandTotal without the prefix.
 i. Merge Payments with **Suppliers** on SupplierID, with a left outer join, and expand SupplierName without the prefix.
 j. Choose **Home > Close & Load**, and rename the new worksheet `Payments`.
@@ -60,7 +60,7 @@ g. Check that C7 and E7 equal the count and total on the Population worksheet.
 
 a. On the Payments worksheet, open the filter list of Amount, choose **Number Filters > Greater Than Or Equal To**, and type `50000`.
 b. For each payment, compare Amount with GrandTotal, and note the supplier and the invoice.
-c. Copy the four rows to A10 of the Strata worksheet, below the stratification table.
+c. Copy the four rows, with the header row, to A10 of the Strata worksheet, below the stratification table.
 d. Add a `Disposition` column beside them, and state the evidence you would examine for each payment.
 e. Clear the filter.
 
@@ -87,7 +87,7 @@ d. In D2 and E2, enter `=C2/C$11` and `=ABS(D2-B2)`, copy them down to row 10, a
 e. In A12, type `MAD`, and in E12, enter `=AVERAGE(E2:E10)`, the mean absolute deviation.
 f. Format columns B, D, and E as percentages with two decimals, and E12 as a number with five decimals.
 g. Select D1:D10, hold Ctrl, and select B1:B10.
-h. Choose **Insert > Insert Combo Chart > Clustered Column - Line**, so that the actual proportions are columns and the expected proportions a line. The chart section of Chapter 6 compares chart types; a combo chart suits a comparison of actual values with a standard.
+h. Choose **Insert > Insert Combo Chart > Create Custom Combo Chart**, set the Actual series to **Clustered Column** and the Expected series to **Line**, and click **OK**, so that the actual proportions are columns and the expected proportions a line. The chart section of Chapter 6 compares chart types; a combo chart suits a comparison of actual values with a standard.
 
 The MAD falls in the marginally acceptable range of @tbl-08-01. The chart in @fig-08-03 shows the pattern behind it: the digits 1 and 2 appear less often than Benford's Law expects, and the digits from 5 to 9 more often. With this many payments, a chi-square test would call the difference highly significant; the MAD says that it is modest but worth explaining.
 

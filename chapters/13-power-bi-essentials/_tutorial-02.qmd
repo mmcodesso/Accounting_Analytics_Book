@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will build the page the controller asked for: what Charles River billed, what it would have billed at list price, and what the promotions gave away, by period, item group, product type, customer segment, and region. You will add cards, a line chart, a bar chart, a matrix, and slicers, explore the page by clicking, and find the place where a filter stops.
 
-**Prerequisites.** You need Charles River Reports.pbix from Tutorial 13.1, with its four related tables and the Validation page.
+**Prerequisites.** You need Charles River Reports.pbix from Tutorial 13.1, with its four related tables and the Validation page. If you start here, download Charles River Reports as it stands at the end of Tutorial 13.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
 **Step-by-step instructions.**
 

@@ -16,6 +16,9 @@ After completing this chapter, you will be able to:
 :::
 
 
+::: {.chapter-slides data-chapter="chapter-05"}
+:::
+
 ## Opening Scenario {.unnumbered}
 
 The analysis workbook you built in Chapter 4 ended with a clue and an open question. The Furniture Seasonal Promotion carries more invoice lines and more discount dollars than any other promotion, and its effective dates, September and October 2026, straddle the two quarters whose margins the controller wants explained. When you tell her, she asks the obvious next question: how many of those discounted lines fell in the fourth quarter, and how much of the Furniture revenue did they account for? You cannot answer yet. The invoice lines record what was sold, at what price, and under which promotion, but not when the invoice was issued, which product group the item belongs to, or which customer bought it. That information lives in other Tables: the invoices, the items, the customers, and the sales orders. Before any of the analysis in the rest of Part II can begin, you have to bring it together, check that it came together correctly, and make the result easy to refresh. This chapter teaches you how.
