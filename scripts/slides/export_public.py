@@ -29,7 +29,9 @@ OWNED_DIRECTORIES = ("slides", "scripts/slides", "shared")
 DEFAULT_BUILD_FILES = (
     "scripts/build_all.py", "scripts/slides/prepare.py", "scripts/slides/verify.py",
     "scripts/slides/export_public.py", "scripts/slides/requirements.txt",
-    "scripts/export_drawio_svgs.py", "_variables.yml", "LICENSE",
+    "scripts/export_drawio_svgs.py", "visuals/export-manifest.json", "_variables.yml", "LICENSE",
+    "visuals/cover/accounting_analytics_cover.drawio", "visuals/cover/cover-web.png",
+    "visuals/cover/cover.png", "visuals/cover/cover.pdf", "styles/book-pdf.tex",
 )
 TEXT_DOCUMENTS = {".qmd", ".md", ".txt"}
 STRUCTURED_TEXT = {".py", ".ps1", ".lua", ".yml", ".yaml", ".json", ".csv", ".svg", ".drawio", ".scss"}

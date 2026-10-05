@@ -1,0 +1,2594 @@
+{
+  "outputs": {
+    "visuals/cover/cover-web.png": {
+      "output_sha256": "f7d64558b0d53b5f359120f5ed745bf1e409751165e27d4cae4d71f9eb8401e8",
+      "recipe": 1,
+      "settings": {
+        "height": 660,
+        "width": 510
+      },
+      "source": "visuals/cover/accounting_analytics_cover.drawio",
+      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+    },
+    "visuals/cover/cover.pdf": {
+      "output_sha256": "2bf9cccb586cf6993fc85e2c8bea01258935b9ccc2c701b24820e326195e0008",
+      "recipe": 1,
+      "settings": {
+        "crop": false
+      },
+      "source": "visuals/cover/accounting_analytics_cover.drawio",
+      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+    },
+    "visuals/cover/cover.png": {
+      "output_sha256": "fb195e26441214b83c0530fa8026126182895206e5ce5ccc30068aebcade0b0d",
+      "recipe": 1,
+      "settings": {
+        "height": 1430,
+        "width": 1105
+      },
+      "source": "visuals/cover/accounting_analytics_cover.drawio",
+      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+    },
+    "visuals/pdf/fig-01-01-analytics-continuum.pdf": {
+      "output_sha256": "f4577fdbad5a2d50b0f16d25b315a1dbe49200ad7ca90d904a71439ef2d052cb",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-01-analytics-continuum.drawio",
+      "source_sha256": "318190b68a957ed6dd49992dff5d09a8dbd8029e4a6568d4644412bbb0d17221"
+    },
+    "visuals/pdf/fig-01-02-analytics-workflow.pdf": {
+      "output_sha256": "dcb0716b0b04bfd7c402e10b51ef748cdce0a54d159373d722210779f610adf7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-02-analytics-workflow.drawio",
+      "source_sha256": "528e852cd216bfc2a24991578287d6d1aee9e53e918f1d839039388ef26717df"
+    },
+    "visuals/pdf/fig-01-03-tools-workflow-mapping.pdf": {
+      "output_sha256": "f919e8d41dd6bef4d53f3c314729cd448ed156373da5c7ddd368d20a4cabcf88",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
+      "source_sha256": "f2cd73a9f44f290884a59cd6ff771d82ad66973d1a586e13ab9afd78aa0dc857"
+    },
+    "visuals/pdf/fig-01-04-charles-river-architecture.pdf": {
+      "output_sha256": "5ada76fc1839f65b3462abb4b2fdbfd47833db672c2fc04b30145cb5d645c792",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-04-charles-river-architecture.drawio",
+      "source_sha256": "9da5235f675366809347695b6b7c767174b885493eb7aaa02d0eb3f6f06baf0e"
+    },
+    "visuals/pdf/fig-01-05-o2c-process-flow.pdf": {
+      "output_sha256": "0251eea506cb608a3a5bdf358b72805e1126ba348b6eb85644d045f2f2b15b5a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-05-o2c-process-flow.drawio",
+      "source_sha256": "b40f0b93f6b58321c7e3da56ba811b308bcceb58c1148a23c46cda708acceb92"
+    },
+    "visuals/pdf/fig-01-06-ledger-posting-trace.pdf": {
+      "output_sha256": "7afa35422e753e91350103e62db1dc7ec2547a530065f63b0ddb23a035678e41",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-06-ledger-posting-trace.drawio",
+      "source_sha256": "efc18bc3e675db24bc6989f47b90a60abac334224340bf00507daf2cd99dd8e6"
+    },
+    "visuals/pdf/fig-01-07-salesorder-worksheet.pdf": {
+      "output_sha256": "f1831d315993203589d7f190d920ab57fe5db3406f0f8a36a92f29eea7281255",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-07-salesorder-worksheet.drawio",
+      "source_sha256": "922dbd37b9a4ddfb23790d644d0b14f5d69f3708b399e046ab38ea03443491f8"
+    },
+    "visuals/pdf/fig-01-08-book-organization-map.pdf": {
+      "output_sha256": "26270be4195a4ba20c2826f63fe2e3809b49f0a587fc01a2bd3ca59876eec8e4",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-01-08-book-organization-map.drawio",
+      "source_sha256": "6723f8e597a8db479c8f790e01b2e1871519282c48707843dc48a498e04fa63a"
+    },
+    "visuals/pdf/fig-02-01-spectrum-data-structure.pdf": {
+      "output_sha256": "adecd63623f5338eea3f869a407336b5e16cd5e292fdc864256875caee5c7fac",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-01-spectrum-data-structure.drawio",
+      "source_sha256": "0e390139a6e13de1c222dd8410bbf669a548aee711c3489067f459489e1c64bd"
+    },
+    "visuals/pdf/fig-02-02-sources-accounting-data.pdf": {
+      "output_sha256": "b6828477e1f70e262c9a655e50e475a2b158a78088cb57b53154138e6fba7a8b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-02-sources-accounting-data.drawio",
+      "source_sha256": "625e6e9a5fdf8acb67ec520feba70ee4f06d8c00e8de08b57b820a3edfe22ed3"
+    },
+    "visuals/pdf/fig-02-03-data-quality-problems.pdf": {
+      "output_sha256": "37b16a833dcd25bb31cab10e881cd8dac983bcdc8b65850957aa35216c51e18a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-03-data-quality-problems.drawio",
+      "source_sha256": "ead192fe60556351e8c5f1c6fff25acca14c8e834820ded1f9e8ed22a7048922"
+    },
+    "visuals/pdf/fig-02-04-shipment-blank-tracking.pdf": {
+      "output_sha256": "a25243318aef40d876e47cc11e42b293dbd94de4995143f0679ac6df3e528a85",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-04-shipment-blank-tracking.drawio",
+      "source_sha256": "956d3edf02769399373d2367360afb4d6c989ae1f776af99ff557fff38818972"
+    },
+    "visuals/pdf/fig-02-05-salesinvoice-date-check.pdf": {
+      "output_sha256": "07f4fd4e79bb239c650189631e8244bfbefd83e2e0c563f306287724ccf3859b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-05-salesinvoice-date-check.drawio",
+      "source_sha256": "124dfc2c4d6c889bc1718faca861bc950a637857a57009473ac32dd7bb2797c8"
+    },
+    "visuals/pdf/fig-02-06-messy-vs-tidy-data.pdf": {
+      "output_sha256": "614ab4f5cd784ecbe144a400d67f5dd35d57e417188c081bd7c0bc5f7b4fc5d0",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-06-messy-vs-tidy-data.drawio",
+      "source_sha256": "327fcfd148939cb79e32c2cc248c2af85415bd6bfe3d75fb8f09f03e242f04a6"
+    },
+    "visuals/pdf/fig-02-07-glentry-debit-credit-sum.pdf": {
+      "output_sha256": "7fd4048a0d7e295512f7b6f78b55341508c96c9415405229d863cdbd72318877",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-02-07-glentry-debit-credit-sum.drawio",
+      "source_sha256": "9c4dbeebeb0a43874ab36c7b92c04eca85b1bb199e7228a0b03a3b0af40646a1"
+    },
+    "visuals/pdf/fig-03-01-anatomy-database-table.pdf": {
+      "output_sha256": "78cc2c28a8a34b0dbbba8530066a46eb64cff4967105b7d5f760fce580dcd4ab",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-01-anatomy-database-table.drawio",
+      "source_sha256": "f8ca54de199278fb5a4dc4f38677b01d6c2f2c958127c16f62bc5f5b2ee9fe78"
+    },
+    "visuals/pdf/fig-03-02-pk-fk-illustrated.pdf": {
+      "output_sha256": "b5faa7487d518dc2c326a1f8a85ebc694820c0017e28ebb7375bf6ea4187e68a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-02-pk-fk-illustrated.drawio",
+      "source_sha256": "dd5c84e2b7217d037b8d06ce9880edd0e5ca2082e467d5c85e7686a470b9ced8"
+    },
+    "visuals/pdf/fig-03-03-three-cardinality-types.pdf": {
+      "output_sha256": "3cdaae2c7c8164175daa1a8e3b8e5fe03166b38ac513d098e130c48ed6353739",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-03-three-cardinality-types.drawio",
+      "source_sha256": "dad8cdd18ae51f7b582c7d8e790ac538a9d4a5f4511919815b91013df5a7fd48"
+    },
+    "visuals/pdf/fig-03-04-crows-foot-notation.pdf": {
+      "output_sha256": "7a267583ea0baca69581f43b7dcf126e156e3d09cd1af04e00e5ba5fd254e3fb",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-04-crows-foot-notation.drawio",
+      "source_sha256": "2c78a61272c6d9110f9bdec94b0fb6faf9a6483b6a8e5bb1d1cd863a6a3a9d65"
+    },
+    "visuals/pdf/fig-03-05-chart-of-accounts-table.pdf": {
+      "output_sha256": "143d90a89fb99400764b327a0e93df1d35847895e87e77ebb31c016528340998",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-05-chart-of-accounts-table.drawio",
+      "source_sha256": "91aa07bc0265d95b6c4900bf466cbb8ca31381c375f5e0372f6d46977b884e80"
+    },
+    "visuals/pdf/fig-03-06-gl-subledger-relationship.pdf": {
+      "output_sha256": "107420f7c8d7d0beb653d143302cdadbdeb171f33bdd4ec9ebf0d008f5fbad53",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-06-gl-subledger-relationship.drawio",
+      "source_sha256": "9b3d481a0ee5cb9a9794b54704a9e6d71a16df2aa9a02b34baa0c30d5df45634"
+    },
+    "visuals/pdf/fig-03-07-o2c-core-er.pdf": {
+      "output_sha256": "961aa726baf6768fdc6644f912bb726ea4df149b3a4d696daf0d3962cadd7cdf",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-07-o2c-core-er.drawio",
+      "source_sha256": "659f0ff7f2426c9046ed896ba7f324441c2f81ff2105a34c63c1d96094cc947d"
+    },
+    "visuals/pdf/fig-03-08-manufacturing-er-focused.pdf": {
+      "output_sha256": "35c949c390f5702279ed3a8a9761cdb43387b8fc0a27fd801292356c7dea9bc7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-08-manufacturing-er-focused.drawio",
+      "source_sha256": "c8e5af48f37b09136589766df02fdd0b0a1f63d44b0c6577287ee979feb7c735"
+    },
+    "visuals/pdf/fig-03-09-accounting-core-er.pdf": {
+      "output_sha256": "3c8fa55a1f629f2b7a6be5d9cc96f20e67ef785fbdeb5abf22da43e9e70bbfb9",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-09-accounting-core-er.drawio",
+      "source_sha256": "87e965384c52d9869cfea6ddb2b1fa10d9f57808311e90c39391f855c4ecf6d4"
+    },
+    "visuals/pdf/fig-03-10-cross-group-traced-path.pdf": {
+      "output_sha256": "1bdd69d931c6d4156d3b8cce503bbd9e852391f3350a5a7fa01a9e3da42477d7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-03-10-cross-group-traced-path.drawio",
+      "source_sha256": "e67af8f27aab13f70bc75249ca3caee83b044eefa9a6bf4875a6dd25a1f5bfe4"
+    },
+    "visuals/pdf/fig-04-01-range-vs-table.pdf": {
+      "output_sha256": "d671f851b021a15147d28c6b8e95c3056d7612101e0d59004f41ce6775ed9055",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-01-range-vs-table.drawio",
+      "source_sha256": "d8c269bf13d0d2622b46b6ed68418d691965088a9e692fb0ec6d93d4ee4c6e63"
+    },
+    "visuals/pdf/fig-04-02-power-query-navigator.pdf": {
+      "output_sha256": "543ce2631c58cea07f175772f50305c0060fd4e93489df871cffadebe4717d6b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-02-power-query-navigator.drawio",
+      "source_sha256": "e9e74ed7b79c6c73c49c694b8a5c4e26e3b47700765e0477b5cc8a0a76c64c2b"
+    },
+    "visuals/pdf/fig-04-03-power-query-editor-item.pdf": {
+      "output_sha256": "43f3086d97690fc699b33ce89c7c825639528da89f89ee3458c8fbc854938ae7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-03-power-query-editor-item.drawio",
+      "source_sha256": "be31185a812ca645ae17e4a002c35c62830ebf9681b2ee79d0d560486aed7b0b"
+    },
+    "visuals/pdf/fig-04-04-salesinvoiceline-table.pdf": {
+      "output_sha256": "ff3889dca36063e399f5f9d1c4e14706da36e35a731597038c49cb0cb8b02759",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-04-salesinvoiceline-table.drawio",
+      "source_sha256": "3e6882e3611670b5e9f5f34a41a3d4db6244ae26ec6024f632d8b5d02fa4e072"
+    },
+    "visuals/pdf/fig-04-05-cell-reference-types.pdf": {
+      "output_sha256": "7eae065e32b3b647e1b970b207358b33697c87a9b5af0b99aa7ee35a8f13241b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-05-cell-reference-types.drawio",
+      "source_sha256": "34d4fbb6722424a6eea0dead001f6a2bebae0dbe0f48137492edd4482f9dc6c6"
+    },
+    "visuals/pdf/fig-04-06-analysis-worksheet.pdf": {
+      "output_sha256": "92da05994af408cb55565e018b0251ccc012913473f11c6f78d7406da940bcdb",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-06-analysis-worksheet.drawio",
+      "source_sha256": "430157daa2f6161dc3f1cd543d425075b069268bfda7af84ffbba436d1e32cf2"
+    },
+    "visuals/pdf/fig-04-07-analysis-workbook-layout.pdf": {
+      "output_sha256": "5d75583943d48758b40287d2a5c5c60758d3bd96eb71779202ce1375f6d54ae0",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-07-analysis-workbook-layout.drawio",
+      "source_sha256": "ba93d663d08ceb23e6cf65482bbdda4926ce0d4d8088f8b45285baaff70fbdd1"
+    },
+    "visuals/pdf/fig-04-08-promotion-slicer.pdf": {
+      "output_sha256": "ae95449d5d7526575baa57911314d3e780f7c5979e124284f7a37e555f2a41db",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-08-promotion-slicer.drawio",
+      "source_sha256": "5b79c9a7a8d9e07331f8bdea3bd5965fb33e4a34cc2f0daa9a6153a4ecce4093"
+    },
+    "visuals/pdf/fig-04-09-documentation-sheet.pdf": {
+      "output_sha256": "cffa24601d87e63e376b49644a351a8a1015e35c80fbb21f2852823145d5bbec",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-04-09-documentation-sheet.drawio",
+      "source_sha256": "0ae4587ad68662a88db6973f3bb6e6df01f1225c351ebc90099db78244915b8b"
+    },
+    "visuals/pdf/fig-05-01-invoicelines-map.pdf": {
+      "output_sha256": "7f632a2b3d93b5a503bb1747ac8bb1a5ed74efabf9aa38ba00bd3f97ddd71db1",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-01-invoicelines-map.drawio",
+      "source_sha256": "a6cd9ef2d510507a143f6abee72bd5d7d8be59cf3a93463de6bc546e0cc76999"
+    },
+    "visuals/pdf/fig-05-02-item-product-type.pdf": {
+      "output_sha256": "7ee6fb9770652b41d94d0df2b0583b2d799b014315a40432453f4f75360314fe",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-02-item-product-type.drawio",
+      "source_sha256": "75f8263c8630161eeba9b8917bc7d7c668c850365723c9a9eaa957bc1416beee"
+    },
+    "visuals/pdf/fig-05-03-salesinvoice-periods.pdf": {
+      "output_sha256": "ed5bd3159c15c44cb7b773a99802c528dc83aaee3920bf38d9e75cf6f61012c6",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-03-salesinvoice-periods.drawio",
+      "source_sha256": "8830360065569794d2a50a6d6cd1fa92e6bfe4967fade2749c4ee3a11c285ed3"
+    },
+    "visuals/pdf/fig-05-04-xlookup-anatomy.pdf": {
+      "output_sha256": "4412507804eb90b1e73225027bdc9f29b170ef421fb190d688e38edaeef71f2b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-04-xlookup-anatomy.drawio",
+      "source_sha256": "2342877ee56b9d5b62fdef9848cfbe540f9dfc670c5cb373088671433342d217"
+    },
+    "visuals/pdf/fig-05-05-invoice-line-lookups.pdf": {
+      "output_sha256": "b545b3e98098f0b70ce40aac61f6221b49778765965900a6689438257fe254ef",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-05-invoice-line-lookups.drawio",
+      "source_sha256": "32bbd37de207c94bef0c7953fd9338b4d038bc21aaac486f749514723f4a5869"
+    },
+    "visuals/pdf/fig-05-06-merge-dialog.pdf": {
+      "output_sha256": "401f715799c3d586279f93ed07d150c9afd2a3a0538390a4cd39b08df1534bae",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-06-merge-dialog.drawio",
+      "source_sha256": "e0287b0419081374f30fd54a0702f87cc5090f1710038a2acb16ef3cd9655874"
+    },
+    "visuals/pdf/fig-05-07-custom-column.pdf": {
+      "output_sha256": "f12a0ea71d1ee33a518f941bebb6426ccee1bb7915e8e83eeb157a96d9b71330",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-07-custom-column.drawio",
+      "source_sha256": "4731ff6fb2d6baccda2732c25d718513ab1dcc5e2aa36c5766f8dde6612d9243"
+    },
+    "visuals/pdf/fig-05-08-invoicelines-table.pdf": {
+      "output_sha256": "e8b645a4b7fe1f335ce438ee97659de7c29802ffe56fb9a328fd90a8e7c7a425",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-05-08-invoicelines-table.drawio",
+      "source_sha256": "f6e084a8a09bb503ec4c8ba492c688ce259dac3106342c41eafee508be8d889b"
+    },
+    "visuals/pdf/fig-06-01-fiscal-2026-profile.pdf": {
+      "output_sha256": "af76881a6efc017c48b72b6788d6829d7138da47041cf4a46321843762bf6bcf",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-01-fiscal-2026-profile.drawio",
+      "source_sha256": "62453d8bfbca7ec37ff33b8dc8f4e33ebe66933c6348dcd4952aab270e37143e"
+    },
+    "visuals/pdf/fig-06-02-line-total-histogram.pdf": {
+      "output_sha256": "5d36cf2b6418e8117f7d96e8e5ba13e50a10067fca38fd86d085c247164f04d3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-02-line-total-histogram.drawio",
+      "source_sha256": "ab088fdb4f02bb6f9f422495769293560d8d141ff5517718c2aee8e0f5a89fbb"
+    },
+    "visuals/pdf/fig-06-03-pivottable-areas.pdf": {
+      "output_sha256": "a0a0d41ff3f5085ebffa769e4640d4280180920caa504b2a8b5ff6ddb32666b0",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-03-pivottable-areas.drawio",
+      "source_sha256": "a2690fe61daceb5fdb1c021b504b273efcd8e5f780f10d5031ed63b7857001f8"
+    },
+    "visuals/pdf/fig-06-04-show-values-as.pdf": {
+      "output_sha256": "e172f640c81fda88e29e78e72fe230c6de679b04d41f0185b091113e66dfbd8c",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-04-show-values-as.drawio",
+      "source_sha256": "77c1b4d56e45a48bb78a5043cf6d97f69d1a6a65c0c7318c506fa160d0154d68"
+    },
+    "visuals/pdf/fig-06-05-calculated-field.pdf": {
+      "output_sha256": "9b02c748b34cc30b03e0795a42c48b5e287b3eab51eff9885a4e717e8100fafa",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-05-calculated-field.drawio",
+      "source_sha256": "d35ca1bb9a17d1ac756b15ea112e2871d5302fcf1bde2c25c256658fd7e110d3"
+    },
+    "visuals/pdf/fig-06-06-revenue-margin-pivot.pdf": {
+      "output_sha256": "adde6b69944cdc472ec8185c9d1a8f99973b57faa07442248976357fdcb3d67f",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-06-revenue-margin-pivot.drawio",
+      "source_sha256": "b426403232cd39c2f24b0f8a5a9676b6345ee5251ff01f6dca0bc62821baaf6a"
+    },
+    "visuals/pdf/fig-06-07-ledger-to-income-statement.pdf": {
+      "output_sha256": "abc5fcec119bb5a472c8e6032d9ab322b4cd3ad0909850d4cdb72ef0f4e1902e",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-07-ledger-to-income-statement.drawio",
+      "source_sha256": "b305a9d48bc7a10e233a4cc3e630f7ca2219c5568f46cae8d91e532ef1299f32"
+    },
+    "visuals/pdf/fig-06-08-furniture-drivers.pdf": {
+      "output_sha256": "95a81dfb011f2acf7dd964024673e65163e4a6cee857ed236515d45b0042c2f5",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-08-furniture-drivers.drawio",
+      "source_sha256": "cd0e2462f1e1c8eafc83b6a0ff0937002aae130d75da66eeb3dd4447fb2e2d57"
+    },
+    "visuals/pdf/fig-06-09-margin-bridge.pdf": {
+      "output_sha256": "374be5257933a44df1a21ad84b505a94e8385503f5ee071ec7403588425a132c",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-09-margin-bridge.drawio",
+      "source_sha256": "b48b7fc7c6ae192c17e1adb682ce002c2524135417633df1f959f4403fde0f8f"
+    },
+    "visuals/pdf/fig-06-10-discounts-by-promotion.pdf": {
+      "output_sha256": "43aa33cc643a50656e4d986c079234eaee6f7d1cb4892085cb46493c8b54f4f3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-06-10-discounts-by-promotion.drawio",
+      "source_sha256": "dcf73a6a57bd805e8ca73f9658406248635b861de42457c4320d8e830e2dc80f"
+    },
+    "visuals/pdf/fig-07-01-monthly-revenue-trend.pdf": {
+      "output_sha256": "d32700aa508453ddad4d8c9b669486b804385e2e2b321c04230de6db6af63c00",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-01-monthly-revenue-trend.drawio",
+      "source_sha256": "dcd73d84516b41f87c6542c8b2aa436d1ec0beb2452f97c9e6a669250965cfb8"
+    },
+    "visuals/pdf/fig-07-02-regression-output.pdf": {
+      "output_sha256": "3ea0c93d83e1217c15807729a9d4d66876087bffb67048d849b45b4f6360a04d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-02-regression-output.drawio",
+      "source_sha256": "83c0f9b11632b6b79a33b3dc619de780ee2a42630f3cb4e04741a33ed0144253"
+    },
+    "visuals/pdf/fig-07-03-forecast-backtest.pdf": {
+      "output_sha256": "6001f5cbbef00ac00879c7cc8b2bba6d4dfe396543ca829543bf2c26a5def1dd",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-03-forecast-backtest.drawio",
+      "source_sha256": "561ffa0f1136a77ad6570062e4caff2b3e2c9081a1da2ccb2a2b1f3e9f457ab3"
+    },
+    "visuals/pdf/fig-07-04-flexible-budget-levels.pdf": {
+      "output_sha256": "c5490b7ce041a8509eea19ce0f906164b938a786c244ccec6b3b2c5b0371e099",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-04-flexible-budget-levels.drawio",
+      "source_sha256": "e43995380de98e8e2d0eff0a393074b465a2227c626407125c820aff6acd5d38"
+    },
+    "visuals/pdf/fig-07-05-flexible-budget-report.pdf": {
+      "output_sha256": "9c8bfd3d4ffd72f9adce1f78393bfea2e3cad8f7e0b8ecc53440af4f25c3d11b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-05-flexible-budget-report.drawio",
+      "source_sha256": "84ae42c1fe6a2e902051ad47820adbf169cc51d1d6261a0aadb3dc1b1d0a5962"
+    },
+    "visuals/pdf/fig-07-06-furniture-price-by-month.pdf": {
+      "output_sha256": "cd1508717e47eb582c3756782b393dedc54155e852762ae1ef19aa5a2eff659a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-06-furniture-price-by-month.drawio",
+      "source_sha256": "c2ae8608e3de107a366a009690f338bd7bb1ec3e91d474318b45d2f3462728d2"
+    },
+    "visuals/pdf/fig-07-07-promotion-model.pdf": {
+      "output_sha256": "deb1ccba126ea523e51b8e404f856a4d45b039c8514a822167099b6f7a31fd12",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-07-promotion-model.drawio",
+      "source_sha256": "2a956f53149842ae56145babc938884ca79e8898dae316242670b18bd6db6411"
+    },
+    "visuals/pdf/fig-07-08-scenario-summary.pdf": {
+      "output_sha256": "fe481d624c2b7f518bc8d55ccecb10da591c659ad074e160458848ff0691ebb6",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-07-08-scenario-summary.drawio",
+      "source_sha256": "7df3c947210c1a95189103b842ca62c25b05f3de920867afba15b615c977eac0"
+    },
+    "visuals/pdf/fig-08-01-audit-analytics-workflow.pdf": {
+      "output_sha256": "969a5d3200e7dccaed9b500e4e36f633dd9e0f17232c8481b4656332f2c521d1",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-01-audit-analytics-workflow.drawio",
+      "source_sha256": "a7915a3dc9bae4bed60e5ebbe0f0c6a0b52726eef3480f6bbdf5949c32fbab8b"
+    },
+    "visuals/pdf/fig-08-02-payment-strata.pdf": {
+      "output_sha256": "7d57cbb2b97d2765c612a7070b095310638dd8b5899e0007f786620441eddcd3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-02-payment-strata.drawio",
+      "source_sha256": "dc7fe15a03f79059122c7c2afddade782119a9486c0430a8350cdcebeefa5d3c"
+    },
+    "visuals/pdf/fig-08-03-benford-all-payments.pdf": {
+      "output_sha256": "cfb1daad5a4b6647468f12e9421ab70820431aee4fb42032b15fef83e09ff9e5",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-03-benford-all-payments.drawio",
+      "source_sha256": "38606ad93d3f5f1796e8b7cd3cb88e5a04d464fea0fbcdf28f6a45b8e8a67882"
+    },
+    "visuals/pdf/fig-08-04-benford-by-payment-type.pdf": {
+      "output_sha256": "d6f41f059143aeb6700adbf14fa42b6529ae8d9100b84a81a11d45f9c65fcbcd",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-04-benford-by-payment-type.drawio",
+      "source_sha256": "4bae2e18fed6d80be8c56f0d97f502d31dd5509316db7d8bd7106e472079c24a"
+    },
+    "visuals/pdf/fig-08-05-ar-aging-reconciliation.pdf": {
+      "output_sha256": "773ac48fcf898150ca948fc99a2b8c03279b372e478f322981be30c6290a4a4d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-05-ar-aging-reconciliation.drawio",
+      "source_sha256": "f824ba2752c4209aa65c74f5c76b5f3fa845483452e99dc243afcb82bde08eae"
+    },
+    "visuals/pdf/fig-08-06-ar-ledger-by-source.pdf": {
+      "output_sha256": "30e46c8aef0fbd9b79af7183277bf2c4e9fac227d794edc222e50797fc9b25c7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-06-ar-ledger-by-source.drawio",
+      "source_sha256": "e1165069e64787e506fa4c828a5bfff97cc90772a5233b9c0e4bb5bc4298165b"
+    },
+    "visuals/pdf/fig-08-07-journal-entry-flags.pdf": {
+      "output_sha256": "b2495d1b908bc820ed66f3f7ddbcb01799e34e8a16a8e105d52b5a5c11d80b01",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-07-journal-entry-flags.drawio",
+      "source_sha256": "1a1f408339f1bb7c3292704d3b6cfd8f54dfc998c1dfd773ac405c7620d8dd56"
+    },
+    "visuals/pdf/fig-08-08-journal-entry-drilldown.pdf": {
+      "output_sha256": "5a564c4d1076739a639d74a1ed20edb01f585ed8df5146fc991896afdf5cfb41",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-08-journal-entry-drilldown.drawio",
+      "source_sha256": "bb5f9ca52c4eeaa67740d2bd8da545a1658e158d8199598ae946288e7d6e1143"
+    },
+    "visuals/pdf/fig-08-09-audit-workpaper.pdf": {
+      "output_sha256": "b9f032b824d74522d37c0c4a463afa8d321622bd4ba659b689170159648c3ec6",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-08-09-audit-workpaper.drawio",
+      "source_sha256": "90e451d69ec220304affe20ef8d4b9e0f8db3c47d553d3deeaaf5ec1a47e9c9b"
+    },
+    "visuals/pdf/fig-09-01-import-vs-query.pdf": {
+      "output_sha256": "03e74c2a156292366e4b36fbc7a5a0e2889d66130961cbf37e831c231be051d4",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-01-import-vs-query.drawio",
+      "source_sha256": "a6ebac6587c774ea8e85b8ad12e99ccd351f2d520ea3c68f42dd550d2c2d63f2"
+    },
+    "visuals/pdf/fig-09-02-database-structure.pdf": {
+      "output_sha256": "de74513490814a3fdf0cd4a762dd765f989fb5371ee79a7c1311c79ed0e65411",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-02-database-structure.drawio",
+      "source_sha256": "382b268b12fa038d08d25b2bdd0df6922b4228e8dfdec74bb92b20e151b687ab"
+    },
+    "visuals/pdf/fig-09-03-account-columns.pdf": {
+      "output_sha256": "3cd96f8a75228beb88bd311dd5cd1d9d70e1295f4664ee33efc74ccce8c3449d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-03-account-columns.drawio",
+      "source_sha256": "91762c5dd38db4d25c076b753e7441ad63c699231a318e60f93323b7e124b31d"
+    },
+    "visuals/pdf/fig-09-04-syntax-error.pdf": {
+      "output_sha256": "89236b86acf5845626e09243e8702464275ab1489946b898b0e718e2bd96c781",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-04-syntax-error.drawio",
+      "source_sha256": "112ba60807848750a4eceb037f7cca11d1ede38d9d6075560f149480cf0c9353"
+    },
+    "visuals/pdf/fig-09-05-variance-check.pdf": {
+      "output_sha256": "6d9b4d10a9f5d2e0bfdf17b40d6b509ec6ca2e34c90a224529d99bd78595b033",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-05-variance-check.drawio",
+      "source_sha256": "1b3ddabfceb150b82de178da618429563a2aa0e1cf02e81d16d1a027da08699c"
+    },
+    "visuals/pdf/fig-09-06-where-null.pdf": {
+      "output_sha256": "eb2278a32c6cc63a4dd93c9c329dfd196b40ee970d2947e4331f9bd8f0053733",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-06-where-null.drawio",
+      "source_sha256": "1fa768125678bc07b13f017778076ef0bc03b8e29372c33d967f01166ff9ca7c"
+    },
+    "visuals/pdf/fig-09-07-variance-sources.pdf": {
+      "output_sha256": "4eff444791ae84fad72f7219c08af4819ce6bfaa05807d2f1a52554975e44789",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-07-variance-sources.drawio",
+      "source_sha256": "122796554894d82237dbf5c8d59df09e74820924c68927a49949761727970730"
+    },
+    "visuals/pdf/fig-09-08-query-anatomy.pdf": {
+      "output_sha256": "7e99d52530d8434cf6cc997b0fcfeb71d676b24f2be6464cc683272da1643022",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-08-query-anatomy.drawio",
+      "source_sha256": "ea388561210e0749ef55bb8ee1280e1442e449b7db12c64eeb63714cdfa18f0f"
+    },
+    "visuals/pdf/fig-09-09-top-variances.pdf": {
+      "output_sha256": "54153f382fbb0bf0a2dc20e1f171a3ead69f1900e35613ac44abdbe8287f842d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-09-top-variances.drawio",
+      "source_sha256": "b09e5817e4cfc2d356510ccb396700290d086b51e902df82e853b725456dcb93"
+    },
+    "visuals/pdf/fig-09-10-saved-script.pdf": {
+      "output_sha256": "7a77d2a195292eb4fc41c154497a538bd36bfe972029c11bcedb04a76cf26112",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-09-10-saved-script.drawio",
+      "source_sha256": "6581faf332b4516e0914ee0ec1b9c5fe7ad05bc53c26548d61df03dc8d872bb3"
+    },
+    "visuals/pdf/fig-10-01-join-matching.pdf": {
+      "output_sha256": "f42e39c7f426dbc86b3508e9f4e425980b0ce3b217c43b344b707e8708c18f2e",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-01-join-matching.drawio",
+      "source_sha256": "a2403fc5096915d928883de36d3b2d0fe032466cd1937542d7e9bf5517881bea"
+    },
+    "visuals/pdf/fig-10-02-group-by.pdf": {
+      "output_sha256": "d61906e48f2d094209ce9114cc21fb723821c92c8866e1bdb515289e1439631e",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-02-group-by.drawio",
+      "source_sha256": "f2fa371d126acb9abaf2d42564c5b3faf0e05258aa50df4fbd94e3dc57c8631d"
+    },
+    "visuals/pdf/fig-10-03-variance-by-group-year.pdf": {
+      "output_sha256": "34de9a7f5e50546ebed72abc9edd5fb1fd3650a6d42d7827683bf2f2e700df0b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-03-variance-by-group-year.drawio",
+      "source_sha256": "c06dff150ce595a1221a3b6a12a7f805ca4171e01d2dc6fad0048baa97c8cd5b"
+    },
+    "visuals/pdf/fig-10-04-fan-out.pdf": {
+      "output_sha256": "1292d2fc760af610808088e4578a6f2c021515ec0dc8addfbe448497fe4bee45",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-04-fan-out.drawio",
+      "source_sha256": "70b22a89e7adf8444c727088d82fa7b87abe5ac9beacf413deed941e29cf2f7a"
+    },
+    "visuals/pdf/fig-10-05-evaluation-order.pdf": {
+      "output_sha256": "7395d58c1602893790f81b3ea93012325012decd675e654368593fbc182a1bb5",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-05-evaluation-order.drawio",
+      "source_sha256": "4c87713d9a18eef69fc631154b207c24fbda5abdc19a3bcd5c165910a083ee4f"
+    },
+    "visuals/pdf/fig-10-06-trial-balance.pdf": {
+      "output_sha256": "92350d84034fc9b7495e7bf65002a8cd0a9bd8f6f86e1bf2ffcf2530f4e3aba4",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-06-trial-balance.drawio",
+      "source_sha256": "6779dfaeeb9129e6bd7b418957ff0b9d84b44ff30f9cbba92d3ca7229fc97212"
+    },
+    "visuals/pdf/fig-10-07-conversion-cost-flow.pdf": {
+      "output_sha256": "aa0ac1744f848ac36a5398ba92c0bf5df9a0b1ca021f767fd4ee711dcd5db8d2",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-07-conversion-cost-flow.drawio",
+      "source_sha256": "7157f003480ea5545f3ff2276015bfa2ce02bd69925b84c2cc50506e00b0cbaf"
+    },
+    "visuals/pdf/fig-10-08-payroll-time-er.pdf": {
+      "output_sha256": "4c3d3e4ecceab285def2bcc2f13e1fffbd447ca2fc6ae1abb48b61ee581a8454",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-08-payroll-time-er.drawio",
+      "source_sha256": "b35e5cff16f9d876119fd28843184efb03a22663ab0fba874da2df8e26c00c8c"
+    },
+    "visuals/pdf/fig-10-09-hours-per-standard-hour.pdf": {
+      "output_sha256": "166ea0ca88114bfbc805d567707c623b7a16ab4a3fe150244c2f4cd8106afe09",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-10-09-hours-per-standard-hour.drawio",
+      "source_sha256": "439700bb448c6106adac8174d01adde8c893c6d147ad2e8490f97529071a4f86"
+    },
+    "visuals/pdf/fig-11-01-conditional-aggregation.pdf": {
+      "output_sha256": "f436313264bfd3b06682c5e3ef26f0f034e61e9142e3ff821250099fb59a8264",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-01-conditional-aggregation.drawio",
+      "source_sha256": "34bc81a2744c7dab6bebf88f1723d2b26e69c7dcc087b85a723380c1f60b5c84"
+    },
+    "visuals/pdf/fig-11-02-early-months.pdf": {
+      "output_sha256": "dea2510788d42162ae0348364c7faa8310734a263d0a7473c4f814288a55b9c0",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-02-early-months.drawio",
+      "source_sha256": "e90f4b7a0bb8e220bdf468d87fddd2bfa6c3e6a41d7f522bb19da6a6cf5b5e33"
+    },
+    "visuals/pdf/fig-11-03-overtime-shares.pdf": {
+      "output_sha256": "46edb601513ffbf66e8389bd6bf3d3c0266222bfae25b3b9f9250fb750eda6ce",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-03-overtime-shares.drawio",
+      "source_sha256": "99add7393fd99a0055deacc4ffb5fc97aad655d62bfc77b79f54d90e7e92bb51"
+    },
+    "visuals/pdf/fig-11-04-window-frames.pdf": {
+      "output_sha256": "f08b1d2c55e29d7799a612803d61947a7daab79ddf78f3eb2a36ca1074af985a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-04-window-frames.drawio",
+      "source_sha256": "8095e3034c9e3efc3609d0ec1f344cfde3c2e6ab66e10a95748314b3ccd464c5"
+    },
+    "visuals/pdf/fig-11-05-gap-year-to-date.pdf": {
+      "output_sha256": "2bfe5562c4567f1f7e2887dde8f575f6f37f04da466526370c09085c979fd4fa",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-05-gap-year-to-date.drawio",
+      "source_sha256": "142293e29681af748fa79cfc6e6f05c38963098293f3dae04dff9112c33c9916"
+    },
+    "visuals/pdf/fig-11-06-gap-pay-dates.pdf": {
+      "output_sha256": "1b83dad2cc5dd06ff1c8f31adbbb243ae4cdf73083c34b8f8b117dc824e900c1",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-06-gap-pay-dates.drawio",
+      "source_sha256": "71e46b0b0ceb3d2a98c9755fe88b6cdf298c4e4361d23c3e074757d2743dc87e"
+    },
+    "visuals/pdf/fig-11-07-work-center-rank.pdf": {
+      "output_sha256": "3394c770298b0e7b73b38e9235fdb29f420c86a7dd72b6bb5140f5a0ac4187f6",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-07-work-center-rank.drawio",
+      "source_sha256": "c36152495967ed5ae0bf20d8116f2add264b435eaf5468fc04a364e82e889003"
+    },
+    "visuals/pdf/fig-11-08-cte-pipeline.pdf": {
+      "output_sha256": "2d9ee21154b5ded3a76a7f08da026c161e082e09611016ab393b95b9cf8944e1",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-08-cte-pipeline.drawio",
+      "source_sha256": "ec6df9b30ce9bcfe4b3ad4758d97174526411a81cf24fc0571c4e8a0c0131fad"
+    },
+    "visuals/pdf/fig-11-09-view-in-structure.pdf": {
+      "output_sha256": "c7de971ba08e3b85ecd4556ec685a750b41e7527b6cee821c1e46950b70dab03",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-09-view-in-structure.drawio",
+      "source_sha256": "c596feeafb9f565424db34e0c019044c534394493faf5a5a542bb532bb780fa4"
+    },
+    "visuals/pdf/fig-11-10-monthly-measure.pdf": {
+      "output_sha256": "cbb3e50383bfd646b3c381b8bd6b219d9c0858254986924cc2de1161eac3ac04",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-11-10-monthly-measure.drawio",
+      "source_sha256": "57f676db4a75793fffb50d30185812674796651a6d92a7b95c6337e070fb8eb9"
+    },
+    "visuals/pdf/fig-12-01-two-way-trace.pdf": {
+      "output_sha256": "276404a2929f3fd660b9a1dd757180330e39a95b7e471f3a38101f0f8a2ffc83",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-01-two-way-trace.drawio",
+      "source_sha256": "3b37d4fb43ac12126534f2f637589a5edd3af5ab65338ac6471503eeb6fd6451"
+    },
+    "visuals/pdf/fig-12-02-trace-exceptions.pdf": {
+      "output_sha256": "411bc49084a8f995f02118028b458e63be28c33535971336d7f25bfdd5dd32a5",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-02-trace-exceptions.drawio",
+      "source_sha256": "7c08f908dc7e1703be1ca28e03fc17414000bcb62f3ccad96964b72c9673e3d7"
+    },
+    "visuals/pdf/fig-12-03-revenue-cutoff.pdf": {
+      "output_sha256": "6e43fa03f9f10791744a2c6369a96c1223400e9256ac0bd07dc8c3b0dd083724",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-03-revenue-cutoff.drawio",
+      "source_sha256": "761906c21f9161ca9c045c9ac35ff4332cc4e9d0eadd13f97941fd23068e037a"
+    },
+    "visuals/pdf/fig-12-04-three-way-match.pdf": {
+      "output_sha256": "cf5e38377ca162d0af69022c6b2dd993e7952902d3b47f8e6af609332a25b24a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-04-three-way-match.drawio",
+      "source_sha256": "bf64661217687da092d62eaf9d84b04e3d2d55c173edac71677daeab53d5f373"
+    },
+    "visuals/pdf/fig-12-05-three-way-match-status.pdf": {
+      "output_sha256": "54c3127032dd1e97af090e70a3ea2ac1b67bde44a41421d98b5958f28ecb186b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-05-three-way-match-status.drawio",
+      "source_sha256": "a3c08bf3492b7dc8d1802048728ba20d7e4374a69424ca72ed7f944a5e119def"
+    },
+    "visuals/pdf/fig-12-06-approval-exceptions.pdf": {
+      "output_sha256": "919691634fc41cc2f8fd770bd03aae5d1e538451bb4337352dd0036006939ee4",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-06-approval-exceptions.drawio",
+      "source_sha256": "60ee0bc64a3f353667e63d8e20aa6b28b580bf7800dd51b9ede8d085406a996c"
+    },
+    "visuals/pdf/fig-12-07-labor-record-chain.pdf": {
+      "output_sha256": "0a8183268a704b029c411a0874299cde1de0a1b839c6d9feb88b4d8c8d9fdd2c",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-07-labor-record-chain.drawio",
+      "source_sha256": "56f12432c2cb48f745a1e1f669381c7a7a574e0d554ba3110057aa04ce09374f"
+    },
+    "visuals/pdf/fig-12-08-surge-days.pdf": {
+      "output_sha256": "b8dc3a30264834320bcc5b17dbb6b0f6c59936b4dc5a0f13371bbb4393d65a87",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-08-surge-days.drawio",
+      "source_sha256": "156847033cae9380cb11f807d0addbf9c2cdf5fdb28793dcd25178711b160a18"
+    },
+    "visuals/pdf/fig-12-09-normal-and-surge-day.pdf": {
+      "output_sha256": "6b7a4b406b12a5b2ee2c8d5176884d17039b4c064ca1ab1d3af79a359ffa4c62",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-09-normal-and-surge-day.drawio",
+      "source_sha256": "45da82925232cd358c64db66509351624e518dcd954bf9c91cd6c6c1a6e55820"
+    },
+    "visuals/pdf/fig-12-10-labor-after-operation-end.pdf": {
+      "output_sha256": "1f4807c5fd3e3badf0959ea9a324a0d12aa56e4fed9fe8181535410229a8fccb",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-10-labor-after-operation-end.drawio",
+      "source_sha256": "71f0264e74143a6cff1c6848a22233b364491840ccf89abda91ce80ee0fe673b"
+    },
+    "visuals/pdf/fig-12-11-audit-library.pdf": {
+      "output_sha256": "a513b2f34feb473dca2e18fc9df1cc0db4b16ccdd2bcf5df7648e8734b3d2813",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-12-11-audit-library.drawio",
+      "source_sha256": "124049c78f884c0296dc80013ba88e0ad04567807ce8332c4bb3c61271516fb5"
+    },
+    "visuals/pdf/fig-13-01-power-bi-workflow.pdf": {
+      "output_sha256": "635f70524366831e3b84d269ad733ccee352d6c265bb32b12df0e493dc0e8ca7",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-01-power-bi-workflow.drawio",
+      "source_sha256": "064f946c56147b58e0b7d42468d38b5345e6fd204992df807b45ce427a201aca"
+    },
+    "visuals/pdf/fig-13-02-desktop-window.pdf": {
+      "output_sha256": "86bba62cb2a267cc4d7fb8adfe60e727f5dac71fd358b97655ad07025bdf3f8b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-02-desktop-window.drawio",
+      "source_sha256": "54abdc0ae15ced546565dadb040037b8f2c046df954be5c06adb64bbb338eb10"
+    },
+    "visuals/pdf/fig-13-03-column-profile.pdf": {
+      "output_sha256": "6ef4fa87f050d07c5f9c46ffc488b19ec48375d82cf9c544d4b976b8a306d2aa",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-03-column-profile.drawio",
+      "source_sha256": "9768ad358f39ac02e26bc84e94407e484b05e5f753b9c296ab6ac9f3e2e38f97"
+    },
+    "visuals/pdf/fig-13-04-model-view.pdf": {
+      "output_sha256": "bdd4809e60d6ec17eff84bc6184880e72e58975336d3bfbb972b064d5c320055",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-04-model-view.drawio",
+      "source_sha256": "25439ce6bee2f6dd22b79cb392467dcca3ad6bfd8e33219ae908c645a777f472"
+    },
+    "visuals/pdf/fig-13-05-validation-page.pdf": {
+      "output_sha256": "281e3040f1e6dd18e62db48223591d15b6a8ce769c40d899d0137653d8c88aca",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-05-validation-page.drawio",
+      "source_sha256": "5a81d7d17d78ea21f0bcd107ada616220ff134f9e42a621be483fec2403efa1f"
+    },
+    "visuals/pdf/fig-13-06-sales-discounts-page.pdf": {
+      "output_sha256": "0d0e7d91e3fc70b7b9c47e258f1dfaf0cbe80212d0651a51d2f0576f9ab4c0f2",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-06-sales-discounts-page.drawio",
+      "source_sha256": "f638cf9807d05a2fee31a9c9a3bb1c9f6d9d1cf0e539807adc1ae827fec2b590"
+    },
+    "visuals/pdf/fig-13-07-encodings.pdf": {
+      "output_sha256": "ced35d898e94f5ed77f80aa7d7de05acd0625f924d81422e6a36d7ef3054fc2d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-07-encodings.drawio",
+      "source_sha256": "7fd1a04fa9ae3aa6561e80245671606da74f6933a1bf54708c0cbda9405ae3a0"
+    },
+    "visuals/pdf/fig-13-08-value-axis.pdf": {
+      "output_sha256": "4bfa7274647f4dc8478681ece052026f6efadcb41c9418e4ca9d2ac4d2fa584e",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-08-value-axis.drawio",
+      "source_sha256": "cd06023710517f10c77b98bfafba3232101ed630efc9d6561656864cba3ebbfd"
+    },
+    "visuals/pdf/fig-13-09-dual-axis.pdf": {
+      "output_sha256": "7d294266573be7a30e114395639c0da43be20e1a9e4cc3a0e320558eb6f2edf5",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-13-09-dual-axis.drawio",
+      "source_sha256": "b1b6d6c3ae99aa081a0a01c3b9c1bad16de102d849c5d8a1d8246977e7019e27"
+    },
+    "visuals/pdf/fig-14-01-star.pdf": {
+      "output_sha256": "684abb394d55d06df34cd0af73b411b7f2f9e59d242cec03d8ff13684f74e7c6",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-01-star.drawio",
+      "source_sha256": "5d680076c40bc94a644b54e95d778161b65929e9c79176ae8d0282aa410ae7fa"
+    },
+    "visuals/pdf/fig-14-02-date-table.pdf": {
+      "output_sha256": "d6f9491a95bd1821506e7954c48d4d5e518b7215ea783bd0837cfdb173f7f1d9",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-02-date-table.drawio",
+      "source_sha256": "04829887cb76d9d53fadba7220787bc902ded29db6f59369c1a21850ef80ec53"
+    },
+    "visuals/pdf/fig-14-03-filter-context.pdf": {
+      "output_sha256": "bd31be1646bfa8bfdebc5a232b1908217a869374241075cd7afc9fb3ec3684bd",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-03-filter-context.drawio",
+      "source_sha256": "f9a96a6761bb81fb0b601bf23125fc128361ef5b378433c1631726d8bb57fd88"
+    },
+    "visuals/pdf/fig-14-04-context-transition.pdf": {
+      "output_sha256": "539c7ae0a6b5a628c0496b7af08895ff6c2954c04890ca31f9473937703b304c",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-04-context-transition.drawio",
+      "source_sha256": "fb9d9d7b86b24ca2d94fef123799dd7ea8b3d799164bcda48888d8812ce8cfef"
+    },
+    "visuals/pdf/fig-14-05-calculate.pdf": {
+      "output_sha256": "d353a2bcace41667989b815a655032ac18fac81b36e1473199fd8526ee953f7d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-05-calculate.drawio",
+      "source_sha256": "b9ed81cea01ecf4112f838e4fa5ab10868b234430262de4e856b37129c5eb150"
+    },
+    "visuals/pdf/fig-14-06-dax-query-view.pdf": {
+      "output_sha256": "99daacb8130404bf86376f19027224db0fae96807aede42e0f586e17455c36b0",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-06-dax-query-view.drawio",
+      "source_sha256": "37ec123d2d7d3550b1716e6edc304257ab1cb91e14f8e4f4a11596fa02878dc5"
+    },
+    "visuals/pdf/fig-14-07-margin-matrix.pdf": {
+      "output_sha256": "d982e6f466359f1e04a5c45ac791836362ee83fefd5384ef67eb6e4f7d9e47ce",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-07-margin-matrix.drawio",
+      "source_sha256": "b037a6c8bd537e8a39cec73e02edfd7650ea2e30d929e003687622c753917399"
+    },
+    "visuals/pdf/fig-14-08-two-stars.pdf": {
+      "output_sha256": "c51dc186fa1ec618c625bdfa247af97f9c33a5740486cb9475ca0c789b7128fc",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-08-two-stars.drawio",
+      "source_sha256": "816d28b190b82617b0940d99be6fd8964e5bfee45842f4d538264fb8c3b4f9c7"
+    },
+    "visuals/pdf/fig-14-09-closes-trap.pdf": {
+      "output_sha256": "d42c697f575fb2cfb1a477753f88228f3365e6d184a9e45183dfaae400db9c55",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-09-closes-trap.drawio",
+      "source_sha256": "bfe9d5232bacd69ed4fcda5f272bd72f4bd3238d0a5e49930e614800293f6d2d"
+    },
+    "visuals/pdf/fig-14-10-income-statement.pdf": {
+      "output_sha256": "df7add27efb95445f8bbfc27bf4a1adbc706b0c3cae89bbef49745da0391b37e",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-10-income-statement.drawio",
+      "source_sha256": "a07a29de026231afe0291b0ecbf6da5f3da41777108c320d46a5195baa0a3e43"
+    },
+    "visuals/pdf/fig-14-11-expense-expectation.pdf": {
+      "output_sha256": "76c87e5ee9124d9084d057ae31b09afa76154b678317a08aad73654dc31dd92b",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-14-11-expense-expectation.drawio",
+      "source_sha256": "33fc0ffa88885972cc36426666d543ff2b21e47ab951f296fb73327c44bcbd0a"
+    },
+    "visuals/pdf/fig-15-01-package-plan.pdf": {
+      "output_sha256": "e653384ed439007ce1ddca8546c1b9b31bc7cc76b584750d81d6b97312619d83",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-01-package-plan.drawio",
+      "source_sha256": "84238f249be3427d9975bae94575eb816c70f7d69c8541dea25ef68d512a70df"
+    },
+    "visuals/pdf/fig-15-02-drill-down-through.pdf": {
+      "output_sha256": "f982542cc4627f32f815c503c73d0e5d6668d77cce04bdc48d90fff69a018f05",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-02-drill-down-through.drawio",
+      "source_sha256": "ecb37a37f7991077892b00e4f3c7d4cb96efe0a3c2dfeb8981dd16cfa236245d"
+    },
+    "visuals/pdf/fig-15-03-promotions-page.pdf": {
+      "output_sha256": "59e873f75da255aa25a65f2813f532c596d7e9d78c56041ddc4a70a9f7a61cd3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-03-promotions-page.drawio",
+      "source_sha256": "42f7b906ebb28118b700ad4c6682d91fdda58e394f32899104ef043d66bc59e4"
+    },
+    "visuals/pdf/fig-15-04-promotion-detail.pdf": {
+      "output_sha256": "40694c1672b3f329fcc45e4f8e7b01459848dd7a4b2b2b52efac9b3ed5867b20",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-04-promotion-detail.drawio",
+      "source_sha256": "226eee9c882275bb2f426e039c7685b23b147e074b0bdf16c97aa271ebeb02e3"
+    },
+    "visuals/pdf/fig-15-05-promotion-tooltip.pdf": {
+      "output_sha256": "0f7b9441620f9ce1d6783d4db0a3eb2c37aacd80431fe824745dfb0be8a22486",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-05-promotion-tooltip.drawio",
+      "source_sha256": "ec230af49276761a411e822013c4534db8140a7ba5362bb82f38d62eb83e4a54"
+    },
+    "visuals/pdf/fig-15-06-visual-calc-editor.pdf": {
+      "output_sha256": "6459f4ca9b4d783fe0da5b062825ad5f246683ca3b99d6275cf5648d105e295d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-06-visual-calc-editor.drawio",
+      "source_sha256": "1b0151c80061009d05ea1d648cd2fbf9460402df38f2c3f007bf1fbf964ecd6f"
+    },
+    "visuals/pdf/fig-15-07-budget-model.pdf": {
+      "output_sha256": "e420a0d8eab00f53076de898d3a723eea5a5968396abb443ebd7da25ae41aaee",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-07-budget-model.drawio",
+      "source_sha256": "41244427a28b7c9ca10702dbb08c7fcd5299c7192e012e876aabb558c6ed124d"
+    },
+    "visuals/pdf/fig-15-08-budget-matrix.pdf": {
+      "output_sha256": "b366e9915343f6f145213f6354434459b7d5eed272b6ca917dcfa11c5398430d",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-08-budget-matrix.drawio",
+      "source_sha256": "6628698b445900a741377c4687ad05f13188bc8fe536272e670b0fb765d81f16"
+    },
+    "visuals/pdf/fig-15-09-variance-reconciliation.pdf": {
+      "output_sha256": "2531160f9485dff249e206764dbb9670f07750daa3cc71e8eb1daf56d0fe30f9",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-09-variance-reconciliation.drawio",
+      "source_sha256": "66b246259f95eecd001ce5daf2ad081244ee00036bb4f505d455b3c1fc94cf89"
+    },
+    "visuals/pdf/fig-15-10-measure-vs-visual-calc.pdf": {
+      "output_sha256": "c718dddc9ee993f139c2f395247018a2c0b046e5e0743117be3e87d78b75f398",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-10-measure-vs-visual-calc.drawio",
+      "source_sha256": "f613800dc1bd9d306a2c8fc2245c9003650131ffe157c973a690f3f695955bc1"
+    },
+    "visuals/pdf/fig-15-11-plant-page.pdf": {
+      "output_sha256": "c00c406e7732998564ada9bf81fe9db3916ad4590ea806aa4570e8c36b27217a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-11-plant-page.drawio",
+      "source_sha256": "0fc4f2b23d28754aa1d60dc0896b3979e503f5ce23f9ba24b8eef3c08d9390fc"
+    },
+    "visuals/pdf/fig-15-12-about-page.pdf": {
+      "output_sha256": "3ea46604f9f8b0c5fe859dfad882bba6a8e376f8df52080d9c8f99f6b9d7b684",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-15-12-about-page.drawio",
+      "source_sha256": "2f53992a50e5131f4515c2384b71fd454afd628850860c0dac7714e4260e7f02"
+    },
+    "visuals/pdf/fig-16-01-monitoring-cycle.pdf": {
+      "output_sha256": "703640e94e3d1821a6c273ded3a9ab41fabfafa05046c988a7aad3790655a5ad",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-01-monitoring-cycle.drawio",
+      "source_sha256": "660b980310aaae84859402ffc1e41b914645b28bf4f28751e1aed62cee9064bc"
+    },
+    "visuals/pdf/fig-16-02-exception-register.pdf": {
+      "output_sha256": "ebe925b4b0146d16dacd2e3911fa8c460bb2a8b617d5b6b8981f488eb4f9d1fe",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-02-exception-register.drawio",
+      "source_sha256": "4e0bf8812eccf5c0a13b159feb8f9aa2297b172fe0fd10acc684650ae7306344"
+    },
+    "visuals/pdf/fig-16-03-je-flags.pdf": {
+      "output_sha256": "1d2ac3925eada5bd4502a05cc7441274eda3c439f7ba81aabeb5b4b8c5f262a3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-03-je-flags.drawio",
+      "source_sha256": "073ce5b65c7e873f0fb06a021a3bec013312ebc56fc2615a8933f345f7f2cf36"
+    },
+    "visuals/pdf/fig-16-04-entry-lines.pdf": {
+      "output_sha256": "9853a57738fc294aabc80e91a4230095e2d74d71210c088286c304e6584902bb",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-04-entry-lines.drawio",
+      "source_sha256": "04245a1d82f96af2b4c8232fe673416ce68ec7a34dbe28a22f5dbf936c3f3cd8"
+    },
+    "visuals/pdf/fig-16-05-monitoring-page.pdf": {
+      "output_sha256": "fc3702408f484dccad454a7b1014da3f036e09f1b1b92e686e59cbd8e5cf2d8a",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-05-monitoring-page.drawio",
+      "source_sha256": "925df4cbcea4250fc8f2ab1a62a361221fee5e68542e3b10460470df7efadad2"
+    },
+    "visuals/pdf/fig-16-06-exception-detail.pdf": {
+      "output_sha256": "e79f100a5bbfb65a7b6144624f89805270993edeb3f75b6c280d8417dca6e64f",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-06-exception-detail.drawio",
+      "source_sha256": "724c7eb7f79e828e777f58a118529714255038e98609024c968cdc298f0315b6"
+    },
+    "visuals/pdf/fig-16-07-review-page.pdf": {
+      "output_sha256": "cffa93dd8b6cec822b98eccd4679a5fb4c50f67e4854cf0e866c1eb165362e95",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-07-review-page.drawio",
+      "source_sha256": "fdd1f3958310f0c96bd75254aced24f5f78207c684b6b85218156fc85b4077ab"
+    },
+    "visuals/pdf/fig-16-08-population-test.pdf": {
+      "output_sha256": "871832826cbd71799599ae3b12218b5caed271e435a2209fc8243f37a21e83a9",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-16-08-population-test.drawio",
+      "source_sha256": "16d19549af5eba337a4fcc35d400335fe2a6089aa3ce1711fe43bc2b7cb0eeda"
+    },
+    "visuals/pdf/fig-17-01-accrual-trace.pdf": {
+      "output_sha256": "103f71b4a8d58dc97253236c5a5d75925a3bf267e709e2dfd293e27504110dc3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-17-01-accrual-trace.drawio",
+      "source_sha256": "5f8da48bc20e146b6a4a78bd5c993329e0dbdcf7dddae2668f8e507f8d383148"
+    },
+    "visuals/pdf/fig-17-02-adjustment-timeline.pdf": {
+      "output_sha256": "c8c4a93864d92e69504ebffabc63f700d8655f903713e8c0bd6c7c24dc5665d3",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-17-02-adjustment-timeline.drawio",
+      "source_sha256": "d88cdb3a1651f77dca4b65f7692b6aa89163c8847d5833e2dd447e863a9343d5"
+    },
+    "visuals/pdf/fig-18-01-costing-views.pdf": {
+      "output_sha256": "e68ee6df8cdbcf9556c25015ed73db614dd3e78274f42252f8898b0f9e92d4db",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-18-01-costing-views.drawio",
+      "source_sha256": "9e7a8a6ab6164080f0d127834804162330ac85c68bcaf75d21a3ad968af331ae"
+    },
+    "visuals/pdf/fig-18-02-make-or-buy-test.pdf": {
+      "output_sha256": "26d40bfc2e9f4dc1c07945ec12b49b16cc69679e67b9a3ba66c0ca0a257d64ab",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-18-02-make-or-buy-test.drawio",
+      "source_sha256": "fd945ea850f79857b03f80e0aff9a39ce48c648a703f59e1a630c88bb60935be"
+    },
+    "visuals/pdf/fig-19-01-credits-cycle.pdf": {
+      "output_sha256": "7c2c5bcb03a164937a823a4b01930a8fbcfe8a38f481018e04179d101cd68ca8",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-19-01-credits-cycle.drawio",
+      "source_sha256": "9191c08304403dad418ff608e93e361e19823e6dd53e5886d25f7daefa56c5b0"
+    },
+    "visuals/pdf/fig-19-02-deficiency-evaluation.pdf": {
+      "output_sha256": "d989e0b37b213700ca46d3956aca7cbafd6edceeb97eb2a851ca1513bef0c074",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-19-02-deficiency-evaluation.drawio",
+      "source_sha256": "417527ceab0981bc10b26021f147c72a11f02f25f7069f8021629da1eddc5a2f"
+    },
+    "visuals/pdf/fig-a-01-rls-reach.pdf": {
+      "output_sha256": "093ff98dadf71c74f6ffca185966d7cc0afaaf755adf74257c842c6fe8a9a153",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-a-01-rls-reach.drawio",
+      "source_sha256": "1f4fb50c1e04ab110dbd3f929eed05880624cdc644cb37e15d15cc29a52d72df"
+    },
+    "visuals/pdf/fig-a-02-access-review.pdf": {
+      "output_sha256": "6a1df8fd25a9fe8f1c9f355784e4274f6a4c1bd4c39c9fcfadac82ebb06256be",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-a-02-access-review.drawio",
+      "source_sha256": "85c9269be0ffa4d949320e9f76fad90b7c9af91d8c2acae88a6fc63c0c61c611"
+    },
+    "visuals/pdf/fig-a-03-manage-roles.pdf": {
+      "output_sha256": "4cb4f3b0e287a7d13440bf6719ca90eab5e43060bf4dc57136520d3be62fa54c",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-a-03-manage-roles.drawio",
+      "source_sha256": "3d74a5c5bee1023d97e2e9e8d0e7a76ece5d0474da00e293b718e1a4c4c89976"
+    },
+    "visuals/pdf/fig-a-04-view-as.pdf": {
+      "output_sha256": "728abab745db6404350d42be84ee33f0deb0c502b7ac81d41f825fe682270a25",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-a-04-view-as.drawio",
+      "source_sha256": "fbcecfd23736b1d30ff28236e8c6db5a6b695ab0b758b4c3afd8deff3d80f160"
+    },
+    "visuals/pdf/fig-a-05-sharing-paths.pdf": {
+      "output_sha256": "c30183d4016bddddb01b5cb687416b4a99667e70a8881eac6b4095908c89e639",
+      "recipe": 1,
+      "settings": {},
+      "source": "visuals/src/fig-a-05-sharing-paths.drawio",
+      "source_sha256": "1e4f022f35a470e530e89dda74a905c39c65479b0ada1bf03f15ecebdb33c8e8"
+    },
+    "visuals/svg/fig-01-01-analytics-continuum.svg": {
+      "output_sha256": "8b09da8acbfee03464450f7b3ad6fb61314f0c530a6e41a178b9364f8495dc4a",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-01-analytics-continuum.drawio",
+      "source_sha256": "318190b68a957ed6dd49992dff5d09a8dbd8029e4a6568d4644412bbb0d17221"
+    },
+    "visuals/svg/fig-01-02-analytics-workflow.svg": {
+      "output_sha256": "21a98d05c5959622559e1b7c8d7a177d94310cdfbccc26fcb746f81c9854a7c6",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-02-analytics-workflow.drawio",
+      "source_sha256": "528e852cd216bfc2a24991578287d6d1aee9e53e918f1d839039388ef26717df"
+    },
+    "visuals/svg/fig-01-03-tools-workflow-mapping.svg": {
+      "output_sha256": "15d2cd27f17cfbc5a46e5efadbd343066d1dc6b5295412bceff4b10ca3e8ce69",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
+      "source_sha256": "f2cd73a9f44f290884a59cd6ff771d82ad66973d1a586e13ab9afd78aa0dc857"
+    },
+    "visuals/svg/fig-01-04-charles-river-architecture.svg": {
+      "output_sha256": "7b914a8c4eab2bd540378a994abbeae79326f62eb31bd0f2d2319904b46250d7",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-04-charles-river-architecture.drawio",
+      "source_sha256": "9da5235f675366809347695b6b7c767174b885493eb7aaa02d0eb3f6f06baf0e"
+    },
+    "visuals/svg/fig-01-05-o2c-process-flow.svg": {
+      "output_sha256": "55e850bab6268b926d23246e39dd059921b7fe24c736b40d3826ab707c439ba3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-05-o2c-process-flow.drawio",
+      "source_sha256": "b40f0b93f6b58321c7e3da56ba811b308bcceb58c1148a23c46cda708acceb92"
+    },
+    "visuals/svg/fig-01-06-ledger-posting-trace.svg": {
+      "output_sha256": "aa10c6812a7ecdd4d51814503d5bd1d9d6f33a29f3a73733a3a6fe3c659eb938",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-06-ledger-posting-trace.drawio",
+      "source_sha256": "efc18bc3e675db24bc6989f47b90a60abac334224340bf00507daf2cd99dd8e6"
+    },
+    "visuals/svg/fig-01-07-salesorder-worksheet.svg": {
+      "output_sha256": "a27688f45e213beae4be65ce655b5a7c92be47dad37040377321b72ecb49013f",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-07-salesorder-worksheet.drawio",
+      "source_sha256": "922dbd37b9a4ddfb23790d644d0b14f5d69f3708b399e046ab38ea03443491f8"
+    },
+    "visuals/svg/fig-01-08-book-organization-map.svg": {
+      "output_sha256": "363d6713b0a58c9b36b7c4a989011ae8adf373614ca5c1afc6998b7b1139b4f0",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-01-08-book-organization-map.drawio",
+      "source_sha256": "6723f8e597a8db479c8f790e01b2e1871519282c48707843dc48a498e04fa63a"
+    },
+    "visuals/svg/fig-02-01-spectrum-data-structure.svg": {
+      "output_sha256": "9d17ceec618a8e27cceaa6b3d091c1e00d5892c05dcb1c319e2325061e5bb222",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-01-spectrum-data-structure.drawio",
+      "source_sha256": "0e390139a6e13de1c222dd8410bbf669a548aee711c3489067f459489e1c64bd"
+    },
+    "visuals/svg/fig-02-02-sources-accounting-data.svg": {
+      "output_sha256": "cacd583b5e3941899f23c8f3b247369d3e7278a3b4ce25619b03c175212e7948",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-02-sources-accounting-data.drawio",
+      "source_sha256": "625e6e9a5fdf8acb67ec520feba70ee4f06d8c00e8de08b57b820a3edfe22ed3"
+    },
+    "visuals/svg/fig-02-03-data-quality-problems.svg": {
+      "output_sha256": "95fcdd8c438c9ffaf304b3cf25ab675cb4461ebfa07baf8efe7a630955f794f0",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-03-data-quality-problems.drawio",
+      "source_sha256": "ead192fe60556351e8c5f1c6fff25acca14c8e834820ded1f9e8ed22a7048922"
+    },
+    "visuals/svg/fig-02-04-shipment-blank-tracking.svg": {
+      "output_sha256": "a44a28a1ffb373a27b3b5a7512c34cfe1ea0acf819183c289593d1ca2cec5633",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-04-shipment-blank-tracking.drawio",
+      "source_sha256": "956d3edf02769399373d2367360afb4d6c989ae1f776af99ff557fff38818972"
+    },
+    "visuals/svg/fig-02-05-salesinvoice-date-check.svg": {
+      "output_sha256": "ce493fbd6fe156d9190545533615a7e57f29d05a3e40004a7b8d4255819b9c3e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-05-salesinvoice-date-check.drawio",
+      "source_sha256": "124dfc2c4d6c889bc1718faca861bc950a637857a57009473ac32dd7bb2797c8"
+    },
+    "visuals/svg/fig-02-06-messy-vs-tidy-data.svg": {
+      "output_sha256": "365f969e653f7d126bdf34a5446ef2c6dc31967013b07079396ccc69a910b96c",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-06-messy-vs-tidy-data.drawio",
+      "source_sha256": "327fcfd148939cb79e32c2cc248c2af85415bd6bfe3d75fb8f09f03e242f04a6"
+    },
+    "visuals/svg/fig-02-07-glentry-debit-credit-sum.svg": {
+      "output_sha256": "59edc985d5e8d9835140811d2863f90ba5b9f68a088abcfd513f39aa26e42175",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-02-07-glentry-debit-credit-sum.drawio",
+      "source_sha256": "9c4dbeebeb0a43874ab36c7b92c04eca85b1bb199e7228a0b03a3b0af40646a1"
+    },
+    "visuals/svg/fig-03-01-anatomy-database-table.svg": {
+      "output_sha256": "e1f919fc006defff730087fe6b77a89755ea77b64519c47f0afa68d7491116b5",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-01-anatomy-database-table.drawio",
+      "source_sha256": "f8ca54de199278fb5a4dc4f38677b01d6c2f2c958127c16f62bc5f5b2ee9fe78"
+    },
+    "visuals/svg/fig-03-02-pk-fk-illustrated.svg": {
+      "output_sha256": "57869075f2e491bf8a70ace334e5d5874778a37f71f346a372ede28c765623f5",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-02-pk-fk-illustrated.drawio",
+      "source_sha256": "dd5c84e2b7217d037b8d06ce9880edd0e5ca2082e467d5c85e7686a470b9ced8"
+    },
+    "visuals/svg/fig-03-03-three-cardinality-types.svg": {
+      "output_sha256": "8bc639b43dcbeb33875c266e385749bb5c98cdeb2b5dfe2116bfb758598e19ab",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-03-three-cardinality-types.drawio",
+      "source_sha256": "dad8cdd18ae51f7b582c7d8e790ac538a9d4a5f4511919815b91013df5a7fd48"
+    },
+    "visuals/svg/fig-03-04-crows-foot-notation.svg": {
+      "output_sha256": "05b3bb0893b5d8682f7c33c6ce3631384d9c7319c39152eafc2c55205c85e888",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-04-crows-foot-notation.drawio",
+      "source_sha256": "2c78a61272c6d9110f9bdec94b0fb6faf9a6483b6a8e5bb1d1cd863a6a3a9d65"
+    },
+    "visuals/svg/fig-03-05-chart-of-accounts-table.svg": {
+      "output_sha256": "9c21e0d6e2f9148b04638c46f40fecc97139b256ba20160ab4c8241209198058",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-05-chart-of-accounts-table.drawio",
+      "source_sha256": "91aa07bc0265d95b6c4900bf466cbb8ca31381c375f5e0372f6d46977b884e80"
+    },
+    "visuals/svg/fig-03-06-gl-subledger-relationship.svg": {
+      "output_sha256": "7fd9a0811107d64edbe59ffe7faf4517563700a38a4a67da26240922a5c08f50",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-06-gl-subledger-relationship.drawio",
+      "source_sha256": "9b3d481a0ee5cb9a9794b54704a9e6d71a16df2aa9a02b34baa0c30d5df45634"
+    },
+    "visuals/svg/fig-03-07-o2c-core-er.svg": {
+      "output_sha256": "b95a84fb1f46fb3690a407b7ac73cc8344cef82768988e241b22e5b9515a07ed",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-07-o2c-core-er.drawio",
+      "source_sha256": "659f0ff7f2426c9046ed896ba7f324441c2f81ff2105a34c63c1d96094cc947d"
+    },
+    "visuals/svg/fig-03-08-manufacturing-er-focused.svg": {
+      "output_sha256": "84fbb1f6d2749376ca3a44a9e6c9d42a2bb8e54b12c9a227ead1bbeb69dc1e2e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-08-manufacturing-er-focused.drawio",
+      "source_sha256": "c8e5af48f37b09136589766df02fdd0b0a1f63d44b0c6577287ee979feb7c735"
+    },
+    "visuals/svg/fig-03-09-accounting-core-er.svg": {
+      "output_sha256": "f42d4e1fcf5448e1651e25120362aca9be0864759e8f5a6180948b601c8c7113",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-09-accounting-core-er.drawio",
+      "source_sha256": "87e965384c52d9869cfea6ddb2b1fa10d9f57808311e90c39391f855c4ecf6d4"
+    },
+    "visuals/svg/fig-03-10-cross-group-traced-path.svg": {
+      "output_sha256": "805e00b175e4c283313e453ba1c54f2008db36bfbeb6a83f62a84d736341c625",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-03-10-cross-group-traced-path.drawio",
+      "source_sha256": "e67af8f27aab13f70bc75249ca3caee83b044eefa9a6bf4875a6dd25a1f5bfe4"
+    },
+    "visuals/svg/fig-04-01-range-vs-table.svg": {
+      "output_sha256": "bf70ac51b79fc94c488a8e53e2aec72ce037225ac48f8547487abe343c0847a7",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-01-range-vs-table.drawio",
+      "source_sha256": "d8c269bf13d0d2622b46b6ed68418d691965088a9e692fb0ec6d93d4ee4c6e63"
+    },
+    "visuals/svg/fig-04-02-power-query-navigator.svg": {
+      "output_sha256": "eacd8bed89f5520a37f56ebf29472823c1797bc7d1218e8a688d1644b5ff849e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-02-power-query-navigator.drawio",
+      "source_sha256": "e9e74ed7b79c6c73c49c694b8a5c4e26e3b47700765e0477b5cc8a0a76c64c2b"
+    },
+    "visuals/svg/fig-04-03-power-query-editor-item.svg": {
+      "output_sha256": "bc1d7b4a3dd5f0f301390a04648e51e603a6e37d3f4df81345f6746e2ef76bc4",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-03-power-query-editor-item.drawio",
+      "source_sha256": "be31185a812ca645ae17e4a002c35c62830ebf9681b2ee79d0d560486aed7b0b"
+    },
+    "visuals/svg/fig-04-04-salesinvoiceline-table.svg": {
+      "output_sha256": "f724e4b06bd288dc2ff1d7f15ee6e5d4257ae445326abe7938ec87c6d7fd72fb",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-04-salesinvoiceline-table.drawio",
+      "source_sha256": "3e6882e3611670b5e9f5f34a41a3d4db6244ae26ec6024f632d8b5d02fa4e072"
+    },
+    "visuals/svg/fig-04-05-cell-reference-types.svg": {
+      "output_sha256": "f02f52bc3d627ab7354cd8d64ac9ec318d27f657f618fb21a39da7cf670ec873",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-05-cell-reference-types.drawio",
+      "source_sha256": "34d4fbb6722424a6eea0dead001f6a2bebae0dbe0f48137492edd4482f9dc6c6"
+    },
+    "visuals/svg/fig-04-06-analysis-worksheet.svg": {
+      "output_sha256": "3de4c4aa295f524c8a95a1c5dca954cb5905cd54f2b2c07dbce2c6dce4f9c903",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-06-analysis-worksheet.drawio",
+      "source_sha256": "430157daa2f6161dc3f1cd543d425075b069268bfda7af84ffbba436d1e32cf2"
+    },
+    "visuals/svg/fig-04-07-analysis-workbook-layout.svg": {
+      "output_sha256": "d0e915019980f196fff393264146ccc94397013826589eed68605332ea2eb3fc",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-07-analysis-workbook-layout.drawio",
+      "source_sha256": "ba93d663d08ceb23e6cf65482bbdda4926ce0d4d8088f8b45285baaff70fbdd1"
+    },
+    "visuals/svg/fig-04-08-promotion-slicer.svg": {
+      "output_sha256": "3ac2e9272bfcd03c936298d17e457e47e40484995b511477eeb19fafa27bd73e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-08-promotion-slicer.drawio",
+      "source_sha256": "5b79c9a7a8d9e07331f8bdea3bd5965fb33e4a34cc2f0daa9a6153a4ecce4093"
+    },
+    "visuals/svg/fig-04-09-documentation-sheet.svg": {
+      "output_sha256": "00d71408fda90433c93debe621b6259c9a3f4145f09600489cf5d7e1a138d986",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-04-09-documentation-sheet.drawio",
+      "source_sha256": "0ae4587ad68662a88db6973f3bb6e6df01f1225c351ebc90099db78244915b8b"
+    },
+    "visuals/svg/fig-05-01-invoicelines-map.svg": {
+      "output_sha256": "db138b2290e72a656b15b11e97f7d8d3923b033453e739374c5dbe27b3a9214e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-01-invoicelines-map.drawio",
+      "source_sha256": "a6cd9ef2d510507a143f6abee72bd5d7d8be59cf3a93463de6bc546e0cc76999"
+    },
+    "visuals/svg/fig-05-02-item-product-type.svg": {
+      "output_sha256": "872b5310ff404b6f5d4abbcebcc17fb461464349bb7f4677aba16c9e5d54fa9a",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-02-item-product-type.drawio",
+      "source_sha256": "75f8263c8630161eeba9b8917bc7d7c668c850365723c9a9eaa957bc1416beee"
+    },
+    "visuals/svg/fig-05-03-salesinvoice-periods.svg": {
+      "output_sha256": "c420ce8b6106a7447a898d737f69f20a501a8c97e712c7dd57cd4ec3b70fc726",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-03-salesinvoice-periods.drawio",
+      "source_sha256": "8830360065569794d2a50a6d6cd1fa92e6bfe4967fade2749c4ee3a11c285ed3"
+    },
+    "visuals/svg/fig-05-04-xlookup-anatomy.svg": {
+      "output_sha256": "a695e9a012c63f48ca9b030c4ae63286d33aee2f94905c2addb24cf6a282754d",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-04-xlookup-anatomy.drawio",
+      "source_sha256": "2342877ee56b9d5b62fdef9848cfbe540f9dfc670c5cb373088671433342d217"
+    },
+    "visuals/svg/fig-05-05-invoice-line-lookups.svg": {
+      "output_sha256": "21d4a00a342507093cad3717a42ae301a97bd7dc5ba8927c0c210a2b8f2fe567",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-05-invoice-line-lookups.drawio",
+      "source_sha256": "32bbd37de207c94bef0c7953fd9338b4d038bc21aaac486f749514723f4a5869"
+    },
+    "visuals/svg/fig-05-06-merge-dialog.svg": {
+      "output_sha256": "8fd198bc403a8c73849e82ea3ef64c0c2b43428f60437a6129d0e57f97cdc7aa",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-06-merge-dialog.drawio",
+      "source_sha256": "e0287b0419081374f30fd54a0702f87cc5090f1710038a2acb16ef3cd9655874"
+    },
+    "visuals/svg/fig-05-07-custom-column.svg": {
+      "output_sha256": "b791a39d3c9837cfb5f706796e4873780439dd797b2de131468edcac1de0087c",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-07-custom-column.drawio",
+      "source_sha256": "4731ff6fb2d6baccda2732c25d718513ab1dcc5e2aa36c5766f8dde6612d9243"
+    },
+    "visuals/svg/fig-05-08-invoicelines-table.svg": {
+      "output_sha256": "ecffe5c8d4403acf1b8c4f4d5eb5bbac9151214c24de6b8647c791a9bb6c05ac",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-05-08-invoicelines-table.drawio",
+      "source_sha256": "f6e084a8a09bb503ec4c8ba492c688ce259dac3106342c41eafee508be8d889b"
+    },
+    "visuals/svg/fig-06-01-fiscal-2026-profile.svg": {
+      "output_sha256": "64ccee6faa9c3f853227a3179d5caa03cbcb0857f03ab617335f70e2fd434a47",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-01-fiscal-2026-profile.drawio",
+      "source_sha256": "62453d8bfbca7ec37ff33b8dc8f4e33ebe66933c6348dcd4952aab270e37143e"
+    },
+    "visuals/svg/fig-06-02-line-total-histogram.svg": {
+      "output_sha256": "6481212b3f4b36d27fdf76e3ada743c1347375f6c09944ee7789ae65e26fed82",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-02-line-total-histogram.drawio",
+      "source_sha256": "ab088fdb4f02bb6f9f422495769293560d8d141ff5517718c2aee8e0f5a89fbb"
+    },
+    "visuals/svg/fig-06-03-pivottable-areas.svg": {
+      "output_sha256": "f38f1e74a0bfe7cf8fcb449c8254ce1060056bbb0e9c3c17268e86da5ac5e7bb",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-03-pivottable-areas.drawio",
+      "source_sha256": "a2690fe61daceb5fdb1c021b504b273efcd8e5f780f10d5031ed63b7857001f8"
+    },
+    "visuals/svg/fig-06-04-show-values-as.svg": {
+      "output_sha256": "e2f464d6b152e709816057b480ff8d617c88cdff946fd96042075c62d79dff71",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-04-show-values-as.drawio",
+      "source_sha256": "77c1b4d56e45a48bb78a5043cf6d97f69d1a6a65c0c7318c506fa160d0154d68"
+    },
+    "visuals/svg/fig-06-05-calculated-field.svg": {
+      "output_sha256": "779d0c9da21dcca17b8ee716a84aede086dc19ecacacae457b9f44ff1c706c06",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-05-calculated-field.drawio",
+      "source_sha256": "d35ca1bb9a17d1ac756b15ea112e2871d5302fcf1bde2c25c256658fd7e110d3"
+    },
+    "visuals/svg/fig-06-06-revenue-margin-pivot.svg": {
+      "output_sha256": "130468c8a3599f6aa72284a8a5d9d013ada39dc51d3ea71e94cdb87c95eb89bb",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-06-revenue-margin-pivot.drawio",
+      "source_sha256": "b426403232cd39c2f24b0f8a5a9676b6345ee5251ff01f6dca0bc62821baaf6a"
+    },
+    "visuals/svg/fig-06-07-ledger-to-income-statement.svg": {
+      "output_sha256": "873ed344aa18dc2bcd7b6e5f35024fc7ac1e70e275d68562329e6f119f0c3581",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-07-ledger-to-income-statement.drawio",
+      "source_sha256": "b305a9d48bc7a10e233a4cc3e630f7ca2219c5568f46cae8d91e532ef1299f32"
+    },
+    "visuals/svg/fig-06-08-furniture-drivers.svg": {
+      "output_sha256": "51783190b00ed232523d6b8a71856023cb78483b285daac16d6d17beef9d0829",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-08-furniture-drivers.drawio",
+      "source_sha256": "cd0e2462f1e1c8eafc83b6a0ff0937002aae130d75da66eeb3dd4447fb2e2d57"
+    },
+    "visuals/svg/fig-06-09-margin-bridge.svg": {
+      "output_sha256": "aef6aed993972b0f01543d381941c5a8b2896cabaf57032302e9fed68ec82f50",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-09-margin-bridge.drawio",
+      "source_sha256": "b48b7fc7c6ae192c17e1adb682ce002c2524135417633df1f959f4403fde0f8f"
+    },
+    "visuals/svg/fig-06-10-discounts-by-promotion.svg": {
+      "output_sha256": "92460fb09e0175d41dae6a0fb7f973820f73736f6afdc1d4149ded16a29220ae",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-06-10-discounts-by-promotion.drawio",
+      "source_sha256": "dcf73a6a57bd805e8ca73f9658406248635b861de42457c4320d8e830e2dc80f"
+    },
+    "visuals/svg/fig-07-01-monthly-revenue-trend.svg": {
+      "output_sha256": "2b4cd959a312199b31340df78f8e3d8d8d4f06a85909035b6d379de7a5de221e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-01-monthly-revenue-trend.drawio",
+      "source_sha256": "dcd73d84516b41f87c6542c8b2aa436d1ec0beb2452f97c9e6a669250965cfb8"
+    },
+    "visuals/svg/fig-07-02-regression-output.svg": {
+      "output_sha256": "b26d286031b84cfafd59955cf20cdb4cb9f440c608edcb515fd003ff8f90bedc",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-02-regression-output.drawio",
+      "source_sha256": "83c0f9b11632b6b79a33b3dc619de780ee2a42630f3cb4e04741a33ed0144253"
+    },
+    "visuals/svg/fig-07-03-forecast-backtest.svg": {
+      "output_sha256": "26cccf0eb70b14585cde3e3dd71d8de049369e1c24addb603b28406da01a9358",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-03-forecast-backtest.drawio",
+      "source_sha256": "561ffa0f1136a77ad6570062e4caff2b3e2c9081a1da2ccb2a2b1f3e9f457ab3"
+    },
+    "visuals/svg/fig-07-04-flexible-budget-levels.svg": {
+      "output_sha256": "7cf08ff870a955def58c7625498ca1fd3e49c7637c8f0e86b91487bf66a7e3af",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-04-flexible-budget-levels.drawio",
+      "source_sha256": "e43995380de98e8e2d0eff0a393074b465a2227c626407125c820aff6acd5d38"
+    },
+    "visuals/svg/fig-07-05-flexible-budget-report.svg": {
+      "output_sha256": "b3154319677bfae3e09bff482541ac3d75107148823c405e1cfc833284bb2582",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-05-flexible-budget-report.drawio",
+      "source_sha256": "84ae42c1fe6a2e902051ad47820adbf169cc51d1d6261a0aadb3dc1b1d0a5962"
+    },
+    "visuals/svg/fig-07-06-furniture-price-by-month.svg": {
+      "output_sha256": "cbb1cd8042ba2ff22114e5e95d9a00e0d4bf2dcc9938092c52aa0840620abc65",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-06-furniture-price-by-month.drawio",
+      "source_sha256": "c2ae8608e3de107a366a009690f338bd7bb1ec3e91d474318b45d2f3462728d2"
+    },
+    "visuals/svg/fig-07-07-promotion-model.svg": {
+      "output_sha256": "03abda2787681472d144006c55bae38298f85ea9dc6baebf79f251548edaafc7",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-07-promotion-model.drawio",
+      "source_sha256": "2a956f53149842ae56145babc938884ca79e8898dae316242670b18bd6db6411"
+    },
+    "visuals/svg/fig-07-08-scenario-summary.svg": {
+      "output_sha256": "989640efa343f3c6e67cd7d21b123bcdd0a01eb5573434cdb75c3fe884cda9fb",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-07-08-scenario-summary.drawio",
+      "source_sha256": "7df3c947210c1a95189103b842ca62c25b05f3de920867afba15b615c977eac0"
+    },
+    "visuals/svg/fig-08-01-audit-analytics-workflow.svg": {
+      "output_sha256": "8f92d8f6f43c85e3860d8ae449dcb94eeecb5eb7f515b0d995a441d0f6fabbe4",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-01-audit-analytics-workflow.drawio",
+      "source_sha256": "a7915a3dc9bae4bed60e5ebbe0f0c6a0b52726eef3480f6bbdf5949c32fbab8b"
+    },
+    "visuals/svg/fig-08-02-payment-strata.svg": {
+      "output_sha256": "dc35bdd8970b5ba7854f3541cc48f4004251fbe1ad3f698dc6953ddc1310323b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-02-payment-strata.drawio",
+      "source_sha256": "dc7fe15a03f79059122c7c2afddade782119a9486c0430a8350cdcebeefa5d3c"
+    },
+    "visuals/svg/fig-08-03-benford-all-payments.svg": {
+      "output_sha256": "df636616fc59fdbcced0637fc5c88a0b0d0884ec741fcf8db167f703e3e8bb5b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-03-benford-all-payments.drawio",
+      "source_sha256": "38606ad93d3f5f1796e8b7cd3cb88e5a04d464fea0fbcdf28f6a45b8e8a67882"
+    },
+    "visuals/svg/fig-08-04-benford-by-payment-type.svg": {
+      "output_sha256": "8e85e92bd038b53494fe7ed525669a829d19a05a0dcea76200b3bfd3623aa7ba",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-04-benford-by-payment-type.drawio",
+      "source_sha256": "4bae2e18fed6d80be8c56f0d97f502d31dd5509316db7d8bd7106e472079c24a"
+    },
+    "visuals/svg/fig-08-05-ar-aging-reconciliation.svg": {
+      "output_sha256": "d208d58b376a7c8b63d1407ee091c895e99076578874bad1e9d14fdbb9284cc7",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-05-ar-aging-reconciliation.drawio",
+      "source_sha256": "f824ba2752c4209aa65c74f5c76b5f3fa845483452e99dc243afcb82bde08eae"
+    },
+    "visuals/svg/fig-08-06-ar-ledger-by-source.svg": {
+      "output_sha256": "ef150d7b2b57194f75f6bcb1b262bd7f13feda3ad1e7b530b7de7d312fd458e3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-06-ar-ledger-by-source.drawio",
+      "source_sha256": "e1165069e64787e506fa4c828a5bfff97cc90772a5233b9c0e4bb5bc4298165b"
+    },
+    "visuals/svg/fig-08-07-journal-entry-flags.svg": {
+      "output_sha256": "79006a5202ed9f015e06ea277fbfa4d64accb74e7afcf3404926ec88a218f9c8",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-07-journal-entry-flags.drawio",
+      "source_sha256": "1a1f408339f1bb7c3292704d3b6cfd8f54dfc998c1dfd773ac405c7620d8dd56"
+    },
+    "visuals/svg/fig-08-08-journal-entry-drilldown.svg": {
+      "output_sha256": "3c3e28aa9ac06b8a61c7908e180fe965006719d1f2c77161d80cb282619610ea",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-08-journal-entry-drilldown.drawio",
+      "source_sha256": "bb5f9ca52c4eeaa67740d2bd8da545a1658e158d8199598ae946288e7d6e1143"
+    },
+    "visuals/svg/fig-08-09-audit-workpaper.svg": {
+      "output_sha256": "6d599249498584bc386966cb6f8611c5ffb18f112d82980c98bad62d80383584",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-08-09-audit-workpaper.drawio",
+      "source_sha256": "90e451d69ec220304affe20ef8d4b9e0f8db3c47d553d3deeaaf5ec1a47e9c9b"
+    },
+    "visuals/svg/fig-09-01-import-vs-query.svg": {
+      "output_sha256": "4c9ea876298b9a2d14a0a3f45d5d97c7e121aa910f1a6e64a196955de032dfc8",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-01-import-vs-query.drawio",
+      "source_sha256": "a6ebac6587c774ea8e85b8ad12e99ccd351f2d520ea3c68f42dd550d2c2d63f2"
+    },
+    "visuals/svg/fig-09-02-database-structure.svg": {
+      "output_sha256": "ecd3a899cd53c4a1a0af0d9670fdf58cd2c43e469c896a5a81d8f838c995d918",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-02-database-structure.drawio",
+      "source_sha256": "382b268b12fa038d08d25b2bdd0df6922b4228e8dfdec74bb92b20e151b687ab"
+    },
+    "visuals/svg/fig-09-03-account-columns.svg": {
+      "output_sha256": "9df815511ed48fbdff649cda9e40ec3aa56a8a4789ec4f72a40a37c4fa55ad07",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-03-account-columns.drawio",
+      "source_sha256": "91762c5dd38db4d25c076b753e7441ad63c699231a318e60f93323b7e124b31d"
+    },
+    "visuals/svg/fig-09-04-syntax-error.svg": {
+      "output_sha256": "49c02d5f6e7e010015e5dc38665766660e92323c3be3ce3a83217755eae3104a",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-04-syntax-error.drawio",
+      "source_sha256": "112ba60807848750a4eceb037f7cca11d1ede38d9d6075560f149480cf0c9353"
+    },
+    "visuals/svg/fig-09-05-variance-check.svg": {
+      "output_sha256": "a502ea3dededfc9d7d00b37b181bdbffcd0e3b65db8cabfa65e5863b99378f64",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-05-variance-check.drawio",
+      "source_sha256": "1b3ddabfceb150b82de178da618429563a2aa0e1cf02e81d16d1a027da08699c"
+    },
+    "visuals/svg/fig-09-06-where-null.svg": {
+      "output_sha256": "a4fe3b785ebd4b9dc7cd6821683c0693e0b36d45e876fe6029e23fb39490e9ee",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-06-where-null.drawio",
+      "source_sha256": "1fa768125678bc07b13f017778076ef0bc03b8e29372c33d967f01166ff9ca7c"
+    },
+    "visuals/svg/fig-09-07-variance-sources.svg": {
+      "output_sha256": "52063d78ebae409d6a0fb2fcba3b5bb160ab5e93d627f7ae9989a2f977c303c2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-07-variance-sources.drawio",
+      "source_sha256": "122796554894d82237dbf5c8d59df09e74820924c68927a49949761727970730"
+    },
+    "visuals/svg/fig-09-08-query-anatomy.svg": {
+      "output_sha256": "f640ff3f818ebfb61405e28ebd0727968dd00bb3ebe2efd38e8af72569e40d21",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-08-query-anatomy.drawio",
+      "source_sha256": "ea388561210e0749ef55bb8ee1280e1442e449b7db12c64eeb63714cdfa18f0f"
+    },
+    "visuals/svg/fig-09-09-top-variances.svg": {
+      "output_sha256": "ec70dfa71e4ad11e1da61344a56021ac9a6da376e8ca109e361b5390860bb59b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-09-top-variances.drawio",
+      "source_sha256": "b09e5817e4cfc2d356510ccb396700290d086b51e902df82e853b725456dcb93"
+    },
+    "visuals/svg/fig-09-10-saved-script.svg": {
+      "output_sha256": "4c61d0e91bbe0a397863476065a6b65da5a245344112900fed79295e18d3e3bd",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-09-10-saved-script.drawio",
+      "source_sha256": "6581faf332b4516e0914ee0ec1b9c5fe7ad05bc53c26548d61df03dc8d872bb3"
+    },
+    "visuals/svg/fig-10-01-join-matching.svg": {
+      "output_sha256": "8a4914eb41d4a3d3b9b9f4d16f0ef4acdbb0addb6b814488ad5a4c42242c96f3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-01-join-matching.drawio",
+      "source_sha256": "a2403fc5096915d928883de36d3b2d0fe032466cd1937542d7e9bf5517881bea"
+    },
+    "visuals/svg/fig-10-02-group-by.svg": {
+      "output_sha256": "53abb5134292ea409ca84e623f1c10de7b1670f6dd27c026ab8cefa6b31d05f9",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-02-group-by.drawio",
+      "source_sha256": "f2fa371d126acb9abaf2d42564c5b3faf0e05258aa50df4fbd94e3dc57c8631d"
+    },
+    "visuals/svg/fig-10-03-variance-by-group-year.svg": {
+      "output_sha256": "d93415d46a492977423b177facea3a828f43e698dcc9f8a9bbb4a083cf5832de",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-03-variance-by-group-year.drawio",
+      "source_sha256": "c06dff150ce595a1221a3b6a12a7f805ca4171e01d2dc6fad0048baa97c8cd5b"
+    },
+    "visuals/svg/fig-10-04-fan-out.svg": {
+      "output_sha256": "fc3f9229fb7c49e50798bd03a0c201daace36397df0394d41bb688c7de1216da",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-04-fan-out.drawio",
+      "source_sha256": "70b22a89e7adf8444c727088d82fa7b87abe5ac9beacf413deed941e29cf2f7a"
+    },
+    "visuals/svg/fig-10-05-evaluation-order.svg": {
+      "output_sha256": "0c4086f6d44172d7040c27d8c7b1e20b521105daa22c093590c34abed218302c",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-05-evaluation-order.drawio",
+      "source_sha256": "4c87713d9a18eef69fc631154b207c24fbda5abdc19a3bcd5c165910a083ee4f"
+    },
+    "visuals/svg/fig-10-06-trial-balance.svg": {
+      "output_sha256": "a72afae69637f97415cb46ed57f5c27e30f535f39a729d70ecb7267da8f343cf",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-06-trial-balance.drawio",
+      "source_sha256": "6779dfaeeb9129e6bd7b418957ff0b9d84b44ff30f9cbba92d3ca7229fc97212"
+    },
+    "visuals/svg/fig-10-07-conversion-cost-flow.svg": {
+      "output_sha256": "46c316db73f1cc8a18926a1a228d267ee071cff0a57d5cfad88302da8611a4d3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-07-conversion-cost-flow.drawio",
+      "source_sha256": "7157f003480ea5545f3ff2276015bfa2ce02bd69925b84c2cc50506e00b0cbaf"
+    },
+    "visuals/svg/fig-10-08-payroll-time-er.svg": {
+      "output_sha256": "53972a1dc90a010ca362247dee278bf03c7f740b187d84d8c378b796becd6a30",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-08-payroll-time-er.drawio",
+      "source_sha256": "b35e5cff16f9d876119fd28843184efb03a22663ab0fba874da2df8e26c00c8c"
+    },
+    "visuals/svg/fig-10-09-hours-per-standard-hour.svg": {
+      "output_sha256": "2a508e8279dbfa1dd516a82154409f2d99e0e02a2f20c4628af546b75bfba899",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-10-09-hours-per-standard-hour.drawio",
+      "source_sha256": "439700bb448c6106adac8174d01adde8c893c6d147ad2e8490f97529071a4f86"
+    },
+    "visuals/svg/fig-11-01-conditional-aggregation.svg": {
+      "output_sha256": "dc66605c38a599446ed900f263bb21812e473ef1df3e5cf0866ee5419cb635ec",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-01-conditional-aggregation.drawio",
+      "source_sha256": "34bc81a2744c7dab6bebf88f1723d2b26e69c7dcc087b85a723380c1f60b5c84"
+    },
+    "visuals/svg/fig-11-02-early-months.svg": {
+      "output_sha256": "2f968896fe37b3e5eadb0929b1bc397e3b6b05699f4225775636706b8c574b0a",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-02-early-months.drawio",
+      "source_sha256": "e90f4b7a0bb8e220bdf468d87fddd2bfa6c3e6a41d7f522bb19da6a6cf5b5e33"
+    },
+    "visuals/svg/fig-11-03-overtime-shares.svg": {
+      "output_sha256": "548b3826ae16b9010d811f853a63249ba43655fa399e9722bac706f4e0695626",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-03-overtime-shares.drawio",
+      "source_sha256": "99add7393fd99a0055deacc4ffb5fc97aad655d62bfc77b79f54d90e7e92bb51"
+    },
+    "visuals/svg/fig-11-04-window-frames.svg": {
+      "output_sha256": "078bcbeed7689225002ff9a1718ff720dea6c2eb5ecc9a7c58484dd87c86402b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-04-window-frames.drawio",
+      "source_sha256": "8095e3034c9e3efc3609d0ec1f344cfde3c2e6ab66e10a95748314b3ccd464c5"
+    },
+    "visuals/svg/fig-11-05-gap-year-to-date.svg": {
+      "output_sha256": "6e7b37fca383070adde627ebc3deefab05c876271dac6c775baa488a66006dfc",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-05-gap-year-to-date.drawio",
+      "source_sha256": "142293e29681af748fa79cfc6e6f05c38963098293f3dae04dff9112c33c9916"
+    },
+    "visuals/svg/fig-11-06-gap-pay-dates.svg": {
+      "output_sha256": "b05ff477dbd0d1b3d06c183bd85e57ac7755015e3440a49d53e276ec77d2dcd2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-06-gap-pay-dates.drawio",
+      "source_sha256": "71e46b0b0ceb3d2a98c9755fe88b6cdf298c4e4361d23c3e074757d2743dc87e"
+    },
+    "visuals/svg/fig-11-07-work-center-rank.svg": {
+      "output_sha256": "73ea808ef3b86013d543ca87fe64c979063c5389c4109808b91d5a45bed8f2cb",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-07-work-center-rank.drawio",
+      "source_sha256": "c36152495967ed5ae0bf20d8116f2add264b435eaf5468fc04a364e82e889003"
+    },
+    "visuals/svg/fig-11-08-cte-pipeline.svg": {
+      "output_sha256": "4f533e4b149bb60b7eb3124238113a7c245189d642aa9e63e11ef7fe2d16a0d3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-08-cte-pipeline.drawio",
+      "source_sha256": "ec6df9b30ce9bcfe4b3ad4758d97174526411a81cf24fc0571c4e8a0c0131fad"
+    },
+    "visuals/svg/fig-11-09-view-in-structure.svg": {
+      "output_sha256": "46bc078d785f19e06bf51f5c4b7c2762b8366113818a6155bc82fa80b7009682",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-09-view-in-structure.drawio",
+      "source_sha256": "c596feeafb9f565424db34e0c019044c534394493faf5a5a542bb532bb780fa4"
+    },
+    "visuals/svg/fig-11-10-monthly-measure.svg": {
+      "output_sha256": "527793296f011d2713b23afe1ab9ec6fb1ef66de9110c648b422e334f5f20524",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-11-10-monthly-measure.drawio",
+      "source_sha256": "57f676db4a75793fffb50d30185812674796651a6d92a7b95c6337e070fb8eb9"
+    },
+    "visuals/svg/fig-12-01-two-way-trace.svg": {
+      "output_sha256": "7f5d0e4bb26a346c542c731e99cb31f858d5515a6fef711ce814b4e9476ba073",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-01-two-way-trace.drawio",
+      "source_sha256": "3b37d4fb43ac12126534f2f637589a5edd3af5ab65338ac6471503eeb6fd6451"
+    },
+    "visuals/svg/fig-12-02-trace-exceptions.svg": {
+      "output_sha256": "7ce8df3edf8c8d8ef810a92fd45efc85effbacfd5d42d6ad073b4acb5415a9a8",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-02-trace-exceptions.drawio",
+      "source_sha256": "7c08f908dc7e1703be1ca28e03fc17414000bcb62f3ccad96964b72c9673e3d7"
+    },
+    "visuals/svg/fig-12-03-revenue-cutoff.svg": {
+      "output_sha256": "408b2d04b4d216ab9ababef765b223042e08bade22cbc01e3f1d0c30af655ce3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-03-revenue-cutoff.drawio",
+      "source_sha256": "761906c21f9161ca9c045c9ac35ff4332cc4e9d0eadd13f97941fd23068e037a"
+    },
+    "visuals/svg/fig-12-04-three-way-match.svg": {
+      "output_sha256": "d93b0ecfd9584e6b3f5bbf8d2d65404667198118f1a6fd73848b2b394dde8117",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-04-three-way-match.drawio",
+      "source_sha256": "bf64661217687da092d62eaf9d84b04e3d2d55c173edac71677daeab53d5f373"
+    },
+    "visuals/svg/fig-12-05-three-way-match-status.svg": {
+      "output_sha256": "163b4356b4de495e6b5e3d767e94eb9594737501fd85d7ea91acd6305cbe2bd0",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-05-three-way-match-status.drawio",
+      "source_sha256": "a3c08bf3492b7dc8d1802048728ba20d7e4374a69424ca72ed7f944a5e119def"
+    },
+    "visuals/svg/fig-12-06-approval-exceptions.svg": {
+      "output_sha256": "4fd71e7c821bb2945c5d72f7c55b4cbe7fba768550daa23de1528601be679cd2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-06-approval-exceptions.drawio",
+      "source_sha256": "60ee0bc64a3f353667e63d8e20aa6b28b580bf7800dd51b9ede8d085406a996c"
+    },
+    "visuals/svg/fig-12-07-labor-record-chain.svg": {
+      "output_sha256": "41eefe490b49b6dba4d06a4b924066df17457a38edffe963612e266a0dcf3947",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-07-labor-record-chain.drawio",
+      "source_sha256": "56f12432c2cb48f745a1e1f669381c7a7a574e0d554ba3110057aa04ce09374f"
+    },
+    "visuals/svg/fig-12-08-surge-days.svg": {
+      "output_sha256": "9035cbdd5536d51e4bc19d74bac6b60d7fca7487bb4661b3385cb6e5068ee93b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-08-surge-days.drawio",
+      "source_sha256": "156847033cae9380cb11f807d0addbf9c2cdf5fdb28793dcd25178711b160a18"
+    },
+    "visuals/svg/fig-12-09-normal-and-surge-day.svg": {
+      "output_sha256": "cfb674e088156de320787f9510f265195ed479f3d85faa60c273f7338c946057",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-09-normal-and-surge-day.drawio",
+      "source_sha256": "45da82925232cd358c64db66509351624e518dcd954bf9c91cd6c6c1a6e55820"
+    },
+    "visuals/svg/fig-12-10-labor-after-operation-end.svg": {
+      "output_sha256": "106c0cf8b201965a8e6706b8d56fae13d934962b93514f4f2772289e038719fc",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-10-labor-after-operation-end.drawio",
+      "source_sha256": "71f0264e74143a6cff1c6848a22233b364491840ccf89abda91ce80ee0fe673b"
+    },
+    "visuals/svg/fig-12-11-audit-library.svg": {
+      "output_sha256": "b81ec23802a109bfef9b24f6aa48ac5a5cbd89e48410d8e1ee0ad889e69cf655",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-12-11-audit-library.drawio",
+      "source_sha256": "124049c78f884c0296dc80013ba88e0ad04567807ce8332c4bb3c61271516fb5"
+    },
+    "visuals/svg/fig-13-01-power-bi-workflow.svg": {
+      "output_sha256": "8abbae51c2aa7d096273f207ddb234dbf7779865a9ad93194059407059cbe6e9",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-01-power-bi-workflow.drawio",
+      "source_sha256": "064f946c56147b58e0b7d42468d38b5345e6fd204992df807b45ce427a201aca"
+    },
+    "visuals/svg/fig-13-02-desktop-window.svg": {
+      "output_sha256": "38f00d4931974f5ac5256ec09285021980f3e035a3e7489c7578bd188ac9b365",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-02-desktop-window.drawio",
+      "source_sha256": "54abdc0ae15ced546565dadb040037b8f2c046df954be5c06adb64bbb338eb10"
+    },
+    "visuals/svg/fig-13-03-column-profile.svg": {
+      "output_sha256": "062b19dd4c648881d8a1b25edf0deac8437e8243a3a6cb4bb41fa06d11199453",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-03-column-profile.drawio",
+      "source_sha256": "9768ad358f39ac02e26bc84e94407e484b05e5f753b9c296ab6ac9f3e2e38f97"
+    },
+    "visuals/svg/fig-13-04-model-view.svg": {
+      "output_sha256": "d2565904c8a9b273ff87ba2029d077615c22cf7ecb157971dfb230c0b52fb3ae",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-04-model-view.drawio",
+      "source_sha256": "25439ce6bee2f6dd22b79cb392467dcca3ad6bfd8e33219ae908c645a777f472"
+    },
+    "visuals/svg/fig-13-05-validation-page.svg": {
+      "output_sha256": "2288e139eaf37d37423b4dab09c838e8ca0f54a9d8f96e867b6190b9eef7890c",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-05-validation-page.drawio",
+      "source_sha256": "5a81d7d17d78ea21f0bcd107ada616220ff134f9e42a621be483fec2403efa1f"
+    },
+    "visuals/svg/fig-13-06-sales-discounts-page.svg": {
+      "output_sha256": "27c46060df3de1797db2c6dfd640691c9eef07a201e4a657118b6dc5ae6d060e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-06-sales-discounts-page.drawio",
+      "source_sha256": "f638cf9807d05a2fee31a9c9a3bb1c9f6d9d1cf0e539807adc1ae827fec2b590"
+    },
+    "visuals/svg/fig-13-07-encodings.svg": {
+      "output_sha256": "825a15d1f96ab557df8f213233b539620d56d065698105c36be6ab98dc3f3487",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-07-encodings.drawio",
+      "source_sha256": "7fd1a04fa9ae3aa6561e80245671606da74f6933a1bf54708c0cbda9405ae3a0"
+    },
+    "visuals/svg/fig-13-08-value-axis.svg": {
+      "output_sha256": "c53e9e4c39f70dd83842e8034756f19a453a93ef10973b1a515f01b4ee80a9d2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-08-value-axis.drawio",
+      "source_sha256": "cd06023710517f10c77b98bfafba3232101ed630efc9d6561656864cba3ebbfd"
+    },
+    "visuals/svg/fig-13-09-dual-axis.svg": {
+      "output_sha256": "3ae3fff1e62c1e730c040d6ad9d92a4a1c4cdfac9224abe28bfc7ec52b64e876",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-13-09-dual-axis.drawio",
+      "source_sha256": "b1b6d6c3ae99aa081a0a01c3b9c1bad16de102d849c5d8a1d8246977e7019e27"
+    },
+    "visuals/svg/fig-14-01-star.svg": {
+      "output_sha256": "6738fc146759c98ad045a38b460db97c306fdfe54aac35042ba1cd74e83d6d46",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-01-star.drawio",
+      "source_sha256": "5d680076c40bc94a644b54e95d778161b65929e9c79176ae8d0282aa410ae7fa"
+    },
+    "visuals/svg/fig-14-02-date-table.svg": {
+      "output_sha256": "31d2d3ffe4b5fe809a648494242f20c4300549569511ed9a1b01ae76e1dad805",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-02-date-table.drawio",
+      "source_sha256": "04829887cb76d9d53fadba7220787bc902ded29db6f59369c1a21850ef80ec53"
+    },
+    "visuals/svg/fig-14-03-filter-context.svg": {
+      "output_sha256": "3df7c1d89d7347d26c9d88e6c3fbafd8fadd796a625f0a6f8205e1da7228e988",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-03-filter-context.drawio",
+      "source_sha256": "f9a96a6761bb81fb0b601bf23125fc128361ef5b378433c1631726d8bb57fd88"
+    },
+    "visuals/svg/fig-14-04-context-transition.svg": {
+      "output_sha256": "3be9acb6367bd7fcf2ca6dfa74a4dc0a398b0f902de78c0f99ad5edda797dd2a",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-04-context-transition.drawio",
+      "source_sha256": "fb9d9d7b86b24ca2d94fef123799dd7ea8b3d799164bcda48888d8812ce8cfef"
+    },
+    "visuals/svg/fig-14-05-calculate.svg": {
+      "output_sha256": "ef8f01b1a1a930355d4f0fc15daf057b5f284509b4dc30c3fd60230cd17c8842",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-05-calculate.drawio",
+      "source_sha256": "b9ed81cea01ecf4112f838e4fa5ab10868b234430262de4e856b37129c5eb150"
+    },
+    "visuals/svg/fig-14-06-dax-query-view.svg": {
+      "output_sha256": "3f0d42a3752b40ccb7638b0dbe4bce2cdaf9903732fd5c7ca4e683773b1cb5c0",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-06-dax-query-view.drawio",
+      "source_sha256": "37ec123d2d7d3550b1716e6edc304257ab1cb91e14f8e4f4a11596fa02878dc5"
+    },
+    "visuals/svg/fig-14-07-margin-matrix.svg": {
+      "output_sha256": "2038b0ed6005cfc2c97bb09138b67bbfeaa3af76839f15f2d3219fba2482fe5d",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-07-margin-matrix.drawio",
+      "source_sha256": "b037a6c8bd537e8a39cec73e02edfd7650ea2e30d929e003687622c753917399"
+    },
+    "visuals/svg/fig-14-08-two-stars.svg": {
+      "output_sha256": "e3ce3de63a7ace2042881d86daf1abe5f5af12dda736ceaea5ca6014ed08df7d",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-08-two-stars.drawio",
+      "source_sha256": "816d28b190b82617b0940d99be6fd8964e5bfee45842f4d538264fb8c3b4f9c7"
+    },
+    "visuals/svg/fig-14-09-closes-trap.svg": {
+      "output_sha256": "f0dbcb0fff8ceb70ecc4556d922daf8638920358797ef90b5447a342ead7586c",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-09-closes-trap.drawio",
+      "source_sha256": "bfe9d5232bacd69ed4fcda5f272bd72f4bd3238d0a5e49930e614800293f6d2d"
+    },
+    "visuals/svg/fig-14-10-income-statement.svg": {
+      "output_sha256": "99015acbb793794e69a4e325d34d72108743a713da2d0c1cf3e1d546ee9a2db3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-10-income-statement.drawio",
+      "source_sha256": "a07a29de026231afe0291b0ecbf6da5f3da41777108c320d46a5195baa0a3e43"
+    },
+    "visuals/svg/fig-14-11-expense-expectation.svg": {
+      "output_sha256": "a7ab6421efcdd3d2ab7ecded149e709d53161ffa324f49a800cc54e830a89de8",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-14-11-expense-expectation.drawio",
+      "source_sha256": "33fc0ffa88885972cc36426666d543ff2b21e47ab951f296fb73327c44bcbd0a"
+    },
+    "visuals/svg/fig-15-01-package-plan.svg": {
+      "output_sha256": "204d6ffe664475836e2be8cf230d4d4afdaa3abf2e8aea9f28599f6e93e96a1e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-01-package-plan.drawio",
+      "source_sha256": "84238f249be3427d9975bae94575eb816c70f7d69c8541dea25ef68d512a70df"
+    },
+    "visuals/svg/fig-15-02-drill-down-through.svg": {
+      "output_sha256": "1defa13dd2e6452c1cf87ce1213141c9ceebe693a5d4193393dfade94b9a936e",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-02-drill-down-through.drawio",
+      "source_sha256": "ecb37a37f7991077892b00e4f3c7d4cb96efe0a3c2dfeb8981dd16cfa236245d"
+    },
+    "visuals/svg/fig-15-03-promotions-page.svg": {
+      "output_sha256": "d28dceb71c5eb8ad53b9570e72a7390b17d648b73d232f4fb921240759646a1f",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-03-promotions-page.drawio",
+      "source_sha256": "42f7b906ebb28118b700ad4c6682d91fdda58e394f32899104ef043d66bc59e4"
+    },
+    "visuals/svg/fig-15-04-promotion-detail.svg": {
+      "output_sha256": "3a93c528a68f7e917d667848004eb59f97c744bbf2d36abb63f7511f9962fde6",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-04-promotion-detail.drawio",
+      "source_sha256": "226eee9c882275bb2f426e039c7685b23b147e074b0bdf16c97aa271ebeb02e3"
+    },
+    "visuals/svg/fig-15-05-promotion-tooltip.svg": {
+      "output_sha256": "a9930772fe66a9a7d9d49ae265d80be127d95fa917991bc70c103611c2ddfa39",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-05-promotion-tooltip.drawio",
+      "source_sha256": "ec230af49276761a411e822013c4534db8140a7ba5362bb82f38d62eb83e4a54"
+    },
+    "visuals/svg/fig-15-06-visual-calc-editor.svg": {
+      "output_sha256": "1c597cbce466d235f0adea38fd5858409bc1cb8d05cb63abe75936668d6e9338",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-06-visual-calc-editor.drawio",
+      "source_sha256": "1b0151c80061009d05ea1d648cd2fbf9460402df38f2c3f007bf1fbf964ecd6f"
+    },
+    "visuals/svg/fig-15-07-budget-model.svg": {
+      "output_sha256": "f56306bfc9f71f085cbe6b89e9b001e8c3345ce538eb64d8d732c8cde0baa96d",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-07-budget-model.drawio",
+      "source_sha256": "41244427a28b7c9ca10702dbb08c7fcd5299c7192e012e876aabb558c6ed124d"
+    },
+    "visuals/svg/fig-15-08-budget-matrix.svg": {
+      "output_sha256": "1dcbee4be63faa9d013232428bfa4a0fae3d5a4b773c2ac0e5cf7718325c35a0",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-08-budget-matrix.drawio",
+      "source_sha256": "6628698b445900a741377c4687ad05f13188bc8fe536272e670b0fb765d81f16"
+    },
+    "visuals/svg/fig-15-09-variance-reconciliation.svg": {
+      "output_sha256": "6f730aceab7a01d5e9f6dd6d27ff2b42c5dbb397ee2772d70bebc43f40d41562",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-09-variance-reconciliation.drawio",
+      "source_sha256": "66b246259f95eecd001ce5daf2ad081244ee00036bb4f505d455b3c1fc94cf89"
+    },
+    "visuals/svg/fig-15-10-measure-vs-visual-calc.svg": {
+      "output_sha256": "18c3fe3ed1db00e6a971ad4373ac365f6b420d880bb3c364869851e924c1c142",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-10-measure-vs-visual-calc.drawio",
+      "source_sha256": "f613800dc1bd9d306a2c8fc2245c9003650131ffe157c973a690f3f695955bc1"
+    },
+    "visuals/svg/fig-15-11-plant-page.svg": {
+      "output_sha256": "7aa4ff51a16fd7d2b6836b7d24a5403005bd81ccbdc9c92c7d52e6bb0043d8ad",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-11-plant-page.drawio",
+      "source_sha256": "0fc4f2b23d28754aa1d60dc0896b3979e503f5ce23f9ba24b8eef3c08d9390fc"
+    },
+    "visuals/svg/fig-15-12-about-page.svg": {
+      "output_sha256": "c59f07d454af61290cbd9b815ff92f9f4cc36d3be2d83e891136cdbd384ff144",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-15-12-about-page.drawio",
+      "source_sha256": "2f53992a50e5131f4515c2384b71fd454afd628850860c0dac7714e4260e7f02"
+    },
+    "visuals/svg/fig-16-01-monitoring-cycle.svg": {
+      "output_sha256": "105b6b02cd1b4ff6d4c82373210bffbe8292f090d12de3f27db1ecb8429e2f87",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-01-monitoring-cycle.drawio",
+      "source_sha256": "660b980310aaae84859402ffc1e41b914645b28bf4f28751e1aed62cee9064bc"
+    },
+    "visuals/svg/fig-16-02-exception-register.svg": {
+      "output_sha256": "5d3b36d16793897df248e1280b0d5e07d64882da88a53f2fa5e674da798ea618",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-02-exception-register.drawio",
+      "source_sha256": "4e0bf8812eccf5c0a13b159feb8f9aa2297b172fe0fd10acc684650ae7306344"
+    },
+    "visuals/svg/fig-16-03-je-flags.svg": {
+      "output_sha256": "5d5ce4d0a74a2f0ad93c54c53daa369ecc6d132ebed4e53f702c4bd114ab28e2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-03-je-flags.drawio",
+      "source_sha256": "073ce5b65c7e873f0fb06a021a3bec013312ebc56fc2615a8933f345f7f2cf36"
+    },
+    "visuals/svg/fig-16-04-entry-lines.svg": {
+      "output_sha256": "e0f81c66c26dbcb9e11f327bbdb8c45fbb069895ad530e3b0740e13c2f9b2567",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-04-entry-lines.drawio",
+      "source_sha256": "04245a1d82f96af2b4c8232fe673416ce68ec7a34dbe28a22f5dbf936c3f3cd8"
+    },
+    "visuals/svg/fig-16-05-monitoring-page.svg": {
+      "output_sha256": "0025e5bc06fafa5f90d1228c9281f3ebfbc26a378cd7524c985c2d1473adfca1",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-05-monitoring-page.drawio",
+      "source_sha256": "925df4cbcea4250fc8f2ab1a62a361221fee5e68542e3b10460470df7efadad2"
+    },
+    "visuals/svg/fig-16-06-exception-detail.svg": {
+      "output_sha256": "50927ca6a277fd7f7345eff2a791ccf9fa5e1595b6dba6a39c54313c55ca4141",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-06-exception-detail.drawio",
+      "source_sha256": "724c7eb7f79e828e777f58a118529714255038e98609024c968cdc298f0315b6"
+    },
+    "visuals/svg/fig-16-07-review-page.svg": {
+      "output_sha256": "0c5a7a5a01a9f4470525d7d98de23cf21c0071a9289dd0b3f17497d4ff0290b8",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-07-review-page.drawio",
+      "source_sha256": "fdd1f3958310f0c96bd75254aced24f5f78207c684b6b85218156fc85b4077ab"
+    },
+    "visuals/svg/fig-16-08-population-test.svg": {
+      "output_sha256": "30d49b9d2436fcf1b783ea9a1b7bfda818a7b72365a17e660639bafe14fada6b",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-16-08-population-test.drawio",
+      "source_sha256": "16d19549af5eba337a4fcc35d400335fe2a6089aa3ce1711fe43bc2b7cb0eeda"
+    },
+    "visuals/svg/fig-17-01-accrual-trace.svg": {
+      "output_sha256": "e7b718ff20df330c2af7e3954f38d2aa25265c7df5f599602c7f1331ca2586a2",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-17-01-accrual-trace.drawio",
+      "source_sha256": "5f8da48bc20e146b6a4a78bd5c993329e0dbdcf7dddae2668f8e507f8d383148"
+    },
+    "visuals/svg/fig-17-02-adjustment-timeline.svg": {
+      "output_sha256": "54a418df57be47be9e1a49b775af7050d64b33d84fdc352d800710ad971d0736",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-17-02-adjustment-timeline.drawio",
+      "source_sha256": "d88cdb3a1651f77dca4b65f7692b6aa89163c8847d5833e2dd447e863a9343d5"
+    },
+    "visuals/svg/fig-18-01-costing-views.svg": {
+      "output_sha256": "bcf0f3049cb180c52ca279a3f38f92585b4d7c8ba43f22258df88f8c4a1ca1b7",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-18-01-costing-views.drawio",
+      "source_sha256": "9e7a8a6ab6164080f0d127834804162330ac85c68bcaf75d21a3ad968af331ae"
+    },
+    "visuals/svg/fig-18-02-make-or-buy-test.svg": {
+      "output_sha256": "63a97b5c66b0734448edb7be57b39ecb5c30d0d55015a2345982bb6456f68a18",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-18-02-make-or-buy-test.drawio",
+      "source_sha256": "fd945ea850f79857b03f80e0aff9a39ce48c648a703f59e1a630c88bb60935be"
+    },
+    "visuals/svg/fig-19-01-credits-cycle.svg": {
+      "output_sha256": "9a7c10c5e523069e55a37f48cc1db4e86fbb8330f9c10c441298f2aff36d4e72",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-19-01-credits-cycle.drawio",
+      "source_sha256": "9191c08304403dad418ff608e93e361e19823e6dd53e5886d25f7daefa56c5b0"
+    },
+    "visuals/svg/fig-19-02-deficiency-evaluation.svg": {
+      "output_sha256": "8a20773a4dd17b9f5a62626db7d4702f1067171102763bc3100f0e842d7771fe",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-19-02-deficiency-evaluation.drawio",
+      "source_sha256": "417527ceab0981bc10b26021f147c72a11f02f25f7069f8021629da1eddc5a2f"
+    },
+    "visuals/svg/fig-a-01-rls-reach.svg": {
+      "output_sha256": "6d667b0ff5087637b00a6858bb2a8d595e73d15415dd0037f4075e80261af777",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-a-01-rls-reach.drawio",
+      "source_sha256": "1f4fb50c1e04ab110dbd3f929eed05880624cdc644cb37e15d15cc29a52d72df"
+    },
+    "visuals/svg/fig-a-02-access-review.svg": {
+      "output_sha256": "072fe1f0c9b871967dce421266007391dda773e83f1727d43854d2c8ee406a61",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-a-02-access-review.drawio",
+      "source_sha256": "85c9269be0ffa4d949320e9f76fad90b7c9af91d8c2acae88a6fc63c0c61c611"
+    },
+    "visuals/svg/fig-a-03-manage-roles.svg": {
+      "output_sha256": "9309b1937cf6b711fdc689452e5d964a16f4ca758bec35840e3c79428069ea31",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-a-03-manage-roles.drawio",
+      "source_sha256": "3d74a5c5bee1023d97e2e9e8d0e7a76ece5d0474da00e293b718e1a4c4c89976"
+    },
+    "visuals/svg/fig-a-04-view-as.svg": {
+      "output_sha256": "f8492c0ec35118f5ed7f776e23f4b22a8e21c8f1f35edf62324b4aef76c39eb3",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-a-04-view-as.drawio",
+      "source_sha256": "fbcecfd23736b1d30ff28236e8c6db5a6b695ab0b758b4c3afd8deff3d80f160"
+    },
+    "visuals/svg/fig-a-05-sharing-paths.svg": {
+      "output_sha256": "cee4d28d69dbdd0f7becd4d8b5c3d5ba9848127913a202e4b0e8a59ffe58af61",
+      "recipe": 1,
+      "settings": {
+        "padding": 0.5
+      },
+      "source": "visuals/src/fig-a-05-sharing-paths.drawio",
+      "source_sha256": "1e4f022f35a470e530e89dda74a905c39c65479b0ada1bf03f15ecebdb33c8e8"
+    }
+  },
+  "version": 1
+}

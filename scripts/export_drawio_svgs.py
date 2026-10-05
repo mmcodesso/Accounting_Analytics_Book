@@ -12,6 +12,9 @@ Each visuals/src/*.drawio file is exported twice:
 from __future__ import annotations
 
 import argparse
+import base64
+import hashlib
+import json
 import struct
 import os
 import re
@@ -19,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+import zlib
 from pathlib import Path
 
 
@@ -29,8 +33,14 @@ DEFAULT_PDF_DIR = REPO_ROOT / "visuals" / "pdf"
 DEFAULT_COVER_SOURCE = REPO_ROOT / "visuals" / "cover" / "accounting_analytics_cover.drawio"
 DEFAULT_COVER_OUTPUT = REPO_ROOT / "visuals" / "cover" / "cover.png"
 DEFAULT_PADDING = 0.5
-DEFAULT_COVER_WIDTH = 2550
-DEFAULT_COVER_HEIGHT = 3300
+# Match the raster background's native resolution while preserving 17:22.
+# Print uses the separate vector PDF, so this PNG need not be 300 DPI.
+DEFAULT_COVER_WIDTH = 1105
+DEFAULT_COVER_HEIGHT = 1430
+DEFAULT_COVER_WEB_WIDTH = 510
+DEFAULT_COVER_WEB_HEIGHT = 660
+# Bump when the export recipe changes in a way that requires new outputs.
+EXPORT_RECIPE_VERSION = 1
 DRAWIO_TEXT_WARNING_PATTERN = re.compile(
     r"<switch>\s*"
     r'<g\s+requiredFeatures="http://www\.w3\.org/TR/SVG11/feature#Extensibility"\s*/>\s*'
@@ -41,6 +51,7 @@ DRAWIO_TEXT_WARNING_PATTERN = re.compile(
 # light-dark(<light>, <dark>), where either value may itself be rgb(...).
 CSS_COLOR = r"(?:[^(),]|\([^()]*\))+"
 LIGHT_DARK_PATTERN = re.compile(rf"light-dark\(\s*({CSS_COLOR}?)\s*,\s*{CSS_COLOR}\)")
+EMBEDDED_PNG_PATTERN = re.compile(rb"data:image/png;base64,([A-Za-z0-9+/]+={0,2})")
 
 
 class ExportError(RuntimeError):
@@ -72,7 +83,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-pdf",
         action="store_true",
-        help="Do not export the vector PDF copies used by the PDF build.",
+        help="Do not export the vector PDF copies or PDF cover used by the PDF build.",
     )
     parser.add_argument(
         "--drawio-bin",
@@ -81,9 +92,20 @@ def parse_args() -> argparse.Namespace:
         help="Path to draw.io/diagrams.net executable. Overrides DRAWIO_BIN and PATH.",
     )
     parser.add_argument(
+        "--pre-render",
+        action="store_true",
+        help="Reuse exports prepared by build_all.py when running as a Quarto hook.",
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=REPO_ROOT / "visuals" / "export-manifest.json",
+        help="Tracked source/output checksums used to reuse exports after checkout.",
+    )
+    parser.add_argument(
         "--force",
         action="store_true",
-        help="Export all diagrams even when the SVG output is newer than the source.",
+        help="Export every requested output even when its recorded checksums match.",
     )
     parser.add_argument(
         "--padding",
@@ -107,7 +129,7 @@ def parse_args() -> argparse.Namespace:
         "--cover-output",
         type=Path,
         default=DEFAULT_COVER_OUTPUT,
-        help="PNG output path for the book cover.",
+        help="Ebook PNG path; also writes <stem>-web.png and <stem>.pdf beside it.",
     )
     parser.add_argument(
         "--cover-width",
@@ -124,7 +146,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-cover",
         action="store_true",
-        help="Do not export the book cover PNG.",
+        help="Do not export any of the book cover variants.",
     )
     return parser.parse_args()
 
@@ -200,7 +222,66 @@ def find_drawio_executable(explicit_path: Path | None) -> Path:
 
 
 def is_output_current(source: Path, output: Path) -> bool:
-    return output.exists() and output.stat().st_mtime >= source.stat().st_mtime
+    return (output.is_file() and output.stat().st_size > 0
+            and output.stat().st_mtime_ns >= source.stat().st_mtime_ns)
+
+
+def export_digest(path: Path) -> str:
+    data = path.read_bytes()
+    if path.suffix.lower() in {".drawio", ".svg"}:
+        # Git can convert text line endings between Windows and Linux.
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
+class ExportManifest:
+    """Persist export freshness across clones without trusting checkout mtimes."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        self.entries = {}
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if data.get("version") != 1 or not isinstance(data.get("outputs"), dict):
+                    raise ValueError("unsupported manifest structure")
+                self.entries = data["outputs"]
+            except (ValueError, AttributeError) as exc:
+                raise ExportError(f"Invalid export manifest {path}: {exc}") from exc
+
+    def record(self, source: Path, output: Path, settings: dict) -> dict:
+        return {"source": source.relative_to(REPO_ROOT).as_posix(),
+                "source_sha256": export_digest(source),
+                "output_sha256": export_digest(output),
+                "recipe": EXPORT_RECIPE_VERSION, "settings": settings}
+
+    def current(self, source: Path, output: Path, settings: dict) -> bool:
+        if not output.is_file() or output.stat().st_size == 0:
+            return False
+        key = output.relative_to(REPO_ROOT).as_posix()
+        previous = self.entries.get(key)
+        if previous is not None:
+            # A changed source cannot be hidden by touching the output file.
+            return previous == self.record(source, output, settings)
+        # Bootstrap existing local exports once, using the old timestamp rule.
+        # Never infer freshness from timestamps on a GitHub Actions checkout.
+        defaults = {".svg": {"padding": DEFAULT_PADDING}, ".pdf": {},
+                    ".png": {"width": DEFAULT_COVER_WIDTH, "height": DEFAULT_COVER_HEIGHT}}
+        return (os.environ.get("GITHUB_ACTIONS") != "true"
+                and settings == defaults.get(output.suffix)
+                and is_output_current(source, output))
+
+    def remember(self, source: Path, output: Path, settings: dict) -> None:
+        self.entries[output.relative_to(REPO_ROOT).as_posix()] = self.record(source, output, settings)
+
+    def save(self) -> None:
+        text = json.dumps({"version": 1, "outputs": self.entries}, indent=2, sort_keys=True) + "\n"
+        if self.path.is_file() and self.path.read_text(encoding="utf-8") == text:
+            return
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.path.with_name(f".{self.path.name}.tmp")
+        temporary.write_text(text, encoding="utf-8", newline="\n")
+        temporary.replace(self.path)
 
 
 def format_number(value: float) -> str:
@@ -310,6 +391,70 @@ def force_light_colors(path: Path) -> None:
         path.write_text(cleaned, encoding="utf-8")
 
 
+def compress_png_losslessly(data: bytes) -> bytes:
+    """Recompress IDAT only; preserve exact scanlines and all other PNG chunks.
+
+    Draw.io's SVG label fallbacks use fast PNG compression. Keep those fallbacks
+    for Word/EPUB readers, but compress their existing data more efficiently.
+    Unsupported or malformed images are left untouched, as are larger results.
+    """
+    signature = b"\x89PNG\r\n\x1a\n"
+    if not data.startswith(signature):
+        return data
+    chunks = []
+    position = len(signature)
+    while position < len(data):
+        if position + 12 > len(data):
+            return data
+        size = struct.unpack_from(">I", data, position)[0]
+        end = position + size + 12
+        if end > len(data):
+            return data
+        kind = data[position + 4:position + 8]
+        chunk = data[position:end]
+        if zlib.crc32(chunk[4:-4]) != struct.unpack(">I", chunk[-4:])[0]:
+            return data
+        chunks.append((kind, chunk))
+        position = end
+    kinds = [kind for kind, _ in chunks]
+    if (not kinds or kinds[0] != b"IHDR" or kinds[-1] != b"IEND"
+            or b"IDAT" not in kinds or b"acTL" in kinds):
+        return data
+    first, last = kinds.index(b"IDAT"), len(kinds) - 1 - kinds[::-1].index(b"IDAT")
+    if any(kind != b"IDAT" for kind in kinds[first:last + 1]):
+        return data
+    try:
+        scanlines = zlib.decompress(b"".join(chunk[8:-4] for _, chunk in chunks[first:last + 1]))
+    except zlib.error:
+        return data
+    compressed = zlib.compress(scanlines, level=9)
+    payload = b"IDAT" + compressed
+    replacement = struct.pack(">I", len(compressed)) + payload + struct.pack(">I", zlib.crc32(payload))
+    result = (signature + b"".join(chunk for _, chunk in chunks[:first])
+              + replacement + b"".join(chunk for _, chunk in chunks[last + 1:]))
+    return result if len(result) < len(data) else data
+
+
+def optimize_svg(path: Path) -> int:
+    """Shrink embedded PNGs without rewriting SVG markup; return bytes saved."""
+    original = path.read_bytes()
+
+    def replace(match: re.Match[bytes]) -> bytes:
+        try:
+            data = base64.b64decode(match[1], validate=True)
+        except ValueError:
+            return match[0]
+        compressed = compress_png_losslessly(data)
+        if compressed == data:
+            return match[0]
+        return b"data:image/png;base64," + base64.b64encode(compressed)
+
+    optimized = EMBEDDED_PNG_PATTERN.sub(replace, original)
+    if len(optimized) < len(original):
+        path.write_bytes(optimized)
+    return len(original) - len(optimized)
+
+
 def run_drawio(command: list[str], source: Path, temp_output: Path, kind: str) -> None:
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode != 0:
@@ -358,10 +503,11 @@ def export_svg(
     remove_drawio_text_warning(temp_output)
     force_light_colors(temp_output)
     add_white_background(temp_output)
+    optimize_svg(temp_output)
     temp_output.replace(output)
 
 
-def export_pdf(drawio_bin: Path, source: Path, output: Path) -> None:
+def export_pdf(drawio_bin: Path, source: Path, output: Path, *, crop: bool = True) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     temp_output = output.with_name(f".{output.stem}.tmp.pdf")
     if temp_output.exists():
@@ -372,7 +518,7 @@ def export_pdf(drawio_bin: Path, source: Path, output: Path) -> None:
         "-x",
         "-f",
         "pdf",
-        "--crop",
+        *(["--crop"] if crop else []),
         "-o",
         str(temp_output),
         str(source),
@@ -440,17 +586,33 @@ def export_cover_png(
             f"expected {width}x{height}. Check the cover Draw.io page aspect ratio."
         )
 
+    temp_output.write_bytes(compress_png_losslessly(temp_output.read_bytes()))
     temp_output.replace(output)
+
+
+def cover_targets(output: Path, width: int, height: int, skip_pdf: bool) -> list[tuple[Path, dict]]:
+    targets = [
+        (output, {"width": width, "height": height}),
+        (output.with_name(f"{output.stem}-web.png"),
+         {"width": DEFAULT_COVER_WEB_WIDTH, "height": DEFAULT_COVER_WEB_HEIGHT}),
+    ]
+    if not skip_pdf:
+        targets.append((output.with_suffix(".pdf"), {"crop": False}))
+    return targets
 
 
 def run() -> int:
     args = parse_args()
+    if args.pre_render and not args.force and os.environ.get("AA_DRAWIO_EXPORTS_READY") == "1":
+        print("Reusing Draw.io SVG, PDF, and cover exports prepared for this build.")
+        return 0
+
     src_dir = args.src_dir.resolve()
     out_dir = args.out_dir.resolve()
     pdf_dir = args.pdf_dir.resolve()
     cover_source = args.cover_source.resolve()
     cover_output = args.cover_output.resolve()
-    force_export = args.force or os.environ.get("GITHUB_ACTIONS") == "true"
+    force_export = args.force
 
     if args.padding < 0:
         raise ExportError(f"Padding must be greater than or equal to 0: {args.padding}")
@@ -468,16 +630,20 @@ def run() -> int:
     if not sources:
         print(f"No .drawio files found in {src_dir}")
 
-    drawio_bin = find_drawio_executable(args.drawio_bin)
-    print(f"Using Draw.io executable: {drawio_bin}")
+    manifest = ExportManifest(args.manifest.resolve())
+    drawio_bin = None
+
+    def executable() -> Path:
+        nonlocal drawio_bin
+        if drawio_bin is None:
+            drawio_bin = find_drawio_executable(args.drawio_bin)
+            print(f"Using Draw.io executable: {drawio_bin}")
+        return drawio_bin
+
     print(f"Using transparent SVG padding: {format_number(args.padding)}")
     if not args.skip_cover:
-        print(
-            f"Using cover PNG size: {args.cover_width}x{args.cover_height} "
-            "(8.5x11 inches at 300 DPI)"
-        )
-    if force_export and not args.force:
-        print("GitHub Actions detected; exporting all diagrams because checkout timestamps are not reliable.")
+        print(f"Using ebook cover PNG size: {args.cover_width}x{args.cover_height} pixels")
+    print("Checking recorded source/output checksums for existing exports.")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     exported = 0
@@ -489,40 +655,37 @@ def run() -> int:
             targets.append(pdf_dir / f"{source.stem}.pdf")
 
         for output in targets:
-            if not force_export and is_output_current(source, output):
+            settings = {"padding": args.padding} if output.suffix == ".svg" else {}
+            if not force_export and manifest.current(source, output, settings):
+                manifest.remember(source, output, settings)
                 print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
                 skipped += 1
                 continue
 
             if output.suffix == ".svg":
-                export_svg(drawio_bin, source, output, args.padding)
+                export_svg(executable(), source, output, args.padding)
             else:
-                export_pdf(drawio_bin, source, output)
+                export_pdf(executable(), source, output)
+            manifest.remember(source, output, settings)
             print(f"export {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
             exported += 1
 
     if not args.skip_cover:
         validate_single_page_drawio(cover_source)
-        if not force_export and is_output_current(cover_source, cover_output):
-            print(
-                f"skip   {cover_source.relative_to(REPO_ROOT)} -> "
-                f"{cover_output.relative_to(REPO_ROOT)}"
-            )
-            skipped += 1
-        else:
-            export_cover_png(
-                drawio_bin,
-                cover_source,
-                cover_output,
-                args.cover_width,
-                args.cover_height,
-            )
-            print(
-                f"export {cover_source.relative_to(REPO_ROOT)} -> "
-                f"{cover_output.relative_to(REPO_ROOT)}"
-            )
-            exported += 1
+        for output, settings in cover_targets(cover_output, args.cover_width, args.cover_height, args.skip_pdf):
+            if not force_export and manifest.current(cover_source, output, settings):
+                print(f"skip   {cover_source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
+                skipped += 1
+            else:
+                if output.suffix == ".pdf":
+                    export_pdf(executable(), cover_source, output, crop=False)
+                else:
+                    export_cover_png(executable(), cover_source, output, settings["width"], settings["height"])
+                print(f"export {cover_source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
+                exported += 1
+            manifest.remember(cover_source, output, settings)
 
+    manifest.save()
     print(f"Done: {exported} exported, {skipped} skipped.")
     return 0
 

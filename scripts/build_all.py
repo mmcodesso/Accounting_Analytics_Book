@@ -146,6 +146,11 @@ def build(root: Path, manifest: dict, quarto: str, *, slides_only=False, include
     env['PATH'] = str(Path(sys.executable).parent) + os.pathsep + env.get('PATH', '')
     env['AA_SLIDES_INCLUDE_PILOT'] = '1' if include_pilot else '0'
     if not slides_only:
+        # Export once for all four book formats. Set the hook bypass only after
+        # success, and only in this build's child environment (never persist it).
+        env.pop('AA_DRAWIO_EXPORTS_READY', None)
+        run(root, [sys.executable, 'scripts/export_drawio_svgs.py'], env)
+        env['AA_DRAWIO_EXPORTS_READY'] = '1'
         downloads = root / 'outputs/build/downloads'
         reset_owned(root, downloads)
         for ext in ('pdf', 'epub', 'docx'):

@@ -6,7 +6,7 @@ project:
     - '!shared/generated/**'
     - '!outputs/**'
   pre-render:
-    - python scripts/export_drawio_svgs.py
+    - python scripts/export_drawio_svgs.py --pre-render
 
 filters:
   - filters/strip-comments.lua
@@ -66,6 +66,7 @@ book:
 
 format:
   html:
+    cover-image: visuals/cover/cover-web.png
     theme:
       - cosmo
       - styles/book.scss
@@ -93,6 +94,8 @@ format:
     number-depth: 3
     fig-cap-location: bottom
     tbl-cap-location: top
+  epub:
+    cover-image: visuals/cover/cover.png
   docx:
     reference-doc: styles/reference.docx
 

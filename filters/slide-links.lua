@@ -14,13 +14,18 @@ local function chapters()
   return result
 end
 
-local function links(chapter)
+local function link_targets(chapter)
   local prefix = '/slides/' .. chapter.id .. '/'
   if FORMAT ~= 'html' and FORMAT ~= 'html5' then
     prefix = 'https://aa.accountinganalyticshub.com' .. prefix
   end
-  return pandoc.Para({pandoc.Link('View slides', prefix .. 'index.html'), pandoc.Str(' · '),
-                      pandoc.Link('Download PowerPoint', prefix .. chapter.id .. '.pptx')})
+  return prefix .. 'index.html', prefix .. chapter.id .. '.pptx'
+end
+
+local function links(chapter)
+  local view, download = link_targets(chapter)
+  return pandoc.Para({pandoc.Link('View slides', view), pandoc.Str(' · '),
+                      pandoc.Link('Download PowerPoint', download)})
 end
 
 function Div(div)
@@ -30,15 +35,25 @@ function Div(div)
     end
     return {}
   elseif div.classes:includes('chapter-slides-list') then
-    local blocks = {}
+    local rows = {}
     for _, chapter in ipairs(chapters()) do
-      table.insert(blocks, pandoc.Para({pandoc.Str(string.format('Chapter %d: %s', chapter.number, chapter.title))}))
-      table.insert(blocks, links(chapter))
+      local view, download = link_targets(chapter)
+      table.insert(rows, {
+        {pandoc.Plain(string.format('Chapter %d: %s', chapter.number, chapter.title))},
+        {pandoc.Plain({pandoc.Link('View slides', view)})},
+        {pandoc.Plain({pandoc.Link('PowerPoint', download)})}
+      })
     end
-    if #blocks == 0 then return {} end
+    if #rows == 0 then return {} end
     local heading = pandoc.Header(2, 'Chapter slides')
     heading.identifier = 'chapter-slides'
-    table.insert(blocks, 1, heading)
-    return blocks
+    local slide_table = pandoc.utils.from_simple_table(pandoc.SimpleTable(
+      {},
+      {pandoc.AlignLeft, pandoc.AlignLeft, pandoc.AlignLeft},
+      {0.60, 0.20, 0.20},
+      {{pandoc.Plain('Chapter name')}, {pandoc.Plain('View slides')}, {pandoc.Plain('Download')}},
+      rows
+    ))
+    return {heading, slide_table}
   end
 end

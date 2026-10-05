@@ -154,6 +154,19 @@ PDF in `visuals/pdf/`. For the PDF book, `filters/pdf-figures.lua` swaps the PDF
 in for the SVG, so figure text stays sharp and searchable in print. Always
 reference the SVG in the chapter; the filter handles the PDF.
 
+SVG exports losslessly compress the embedded PNG text fallbacks that document
+viewers use. Vector markup, text, dimensions, colors, and fallback pixels stay
+unchanged. This optimization runs automatically during export and uses only
+Python's standard library.
+
+The cover source is `visuals/cover/accounting_analytics_cover.drawio`. The exporter
+creates `cover-web.png` at 510 x 660 pixels for the website and README,
+`cover.png` at 1105 x 1430 pixels for EPUB (close to the background's native
+1103 x 1426 resolution), and `cover.pdf` for the PDF book's
+full-page cover. PNG exports use lossless compression; the PDF preserves the
+source's vector text over its raster background. All three variants use the
+same checksum-based incremental export checks as the chapter figures.
+
 Every figure follows one design standard, so it reads well on screen, in the
 PDF, and on paper:
 
@@ -226,8 +239,18 @@ python scripts/build_all.py
 ```
 
 The full build preserves PDF, EPUB, and DOCX downloads, renders both presentation
-formats separately, renders book HTML last, then assembles `_book/`. Publication
-uses committed public facts and needs no local dataset. `--slides-only` includes
+formats separately, renders book HTML last, then assembles `_book/`. It exports
+Draw.io SVGs, vector PDFs, and the cover once before the book renders;
+all four book formats reuse those files. `visuals/export-manifest.json` records
+source/output checksums and export settings so GitHub Actions can skip unchanged
+figures despite unreliable checkout timestamps. Commit that manifest with changed
+sources and exports. Missing or changed outputs, changed sources, and changed
+settings trigger an export; `python scripts/export_drawio_svgs.py --force` rebuilds
+everything. Existing local exports without manifest entries are adopted once when
+their timestamps are current and default settings are used; CI never trusts those
+timestamps. Standalone
+`quarto render` commands continue to export through the pre-render hook.
+Publication uses committed public facts and needs no local dataset. `--slides-only` includes
 review drafts; `--include-pilot` also places them in a local full-build site.
 CI never enables that flag, and pull requests build without deploying.
 

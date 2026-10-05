@@ -18,9 +18,6 @@ These files are automatically updated whenever the book is rebuilt.
 - [Download DOCX (latest)](/downloads/book-latest.docx)
 
 
-::: {.chapter-slides-list}
-:::
-
 ## Charles River Accounting Dataset
 
 The Charles River Accounting Dataset supports every chapter of the book across Excel, SQL, and Power BI.
@@ -38,6 +35,9 @@ Use the files below, which come from that release, so that your results match th
 
 All three formats contain the same Charles River data, so students can move between Excel, SQL, and Power BI without changing datasets.
 The [release page]({{< var dataset.release >}}) lists each file's SHA-256 checksum, which you can use to confirm a download.
+
+::: {.chapter-slides-list}
+:::
 
 
 <!-- ## Versioned Editions (coming soon)

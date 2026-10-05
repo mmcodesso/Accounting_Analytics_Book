@@ -14,7 +14,7 @@
     "scripts/slides/refresh_foundations.py": "bbbc139c5389b0b2f78b004edd7030f2a023862061560d5623530848b54e7d00",
     "scripts/figures/ch04.py": "9b7015687c3a7ffd27a9c94ad34d66b0f457e106b1860c73b43fe049066ff723",
     "visuals/src/fig-04-05-cell-reference-types.drawio": "34d4fbb6722424a6eea0dead001f6a2bebae0dbe0f48137492edd4482f9dc6c6",
-    "visuals/svg/fig-04-05-cell-reference-types.svg": "cef670609c119ac287ab5fa450cc875229d82ce138a05181cd9f6c5ed423688f"
+    "visuals/svg/fig-04-05-cell-reference-types.svg": "f02f52bc3d627ab7354cd8d64ac9ec318d27f657f618fb21a39da7cf670ec873"
   },
   "artifact_sha256": {
     "lookup.svg": "cd26cc702c26d432eaa673f6c5a3984e86beb59d69bf93a83948ee37ff86c08c",

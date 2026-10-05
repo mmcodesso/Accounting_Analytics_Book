@@ -13,7 +13,7 @@ available book downloads and the companion dataset.
 
 <p align="center">
   <a href="https://aa.accountinganalyticshub.com/">
-    <img src="visuals/cover/cover.png" alt="Cover of Accounting Analytics: An Integrated Approach by Mauricio Codesso" width="240">
+    <img src="visuals/cover/cover-web.png" alt="Cover of Accounting Analytics: An Integrated Approach by Mauricio Codesso" width="240">
   </a>
 </p>
 
