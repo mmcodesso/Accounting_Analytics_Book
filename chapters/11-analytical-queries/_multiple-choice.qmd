@@ -106,21 +106,3 @@ A.  The rise is a trend, since the trailing measure smooths single months
 B.  The monthly figures are wrong, because they differ from the trailing ones
 C.  Nothing, because a trailing twelve-month measure always rises over time
 D.  The swings show that the plant's efficiency improved in some months
-
-<!-- Answer key, Chapter 11 (for instructors; HTML comments are removed from every rendered format):
-     1 D, 2 B, 3 C, 4 A, 5 D, 6 C, 7 A, 8 B, 9 D, 10 B, 11 A, 12 C, 13 D, 14 B, 15 A.
-     1 D: a CASE without ELSE returns NULL for rows that meet no condition.
-     2 B: conditions are tested in order, and the first true one wins.
-     3 C: conditional aggregation passes the amounts of one category and zero for the others; B counts rows, and D is not an aggregate of the category.
-     4 A: strftime returns text formatted by its pattern.
-     5 D: the difference of two julianday values is a number of days.
-     6 C: date functions return text; compare with '2026' or CAST.
-     7 A: an ordered aggregate window is a running total, restarting in each partition (each period appears once a year, so there are no ties).
-     8 B: LAG with offset 12 over one row per month returns the same month a year earlier.
-     9 D: RANK gives ties the same number; ROW_NUMBER numbers every row differently.
-     10 B: WHERE runs before window functions; filter in an outer query.
-     11 A: the default window of an ordered aggregate runs through the current row and its peers, the rows tied with it; B describes ROWS UNBOUNDED PRECEDING.
-     12 C: named steps can be read and checked one at a time; a subquery can also be repeated, so D is false.
-     13 D: a view stores its query and runs it again each time.
-     14 B: PARTITION BY decides which rows each calculation sees, without collapsing them.
-     15 A: a trailing measure separates a trend from single-month swings. -->

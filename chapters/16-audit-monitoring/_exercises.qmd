@@ -26,13 +26,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The aging page, the reconciliation, and a short note answering requirements (4) and (5).
 
-<!-- notes: ch16.ex1 -->
-<!-- Instructor notes, Exercise 16.1 (SQL; Chapter 8 and Exercise 12.2): open balance = GrandTotal - applications - credit memos
-     (on OriginalSalesInvoiceID), both dated <= 2026-12-31, rounded, kept if > 0: 1,079 invoices, 4,418,804.32 (203 customers).
-     Buckets by DueDate at 2026-12-31: Current 3,655,971.50; 1-30 745,674.84; 31-60 16,711.26; 61-90 405.41; over 90 41.31
-     (3 small residuals of invoices paid almost in full, the largest 40.85). GL 1020 at 2026-12-31: 4,798,804.32; the difference, 380,000.00, is the receivables line of the
-     opening entry JE-2024-000001, unsupported by any invoice (the author's decision: an audit finding). (5) 225 invoices have a
-     negative balance, -220,131.88: credit memos on paid invoices, credited to 2060 and refunded on 222 of them (Chapter 8). -->
+
+
 
 **Exercise 16.2: Cutoff as a Monthly Test**
 
@@ -54,13 +49,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The two exception queries, the page, and a short note answering requirement (5).
 
-<!-- notes: ch16.ex2 -->
-<!-- Instructor notes, Exercise 16.2 (SQL; Chapter 12 L5-L6): by InvoiceDate, 22 invoices were delivered in the prior year: 15
-     invoiced in January 2025 for December 2024 deliveries and 7 in January 2026 for December 2025 deliveries (SubTotal 106,446.61
-     together). Chapter 12, by GL posting date, counts 15 and 8: SI-2026-013742 is dated in December 2025 but posted 2026-01-01,
-     and it shipped on 2025-12-06, so by posting date it joins January 2026 (the revenue cutoff error of Chapter 6). The 9
-     shipment lines never invoiced are all December 2026 deliveries (standard cost 22,895.78). Five invoices are dated in a year
-     before their delivery (SI-2025-006733 to 006735, SI-2026-013741, SI-2026-013743), a different direction, not asked here. -->
+
+
 
 ### Managerial Accounting Exercises
 
@@ -117,19 +107,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The page, the measure, and the note.
 
-<!-- notes: ch16.ex4 -->
-<!-- Instructor notes, Exercise 16.4 (AM16 reference model, checked in Desktop 2.158's engine): exceptions / population / rate per
-     1,000 by year: journal entries 16 / 266 / 60.15, 12 / 288 / 41.67, 15 / 297 / 50.51; purchase orders 11 / 3,921 / 2.81, 6 / 6,545 / 0.92, 8 / 8,366 / 0.96; payroll 27 / 2,645 / 10.21, 28 / 2,774 / 10.09, 28 / 2,778 / 10.08. (1) Population
-     uses SELECTEDVALUE ( Tests[Process] ), blank when several processes are in context, so a rate across processes, which
-     would mix populations, is never shown. (2) CALCULATE ( [Exceptions], Exceptions[Disposition] <> "Expected", Tests[TestID]
-     <> "PR SelfApproved" ) divided by [Population], times 1,000 (a blank Disposition is not equal to "Expected", so open
-     exceptions stay in): journal entries 52.63, 34.72, 43.77 (the two closes a year removed); payroll 0.76, 0.72, 0.72;
-     purchase orders unchanged. (4) the count rose by a third (6 to 8) while the rate barely moved (0.92 to 0.96), because the
-     number of orders grew by about 28%; from 2024 the rate fell by two-thirds while orders more than doubled. (5) Journal
-     entries are the process to watch: their unexplained rate fell in 2025 and rose in 2026, mostly because of single
-     documents that fail several tests (the opening entry's four in 2024, the debt reclassifications' two each in 2024 and 2026),
-     while Weekend (6, 5, 6), Backdated (2, 2, 2), and SelfApproved (3, 2, 2) barely move; payroll's unexplained
-     exceptions are two a year, so its rate is almost entirely the design finding. -->
+
+
 
 ### Auditing Exercises
 
@@ -153,14 +132,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The page, the measures, and a short note answering requirements (2) and (5).
 
-<!-- notes: ch16.ex5 -->
-<!-- Instructor notes, Exercise 16.5 (SQL; Chapters 8 and 12): 39,864 payments dated through 2026-12-31; MAD 0.01295 (marginally
-     acceptable conformity); full payments 34,115, MAD 0.00755 (acceptable); partial payments 5,749, MAD 0.04496
-     (nonconformity), because only invoices of $1,000 or more are paid in parts. A DAX first digit: VALUE ( LEFT ( FORMAT (
-     Payments[Amount], "0.00000000E+00" ), 1 ) ). Taking the first character of the amount as text fails on the 121 payments below
-     $1, whose text begins with 0. The observed share is a count of the payments with the digit divided by the count of all
-     payments in the filter context; MAD = AVERAGEX of the nine absolute differences. Nickell, Schwebke, and Goldwater (2023) is a
-     Power BI and Benford teaching case. -->
+
+
 
 **Exercise 16.6: Near-Duplicates and the Concentration of Approval**
 
@@ -181,18 +154,3 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 (5) Explain why a near-duplicate pair on different invoices is an anomaly to look at rather than a duplicate payment, and what the shares of approval say about the design of the purchasing and payroll approvals that no exception shows.
 
 **Deliverable.** The PaymentPairs query, the table of approval shares, and a short note answering requirement (5).
-
-<!-- notes: ch16.ex6 -->
-<!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6; the measures checked in Desktop 2.158's engine on the AM16
-     reference model): 113 supplier-and-amount pairs on different dates among the payments through 2026-12-31, 13 within 30
-     days, none paying the same invoice (Chapter 8: near-duplicates, not duplicates). Orders Approved = CALCULATE ( COUNTROWS (
-     PurchaseOrder ), TREATAS ( VALUES ( Employee[EmployeeID] ), PurchaseOrder[ApprovedByEmployeeID] ) ); Registers Approved the
-     same on PayrollRegister; Entries Approved = COUNTROWS ( JournalEntry ); the entries' share divides by CALCULATE ( COUNTROWS (
-     JournalEntry ), REMOVEFILTERS ( Employee ) ), while the other two divide by COUNTROWS of their table, which Employee does not
-     filter. Shares: Cynthia Reyes (Chief Financial Officer) 18,817 orders, 99.92%, and 43 entries, 5.05%; David Roth
-     (Controller) 802 entries, 94.24%; Tasha Todd (Accounting Manager) 8,197 registers, 100%, and 6 entries, 0.71%; the other
-     15 orders spread over eight employees (buyers, procurement analysts, the Purchasing Manager, the Production Manager and a
-     Production Supervisor, and the departed Account Executive, 3). The exceptions by approver put the Accounting Manager first
-     (89) and the CFO second (21), but the shares show that each of three processes rests on one person, a design question for
-     segregation of duties and for absences (who approves when that person is away, and who approves that person's own
-     documents). -->

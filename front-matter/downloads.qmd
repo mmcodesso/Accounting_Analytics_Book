@@ -38,14 +38,3 @@ The [release page]({{< var dataset.release >}}) lists each file's SHA-256 checks
 
 ::: {.chapter-slides-list}
 :::
-
-
-<!-- ## Versioned Editions (coming soon)
-
-In future major releases, we will archive:
-
-- Edition 1.0 (PDF, EPUB, DOCX)
-- Edition 2.0 (PDF, EPUB, DOCX)
-- Dataset versions (v1.0, v2.0, etc.)
-
-These will remain permanently accessible for citation and reproducibility. -->

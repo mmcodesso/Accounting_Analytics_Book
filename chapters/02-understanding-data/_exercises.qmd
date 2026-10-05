@@ -121,8 +121,8 @@
 
 (4) A duplicate payment does not always share a reference number, so test the risk directly. In the PurchaseInvoice worksheet, use SUMIFS to total the payments recorded against each invoice in the DisbursementPayment worksheet, matching on PurchaseInvoiceID, and compare that total with the invoice's GrandTotal. Many invoices are paid in installments, which is normal. Identify any invoice whose payments exceed its GrandTotal, and explain what a clean result does and does not prove.
 
-<!-- notes: ch02.ex6 -->
-<!-- Instructor notes, Exercise 2.6: six supplier invoice numbers appear twice for the same supplier (suppliers 1 and 2, one pair each per year, for example V0002-2024-000182); each pair has different dates and amounts and each invoice was paid once, so they are reused numbers rather than one invoice paid twice, but they still require follow-up. Two check numbers repeat for supplier 1 (CHK0006076 on payments 6076 and 6107, CHK0019708 on payments 19708 and 19843); each pair pays two different invoices of different amounts. The SUMIFS test finds no invoice paid above its GrandTotal (2,641 invoices were paid in installments): recorded payments never exceed an invoice, which does not prove the invoices themselves are valid. The generator's AnomalyLog lists six duplicate payment references, but only these two are present in the data. -->
+
+
 
 (5) Assess the reliability of your approach. Consider what duplicates your tests would miss, such as the same invoice entered with a slightly different number or paid by a method that has no check number. Write two to three sentences explaining why a SQL-based approach, which you will learn in Part III, would be more effective for this task.
 

@@ -124,21 +124,3 @@ A.  Ask management for the expected amount and accept it if it is close to the r
 B.  Develop the expectation and decide in advance how large a difference is acceptable.
 C.  Replace the expectation with the recorded amount of the previous year.
 D.  Select a random sample of transactions, because analytical procedures use no expectations.
-
-<!-- Answer key, Chapter 6 (for instructors; HTML comments are removed from every rendered format):
-     1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 15 B.
-     1 B: a mean well above the median signals a right skew: a minority of large lines pulls the average up.
-     2 C: STDEV.S divides by n - 1 for a sample; STDEV.P divides by n for a whole population.
-     3 A: MEDIAN accepts no criteria and there is no MEDIANIFS, so FILTER supplies the year's rows.
-     4 D: a misspelled criterion matches nothing, so SUMIFS returns zero silently; a control total catches it.
-     5 A: the difference equals a whole category, Services, missing from the summary.
-     6 C: a histogram shows how values are distributed across bins of equal width.
-     7 D: a calculated field applies its formula to sums, so Quantity*UnitPrice multiplies two sums.
-     8 B: % of Column Total shows each group's share of the quarter's revenue.
-     9 C: GETPIVOTDATA names the value by field and item, so layout changes do not break it.
-     10 A: a PivotTable reads its pivot cache, which updates only on refresh.
-     11 D: the year-end closing entry debits every revenue account on December 31.
-     12 B: the closing entries zero the revenue and expense accounts, so a pre-closing trial balance leaves them out.
-     13 C: each item has one standard cost, so the cost effect at standard is zero.
-     14 A: margin before discounts rising while margin falls isolates the promotional discounts as the cause.
-     15 B: the auditor develops the expectation and sets the acceptable difference before evaluating it. -->

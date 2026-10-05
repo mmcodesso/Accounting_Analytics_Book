@@ -150,21 +150,8 @@ The CFO's comparison joins invoice lines, items, work orders, their closes, and 
 - Test the CFO's second premise: whether list prices and standard costs changed at any time in the three years.
 - Reconcile the families' variances to account 5080.
 
-<!-- notes: ch18.r1 -->
-<!-- Instructor notes, Requirement 1: families of manufactured finished goods (Item.SupplyMode 'Manufactured'), first seven characters of
-     ItemCode; ACC-CDL was not made or sold in 2026. Fiscal 2026 by InvoiceDate; variance = TotalVarianceAmount of closes dated in 2026
-     (material 106,498.85, labor -14,074.81, overhead 2,173,212.84; total 2,265,636.88, equal to 5080). Variance per unit completed =
-     the family's 2026 close variance / its 2026 units completed. Family / units sold / revenue / closes / variance / share of standard
-     completed / per unit completed / margin at standard / after per-unit variance / with the year's variance / purchased margin at
-     standard: FUR-BKC 1,955.0 / 1,158,000.85 / 179 / 106,587.95 / 14.5% / 52.33 / 39.4 / 30.5 / 30.2 / none; FUR-BNH 1,454.9 / 885,941.44 / 152 / 111,599.30 / 16.1% / 62.48 / 37.8 / 27.5 / 25.2 / 47.6; FUR-CON 1,321.7 / 822,620.94 / 165 / 104,967.73 / 15.4% / 55.48 / 45.9 / 37.0 / 33.2 / 42.8; FUR-CTB 4,361.0 / 2,452,336.51 / 490 / 280,253.94 / 16.5% / 53.27 / 42.4 / 32.9 / 30.9 / 38.1; FUR-DSK 4,567.4 / 2,982,469.82 / 439 / 235,254.95 / 14.6% / 49.23 / 44.3 / 36.8 / 36.4 / 45.1; FUR-NGT 3,198.9 / 1,565,380.69 / 331 / 167,618.64 / 18.3% / 52.33 / 41.6 / 30.9 / 30.9 / 44.5; FUR-SDB 3,780.0 / 2,079,063.38 / 370 / 259,360.59 / 20.1% / 62.23 / 43.5 / 32.2 / 31.0 / 40.9; FUR-TBL 4,984.1 / 2,822,552.50 / 462 / 313,491.13 / 18.7% / 63.62 / 41.3 / 30.1 / 30.2 / 44.0; LGT-CHD 2,167.1 / 678,919.89 / 138 / 52,219.07 / 12.9% / 23.12 / 41.7 / 34.3 / 34.0 / 48.3; LGT-FLR 4,404.4 / 1,085,286.98 / 321 / 113,365.27 / 17.6% / 21.75 / 47.9 / 39.1 / 37.5 / 46.3; LGT-PND 2,773.2 / 1,081,462.36 / 207 / 104,786.77 / 16.2% / 33.98 / 45.9 / 37.2 / 36.2 / 41.8; LGT-SCN 4,591.4 / 1,500,136.53 / 274 / 170,490.55 / 20.9% / 34.12 / 48.0 / 37.6 / 36.6 / 45.9; LGT-TBL 2,976.2 / 864,006.77 / 213 / 80,274.14 / 16.5% / 24.24 / 49.4 / 41.0 / 40.1 / 44.4; TXT-CRT 1,657.0 / 720,512.88 / 99 / 52,879.36 / 12.8% / 29.45 / 47.1 / 40.3 / 39.8 / 49.0; TXT-PIL 673.3 / 246,514.48 / 27 / 17,307.85 / 21.8% / 34.56 / 56.6 / 47.2 / 49.6 / 41.0; TXT-THR 1,920.5 / 1,115,802.11 / 93 / 95,179.64 / 17.6% / 48.91 / 52.2 / 43.8 / 43.7 / 44.6. Groups (standard / per unit / year): Furniture
-     revenue 14,768,366.13, 42.33% / 32.56% / 31.64% (variance 1,579,134.23); Lighting
-     5,209,812.53, 46.96% / 37.96% / 36.96% (521,135.80); Textiles
-     2,082,829.47, 50.96% / 42.99% / 43.02% (165,366.85). The CFO's "ten points" is Furniture's 42.3% against
-     31.6%; only TXT-PIL beats its purchased benchmark after the variance. Premises: BaseListPrice equals Item.ListPrice on all 27,933
-     invoice lines; every ShipmentLine standard cost equals quantity x StandardCost; completion lines differ by at most 0.02 (component
-     rounding); 198 items were sold in each of the three years; so neither list prices nor standards changed. Purchased cost to list in
-     2026 for the quoted families: BNH 0.472, NGT 0.478, SDB 0.517, TBL 0.485, SCN 0.486, PIL 0.540 (the quote's calibration); purchased
-     cost averages 1.011 times standard (0.95 to 1.07). The CFO's premise holds as arithmetic and fails as a diagnosis: Requirement 2. -->
+
+
 
 **Requirement 2: Take the overhead apart (Chapters 7, 10, and 11).**
 
@@ -174,21 +161,8 @@ The CFO's comparison joins invoice lines, items, work orders, their closes, and 
 - Extract each input by month, January 2024 to December 2026, with the standard hours completed each month, and test which inputs move with output from February 2024 on. Explain what including January 2024, and the months with three pay dates, would do to the test.
 - Write a sentence for each input that classifies it as a cost that varies with output, a committed capacity cost, or neither, with the evidence.
 
-<!-- notes: ch18.r2 -->
-<!-- Instructor notes, Requirement 2: inputs to 1090 in fiscal 2026 (PayrollSummary, Factory Overhead and Depreciation entries; the
-     favorable closes' debits excluded): direct labor regular 47,020.5 hours 1,253,247.29, overtime 17,105.1 hours 682,821.11; indirect
-     regular 38,030.5 hours 1,011,567.67, overtime 3,306.0 hours 131,908.30; salaries 263,191.24; employer payroll tax 255,719.16; employer
-     benefits 216,942.37 (payroll 3,815,397.14); Factory Overhead entries 1,308,869.06; depreciation 303,666.63; total 5,427,932.83.
-     Released at standard (ProductionCompletion credits 3,266,422.54; completion lines 3,266,421.95): labor 1,948,859.23, variable
-     overhead 746,606.73, fixed overhead 570,955.99, on 68,912.79 standard hours: 47.40 per standard hour (labor 28.28, overhead 19.12).
-     Actual: 78.77 per standard hour; overhead (inputs less direct earnings of 1,936,068.40) 3,491,864.43, 50.67 per standard hour, 2.65
-     times applied: the CFO's "a third" is 0.38. Behavior, 35 months February 2024 to December 2026, on standard hours completed: Factory
-     Overhead entries slope 19.66, intercept -3,122, r 0.975, R-squared 0.951 (variable, at about the applied rate: their ratio to applied
-     overhead is 1.001, 1.003, 0.993 by year); payroll to 1090 slope 3.06, intercept 268,143, r 0.066, R-squared 0.004 (committed; with
-     January 2024, r 0.396, a start-up artifact); depreciation follows its schedule (24,625.00; 26,958.33 in February to May; 24,458.33
-     from June 2026), and its r of -0.515 is spurious. Conclusion: the overhead the standards apply already covers the overhead that varies;
-     the gap is the crew and supervision, which do not move with output, plus depreciation, spread over a plant that runs well below its
-     capacity. So the products are not "under-costed" by the variable overhead rate; the question is what the committed capacity is for. -->
+
+
 
 **Requirement 3: Measure the activities and the capacity (Chapters 10 and 11).**
 
@@ -198,13 +172,8 @@ What each family uses of the plant comes from the routings, multiplied by what w
 - For each work center, return the hours available in 2026, the practical capacity under @tbl-18-02, the routing time used, and its share of each.
 - Explain in a sentence why routing time is the right measure of use here, and what it leaves out.
 
-<!-- notes: ch18.r3 -->
-<!-- Instructor notes, Requirement 3: 2026 completions by group (units / work orders / batch / setup hours per 1,000 units / issue
-     lines per 1,000 units): Furniture 28,052.6 / 2,604 / 10.8 / 127.9 / 543.3; Lighting 18,865.1 / 1,160 / 16.3 / 57.8 / 257.0; Textiles 4,242.3 / 220 / 19.3 / 54.7 / 279.6. Furniture's small batches carry twice the setup per unit. Routing time on 2026
-     completions: run 68,912.79 hours (equal to the standard labor hours) plus setup 4,910.11 = 73,822.90. Work centers (available /
-     practical at 80% / used / of available / of practical): Cutting 25,655.58 / 20,524.46 / 12,313.7 / 48.0% / 60.0%; Assembly 55,177.04 / 44,141.63 / 34,435.8 / 62.4% / 78.0%; Finishing and Test 30,234.03 / 24,187.22 / 19,064.8 / 63.1% / 78.8%; Packing 13,809.10 / 11,047.28 / 7,648.5 / 55.4% / 69.2%; Quality Assurance 3,957.50 / 3,166.00 / 360.2 / 9.1% / 11.4%; plant 128,833.25 / 103,066.60 /
-     73,822.9 / 57.3% / 71.6%. Routing time measures what the products should use; it leaves out the indirect time and the hours beyond
-     the work that Part III found, which are exactly what the unused capacity of Requirement 4 will hold. -->
+
+
 
 ### Phase 2: What a Product Costs
 
@@ -227,16 +196,8 @@ Each cost is a formula over a handful of inputs that the decision makers will wa
 - Add a Data Table of practical capacity from 75% to 90% of available hours, and explain what moves and what barely moves. Excel takes a data table's input cell only from the table's own worksheet, so keep the practical share that the cost formulas use in a cell on that sheet.
 - Keep the item costs as an Excel Table, so that Power BI can load them.
 
-<!-- notes: ch18.r4 -->
-<!-- Instructor notes, Requirement 4: committed cost 4,119,063.77 = hourly crew 3,515,852.70 (64 employees; gross 3,079,544.37,
-     employer tax 235,585.02, benefits 200,723.31) + salaried staff 299,544.44 (3; gross 263,191.24) + depreciation 303,666.63; practical
-     capacity 103,066.6 hours; rate 39.9651 an hour (crew 34.1124, supervision and equipment 5.8526); Factory Overhead 18.9931 per
-     standard hour; material variance rate 1.059% of standard material completed. Products' conversion 4,259,206.41; unused capacity
-     29,243.7 hours, 1,168,726.42 (crew 997,573.76); total 5,427,932.83 = the inputs to 1090. Per unit at the 2026 mix (price / standard
-     / absorption / time-driven / time-driven margin): FUR-BKC 592.33 / 359.14 / 411.47 / 380.16 / 35.8%; FUR-BNH 608.92 / 378.70 / 441.18 / 399.01 / 34.5%; FUR-CON 622.40 / 336.49 / 391.97 / 356.34 / 42.7%; FUR-CTB 562.33 / 324.10 / 377.37 / 348.59 / 38.0%; FUR-DSK 652.99 / 363.51 / 412.74 / 385.34 / 41.0%; FUR-NGT 489.36 / 285.97 / 338.29 / 308.67 / 36.9%; FUR-SDB 550.02 / 310.77 / 373.00 / 338.07 / 38.5%; FUR-TBL 566.31 / 332.28 / 395.90 / 357.64 / 36.8%; LGT-CHD 313.29 / 182.68 / 205.79 / 197.27 / 37.0%; LGT-FLR 246.41 / 128.35 / 150.10 / 145.67 / 40.9%; LGT-PND 389.96 / 210.83 / 244.81 / 231.18 / 40.7%; LGT-SCN 326.73 / 169.92 / 204.03 / 188.24 / 42.4%; LGT-TBL 290.31 / 146.93 / 171.17 / 163.79 / 43.6%; TXT-CRT 434.82 / 230.04 / 259.49 / 251.98 / 42.0%; TXT-PIL 366.13 / 158.86 / 193.42 / 180.09 / 50.8%; TXT-THR 580.99 / 277.64 / 326.55 / 305.55 / 47.4%. Group time-driven margins: Furniture 38.23%, Lighting 41.23%, Textiles 45.96%. Time-driven sits between standard and absorption for every family: the products cost more than
-     their standards say (the standards miss the rate increase, supervision, and depreciation; 1,008,586.26 in total) but less than absorption says (idle
-     capacity is not theirs; 1,069,728.92), nearer standard for Furniture and nearer absorption for Lighting and Textiles. Top fifth of the 207 finished goods sold (41 items) earns 51.2% of margin at standard, 50.6% under
-     absorption, 50.7% time-driven; no item loses money under any view (lowest under absorption LGT-SCN-0011, 12.6%). Data Table at 75 / 80 / 85 / 90%: rate 42.63 / 39.97 / 37.61 / 35.52; unused capacity 972,037 / 1,168,726 / 1,342,276 / 1,496,542; FUR-TBL 362.79 / 357.64 / 353.10 / 349.06. Product costs move by a few dollars; the unused capacity moves by hundreds of thousands. -->
+
+
 
 **Requirement 5: Build the explorer for the meeting (Chapters 13 to 15).**
 
@@ -247,17 +208,8 @@ The CFO and the production manager will want to move between families and items,
 - Build a Families page with a matrix of families by view, a chart of items ranked by margin under the view a slicer selects, and a Capacity page from the workbook's capacity table.
 - Add an About page, a Validation page that reproduces control totals from earlier chapters, and a Tests tab that checks the totals of each view against the workbook.
 
-<!-- notes: ch18.r5 -->
-<!-- Instructor notes, Requirement 5 (CR18 reference model in Desktop 2.158, through the local engine): Product Cost = SWITCH (
-     SELECTEDVALUE ( 'Costing View'[View], "Standard" ), "Standard", [Standard Cost], "Absorption", [Absorption Cost], "Time-driven",
-     [Time-Driven Cost] ), each cost a SUMX over SalesInvoiceLine of Quantity x RELATED ( the item cost ); with no view selected it falls
-     back to Standard. 2026, the 207 finished goods sold (Services left out, the blank row): revenue 28,543,076.08 (29,756,420.08 less
-     Services 1,213,344.00); margin at standard 12,739,803.20 (standard cost 15,803,272.88, Chapter 14's figure), absorption
-     10,661,488.02, time-driven 11,731,216.94 (10,562,490.53 after unused capacity); with the year's variance charged 10,474,166.32 (the
-     totals differ through the inventory build and timing). These totals take the item costs at six decimals, as CR18's CSV holds them; unrounded, absorption is 10,661,488.03. Family margins match Requirement 4 (FUR-TBL 41.3 / 30.1 / 36.8%). Optional for
-     strong students: a cumulative-margin curve on a disconnected rank table (GENERATESERIES) with TOPN over ALLSELECTED items, checked in
-     the engine (41 items 51.2 / 50.6 / 50.7%, 100% at 207, blank beyond). Tests: each view's total equals the workbook's; revenue and
-     standard cost equal Chapter 14's; the variances charged equal 5080. -->
+
+
 
 ### Phase 3: Make, Buy, or Reprice
 
@@ -280,23 +232,8 @@ The comparison is a few lines per family, with two assumptions that the decision
 Actual absorption cost is not a relevant cost. It includes supervision, depreciation, and the crew's idle hours, which do not stop when one family is bought. If a family goes and those costs stay, they fall on the families that remain, which then look more expensive and invite the next decision to buy: the spiral that cost systems built on actual volume can set off. Compare the quote with the costs that would stop, and state what has to happen for each of them to stop.
 :::
 
-<!-- notes: ch18.r6 -->
-<!-- Instructor notes, Requirement 6: per unit (crew kept / crew reduced / delivered quote; annual effect of buying at 2026 volume under
-     absorption / crew kept / crew reduced; break-even quote kept / reduced): FUR-BNH 332.16 / 389.22 / 334.75; +154,853 / -3,773 /
-     +79,249; 322.48 / 377.88. FUR-NGT 243.27 / 299.09 / 278.10; +192,550 / -111,432 /
-     +67,149; 236.18 / 290.38. FUR-SDB 267.98 / 327.81 / 334.75; +144,571 / -252,392 /
-     -26,237; 260.17 / 318.26. FUR-TBL 280.42 / 346.34 / 324.45; +356,123 / -219,431 /
-     +109,084; 272.26 / 336.25. LGT-SCN 143.68 / 181.72 / 185.40; +85,551 / -191,571 /
-     -16,917; 139.49 / 176.42. TXT-PIL 138.64 / 174.02 / 226.60; -22,341 / -59,222 /
-     -35,404; 134.60 / 168.95. (Relevant cost kept = material x 1.0106 + 18.99 x standard hours; reduced adds 34.11
-     x routing hours per unit.) The CFO's absorption view says buy five of six; on relevant costs, buy only BNH, NGT, and TBL, and only
-     with the crew reduced: +255,481 a year; their routing time at 2026 volume 17,299 hours, 10.56 positions of 1,638.4 hours; severance
-     8 weeks x 40 hours x 30.38 = 9,722.90 a position, 102,660; tooling 70,000; two-year net about +338,302. With the crew kept, buying the
-     three costs 334,636 a year. Two-way table (crew removed 0 / 50 / 100%; quote -10 / 0 / +10%): -35,263 / -334,636 / -634,009; +259,796 / -39,578 / -338,951; +554,854 / +255,481 / -43,892. Make SDB, SCN, and PIL under any crew case. Left out: the 80%
-     minimum (the quoted volumes are within 4% of 2026 sales, family by family), quality and the 1.5% defect threshold, lead time and inventory, the
-     designs and bills of material shared with a supplier, the price risk after two years, and the materials stock of the Part IV case
-     (the three families used 2,465,127.57 of standard material in their 2026 completions; their work orders drew 2,485,926.61, 24% of the
-     year's issues of 10,161,204.64, of which 1,782,126 was the six raw materials that carry the Part IV build, so buying them slows its drawdown). -->
+
+
 
 **Requirement 7: Value the capacity that buying would free (Chapter 7).**
 
@@ -305,13 +242,8 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
 - Show what happens to the cost of the remaining families if the crew is kept.
 - Optional: with Solver, find which families to buy if volume grew by 40% and by 50%, minimizing the added cost with the crew kept and practical capacity at each work center as the limit, and report which work center binds and its shadow price.
 
-<!-- notes: ch18.r7 -->
-<!-- Instructor notes, Requirement 7: buying BNH, NGT, and TBL frees (2026 production) Cutting 3,884, Assembly 7,607, Finishing 4,596, Packing 1,708 hours, 17,795 in all; plant use of practical capacity falls from 71.6% to 54.4%. The plant already leaves 29,243.7
-     practical hours unused, 17.85 positions, more than buying would free: fitting the crew to the work matters more than outsourcing,
-     and the production manager's point that idle capacity is not the products' fault is right but cuts both ways, because it is still a
-     cost. If the crew is kept, its 17,299 hours on those families (about 590,117, sales basis) become unused capacity, and the supervision and equipment the three families carried (about 101,246) spreads over the rest, so their
-     absorption cost rises. Practical capacity over 2026 use (sales basis): Cutting 1.80, Assembly 1.40, Finishing 1.40, Packing 1.58, QA 10.24, so growth of about 40% reaches the first limit. Solver (Simplex LP, buying the quoted families at their crew-kept extra
-     cost): +40%, Finishing binds (shadow price about 6.01 an hour), buy about 151 BNH, extra cost about 391; +50%, Assembly binds (about 49.98), buy all 2,182 BNH and about 2,311 NGT, extra cost about 86,177. -->
+
+
 
 **Requirement 8: Reprice the families below the floor (Chapter 7).**
 
@@ -324,13 +256,8 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
 Price is the most powerful lever on profit, and often the least managed. In a study of companies with average economics, a 1% improvement in price, with no loss of volume, raised operating profit by 11.1%, three to four times the effect of a 1% gain in volume (Marn & Rosiello, 1992). The authors traced how the price a customer finally pays falls from the list price through discounts to the invoice price, and then through cash discounts, allowances, rebates, and freight to what they called the pocket price. Chapter 15's gross-to-net waterfall did the same for Charles River, from list price to net revenue.
 :::
 
-<!-- notes: ch18.r8 -->
-<!-- Instructor notes, Requirement 8: families below the 40% floor on time-driven cost and the increase that reaches it (volume loss
-     the increase absorbs, on the crew-kept contribution margin): FUR-BKC +6.97% (12.7%), FUR-BNH +9.21% (16.9%), FUR-CTB +3.32% (6.1%), FUR-NGT +5.13% (9.3%), FUR-SDB +2.44% (4.5%), FUR-TBL +5.26% (9.4%), LGT-CHD +4.94% (9.2%); +556,535 of revenue a year if volume
-     holds. If BNH, NGT, and TBL are bought, their delivered margins are 45.0%, 43.2%, and 42.7%, so only BKC, CTB, SDB, and CHD need
-     increases. Evidence: no promotion raised volume (Part II case); active price lists run at 0.84 to 0.94 of list and every one ended
-     2026-12-31, and lists 1, 2, and 4 had expired yet were still used (Exercise 8.6); the Sales Manager approves overrides; so the
-     increases need new, approved lists for 2028 with stated end dates, and customer-specific lists should be renegotiated, not inherited. -->
+
+
 
 ### Phase 4: Standards and the Memo
 
@@ -342,32 +269,13 @@ Standards serve inventory as well as decisions. The inventory standard of U.S. g
 - Revalue the manufactured finished goods made since the ledger opened and still on hand at the end of fiscal 2024, 2025, and 2026, and measure the effect on retained earnings at the start of fiscal 2025, on 2025 and 2026 income, and on each balance sheet, against the materiality of @tbl-18-02. Show how the answer depends on what you treat as normal capacity.
 - The company issued its fiscal 2025 and 2026 statements to its shareholders. Recommend whether the correction belongs in the next statements or calls for revised ones, and what the CFO should tell the shareholders.
 
-<!-- notes: ch18.r9 -->
-<!-- Instructor notes, Requirement 9: proposed rate per standard hour on the Part III plan (68,912.79 standard hours, 1.18 hours per
-     standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47;
-     supervision 263,191.24 x 1.1414 / 68,912.79 = 4.36; depreciation 293,499.96 / 68,912.79 = 4.26; total 63.46 (58.00 at 1.0 hours).
-     Current 47.40; time-driven 61.81; 2026 actual 78.77, which includes idle capacity and the hours beyond the work (Part III), abnormal
-     under Topic 330. Revised standard costs (time-driven beside): BNH 398.17 (399.01), NGT 306.99 (308.67), SDB 337.91 (338.07), TBL 358.19 (357.64), SCN 189.74 (188.24), PIL 180.97 (180.09). Manufactured finished goods made since the opening and on hand (completions less
-     shipments plus returns, by item; FUR-SDB-0006 at 2024 and FUR-DSK-0044 at 2026 are negative, proof of opening stock, and left out):
-     2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.3, 23,116.1, 1,097,455.36; 2026 21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117; at 1.0 hours
-     (58.00): +167,288 / +243,171 / +309,655; time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle
-     capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at 1 January 2025 +257,435, 2025 income +112,161, 2026 income
-     +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the materiality of tbl-18-02 (256,717.74 and 225,180.56), while
-     the income effects are below it; at 1.0 hours the 2025 balance (243,171) falls below materiality and 2026's (309,655) stays above.
-     The rates are 2027's plan applied to 2024-2026 stock, an approximation a strong answer names. A strong answer judges the balance
-     sheet effect material on the plan's definition of normal capacity, recommends revised statements for the shareholders
-     (inventories, retained earnings, and income corrected, with the correction disclosed), or, if the CFO judges it immaterial on a
-     narrower definition, a correction in the next statements with disclosure; the decision is the CFO's. The opening
-     4,111,795.76 of finished goods has no item detail and is left out. -->
+
+
 
 **Requirement 10: Write the decision memo.** Write a memorandum of no more than two pages to the CFO and the production manager, with an appendix of exhibits of no more than three pages and a decision table that gives, for each quoted family and each family below the floor, what to do, the annual effect, the one-time cost, and what the decision depends on. Close with the standards you propose, what the fiscal 2026 statements need, and the one decision that only the production manager can make.
 
-<!-- notes: ch18.r10 -->
-<!-- Instructor notes, Requirement 10: a strong memo makes SDB, SCN, and PIL; buys BNH, NGT, and TBL only with a committed plan to
-     reduce the crew in step (about 10.6 positions; otherwise keep making them and reprice); says first that the plant already pays for
-     about 17.8 positions of unused capacity, so fitting the crew to the work is worth more than outsourcing; raises BKC, CTB, SDB, and CHD to the floor (and BNH, NGT, TBL if kept) through new, approved price lists with end dates; adopts standards on normal capacity for
-     inventory and time-driven costs for decisions; and raises the question of the fiscal 2026 inventory with the CFO. It explains the disagreement
-     between the CFO and the production manager in their own terms: both are right about part of the cost. -->
+
+
 
 
 ## Deliverables and Checklist

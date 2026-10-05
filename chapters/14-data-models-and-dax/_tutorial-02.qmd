@@ -21,7 +21,7 @@ c. Repeat the two actions for each of the other definitions.
 d. Select each new measure, and on the **Measure tools** tab, set its format: the thousands separator and two decimals for amounts, and a whole number for the two counts.
 e. Right-click Column1 of the Key Measures table, and choose **Hide in report view**.
 
-<!-- dax-check: measure -->
+
 ```
 Revenue = SUM ( SalesInvoiceLine[LineTotal] )
 List Amount = SUM ( SalesInvoiceLine[ListAmount] )
@@ -37,7 +37,7 @@ Each line is a separate measure, typed one at a time, and with Column1 hidden th
 a. Add the measures below to the Key Measures table, as in Step 2.
 b. Format Standard Cost and Gross Margin as amounts, and Margin % as a percentage with two decimals.
 
-<!-- dax-check: measure -->
+
 ```
 Standard Cost =
 SUMX (
@@ -46,12 +46,12 @@ SUMX (
 )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Gross Margin = [Revenue] - [Standard Cost]
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Margin % =
 VAR Rev = [Revenue]
@@ -66,13 +66,13 @@ In the formula bar, Shift+Enter starts a new line within a measure, and Enter co
 a. Add the two measures below.
 b. Format Discount Rate as a percentage with two decimals.
 
-<!-- dax-check: measure -->
+
 ```
 Price Before Discount =
 SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * SalesInvoiceLine[UnitPrice] )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Discount Rate = DIVIDE ( [Discounts], [Price Before Discount] )
 ```
@@ -85,12 +85,12 @@ a. Add the two measures below, and format Furniture Revenue as an amount and Sha
 b. On a new page named `Margins`, add a table visual with ItemGroup from Item and the measures Revenue, Furniture Revenue, and Share of Revenue.
 c. Add a slicer with Year from the Date table, and select 2026.
 
-<!-- dax-check: measure -->
+
 ```
 Furniture Revenue = CALCULATE ( [Revenue], 'Item'[ItemGroup] = "Furniture" )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Share of Revenue =
 DIVIDE ( [Revenue], CALCULATE ( [Revenue], REMOVEFILTERS ( 'Item' ) ) )
@@ -116,7 +116,7 @@ b. Double-click the query tab and rename it `Tests`.
 c. Type the query below with its comment line, select it, and click **Run**.
 d. Record the result.
 
-<!-- dax-check: query -->
+
 ```
 // Test 1: fiscal 2026 revenue and lines must equal Chapter 6's control totals
 EVALUATE
@@ -137,7 +137,7 @@ The test rounds its amounts to the cent and its ratio to four decimals, because 
 a. Type the query below under the first, with its comment line.
 b. Select it, and click **Run**.
 
-<!-- dax-check: query -->
+
 ```
 // Test 2: Furniture margin by quarter must equal the margins of Chapter 6's bridge
 EVALUATE
@@ -162,13 +162,8 @@ d. On the **Validation** page, add Invoices, Standard Cost, and Margin % to the 
 
 A reader who points at a measure in the Data pane now sees what it means, and the Validation page shows the new measures beside the control totals they must agree with.
 
-<!-- notes: ch14.t2 -->
-<!-- Tutorial 14.2 expected values (Desktop 2.158 reference model through the local engine, and SQL): fiscal 2026 Revenue
-     29,756,420.08, Invoice Lines 9,522, Invoices 7,171, Standard Cost 15,803,272.88, Gross Margin 13,953,147.20, Margin % 46.89%
-     (2025 47.26%, 2024 47.49%). Discount Rate 2026 1.20% (Average of Discount 0.85%). Shares of 2026 revenue: Furniture 58.46%, Lighting 20.16%, Textiles 11.02%, Accessories 6.29%, Services 4.08% (with ALL(SalesInvoiceLine) instead, Furniture 20.12%).
-     Furniture Revenue on every row: 17,395,054.38 (it also ignores a Lighting slicer). Furniture by quarter (revenue, margin,
-     margin %): 2025-Q1 4,301,703.57 / 1,863,998.51 / 43.33%; Q2 4,334,096.08 / 1,887,881.25 / 43.56%; Q3 4,376,704.12 / 1,897,662.97 / 43.36%; Q4 4,472,771.31 / 1,895,399.20 / 42.38%; 2026-Q1 4,354,122.83 / 1,874,614.74 / 43.05%; Q2 4,600,820.85 / 1,985,163.11 / 43.15%; Q3 4,283,322.86 / 1,810,257.09 / 42.26%; Q4 4,156,787.84 / 1,695,211.02 / 40.78% (Chapter 6's bridge: 1,810,257.09 to
-     1,695,211.02). Discount rate Furniture 2026 Q1-Q4: 0.26%, 0.49%, 2.20%, 4.97%. -->
+
+
 
 **Checkpoint.** Your model should now pass these checks:
 

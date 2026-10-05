@@ -50,13 +50,13 @@ A merge can match on several columns at once, and the order in which you select 
 a. Add the measures below to the Key Measures table.
 b. In DAX query view, open the **Tests** tab, add the query of Test 3 below it, select the query, and click **Run**.
 
-<!-- dax-check: measure -->
+
 ```
 Reviewed Exceptions = CALCULATE ( [Exceptions], NOT ISBLANK ( Exceptions[Disposition] ) )
 Open Exceptions = CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ) )
 ```
 
-<!-- dax-check: query -->
+
 ```
 // Test 3: every disposition must match an exception of the register
 EVALUATE
@@ -91,7 +91,7 @@ At the top of the table, as @fig-16-07 shows, is the opening balance entry, whic
 a. In the **Tests** tab, add the query of Test 4 below.
 b. Select it, and click **Run**.
 
-<!-- dax-check: query -->
+
 ```
 // Test 4: the purchase orders have no gaps, and three registers were never paid
 EVALUATE
@@ -121,7 +121,7 @@ The variables hold the order numbers, taken from the last six characters of each
 a. Add the measure below to the Key Measures table, and set its format to a short date.
 b. On the Monitoring page, add a card of Data Through, titled `Data through`.
 
-<!-- dax-check: measure -->
+
 ```
 Data Through =
 MINX (
@@ -154,22 +154,8 @@ c. Report the results of Tests 1 to 4 of the monitoring file and Tests 1 to 5 of
 d. Recommend change controls for both reports: a project under version control, a named owner, a reviewer who approves each change, the tests rerun before each release, and no copies of the file in circulation.
 e. Save Audit Monitoring.pbix.
 
-<!-- notes: ch16.t3 -->
-<!-- Tutorial 16.3 expected values (SQL twins; AM16 reference model in Desktop 2.158, extended with the Dispositions table and
-     the two-key merge, every DAX block run through ADOMD.NET): Dispositions 15 rows; Test 3: 15 / 15 / 136 (151 exceptions).
-     Reviewed by test: JE AboveLimit 6 of 9 (open 3: JE-2024-000001, JE-2024-000103, JE-2026-000001), PO AfterTermination 3 of 3, PR AfterTermination 3 of 3, PR PaidBeforeApproval 3 of 3. By disposition: Expected 6, Deficiency 6, Follow up 3. Open by
-     process and year: JE 14 / 10 / 13; PO 10 / 5 / 7; PR 25 / 26 / 26 (PR SelfApproved 25 / 26 / 26 of 77, the rest of PR
-     reviewed). Documents with two or more exceptions: 19 (JE-2024-000001 with 4; JE-2024-000002, JE-2024-000103, JE-2025-000001, JE-2025-000002, JE-2026-000001, JE-2026-000002, JE-2026-000003; PO-2024-000001 and 000002, PO-2025-003923 and 003924, PO-2026-010468 and 010469 (self-approved by buyers and procurement analysts with a limit of 0, also above it);
-     PO-2024-000474, PO-2025-003922, PO-2026-010467 (employee 81, after termination and above a limit of 0; open 1 each);
-     PO-2024-001942 and PO-2026-011104 (360,000 and 280,000, created and approved by employee 10, the Purchasing Manager, limit
-     25,000)). Test 4: 18,832 orders, first 1, last 18,832 (PO numbers continue across years); 8,197 registers, 3 not paid
-     (registers 1, 2646, 5420; Chapter 12: their PayrollPayment GL rows are trace orphans; register 1 is the CEO's first
-     register, not an exception of the register's tests). Data Through: 2026-12-18 (JE 2026-12-31, PO 2026-12-31, last PayDate
-     2026-12-18); by year 2024-12-20, 2025-12-19, 2026-12-18. The package's Tests 1-5 (Chapters 14-15): Test 1 by year 9,040 /
-     27,313,723.48, 9,371 /
-     29,376,702.28, 9,522 /
-     29,756,420.08; Test 2 Furniture margins of Chapter 6's bridge; Test 3 71
-     accounts, 67,107,722.36; Test 4 Chapter 7's 2026 operating expense budget and actual; Test 5 1.18, 1.41, 1.51. -->
+
+
 
 **Checkpoint.** Before you send the memo, confirm the following:
 

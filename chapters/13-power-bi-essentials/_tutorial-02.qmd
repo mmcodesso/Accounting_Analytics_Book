@@ -75,13 +75,8 @@ The count taken from SalesInvoiceLine falls to the invoices that contain a Furni
 
 **Step 9. Save the report.** Save Charles River Reports.pbix, which the next tutorial and the chapters after it extend.
 
-<!-- notes: ch13.t2 -->
-<!-- Tutorial 13.2 expected values (fiscal 2026, read-only twin): cards Revenue 29,756,420.08; At list price 33,589,137.45;
-     Discounts 362,110.75; Invoices 7,171. Furniture selected: 17,395,054.38; 19,878,268.16; 347,864.64; 3,093 invoices with a
-     Furniture line; the SalesInvoice count stays 7,171. Discounts by month 2026: Jan 6,602.69; Feb 844.80; Mar 7,670.52; Apr 14,950.85; May 6,751.62; Jun 822.35; Jul 0.00; Aug 356.75; Sep 95,996.97; Oct 136,935.59; Nov 73,447.23; Dec 17,731.36
-     (Furniture: Sep 95,996.97, Oct 136,935.59, Nov 66,155.58, Dec 14,369.30). Discounts by group: Furniture 347,864.64; Lighting 7,825.54; Textiles 4,098.06; Accessories 2,322.51; Services 0.
-     Design Trade: Furniture 48,988.07, Lighting 6,296.95, Textiles 2,598.82, Accessories 1,789.63; by month Sep 9,393.41, Oct 12,409.04, Nov 27,595.87 (promotion 9 21,482.20), Dec 8,692.04. Furniture revenue by quarter (product types BKC, BNH, CON, CTB, DSK, NGT, SDB, TBL):
-     Q1 4,354,122.83; Q2 4,600,820.85; Q3 4,283,322.86; Q4 4,156,787.84 (the Part I case totals). -->
+
+
 
 **Checkpoint.** Before you move on, confirm that your page does the following:
 

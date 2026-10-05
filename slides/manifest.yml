@@ -39,6 +39,18 @@
         "revealjs_sha256": "38632a79ae441d9fc5ac039c0fdb5b1e87c493995cbd84f052820798c2bb705b",
         "pptx_sha256": "891f334ac2efe30bd7b685711ffafc04669c247d216fcb5dc88bf2dae843b8ae"
       }
+      "approval_note": "Author approved the finished 47-slide storytelling revision, including cover, surname-only attribution, and architecture alignment, on 2026-10-05: \"Great. I aprove this version\".",
+      "artifact_checks": {
+        "native_table": true,
+        "embedded_media": true
+      },
+      "approved_revision": {
+        "approved_at": "2026-10-05T19:33:23.551166+00:00",
+        "source_sha256": "d5d41279adaa2bdbecba5aae27e95b7e7f3bbb1db44ab8b703951fa2e6bf87f1",
+        "facts_sha256": "ace20763c0a993d2dfa22a117180e5b573e20bbf9caf50aa94a6be5b22dc767a",
+        "revealjs_sha256": "38632a79ae441d9fc5ac039c0fdb5b1e87c493995cbd84f052820798c2bb705b",
+        "pptx_sha256": "891f334ac2efe30bd7b685711ffafc04669c247d216fcb5dc88bf2dae843b8ae"
+      }
     },
     {
       "id": "chapter-02",
@@ -322,12 +334,12 @@
         "chapters/11-analytical-queries/_references.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/11-analytical-queries/chapter.qmd": "188f8041800aa44db5ec4142a9d81228da05396c80f6bc4daf9aca7bc9e9861e",
+        "chapters/11-analytical-queries/chapter.qmd": "7c63e3b7511d0239e061b75fc4d987e51144b4acd27e30727ab915452337cb8b",
         "chapters/11-analytical-queries/_key-terms.qmd": "1a2fcc4b2501cd9fab7ff60454855bbb4bded91b7baa56bb37ca5a3795b9bd08",
         "chapters/11-analytical-queries/_summary.qmd": "728131db0fcf11026b5a5d93581a1fd5353be7103a03f846a1dec6ba2bdb2d6a",
         "chapters/11-analytical-queries/_tutorial-01.qmd": "4f8235cdf07cd556b43e2b530e599f7570f05677dbb44622df77526fe0d98602",
         "chapters/11-analytical-queries/_tutorial-02.qmd": "6906adccd57270920e7afc84655ea1ac865cbb2af09b8844026c330ed2388988",
-        "chapters/11-analytical-queries/_tutorial-03.qmd": "9b9d5a4d459fadfcf3d5aeb85641b1459bdf837aa8888bcd23883e53180ec11a",
+        "chapters/11-analytical-queries/_tutorial-03.qmd": "3390fba0ff9dc453675373b4e5734ce5ccf8eec0c6718f25d303c919ffea01a4",
         "chapters/11-analytical-queries/_references.qmd": "87c8b6ae995182c8424e732fe61d24e3a52ff150114c8064a226506379a2e50a"
       },
       "artifact_checks": {
@@ -385,9 +397,9 @@
         "chapters/13-power-bi-essentials/chapter.qmd": "ac621d4b5278fe5d83d1b5632dcbaae046ae91876c18c22b0c7fc66f081ad76c",
         "chapters/13-power-bi-essentials/_key-terms.qmd": "98a37d5dcbff9387c321397d8f5ebd83646ebf31ee26b6caed4b553def32e68b",
         "chapters/13-power-bi-essentials/_summary.qmd": "ca6bae6cec3f4dc72cf30faca4e6ca3c477fc6a5739e0ff29608a17340ad5b4d",
-        "chapters/13-power-bi-essentials/_tutorial-01.qmd": "c54df6a8ade9378ab9d60f5436fde3da15e162ba50ed319e13eecd76f0e69b38",
-        "chapters/13-power-bi-essentials/_tutorial-02.qmd": "5bc04ffcbe6a168c3103fb3a130188e2ca55f22bc3d78143285f8dc13a6246e3",
-        "chapters/13-power-bi-essentials/_tutorial-03.qmd": "9f3b7b14cc9cba59d40b0425093be34e9c5e2ac87410cd918c540c1271f28b7d",
+        "chapters/13-power-bi-essentials/_tutorial-01.qmd": "3c2f3a90024671f2722565a5ed0548a0e63aeccc2b5f07db6b58bee1f3c68006",
+        "chapters/13-power-bi-essentials/_tutorial-02.qmd": "3e2e6d315ecdcc4d33016c8ded59561f313ef2e85143ef9ca71e7e4bb2adb94a",
+        "chapters/13-power-bi-essentials/_tutorial-03.qmd": "1c067825d7542531aa6bc15e289d422b89f8f1b6cd01a6f3a0bee87fb8c24c1d",
         "chapters/13-power-bi-essentials/_references.qmd": "01617ef8002cb9d5b92a005596c50376176c226da31543a4f38a1c1d0caaa82a"
       },
       "artifact_checks": {
@@ -412,12 +424,12 @@
         "chapters/14-data-models-and-dax/_references.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/14-data-models-and-dax/chapter.qmd": "8fc9b33359a7afb8d275b3759ba0ad4e64e45457241d33c5e23576ae474dfd9d",
+        "chapters/14-data-models-and-dax/chapter.qmd": "303d5972a5b383b6574cb291f6e571d04fd8657eef28aec841e412878b2996b0",
         "chapters/14-data-models-and-dax/_key-terms.qmd": "e3a5fbaac9fec6bceecac72c9be333505bef143c0f1c078375f1b7ce612e05d0",
         "chapters/14-data-models-and-dax/_summary.qmd": "b896645900d63d3400c3df7e04e5c027d56f3d3ae0ceceb154ff0bb1ca3d0ff9",
-        "chapters/14-data-models-and-dax/_tutorial-01.qmd": "57e7b8102cf13fab092ab70581b460e64250505edcbcbccf0272464db33afc9c",
-        "chapters/14-data-models-and-dax/_tutorial-02.qmd": "34885ab0c144c446478fab89bdb8d0697b7e5437a28ab939882db09a10bbd541",
-        "chapters/14-data-models-and-dax/_tutorial-03.qmd": "cd8d12dfb9800ef4802adb5511e26ac2966ff640d202e3461e029925929576bb",
+        "chapters/14-data-models-and-dax/_tutorial-01.qmd": "272d97935cdd09483363536a15e506a23da12ee6bc51e3cadc5d91f70980577c",
+        "chapters/14-data-models-and-dax/_tutorial-02.qmd": "9cad9664b0ad94b3105480dff15cf72e4d0b3a1b38c6feb8ad2df858889c15e5",
+        "chapters/14-data-models-and-dax/_tutorial-03.qmd": "67565f884e5909ea8e6c2c5abe8e397bd6d5cfa855828fd62ca3e969cc6e7471",
         "chapters/14-data-models-and-dax/_references.qmd": "42f42b1a10dd69263bffff5bd6822261915a9a8a2e1e155d04291beee8b7b451"
       },
       "artifact_checks": {
@@ -445,9 +457,9 @@
         "chapters/15-management-reports/chapter.qmd": "2c80ef3e5eafef62fc70d90e64171792bf8bde4f3e4a96369febaad22ecc0074",
         "chapters/15-management-reports/_key-terms.qmd": "cc819a9f47481fc94429a2f17906c06315a2d3c45cc6b27c7a359903c2936b04",
         "chapters/15-management-reports/_summary.qmd": "c05860e58ece91ce486e89efb85d5463023fa2bd130c02f9efe5c9b789c00bfe",
-        "chapters/15-management-reports/_tutorial-01.qmd": "743b9b8bfaf56c90ddc9ddaaaf1c0050b57c3a876ac42100306e3e86439ca1ae",
-        "chapters/15-management-reports/_tutorial-02.qmd": "76fa548564de4d017467a03817135d12ffa1017ef293e776d88e54b74716a20a",
-        "chapters/15-management-reports/_tutorial-03.qmd": "eac71c34ff23c28da8382613720e780f5e22a17fb6c64fdfb12b97bb13041039",
+        "chapters/15-management-reports/_tutorial-01.qmd": "c15f4d9394f9dfaa38ed5435534f888ebe613fb8177580e513862f4f5f1a4e6a",
+        "chapters/15-management-reports/_tutorial-02.qmd": "2ebef789c99801a27ca5544e1db6e1dbcffe549f72000e50e2492a4dceaad2ee",
+        "chapters/15-management-reports/_tutorial-03.qmd": "9cd86ffffbfdf74a653f36c8b30c3834bec16e25037b1d610475c9db513999c1",
         "chapters/15-management-reports/_references.qmd": "1dc88fe05bc934fd9914445402a3262cc144cdac61021a052e237a576f1aad69"
       },
       "artifact_checks": {
@@ -475,9 +487,9 @@
         "chapters/16-audit-monitoring/chapter.qmd": "ca876cb4274d999f0ec5ea65b123d3b926db2f2b1609f1629f3e309899693779",
         "chapters/16-audit-monitoring/_key-terms.qmd": "8428842fa90b4d7c2b49406373c558a16794616299e5e691ca115cde6fbc0535",
         "chapters/16-audit-monitoring/_summary.qmd": "321f9a95879bd240f35727221617843abf5cbbd63cf13a89eb731694c1f2484d",
-        "chapters/16-audit-monitoring/_tutorial-01.qmd": "dea4b1990d5389553b59b1c595d1c6e53d5e7eeefb10ed3d498d1001ff931ec6",
-        "chapters/16-audit-monitoring/_tutorial-02.qmd": "8a3cbaf88fe2ab1a6b03375cf86b4f18666b46315e8971b6749ad258cb0eb4a8",
-        "chapters/16-audit-monitoring/_tutorial-03.qmd": "5d9b91c178677c8711221c21d780601beca5209e0569874c1dab302c7f0fdfd9",
+        "chapters/16-audit-monitoring/_tutorial-01.qmd": "555c9657650d99b3a92f9bd195ada9fa5aded4d2344db25e4e03bd669094c050",
+        "chapters/16-audit-monitoring/_tutorial-02.qmd": "9106571b3db40ff8ce4308742b06bfdbe7415b619ce43f23d41ef71289dfc8be",
+        "chapters/16-audit-monitoring/_tutorial-03.qmd": "0f31c61705bcdb32db89f47a2072ae2a2166ecb6cfd7f3662222e2d3c52514e2",
         "chapters/16-audit-monitoring/_references.qmd": "74de5a98f0c2cf753d154625e56d36e32e06ec20802d2f896ec535598a56d8c5"
       },
       "artifact_checks": {
@@ -498,7 +510,7 @@
         "chapters/17-statements-for-a-lender/_further-reading.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/17-statements-for-a-lender/chapter.qmd": "e28f9bfaf45bba510e0d4d84ee6ac84a7ab8e306e27281febbb25b7aa3de5d8e",
+        "chapters/17-statements-for-a-lender/chapter.qmd": "f8cd465cc9a1640659f48f583e9b3359f6752b838866e04b0a837760aa4036ab",
         "chapters/17-statements-for-a-lender/_references.qmd": "db16624d97c42dcd98d559203dfbc7df64a14bc21d71effb2fc1674ed174f936",
         "chapters/17-statements-for-a-lender/_further-reading.qmd": "fba43fc82fdfc77bb7f3b0e660c62727d6237be4978bf6cbf8fad793f93cf0de"
       },
@@ -529,6 +541,7 @@
         "embedded_media": false
       },
       "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation. Source change reviewed 2026-10-05: public text is identical to the prior sanitized export; only a private comment changed, with no effect on the teaching deck."
+      "approval_note": "Author approved the completed chapter slide set on 2026-10-04: \"I liked the slides. Lets Proceed\". Current public tutorial clarifications were checked and reflected in teaching notes before release preparation. Source change reviewed 2026-10-05: public text is identical to the prior sanitized export; only a private comment changed, with no effect on the teaching deck."
     },
     {
       "id": "chapter-19",
@@ -542,7 +555,7 @@
         "chapters/19-customer-credits-audit/_further-reading.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/19-customer-credits-audit/chapter.qmd": "3f0c779b63bd73adfb73a683aa64ab6e3ef7724d9040170cb518348853be961d",
+        "chapters/19-customer-credits-audit/chapter.qmd": "1253fddb52fd023b196e2b0a8da63533e178d4c1b7d67d8d397a3f554b37146b",
         "chapters/19-customer-credits-audit/_references.qmd": "48d9c13f5f798a774f29ac8b5beff1b9c93267db24b24f5c6d9a5c3bae1b4e1e",
         "chapters/19-customer-credits-audit/_further-reading.qmd": "c1770df164a3596d8636d09f13769519cff62f534d12bff42fe96fa1fc73e059"
       },
@@ -746,6 +759,39 @@
     "visuals/src/fig-01-04-charles-river-architecture.drawio",
     "visuals/src/fig-01-05-o2c-process-flow.drawio",
     "visuals/src/fig-03-05-chart-of-accounts-table.drawio"
+    "shared/generated/chapter-16/monitoring.png",
+    "shared/generated/chapter-01/storytelling/facts.json",
+    "shared/generated/chapter-01/storytelling/analytics-types.svg",
+    "shared/generated/chapter-01/storytelling/analytics-types.png",
+    "shared/generated/chapter-01/storytelling/tools-workflow.svg",
+    "shared/generated/chapter-01/storytelling/tools-workflow.png",
+    "shared/generated/chapter-01/storytelling/architecture-overview.svg",
+    "shared/generated/chapter-01/storytelling/architecture-overview.png",
+    "shared/generated/chapter-01/storytelling/architecture-operating.svg",
+    "shared/generated/chapter-01/storytelling/architecture-operating.png",
+    "shared/generated/chapter-01/storytelling/architecture-reference.svg",
+    "shared/generated/chapter-01/storytelling/architecture-reference.png",
+    "shared/generated/chapter-01/storytelling/o2c-forward.svg",
+    "shared/generated/chapter-01/storytelling/o2c-forward.png",
+    "shared/generated/chapter-01/storytelling/checked-credit.svg",
+    "shared/generated/chapter-01/storytelling/checked-credit.png",
+    "shared/generated/chapter-01/storytelling/_key-task.qmd",
+    "shared/generated/chapter-01/storytelling/_key-response.qmd",
+    "shared/generated/chapter-01/storytelling/_source-fields.qmd",
+    "shared/generated/chapter-01/storytelling/_customer-response.qmd",
+    "shared/generated/chapter-01/storytelling/_account-focus.qmd",
+    "shared/generated/chapter-01/storytelling/_item-response.qmd",
+    "shared/generated/chapter-01/storytelling/_initial-response.qmd",
+    "shared/generated/chapter-01/storytelling/_model-update.qmd",
+    "shared/generated/chapter-01/storytelling/source-trace-dated.svg",
+    "shared/generated/chapter-01/storytelling/source-trace-dated.png",
+    "shared/generated/chapter-01/storytelling/salesorder-task.svg",
+    "shared/generated/chapter-01/storytelling/salesorder-task.png",
+    "visuals/src/fig-01-01-analytics-continuum.drawio",
+    "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
+    "visuals/src/fig-01-04-charles-river-architecture.drawio",
+    "visuals/src/fig-01-05-o2c-process-flow.drawio",
+    "visuals/src/fig-03-05-chart-of-accounts-table.drawio"
   ],
   "public_fragments": [
     "shared/fragments/_accounting-analytics.qmd",
@@ -821,6 +867,10 @@
     "scripts/figures/ch13.py",
     "scripts/figures/ch14.py",
     "scripts/figures/ch15.py",
+    "scripts/figures/ch16.py",
+    "scripts/slides/refresh_storytelling.py",
+    "slides/reviews/chapter-01-storytelling.md",
+    "tests/test_slide_storytelling.py"
     "scripts/figures/ch16.py",
     "scripts/slides/refresh_storytelling.py",
     "slides/reviews/chapter-01-storytelling.md",

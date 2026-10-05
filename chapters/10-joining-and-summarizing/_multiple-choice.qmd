@@ -106,21 +106,3 @@ A.  In the direct labor part, as an unfavorable labor efficiency variance
 B.  In the material part, because more material was used for each unit
 C.  In the overhead part, because indirect labor is part of overhead
 D.  Nowhere, because the standards for direct labor were met in every year
-
-<!-- Answer key, Chapter 10 (for instructors; HTML comments are removed from every rendered format):
-     1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 A, 12 C, 13 A, 14 D, 15 C.
-     1 C: an inner join drops rows whose key finds no match; the row count is the test of the keys.
-     2 A: a column name in two joined tables must be qualified; an alias in SELECT does not say which table it comes from.
-     3 D: GROUP BY ItemGroup with SUM returns one total per group.
-     4 B: the unmatched item keeps one row, which COUNT(*) counts; COUNT(wo.WorkOrderID) skips its NULL.
-     5 B: a condition on an aggregate belongs in HAVING.
-     6 D: the anti-join keeps the items with no matching work order.
-     7 A: grouping by name merges different customers that share it; group by the key.
-     8 C: fan-out repeats the header amount on each line.
-     9 D: a subquery in WHERE supplies the average to compare with.
-     10 B: a NULL in the NOT IN list makes every comparison unknown, so no row qualifies; use NOT EXISTS or an anti-join.
-     11 A: a condition on the second table in WHERE removes the NULL rows; put it in ON.
-     12 C: SQLite allows a bare column in a grouped query but returns an arbitrary row's value.
-     13 A: when all balances net to zero, the debits equal the credits.
-     14 D: amounts at different levels are summarized to a common level (the year) before joining.
-     15 C: indirect labor is overhead, applied at a standard rate per unit, so extra indirect time raises the overhead variance. -->

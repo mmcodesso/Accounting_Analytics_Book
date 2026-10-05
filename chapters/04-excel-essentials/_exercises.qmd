@@ -26,17 +26,8 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Deliverable.** A refreshable billing schedule by fiscal year that ties to the invoice detail, with validated period parameters and a short note on its limitations.
 
-<!-- notes: ch04.ex1 -->
-<!-- Instructor notes, Exercise 4.1: invoices by fiscal year 2024 / 2025 / 2026: 6,735 / 7,008 / 7,171 (20,914 in all).
-     SubTotal 27,313,723.48 / 29,376,702.28 / 29,756,420.08 (86,446,845.84); FreightAmount 192,134.79 / 214,544.33 / 214,588.22;
-     TaxAmount 1,787,880.84 / 1,923,431.50 / 1,948,116.12; GrandTotal 29,293,739.11 / 31,514,678.11 / 31,919,124.42.
-     SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted (158 / 232 / 222 credit memos,
-     SubTotal 145,655.35 / 201,104.38 / 242,764.56), sales tax is a liability collected for the government rather than revenue, and freight
-     billed is recorded in its own revenue account (4050). Grid formula, for example
-     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[[InvoiceDate]:[InvoiceDate]],">="&DATE($A5,1,1),SalesInvoice[[InvoiceDate]:[InvoiceDate]],"<="&DATE($A5,12,31)),
-     entered once and filled right and down: filling across shifts SubTotal to the adjacent FreightAmount, TaxAmount, and GrandTotal
-     columns, as the grid needs, while the locked [[InvoiceDate]:[InvoiceDate]] and the mixed $A5 stay put (the Watch out on structured
-     references). Pasted instead of filled, the formula keeps SubTotal in every column. -->
+
+
 
 
 **Exercise 4.2: Reviewing Promotional Discounts**
@@ -59,13 +50,8 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Deliverable.** A promotion summary with shares of the discount dollars, a rate consistency test, and a half-page memo.
 
-<!-- notes: ch04.ex2 -->
-<!-- Instructor notes, Exercise 4.2: lines / LineTotal / DiscountAmount by promotion (DiscountAmount = ROUND(Quantity*UnitPrice*Discount,2);
-     Excel rounding may move totals by a few cents): 1 Alder Collection 80 / 323,434.84 / 28,124.79; 2 Accessories Seasonal 431 / 337,900.23 / 37,544.57; 3 Strategic Customer 149 / 494,666.68 / 67,454.54; 4 Brookside Collection 74 / 374,091.50 / 32,529.70; 5 Textiles Seasonal 228 / 468,808.77 / 52,089.91; 6 Wholesale Customer 414 / 1,106,747.14 / 150,920.03; 7 Harbor Collection 68 / 350,503.51 / 30,478.53; 8 Furniture Seasonal 576 / 2,664,482.15 / 296,053.57; 9 Design Trade Customer 88 / 205,755.54 / 28,057.65; all 2,108 lines /
-     723,253.29. Promotion 8 holds about 41 percent of the discount dollars. The consistency test finds no differences: every promotion
-     line carries its promotion's DiscountPct, and no line has a discount without a PromotionID. Students may notice that promotions 4 and 7
-     have an EffectiveEndDate earlier than their EffectiveStartDate and promotion 1 is effective for a single day; testing billing dates
-     against the effective dates needs the invoice dates, which a later chapter brings onto the lines. -->
+
+
 
 
 ### Managerial Accounting Exercises
@@ -92,11 +78,8 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Deliverable.** An Item analysis with margin columns, a validated margin target, highlighted exceptions, a group selector driving AVERAGEIFS results, and a short interpretation.
 
-<!-- notes: ch04.ex3 -->
-<!-- Instructor notes, Exercise 4.3: 219 finished goods. The four design services have a StandardCost of 0, so their MarginPct is 100 percent.
-     Average UnitMargin / average MarginPct: Accessories 76.47 / 56.2%; Furniture 385.62 / 49.3%; Lighting 162.03 / 51.8%; Textiles 141.65 / 53.5%. MarginPct ranges from 39.6% to 63.9%, so no item is below 30 percent; 27 items are below 0.45 (Furniture 20, Lighting 6, Textiles 1, Accessories 0). Furniture earns the most per unit but the lowest percentage. List-price margin overstates realized margin,
-     because most sales are billed at price-list prices below list, some carry promotional discounts, and StandardCost is a standard,
-     not an actual cost. -->
+
+
 
 
 **Exercise 4.4: Freight Billed Versus Freight Incurred**
@@ -121,13 +104,8 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Deliverable.** A freight analysis with calculated columns, highlighted shortfalls, a summary grid by freight terms, and a short interpretation.
 
-<!-- notes: ch04.ex4 -->
-<!-- Instructor notes, Exercise 4.4: 9,707 shipments. FreightTerms values are Prepaid (5,024 shipments) and Prepaid and Add (4,683).
-     Every Prepaid shipment has BillableFreightAmount 0, so all are negative by design: FreightMargin -849,739.09 (average FreightCost 169.14).
-     Prepaid and Add shipments bill freight: 2,070 above cost, 2,608 below, 5 equal; FreightMargin -6,391.63 (average FreightCost 134.03;
-     billed freight totals about 99 percent of cost, while the shipments' ratios average about 96 percent). Total FreightMargin -856,130.72; 7,632 negative shipments. FreightCost ranges from
-     23.24 to 873.95. The finding: freight is absorbed by design on Prepaid orders, and freight billed under Prepaid and Add recovers most but
-     not all of the carrier cost. -->
+
+
 
 
 ### Auditing Exercises
@@ -154,12 +132,8 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Deliverable.** A refreshable exception report with a validated review date, highlighted exceptions, counts by category, and a half-page memo.
 
-<!-- notes: ch04.ex5 -->
-<!-- Instructor notes, Exercise 4.5: 9,707 shipments. Blank TrackingNumber: 392 (368 Delivered, 24 In Transit). In Transit: 740 shipments
-     from every year of the data (2024: 234, 2025: 254, 2026: 252). With ReviewDate 2026-12-31, 739 In Transit shipments have a DeliveryDate
-     before the review date (the other is due on the review date itself); with ReviewDate 2026-12-01 the count is 722. All 24 In Transit
-     shipments with a blank tracking number are in both categories. No ShipmentDate or DeliveryDate is blank. The Status conflict is a
-     consistency and timeliness problem (Chapter 2); the blank tracking numbers are a completeness problem. -->
+
+
 
 
 **Exercise 4.6: Reviewing Price Override Approvals**
@@ -183,13 +157,3 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 (6) Prepare a brief memo (one half page) that describes each exception, explains why it matters for the design of the pricing control, and lists the follow-up procedures you would propose, including how you would find out whether the pending requests were used on sales.
 
 **Deliverable.** A reviewed approval Table with highlighted exceptions, a grid of requests by requester, and a half-page memo on the pricing control.
-
-<!-- notes: ch04.ex6 -->
-<!-- Instructor notes, Exercise 4.6: 412 requests; 409 Approved, 3 Pending. All 409 approvals were made by EmployeeID 6 (Carrie Schultz,
-     Sales Manager). Requests by requester: EmployeeID 6 109, 82 44, 84 76, 107 80, 108 31, 120 72. The Sales Manager approved 106 of her
-     own 109 requests; her other 3 requests are the 3 Pending ones (IDs 2, 165, and 294), which have no approver or approval date. These
-     three are the AnomalyLog's missing_price_override_approval items. DiscountFromReference ranges from about 5.7% to 10.6%. Follow-up
-     for the pending requests: their SalesOrderLineIDs (147, 8038, 15033) were invoiced at the pending ApprovedUnitPrice under a price-list
-     PricingMethod (AnomalyLog sale_below_price_floor_without_approval), which students can find by filtering SalesInvoiceLine on
-     SalesOrderLineID; the full test is part of the audit analytics later in Part II. The self-approval pattern is a design issue:
-     the only approver is also a requester. -->

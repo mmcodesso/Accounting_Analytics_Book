@@ -157,7 +157,7 @@ ORDER BY ItemGroup, ItemCode;
 
 ORDER BY inside OVER sets the order of the rows within each partition. For an aggregate such as SUM, it also changes the window: unless the query says otherwise, the window runs from the first row of the partition through the current row, so the sum becomes a running total. The expression below is a year-to-date total that starts again at zero in each fiscal year:
 
-<!-- sql-check: skip -->
+
 
 ```sql
 SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)
@@ -197,7 +197,7 @@ A ROWS frame counts rows, not months. Over a result with one row for every month
 
 When several functions share one window, the WINDOW clause names it once. It follows the WHERE, GROUP BY, and HAVING clauses and comes before ORDER BY, and each function then refers to the window by name:
 
-<!-- sql-check: skip -->
+
 
 ```sql
 SUM(LaborHours) OVER w / SUM(StandardHours) OVER w
@@ -305,7 +305,7 @@ The SQLite documentation describes a CTE as working like a view that exists for 
 
 A view is a query saved in the database under a name. Once created, it can be queried like a table, and every query of it runs the saved query again against the current data. A view stores the query, not the rows, so it never goes out of date (SQLite, n.d.-a). A view cannot be changed in place, so a script that creates one drops it first, and can then be run again whenever the query changes:
 
-<!-- sql-check: skip -->
+
 
 ```sql
 DROP VIEW IF EXISTS MonthlyLaborEfficiency;

@@ -106,21 +106,3 @@ A.  The hours paid were worked, because the pay agrees with the expectation
 B.  The pay is right for the hours recorded, so the question is the hours
 C.  The payroll registers are complete, because they agree with the ledger
 D.  The pay rates are wrong, because the totals do not agree to the cent
-
-<!-- Answer key, Chapter 12 (for instructors; HTML comments are removed from every rendered format):
-     1 A, 2 D, 3 C, 4 C, 5 B, 6 A, 7 D, 8 C, 9 A, 10 D, 11 C, 12 B, 13 B, 14 A, 15 B.
-     1 A: a test on an unreconciled population may miss items; reconcile first.
-     2 D: postings whose SourceDocumentID matches no payment point to nothing.
-     3 C: completeness asks whether every document was posted.
-     4 C: UNION ALL matches columns by position and names them after the first query, without an error.
-     5 B: revenue belongs to the year of delivery; a December delivery posted in January is a cutoff error.
-     6 A: quantities must be summed to the purchase order line before comparing.
-     7 D: the tolerance comes from policy and is set and documented in advance.
-     8 C: two records agreeing supports the balance; completeness also needs a search for unrecorded liabilities.
-     9 A: identical times for a whole plant suggest bulk entry; the records cannot show the hours were worked.
-     10 D: one approver for nearly everything can indicate a design weakness.
-     11 C: a pattern suggests a policy threshold, to be confirmed; test above it.
-     12 B: time charged to finished operations cannot be placed at the operations that used it.
-     13 B: the condition keeps each pair once and excludes a payment paired with itself.
-     14 A: scientific notation starts with the first significant digit.
-     15 B: an expectation from hours and rates tests the pay for the hours; it cannot show that the hours were worked. -->

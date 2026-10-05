@@ -146,7 +146,7 @@ Two habits make measures reliable. The first is DIVIDE, which returns a blank in
 
 A measure that returns a number is not yet a measure that returns the right number. In a workbook, you checked a formula against a control total. In SQL, you compared a query's result with a total from another source. In Power BI, DAX query view is the place for the same check. It runs DAX queries against the model and shows the result in a grid, without building a visual. A query begins with EVALUATE, followed by an expression that returns a table, such as SUMMARIZECOLUMNS, which groups by columns and calculates measures for each group, much like a SQL query with GROUP BY:
 
-<!-- dax-check: query -->
+
 ```
 EVALUATE
 SUMMARIZECOLUMNS (
