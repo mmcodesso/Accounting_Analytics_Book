@@ -4,9 +4,7 @@ format:
     number-sections: false
 ---
 
-<!-- Registered in Phase 1 with the Part III files; each Part's list arrives with its files.
-To confirm in Power BI Desktop 2.158 and Excel: the Change Source dialog for an Excel Workbook source (file path box
-and Browse), the "Apply changes" bar after a source change, and whether Excel for Mac offers Data Source Settings. -->
+
 
 # Companion Files {#sec-companion-files .unnumbered}
 

@@ -1,5 +1,0 @@
-<!-- Instructor notes, Exercise 7.1: MAPE over {{ d.C }} Q1-Q4, fitted on {{ d.F }}-{{ d.P }} (trend / mean / same quarter last year): {% for g, e in mape %}{{ g }} {{ e[0]|pct }} / {{ e[1]|pct }} / {{ e[2]|pct }}{{ '; ' if not loop.last }}{% endfor %}. No single
-     method wins: the mean or the same quarter last year suits Furniture, the trend suits Lighting, whose revenue grew in {{ d.C }}, and the mean
-     suits Textiles, Accessories, and Services (which is volatile under every method). Q1 {{ d.F }} is depressed by the start-up month, which
-     biases the trend and the Q1 same-quarter forecast for {{ d.P }}; excluding it is defensible. {{ d.C }} actual Q1 by group: {% for g, v in q1 %}{{ g }} {{ v|num }}{{ ', ' if not loop.last }}{% endfor %}. Mean of all twelve quarters as a reference forecast for
-     {{ d.N }} Q1: {% for g, m, lo, hi in means %}{{ g }} {{ m|num }}{% if loop.first %} (range of quarters {{ lo|num }}-{{ hi|num }}){% endif %}{{ ', ' if not loop.last }}{% endfor %}. Company quarterly totals {{ d.F }}-{{ d.C }}: {{ totals|map('num')|join(' / ') }}. Tutorial 7.1's company forecast is {{ company|money }}. -->

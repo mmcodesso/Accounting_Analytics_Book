@@ -26,16 +26,7 @@ Work on both exercises in a copy of Charles River Reports.pbix, saved with **Fil
 
 **Deliverable.** The role's script, the comparison, and a short note answering requirement (5).
 
-<!-- Instructor notes, Exercise A.1 (Learn, OLS 2026-06-30; RLS guidance 2024): TMDL view scripts a role with createOrReplace;
-     starting from the scripted role keeps its tablePermission filters, and adding
-         tablePermission LaborTimeEntry
-             columnPermission ExtendedLaborCost
-                 metadataPermission: none
-     hides the column from the role. The Labor Cost measure, and the visual that uses it, fail for the role ("the field can't be
-     found"), while the Plant page's hours visuals still work; the Finance role sees everything. A role written from scratch
-     with createOrReplace would replace the role and lose its row filters, which is why the exercise starts from the scripted
-     role. Row-level security restricts rows, not columns; the controller should keep cost measures off the managers' pages or
-     in the finance report. Performance analyzer durations vary by machine; expect slightly longer durations under View as. -->
+
 
 ### Auditing Exercises
 
@@ -60,16 +51,3 @@ Work on both exercises in a copy of Charles River Reports.pbix, saved with **Fil
 (6) Explain what the queries found, how often internal audit should run them, and what to do about AccessEmployees before the file is published.
 
 **Deliverable.** The query tab and a short note answering requirements (5) and (6).
-
-<!-- notes: appendix_a.ex2 -->
-<!-- Instructor notes, Exercise A.2 (SQL twins; the CR16 reference model): (2) one cost center, Research and Development (8),
-     whose manager of record is a Product Analyst. Security is unrelated, so RELATEDTABLE cannot be used; EXCEPT ( VALUES (
-     CostCenter[CostCenterID] ), VALUES ( Security[CostCenterID] ) ), or a FILTER on CostCenter with a COUNTROWS ( FILTER (
-     Security, ... ) ) = 0 test, finds it. (3) none: nine users, nine cost centers. (4) all nine names match the Email
-     of an active employee (1 Chief Executive Officer, 6 Sales Manager, 7 Warehouse Manager, 4 Production Manager, 10 Purchasing Manager, 5 Accounting Manager, 11 Customer Service Manager, 12 Marketing Manager, 14 Design Services Manager),
-     each in the cost center the table gives them, so no user is flagged; LOOKUPVALUE ( AccessEmployees[EmployeeID],
-     AccessEmployees[Email], Security[UserPrincipalName] ) inside ADDCOLUMNS. (5) every row of AccessEmployees, all 120
-     employees with their addresses and termination dates, because no rule filters an unrelated table (the same reason the
-     Customer table still lists every customer for a user missing from the security table). A rule of FALSE () on the table
-     for Cost Center Managers, or keeping the table out of the published file, closes it. Run the review whenever the table
-     changes and at least quarterly, with the controller's approval recorded. -->

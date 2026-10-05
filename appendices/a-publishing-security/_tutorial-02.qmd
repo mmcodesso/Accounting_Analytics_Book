@@ -49,18 +49,7 @@ b. Recommend where the Income Statement and Validation pages belong, given that 
 c. Recommend how the semantic model is refreshed, and who watches the refresh history.
 d. Recommend whether Publish to web should be allowed, and whether the package should carry a sensitivity label.
 
-<!-- Guided Tutorial A.2 notes (Learn: Publish from Desktop 2025c; workspace roles 2025f; RLS 2026e (ms.date 2026-05-13): RLS
-     applies to Viewers only; Security is on the semantic model's More options menu; Test as role is under More options next to
-     the role, with a "Now viewing as" header and "Back to Row-Level Security"; Test as role uses your own identity for
-     USERPRINCIPALNAME, so another user's view is validated by that user signing in. Give access (Learn, 2025-11-01): Manage
-     access needs the workspace Admin role; + Add people or groups, Add > Close; changes take effect at the user's next sign-in.
-     Enter data (Learn, 2025-02-26): data in an
-     Enter data table can be changed only in Desktop and republished). Label to confirm in 2.158: the settings
-     (gear) icon of the Source step reopens the Create Table dialog. Expected memo: managers as Viewers or app readers, the
-     controller's staff as Members or Contributors (who bypass RLS, so the list of editors is itself reviewed); the Income
-     Statement and Validation pages in a separate finance report on the same semantic model, shown to the controller's audience;
-     a gateway, or the workbook moved to OneDrive or SharePoint, with failure notifications to the package's owner; Publish to
-     web disabled by the administrator; a Confidential label where labels are enabled (not supported in .pbip projects). -->
+
 
 **Checkpoint.** Before you send the memo, confirm the following:
 

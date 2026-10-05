@@ -1,3 +1,0 @@
-relationship 1efd4e6e-0dea-5f02-8ed0-cd01e1cbfbf4
-	fromColumn: SalesInvoiceLine.ItemID
-	toColumn: ItemCosts.ItemID

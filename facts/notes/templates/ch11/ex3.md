@@ -1,5 +1,0 @@
-<!-- Instructor notes, Exercise 11.3: {{ items }} items have a list price ({% for g, n in counts %}{{ g }} {{ n }}{{ ', ' if not loop.last }}{% endfor %}). No
-     two items in a group share a unit margin, so RANK, DENSE_RANK, and ROW_NUMBER agree. Top items: {% for g, code, name, margin in top %}{{ g }} {{ code }} {{ name }} ({{ margin|money }}){{ '; ' if not loop.last }}{% endfor %}. Ranges: {% for g, low, high in ranges %}{{ g }} {{ low|money }} to {{ high|money }}{{ '; ' if not loop.last }}{% endfor %}. Services carry a StandardCost of zero, because their cost is design staff payroll
-     (Chapter 6). For the {{ manufactured }} manufactured items StandardCost includes fixed overhead (the {{ purchased }} purchased finished goods carry none),
-     and for every item the measure ignores variable selling costs such as commissions, freight, and discounts, so ListPrice minus
-     StandardCost is not a contribution margin; list price is also not the price charged. Unrounded differences may show binary fractions; ROUND fixes the display. -->

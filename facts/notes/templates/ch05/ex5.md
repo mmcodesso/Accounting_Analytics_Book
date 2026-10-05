@@ -1,4 +1,0 @@
-<!-- Instructor notes, Exercise 5.5: {{ n }} suppliers share an exact address and city with an employee: {% for m in matches %}{{ 'Supplier ' if loop.first }}{{ m.id }} {{ m.name }} and {{ 'employee ' if loop.first }}{{ m.emp }}
-     {{ m.emp_name }} ({{ m.title }}){{ '; ' if not loop.last }}{% endfor %}. Payments: {% for m in matches %}{{ 'supplier ' if loop.first }}{{ m.id }} {{ m.payments|count }}{{ ' payments' if loop.first }} {{ m.paid|money }}{{ '; ' if not loop.last }}{% endfor %}. These are the AnomalyLog's related_party_address_match items. The addresses match
-     exactly, so standardizing does not change the result, which students should note. Next procedures: confirm ownership, review the
-     approval of these suppliers and of their invoices, and compare prices with other suppliers. -->

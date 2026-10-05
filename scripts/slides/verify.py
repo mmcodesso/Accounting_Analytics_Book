@@ -47,15 +47,53 @@ REVEAL_PLUGIN_METADATA = {
 
 
 def load_manifest(path: Path) -> dict:
+    """Read JSON-format manifests or YAML configuration without silent overrides."""
     text = path.read_text(encoding="utf-8-sig")
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
+
+    def unique_mapping(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"{path}: duplicate key '{key}'")
+            result[key] = value
+        return result
+
+    # Our manifest is JSON (a strict YAML subset). A broken JSON document must
+    # not fall through to YAML and obscure its original location and error.
+    if text.lstrip().startswith(("{", "[")):
+        try:
+            result = json.loads(text, object_pairs_hook=unique_mapping)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{path}:{exc.lineno}:{exc.colno}: invalid JSON: {exc.msg}") from exc
+    else:
         try:
             import yaml
         except ImportError as exc:
             raise RuntimeError("Install the slide requirements to read YAML manifests.") from exc
-        return yaml.safe_load(text)
+
+        class UniqueLoader(yaml.SafeLoader):
+            def construct_mapping(self, node, deep=False):
+                keys = set()
+                for key_node, _ in node.value:
+                    if key_node.tag == "tag:yaml.org,2002:merge":
+                        continue
+                    key = self.construct_object(key_node, deep=deep)
+                    try:
+                        if key in keys:
+                            mark = key_node.start_mark
+                            raise ValueError(f"{path}:{mark.line + 1}:{mark.column + 1}: duplicate key '{key}'")
+                        keys.add(key)
+                    except TypeError as exc:
+                        raise ValueError(f"{path}: mapping keys must be scalar values") from exc
+                return super().construct_mapping(node, deep=deep)
+
+        try:
+            result = yaml.load(text, Loader=UniqueLoader)
+        except yaml.YAMLError as exc:
+            raise ValueError(f"{path}: invalid YAML: {exc}") from exc
+    if not isinstance(result, dict):
+        raise ValueError(f"{path}: expected a top-level mapping")
+    return result
 
 
 def sha256(path: Path) -> str:

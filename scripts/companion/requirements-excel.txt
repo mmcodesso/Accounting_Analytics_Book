@@ -1,7 +1,0 @@
-# The Excel companion builders run in their own environment on Windows with Excel for Microsoft 365.
-#   python -m venv venv
-#   venv\Scripts\python -m pip install -r scripts/companion/requirements-excel.txt
-#   venv\Scripts\python scripts/companion/build.py --tool excel
-pywin32
-openpyxl
-pyyaml

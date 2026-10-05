@@ -59,16 +59,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 - Test the links that the later requirements rely on: every punch to its clock entry, every clock entry to its roster, and every attendance exception to its clock entry, comparing the employee and the date on each side. Give each exception a disposition, but do not pursue the isolated ones further.
 - Save the surge days as a view named SurgeDays, with the definition of the SurgeDays CTE in test H9 of Tutorial 12.3, and reconcile it to the surge days and clock entries that Tutorial 12.3 found. Then save a second view with one row for each hourly manufacturing clock entry and a DayType column of Surge or Ordinary, for the requirements that follow.
 
-<!-- notes: case3.r1 -->
-<!-- Instructor notes, Requirement 1: TimeClockPunch holds 165,137 punches of 76 employees, 2024-01-01 to 2026-12-11, all with PunchSource
-     Badge: Clock In 52,967, Clock Out 52,964 (the three missing belong to employee 85's January 1 entries), Meal Start and Meal End 29,603
-     each; no punch lacks its clock entry, and no clock entry has two punches of one type. EmployeeShiftRoster has 53,002 rows (Scheduled 44,728, Reassigned 8,236, Absent 38), no employee rostered twice on one date, created by the department managers 4 (Production Manager), 5, 7, and 11. AttendanceException has 18 rows, three each of Duplicate Clock Day, Labor After Close, Missing Clock Out, Missing Final Punch, Off Shift Clocking, and Paid Without Approved Clock, all Open and never reviewed (ReviewedByEmployeeID is NULL on every row).
-     WorkCenterCalendar has 5,900 rows, five work centers, 2024-01-01 to 2027-03-25; in 2026, 256 working days, with maintenance at some work
-     center on 19 dates and reduced capacity on 53, and 128,833.25 available hours. Links: 18 punches carry a different date from their clock
-     entry, the punches of the six clock entries behind the Duplicate Clock Day and Labor After Close exceptions (142, 289, 17855, 17926, 36082, 36149), whose roster dates also differ; 3 clock-in punches (1, 52951, 109493, employee 85 on each January 1) are detached from their
-     roster; every clock entry has a roster of the same employee; exceptions 2, 3, 8, and 9 name employee 86, although their clock entries
-     (17846 and 36072) belong to employee 85, so the exception report itself misattributes. SurgeDays: 12, 32, and 49 days, with 768, 2,048, and 3,136 hourly manufacturing entries (5,952), as in Tutorial 12.3. The isolated exceptions are the generator's planted anomalies; they
-     need a disposition, not the memo's attention. -->
+
+
 
 **Requirement 2: Test whether other records support the surge days (Chapters 10 to 12; auditing).**
 
@@ -77,35 +69,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 - Test the reasons behind the overtime against the plant's own plans: the calendar status of each surge day, the planned load of the weeks with surge days against other weeks in RoughCutCapacityPlan, and whether the operation that each surge-day overtime approval cites was still open on the work date. This tests the authorization of the overtime, where test H9 tested the labor time recorded against operations.
 - Summarize your tests in a corroboration matrix: for each, whether it supports the hours, contradicts them, or says nothing, and whether its record is independent of the Production Manager and of the timekeeping system. Name two explanations that fit the records, and the evidence outside the database that would tell them apart.
 
-<!-- notes: case3.r2 -->
-<!-- Instructor notes, Requirement 2: 93 surge days against 652 ordinary days, hourly manufacturing employees only. Employees per day 64.0
-     against 62.8, and 573 of the 652 ordinary days also had all 64, so attendance says little. Different clock-in times per day 2.0 against
-     22.4; the largest group sharing one clock-in timestamp is 32 or 33 on every surge day (COUNT(*) OVER (PARTITION BY WorkDate,
-     ClockInTime)), against 13.2 on average and 25 at most on ordinary days. Every surge entry (5,952) has meal punches, against 17,707 of the
-     40,974 ordinary entries (43.2%). The punches are all Badge punches whose timestamps equal the clock entry's (except on nine entries, all cited by
-     attendance exceptions), so they repeat the
-     timekeeping record rather than corroborate it. Rosters: every surge entry is rostered for a normal eight-hour shift, 07:00-15:30 or
-     15:00-23:30, created seven days ahead by the Production Manager, who creates every manufacturing roster; the clock shows 06:30-19:30 or
-     14:30-03:30, 30 minutes early and 240 minutes late, 12.5 hours against 8.0. On ordinary days the rostered hours equal the clocked hours
-     on 30,251 of 40,974 entries (73.8%), on surge days on none. The control: the three Off Shift Clocking exceptions are clock-ins 120
-     minutes after the scheduled start (10:00 against 08:00), so the rule tests arrival; surge arrivals are 30 minutes early and the
-     four-hour late departures count as approved overtime, so no surge entry could be flagged, and the anti-join finds none flagged (2,591
-     ordinary entries also end more than 120 minutes after their roster). Design: nothing compares overtime with a roster or a plan made in
-     advance. Operation: all 18 exceptions are Open and none was reviewed in up to three years, among them the three Paid Without Approved
-     Clock exceptions (the Pending entries of test H1) and four that name the wrong employee. Calendar: every surge day is a working day,
-     but on 6 of them a work center was under maintenance and on 21 at reduced capacity. Rough-cut plan (Monday weeks, available hours taken
-     once per work center and week, through 2026-12-07): planned load against available hours was 0.568, 0.596, and 0.585 in weeks with surge
-     days against 0.687, 0.618, and 0.614 in other weeks (2024-2026), so the surge weeks were not planned overloads; the four reason codes
-     are used 1,488 times each on surge days. Approvals: 1,475 of the 5,952 surge-day approvals cite a work order operation, and every one of
-     those operations had ended before the work date; on ordinary days 497 of the 2,397 cited operations had ended. Surge days fall mostly
-     late in the week (Monday 4, Tuesday 13, Wednesday 19, Thursday 26, Friday 31). Matrix: supports: every employee present, badge
-     punches, more output in surge weeks (Requirement 3); contradicts or unexplained: one clock-in time for half the plant at once,
-     overtime in no roster, approvals citing finished work, no planned overload, overtime on maintenance and reduced-capacity days; silent:
-     absences (none recorded in Manufacturing in any year). Independence: punches and clock entries are one system, rosters and overtime
-     approvals come from the same manager, and only the calendar, the capacity plan, and the output come from outside timekeeping. Two
-     explanations: the hours were worked and the time was entered for the plant as a block, which breaks the timekeeping control but not the
-     pay; or the hours were not worked as recorded. Evidence outside the database: building access or gate logs, statements of supervisors
-     and employees, security video, machine-run or utility data, and the timekeeping system's own log of who entered the punches. -->
+
+
 
 **Requirement 3: What the hours produced and what they cost (Chapters 10 and 11; managerial accounting).**
 
@@ -114,26 +79,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 - Put a cost on the surge-day overtime in two ways, each with the employer's payroll taxes and benefits: the premium alone, if the hours were needed but could have been worked at straight time, and the full cost of the overtime, if they were not needed. Use the base rates in the Employee table, as test H5 did.
 - Bridge the growth of account 5080 from fiscal 2024 to fiscal 2026 on the ledger. First split it into the ledger lines that make it up: the payroll charged to account 1090, the journal entries charged to it, the standard cost that completions released, the change in the balance of 1090, the material variance, and the postings made directly to 5080. Then explain the payroll line with three measures: the calendar, the straight-time cost of the hours beyond the 2024 hours per standard hour, and the growth of the surge premium. Explain why the three measures do not add up exactly to the payroll line.
 
-<!-- notes: case3.r3 -->
-<!-- Instructor notes, Requirement 3: by year (work dates, output to 2026-12-11): hours 83,628, 93,391, 101,237 against standard hours
-     70,871, 66,109, 66,998 (1.180, 1.413, 1.511 hours per standard hour); surge-day overtime 3,456, 9,216, 14,112 hours, other overtime
-     6,273, 6,426, 5,918. Output was flat while surge overtime quadrupled. Weekly (Monday weeks, date(WorkDate, '-6 days', 'weekday 1')), 2026:
-     37 weeks without surge days averaged 1,555 clocked hours and 1,087 standard hours completed (0.70), and the 12 weeks with surge days
-     3,622 and 2,005 (0.55), in detail 3 surge days 2 weeks (3,130 and 1,762), 4 surge days 7 weeks (3,601 and 1,482), 5 surge days 3 weeks (4,000 and 3,385); the six weeks after a week with surge days averaged 1,141 standard hours, against 1,400 after other weeks. June 2024
-     onward: 102 weeks without surge days, 1,500 and 1,108 (0.74). Surge weeks complete more but not in proportion to the hours, and the
-     weeks after them complete less, which looks like work pulled forward rather than more work; completions lag the work by weeks (lead
-     times of about 40 days in 2026) and post on weekends, so a week cannot be matched exactly to its output. Capacity on ordinary days:
-     4.92, 4.79, and 5.26 clocked hours per employee per day; unused straight-time hours (8 less regular hours, on entries with fewer than 8) 52,606, 51,956, and 38,417,
-     against surge overtime of 3,456, 9,216, and 14,112, so the 2026 surge overtime would have fit more than twice over into straight time.
-     Cost at base rates: premium 46,055.52, 122,814.72, 188,060.04 (214,651.73 with the 14.14% burden in 2026); full overtime 138,166.56, 368,444.16, 564,180.12 (643,955.19 with burden in 2026). Bridge (ledger, closes excluded): 5080 rose from 1,317,927.32 to 2,265,636.88,
-     +947,709.56 = payroll to 1090 +966,846.03 (2,848,551.11 to 3,815,397.14) + journal entries -8,473.29 (1,621,008.98 to 1,612,535.69) +
-     standard cost released +91,787.08 (3,358,209.62 to 3,266,422.54, released less) + change in 1090 -72,196.35 (the account fell by
-     69,824.09 in 2024 and rose by 2,372.26 in 2026) + material variance -9,378.15 (115,877.00 to 106,498.85) + direct postings -20,875.76
-     (2024's January payroll, 11,520.94, and JE-2024-000005, 9,354.82). The payroll line: calendar, two payrolls at 2024's average to 1090,
-     237,379.26; hours beyond 2024's 1.18 hours per standard hour, 22,180 hours at the 2026 straight-time rate of 26.62 with burden,
-     673,995; growth of the surge premium with burden, 162,084; together 1,073,459, which exceeds the payroll line by 106,612 because the
-     measures overlap and use different calendars: the hours follow work dates through 11 December, the payroll pay dates, and the calendar
-     measure 2024's average payroll, which includes the start-up month. -->
+
+
 
 **Requirement 4: Plan the 2027 hours and conversion cost (Chapter 11, with the planning of Chapter 7; managerial accounting).**
 
@@ -148,23 +95,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 - Build the plan's conversion cost from hourly labor, the salaried manufacturing staff, factory overhead, and depreciation, and compare it with the standard conversion cost of the planned output. Put three ratios in a Scenarios CTE built with UNION ALL: standard hours, the 2024 level, and the 2026 level with its overtime. Show the expected variance of each.
 - Explain the variance that remains even at standard hours, and decide whether the standards should change: the direct-hour standards and the overhead rates.
 
-<!-- notes: case3.r4 -->
-<!-- Instructor notes, Requirement 4: volume: 2026 completions of 68,912.79 standard hours, whose standard conversion cost, 3,266,422.54, is
-     what completions released to 1090 (47.40 per standard hour); the budget plans about three times the units the plant completed and the demand forecast
-     two to three times (Chapter 7), and no year has a manufacturing labor or overhead budget, only cost of goods sold at standard. Rate:
-     26.62 an hour (2026, hours-weighted base rate), burden 14.14%; salaried manufacturing staff 263,191.24 gross (Production Manager, Planner, Supervisor). Factory Overhead entries 1,308,869.06 in 2026. Depreciation: monthly OriginalCost / UsefulLifeMonths from the
-     month after the in-service date, through the month before disposal, for assets whose DepreciationDebitAccountID is 92 (account 1090):
-     24,625.00 in January 2026, 26,958.33 from February (MFG-0007, in service 2026-01-14), 24,458.33 from June (MFG-0004 disposed 2026-06-05), 303,666.63 for the year, equal to the ledger; 2027: 24,458.33 a month, 293,499.96, and MFG-0005 reaches the end of its
-     life in December 2027. MFG-0006 and MFG-0007 are the purchases behind PO-2024-001942 and PO-2026-011104, approved above authority in
-     Tutorial 12.2. Capacity: 64 employees x 8 hours x 256 working days = 131,072 regular hours (the calendar's available hours were
-     128,833.25 in 2026); the plan needs 68,913 hours at 1.0, 81,317 at 1.18, and 104,127 at the 2026 level of 1.511, so no scenario needs
-     overtime for capacity, and the plan should allow none as a routine. Conversion cost and expected variance: at 1.0, 3,996,855 and
-     730,432; at 1.18, 4,373,789 and 1,107,366; at the 2026 level with its overtime premium (266,521.04, 304,207.11 with burden), 5,371,136 and
-     2,104,714, close to the 2,159,138.03 conversion variance of 2026. The variance left at standard hours comes from the labor rate with
-     burden above the standard rate (30.39 against 28.28 an hour, about 145,000), and from overhead of 1,902,776 (salaried staff, factory
-     overhead, depreciation) against 1,317,563 applied at 19.12 per standard hour (about 585,000): the plant makes about 53% of its regular
-     capacity, so the fixed overhead is spread over far fewer hours than the rates assume. Standards: keep the direct-hour standards, since
-     direct time stays within them; review the rates, but do not raise the fixed overhead rate to absorb idle capacity (Requirement 5). -->
+
+
 
 **Requirement 5: Close the fiscal 2026 statements (Chapters 11 and 12; financial reporting).**
 
@@ -173,31 +105,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 - Explain where the cost of the hours beyond the work belongs. The inventory standard of U.S. GAAP (FASB Accounting Standards Codification Topic 330) allocates fixed production overhead to inventory on the normal capacity of the production facilities, and charges abnormal amounts, such as idle facility expense, to the period in which they are incurred. Consider what raising the standards to absorb 2026's actual conversion cost would do to the finished goods inventory.
 - Rerun tests L5 and L6 of Audit.sql for the revenue cutoff. Summarize the proposed adjustments and their effect on fiscal 2026 net income, starting from the net income of Chapter 6's income statement, and on the balance sheet, and judge whether they are material.
 
-<!-- notes: case3.r5 -->
-<!-- Instructor notes, Requirement 5: the last eight processed periods (70-77, 2026-08-24 to 2026-12-13) cost 2,298,268.90 over 78 working
-     days, 29,464.99 a day; 14-31 December 2026 has 13 working days (25 December is a holiday), so the accrual is 383,044.82: gross pay
-     336,456.34, employer payroll taxes 25,738.93, benefits 20,849.55. By cost center: Manufacturing 197,970.68 (gross 173,440.12), Executive 42,080.32, Design Services 27,818.05, Sales 23,206.37, Administration 19,301.65, Purchasing 18,982.21, Warehouse 17,730.79, Marketing 14,333.19, Customer Service 11,338.71, Research and Development 10,282.84. Entries: debit 1090 for Manufacturing and the salary accounts
-     of the other cost centers (6010-6050, 6230, 6240, 6250, 6280) for gross pay and 6060 Payroll Taxes and Benefits for the employer costs;
-     credit 2030 Accrued Payroll for gross pay, 2032 for employer taxes, and 2033 for benefits. No completion releases standard cost against
-     the manufacturing part, so it ends in 5080 and cost of goods sold. The 2025 year-end: period 52 (2025-12-15 to 12-28, paid 2026-01-02)
-     is all 2025 work, 263,426.72, and 3 of the 9 working days of period 53 (2025-12-29 to 2026-01-11) fall in 2025, 307,483.41 x 3/9 =
-     102,494.47, so 365,921.19 of 2025 work (manufacturing 180,675.14) was charged to fiscal 2026. Recording both: fiscal 2026 expense rises by
-     only 17,123.63 (383,044.82 less 365,921.19), while the liability at 2026-12-31 rises by 383,044.82 and opening retained earnings fall by
-     365,921.19; the errors counterbalance in income but not on the balance sheet. (Allocating by the hours actually worked, as Exercise 12.1
-     does for hourly labor, gives about 335,000 for 2025.) The 95,000 in 2030 is the opening line of JE-2024-000001; no payroll in the data
-     ever cleared it, so it is not the year-end accrual: investigate it with the other unsupported opening balances of Chapter 8, and reverse
-     it against opening retained earnings if nothing supports it, rather than netting it against the new accrual. ASC 330: 2026's actual
-     conversion cost was 78.77 per standard hour against the standard 47.40; raising the standards to absorb it would carry idle capacity and
-     unneeded hours into finished goods (1040, 12,169,701.74 at year-end) and defer them to later years. Standards that approximate actual
-     cost are acceptable, and an ordinary variance from out-of-date standards could be spread between inventory and cost of sales, so the
-     argument rests on the causes this Part found: idle capacity and hours beyond the work are abnormal, and they belong in 2026's cost of
-     goods sold. Cutoff (L5, L6): fiscal 2026 revenue includes 19,540.86 of December 2025 deliveries and excludes 9 December 2026 shipment
-     lines never invoiced, 44,481.11 at order price, whose standard cost (22,895.78) is already in cost of goods sold; the net effect on 2026
-     revenue is +24,940.25, with receivables +44,481.11 and opening retained earnings +19,540.86. Adjusted 2026 net income: 4,503,611.24 -
-     17,123.63 + 24,940.25 = 4,511,427.86 (the ledger records no income tax). Materiality: the effect on income is under 0.2% and
-     immaterial, but the unrecorded liability of about 383,000 recurs every year, and the absence of any year-end payroll accrual is a
-     deficiency in the close; the supplier invoice ASV0050-2025-040073 (3,266.27, received 2026-01-01) is not a payables cutoff item: its
-     October 2025 accrual, JE-2025-000188, carried the liability at the year-end. -->
+
+
 
 **Requirement 6: Write the decision memo.** Write a memorandum of no more than two pages to the controller, organized in the order of her questions:
 
@@ -207,14 +116,8 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 
 Close the memo with your recommendation.
 
-<!-- notes: case3.r6 -->
-<!-- Instructor notes, Requirement 6: a strong memo does not conclude that the hours were fictitious. The records outside timekeeping do not
-     support the surge-day hours as recorded, and the ones that agree with them come from the same system or the same manager; the question
-     goes to the evidence outside the database. The recommendation: stop routine surge days and require overtime to be approved in advance
-     against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the
-     roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a 2027 plan at about the 2024
-     level of hours per standard hour, with no routine overtime, since capacity allows it; keep the direct-hour standards and review the
-     overhead rates on normal capacity; and record the year-end payroll accrual now and at every year-end. -->
+
+
 
 **Deliverable.** A decision memorandum of no more than two pages, with a one-page appendix of exhibits: the corroboration matrix, output against hours, the bridge of the variance, the 2027 plan against the status quo, and the proposed adjustments. Submit Case.sql as well, with its header complete and a comment above every query.
 

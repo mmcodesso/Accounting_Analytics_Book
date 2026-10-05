@@ -62,7 +62,7 @@ a. Choose **Modeling > Manage roles**, click **New role**, and name the role `Co
 b. Under **Tables**, select **CostCenter**, click **Switch to DAX editor**, and enter the first rule below.
 c. Select **Employee**, and enter the same rule.
 
-<!-- dax-check: skip -->
+
 ```
 [CostCenterID] IN CALCULATETABLE (
     VALUES ( Security[CostCenterID] ),
@@ -81,12 +81,12 @@ b. Select **Security**, and enter the second rule below.
 c. Click **New role**, name it `Finance`, and leave it without rules.
 d. Click **Save**.
 
-<!-- dax-check: skip -->
+
 ```
 USERPRINCIPALNAME () IN VALUES ( Security[UserPrincipalName] )
 ```
 
-<!-- dax-check: skip -->
+
 ```
 [UserPrincipalName] = USERPRINCIPALNAME ()
 ```
@@ -118,7 +118,7 @@ a. Add the two measures below to the Key Measures table.
 b. Add a card of Cost Centers Shown to the Budget page and the Income Statement page, titled `Cost centers shown`.
 c. Add a card of Who Am I to the About page.
 
-<!-- dax-check: measure -->
+
 ```
 Cost Centers Shown =
 CONCATENATEX (
@@ -128,7 +128,7 @@ CONCATENATEX (
 )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Who Am I = USERPRINCIPALNAME ()
 ```
@@ -152,22 +152,8 @@ b. Recommend who maintains the security table, who approves it, and how often in
 c. Describe what each manager sees, including the pages that become partial and the Budget page that does not serve the Production Manager.
 d. Save both files.
 
-<!-- notes: appendix_a.t1 -->
-<!-- Guided Tutorial A.1 expected values (SQL twins; CR16 reference model in Desktop 2.158, roles tested through ADOMD.NET with
-     Roles= and literal-UPN test roles; the rule with USERPRINCIPALNAME returned no rows for the Windows identity, as expected):
-     Access review: Executive 81 Daniel Diaz, Account Executive, Terminated 2024-04-26; Sales 83 Cassandra Cardenas, Sales Representative, Terminated 2024-06-21; Warehouse 85 Dean Cook, Inventory Specialist, Terminated 2024-09-13; Research and Development 13 Melinda Murphy, Product Analyst, Active; the other six are their departments' managers (4, 10, 5, 11, 12, 14).
-     Actual Sales Manager employee 6 (Carrie Schultz), Warehouse Manager employee 7 (Robert Fisher). Every address in the
-     Security table is the Email of an active employee whose own CostCenterID is the cost center the table gives them (1, 6, 7, 4, 10, 5, 11, 12, 14). 2026, Operating Expense: Sales Manager sees Sales only, budget 2,734,179.05, actual 1,018,872.21,
-     flexed 1,090,985.80 (unchanged); Income Statement net income 11,306,186.32 (Sales revenue 28,517,713.92 less Sales
-     expenses 17,211,527.60), 2.51 times the company's 4,503,611.24; Revenue measure 29,756,420.08 (all sales); Plant blank.
-     Warehouse Manager: 353,015.28 / 447,856.23; net income -447,856.23; Plant hours blank (standard hours still 66,997.8,
-     completions unrelated to CostCenter). Production Manager: Budget page empty (Manufacturing has COGS budget lines only);
-     Plant 101,237 hours / 66,997.8 standard / 1.511; net income -2,412,332.31; 67 employees. employee083: nothing (no cost
-     centers, no employees, no items, Revenue blank); the Customer table still lists 220 customers. Finance (no rules) and no
-     role: everything (net income 4,503,611.24; Cost Centers Shown lists all ten). Who Am I in Desktop without View as returned
-     the Windows identity (machine\user on a local account). Labels to confirm in 2.158: the View as roles dialog (Other user,
-     role check boxes, OK), the bar shown while viewing as, and Stop viewing; UI Automation reads Manage security roles (New
-     role, Tables, Switch to DAX editor, Save, Close) and Modeling > Security (Manage roles, View as). -->
+
+
 
 **Checkpoint.** Before you report to the controller, confirm the following:
 

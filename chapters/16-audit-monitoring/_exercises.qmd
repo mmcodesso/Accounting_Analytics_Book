@@ -74,18 +74,8 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Deliverable.** The SurgeDays query, the page, and a short note answering requirement (5).
 
-<!-- notes: ch16.ex3 -->
-<!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the
-     first is 2024-05-31, then surge days in 26 of the 30 months from July 2024 (about 3 a month), up to 7 in October 2026; every surge day has all 64 hourly
-     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705
-     of the year's manufacturing overtime; overtime on other days did not grow (6,273, 6,426, 5,918). All 5,952 surge entries
-     were approved by the Production Manager on the work date. Distinct values of total hours: Group By's "Count Distinct Rows"
-     counts distinct rows, not the values of one column, so the aggregation is written List.Count ( List.Distinct (
-     [TotalHours] ) ) (or only WorkDate and TotalHours are kept before grouping); one value means everyone clocked the
-     same hours. (5) The production manager approved every entry the
-     test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found
-     can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The
-     Plant page's overtime share is a management measure; the surge-day test is an audit test. -->
+
+
 
 **Exercise 16.4: Exception Rates over Time**
 

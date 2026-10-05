@@ -13,6 +13,38 @@ from scripts.slides.verify import load_manifest
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class ManifestParsingTests(unittest.TestCase):
+    def read(self, text):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'manifest.yml'
+            path.write_text(text, encoding='utf-8')
+            return load_manifest(path)
+
+    def test_missing_comma_reports_original_json_location(self):
+        with self.assertRaisesRegex(ValueError, r'manifest.yml:3:3: invalid JSON: Expecting'):
+            self.read('{\n  "status": "approved"\n  "approval_note": "reviewed"\n}')
+
+    def test_duplicate_approval_cannot_silently_override(self):
+        for text in ('{"chapters": [{"status": "pilot", "status": "approved"}]}',
+                     'chapters:\n  - status: pilot\n    status: approved\n'):
+            with self.subTest(text=text), self.assertRaisesRegex(ValueError, "duplicate key 'status'"):
+                self.read(text)
+
+    def test_valid_json_and_yaml_configurations_still_load(self):
+        expected = {'project': {'type': 'default'}}
+        self.assertEqual(expected, self.read('\ufeff{"project": {"type": "default"}}'))
+        self.assertEqual(expected, self.read('project:\n  type: default\n'))
+        # Explicit overrides of a YAML merge are intentional, not duplicate keys.
+        self.assertEqual({'base': {'type': 'default'}, 'project': {'type': 'book'}},
+                         self.read('base: &base\n  type: default\nproject:\n  <<: *base\n  type: book\n'))
+
+    def test_invalid_yaml_and_non_mapping_have_actionable_errors(self):
+        with self.assertRaisesRegex(ValueError, 'manifest.yml: invalid YAML'):
+            self.read('project:\n  type: [default\n')
+        with self.assertRaisesRegex(ValueError, 'expected a top-level mapping'):
+            self.read('[]')
+
+
 class FocusedBuildTests(unittest.TestCase):
     def test_selection_excludes_unrelated_editorial_staleness(self):
         manifest = load_manifest(ROOT / 'slides/manifest.yml')
