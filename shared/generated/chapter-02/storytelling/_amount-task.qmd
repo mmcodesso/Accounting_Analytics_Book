@@ -1,0 +1,5 @@
+| Evidence | Amount |
+| --- | --- |
+| GLEntry 126312 revenue credit | $688.42 |
+| Invoice line 10645 | $688.42 |
+| Invoice 7947 grand total | $787.48 |

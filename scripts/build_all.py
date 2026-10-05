@@ -53,10 +53,12 @@ def source_checks(root: Path, manifest: dict, chapter_id: str | None = None) -> 
     from scripts.slides.refresh_sql import check_fresh as check_sql
     from scripts.slides.refresh_bi import check_fresh as check_bi
     from scripts.slides.refresh_storytelling import check_fresh as check_storytelling
+    from scripts.slides.refresh_chapter02_storytelling import check_fresh as check_chapter02_storytelling
     selected = selected_manifest(manifest, chapter_id)
     errors = (verify_sources(root, selected)
               + (check_fresh(root) if chapter_id in (None, 'chapter-01') else [])
               + check_storytelling(root, selected)
+              + check_chapter02_storytelling(root, selected)
               + check_foundations(root, selected) + check_excel(root, selected)
               + check_sql(root, selected) + check_bi(root, selected))
     config = load_manifest(root / 'slides/_quarto.yml')
@@ -252,12 +254,16 @@ def main() -> int:
             return 0
         if args.refresh_shared:
             if chapter_id:
-                if chapter_id != 'chapter-01':
-                    raise ValueError('Focused refresh is currently supported for chapter-01 only')
-                from scripts.slides.refresh import refresh
-                from scripts.slides.refresh_storytelling import refresh as refresh_storytelling
-                refresh(ROOT)
-                refresh_storytelling(ROOT)
+                if chapter_id == 'chapter-01':
+                    from scripts.slides.refresh import refresh
+                    from scripts.slides.refresh_storytelling import refresh as refresh_storytelling
+                    refresh(ROOT)
+                    refresh_storytelling(ROOT)
+                elif chapter_id == 'chapter-02':
+                    from scripts.slides.refresh_chapter02_storytelling import refresh as refresh_chapter02
+                    refresh_chapter02(ROOT)
+                else:
+                    raise ValueError('Focused refresh is supported for chapter-01 and chapter-02 only')
             else:
                 refresh_all(ROOT)
         errors = source_checks(ROOT, manifest, chapter_id)
@@ -298,6 +304,8 @@ def refresh_all(root: Path) -> None:
     run(root, [sys.executable, 'scripts/export_drawio_svgs.py'])
     from scripts.slides.refresh_storytelling import refresh as refresh_storytelling
     refresh_storytelling(root)
+    from scripts.slides.refresh_chapter02_storytelling import refresh as refresh_chapter02_storytelling
+    refresh_chapter02_storytelling(root)
     from scripts.slides.refresh_excel import refresh as refresh_excel
     refresh_excel(root)
     from scripts.slides.refresh_sql import refresh as refresh_sql

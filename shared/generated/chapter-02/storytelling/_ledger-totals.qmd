@@ -1,0 +1,5 @@
+| Whole-extract measure | Amount |
+| --- | --- |
+| Total debits | $731,949,908.31 |
+| Total credits | $731,949,908.31 |
+| Difference | $0.00 |

@@ -46,6 +46,12 @@ $presentation-heading-line-height: 1.12;
 .reveal .balanced .slide-body .column p { margin-top: 0; margin-bottom: 0.7em; }
 // Hidden fragments keep their space, so the content never jumps on advance.
 .reveal .slides .fragment { transition: none; }
+// Chapter 2 Excel formulas are native text at the teaching body size.
+.reveal .slides section.ch02-formula code {
+  font-size: 1em;
+  white-space: normal;
+  overflow-wrap: normal;
+}
 @media print {
   .reveal .slides .fragment { opacity: 1 !important; visibility: visible !important; }
   .reveal .stepwise li::marker { color: inherit; }

@@ -1,0 +1,3 @@
+| AccountID | AccountNumber | AccountName |
+| --- | --- | --- |
+| 42 | 4010 | Sales Revenue - Furniture |

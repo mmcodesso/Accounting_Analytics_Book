@@ -45,7 +45,7 @@
       "number": 2,
       "title": "Understanding Data in Accounting",
       "source": "chapter-02/index.qmd",
-      "status": "approved",
+      "status": "pilot",
       "book_sources": [
         "chapters/02-understanding-data/chapter.qmd",
         "chapters/02-understanding-data/_key-terms.qmd",
@@ -66,7 +66,7 @@
         "native_table": true,
         "embedded_media": true
       },
-      "approval_note": "Author authorized proceeding to Chapters 4-8 after the Chapters 2-3 review handoff on 2026-10-04."
+      "approval_note": "Revised 50-slide audit-readiness pilot requested 2026-10-05; fresh render acceptance pending. The previous approved release remains the baseline."
     },
     {
       "id": "chapter-03",
@@ -745,7 +745,23 @@
     "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
     "visuals/src/fig-01-04-charles-river-architecture.drawio",
     "visuals/src/fig-01-05-o2c-process-flow.drawio",
-    "visuals/src/fig-03-05-chart-of-accounts-table.drawio"
+    "visuals/src/fig-03-05-chart-of-accounts-table.drawio",
+    "shared/generated/chapter-02/storytelling/_invoice-date-task.qmd",
+    "shared/generated/chapter-02/storytelling/_invoice-date-response.qmd",
+    "shared/generated/chapter-02/storytelling/_ledger-totals.qmd",
+    "shared/generated/chapter-02/storytelling/_account-task.qmd",
+    "shared/generated/chapter-02/storytelling/_account-response.qmd",
+    "shared/generated/chapter-02/storytelling/_period-coverage.qmd",
+    "shared/generated/chapter-02/storytelling/_amount-task.qmd",
+    "shared/generated/chapter-02/storytelling/_amount-response.qmd",
+    "shared/generated/chapter-02/storytelling/_budget-wide.qmd",
+    "shared/generated/chapter-02/storytelling/_budget-long.qmd",
+    "shared/generated/chapter-02/storytelling/posting-trace.svg",
+    "shared/generated/chapter-02/storytelling/posting-trace.png",
+    "shared/generated/chapter-02/storytelling/facts.json",
+    "visuals/src/fig-02-05-salesinvoice-date-check.drawio",
+    "visuals/src/fig-02-07-glentry-debit-credit-sum.drawio",
+    "visuals/src/fig-01-06-ledger-posting-trace.drawio"
   ],
   "public_fragments": [
     "shared/fragments/_accounting-analytics.qmd",
@@ -830,7 +846,10 @@
     "tests/test_slide_release_tools.py",
     "slides/reviews/chapter-01-acceptance-2026-10-05.json",
     "slides/reviews/all-chapters-acceptance-2026-10-05.json",
-    "slides/reviews/editorial-review-2026-10-05.json"
+    "slides/reviews/editorial-review-2026-10-05.json",
+    "scripts/slides/refresh_chapter02_storytelling.py",
+    "slides/reviews/chapter-02-storytelling.md",
+    "tests/test_slide_chapter02_storytelling.py"
   ],
   "public_book_files": [
     "_quarto.yml",
