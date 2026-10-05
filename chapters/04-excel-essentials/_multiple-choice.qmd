@@ -118,21 +118,3 @@ A.  PERCENTILE.INC guarantees that every line above the threshold is an error to
 B.  A named cell cannot be changed, so the threshold is protected without any data validation.
 C.  The threshold comes from the data, is stated in one named place, and updates with the data.
 D.  The formula keeps the threshold identical from one year to the next, whatever the data.
-
-<!-- Answer key, Chapter 4 (for instructors; HTML comments are removed from every rendered format):
-     1 C, 2 A, 3 B, 4 D, 5 C, 6 B, 7 A, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B, 15 C.
-     1 C: a Table lets formulas use Table and column names, and it includes rows added later.
-     2 A: SUBTOTAL with 109 sums only the rows a filter leaves visible.
-     3 B: [@Quantity] is the Quantity in the formula's own row.
-     4 D: $C$500 locks both the column and the row, so it is absolute.
-     5 C: pasting one column right moves B$15 to C$15, while $A16 stays in column A.
-     6 B: a refresh repeats every applied step on the source, which is never changed.
-     7 A: a Table already defines its header row and extent.
-     8 D: relative date filters are measured from today's date, not from the data.
-     9 B: a slicer filters the Table, hiding the other rows without deleting them.
-     10 A: the dollar sign fixes the column while the row adjusts, so each row is tested on its own value.
-     11 C: a new rule goes to the top of the list and wins when two rules set the same property.
-     12 D: the Warning style only cautions the user, who can accept an invalid entry.
-     13 A: a formula typed beside a Table extends it; summaries belong on a separate worksheet.
-     14 B: documentation lets someone with no connection to the work understand and review it.
-     15 C: a threshold derived from the data and stated in one named place updates with the data and shows its logic. -->

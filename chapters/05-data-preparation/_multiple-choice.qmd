@@ -118,21 +118,3 @@ A.  Round every quantity to the nearest whole number before analyzing any of the
 B.  Record it as a limitation, raise it with the system's owners, and avoid relying on whole units.
 C.  Delete the lines with fractional quantities from the analysis so that the totals are clean.
 D.  Ignore the finding, because quantities do not affect the revenue recorded on each line.
-
-<!-- Answer key, Chapter 5 (for instructors; HTML comments are removed from every rendered format):
-     1 D, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 A, 15 B.
-     1 D: MID returns 3 characters starting at position 5, the product type DSK.
-     2 B: PROPER capitalizes the first letter of each word and lowers the rest, so LLC becomes Llc.
-     3 A: with a fiscal year starting April 1, January to March is the fourth quarter.
-     4 C: TODAY changes daily, so results cannot be reproduced; an as-of date is fixed.
-     5 B: the fourth argument is the value returned when the key is not found.
-     6 D: the order date is two keys away: invoice first, then order.
-     7 C: a lookup returns the first match; on the many side, MINIFS returns the earliest date.
-     8 A: ISBLANK is FALSE for a cell that holds a formula, even one that returns empty text.
-     9 D: a blank PromotionID records the fact that the line carried no promotion.
-     10 C: a left anti join returns the rows of the first query with no match in the second.
-     11 B: a key repeated in the second table makes a left outer merge add rows.
-     12 A: Text.Middle counts positions from zero, MID from one.
-     13 C: a reference query leaves the original unchanged and updates with it.
-     14 A: AND needs both tests true; the invoice date is before PromoEnd, so the result is OK.
-     15 B: record the limitation, raise it with the system owners, and avoid conclusions that need whole units. -->

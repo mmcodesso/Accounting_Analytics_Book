@@ -1,0 +1,5 @@
+| SalesOrderID | CustomerID |
+| --- | --- |
+| 62 | 1 |
+| 85 | 1 |
+| 59 | 4 |

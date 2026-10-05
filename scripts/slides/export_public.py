@@ -43,7 +43,13 @@ MARKDOWN_RESOURCE = re.compile(r"!?\[[^\]]*\]\((<?[^\s)>]+>?)(?:\s+[^)]*)?\)")
 
 def sanitize_public_document(text: str) -> str:
     """Strip raw author comments before copying any public Markdown source."""
-    return COMMENT.sub("", text)
+    sanitized = COMMENT.sub("", text)
+    if sanitized == text:
+        return text
+    # Removing a comment can leave whitespace-only lines or a blank file tail.
+    # Keep intentional Markdown hard breaks on nonempty lines intact.
+    sanitized = re.sub(r"(?m)^[ \t]+$", "", sanitized)
+    return sanitized.rstrip() + "\n" if sanitized.strip() else ""
 
 
 def _references(path: Path, text: str) -> list[str]:

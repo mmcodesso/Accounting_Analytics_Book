@@ -106,21 +106,3 @@ A.  To show which assumptions change the conclusion most, so review focuses on t
 B.  To prove that the assumptions used in the model are correct
 C.  To record the formula used in each cell of the model
 D.  To list the people who approved each assumption and when
-
-<!-- Answer key, Chapter 7 (for instructors; HTML comments are removed from every rendered format):
-     1 D, 2 A, 3 B, 4 C, 5 B, 6 D, 7 A, 8 C, 9 C, 10 B, 11 D, 12 A, 13 B, 14 C, 15 A.
-     1 D: a coefficient of -0.80 is a strong negative linear association; it says nothing about cause or size.
-     2 A: when one observation changes the conclusion, investigate it and report both results unless it can be explained.
-     3 B: R Square is the share of the variation in y that the line explains.
-     4 C: the slope is significant only with the start-up month, so there is no reliable evidence of a trend.
-     5 B: a backtest fits the method to earlier data and compares its forecasts of held-back data with the actuals.
-     6 D: a method that cannot beat simple benchmarks is not worth its extra complexity.
-     7 A: both fit the same least-squares line; TREND can return several values, FORECAST.LINEAR one.
-     8 C: a flexible budget recalculates the budget at actual volume with budgeted prices and costs per unit.
-     9 C: the sales-volume variance values the difference in units at the planned margins per unit.
-     10 B: commissions are variable, so the budget must be flexed to actual revenue before the difference is judged.
-     11 D: break-even revenue is fixed costs divided by the contribution margin ratio: 900,000 / 0.30 = 3,000,000.
-     12 A: Goal Seek changes one input until a formula cell reaches a target value.
-     13 B: a two-variable data table fills in a result for every combination of two inputs.
-     14 C: the Sensitivity report requires an optimal solution and no integer constraints.
-     15 A: the sensitivity column shows which assumptions change the conclusion, so review focuses on them. -->

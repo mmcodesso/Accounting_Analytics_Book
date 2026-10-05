@@ -106,21 +106,3 @@ A.  A Filters pane filter that excludes one segment, mentioned nowhere on the pa
 B.  A slicer for the fiscal year placed at the top of the page, with the current year selected
 C.  A filter applied by clicking a bar, which the other visuals on the page then reflect
 D.  A visual title that names the period, the measure, and the unit of the values shown
-
-<!-- Answer key, Chapter 13 (for instructors; HTML comments are removed from every rendered format):
-     1 B, 2 D, 3 C, 4 A, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 C, 12 A, 13 D, 14 B, 15 A.
-     1 B: a report serves readers who ask the next question themselves.
-     2 D: dashboards are single pages of pinned tiles in the Power BI service.
-     3 C: by default, profiling covers the first 1,000 rows, which predate every promotion.
-     4 A: a guessed relationship can join the wrong columns silently.
-     5 B: a whole-number year is summed unless its summarization is Don't summarize.
-     6 D: the filter flows from Item to the lines, not from the lines to SalesInvoice.
-     7 A: an average of rates weights each line equally; the ratio of totals weights by dollars.
-     8 C: position along a common scale ranks first in Cleveland and McGill's experiments.
-     9 D: a table fits a task that needs an exact value.
-     10 B: a line chart's default axis starts just below the smallest value.
-     11 C: one axis shows the true size; separate charts show each pattern on its own labeled scale.
-     12 A: the comparison starts at the start-up month; whole years show little growth.
-     13 D: meaning must not rest on color alone.
-     14 B: good performers graphed more, and about 30% of graphs distorted, exaggerating on average.
-     15 A: a hidden page filter changes the numbers without telling the reader. -->

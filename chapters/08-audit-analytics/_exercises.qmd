@@ -32,17 +32,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Deliverable.** The Aging worksheet with the loss rates and expected credit losses, the adjusting entry, and the memo.
 
-<!-- notes: ch08.ex1 -->
-<!-- Instructor notes, Exercise 8.1: at 2026-12-31, aging by due date (OpenBalance > 0 after cash applications and credit memos dated
-     on or before the as-of date): Current 780 invoices, 3,655,971.50; 1-30 days 258, 745,674.84; 31-60 days 28, 16,711.26; 61-90 days
-     10, 405.41; over 90 days 3, 41.31; total 1,079 invoices, 4,418,804.32. Expected losses at the given rates: 18,279.86 + 14,913.50 +
-     835.56 + 60.81 + 16.52 = 34,106.25. With the 380,000.00 opening balance (JE-2024-000001, account 1020) at 40%: 186,106.25. The
-     opening balance has no invoice detail and no cash application, so its age and collectability are unknown; the honest answer is
-     that it must be supported (conversion-date customer detail) or written off, not merely aged. Balances under $10: 10 invoices
-     totalling 23.58 (SI-2026-020608 5.20 is current; the others are 61+ days past due, from 0.03 to 9.98). Entry: Dr 6170 Bad Debt
-     Expense, Cr 1030 Allowance for Doubtful Accounts. Neither account has any GL rows. ASC 326-20-30-3 accepts aging-schedule methods
-     and 326-20-30-10 requires the estimate to reflect risk even when remote; Example 5 (326-20-55-37 to 55-40) adjusts historical
-     bucket rates for current conditions and forecasts. -->
+
+
 
 
 **Exercise 8.2: Reconciling Accounts Payable to the Ledger**
@@ -65,17 +56,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Deliverable.** A reconciliation workpaper for accounts payable at the end of fiscal 2026, with the PivotTable and the detail of each reconciling item.
 
-<!-- notes: ch08.ex2 -->
-<!-- Instructor notes, Exercise 8.2: open invoices at 2026-12-31: 4,781,095.54. GL 2010 (credit minus debit): 6,237,466.66, made up of
-     PurchaseInvoice 56,461,312.87, DisbursementPayment -51,680,217.33, and JournalEntry +1,456,371.12. The JournalEntry rows are three:
-     (a) JE-2024-000001, the opening balance entry, credits 2010 with 2,096,371.12, accounts payable with no invoice detail that has never
-     been paid; the same entry debits cash with exactly the same amount, a coincidence worth a question; (b) JE-2024-000103 (Debt Reclass,
-     360,000.00) and (c) JE-2026-000001 (Debt Reclass, 280,000.00) debit 2010 and credit 2110 Notes Payable, reclassifying note-financed
-     capital invoices V0005-2024-003160 and V0005-2026-021692 (supplier 5, Nelson-Rocha), which have no supplier payments and therefore
-     still appear open in the invoice detail. Reconciliation: 4,781,095.54 - 640,000.00 + 2,096,371.12 = 6,237,466.66. The reclasses are
-     explained (the invoice detail should be closed or flagged as settled by a note), while the opening balance is unsupported, the same
-     finding as accounts receivable. The purchase orders behind the two capital invoices, PO-2024-001942 and PO-2026-011104, were created
-     and approved by the Purchasing Manager, whose limit is 25,000 (Exercise 8.5). -->
+
+
 
 
 ### Managerial Accounting Exercises
@@ -98,15 +80,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Deliverable.** A credit exposure worksheet with the customer ranking, the credit limit comparison, the concentration measures, and the memo.
 
-<!-- notes: ch08.ex3 -->
-<!-- Instructor notes, Exercise 8.3: 203 customers have open balances at 2026-12-31. Five exceed their credit limit, and none of them has
-     any past-due balance:
-     Miller-Hernandez 143,506.09 against 125,394.78 (Strategic, Net 60), Sanchez, Lee and Jones 82,088.52 against 58,146.44 (Wholesale, Net 45), James, Gill and Campbell 34,917.32 against 34,690.20 (Design Trade, Net 90), Jenkins Ltd 14,833.81 against 11,873.67 (Small Business, Net 60), Santos-Salazar 12,815.16 against 11,868.51 (Small Business, Net 60). They are over the
-     limit because of recent billing, not slow payment, which argues for reviewing the limits rather than stopping shipments. Largest
-     balances: Wright PLC 251,470.60, Miller-Hernandez, Eaton, Robertson and Grant 105,369.89, Willis and Sons 97,530.65, Sanchez LLC 96,886.09, all Strategic.
-     Top 5 hold 15.7% and top 10 24.7% of the open balance.
-     By segment: Wholesale 2,270,774.32, Strategic 1,323,927.91, Design Trade 381,811.50, Design Services 252,933.36, Small Business 189,357.23. By terms (open, past due, customers):
-     Net 30 1,394,279.02, 280,641.33, 88; Net 45 1,402,433.58, 270,357.98, 60; Net 60 1,265,864.14, 193,277.93, 48; Net 90 356,227.58, 18,555.58, 7. Every invoice's due date matches its customer's PaymentTerms. -->
+
+
 
 
 **Exercise 8.4: Supplier Concentration and Payment Timing**
@@ -127,14 +102,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Deliverable.** A worksheet with the supplier ranking, the concentration measures, the category summary, the payment timing analysis, and the memo.
 
-<!-- notes: ch08.ex4 -->
-<!-- Instructor notes, Exercise 8.4: fiscal 2026 payments: 20,192 payments to 103 suppliers, 21,958,743.39. 19 suppliers make up 50%, 58
-     make up 80%, and 76 make up 90% of spending; the largest supplier (Berger, Stanley and Cooper, Raw Materials) has 4.45%, so
-     concentration is low. By category: Raw Materials 9,022,917.71; Services 3,007,250.79; Furniture 2,635,672.47; Accessories 2,268,117.37; Textiles 1,649,833.90; Packaging 1,485,772.29; Lighting 1,101,793.63; Logistics 787,385.23.
-     Timing: 6,171 payments
-     before the due date, 771 on it, and 13,250 after it (65.6%, holding 66.7% of the value); median 5 days after due, mean 9.9; 2,214
-     payments more than 30 days late. Paying late conserves cash but risks supplier relationships and late fees; paying early forgoes
-     cash without a discount, since the data has no early-payment discounts. -->
+
+
 
 
 ### Auditing Exercises
@@ -170,26 +139,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Deliverable.** The flagged purchase orders and invoices with their dispositions, the requisition band analysis with its chart, the duplicate and gap tests, and the memo.
 
-<!-- notes: ch08.ex5 -->
-<!-- Instructor notes, Exercise 8.5: 18,832 purchase orders; the CFO approved 99.9% of them. SelfApproved: 9
-     (PO-2024-000001, -000002, -000003, PO-2024-001942 for 360,000.00, PO-2025-003923, -003924, PO-2026-010468, -010469, and PO-2026-011104 for 280,000.00; the two
-     large ones were created and approved by the Purchasing Manager, limit 25,000, and are the note-financed capital purchases of Exercise
-     8.2). AboveLimit: 13, including orders approved by Buyers and Procurement Analysts with a limit of 0,
-     PO-2024-000040 (Production Manager, 26,027.28 against 25,000) and PO-2024-000042 (Production Supervisor, 13,737.60 against 5,000).
-     AfterTermination: 3
-     (PO-2024-000474, PO-2025-003922, PO-2026-010467), all approved by Daniel Diaz, an Account Executive terminated on 2024-04-26. Risk
-     scores: 11 orders score 2 and 3 score 1. Requisition bands from 4,800: 7, 8, 4, 18, 9, 4, 9, 4, so the 4,950-4,999.99 band has twice
-     the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714, -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are
-     three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO
-     approved 40,196 of 40,204; the other 8 are PI 7038, 7047, 20345, and 20399 (200.69, 3,102.49, 794.96, 23.20), approved by Melinda Murphy,
-     a Product Analyst with a limit of 0; PI 7122 and 20452 (1,301.21, 1,269.12), approved by Daniel Odom, a Production Supervisor,
-     within the 5,000 limit but outside the purchasing and accounting roles;
-     and PI 3160 and 21692 (360,000.00 and 280,000.00), approved by Jennifer Cole,
-     the Purchasing Manager, above the 25,000 limit, the note-financed capital invoices of
-     Exercise 8.2. Near-duplicates, payments dated before 2027-01-01: SameAmount flags 226 payments in 113 pairs (no group larger than
-     two; 13 pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices and no invoice was paid twice.
-     Gap test: PO-2024 runs 1 to 3,921 (3,921 orders), PO-2025 3,922 to 10,466 (6,545), PO-2026 10,467 to 18,832 (8,366); no numbers
-     are missing, and the sequence continues across years rather than restarting. -->
+
+
 
 
 **Exercise 8.6: Testing Pricing Controls**
@@ -215,31 +166,3 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 (7) Write a memo of one half to one page to the sales manager and the controller that describes the exceptions, their amounts, and the changes you would recommend to the pricing controls.
 
 **Deliverable.** The flagged promotions with their invoice lines, the pending override requests with the lines billed at their prices, the price-list tests, and the memo.
-
-<!-- notes: ch08.ex6 -->
-<!-- Instructor notes, Exercise 8.6: promotions 1 (PROMO-2024-001, Alder Collection, effective 2024-03-01 to 2024-03-01), 4 (PROMO-2025-004, Brookside Collection, 2025-03-01 to 2025-02-27), and 7 (PROMO-2026-007, Harbor Collection, 2026-03-01 to 2026-02-28)
-     are 8% collection
-     promotions approved by EmployeeID 6 (Carrie Schultz, Sales Manager) on their start dates. All of their invoice lines were ordered
-     outside the effective dates: 80 lines with discounts of 28,124.77, 74 lines with 32,529.69, and 68 lines with 30,478.57, a total of
-     222 lines and 91,133.03, ordered in March and April of each year and invoiced through July or August. Every line of the other
-     promotions was ordered within its dates.
-     Pending overrides: IDs 2, 165, and 294
-     on SalesOrderLineIDs 147, 8038, and 15033. They were
-     billed on four invoice lines
-     (SI-2024-000054; SI-2025-007015 and SI-2025-007598, two shipments of one order line; SI-2026-013958) at
-     the pending ApprovedUnitPrice (181.00, 102.70, 351.24) under a price-list PricingMethod (Segment Price List or Customer Price List)
-     with a blank PriceOverrideApprovalID, 755.69 below the reference prices in total. Price lists: 1 (Strategic segment, ends
-     2024-12-29), 2 (Wholesale, ends
-     2025-12-29), and 4 (Small Business, ends
-     2023-12-29, before its 2024-01-01 start) are Expired and
-     have no successor, yet they priced 8,135 order lines dated after their end dates (31,004,051.07):
-     list 1 11 in late December 2024, 1,340 in 2025, and 1,200 in 2026;
-     list 2 33 in late December 2025 and 3,710 in 2026;
-     list 4 all 1,841 of its lines (550, 650, 641).
-     Lists 12, 13, and 14, three Active copies of the Design Trade list named Overlap with the same dates as list 3, have no
-     price list lines and price nothing. Customer lists: customer 106 (Richardson, Porter and Chavez, Strategic, list 11) has three
-     order lines under Segment Price List that cite list 1: SalesOrderLineIDs 368 (2024-01-02), 7675 (2025-01-01), and 15031 (2026-01-02). Their UnitPrice equals the customer's own list (21.88, 913.83, 564.75), not list 1 (22.65, 946.08, 584.68): the
-     customer paid its contract price, but the record names the wrong, and in 2025 and 2026 expired, list. No other customer with its
-     own list has Segment Price List lines. Design: the system accepts end dates before start dates, lets an order line carry a
-     pending price, and prices from expired lists. Operation: the approvals did not prevent the discounts, and nobody renewed the
-     segment lists. -->

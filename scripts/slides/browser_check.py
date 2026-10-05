@@ -216,6 +216,7 @@ def inspect_steps(page, slide: dict, screenshots: Path) -> dict:
                 errors.append("Content moved when the next point appeared")
         if page.evaluate(SLIDE_METRICS)["issues"]:
             errors.append(f"Content bounds failed at step {index}")
+        page.screenshot(path=str(screenshots / f"steps-{slide['ordinal'] + 1:02d}-{index:02d}.png"))
     page.keyboard.press("ArrowLeft")
     page.wait_for_timeout(30)
     if page.evaluate("() => Reveal.getCurrentSlide().id") != slide["id"]:
@@ -260,6 +261,10 @@ def inspect_deck(context, url: str, chapter: str, screenshots: Path) -> dict:
     page.evaluate("() => document.fonts.ready")
     inventory = page.evaluate(SLIDE_INVENTORY)
     screenshots.mkdir(parents=True, exist_ok=True)
+    # Remove obsolete states owned by this checker after a fragment revision.
+    for old in screenshots.glob('steps-*.png'):
+        if old.is_file() and not old.is_symlink():
+            old.unlink()
     result = {"chapter": chapter, "url": url, "slideCount": len(inventory),
               "teachingSlideCount": sum(slide["teaching"] for slide in inventory),
               "slides": [], "checks": {}, "errors": []}

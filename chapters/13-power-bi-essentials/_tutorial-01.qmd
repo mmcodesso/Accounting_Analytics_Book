@@ -121,17 +121,8 @@ c. Save the report.
 
 ![The Validation Page of the Charles River Reports File.](/visuals/svg/fig-13-05-validation-page.svg){#fig-13-05 fig-alt="A mock of a report page named Validation in Power BI Desktop. A table visual lists fiscal years 2024, 2025, and 2026 with the count of invoice lines, the sum of LineTotal, the sum of ListAmount, and the sum of DiscountAmount for each, and a total row. The fiscal 2026 row is outlined. A second table lists the five item groups, Accessories, Furniture, Lighting, Services, and Textiles, with their line totals and no blank row."}
 
-<!-- notes: ch13.t1 -->
-<!-- Tutorial 13.1 expected values (read-only twin, pbi_ch13.py): rows loaded: SalesInvoiceLine 27,933; SalesInvoice 20,914;
-     Item 223 after the ListPrice filter (266 before); Customer 220. No invoice line refers to an item with a blank ListPrice,
-     and every line finds its invoice, item, and customer. Validation table: 2024 9,040 lines, 27,313,723.48, list 30,596,029.91,
-     discounts 126,607.64; 2025 9,371, 29,376,702.28, 33,030,575.85,
-     234,534.72; 2026 9,522, 29,756,420.08, 33,589,137.45,
-     362,110.75
-     (Chapter 6 control total and the Part II case gross to net); total 27,933, 86,446,845.84. Item groups (all years):
-     no (Blank) row. Profile (Step 6): first 1,000 lines (dated 2024-01-01 to 2024-02-29) PromotionID 100% empty, Discount 1
-     distinct value (0); entire data set: PromotionID empty on 25,825 of 27,933 lines (92%), Discount 4 distinct values
-     (0, 0.08, 0.10, 0.12). -->
+
+
 
 **Checkpoint.** Before you build on the model, confirm the following:
 

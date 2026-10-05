@@ -36,7 +36,7 @@ d. Hide the two keys of BudgetLine.
 a. Add the measures below to the Key Measures table, one at a time.
 b. Format the first three as amounts and Variance % as a percentage with one decimal.
 
-<!-- dax-check: measure -->
+
 ```
 Budget = SUM ( BudgetLine[BudgetAmount] )
 Actual = [GL Amount]
@@ -69,7 +69,7 @@ c. Write three rules, with **Number** values: at least 0.05, an arrow pointing u
 
 a. Add the measure below, and format it as an amount.
 
-<!-- dax-check: measure -->
+
 ```
 Flexed Budget =
 VAR CommissionBudget =
@@ -95,7 +95,7 @@ Read the measure one variable at a time. CommissionBudget is the commission budg
 a. Add the measure below, and format it as an amount.
 b. Add Flexed Budget and Variance to Flexed to the matrix.
 
-<!-- dax-check: measure -->
+
 ```
 Variance to Flexed = [Actual] - [Flexed Budget]
 ```
@@ -116,7 +116,7 @@ The Warehouse has a depreciation account with actual expense and no budget at al
 a. Add the measures below, formatting the first three as amounts and Remaining % as a percentage with one decimal.
 b. On the Budget page, add a table visual with CostCenterName, Variance, Volume Effect, Classification Effect, Remaining Variance, and Remaining %, filtered to Operating Expense as the matrix is.
 
-<!-- dax-check: measure -->
+
 ```
 Volume Effect = [Flexed Budget] - [Budget]
 Classification Effect =
@@ -135,7 +135,7 @@ a. Add a table visual with YearMonth from Date and Variance to Flexed, filtered 
 b. With the table selected, choose **Home > New visual calculation**.
 c. Type the formula below in the formula bar, and click **Back to report**.
 
-<!-- dax-check: skip -->
+
 ```
 YTD Variance = RUNNINGSUM ( [Variance to Flexed] )
 ```
@@ -147,7 +147,7 @@ The year-to-date column climbs in January, falls through June, climbs again in J
 a. In DAX query view, open the **Tests** tab, and add the query below at the end.
 b. Run it, and save the report.
 
-<!-- dax-check: query -->
+
 ```
 // Test 4: the 2026 operating expense budget and actual must equal Chapter 7's
 EVALUATE
@@ -164,17 +164,8 @@ CALCULATETABLE (
 
 The budget equals the operating-expense budget lines of Chapter 7, including the lines without a cost center that its Budget Table left out, and the actual amount equals the operating expense of Tutorial 14.3. The flexed budget differs from the budget by exactly the change in the commission budget.
 
-<!-- notes: ch15.t2 -->
-<!-- Tutorial 15.2 expected values (SQL twins; checked in Desktop 2.158's engine on the CR15 reference model): BudgetLine 2026 without
-     Balance Sheet: Revenue 103,974,558.70 (2,463 lines, CC Sales), COGS 55,159,897.72 (CC Manufacturing), Operating Expense category
-     8,318,595.27 incl. Debt Interest Schedule 28,946.47 (account 7030, AccountSubType Other Expense); opex by AccountSubType
-     8,289,648.80. 2026 opex by cost center (budget / actual / variance %): (Blank) 2,024,273.70 / 2,040,916.48 / +0.8%; Administration 659,199.36 / 546,710.11 / -17.1%; Customer Service 230,151.96 / 221,422.90 / -3.8%; Design Services 558,149.42 / 534,250.28 / -4.3%; Executive 854,857.56 / 820,566.24 / -4.0%; Marketing 286,786.93 / 276,150.82 / -3.7%; Purchasing 385,041.96 / 370,153.16 / -3.9%; Research and Development 203,993.58 / 194,798.15 / -4.5%; Sales 2,734,179.05 / 1,018,872.21 / -62.7%; Warehouse 353,015.28 / 447,856.23 / +26.9%; total 8,289,648.80 / 6,471,696.58. Commission rate 2,264,973.29 / 103,974,558.70 = 2.1784%
-     (the same in every month); product revenue 28,543,076.08; flexed commission 621,780.04 (Chapter 7); Sales flexed budget
-     1,090,985.80 (other opex 469,205.76 + 621,780.04). Volume effect -1,643,193.25; depreciation 6130: budget 272,578.56 all
-     Administration, actual 170,749.92 Administration and 101,828.64 Warehouse; classification +101,828.64 / -101,828.64, total 0.
-     Remaining: Warehouse -6,987.69 (-2.0%), Administration -10,660.61 (-1.6%), Sales -72,113.59 (-6.6%), others as above, (Blank)
-     +16,642.78; total -174,758.97. Monthly variance to flexed (engine; the rate is applied month by month): Jan +99,620.67, Feb -36,350.15, Mar -43,925.89, Apr -34,491.81, May -38,383.26, Jun -39,824.69, Jul +98,203.74, Aug -36,397.02, Sep -37,008.46, Oct -37,116.99, Nov -36,459.18, Dec -32,625.93 (above the flexed budget only in January and July, the months with three pay dates); YTD +99,620.67 in January, -93,355.12 in June, +4,848.62 in July, -174,758.96 in December. Test 4: 8,289,648.80; 6,646,455.55;
-     6,471,696.58. -->
+
+
 
 **Checkpoint.** Before you move on, confirm the following:
 

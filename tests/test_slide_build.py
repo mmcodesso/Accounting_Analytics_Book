@@ -438,7 +438,7 @@ class SourceAndPreviewTests(unittest.TestCase):
                  patch.object(Path, "touch", side_effect=lambda: events.append("touch")):
                 build_all.preview(root, data, "fake-quarto", "chapter-02")
             self.assertEqual(["prepare", "prepare", "touch"], events)
-            checks.assert_called_once_with(root, data)
+            checks.assert_called_once_with(root, data, "chapter-02")
             process.terminate.assert_not_called()
             stop.set.assert_called_once()
 

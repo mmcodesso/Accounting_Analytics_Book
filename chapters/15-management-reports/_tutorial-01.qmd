@@ -38,7 +38,7 @@ Steps is a disconnected table: it has no relationship to any other table. Its ro
 a. Select the **Key Measures** table, and choose **Modeling > New measure**.
 b. Type the measure below, and format it as an amount.
 
-<!-- dax-check: measure -->
+
 ```
 Gross to Net =
 SWITCH (
@@ -101,13 +101,8 @@ d. Drill through on the Harbor Collection Promotion, and compare its effective d
 
 ![A Report-Page Tooltip.](/visuals/svg/fig-15-05-promotion-tooltip.svg){#fig-15-05 fig-alt="A mock of the promotions bar chart with the pointer on the Furniture Seasonal Promotion bar. A small tooltip page floats beside the pointer, showing the promotion's discounts by month as a column chart, from September to December 2026."}
 
-<!-- notes: ch15.t1 -->
-<!-- Tutorial 15.1 expected values (SQL twins; the measures checked in Desktop 2.158's engine on the CR15 reference model):
-     PromotionProgram 9 rows; 25,825 of 27,933 lines have no promotion. Fiscal 2026 gross to net: List Amount 33,589,137.45;
-     price lists and overrides -3,470,607.31; promotions -362,110.06 (Discounts 362,110.75; 0.69 of line rounding); total 29,756,420.08.
-     2026 discounts by promotion: 8 Furniture Seasonal 296,053.58 (576 lines); 7 Harbor Collection 30,478.57 (68); 9 Design Trade Customer 28,057.57 (88); 6 Wholesale Customer (2025) 6,858.14 (54); 5 Textiles Seasonal (2025) 662.89 (10). Promotion 8 by
-     invoice month: 2026-09 95,996.97 (167 lines); 10 136,935.59 (249); 11 51,965.03 (119); 12 11,155.99 (41); 160 lines after
-     2026-10-31. Promotion 7 effective 2026-03-01 to 2026-02-28, invoiced 2026-03-07 to 2026-08-08. -->
+
+
 
 **Checkpoint.** Before you move on, confirm the following:
 

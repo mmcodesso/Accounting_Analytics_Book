@@ -187,7 +187,7 @@ a. Copy the query of Step 4 to the end of the script, and change its comment to 
 b. Delete the last line of the copy, `ORDER BY Month;`, and add a semicolon at the end of the line `WHERE MonthsInWindow = 12`.
 c. Add the lines `DROP VIEW IF EXISTS MonthlyLaborEfficiency;` and `CREATE VIEW MonthlyLaborEfficiency AS` above `WITH`, so that the statements read as below.
 
-   <!-- sql-check: view -->
+
 
    ```sql
    -- Tutorial 11.3: the measure saved as a view

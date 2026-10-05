@@ -301,11 +301,13 @@ def verify_pptx(path: Path, *, expected_notes: int = 1, expected_slides: int | N
     return errors
 
 
-def verify_outputs(root: Path, manifest: dict, site: Path | None = None) -> list[str]:
+def verify_outputs(root: Path, manifest: dict, site: Path | None = None,
+                   build_root: Path | None = None) -> list[str]:
     errors: list[str] = []
-    html_root = Path(site) if site else root / "slides/_build/revealjs"
+    staging = build_root or root / "slides/_build"
+    html_root = Path(site) if site else staging / "revealjs"
     deck_root = html_root / "slides" if site else html_root
-    pptx_root = deck_root if site else root / "slides/_build/pptx"
+    pptx_root = deck_root if site else staging / "pptx"
     for chapter in active_chapters(manifest, public_only=site is not None):
         identifier = chapter["id"]
         html_path = deck_root / identifier / "index.html"

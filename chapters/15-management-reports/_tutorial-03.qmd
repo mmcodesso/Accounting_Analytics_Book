@@ -42,7 +42,7 @@ The Date table now filters five fact tables: the invoice lines, the ledger, the 
 
 a. Add the measures below to the Key Measures table, formatting the hours as whole numbers.
 
-<!-- dax-check: measure -->
+
 ```
 Manufacturing Hours =
 CALCULATE (
@@ -51,7 +51,7 @@ CALCULATE (
 )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Direct Hours =
 CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Direct Manufacturing" )
@@ -59,7 +59,7 @@ Indirect Hours =
 CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Indirect Manufacturing" )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Overtime Hours =
 CALCULATE (
@@ -74,7 +74,7 @@ Manufacturing hours are the regular and overtime hours of direct and indirect ma
 
 a. Add the measures below, formatting Standard Hours and Standard Hours to Cut-off as whole numbers and the ratio with two decimals.
 
-<!-- dax-check: measure -->
+
 ```
 Standard Hours =
 SUMX (
@@ -83,7 +83,7 @@ SUMX (
 )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Standard Hours to Cut-off =
 VAR LastTimeRecord =
@@ -92,7 +92,7 @@ RETURN
     CALCULATE ( [Standard Hours], KEEPFILTERS ( 'Date'[Date] <= LastTimeRecord ) )
 ```
 
-<!-- dax-check: measure -->
+
 ```
 Hours per Standard Hour = DIVIDE ( [Manufacturing Hours], [Standard Hours to Cut-off] )
 ```
@@ -104,7 +104,7 @@ Standard hours are the hours the standards allow for the units completed, Chapte
 a. Add the measure below, with two decimals.
 b. Add a page named `Plant`, and add a line chart with YearMonth on the **X-axis** and Hours per Standard Hour TTM on the **Y-axis**, filtered to the years 2024 to 2026.
 
-<!-- dax-check: measure -->
+
 ```
 Hours per Standard Hour TTM =
 VAR Window =
@@ -129,7 +129,7 @@ a. Add a table visual with YearMonth, Manufacturing Hours, Standard Hours to Cut
 b. Choose **Home > New visual calculation**, type the formula below, and click **Back to report**.
 c. Compare the two trailing columns from December 2024 to December 2026.
 
-<!-- dax-check: skip -->
+
 ```
 TTM (visual) = DIVIDE (
     MOVINGAVERAGE ( [Manufacturing Hours], 12 ),
@@ -151,7 +151,7 @@ a. Delete the table of Steps 8 and 9, which served only for the comparison.
 b. Add a card visual with Hours per Standard Hour TTM and a second measure, written below, that holds the 2024 level for comparison.
 c. Filter the card to the years 2024 to 2026, like the line chart.
 
-<!-- dax-check: measure -->
+
 ```
 Hours per Standard Hour 2024 =
 CALCULATE ( [Hours per Standard Hour], REMOVEFILTERS ( 'Date' ), 'Date'[Year] = 2024 )
@@ -164,7 +164,7 @@ The card sets the latest trailing figure beside the 2024 level, the KPI with its
 a. Add a clustered bar chart of Direct Hours by WorkCenterName, with a visual filter on 2026.
 b. Add a clustered column chart with JobTitle on the **X-axis**, Year on **Legend**, and the Overtime Share measure below on the **Y-axis**, filtered to the years 2024 to 2026 and to the job titles Assembler, Machine Operator, and Quality Technician.
 
-<!-- dax-check: measure -->
+
 ```
 Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 ```
@@ -190,7 +190,7 @@ e. Copy the navigator to the top of each visible page, and test it by holding Ct
 a. In DAX query view, open the **Tests** tab, add the query below, and run it.
 b. Save the report.
 
-<!-- dax-check: query -->
+
 ```
 // Test 5: hours per standard hour by year must equal Chapter 11's December figures
 EVALUATE
@@ -205,14 +205,8 @@ SUMMARIZECOLUMNS (
 
 The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, which shows that the model, the visuals, and the queries of Part III agree.
 
-<!-- notes: ch15.t3 -->
-<!-- Tutorial 15.3 expected values (SQL twins; checked in Desktop 2.158's engine on the CR15 reference model): LaborTimeEntry
-     68,859 rows (Direct 51,117, Indirect 11,702, NonManufacturing 6,040), last WorkDate 2026-12-11; 51,097 direct rows match an
-     operation; ProductionCompletionLine 17,352 rows, 83 items. Test 5: 2024 83,637 / 70,871 / 1.18; 2025 93,391 / 66,109 / 1.41; 2026 101,237 / 66,998 / 1.51. TTM (measure) from 2024-12: 1.180, 1.121, 1.195, 1.269, 1.345, 1.392, 1.435, 1.407, 1.412, 1.396, 1.399, 1.360, 1.413 (2025-12), 1.440, 1.441, 1.457, 1.464, 1.447, 1.470, 1.508, 1.492, 1.494, 1.544, 1.528, 1.511 (2026-12).
-     Visual calculation on an axis starting 2025-01: 1.375, 1.554, 1.611, 1.592, 1.604, 1.495, 1.463, 1.494, 1.498, 1.470, 1.418, 1.413 (equal to the measure from 2025-12). 2026 direct hours by work center: Packing 33,026.9; Assembly 12,777.0; Finishing and Test 10,480.1; Cutting 4,856.0; Quality Assurance 1,602.0; (Blank) 22.1 (direct lines without an operation). Overtime share by
-     job title, 2024 to 2026: Assembler 11.9% to 20.1%; Machine Operator 11.8% to 19.6%; Quality Technician 11.1% to 19.5%; plant
-     0.116, 0.167, 0.198. The card without a year filter is (Blank): its window ends 2027-12, past the time records; filtered to
-     2024-2026 or to 2026 it shows 1.51, and the 2024 measure 1.18. -->
+
+
 
 **Checkpoint.** Before you hand the package to its readers, confirm the following:
 

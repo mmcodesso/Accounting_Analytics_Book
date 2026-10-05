@@ -78,7 +78,7 @@ b. Choose **Modeling > New table**, and create the Date table with the formula b
 c. Set the Date column's type to **Date**, sort MonthName by MonthNumber, and mark the table as a date table.
 d. In **Model view**, relate JournalEntry to the **Date** table on PostingDate, and to **Employee** on ApprovedByEmployeeID.
 
-<!-- dax-check: table -->
+
 ```
 Date =
 ADDCOLUMNS (
@@ -99,7 +99,7 @@ The relationship to Employee runs through the approver, so a visual of entries b
 a. Create a Key Measures table with **Home > Enter data**, as in Tutorial 14.2, and add the two measures below.
 b. On a page named `Journal Entries`, add a matrix with RiskScore on **Rows** and Entries and Entry Amount as **Values**.
 
-<!-- dax-check: measure -->
+
 ```
 Entries = COUNTROWS ( JournalEntry )
 Entry Amount = SUM ( JournalEntry[TotalAmount] )
@@ -154,7 +154,7 @@ a. Add a page named `Validation` with cards for Entries, Entry Amount, and the s
 b. In DAX query view, rename the first query tab `Tests`, enter the query below, and run it.
 c. Save the file.
 
-<!-- dax-check: query -->
+
 ```
 // Test 1: the journal entries equal their postings in the ledger
 EVALUATE
@@ -168,13 +168,8 @@ ROW (
 
 The entries' totals equal the debits and the credits of their postings, the reconciliation Chapter 8 performed before its tests and Chapter 12 performed in SQL. The population the tests run on is complete, so an entry that escapes them does so because of the rules, not because it is missing.
 
-<!-- notes: ch16.t1 -->
-<!-- Tutorial 16.1 expected values (SQL twins; checked in Desktop 2.158's engine on the AM16 reference model): JournalEntry 851
-     rows; flags Weekend 17, Backdated 6, SelfApproved 7, AboveLimit 9, RoundAmount 4 (43 exceptions in JE Exceptions); RiskScore
-     0: 818 entries (12,566,063.49), 1: 25 (102,803,775.20), 2: 7 (673,579.00), 3: none, 4: 1 (13,817,192.58, JE-2024-000001,
-     Opening). Score 2: JE-2024-000002 Rent, JE-2024-000103 Debt Reclass, JE-2025-000001 Debt Principal Payment, JE-2025-000002 Interest Payment, JE-2026-000001 Debt Reclass, JE-2026-000002 Debt Principal Payment, JE-2026-000003 Interest Payment.
-     JournalLines 2,821 rows; JE-2024-000001 has 18 lines, debits = credits = 13,817,192.58. Test 1: 851 / 129,860,610.27 /
-     129,860,610.27 / 129,860,610.27. No approver has a null MaxApprovalAmount. -->
+
+
 
 **Checkpoint.** Before you add the other processes, confirm the following:
 

@@ -26,13 +26,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the reconciliation queries and a short explanation of the difference.
 
-<!-- notes: ch10.ex1 -->
-<!-- Instructor notes, Exercise 10.1: the four-table join returns 27,933 rows, one per invoice line. Fiscal 2026 invoice lines by group:
-     Furniture 17,395,054.38, Lighting 5,997,536.93, Textiles 3,278,211.11, Accessories 1,872,273.66, Services 1,213,344.00; total
-     29,756,420.08, Chapter 6's control total. Ledger, SalesInvoice postings in fiscal 2026: 4010 17,398,287.56, 4020 5,998,649.16, 4030 3,278,211.11, 4040 1,872,510.62, 4080 1,213,344.00; total 29,761,002.45. The difference of 4,582.37 is three invoices dated in late 2025
-     and posted on 2026-01-01: SI-2026-013741 (dated 2025-11-29, adding 1,112.23 to 4020), SI-2026-013742 (2025-12-04, 3,233.18 to 4010), and SI-2026-013743 (2025-12-03, 236.96 to 4040)
-     (Exercise 6.1; Exercise 5.2's cutoff invoices). Freight is billed on the invoice
-     header, not on the lines, so it posts to 4050 without a line to match. -->
+
+
 
 
 **Exercise 10.2: Tracing a Sale from the Ledger to Its Documents**
@@ -53,14 +48,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the trace queries and a half-page memo.
 
-<!-- notes: ch10.ex2 -->
-<!-- Instructor notes, Exercise 10.2: SI-2025-007947 (SalesInvoiceID 7947, dated 2025-03-05, customer 135 Sullivan-Mcdonald) posts four
-     rows on 2025-03-05: GLEntry 126311 debit 787.48 to 1020 Accounts Receivable; 126312 credit 688.42 to 4010 Sales Revenue - Furniture
-     with SourceLineID 10645; 126313 credit 51.00 to 4050 Freight Revenue; 126314 credit 48.06 to 2050 Sales Tax Payable. Debits 787.48 =
-     credits 787.48 = GrandTotal (SubTotal 688.42, freight 51.00, tax 48.06). Line 10645 is the Alder Desk Ash Whitewash 84 in, 2 units at
-     344.21. Requirement (3): 9,525 SalesInvoice postings of fiscal 2026 carry a SourceLineID, and none is orphaned (the anti-join returns no
-     rows); the header-level rows (receivable, freight, tax) have no SourceLineID. Trap: a join on SourceDocumentID alone returns 38 rows
-     from 11 document types for ID 7947; the join must also require SourceDocumentType = 'SalesInvoice'. -->
+
+
 
 
 ### Managerial Accounting Exercises
@@ -85,10 +74,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the queries and a short note for the sales manager.
 
-<!-- notes: ch10.ex3 -->
-<!-- Instructor notes, Exercise 10.3: 5,819 orders from 211 customers (9 customers have none); overall average order value 15,036.96.
-     Highest averages: customer 136 Glenn-Estrada (54 orders, 26,202.95), 169 Miller-Hernandez (50, 25,394.03), 78 Eaton, Robertson and Grant (44, 25,350.26). Grouping by name returns one row fewer: the two Brown LLCs, customer 5 (Design Trade, 20 orders, average 10,258.01) and customer 173 (Strategic, 51 orders, 24,276.43), merge into one row of 71 orders averaging 20,327.58. (The two Smith Ltd
-     customers do not merge in this query, because only customer 170 has orders.) By segment: Strategic 1,136 orders, 23,386.13; Wholesale 2,771, 15,993.96; Design Services 239, 14,742.20; Design Trade 956, 10,062.99; Small Business 717, 4,840.43. -->
+
+
 
 
 **Exercise 10.4: Purchase Price Variance by Supplier**
@@ -111,15 +98,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the queries and a half-page memo.
 
-<!-- notes: ch10.ex4 -->
-<!-- Instructor notes, Exercise 10.4: GL variance postings of fiscal 2026 (descriptions ending in "purchase variance") net 109,566.58.
-     Largest suppliers: 65 Bell, Pruitt and David 6,158.65; 56 Velasquez-Baxter 5,170.56; 100 Collins-Johnson 4,931.16; 17 Brooks, Johnson and Olson 4,719.17; 16 Berger, Stanley and Cooper 4,410.07. The line-level recalculation for invoices dated in 2026 is 109,566.20,
-     0.38 from the ledger because each posting is rounded; by supplier the two agree to within about 0.22. Of 19,866 fiscal 2026 invoice lines,
-     12,413 are billed above the order price, 7,286 below, and 167 at it; the differences range from 1.5% below to 2.6% above. Amount
-     invoiced against orders (SUM of Quantity times the invoice UnitCost) and variance: 2024 13,491,998 and 64,632 (0.48%); 2025 17,468,202 and 82,377 (0.47%); 2026 21,612,260 and 109,566 (0.51%); SUM(LineTotal) differs by 0.80 to 1.99 a year (the rounding of each line). The rate is steady, so the
-     account grew because purchases grew, not because suppliers raised their billing relative to the order price. The measure is an invoice
-     price variance: a price rise already built into the purchase-order prices would not show in it. The rest of account 5060 is
-     nonrecoverable purchase tax (66,444.78 in 2026). -->
+
+
 
 
 ### Auditing Exercises
@@ -146,18 +126,8 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Deliverable.** A script with the profile and the anti-join tests, and a table of findings with dispositions.
 
-<!-- notes: ch10.ex5 -->
-<!-- Instructor notes, Exercise 10.5: (1) Profile by LaborType: Direct Manufacturing 51,117 entries, 51,114 with a WorkOrderOperationID, 64 employees, 2024-01-17 to 2026-12-11; Indirect Manufacturing 11,702, none with an operation, 65 employees, 2024-01-15 to 2026-12-04; NonManufacturing 6,040, none, 12 employees, 2024-01-01 to 2026-12-11. Expected: indirect and non-manufacturing time has no operation by design, and the manufacturing time starts in the January 2024 start-up month. Not expected: 3 direct entries without an operation (Exercise 9.6), and the end on 11 December 2026 (the open pay periods of Tutorial 10.3), a timeliness limit. Indirect time ends a week earlier (2026-12-04): the records after it hold only direct and non-manufacturing time. (2) six GLEntry rows with SourceDocumentType PayrollPayment point to no payment: GLEntryIDs 7231 and
-     7232 (2024-01-19, SourceDocumentID 1), 12521 and
-     12522 (2025-01-03, SourceDocumentID 2646), 18069 and
-     18070 (2026-01-02, SourceDocumentID 5420), each pair a 7,971.10 debit "Clear accrued payroll" and a 7,971.10 credit "Disburse payroll cash"; debits and
-     credits 23,913.30 each. They are ledger postings without a supporting document (planted missing payroll payment), an integrity failure
-     to investigate. (3) Nine customers have no orders, all with IsActive 0, an expected condition. (4) Three work orders have no
-     operations, WO-2024-000001, WO-2025-005504, and WO-2026-010075, all Closed (planted), a process exception: a closed work order should
-     have operations. They do have labor: 18 direct time entries. (5) 17 Direct Manufacturing entries (42.1 hours) carry a
-     WorkOrderOperationID that matches no operation: 4 on WO-2024-000001, 6 on WO-2025-005504, and 7 on WO-2026-010075, the work orders of
-     requirement (4). An orphaned key, not a missing one, so an IS NULL filter alone would miss them; an integrity failure to correct.
-     (Three more direct entries have no WorkOrderOperationID at all, Exercise 9.6.) -->
+
+
 
 
 **Exercise 10.6: Suppliers That Share an Employee's Address**
@@ -179,17 +149,3 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 (5) Write a short memo (one half page) to the audit senior with the findings and the next procedures you recommend.
 
 **Deliverable.** A script with the queries and a half-page memo.
-
-<!-- notes: ch10.ex6 -->
-<!-- Instructor notes, Exercise 10.6: six suppliers share an address with an employee (planted related-party matches): supplier 1
-     Anderson-Noble with employee 22 (Assembler), 2
-     Watson, Mitchell and Chen with 46 (Machine Operator), 3
-     Lucas, Green and Richardson with 33 (Assembler), 4
-     Stokes, Mann and Keller with 119 (Designer), 5
-     Nelson-Rocha with 65 (Quality Technician), and 6
-     Wright, Sanchez and Garza with 20 (Assembler); all six are approved. Supplier invoices (all dated through 2026-12-31): 1 390 invoices 377,401.03; 2 327 467,847.58; 3 392 400,322.61; 4 208 703,106.56; 5 245 1,227,176.20; 6 373 388,893.73. Payments through 2026-12-31: 1 392 payments 354,958.21; 2 322, 431,269.26; 3 387, 366,307.32; 4 214, 690,304.23; 5 234, 563,122.42; 6 368, 340,084.99. No two employees share an
-     address, so each supplier matches one employee. Joining invoices and payments in one query fans out (152,880 rows for supplier 1, both dated through 2026-12-31).
-     Supplier 5 has 664,053.78 of invoices still open at 2026-12-31, including V0005-2024-003160 (360,000) and V0005-2026-021692 (280,000), the invoices
-     that the Debt Reclass entries moved (Chapter 8). Shared customer names: Brown LLC (customers 5, Design Trade, and 173, Strategic) and
-     Smith Ltd (170 and 220, both Small Business). An exact join misses addresses written differently (Chapter 2) and cannot prove a
-     relationship; the next steps are vendor setup records, conflict-of-interest declarations, and the employees' purchasing roles. -->

@@ -106,21 +106,3 @@ A.  The O2C group is a newer part of the database and uses more modern design pr
 B.  The O2C group captures a complex transactional cycle spanning pricing, ordering, shipping, invoicing, commissions, returns, and cash collection, each of which requires its own set of tables.
 C.  The Master Data group contains errors that should have been stored in additional tables.
 D.  The number of tables is arbitrary and has no relationship to the complexity of the business process.
-
-<!-- Answer key, Chapter 3 (for instructors; HTML comments are removed from every rendered format):
-     1 A, 2 B, 3 B, 4 D, 5 C, 6 C, 7 A, 8 C, 9 D, 10 C, 11 A, 12 B, 13 A, 14 D, 15 B.
-     1 A: a primary key uniquely identifies each row and cannot be duplicated or blank.
-     2 B: CustomerID in SalesOrder refers to the Customer table's primary key, so it is a foreign key.
-     3 B: a single bar at one end and a crow's foot at the other is one-to-many.
-     4 D: SalesOrderLine resolves the many-to-many relationship between orders and items.
-     5 C: the Manufacturing group holds the work orders, completions, and closes with cost and variance data.
-     6 C: ParentAccountID points to another row of the same table.
-     7 A: a trial balance sums the GLEntry rows by account, labeled from the Account table.
-     8 C: undeclared relationships still join, but nothing enforces them, so they must be tested.
-     9 D: referential integrity means every foreign key value matches an existing primary key.
-     10 C: the join returns one row per order line, 45 rows.
-     11 A: the chart of accounts hierarchy is a self-referencing table.
-     12 B: the target table depends on SourceDocumentType, so no single foreign key can describe it.
-     13 A: a relational database organizes tables connected by primary and foreign keys.
-     14 D: an INTEGER column stores whole numbers such as 4500.
-     15 B: the O2C cycle has many stages, each needing its own tables. -->

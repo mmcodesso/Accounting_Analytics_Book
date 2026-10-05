@@ -1,12 +1,13 @@
 # Chapter presentations
 
 This independent Quarto project renders one chapter source to Reveal.js and
-PowerPoint. All 19 numbered chapters are approved for the public presentation
-inventory. Each deck includes public teaching notes and both output formats.
+PowerPoint. The inventory contains all 19 numbered chapters. Chapter 1's 47-slide
+storytelling revision was approved on 5 October 2026; the other decks retain their approval.
+Each deck includes public teaching notes and both output formats.
 
 | Chapter | Status | Teaching slides | Module dividers | Total including opening |
 |---|---|---:|---:|---:|
-| 1 | Approved | 33 | 5 | 39 |
+| 1 | Approved | 41 | 5 | 47 |
 | 2 | Approved | 35 | 4 | 40 |
 | 3 | Approved | 40 | 4 | 45 |
 | 4 | Approved | 30 | 4 | 35 |
@@ -30,7 +31,38 @@ The intended audience has introductory financial and managerial accounting
 knowledge. No prior analytics, programming, or accounting information systems
 course is required.
 
-## Teaching Chapter 1
+## Default teaching structure
+
+Use a recurring accounting investigation within each module. The stages guide
+teaching, rather than impose six slides or a fixed chapter length.
+
+| Stage | Purpose | Observable student work |
+|---|---|---|
+| Situation | Business event, decision maker, consequence | Recognize the accounting context |
+| Question | Question, population, period, measure | Clarify what must be explained or decided |
+| Evidence | Relevant records, figures, results | Observe, compare, locate, predict |
+| Method | Needed concept and visible intermediate steps | Follow a worked process |
+| Check | Verify understanding or a result | Calculate, match, diagnose, explain |
+| Interpretation | Supported conclusion, limits, next evidence | Produce a qualified response |
+
+Repeat the sequence where useful. Concept chapters emphasize comparisons and
+processes, software chapters intermediate results and troubleshooting, and
+cases competing explanations and decisions. These teaching stages differ from
+the book's six-stage analytical workflow.
+
+Each teaching slide has one principal purpose, an evidence source or student
+task, and public notes stating **Purpose, Evidence, Timing, Narration, Expected
+response, Misconception, and Transition**. Ordinary explanations allow 45–90
+seconds; activities state a longer practical timing. Every activity names an
+observable output. Keep its instructions visible throughout student work.
+
+Selected checks use a separate response slide, preserving the pause in both
+formats. Fragments pace explanations in Reveal, while essential reasoning stays
+complete in static PowerPoint. Do not hide a required instruction in a fragment
+or rely on animation inside a diagram. Use one teaching purpose per figure view,
+with consistent link meanings and attribution.
+
+## Chapter 1 recording modules
 
 The five modules can be taught together or recorded separately:
 
@@ -55,6 +87,38 @@ The Furniture exhibit previews Chapter 6's public calculation. Its measure is
 gross profit or reveal the diagnostic explanation. The posting trace checks one
 revenue credit, not a complete journal entry. Its displayed values and identifiers
 come from the prepared public facts through the `slide.trace` variables.
+
+The 2026 margin comparison and **5 March 2025** navigation trace have distinct
+evidence boundaries. The trace verifies one invoice line against one revenue
+credit and provides no diagnosis of the 2026 decline. Review the complete
+storyboard and original-slide dispositions in
+[the implementation record](reviews/chapter-01-storytelling.md).
+
+Focused, dataset-free authoring checks and renders:
+
+```text
+python scripts/build_all.py --check --chapter chapter-01
+python scripts/build_all.py --slides-only --chapter chapter-01
+python scripts/build_all.py --preview chapter-01
+```
+
+Explicit authoring refresh, followed by the focused build:
+
+```text
+python scripts/build_all.py --slides-only --chapter chapter-01 --refresh-shared
+```
+
+Focused renders use isolated Quarto output directories before replacing the
+selected chapter. Other decks and approved release bundles remain intact. The
+chapter report is `outputs/build/chapter-01/build-report.json`. Chapter selection
+is rejected for full-site assembly and public export: those operations validate
+the whole inventory. The preview watcher uses selected-chapter checks as well.
+
+`scripts/slides/refresh_storytelling.py` owns supplemental Chapter 1 views and
+native table fragments in `shared/generated/chapter-01/storytelling/`. It reads
+the pinned database only on explicit refresh, verifies its unchanged checksum,
+and records generator, canonical-input, and artifact hashes. The original
+`refresh.py` and the provenance of other chapter generators remain unchanged.
 
 ## Teaching Chapters 2-3
 
@@ -113,6 +177,8 @@ Opt into these treatments on a teaching-slide heading:
 - `.balanced` centers the content beneath the title with more space between points.
 - `.stepwise` reveals paragraphs, list items, or comparison columns in sequence.
 - `.step-rows` reveals table rows in sequence, keeping the heading and first row visible.
+- A `.persistent` fenced div keeps an accounting qualification or instruction
+  visible throughout a stepped explanation. PowerPoint includes it as native text.
 
 Omit the step class when students need the complete exhibit or instructions at
 once. Keep a brief delivery cue in the public notes for slides taught in steps.

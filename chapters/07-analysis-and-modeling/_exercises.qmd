@@ -24,12 +24,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A backtest table by item group, the chosen methods with reasons, and a forecast of the first quarter of 2027 by item group with ranges.
 
-<!-- notes: ch07.ex1 -->
-<!-- Instructor notes, Exercise 7.1: MAPE over 2026 Q1-Q4, fitted on 2024-2025 (trend / mean / same quarter last year): Furniture 13.8% / 4.6% / 4.2%; Lighting 5.5% / 9.5% / 8.1%; Textiles 6.0% / 2.7% / 8.4%; Accessories 8.0% / 5.6% / 5.7%; Services 18.4% / 14.1% / 17.3%. No single
-     method wins: the mean or the same quarter last year suits Furniture, the trend suits Lighting, whose revenue grew in 2026, and the mean
-     suits Textiles, Accessories, and Services (which is volatile under every method). Q1 2024 is depressed by the start-up month, which
-     biases the trend and the Q1 same-quarter forecast for 2025; excluding it is defensible. 2026 actual Q1 by group: Furniture 4,354,123, Lighting 1,569,381, Textiles 816,552, Accessories 475,577, Services 331,220. Mean of all twelve quarters as a reference forecast for
-     2027 Q1: Furniture 4,212,825 (range of quarters 3,181,390-4,600,821), Lighting 1,403,332, Textiles 814,991, Accessories 479,439, Services 293,317. Company quarterly totals 2024-2026: 5,796,664 / 7,174,741 / 6,907,655 / 7,434,663 / 7,340,014 / 7,376,263 / 7,349,835 / 7,310,590 / 7,546,852 / 7,654,417 / 7,267,963 / 7,287,188. Tutorial 7.1's company forecast is 7,288,999.66. -->
+
+
 
 
 **Exercise 7.2: Reconciling the Budget to Its Detail**
@@ -52,11 +48,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A reconciliation by account for 2026, the totals for 2024 and 2025, and a half-page memo.
 
-<!-- notes: ch07.ex2 -->
-<!-- Instructor notes, Exercise 7.2: 2026 Budget Table total 165,428,777.99 (348 rows) against BudgetLine revenue, COGS, and operating-expense lines
-     167,453,051.69; difference 2,024,273.70. The difference is exactly the 168 operating-expense BudgetLine rows with a blank CostCenterID,
-     twelve months for each of 14 accounts: 6070 Rent Expense - Warehouse 288,065.60; 6080 Rent Expense - Office 216,179.72; 6090 Utilities 120,547.47; 6100 Insurance 53,709.73; 6110 Office Supplies 78,370.66; 6120 Repairs and Maintenance 126,338.75; 6140 IT and Software 71,904.86; 6150 Marketing and Promotion 359,842.35; 6160 Travel and Entertainment 114,548.06; 6180 Professional Fees 60,447.65; 6190 Bank Fees 42,077.99; 6200 Miscellaneous Administrative 96,328.87; 6210 Warehouse Supplies 107,611.71; 6220 Research and Development 288,300.28. The Budget Table omits these accounts entirely. Gaps in earlier years: 2024 1,884,434.88; 2025 1,948,965.44.
-     BudgetLine is the complete source; a control is a monthly reconciliation of the summary to the detail with a zero-difference check. -->
+
+
 
 
 ### Managerial Accounting Exercises
@@ -83,14 +76,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A break-even model with two sets of fixed costs, a sensitivity table, and a half-page memo.
 
-<!-- notes: ch07.ex3 -->
-<!-- Instructor notes, Exercise 7.3: 2026 revenue 29,756,420.08 (including Services); standard cost of products 15,803,272.88; commissions
-     (GL 6290, excluding close JE-2026-000296) 566,347.93; contribution margin 13,386,799.27; CM ratio 44.99%. Fixed costs: 2026
-     operating-expense budget 8,318,595.27 less commission budget 2,264,973.29 = 6,053,621.98 (the budget is reasonable because salaries,
-     rent, depreciation, and the other recurring accounts came within a few percent of actual, as Tutorial 7.2 showed). Break-even revenue
-     13,456,100.67; margin of safety 16,300,319.41 (54.8%). Adding 5050 Freight-Out 513,133.49, 5060 Purchase Price Variance 176,011.36, and 5080 Manufacturing Variance 2,265,636.88 (total 2,954,781.73): break-even 20,024,043.06, margin of safety 32.7%. Goal Seek for operating
-     income of 4,000,000 under (4): revenue 28,915,315.57; without the added items it would be 22,347,373.18. Treating Services' design staff
-     as fixed and all product standard cost as variable are further simplifications worth naming. -->
+
+
 
 
 **Exercise 7.4: The Product Mix under a Capacity Constraint**
@@ -113,13 +100,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** A Solver model, its Answer and Sensitivity reports, and a half-page recommendation to the operations manager.
 
-<!-- notes: ch07.ex4 -->
-<!-- Instructor notes, Exercise 7.4: 83 manufactured items sold in 2026 (Furniture 54, Lighting 24, Textiles 5); 5 manufactured items had no 2026 sales.
-     Commission rate 1.903%. Hours needed to meet all demand relative to half of 2026 capacity: Cutting 0.79, Assembly 1.09, Finishing and Test 1.07, Packing 0.94, Quality Assurance 0.13. Optimum: total contribution 9,532,535.21 against 9,861,535.80 if all demand were met (a loss
-     of 329,000.59). Only Assembly binds (27,589 hours), with a shadow price of about 166.98 per hour; Finishing uses 14,764 of 15,117 hours.
-     Items reduced: LGT-TBL-0003 (0 of 826.5 units), LGT-FLR-0006 (224.8 of 717.0), FUR-DSK-0011 (0 of 537.9), FUR-TBL-0013 (0 of 364.6), LGT-FLR-0008 (0 of 315.7), LGT-SCN-0011 (0 of 805.0), LGT-FLR-0039 (0 of 642.0): the items with the lowest contribution per Assembly
-     hour. Setup hours are ignored; spread over each item's average 2026 work-order quantity, they leave Assembly the only binding
-     center and raise the contribution lost to about 562,000. -->
+
+
 
 
 ### Auditing Exercises
@@ -144,17 +126,8 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Deliverable.** Two regressions, a table of 2026 expectations and differences, and a half-page memo to your senior.
 
-<!-- notes: ch07.ex5 -->
-<!-- Instructor notes, Exercise 7.5: revenue on invoice count: R2 0.725 with January 2024, 0.432 without it (slope about 3,563 per invoice); the
-     residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot
-     reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954.
-     2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%.
-     The January and February differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its
-     invoice's date except 9 of 27,933 (the invoices dated before their first shipment, Tutorial 2.1; 6 of them in another month). The cause is the
-     customer mix: commission rates run from 1.5% (Wholesale) to 4% (design services), and Wholesale was 62% of January's commission
-     base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%, which one regression slope
-     cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment
-     rows (232, from credit memos) 4,369.54 = GL 566,347.93. -->
+
+
 
 
 **Exercise 7.6: Evaluating Management's Forecast**
@@ -178,19 +151,3 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 (6) Write a memo of half a page that states whether the forecast is consistent with historical experience, the consequences for any estimate or plan that relies on it, what the adjusted forecasts show about the review of planners' changes, and the evidence and explanations you would request from management.
 
 **Deliverable.** A comparison of forecast and actual orders by year and item group, a list of the adjusted forecasts, and a half-page memo.
-
-<!-- notes: ch07.ex6 -->
-<!-- Instructor notes, Exercise 7.6: forecast / orders by year: 2024 about 2.33 (Furniture 2.31, Lighting 2.30, Textiles 2.34, Accessories 2.36); 2025 about 2.57 (2.51 / 2.55 / 2.60 / 2.67); 2026 about 2.88 (2.92 / 2.83 / 2.84 / 2.90). The forecast is consistently more than twice the
-     orders in every group, and the bias grows each year, so it is not consistent with historical experience. 2026 product-group totals:
-     forecast 218,920.6 units, budget 264,493.7 units (higher still), orders 76,023.4, invoiced 76,088.9. Forecast methods in the Table:
-     Seasonal Trend, Planner Adjusted, and Lifecycle Adjusted; the forecast weeks run to February 2027. All 66,496 rows are IsCurrent 1
-     (one version, Current Weekly Plan). Requirement (5): every forecast is within about 10 percent of its baseline (ratios 0.92-1.10)
-     except DemandForecastID 1, 107, and 211, the first forecast week of 2024, 2025, and 2026 (2024-01-01, 2025-01-06, 2026-01-05)
-     for item ACC-MIR-0001 (Foundry Mirror Glass Soft White, Accessories) at warehouse 1, East Distribution Center: ForecastMethod
-     Planner Adjusted, ForecastQuantity 3.1 times BaselineForecastQuantity (23.78 against 7.67, 28.15 against 9.08, 28.06 against 9.05), planner employee 90, Michelle Garcia, a Buyer, and no ApprovedByEmployeeID. They are the only unapproved forecasts in the
-     Table, so the control is the approval of planner adjustments: every other adjustment was approved. The quantities are small, but
-     an unapproved override by a buyer, who also places purchase orders (employee 90 plans most
-     forecasts and created 2,884 purchase orders), is a control exception worth reporting. Consequences: inflated purchasing and
-     production plans, excess inventory and a possible need for an obsolescence reserve, and a budget whose volume cannot be used to evaluate
-     performance (Tutorial 7.2). Evidence to request: the forecasting method and its inputs, the planners' adjustments, and management's own
-     comparisons of forecast with actual. -->

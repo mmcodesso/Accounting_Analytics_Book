@@ -1,0 +1,5 @@
+Furniture's invoice-based margin at standard cost fell from **42.26% in Q3** to **40.78% in Q4 2026**, about **1.48 percentage points**.
+
+We need transaction detail to explain the change and a separate ledger reconciliation to assess financial-statement gross profit.
+
+The **5 March 2025** example verifies one invoice line against one revenue credit. It teaches navigation and provides no explanation for the 2026 decline.
