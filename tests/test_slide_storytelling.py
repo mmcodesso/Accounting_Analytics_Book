@@ -1,6 +1,7 @@
 """Scoped builds preserve other decks; provenance checks require no dataset."""
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -95,6 +96,34 @@ class FocusedBuildTests(unittest.TestCase):
             return 'changed' if path.name == 'checked-credit.svg' else original(path)
         with patch.object(story, '_content_hash', side_effect=changed):
             self.assertTrue(any('checked-credit.svg' in error for error in story.check_fresh(ROOT, manifest)))
+
+    def test_storytelling_inputs_are_fresh_with_lf_or_crlf(self):
+        manifest = {'public_assets': [(story.OUTPUT/'facts.json').as_posix()]}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            paths = set(story.INPUTS + story.GENERATORS + ('_variables.yml',))
+            paths.update((story.OUTPUT/name).as_posix()
+                         for name in story.ASSETS + ('facts.json',))
+            for name in paths:
+                target = root/name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT/name, target)
+            for newline in ('\n', '\r\n'):
+                with self.subTest(newline=repr(newline)):
+                    for name in story.INPUTS:
+                        path = root/name
+                        text = path.read_text(encoding='utf-8')
+                        path.write_bytes(text.replace('\n', newline).encode('utf-8'))
+                    self.assertEqual([], story.check_fresh(root, manifest))
+            # Normalizing newlines must still detect actual input changes.
+            for name in story.INPUTS:
+                with self.subTest(changed=name):
+                    path = root/name
+                    original = path.read_bytes()
+                    path.write_bytes(original + b'changed')
+                    self.assertTrue(any('input_sha256 changed' in error
+                                        for error in story.check_fresh(root, manifest)))
+                    path.write_bytes(original)
 
 
 if __name__ == '__main__':

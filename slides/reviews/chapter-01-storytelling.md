@@ -88,9 +88,13 @@ other chapter outputs, and selected reports cannot overwrite release reports.
 
 ## Acceptance record
 
-Validation completed on 5 October 2026. The detailed results are recorded in
-`outputs/build/chapter-01/validation-summary.json`, with chapter-specific source,
-browser, PowerPoint, and public-reproduction reports in the same directory.
+Validation completed on 5 October 2026. Durable results are preserved in
+[the Chapter 1 acceptance snapshot](chapter-01-acceptance-2026-10-05.json).
+[The earlier all-chapter snapshot](all-chapters-acceptance-2026-10-05.json)
+preserves the prior rollout review; its Chapter 1 record is superseded by this
+revision. Raw source-check, browser, PowerPoint, and public-reproduction reports
+under `outputs/build/chapter-01/` are disposable diagnostics. The approval hashes
+also remain in `slides/manifest.yml`.
 
 - Both formats contain 47 slides, including five module dividers and 41 teaching
   slides. Artifact checks passed for notes, resources, hyperlinks, alt text,

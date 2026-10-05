@@ -6,14 +6,14 @@
     "sha256": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
   },
   "generator_sha256": {
-    "scripts/slides/refresh_storytelling.py": "b64f66e9b2d074241b5f5efcc33eb9ef6e8f3692fc9b6be082563da978fdd113",
+    "scripts/slides/refresh_storytelling.py": "814f0b9c7cba70611fdf62f6a9ee165c19809e6a18dfc68aab8f866521dd89c5",
     "scripts/slides/refresh.py": "a0086332d07a8b7237feec6a54e59102879f1bbea3f76b772070ba03c4a86c04",
     "shared/calculations/foundations.py": "64727f87f0a8a50595735bcd7c05ea0ddefddacc4bc58a1f68ddc662b1920ccd",
     "scripts/figures/ch01.py": "50aca22838b4a23b51b369fde0d7f5d0b4ce94fbf96b43ffeadca6162161368f",
     "scripts/figures/ch03.py": "54dc5f9d782b2389685fcebf1eee5b241fd5cefc1906e760eed6c435d659c89d"
   },
   "input_sha256": {
-    "shared/generated/chapter-01/facts.json": "3b46ba4ed70b787b05d0edd816e1b9a9a30b35bac872a860678d4dd0ba81123c",
+    "shared/generated/chapter-01/facts.json": "76788bd3c8f7d73897028b0a3b9d1606992497afa6cad192ab9824f0492a7d98",
     "shared/generated/chapter-01/source-trace.svg": "81c528937a534b16bd4c272db8970f359a539543ccd43eae6a2fb48d0f054973",
     "shared/generated/chapter-01/salesorder-focus.svg": "8cc79484ea8e69dcd7699786ff26969c334863075a2ee814444bc4d86f0f0866",
     "visuals/src/fig-01-01-analytics-continuum.drawio": "318190b68a957ed6dd49992dff5d09a8dbd8029e4a6568d4644412bbb0d17221",

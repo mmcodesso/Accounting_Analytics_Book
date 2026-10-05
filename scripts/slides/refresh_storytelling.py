@@ -7,6 +7,7 @@ come from the canonical Draw.io files, with a separate presentation geometry.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import math
@@ -46,7 +47,11 @@ ASSETS = tuple(f'{view}.{ext}' for view in VIEWS for ext in ('svg', 'png')) + FR
 
 
 def hashes(root: Path, names: tuple) -> dict:
-    return {name: _content_hash(root / name) for name in names}
+    # These additional text inputs are not covered by the base slide hasher.
+    # Git may convert their line endings between Windows authoring and Linux CI.
+    return {name: hashlib.sha256((root / name).read_text(encoding='utf-8').encode('utf-8')).hexdigest()
+            if Path(name).suffix in {'.json', '.drawio'} else _content_hash(root / name)
+            for name in names}
 
 
 def check_fresh(root: Path, manifest: dict) -> list[str]:

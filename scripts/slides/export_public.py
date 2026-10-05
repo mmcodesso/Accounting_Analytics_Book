@@ -106,8 +106,20 @@ def _validate_destination(root: Path, destination: Path) -> None:
         previous = json.loads(marker.read_text(encoding="utf-8"))
         owned = {entry["path"] for entry in previous.get("files", [])}
         owned.update({"export-manifest.json", "TRANSFER.md"})
+        # Rendering the sanitized bundle creates the same disposable products
+        # as rendering a normal checkout. They are not new source authorities.
+        disposable = (".quarto/", "_book/", "outputs/", "slides/_build/",
+                      "slides/_shared/", "slides/.quarto/")
+        def generated_ignore(path: Path) -> bool:
+            return (path.relative_to(destination).as_posix() in {".gitignore", "slides/.gitignore"}
+                    and path.read_text(encoding="utf-8-sig").strip()
+                    == "/.quarto/\n**/*.quarto_ipynb")
+
         unexpected = [path.relative_to(destination).as_posix() for path in destination.rglob("*")
                       if path.is_file() and path.relative_to(destination).as_posix() not in owned
+                      and path.relative_to(destination).as_posix() != "slides/_variables.yml"
+                      and not path.relative_to(destination).as_posix().startswith(disposable)
+                      and not generated_ignore(path)
                       and not ("__pycache__" in path.parts and path.suffix == ".pyc")]
         if unexpected:
             raise ValueError(f"Untracked files in existing export; preserve them before rebuilding: {unexpected}")

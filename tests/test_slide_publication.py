@@ -218,6 +218,27 @@ class ExportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "inside this repository"):
                 export_public(root, manifest, root / "some-source-folder")
 
+    def test_bundle_can_be_regenerated_after_dataset_free_render(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = fixture(root)
+            destination = export_public(root, manifest)
+            products = ("slides/_build/revealjs/chapter-01/index.html",
+                        "slides/_shared/generated/example.svg", "slides/_variables.yml",
+                        "slides/.quarto/cache.json", "outputs/build/build-report.json",
+                        ".quarto/project-cache.json", "_book/index.html")
+            for relative in products:
+                write(destination, relative, "disposable render product")
+            write(destination, "slides/.gitignore", "/.quarto/\n**/*.quarto_ipynb\n")
+            export_public(root, manifest)
+            self.assertTrue((destination / "slides/chapter-01/index.qmd").is_file())
+            self.assertTrue(all(not (destination / relative).exists() for relative in products))
+            self.assertFalse((destination / "slides/.gitignore").exists())
+            write(destination, "slides/editorial-draft.qmd", "unlisted author work")
+            with self.assertRaisesRegex(ValueError, "Untracked"):
+                export_public(root, manifest)
+            self.assertTrue((destination / "slides/editorial-draft.qmd").is_file())
+
     def test_public_checkout_check_uses_disposable_dataset_free_copy(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp) / "authoring"

@@ -824,7 +824,13 @@
     "scripts/figures/ch16.py",
     "scripts/slides/refresh_storytelling.py",
     "slides/reviews/chapter-01-storytelling.md",
-    "tests/test_slide_storytelling.py"
+    "tests/test_slide_storytelling.py",
+    "scripts/slides/package_release.py",
+    "scripts/slides/verify_published.py",
+    "tests/test_slide_release_tools.py",
+    "slides/reviews/chapter-01-acceptance-2026-10-05.json",
+    "slides/reviews/all-chapters-acceptance-2026-10-05.json",
+    "slides/reviews/editorial-review-2026-10-05.json"
   ],
   "public_book_files": [
     "_quarto.yml",

@@ -5,6 +5,65 @@ PowerPoint. The inventory contains all 19 numbered chapters. Chapter 1's 47-slid
 storytelling revision was approved on 5 October 2026; the other decks retain their approval.
 Each deck includes public teaching notes and both output formats.
 
+## Source files and disposable outputs
+
+Keep everything needed to edit, build, or review the presentations in repository
+source folders. `outputs/` is ignored and contains disposable build products.
+
+| Location | What belongs there |
+|---|---|
+| `slides/chapter-NN/index.qmd` | Slide narrative and all public speaker notes |
+| `slides/theme/` and `slides/filters/` | Presentation styling, reference template, and filters |
+| `slides/manifest.yml` | Chapter inventory, approval, and dependency provenance |
+| `shared/` and `visuals/src/` | Public calculations, fragments, approved generated facts, and figure authorities |
+| `scripts/slides/` and `tests/` | Reusable preparation, validation, and packaging code |
+| `slides/reviews/` | Durable acceptance records and editorial decisions |
+| `slides/_build/` and `outputs/` | Rendered decks, ZIPs, staged source copies, logs, screenshots, and temporary reports |
+
+The public export contains copies of `.qmd`, Python, and other source files for
+manual transfer. Edit their originals in the source folders, then regenerate
+the export. Those copies are never the sole authority. Virtual environments,
+temporary public checkouts, and validation fixtures are also disposable; their
+requirements and preparation code remain in the repository.
+
+The tracked acceptance snapshots preserve the Chapter 1 review and the earlier
+all-chapter review even when temporary reports are deleted. They identify the
+reviewed artifacts and remaining limitations. Automatic builds never rewrite
+these records or approve a new revision. Retain an intentional review record
+when accepting later changes; keep raw logs and screenshots in `outputs/`.
+
+Regenerate the site, public source overlay, and transfer ZIPs from repository
+sources with:
+
+```sh
+python scripts/build_all.py
+python scripts/build_all.py --export-public
+python scripts/slides/package_release.py
+```
+
+The ZIPs are `outputs/chapter-slides.zip` and
+`outputs/chapter-slides-public-source.zip`. Packaging checks the current site
+and export inventory and includes only allowlisted source files. No previous
+ZIP, saved screenshot, or review report is required.
+
+To repeat the dataset-free Chapter 1 render using only the sanitized export:
+
+```sh
+python outputs/public-export/scripts/build_all.py --slides-only --chapter chapter-01
+```
+
+After deployment, compare the public deck, notes, book links, and local runtime
+resources with the local render:
+
+```sh
+python scripts/slides/verify_published.py --chapter chapter-01
+```
+
+This writes a fresh diagnostic report under `outputs/build/chapter-01/`; it
+does not alter the tracked acceptance record or deploy anything.
+
+## Chapter inventory
+
 | Chapter | Status | Teaching slides | Module dividers | Total including opening |
 |---|---|---:|---:|---:|
 | 1 | Approved | 41 | 5 | 47 |

@@ -1,0 +1,163 @@
+{
+  "status": "passed",
+  "sources": [
+    {
+      "chapter": "chapter-13",
+      "source": "chapters/13-power-bi-essentials/_tutorial-02.qmd",
+      "previous_review_sha256": "fb84e61b8de54566b5e8010675b393f701c5368b25d560cd261df4d5190a9260",
+      "reviewed_sha256": "5bc04ffcbe6a168c3103fb3a130188e2ca55f22bc3d78143285f8dc13a6246e3",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-13",
+      "source": "chapters/13-power-bi-essentials/_tutorial-03.qmd",
+      "previous_review_sha256": "c62e3f4d229af2cdcc5cec5ab0dc613cdd091458cc4e26f98d3a94e869c4bd26",
+      "reviewed_sha256": "9f3b7b14cc9cba59d40b0425093be34e9c5e2ac87410cd918c540c1271f28b7d",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-14",
+      "source": "chapters/14-data-models-and-dax/chapter.qmd",
+      "previous_review_sha256": "11bb1e261df8e9810fbae95a14d527c4a472770988417e957d0630e894211bda",
+      "reviewed_sha256": "8fc9b33359a7afb8d275b3759ba0ad4e64e45457241d33c5e23576ae474dfd9d",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-14",
+      "source": "chapters/14-data-models-and-dax/_tutorial-01.qmd",
+      "previous_review_sha256": "b11aaf19608b3149310c0ae0f381125d9cfa0b96399dad245a7dea6d5a482b79",
+      "reviewed_sha256": "57e7b8102cf13fab092ab70581b460e64250505edcbcbccf0272464db33afc9c",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-14",
+      "source": "chapters/14-data-models-and-dax/_tutorial-02.qmd",
+      "previous_review_sha256": "7ce08bbfd96f85d47bd14bcf3e7f00553c0ff6899f4bda75aa33c8477e23cfd4",
+      "reviewed_sha256": "34885ab0c144c446478fab89bdb8d0697b7e5437a28ab939882db09a10bbd541",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-14",
+      "source": "chapters/14-data-models-and-dax/_tutorial-03.qmd",
+      "previous_review_sha256": "a492a4c450134210933768c68337e95d58ad765c241884a4d7e7d16e321abde4",
+      "reviewed_sha256": "cd8d12dfb9800ef4802adb5511e26ac2966ff640d202e3461e029925929576bb",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-15",
+      "source": "chapters/15-management-reports/_tutorial-01.qmd",
+      "previous_review_sha256": "c81b88fdce044356156dac72f242bc70ce3161ccab46f16bea4084d0e91a247c",
+      "reviewed_sha256": "743b9b8bfaf56c90ddc9ddaaaf1c0050b57c3a876ac42100306e3e86439ca1ae",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-15",
+      "source": "chapters/15-management-reports/_tutorial-02.qmd",
+      "previous_review_sha256": "7c6f3e703b276d60f373aeb36b36c167d87c73a189e19289f6381d25bca661a1",
+      "reviewed_sha256": "76fa548564de4d017467a03817135d12ffa1017ef293e776d88e54b74716a20a",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-15",
+      "source": "chapters/15-management-reports/_tutorial-03.qmd",
+      "previous_review_sha256": "643d4772f89e30eee14c7254e34c8cf9db05c0f661a85073fa64b2b07db111b5",
+      "reviewed_sha256": "eac71c34ff23c28da8382613720e780f5e22a17fb6c64fdfb12b97bb13041039",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-16",
+      "source": "chapters/16-audit-monitoring/_tutorial-01.qmd",
+      "previous_review_sha256": "6f2d98b3e0e3d9515d34c3f96e417ce7e803c32913810d206235e8a8d269693b",
+      "reviewed_sha256": "dea4b1990d5389553b59b1c595d1c6e53d5e7eeefb10ed3d498d1001ff931ec6",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-16",
+      "source": "chapters/16-audit-monitoring/_tutorial-02.qmd",
+      "previous_review_sha256": "f17b58397853ee3dc2fa11cc5f3445f1080661fa531201c8687c5e8a4ad75a63",
+      "reviewed_sha256": "8a3cbaf88fe2ab1a6b03375cf86b4f18666b46315e8971b6749ad258cb0eb4a8",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-16",
+      "source": "chapters/16-audit-monitoring/_tutorial-03.qmd",
+      "previous_review_sha256": "22a9dc3c0c69887db116d2762e02613a2fe6bac57a87ea4f4d57fbac15e0590a",
+      "reviewed_sha256": "5d9b91c178677c8711221c21d780601beca5209e0569874c1dab302c7f0fdfd9",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    },
+    {
+      "chapter": "chapter-18",
+      "source": "chapters/18-make-buy-or-reprice/chapter.qmd",
+      "previous_review_sha256": "1840ccaeadcd822d5562b143535ec72a859c03169ce9bf5cbb5c49b56f31a09d",
+      "reviewed_sha256": "0f76da5c99819566244c182fb7ac214d902f18bf8ec84c2de233425218a4b74b",
+      "decision": "Public changes reviewed against the deck. Added starter/naming or procedural clarification to the relevant public activity notes. Slide narrative and visual layout remain unchanged."
+    }
+  ],
+  "notes_updated": [
+    {
+      "chapter": "chapter-13",
+      "slide_id": "ch13-21",
+      "addition": "If students start here, use the Companion Files project from the end of Tutorial 13.1; point it at the local CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix before beginning."
+    },
+    {
+      "chapter": "chapter-13",
+      "slide_id": "ch13-30",
+      "addition": "If students start here, use the Companion Files project from the end of Tutorial 13.2, reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-14",
+      "slide_id": "ch14-10",
+      "addition": "For students joining here, the Companion Files project at the end of Chapter 13 supplies the starting report; reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-14",
+      "slide_id": "ch14-24",
+      "addition": "Store the measures in the table named Key Measures, following the revised tutorial naming. Students joining here can use the Companion Files project at the end of Tutorial 14.1, reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-14",
+      "slide_id": "ch14-33",
+      "addition": "The measure home table is Key Measures. The Companion Files project at the end of Tutorial 14.2 is the starting point for students joining here; reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-15",
+      "slide_id": "ch15-11",
+      "addition": "Use Key Measures as the measure home table. Students joining here can open the Companion Files project at the end of Chapter 14, reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-15",
+      "slide_id": "ch15-20",
+      "addition": "Keep new measures in Key Measures. For students joining here, use the Companion Files project at the end of Tutorial 15.1, reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-15",
+      "slide_id": "ch15-28",
+      "addition": "Keep new measures in Key Measures. The Companion Files project at the end of Tutorial 15.2 supplies the starting report for students joining here; reconnect CharlesRiver.xlsx, refresh, and save Charles River Reports.pbix."
+    },
+    {
+      "chapter": "chapter-16",
+      "slide_id": "ch16-11",
+      "addition": "Name the measure home table Key Measures, as specified in the revised tutorial."
+    },
+    {
+      "chapter": "chapter-16",
+      "slide_id": "ch16-21",
+      "addition": "Use Key Measures as the measure home table. Students joining here can use the Companion Files project at the end of Tutorial 16.1, reconnect CharlesRiver.xlsx, refresh, and save Audit Monitoring.pbix."
+    },
+    {
+      "chapter": "chapter-16",
+      "slide_id": "ch16-31",
+      "addition": "Students joining here need both Companion Files projects: Audit Monitoring at the end of Tutorial 16.2 and Charles River Reports at the end of Chapter 15. Point each at the local CharlesRiver.xlsx, refresh, and save the corresponding .pbix file. Measures remain in Key Measures."
+    },
+    {
+      "chapter": "chapter-18",
+      "slide_id": "ch18-09",
+      "addition": "Extract January 2024 through December 2026. Fit the regression and test cost behavior from February 2024 onward, then explain how including January 2024 and the months with three pay dates affects the interpretation."
+    },
+    {
+      "chapter": "chapter-18",
+      "slide_id": "ch18-15",
+      "addition": "Excel requires the Data Table input cell to be on the same worksheet as the Data Table. Keep the practical-share input used by the cost formulas on that worksheet while testing the assigned 75% to 90% range."
+    }
+  ]
+}

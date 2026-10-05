@@ -1,0 +1,569 @@
+{
+  "record_type": "historical acceptance snapshot",
+  "reviewed_at": "2026-10-05T00:45:44.178155+00:00",
+  "scope": "All 19 chapter decks before the later Chapter 1 storytelling revision",
+  "superseded_chapters": {
+    "chapter-01": "chapter-01-acceptance-2026-10-05.json"
+  },
+  "author_approval": "Recorded in the chapter manifest and original review summaries",
+  "unit_tests": {
+    "passed": 47,
+    "public_bundle_passed": 47
+  },
+  "full_build": "PDF, EPUB, DOCX, Reveal.js, PPTX, then book HTML and assembly passed.",
+  "public_source_render": "All 19 decks rendered without private dataset or instructor tooling",
+  "visual_review": "Author approved all 19 decks. Previously inspected slide layouts remain identical; five revised note sets also passed new browser and native PowerPoint checks.",
+  "unverified": [
+    "Interactive PowerPoint slideshow operation",
+    "Reading order and screen-reader behavior",
+    "GitHub Actions execution and transfer into the actual public repository",
+    "Power BI Desktop tutorial execution was not repeated for slide review"
+  ],
+  "narrow_screen_limitation": "Canvas fits portrait phones, but type is small; use landscape/full screen.",
+  "dataset_checksums": {
+    "status": "unchanged",
+    "sha256": {
+      "sqlite": "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c",
+      "xlsx": "185d42bd069fad177fae23c5e30df93edc7cf2669f687236c8a9f29435388e09"
+    }
+  },
+  "decks": [
+    {
+      "chapter": "chapter-01",
+      "title": "The Role of Analytics in Accounting",
+      "slides": 39,
+      "teaching_slides": 33,
+      "public_notes_slides": 38,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "bb19eeb390967ad4fd4d1f569569371f40929efb3a91c2d57094ca62733d054e"
+      },
+      "powerpoint": {
+        "native_slide_exports": 39,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-01",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "d6477cf7ccecd4100dc8aac96218cb2e09344204f2b2e67651e714d95aa107dd",
+        "artifact_sha256": "055e5e3c907d5bfd97f5fcc7ddc8b9a91b3216ebf029fe5a41a6debe797c72ba"
+      }
+    },
+    {
+      "chapter": "chapter-02",
+      "title": "Understanding Data in Accounting",
+      "slides": 40,
+      "teaching_slides": 35,
+      "public_notes_slides": 39,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "ae064ef49bf61f51b304e717842d57e4e44eba46de1a6d9892392cbbbf672604"
+      },
+      "powerpoint": {
+        "native_slide_exports": 40,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-02",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "59afe7ec006a3bf3aad7543a2c5bbaac3034f8a6f64872c8a2b61e9aff786908",
+        "artifact_sha256": "12ea6f1de007ab4f1ac747251609f83b826b6763fed1f9cae866fe5c8f666a95"
+      }
+    },
+    {
+      "chapter": "chapter-03",
+      "title": "The Accounting Data Environment",
+      "slides": 45,
+      "teaching_slides": 40,
+      "public_notes_slides": 44,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "745cec6d2d5ac404f7593f970168f2a8daa7029b946d062c45f1105137f12532"
+      },
+      "powerpoint": {
+        "native_slide_exports": 45,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-03",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "fbaef370afb7c9193c12e0f1b58acabb880ff7aff4ed07ed39b3c9f32087bb66",
+        "artifact_sha256": "4c75c70756904ec2e110996addf2890b7febebba637fc127e3271d1c4a9a036d"
+      }
+    },
+    {
+      "chapter": "chapter-04",
+      "title": "Excel Essentials for Accounting Analytics",
+      "slides": 35,
+      "teaching_slides": 30,
+      "public_notes_slides": 34,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "b9cc337446ab75fa9a81bd7a39b6ad62367576b2821648439b64faea5be53b46"
+      },
+      "powerpoint": {
+        "native_slide_exports": 35,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-04",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "0058c5b491fafcbb11e623802a4bd449999faf1c55f9d9cc6c97db47c943720a",
+        "artifact_sha256": "c2151d66d87d8e5b2d0ce05f8850c923aade5d901dce9d45cab9f8389f8179ee"
+      }
+    },
+    {
+      "chapter": "chapter-05",
+      "title": "Data Preparation and Cleaning in Excel",
+      "slides": 33,
+      "teaching_slides": 29,
+      "public_notes_slides": 32,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "664f9e42b2c4073b34fca16dc72227cd13cdf974546388e1fdc08a54f5c0b498"
+      },
+      "powerpoint": {
+        "native_slide_exports": 33,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-05",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "bdf20a0299cc0f31007f23b372cbdb359451c1a5beb512501d18cdd4632d6d2a",
+        "artifact_sha256": "25ae382422dde506fb8e2959d9066080e4aabb232ee564e15c39aeaf58cf833a"
+      }
+    },
+    {
+      "chapter": "chapter-06",
+      "title": "Descriptive and Diagnostic Analytics in Excel",
+      "slides": 35,
+      "teaching_slides": 30,
+      "public_notes_slides": 34,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "bdf723a2f0037567ed7a7dcf1c32f2ea57a1ec5f11e7c774a95db7d24da157e6"
+      },
+      "powerpoint": {
+        "native_slide_exports": 35,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-06",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "2fceb04ae80b12ea7d5a52c73c7c505c69d10ee7b56120c2c8817888e9c4eb3f",
+        "artifact_sha256": "fe07b703b19d3dbc8492eb1d5cd153917511529b62ff3175c98ca8d12299745a"
+      }
+    },
+    {
+      "chapter": "chapter-07",
+      "title": "Forecasting, Budgeting, and What-If Analysis in Excel",
+      "slides": 35,
+      "teaching_slides": 30,
+      "public_notes_slides": 34,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "f959c240963965425bd72fed4ffc54d7d0eb248c82e952449952cc0fb03d7ace"
+      },
+      "powerpoint": {
+        "native_slide_exports": 35,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-07",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "55d532677f9e84df13e6fc60f915d445c2f19d2febe092ef573c5ed1571134c7",
+        "artifact_sha256": "418bc3d1f49d606bc59dfa4dcaff124ce53e441fa1ea498da0f9e48c40214582"
+      }
+    },
+    {
+      "chapter": "chapter-08",
+      "title": "Audit Analytics in Excel",
+      "slides": 39,
+      "teaching_slides": 34,
+      "public_notes_slides": 38,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "75ef15dec7797a60851556b1c63c8ba486103797da8bd7d15f952a4bad1cd4ac"
+      },
+      "powerpoint": {
+        "native_slide_exports": 39,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-08",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "330bad90b322d5fa674601b9d2dcd2ac6ac3749c272a8e78e0eccaf9e4b95f85",
+        "artifact_sha256": "e348f7acd2800e4eda3d314cb07fd9964fa75c12ad528d0a7e3dbf38bd716514"
+      }
+    },
+    {
+      "chapter": "chapter-09",
+      "title": "SQL Essentials for Accounting Analytics",
+      "slides": 37,
+      "teaching_slides": 32,
+      "public_notes_slides": 36,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "40f5eb17b1ebb8665c35995e749b2fbb863668027c25e7273869e728a6ef1503"
+      },
+      "powerpoint": {
+        "native_slide_exports": 37,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-09",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "8a634ed6ad6b9b8a9c80dbc9be13df42a2abc1131cc2e4107783848ec922f78b",
+        "artifact_sha256": "ca71f0d0c0db8656266cd39f8d44c79b8feb8d999cd3d976e9b30318984e032c"
+      }
+    },
+    {
+      "chapter": "chapter-10",
+      "title": "Joining and Summarizing Data in SQL",
+      "slides": 39,
+      "teaching_slides": 34,
+      "public_notes_slides": 38,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "ceb721e759f5e48b675d13ff2bd25f7008c69de91512eb484661f1be352302f3"
+      },
+      "powerpoint": {
+        "native_slide_exports": 39,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-10",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "f4b55322d8b4054099445a7105772d375f8b8f83f08ee9e9027fb2a7b0ade859",
+        "artifact_sha256": "9b78884d7be6f1051f122878b9b20e9da91a590f8b51290461d728c9a7d32830"
+      }
+    },
+    {
+      "chapter": "chapter-11",
+      "title": "Analytical Queries in SQL",
+      "slides": 37,
+      "teaching_slides": 33,
+      "public_notes_slides": 36,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "576327050fa0a82ecdbf624a4e067270d82aceecf21e620f4367b22f3101a98a"
+      },
+      "powerpoint": {
+        "native_slide_exports": 37,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-11",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "4eafb8d6d26492b1dccffeaa1a17d34db398f3642c2788f2eec15129f3e5e1ba",
+        "artifact_sha256": "5c2aea373ee7b834191d5e63bfa9b731e85c4db1e48eff5151d1fe78d160a31e"
+      }
+    },
+    {
+      "chapter": "chapter-12",
+      "title": "Audit Analytics in SQL",
+      "slides": 42,
+      "teaching_slides": 37,
+      "public_notes_slides": 41,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "0cae8ded95b1dfc9d2f021ee5bfc87b837079773780411d143fa786c88995e0c"
+      },
+      "powerpoint": {
+        "native_slide_exports": 42,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-12",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "5f94603aa5e67872d85d1d18f7f04085b256b4b947247ccb150c49317f09bf67",
+        "artifact_sha256": "d7d83c0cf2bdfce70ff931e420453598b206929dcc01173d8a892d4d338e7c75"
+      }
+    },
+    {
+      "chapter": "chapter-13",
+      "title": "Power BI Essentials for Accounting Analytics",
+      "slides": 34,
+      "teaching_slides": 30,
+      "public_notes_slides": 33,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "d37514e88d4c5fcf1d5cafdbd36d4b83d8f0864b71ccc5a2529d7a02a7ae1afa"
+      },
+      "powerpoint": {
+        "native_slide_exports": 34,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-13",
+        "passed": true,
+        "notes_changed": true,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "fbd6ff4185378d6ceba33a2a4fe334a5c743cc4375dceb284c9737868a1989fd",
+        "artifact_sha256": "c6b39822c93c82d9aea49f4f61e1c90ab3288b786494980ead81e16415f1541f"
+      }
+    },
+    {
+      "chapter": "chapter-14",
+      "title": "Data Models and DAX Measures",
+      "slides": 36,
+      "teaching_slides": 32,
+      "public_notes_slides": 35,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "94b394b067287bac3e426c257ce962394f05cf0fb5e4cc7f2bbbb4a991c8b4f7"
+      },
+      "powerpoint": {
+        "native_slide_exports": 36,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-14",
+        "passed": true,
+        "notes_changed": true,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "a2c6ce331c41b403d80fcec83b86f90a692525d2b70a490e0848d8821647f3c1",
+        "artifact_sha256": "146b89e964c23be872a00d163f6b5520f68fb70b7bf0eb629926160fda2a907c"
+      }
+    },
+    {
+      "chapter": "chapter-15",
+      "title": "Reports for Management Decisions",
+      "slides": 34,
+      "teaching_slides": 30,
+      "public_notes_slides": 33,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "a67b809e84aebfb44ed94dcef653f7c64213e1b29d54de78305bb80c02740ba7"
+      },
+      "powerpoint": {
+        "native_slide_exports": 34,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-15",
+        "passed": true,
+        "notes_changed": true,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "9817f5931f00d6d90a8223d55349fac02a7972fac616407b6fcca6166d1a1a2a",
+        "artifact_sha256": "96fa54fa3342bb1b935a0e2c3e371d5ef33b3cb50afd9d9eb10369a4ec3299ab"
+      }
+    },
+    {
+      "chapter": "chapter-16",
+      "title": "Audit Monitoring and Report Assurance",
+      "slides": 34,
+      "teaching_slides": 30,
+      "public_notes_slides": 33,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "d5ff38494f99d0599ab270eed2b0dc712102ee7ae33b7009017b7a00a534ec16"
+      },
+      "powerpoint": {
+        "native_slide_exports": 34,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-16",
+        "passed": true,
+        "notes_changed": true,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "82a6f7bdf8f799ca0a0eed9b3a89c3883202dadee2200abc0032feee3bab0259",
+        "artifact_sha256": "3633c999741f90115b692348e23f4682852cff6b959b1491e6a5180a65369c83"
+      }
+    },
+    {
+      "chapter": "chapter-17",
+      "title": "Financial Statements for a Lender",
+      "slides": 31,
+      "teaching_slides": 26,
+      "public_notes_slides": 30,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "5698eee7e6a3124646381e03d9e2c80fe7edf04edc48ff8f1b2e893122d715ea"
+      },
+      "powerpoint": {
+        "native_slide_exports": 31,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-17",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "54f459e4b3fb4a17086ec407ad69c0562f75bea6bec7f98c35a0e665faa476d2",
+        "artifact_sha256": "8c96870a200b692b1e3403f665051f6a4cf1d93c0343483b01ec01812375fb58"
+      }
+    },
+    {
+      "chapter": "chapter-18",
+      "title": "Make, Buy, or Reprice",
+      "slides": 32,
+      "teaching_slides": 27,
+      "public_notes_slides": 31,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "4fc81c12c79d6ecdf7b8be68e9d2db07c444cb6d4683b9b5d8ae433484f1229a"
+      },
+      "powerpoint": {
+        "native_slide_exports": 32,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-18",
+        "passed": true,
+        "notes_changed": true,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "abf81667469260d5759ad162e0fb6a67d969be1b2166a2bc9a2d1527c6f36edd",
+        "artifact_sha256": "94c29f977518216059f944217c7b4cc6545d31767297f436186a30d122cdab12"
+      }
+    },
+    {
+      "chapter": "chapter-19",
+      "title": "Auditing the Customer Credits Cycle",
+      "slides": 33,
+      "teaching_slides": 29,
+      "public_notes_slides": 32,
+      "browser": {
+        "status": "passed",
+        "reviewed_html_sha256": "2925162a0a1c9d43668aff8d20828da3835f47a065b9b1aba57bce8631aaf087"
+      },
+      "powerpoint": {
+        "native_slide_exports": 33,
+        "overflow_flags": 0,
+        "editable_text": true,
+        "editable_table": true,
+        "saved_copy_reopened": true
+      },
+      "artifact_equivalence": {
+        "chapter": "chapter-19",
+        "passed": true,
+        "notes_changed": false,
+        "pptx_visual_package_identical": true,
+        "reveal_identical_outside_notes": true,
+        "comparison": "All ZIP members compared; only core timestamps normalized and revised notes excluded where applicable.",
+        "package_content_sha256": "af9aa4196395893e9b5be5cf06d3cabb2680000a64c0a3f0e9db53243947c58d",
+        "artifact_sha256": "ff500a1301c3ed095d145e635a2b4e23af6e08dd1b03641ec7d24e40c6656ded"
+      }
+    }
+  ],
+  "editorial_review_record": "editorial-review-2026-10-05.json",
+  "live_preview": {
+    "status": "passed",
+    "report": "phase-6/preview-watch-report.json"
+  }
+}
