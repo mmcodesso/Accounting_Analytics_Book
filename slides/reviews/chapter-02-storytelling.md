@@ -1,9 +1,10 @@
 # Chapter 2 storytelling implementation review
 
-Status: **pilot; fresh-render acceptance pending**. Requested 5 October 2026.
+Status: **approved for publication by the author on 5 October 2026**.
 One cover, four recording-module dividers, and 45 content slides: **50 total**.
-The previous approved publication and transfer bundles remain the baseline.
-Revised slides are not authorized for release until their fresh renders are accepted.
+The author requested: "Lets publish chapter 2 slides" after the revision handoff.
+The revised deck is included in the approved inventory for the coordinated site
+build and public source export. The remaining native checks are recorded below.
 
 ## Story and evidence boundaries
 
@@ -104,8 +105,17 @@ and valid local resources/package relationships. The regression suite passes
 79 tests, including selected refresh isolation, dataset-free provenance,
 LF/CRLF equivalence, artifact tampering, and focused output preservation.
 
+Fresh sanitized-public-input renders pass without a datasets directory or
+instructor tooling. Reveal HTML matches the local render byte for byte; the
+PowerPoint slide, note, and media parts also match. Both contain 50 slides.
+
+Browser checks cover all 50 slide bounds and loaded images, with no detected
+overflow, and all 27 fragment steps using keyboard navigation. Selected visual
+checks cover the formula, posting trace, and wide budget slides. These checks
+do not constitute an exhaustive visual or accessibility inspection.
+
 Native inspection was stopped with the physical Escape key before the deck was
-opened. **PowerPoint visual inspection and Excel formula execution remain
-unverified.** Reveal slide/fragment visual inspection and a fresh sanitized-bundle
-render also remain unverified. Automated checks do not substitute for those
-acceptance checks. Author acceptance and coordinated release remain pending.
+opened during the revision. **PowerPoint visual inspection and Excel formula
+execution remain unverified.** The author's publication authorization does not
+change the recorded status of those checks. The coordinated release runs the
+full inventory validation and assembles the approved slides with the book.

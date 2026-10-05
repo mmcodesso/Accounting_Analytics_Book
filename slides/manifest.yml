@@ -45,7 +45,7 @@
       "number": 2,
       "title": "Understanding Data in Accounting",
       "source": "chapter-02/index.qmd",
-      "status": "pilot",
+      "status": "approved",
       "book_sources": [
         "chapters/02-understanding-data/chapter.qmd",
         "chapters/02-understanding-data/_key-terms.qmd",
@@ -66,7 +66,7 @@
         "native_table": true,
         "embedded_media": true
       },
-      "approval_note": "Revised 50-slide audit-readiness pilot requested 2026-10-05; fresh render acceptance pending. The previous approved release remains the baseline."
+      "approval_note": "Author authorized publication of the revised 50-slide audit-readiness deck on 2026-10-05: Lets publish chapter 2 slides. Fresh dataset-free renders and automated artifact checks pass; browser layout and keyboard fragment checks pass. Native PowerPoint inspection and Excel formula execution remain unverified."
     },
     {
       "id": "chapter-03",

@@ -67,7 +67,7 @@ does not alter the tracked acceptance record or deploy anything.
 | Chapter | Status | Teaching slides | Module dividers | Total including opening |
 |---|---|---:|---:|---:|
 | 1 | Approved | 41 | 5 | 47 |
-| 2 | Pilot review | 45 | 4 | 50 |
+| 2 | Approved | 45 | 4 | 50 |
 | 3 | Approved | 40 | 4 | 45 |
 | 4 | Approved | 30 | 4 | 35 |
 | 5 | Approved | 29 | 3 | 33 |
@@ -183,7 +183,7 @@ and records generator, canonical-input, and artifact hashes. The original
 
 Chapter 2 follows an internal auditor's readiness assessment for fiscal
 2024–2026: meaning and sources, operational quality, tidy observations, then
-Accounting Core checks and a qualified supervisor response. Its 50-slide pilot
+Accounting Core checks and a qualified supervisor response. Its 50-slide deck
 retains four recording modules and covers all steps of public Tutorials 2.1 and
 2.2. Separate prompt/response slides keep reasoning pauses in both formats.
 Budget and quality exhibits preserve the book's public example values.
@@ -204,8 +204,10 @@ python scripts/build_all.py --preview chapter-02
 `scripts/slides/refresh_chapter02_storytelling.py` owns the supplemental views
 and native fragments in `shared/generated/chapter-02/storytelling/`. A focused
 refresh does not regenerate Chapter 1 or the existing foundations artifacts.
-Ordinary builds remain dataset-free. The revised pilot is excluded from default
-publication pending fresh-render acceptance; the existing release is retained.
+Ordinary builds remain dataset-free. The author authorized publication of the
+revised deck on 5 October 2026. It is included in default publication and public
+source exports. Native PowerPoint inspection and Excel formula execution remain
+unverified; the review record distinguishes performed checks from those limits.
 
 Chapter 3 covers tables and types, keys, cardinality, table groups, and the public
 Tutorial 3.2 sale. Focused ER views use the book's observed-cardinality function.
