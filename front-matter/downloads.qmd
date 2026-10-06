@@ -1,6 +1,10 @@
 ---
+format:
+  html:
+    number-sections: false
 aliases:
   - /downloads.html
+  - /front-matter/companion-files.html
 ---
 
 # Downloads {#sec-downloads .unnumbered}
@@ -36,5 +40,56 @@ Use the files below, which come from that release, so that your results match th
 All three formats contain the same Charles River data, so students can move between Excel, SQL, and Power BI without changing datasets.
 The [release page]({{< var dataset.release >}}) lists each file's SHA-256 checksum, which you can use to confirm a download.
 
-::: {.chapter-slides-list}
-:::
+## Supplementary Material {#sec-companion-files}
+
+Each chapter's slides, companion files, and solutions are in the table below. **Slides** are the chapter's PowerPoint deck; the chapter page also lets you view them in the browser. **Companion files** are the start files of the tutorials: each holds the work as it stands at the end of the previous tutorial, and a chapter-end file closes the set, so you can begin a tutorial without the one before it or check your own work. **Solutions** cover the exercises, the comprehensive cases, and the capstone cases, so try the work first. Every file explains itself, in a **Solution Notes** worksheet, a Power BI **Notes** page with a **Checks** query, or a SQL script's header and notes block.
+
+| Chapter | Slides | Companion files | Solutions |
+|:--------------------------------------------|:------------|:--------------|:--------------------------|
+| Chapter 1: The Role of Analytics in Accounting | [PowerPoint]{.slides data-chapter="chapter-01"} | — | — |
+| Chapter 2: Understanding Data in Accounting | [PowerPoint]{.slides data-chapter="chapter-02"} | — | — |
+| Chapter 3: The Accounting Data Environment | [PowerPoint]{.slides data-chapter="chapter-03"} | — | — |
+| Part I case: Getting the Data Ready for the Furniture Margin Question | — | — | — |
+| Chapter 4: Excel Essentials for Accounting Analytics | [PowerPoint]{.slides data-chapter="chapter-04"} | [Start files](/supplementary/start-files/Chapter04-companion.zip) | [Excel](/supplementary/solutions/Chapter04-exercises.zip) |
+| Chapter 5: Data Preparation and Cleaning in Excel | [PowerPoint]{.slides data-chapter="chapter-05"} | [Start files](/supplementary/start-files/Chapter05-companion.zip) | [Excel](/supplementary/solutions/Chapter05-exercises.zip) |
+| Chapter 6: Descriptive and Diagnostic Analytics in Excel | [PowerPoint]{.slides data-chapter="chapter-06"} | [Start files](/supplementary/start-files/Chapter06-companion.zip) | [Excel](/supplementary/solutions/Chapter06-exercises.zip) |
+| Chapter 7: Forecasting, Budgeting, and What-If Analysis in Excel | [PowerPoint]{.slides data-chapter="chapter-07"} | [Start files](/supplementary/start-files/Chapter07-companion.zip) | [Excel](/supplementary/solutions/Chapter07-exercises.zip) |
+| Chapter 8: Audit Analytics in Excel | [PowerPoint]{.slides data-chapter="chapter-08"} | [Start files](/supplementary/start-files/Chapter08-companion.zip) | [Excel](/supplementary/solutions/Chapter08-exercises.zip) |
+| Part II case: Deciding on the 2027 Promotion Calendar | — | — | [Excel](/supplementary/solutions/PartII-case.zip) |
+| Chapter 9: SQL Essentials for Accounting Analytics | [PowerPoint]{.slides data-chapter="chapter-09"} | [Start files](/supplementary/start-files/Chapter09-companion.zip) | [SQL](/supplementary/solutions/Chapter09-exercises-sql.zip) |
+| Chapter 10: Joining and Summarizing Data in SQL | [PowerPoint]{.slides data-chapter="chapter-10"} | [Start files](/supplementary/start-files/Chapter10-companion.zip) | [SQL](/supplementary/solutions/Chapter10-exercises-sql.zip) |
+| Chapter 11: Analytical Queries in SQL | [PowerPoint]{.slides data-chapter="chapter-11"} | [Start files](/supplementary/start-files/Chapter11-companion.zip) | [SQL](/supplementary/solutions/Chapter11-exercises-sql.zip) |
+| Chapter 12: Audit Analytics in SQL | [PowerPoint]{.slides data-chapter="chapter-12"} | [Start files](/supplementary/start-files/Chapter12-companion.zip) | [SQL](/supplementary/solutions/Chapter12-exercises-sql.zip) |
+| Part III case: Planning the Plant's Hours for 2027 | — | [Views script](/supplementary/start-files/Setup_Part3_Views.sql) | [SQL](/supplementary/solutions/PartIII-case-sql.zip) |
+| Chapter 13: Power BI Essentials for Accounting Analytics | [PowerPoint]{.slides data-chapter="chapter-13"} | [Start files](/supplementary/start-files/Chapter13-companion.zip) | [Power BI](/supplementary/solutions/Chapter13-exercises-pbi.zip) |
+| Chapter 14: Data Models and DAX Measures | [PowerPoint]{.slides data-chapter="chapter-14"} | [Start files](/supplementary/start-files/Chapter14-companion.zip) | [Power BI](/supplementary/solutions/Chapter14-exercises-pbi.zip) |
+| Chapter 15: Reports for Management Decisions | [PowerPoint]{.slides data-chapter="chapter-15"} | [Start files](/supplementary/start-files/Chapter15-companion.zip) | [Power BI](/supplementary/solutions/Chapter15-exercises-pbi.zip) |
+| Chapter 16: Audit Monitoring and Report Assurance | [PowerPoint]{.slides data-chapter="chapter-16"} | [Start files](/supplementary/start-files/Chapter16-companion.zip) | [Power BI](/supplementary/solutions/Chapter16-exercises-pbi.zip) |
+| Part IV case: Finding the Cash Behind the Profit | — | — | [Power BI](/supplementary/solutions/PartIV-case.zip) |
+| Chapter 17: Financial Statements for a Lender | [PowerPoint]{.slides data-chapter="chapter-17"} | — | [Excel](/supplementary/solutions/Chapter17-capstone-excel.zip) · [Power BI](/supplementary/solutions/Chapter17-capstone-pbi.zip) · [SQL](/supplementary/solutions/Chapter17-capstone-sql.zip) |
+| Chapter 18: Make, Buy, or Reprice | [PowerPoint]{.slides data-chapter="chapter-18"} | — | [Excel](/supplementary/solutions/Chapter18-capstone-excel.zip) · [Power BI](/supplementary/solutions/Chapter18-capstone-pbi.zip) · [SQL](/supplementary/solutions/Chapter18-capstone-sql.zip) |
+| Chapter 19: Auditing the Customer Credits Cycle | [PowerPoint]{.slides data-chapter="chapter-19"} | — | [Excel](/supplementary/solutions/Chapter19-capstone-excel.zip) · [Power BI](/supplementary/solutions/Chapter19-capstone-pbi.zip) · [Audit Monitoring](/supplementary/solutions/Chapter19-capstone-pbi-monitoring.zip) · [SQL](/supplementary/solutions/Chapter19-capstone-sql.zip) |
+| Appendix: Publishing, Securing, and Sharing Reports | — | [Start files](/supplementary/start-files/AppendixA-companion.zip) | [Power BI](/supplementary/solutions/AppendixA-exercises-pbi.zip) |
+
+For instructors, [Instructor-Notes.zip](/supplementary/solutions/Instructor-Notes.zip) collects the instructor notes, the expected values of the tutorials, and the answer keys of the multiple-choice questions for every chapter, case, and the appendix, as Markdown and Word files.
+
+### Opening a Companion File
+
+The Excel and Power BI files read CharlesRiver.xlsx from the folder `C:\CharlesRiver`. If your copy is there, a file is ready to refresh. Otherwise, point the file at your copy once, before you refresh it. The Power BI solutions of the capstone cases also read their case's solution workbook, and Chapter 19's reads RefundFlags.csv, from the same folder.
+
+In Excel:
+
+1. Select **Data > Get Data > Data Source Settings**.
+2. Select the CharlesRiver.xlsx source and **Change Source**, browse to your copy, and select **OK**.
+3. Close the dialog and select **Data > Refresh All**.
+
+The Power BI files are Power BI projects: a .pbip file and two folders with the same name, which hold no data until you refresh them. In Power BI Desktop:
+
+1. Copy the .pbip file and its two folders into a folder of your own, and open the .pbip file.
+2. Select **Home > Transform data > Data source settings**, select the CharlesRiver.xlsx source and **Change Source**, browse to your copy, select **OK**, and close the dialog.
+3. Select **Apply changes** if a bar offers it, or **Refresh** on the **Home** tab.
+4. Select **File > Save as** and save a .pbix file with the name the tutorials use, such as Charles River Reports.pbix.
+
+The new Power Query experience, a preview feature, has no **Change Source** button, so if you turned it on, turn it off in **File > Options and settings > Options > Preview features** first.
+
+The SQL scripts need no change of source. Save a script in the folder of your working copy, CharlesRiver_Work.sqlite (Tutorial 9.1), open the copy in DB Browser for SQLite, and open the script from the **Execute SQL** tab with **Open SQL file(s)**. The Part III case uses the view that Tutorial 11.3 saves in the working copy. If you skipped that tutorial, run Setup_Part3_Views.sql once and select **Write Changes**.

@@ -22,9 +22,9 @@ The chapters of the book are organized into five parts. Part I establishes the c
 
 ## Where to Start {.unnumbered}
 
-- **Instructors** can begin with the [Preface](#sec-preface), which describes the pedagogical design, the intended audience, and how the book is organized.
-- **Students** can begin with [To the Student](#sec-to-the-student), which explains what to expect from each chapter and how to succeed with the material.
-- **Every reader** can meet the company behind the data in [About the Dataset](#sec-about-the-dataset) and find the book and dataset files on the [Downloads](#sec-downloads) page.
+- **Every reader** can begin with the [Preface](#sec-preface), which explains how the book is organized, how each chapter works, and what software it needs, and whose [About the Dataset](#sec-about-the-dataset) section introduces the company behind the data.
+- **Students** can then turn to its [To the Student](#sec-to-the-student) section, and **instructors** to its [To the Instructor](#sec-to-the-instructor) section.
+- The [Downloads](#sec-downloads) page holds the book and dataset files and each chapter's slides, companion files, and solutions.
 
 
 ## Open Access {.unnumbered}

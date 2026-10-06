@@ -53,7 +53,7 @@ from notes import ch17  # noqa: E402
 FILE = "Charles River Lender Review"
 WORKBOOK = "Charles River Lender Package.xlsx"
 NEUTRAL_WB = "C:\\CharlesRiver\\" + WORKBOOK          # where the shipped project looks for the package workbook
-DEFAULT_WB = REPO / "outputs" / "companion" / "instructor-2026" / "Chapter17-capstone-excel" / WORKBOOK
+DEFAULT_WB = REPO / "outputs" / "companion" / "solutions" / "Chapter17-capstone-excel" / WORKBOOK
 KM = MEASURES_TABLE
 M = lambda n: meas(KM, n)                 # noqa: E731
 CH14_EX = CH14 / "_exercises.qmd"

@@ -6,7 +6,7 @@
     python scripts/facts.py sync | mark            # retired: the chapters carry no notes (see below)
 
 The notes are rendered from their templates (facts/notes/templates) into the solution files and
-Instructor-Notes-2026.zip (facts/instructor/package.py), never into the chapter text: the chapters stay clean
+Instructor-Notes.zip (facts/instructor/package.py), never into the chapter text: the chapters stay clean
 (author's decision, 2026-10-05). `sync` and `mark` wrote notes into the .qmd between markers in the first design; they
 now refuse to run, unless --inline is given (the old behavior, only for a copy of the book that wants notes inline).
 """
@@ -67,7 +67,7 @@ def retired(args, name: str) -> bool:
     """sync and mark write comments into the chapters, which stay clean: refuse unless --inline is given."""
     if getattr(args, "inline", False):
         return False
-    print(f"{name} is retired: the chapters carry no notes (rendered into the solution files and Instructor-Notes-2026.zip "
+    print(f"{name} is retired: the chapters carry no notes (rendered into the solution files and Instructor-Notes.zip "
           "by facts/instructor/package.py). Pass --inline only for a copy of the book that should carry them.")
     return True
 

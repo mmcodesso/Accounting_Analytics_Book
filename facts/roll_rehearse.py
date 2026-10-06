@@ -220,18 +220,11 @@ def roll_pins(tree: Path, window: tuple[int, int], sqlite_sha: str, xlsx_sha: st
     new_edition, new_version = str(C), f"v{C}.1"
     text = re.sub(r'^(edition:\s*)"?\d{4}"?', rf'\g<1>"{new_edition}"', text, flags=re.M)
     text = re.sub(r'(window:\s*")fiscal \d{4}–\d{4}(")', rf"\g<1>fiscal {F}–{C}\g<2>", text)
-    text = text.replace(old_version, new_version).replace(f"companion-{old_edition}", f"companion-{new_edition}")
+    text = text.replace(old_version, new_version)
     text = re.sub(r'(sqlite:\s*")[0-9a-f]{64}(")', rf"\g<1>{sqlite_sha}\g<2>", text)
     text = re.sub(r'(xlsx:\s*")[0-9a-f]{64}(")', rf"\g<1>{xlsx_sha}\g<2>", text)
     vp.write_text(text, encoding="utf-8")
     changed.append(f"_variables.yml: edition {old_edition} to {new_edition}, {old_version} to {new_version}, window fiscal {F}-{C}, SHA-256 of the SQLite file")
-    mp = tree / "scripts" / "companion" / "manifest.yml"
-    if mp.is_file():
-        m = mp.read_text(encoding="utf-8")
-        m2 = re.sub(rf"\b(companion|instructor)-{old_edition}\b", rf"\1-{new_edition}", m)
-        if m2 != m:
-            mp.write_text(m2, encoding="utf-8")
-            changed.append(f"scripts/companion/manifest.yml: companion-{old_edition} and instructor-{old_edition} to {new_edition}")
     return changed
 
 

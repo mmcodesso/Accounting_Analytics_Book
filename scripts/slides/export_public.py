@@ -78,7 +78,7 @@ def _add_document_closure(root: Path, rel: str, files: set[str]) -> None:
     text = sanitize_public_document(path.read_text(encoding="utf-8-sig"))
     for reference in _references(path, text):
         # These are assembled-site artifacts, not source dependencies.
-        if reference.startswith(("/downloads/", "/slides/")) and reference not in INCLUDE.findall(text):
+        if reference.startswith(("/downloads/", "/slides/", "/supplementary/")) and reference not in INCLUDE.findall(text):
             continue
         resolved = ((root / reference.lstrip("/")) if reference.startswith("/") else path.parent / reference).resolve()
         if not resolved.is_relative_to(root):

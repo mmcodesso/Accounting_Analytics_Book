@@ -4,12 +4,13 @@
 # at the end of every tutorial in the chain. The start file of a tutorial is the end file of the
 # tutorial before it, and the chapter-end file is the copy the chapter's exercises start from.
 # audience: every file is public (author's decision, 2026-10-05): the start and end files and the solutions
-# (exercises, cases, and capstones) all go on the book's release.
+# (exercises, cases, and capstones) are tracked in supplementary/, which the site serves (supplementary/README.md).
 #
 # Build with:  python scripts/companion/build.py [--tool sql|excel|pbi] [--chapter 10]
+# Publish with: python scripts/companion/build.py --publish   (copies the built files into supplementary/)
 
-release_tag: companion-2026          # on github.com/mmcodesso/Accounting_Analytics_Book
-instructor_tag: instructor-2026       # the folder of the solutions under outputs/companion/ (uploaded with the companion files)
+start_folder: start-files            # the build folder of the start files under outputs/companion/ (published to supplementary/start-files/)
+solutions_folder: solutions          # the build folder of the solutions under outputs/companion/ (published to supplementary/solutions/)
 
 chains:
   - id: ch04-07-analysis
@@ -205,7 +206,7 @@ solutions:                           # instructor files, built with --solutions 
     builder: pbibuild.cap17
     table: GLEntry                  # the model has loaded once this table is in the engine
     also_sources:                   # the package workbook the Review file loads: read from C:\CharlesRiver\<name> when shipped
-      Charles River Lender Package.xlsx: outputs/companion/instructor-2026/Chapter17-capstone-excel/Charles River Lender Package.xlsx
+      Charles River Lender Package.xlsx: outputs/companion/solutions/Chapter17-capstone-excel/Charles River Lender Package.xlsx
     audience: instructor
   - id: ch18-capstone-pbi
     tool: pbi
@@ -218,7 +219,7 @@ solutions:                           # instructor files, built with --solutions 
     builder: pbibuild.cap18
     table: SalesInvoiceLine         # (the builder may change it)
     also_sources:                   # the case workbook the explorer loads: read from C:\CharlesRiver\<name> when shipped
-      Make Buy Reprice.xlsx: outputs/companion/instructor-2026/Chapter18-capstone-excel/Make Buy Reprice.xlsx
+      Make Buy Reprice.xlsx: outputs/companion/solutions/Chapter18-capstone-excel/Make Buy Reprice.xlsx
     audience: instructor
   - id: ch19-capstone-pbi
     tool: pbi
@@ -231,7 +232,7 @@ solutions:                           # instructor files, built with --solutions 
     builder: pbibuild.cap19
     table: CustomerRefund           # the model has loaded once this table is in the engine
     also_sources:                   # the refund flags Credits.sql exports (Requirement 4); the builder writes the file
-      RefundFlags.csv: outputs/companion/instructor-2026/Chapter19-capstone-pbi/RefundFlags.csv
+      RefundFlags.csv: outputs/companion/solutions/Chapter19-capstone-pbi/RefundFlags.csv
     include_sources: [RefundFlags.csv]   # shipped in the zip beside the project
     audience: instructor
   - id: ch19-monitoring-pbi

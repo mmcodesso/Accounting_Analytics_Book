@@ -1,0 +1,2 @@
+# The supplementary files are served byte for byte: no line-ending conversion, no diffs of the zips.
+supplementary/** -text -diff

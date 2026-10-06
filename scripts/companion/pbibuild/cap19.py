@@ -45,7 +45,7 @@ from notes import ch19  # noqa: E402
 FILE = "Credits Analytics"
 FLAGS_CSV = "RefundFlags.csv"
 NEUTRAL_CSV = "C:\\CharlesRiver\\" + FLAGS_CSV        # where the shipped project looks for the refund flags
-DEFAULT_CSV = REPO / "outputs" / "companion" / "instructor-2026" / "Chapter19-capstone-pbi" / FLAGS_CSV
+DEFAULT_CSV = REPO / "outputs" / "companion" / "solutions" / "Chapter19-capstone-pbi" / FLAGS_CSV
 RATE = "0.000%"
 KM = MEASURES_TABLE
 M = lambda n: meas(KM, n)                 # noqa: E731

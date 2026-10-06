@@ -1,6 +1,7 @@
-"""Build the companion files listed in manifest.yml into outputs/companion/<release_tag>/.
+"""Build the companion files listed in manifest.yml into outputs/companion/<start_folder>/.
 
 Usage: python scripts/companion/build.py [--tool sql|excel] [--chapter 10]
+       python scripts/companion/build.py --publish   (copy the built files into supplementary/)
 
 SQL chains come from the chapter scripts in scripts/figures (dbbrowser.Script), the same
 scripts the tutorial text and figures must match. For every tutorial the builder writes the
@@ -22,6 +23,7 @@ Windows, Excel for Microsoft 365, and pywin32 and openpyxl (scripts/companion/re
 from __future__ import annotations
 
 import argparse
+import filecmp
 import hashlib
 import importlib
 import json
@@ -43,7 +45,9 @@ import yaml  # noqa: E402
 HERE = Path(__file__).resolve().parent
 TUTORIAL = re.compile(r"^-- Tutorial (\d+)\.(\d+)\b")
 ZIP_DATE = (2026, 1, 1, 0, 0, 0)          # fixed, so a rebuild of unchanged files is byte-identical
-SITE = "https://aa.accountinganalyticshub.com/front-matter/companion-files.html"
+SITE = "https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files"
+SUPPLEMENTARY = REPO / "supplementary"              # tracked; the site serves it at /supplementary/
+DOWNLOADS = REPO / "front-matter" / "downloads.qmd"
 NEUTRAL = "C:\\CharlesRiver\\CharlesRiver.xlsx"   # where the Excel and Power BI files look for the workbook
 
 
@@ -226,7 +230,7 @@ def chapter_id(text: str) -> int | str:
 
 
 def folder_name(ch: int | str) -> str:
-    """The release folder of a chapter (Chapter13) or an appendix (AppendixA)."""
+    """The build folder of a chapter (Chapter13) or an appendix (AppendixA)."""
     return f"Chapter{ch:02d}" if isinstance(ch, int) else f"Appendix{ch}"
 
 
@@ -307,7 +311,7 @@ def build_excel_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
                "queries at your copy with Data > Get Data > Data Source Settings > Change Source; then choose "
                "Data > Refresh All.",
         built=f"{date.today().isoformat()}; every check below agreed after a refresh on the dataset release above")
-    work = out.parent / f"_work-{out.name}" / chain["id"]     # outside the release folder, so it is never uploaded
+    work = out.parent / f"_work-{out.name}" / chain["id"]     # outside the build folder, so it is never published
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
@@ -530,7 +534,7 @@ def distribute_pbi(chain: dict, variables: dict, out: Path, ends: dict[str, Path
 
 # --- Excel solutions (instructor) -------------------------------------------------------------------------------
 
-def build_excel_solution(entry: dict, variables: dict, out_root: Path, release_tag: str, work_suffix: str = "") -> Path:
+def build_excel_solution(entry: dict, variables: dict, out_root: Path, start_folder: str, work_suffix: str = "") -> Path:
     """Apply a solution builder (exercises, a case, or a capstone) to its starting workbook, write the Solution Notes,
     verify, and zip.
 
@@ -542,7 +546,7 @@ def build_excel_solution(entry: dict, variables: dict, out_root: Path, release_t
     kind = entry.get("kind", "exercises")
     base = None
     if entry.get("base"):
-        base = out_root.parent / f"_work-{release_tag}" / entry["base"]["chain"] / f"end-{entry['base']['after']}.xlsx"
+        base = out_root.parent / f"_work-{start_folder}" / entry["base"]["chain"] / f"end-{entry['base']['after']}.xlsx"
         if not base.exists():
             raise SystemExit(f"{entry['id']}: build the chain {entry['base']['chain']} first (no {base})")
     real = str(XLSX)
@@ -626,7 +630,7 @@ def build_excel_solution(entry: dict, variables: dict, out_root: Path, release_t
     return zip_folder(folder, suffix="")
 
 
-def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag: str, work_suffix: str = "") -> Path:
+def build_pbi_solution(entry: dict, variables: dict, out_root: Path, start_folder: str, work_suffix: str = "") -> Path:
     """The Power BI counterpart of build_excel_solution. Exercises replay the chain's tutorials up to the chapter-end
     checkpoint (`base`), as the reader's Save as copy starts there, and apply one function per exercise; a case or
     capstone (`kind: requirements`) starts a new project. The Notes page lists the exercises or requirements with their
@@ -735,7 +739,7 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, release_tag
     return zip_folder(folder, suffix="")
 
 
-def build_sql_solution(entry: dict, variables: dict, out_root: Path, release_tag: str, work_suffix: str = "") -> Path:
+def build_sql_solution(entry: dict, variables: dict, out_root: Path, start_folder: str, work_suffix: str = "") -> Path:
     """Write the SQL solution scripts of an exercise set, a case, or a capstone (sqlbuild/script.py), run every query
     read-only with its checks, run each finished file top to bottom as DB Browser would, and zip."""
     from sqlbuild.script import Build, notes_block, run
@@ -830,6 +834,40 @@ def zip_folder(folder: Path, extra_files: list[Path] = (), suffix: str = "-compa
     return target
 
 
+def publish(manifest: dict) -> int:
+    """Copy the built zips and scripts into supplementary/start-files/ and supplementary/solutions/, which the site
+    serves at /supplementary/. The set of files must equal the set of /supplementary/ links of the Downloads page.
+    Only files whose bytes changed are copied, so git sees only real rebuilds; files no longer built are removed."""
+    folders = {"start-files": REPO / "outputs" / "companion" / manifest["start_folder"],
+               "solutions": REPO / "outputs" / "companion" / manifest["solutions_folder"]}
+    built = {f"{sub}/{f.name}": f for sub, folder in folders.items()
+             for f in sorted(folder.glob("*")) if f.is_file() and f.suffix in (".zip", ".sql")}
+    linked = set(re.findall(r"\]\(/supplementary/([^)\s]+)\)", DOWNLOADS.read_text(encoding="utf-8")))
+    missing, unlinked = sorted(linked - built.keys()), sorted(built.keys() - linked)
+    for rel in missing:
+        print(f"linked on the Downloads page but not built: {rel}")
+    for rel in unlinked:
+        print(f"built but not linked on the Downloads page: {rel}")
+    if missing or unlinked:
+        return 1
+    updated = 0
+    for rel, source in built.items():
+        target = SUPPLEMENTARY / rel
+        if target.is_file() and filecmp.cmp(source, target, shallow=False):
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        updated += 1
+        print(f"updated {target.relative_to(REPO).as_posix()} ({source.stat().st_size / 1e6:.1f} MB)")
+    for sub in folders:
+        for f in sorted((SUPPLEMENTARY / sub).glob("*")):
+            if f.is_file() and f"{sub}/{f.name}" not in built:
+                f.unlink()
+                print(f"removed {f.relative_to(REPO).as_posix()}")
+    print(f"{len(built)} files in supplementary/, {updated} updated")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--tool", choices=["sql", "excel", "pbi"], default=None)
@@ -839,15 +877,20 @@ def main() -> int:
                         help="build a solution in a fresh work folder (when a stale Excel instance holds the usual one)")
     parser.add_argument("--solutions", action="store_true",
                         help="build the instructor solutions (exercises, cases, capstones) instead of the chains")
+    parser.add_argument("--publish", action="store_true",
+                        help="copy the built files into supplementary/, which the site serves, and check them "
+                             "against the links of the Downloads page")
     args = parser.parse_args()
 
     manifest = load_yaml(HERE / "manifest.yml")
+    if args.publish:
+        return publish(manifest)
     variables = load_yaml(REPO / "_variables.yml")
     check_dataset(variables)
-    out = REPO / "outputs" / "companion" / manifest["release_tag"]
+    out = REPO / "outputs" / "companion" / manifest["start_folder"]
     out.mkdir(parents=True, exist_ok=True)
     if args.solutions:
-        instructor = REPO / "outputs" / "companion" / manifest["instructor_tag"]
+        instructor = REPO / "outputs" / "companion" / manifest["solutions_folder"]
         instructor.mkdir(parents=True, exist_ok=True)
         for entry in manifest.get("solutions", []):
             if args.tool not in (None, entry["tool"]) or args.chapter not in (None, entry.get("chapter")):
@@ -856,7 +899,7 @@ def main() -> int:
                 continue
             print(f"{entry['id']}: building {entry.get('file', 'the SQL scripts')}")
             build = {"excel": build_excel_solution, "pbi": build_pbi_solution, "sql": build_sql_solution}[entry["tool"]]
-            archive = build(entry, variables, instructor, manifest["release_tag"], args.work_suffix)
+            archive = build(entry, variables, instructor, manifest["start_folder"], args.work_suffix)
             print(f"{entry['id']}: -> {archive.relative_to(REPO)}")
         return 0
 

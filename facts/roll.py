@@ -10,7 +10,7 @@ Four steps, each timed, and a verdict (see facts/ROLL.md for the whole runbook):
    shows; a selection rule that finds nothing is listed and fails the preflight;
 3. the generated notes on the new build (facts/notes): every claim a note's wording makes, evaluated on the new data;
    a failing claim is wording to revise (the notes are no longer in the chapters; they are rendered into the solution
-   files and Instructor-Notes-2026.zip);
+   files and Instructor-Notes.zip);
 4. a dry run of the text rewriter (facts/roll_text.py, no --apply): how many literals change, and whether any is
    unresolved, stale or unclassified.
 

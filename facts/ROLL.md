@@ -44,7 +44,7 @@ It runs the data contract (every storyline and quirk the chapters rely on; 41 ch
 
 ### 3. Pin the new dataset
 
-Create the dataset release with a new tag (v2027.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (edition, `dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values) and the tags in `scripts/companion/manifest.yml` (`release_tag`, `instructor_tag`). Put the files in `datasets/` and run:
+Create the dataset release with a new tag (v2027.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (edition, `dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values). The companion files carry no edition in their names, so `scripts/companion/manifest.yml` needs no change. Put the files in `datasets/` and run:
 
     python scripts/verify/pinned_dataset.py --verify datasets/CharlesRiver.sqlite
 
@@ -110,7 +110,7 @@ A build that stops names the failing check: a value that no longer agrees is a s
 
 ### 10. Publish
 
-Release the dataset (step 3), upload the companion and solution files to the edition's release (`scripts/companion/release-notes-2026.md` is the template for its description), push, and let `publish.yml` and `verify-data.yml` run. Keep the previous edition's PDF, EPUB and DOCX on its own edition release.
+Release the dataset (step 3), copy the rebuilt companion and solution files into `supplementary/` with `python scripts/companion/build.py --publish` (see `supplementary/README.md`), commit them, push, and let `publish.yml` and `verify-data.yml` run. Keep the previous edition's PDF, EPUB and DOCX on its own edition release.
 
 ## Rehearsal
 

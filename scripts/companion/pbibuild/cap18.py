@@ -46,7 +46,7 @@ from notes import ch18  # noqa: E402
 FILE = "Product Costs"
 WORKBOOK = "Make Buy Reprice.xlsx"
 NEUTRAL_WB = "C:\\CharlesRiver\\" + WORKBOOK          # where the shipped project looks for the case workbook
-DEFAULT_WB = REPO / "outputs" / "companion" / "instructor-2026" / "Chapter18-capstone-excel" / WORKBOOK
+DEFAULT_WB = REPO / "outputs" / "companion" / "solutions" / "Chapter18-capstone-excel" / WORKBOOK
 PCT = "0.0%"
 HOURS = "#,0.0"
 KM = MEASURES_TABLE

@@ -18,8 +18,3 @@ dataset:
     sqlite: "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
     xlsx: "185d42bd069fad177fae23c5e30df93edc7cf2669f687236c8a9f29435388e09"
     csv: "5f2821ee81f86c2da60702a9feaa51fa18f72687e5d0807c44a7d5489fecffb6"
-
-# Companion files of this edition (scripts/companion/build.py), on a release of the book repository.
-companion:
-  release: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/tag/companion-2026"
-  download: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/download/companion-2026"

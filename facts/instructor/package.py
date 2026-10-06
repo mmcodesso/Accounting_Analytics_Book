@@ -1,8 +1,8 @@
-"""The instructor notes document: Instructor-Notes-2026.zip.
+"""The instructor notes document: Instructor-Notes.zip.
 
     python facts/instructor/package.py [--out DIR] [--no-docx] [--skip-verify]
 
-Builds outputs/companion/instructor-2026/Instructor-Notes-2026.zip: a README and, for every chapter, case and
+Builds outputs/companion/solutions/Instructor-Notes.zip: a README and, for every chapter, case and
 appendix in book order, one Markdown file (and a .docx of each, through Quarto's bundled pandoc, when it is
 available) that reads as a teaching companion.  Per tutorial, exercise, case requirement and milestone it gives the
 heading and the instructor note; per chapter, the multiple-choice answer key with its rationale for every question.
@@ -38,8 +38,8 @@ for p in (REPO / "scripts", REPO / "facts", HERE):
 
 import source  # noqa: E402  (facts/instructor/source.py)
 
-OUT = REPO / "outputs" / "companion" / "instructor-2026"
-ZIP_NAME = "Instructor-Notes-2026.zip"
+OUT = REPO / "outputs" / "companion" / "solutions"
+ZIP_NAME = "Instructor-Notes.zip"
 INCLUDE = re.compile(r"^\{\{< include (\S+) >\}\}\s*$")
 EXERCISE = re.compile(r"^\*\*Exercise (\d+|[A-Z])\.(\d+):? (.+?)\*\*")
 REQUIREMENT = re.compile(r"^\*\*Requirement (\d+): (.+?)\*\*")
@@ -433,7 +433,7 @@ def main() -> int:
     docx_ok = not args.no_docx and pandoc_command() is not None
     readme_text = readme(units, results, v, docx_ok)
     problems = [] if args.skip_verify else verify(units, results, readme_text, v)
-    folder = out / "Instructor-Notes-2026"
+    folder = out / "Instructor-Notes"
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
@@ -451,7 +451,7 @@ def main() -> int:
     zpath = out / ZIP_NAME
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         for f in sorted(folder.iterdir()):
-            z.write(f, f"Instructor-Notes-2026/{f.name}")
+            z.write(f, f"Instructor-Notes/{f.name}")
     keys = {k: s for res in results for k, s in res.keys.items()}
     mismatches = [m for res in results for m in res.missing if m.startswith("KEY MISMATCH")]
     missing = [(u.slug, m) for u, res in zip(units, results) for m in res.missing if not m.startswith("KEY MISMATCH")]

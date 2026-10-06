@@ -23,8 +23,8 @@ PRIVATE_TEXT = re.compile(
     r"answer[ _-]+key|private[ _-]+(?:facts|answers?|solutions?))\b", re.I
 )
 # Everything is public (author's decision, 2026-10-05): the solutions and the instructor notes are release files, and
-# the Companion Files page lists them by name, so the wording check skips that one page of the assembled site.
-SOLUTION_PAGES = {"front-matter/companion-files.html"}
+# the Downloads page lists them by name, so the wording check skips that one page of the assembled site.
+SOLUTION_PAGES = {"front-matter/downloads.html"}
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
 INCLUDE =re.compile(r"\{\{<\s*include\s+[\"']?([^\s>\"']+)[\"']?\s*>\}\}")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<?[^\s)>]+>?)")

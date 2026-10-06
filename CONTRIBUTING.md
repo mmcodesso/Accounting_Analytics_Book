@@ -53,9 +53,11 @@ cases/
   part-1-case.qmd
 front-matter/
   preface.qmd
-  to-the-student.qmd
-  about-the-dataset.qmd
   downloads.qmd
+supplementary/
+  start-files/
+  solutions/
+  README.md
 index.qmd
 ```
 

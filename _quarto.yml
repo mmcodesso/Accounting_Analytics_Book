@@ -5,6 +5,8 @@ project:
     - '!shared/calculations/**'
     - '!shared/generated/**'
     - '!outputs/**'
+    - supplementary/**/*.zip
+    - supplementary/**/*.sql
   pre-render:
     - python scripts/export_drawio_svgs.py --pre-render
 
@@ -22,10 +24,7 @@ book:
   chapters:
     - index.qmd
     - front-matter/preface.qmd
-    - front-matter/to-the-student.qmd
-    - front-matter/about-the-dataset.qmd
     - front-matter/downloads.qmd
-    - front-matter/companion-files.qmd
     - part: "Foundations of Accounting Analytics"
       chapters:
         - chapters/01-role-of-analytics/chapter.qmd
