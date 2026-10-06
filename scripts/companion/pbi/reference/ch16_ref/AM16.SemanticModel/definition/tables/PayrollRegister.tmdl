@@ -1,0 +1,79 @@
+table PayrollRegister
+
+	column PayrollRegisterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: PayrollRegisterID
+
+	column EmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+	column NetPay
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: NetPay
+
+	column ApprovedByEmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ApprovedByEmployeeID
+
+	column ApprovedDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: ApprovedDate
+
+	column PaymentDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PaymentDate
+
+	column PeriodEndDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PeriodEndDate
+
+	column PayDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PayDate
+
+	column TerminationDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: TerminationDate
+
+	column PaidBeforeApproval
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: PaidBeforeApproval
+
+	column AfterTermination
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: AfterTermination
+
+	column SelfApproved
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SelfApproved
+
+	partition PayrollRegister = m
+		mode: import
+		source =
+			let
+			    Source = PayrollFlags
+			in
+			    Source
+

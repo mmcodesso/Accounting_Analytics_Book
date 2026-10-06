@@ -1,0 +1,124 @@
+table LaborTimeEntry
+
+	measure 'Manufacturing Hours' =
+			CALCULATE (
+			    SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
+			    LaborTimeEntry[LaborType] <> "NonManufacturing"
+			)
+		formatString: #,0
+
+	measure 'Direct Hours' = CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Direct Manufacturing" )
+		formatString: #,0
+
+	measure 'Indirect Hours' = CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Indirect Manufacturing" )
+		formatString: #,0
+
+	measure 'Overtime Hours' =
+			CALCULATE (
+			    SUM ( LaborTimeEntry[OvertimeHours] ),
+			    LaborTimeEntry[LaborType] <> "NonManufacturing"
+			)
+		formatString: #,0
+
+	measure 'Standard Hours' =
+			SUMX (
+			    ProductionCompletionLine,
+			    ProductionCompletionLine[QuantityCompleted] * RELATED ( 'Item'[StandardLaborHoursPerUnit] )
+			)
+		formatString: #,0
+
+	measure 'Standard Hours to Cut-off' =
+			VAR LastTimeRecord =
+			    CALCULATE ( MAX ( LaborTimeEntry[WorkDate] ), REMOVEFILTERS () )
+			RETURN
+			    CALCULATE ( [Standard Hours], KEEPFILTERS ( 'Date'[Date] <= LastTimeRecord ) )
+		formatString: #,0
+
+	measure 'Hours per Standard Hour' = DIVIDE ( [Manufacturing Hours], [Standard Hours to Cut-off] )
+		formatString: 0.00
+
+	measure 'Hours per Standard Hour TTM' =
+			VAR Window =
+			    DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH )
+			VAR MonthsInWindow =
+			    COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), Window ) )
+			RETURN
+			    IF (
+			        MonthsInWindow = 12 && NOT ISBLANK ( [Manufacturing Hours] ),
+			        DIVIDE (
+			            CALCULATE ( [Manufacturing Hours], Window ),
+			            CALCULATE ( [Standard Hours to Cut-off], Window )
+			        )
+			    )
+		formatString: 0.00
+
+	measure 'Overtime Share' = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
+		formatString: 0.0%
+
+	column LaborTimeEntryID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: LaborTimeEntryID
+
+	column EmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+	column WorkOrderOperationID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: WorkOrderOperationID
+
+	column WorkDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: WorkDate
+
+	column LaborType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: LaborType
+
+	column RegularHours
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: RegularHours
+
+	column OvertimeHours
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: OvertimeHours
+
+	column ExtendedLaborCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: ExtendedLaborCost
+
+	column WorkCenterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: WorkCenterID
+
+	partition LaborTimeEntry = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T60_LaborTimeEntry",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"LaborTimeEntryID", "EmployeeID", "WorkOrderOperationID", "WorkDate", "LaborType",
+			        "RegularHours", "OvertimeHours", "ExtendedLaborCost"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"LaborTimeEntryID", Int64.Type}, {"EmployeeID", Int64.Type},
+			        {"WorkOrderOperationID", Int64.Type}, {"WorkDate", type date}, {"LaborType", type text},
+			        {"RegularHours", type number}, {"OvertimeHours", type number}, {"ExtendedLaborCost", type number}}),
+			    Merged = Table.NestedJoin(Typed, {"WorkOrderOperationID"}, Operations, {"WorkOrderOperationID"}, "Op", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "Op", {"WorkCenterID"})
+			in
+			    Expanded
+

@@ -1,0 +1,58 @@
+table Receipts
+
+	column GoodsReceiptLineID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: GoodsReceiptLineID
+
+	column ItemID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ItemID
+
+	column QuantityReceived
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: QuantityReceived
+
+	column ExtendedStandardCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: ExtendedStandardCost
+
+	column ReceiptDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: ReceiptDate
+
+	column RequisitionID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RequisitionID
+
+	column Channel
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Channel
+
+	partition Receipts = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T36_GoodsReceiptLine",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"GoodsReceiptLineID", "GoodsReceiptID", "POLineID", "ItemID", "QuantityReceived", "ExtendedStandardCost"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"GoodsReceiptLineID", Int64.Type}, {"GoodsReceiptID", Int64.Type}, {"POLineID", Int64.Type},
+			        {"ItemID", Int64.Type}, {"QuantityReceived", type number}, {"ExtendedStandardCost", type number}}),
+			    M1 = Table.NestedJoin(Typed, {"GoodsReceiptID"}, ReceiptHeaders, {"GoodsReceiptID"}, "H", JoinKind.LeftOuter),
+			    E1 = Table.ExpandTableColumn(M1, "H", {"ReceiptDate"}),
+			    M2 = Table.NestedJoin(E1, {"POLineID"}, POLines, {"POLineID"}, "P", JoinKind.LeftOuter),
+			    E2 = Table.ExpandTableColumn(M2, "P", {"RequisitionID"}),
+			    M3 = Table.NestedJoin(E2, {"RequisitionID"}, RequisitionsStaged, {"RequisitionID"}, "R", JoinKind.LeftOuter),
+			    E3 = Table.ExpandTableColumn(M3, "R", {"Channel"}),
+			    Out = Table.RemoveColumns(E3, {"GoodsReceiptID", "POLineID"})
+			in
+			    Out
+

@@ -1,0 +1,90 @@
+# Dates and clock times in the text (facts/textscan.py; Phase 7 of the yearly-roll program).
+#
+# A date with a year inside the window's range is one of:
+#   key         a date of the data: replaced by the key's value in the new edition's snapshot (facts/visible.py),
+#               in the literal's own shape (2026-12-11, 11 December 2026, December 11, 2026, 11 December);
+#   structural  the first or last day of a month (2026-12-31, 2027-01-01): only its year moves with the role year;
+#   shift       a hypothetical date tied to the window (an invoice "due on November 15, 2026"): the year moves;
+#   constant    a worked example that does not depend on the window (SQLite's date('2026-01-31', '+1 month'), which
+#               returns 2026-03-03 only because 2026 is not a leap year): kept as written;
+#   real        a real-world date (a Microsoft Learn date, the day a value was verified): kept.
+# A date without a year ("11 December", "December 18") is a constant unless a per-file decision gives it a key.
+# A date outside the range is real. The lint fails on a date that none of these covers.
+#
+# dates: maps an ISO date to its key; it applies to every shape of that date with a year, in every file in scope.
+# times: the same for clock times. files: per-file decisions; in `rx`, {Y} stands for the literal itself.
+
+dates:
+  2026-12-11: date.time_records_end
+  2026-12-07: date.time_records_end.monday
+  2026-12-18: date.payroll.last_pay
+  2027-02-23: date.gl.end
+  2024-01-06: date.je.backdated_created
+  2025-03-05: date.trace.invoice
+  2025-03-02: date.trace.shipment
+  2024-11-21: date.trace.order
+  2025-04-17: date.trace.application
+  2024-03-12: date.ch12.normal_day
+  2026-06-10: date.ch12.surge_day
+
+times:
+  "10:00:00": time.je.backdated_created
+
+files:
+  # --- the book ---------------------------------------------------------------------------------
+  chapters/01-role-of-analytics/chapter.qmd:
+    - {rx: 'on or after {Y}', class: real, why: "effective date of the PCAOB amendments"}
+  chapters/02-understanding-data/_multiple-choice.qmd:
+    - {rx: '(?:on|posted on) {Y}', class: constant, why: "a generic scenario (an ERP extract in March)"}
+  chapters/02-understanding-data/_tutorial-01.qmd:
+    - {rx: 'dated {Y}, whose order', key: date.invoice_before_shipment}
+    - {rx: 'first shipped on {Y}', key: date.invoice_before_shipment.first_ship}
+  chapters/02-understanding-data/chapter.qmd:
+    - {rx: '"{Y}" while another', class: constant, why: "an example of a date format"}
+    - {rx: 'at {Y} AM', class: constant, why: "a generic example of a posting time"}
+  chapters/03-accounting-data-environment/_multiple-choice.qmd:
+    - {rx: 'B\.\s+{Y}', class: constant, why: "an example of a date value"}
+  chapters/04-excel-essentials/_tutorial-01.qmd:
+    - {rx: 'such as {Y} AM', class: constant, why: "how Power Query shows a date column typed as date and time"}
+  chapters/13-power-bi-essentials/_tutorial-01.qmd:
+    - {rx: 'such as {Y} AM', class: constant, why: "how Power Query shows a date column typed as date and time"}
+  chapters/05-data-preparation/_multiple-choice.qmd:
+    - {rx: 'dated {Y} belong', class: constant, why: "a generic scenario (a fiscal year that begins on April 1)"}
+    - {rx: 'invoiced on {Y}', class: shift, why: "inside the Furniture promotion of the story year"}
+  chapters/08-audit-analytics/_multiple-choice.qmd:
+    - {rx: '(?:due on|paid it in full on) {Y}', class: shift, why: "a hypothetical aging scenario tied to the as-of date"}
+  chapters/11-analytical-queries/chapter.qmd:
+    - {rx: '*', class: constant, why: "worked examples of SQLite's date functions (date('2026-01-31', '+1 month') is 2026-03-03 only in a year that is not a leap year)"}
+  chapters/11-analytical-queries/_multiple-choice.qmd:
+    - {rx: '*', class: constant, why: "worked examples of SQLite's date functions"}
+  chapters/11-analytical-queries/_tutorial-03.qmd:
+    - {rx: 'stops on {Y}', key: date.time_records_end}
+  chapters/12-sql-audit-analytics/_multiple-choice.qmd:
+    - {rx: '(?:on|posted to the ledger on) {Y}', class: shift, why: "a hypothetical cutoff scenario across the year-end of the story"}
+  chapters/16-audit-monitoring/_multiple-choice.qmd:
+    - {rx: 'after {Y} were backdated|ends on {Y}', key: date.payroll.last_pay}
+    - {rx: 'shows {Y}', key: date.payroll.last_pay}
+  chapters/16-audit-monitoring/chapter.qmd:
+    - {rx: 'paid on {Y}', key: date.payroll.last_pay}
+  chapters/18-make-buy-or-reprice/chapter.qmd:
+    - {rx: '*', class: constant, why: "the story's calendar (a quote that expires on 15 September), with no year"}
+  appendices/a-publishing-security/_tutorial-02.qmd:
+    - {rx: '*', class: real, why: "Microsoft Learn page dates"}
+  appendices/a-publishing-security/_exercises.qmd:
+    - {rx: '*', class: real, why: "Microsoft Learn page dates"}
+  # --- the slides --------------------------------------------------------------------------------
+  slides/chapter-02/index.qmd:
+    - {rx: 'earliest shipment {Y}', key: date.invoice_before_shipment.first_ship}
+  # --- code that mirrors the text ----------------------------------------------------------------
+  scripts/companion/pbibuild/ex15.py:
+    - {rx: 'drew it on {Y}', class: real, why: "the day the chart was read in Desktop"}
+  facts/notes/*.py:
+    - {rx: "(?:'|\"){Y}(?:'|\") ->|\bsuch as: '{Y}", class: constant, why: "a docstring's example of a date format"}
+    - {rx: 'decision {Y}', class: real, why: "the date of an author's decision"}
+    - {rx: "'{Y} and 01-04'", class: constant, why: "a docstring's example of a date format"}
+    - {rx: "-> '{Y}'", class: constant, why: "a docstring's example of a date format"}
+  scripts/slides/refresh_chapter02_storytelling.py:
+    - {rx: '''SI-\d{4}-\d+'',''{Y}'',\d+', key: date.invoice_before_shipment}
+    - {rx: '''SI-\d{4}-\d+'',''[\d-]+'',\d+,''{Y}''', key: date.invoice_before_shipment.first_ship}
+  tests/test_slide_public_assets.py:
+    - {rx: '*', class: shift, why: "invented rows of a test fixture, tied to the years the test filters on"}

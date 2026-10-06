@@ -1,0 +1,55 @@
+table ItemCosts
+
+	column ItemID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ItemID
+
+	column ItemCode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ItemCode
+
+	column Family
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Family
+
+	column ItemGroup
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ItemGroup
+
+	column SupplyMode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SupplyMode
+
+	column StandardCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: StandardCost
+
+	column AbsorptionCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: AbsorptionCost
+
+	column TimeDrivenCost
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: TimeDrivenCost
+
+	partition ItemCosts = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("D:\codes projects\Accounting_Analytics\scripts\companion\pbi\reference\cr18_itemcosts.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    Typed = Table.TransformColumnTypes(Promoted, {{"ItemID", Int64.Type}, {"ItemCode", type text}, {"Family", type text}, {"ItemGroup", type text}, {"SupplyMode", type text}, {"StandardCost", type number}, {"AbsorptionCost", type number}, {"TimeDrivenCost", type number}}, "en-US")
+			in
+			    Typed
+

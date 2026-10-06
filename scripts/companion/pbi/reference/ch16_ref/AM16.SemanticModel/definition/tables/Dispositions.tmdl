@@ -1,0 +1,47 @@
+table Dispositions
+	isHidden
+
+	column TestID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: TestID
+
+	column DocumentNumber
+		dataType: string
+		summarizeBy: none
+		sourceColumn: DocumentNumber
+
+	column Disposition
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Disposition
+
+	column Note
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Note
+
+	partition Dispositions = m
+		mode: import
+		source =
+			let
+			    Source = #table(type table [TestID = text, DocumentNumber = text, Disposition = text, Note = text], {
+			        {"JE AboveLimit", "JE-2024-000265", "Expected", "Year-end close"},
+			        {"JE AboveLimit", "JE-2024-000266", "Expected", "Year-end close"},
+			        {"JE AboveLimit", "JE-2025-000287", "Expected", "Year-end close"},
+			        {"JE AboveLimit", "JE-2025-000288", "Expected", "Year-end close"},
+			        {"JE AboveLimit", "JE-2026-000296", "Expected", "Year-end close"},
+			        {"JE AboveLimit", "JE-2026-000297", "Expected", "Year-end close"},
+			        {"PO AfterTermination", "PO-2024-000474", "Deficiency", "Approver had left"},
+			        {"PO AfterTermination", "PO-2025-003922", "Deficiency", "Approver had left"},
+			        {"PO AfterTermination", "PO-2026-010467", "Deficiency", "Approver had left"},
+			        {"PR AfterTermination", "Register 840", "Deficiency", "Payee had left"},
+			        {"PR AfterTermination", "Register 2646", "Deficiency", "Payee had left"},
+			        {"PR AfterTermination", "Register 5420", "Deficiency", "Payee had left"},
+			        {"PR PaidBeforeApproval", "Register 2", "Follow up", "Paid before approval"},
+			        {"PR PaidBeforeApproval", "Register 2647", "Follow up", "Paid before approval"},
+			        {"PR PaidBeforeApproval", "Register 5421", "Follow up", "Paid before approval"}
+			    })
+			in
+			    Source
+

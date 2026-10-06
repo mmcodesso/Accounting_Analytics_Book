@@ -1,0 +1,805 @@
+# How the exact values in the text are classified (facts/visible_values.py; Phase 7 of the yearly-roll program).
+#
+# An exact value is a numeric literal written with digits in a file in scope: the book's .qmd files and
+# shared/fragments, the slides decks, and the code that mirrors the text. Years, dates and document numbers
+# belong to facts/literals/{years,dates,ids}.yml. This file classifies everything else that is not
+# structural (a reference such as Tutorial 4.1 or Step 3, a list number, a slide timing, a multiple-choice
+# key, an account number, a single digit that does not count data, a tolerance or cell reference, which
+# visible_values.py recognizes by its context).
+#
+# A literal is one of:
+#   key       a value the roll rewrites: the literal, in its display format, equals the key's value on the
+#             edition's dataset (facts/visible_values.py values()). Keys are val.* (computed in
+#             facts/visible_values_data.py) or registry keys of agent A's facts/visible.py (id.trace.invoice_id).
+#   constant  a teaching constant, threshold, software fact, real-world figure or generic illustration that a
+#             roll keeps (1,000 rows profiled, a 5% policy, the $15,000 mistyped as $1,500).
+#   computed  code that computes the value from the dataset, so there is nothing to rewrite.
+#   review    a figure that may change with a roll, with no registry key yet: the impact report lists it for the
+#             author to check by hand (the note says what to look at).
+#
+# Sections (consulted in this order): files: path -> {literal as written: spec}, rules: patterns by file glob,
+# literal regex and context regex, everywhere: literal -> spec. A spec is "constant", a key, or a mapping
+# {key|class, format, context, note}; `context` is a regular expression searched in the 70 characters before and
+# 50 after the literal, so one literal can mean two things in one file (a spec with a context wins).
+# Formats (see visible_values.py): "$,.2" dollars with separators and two decimals, ".1%" a fraction as a
+# percentage, ".1 percent" the same in words, ".1M" millions, "+ ,.2" signed, "abs ,.2" absolute value,
+# "~10 $.0" about (to a multiple of 10), "floor100000 ,.0" more than. The inference from the literal is right
+# for most keys, so a format is written only where it is not (a positive literal for a negative value).
+
+rules:
+  - name: aging buckets (current, 1-30, 31-60, 61-90, over 90 days past due)
+    class: constant
+    literal: '1|30|31|60|61|90|91|0'
+    context: '(?i)(past due|aging|bucket|days late|over 90|more than 90|1 to 30|31 to 60|61 to 90|1-30|31-60|61-90|1–30|31–60|61–90|DaysPastDue|Over 90)'
+  - name: payment terms in days (30, 45, 60, 90)
+    class: constant
+    literal: '30|45|60|90|31'
+    context: 'DaysToDue|DaysPastDue'
+  - name: the 1,000 rows Power Query profiles by default
+    class: constant
+    literal: '1,000|1000'
+    context: '(?i)(top 1,000|first 1,000|1,000 rows|1,000 lines|1,000 invoice|first 1000|top 1000|profil)'
+  - name: the first 200 rows that decide a Power Query column type
+    class: constant
+    literal: '200'
+    context: '(?i)first 200'
+  - name: a rate per 1,000 documents
+    class: constant
+    literal: '1,000|1000|1000\.0'
+    context: '(?i)(per 1,000|per 1000|\* 1000|1000 \*|1000 \* n|Per 1,000)'
+  - name: the twelve months of a year, trailing windows, lags
+    class: constant
+    literal: '12|11|-12|-3|24'
+    context: '(?i)(MonthsInWindow|PRECEDING|LAG\(|DATESINPERIOD|[*] ?12|12 months|twelve|12\) ?\)|SEQUENCE|MOVINGAVERAGE|, 12, 5|substr|MONTHS|, -12|EDATE|k < 11|[+] 12|1 to 12|range\(1, 13\))'
+  - name: SQL date modifiers
+    class: constant
+    literal: '\+1|-1'
+    context: "(?i)(month'|day'|modifier|start of month)"
+  - name: a sample or population of generic size in an illustration
+    class: constant
+    literal: '(5|10|15|20|45|55|50)'
+    context: '(?i)(a customer (has|with)|those 10 orders|total of 45|1 row B|10 rows|45 rows|55 rows|orders and 20 line|appear 15 times|count the customer 15|factor of 20)'
+  - name: license and standards
+    class: constant
+    literal: '4\.0'
+    context: '(?i)(BY-SA|ShareAlike|license)'
+  - name: image width and layout attributes
+    class: constant
+    literal: '\d{2,3}%'
+    context: 'width=|height='
+  - name: Excel number formats and DAX format strings
+    class: constant
+    literal: '[0#.,]+%?'
+    context: 'NumberFormat|FormatString|format_string|FORMAT \('
+  - name: AccountID values (the Account surrogate key; AccountID 42 is account 4010)
+    context: 'AccountID[^.;]{0,45}\b{lit}\b'
+    map:
+      "2": val.account_id.1010
+      "3": val.account_id.1020
+      "4": val.account_id.1030
+      "5": val.account_id.1040
+      "22": val.account_id.2010
+      "26": val.account_id.2050
+      "27": val.account_id.2060
+      "41": val.account_id.4000
+      "42": val.account_id.4010
+      "46": val.account_id.4050
+      "50": val.account_id.5010
+      "54": val.account_id.5050
+      "55": val.account_id.5060
+      "74": val.account_id.6170
+      "92": val.account_id.1090
+      "93": val.account_id.5080
+      "104": val.account_id.6290
+  - name: a tolerance for comparing decimals (0.0001, 0.001, 0.01)
+    class: constant
+    literal: '-?0\.0{1,3}1'
+  - name: the wording of the generated notes (thresholds, references and policies the exercises set; the values come from the context functions and are rendered from the window)
+    class: constant
+    files: ["facts/notes/templates/*"]
+    literal: '.*'
+  - name: worksheet row numbers named in the steps (row 15, rows 22 to 26)
+    class: constant
+    literal: '\d{1,3}'
+    context: '(?i)\brows?\b[^.;`]{0,30}\b{lit}\b'
+  - name: layout, font-metric and contrast constants of the figure generator
+    class: constant
+    files: ["scripts/figures/check_figures.py", "scripts/figures/drawio.py", "scripts/figures/dbbrowser.py", "scripts/figures/excel.py", "scripts/figures/powerbi.py"]
+    literal: '.*'
+    origin: constant
+  - name: numeric tables of the companion builders and the note modules (rates, strata, months, codes, tables numbers, colors); data-bearing ones are listed per file
+    class: constant
+    files: ["scripts/companion/*/*.py", "facts/notes/*.py"]
+    literal: '.*'
+    origin: constant
+
+everywhere:
+  # the traced sale of Chapters 1 and 3 (SI-2025-007947 in the 2026 edition), wherever it is told
+  "$688.42": val.trace.line_total
+  "688.42": val.trace.line_total
+  "6.884200e+02": {key: val.trace.line_total, format: ".6e"}
+  "68,842": val.trace.line_total_x100
+  "$344.21": val.trace.unit_price
+  "344.21": val.trace.unit_price
+  "$787.48": val.trace.grand_total
+  "787.48": val.trace.grand_total
+  "$51.00": val.trace.freight
+  "$48.06": val.trace.tax
+  "$459.32": val.trace.extended_cost
+  "$229.66": val.trace.standard_cost
+  "229.66": val.trace.standard_cost
+  "382.45": val.trace.list_price
+  "$23,870.99": val.trace.receipt_amount
+  "7947": id.trace.invoice_id
+  "007947": {key: id.trace.invoice_id, format: "zero6 .0"}
+  "10645": id.trace.line_id
+  "10646": val.trace.line_id_p1
+  "10648": val.trace.line_id_p3
+  "10449": id.trace.shipment_line_id
+  "6522": id.trace.order_line_id
+  "3603": id.trace.shipment_id
+  "1697": id.trace.order_id
+  "10686": id.trace.application_id
+  "3043": id.trace.receipt_id
+  "126312": id.trace.gl_revenue_id
+  # Chapter 2's freight outlier and the ledger's totals
+  "$873.95": val.freight.max
+  "$152.20": val.freight.mean
+  "$731,949,908.31": val.gl.total_debits
+  # the promotions of the report year: the item-group promotion, its neighbors, and the discount rates on the lines
+  "42.26 percent": {key: val.furniture.margin.Q3, format: ".2 percent"}
+  "40.78 percent": {key: val.furniture.margin.Q4, format: ".2 percent"}
+  "43.05 percent": {key: val.furniture.margin.Q1, format: ".2 percent"}
+  "43.15 percent": {key: val.furniture.margin.Q2, format: ".2 percent"}
+
+files:
+  # ---- Part I -----------------------------------------------------------------------------------------
+  chapters/01-role-of-analytics/chapter.qmd:
+    constants: ["50", "500,000", "1,446"]    # a generic audit-sampling illustration; the CIMA survey (Chapter 1's reference)
+    "FUR-DSK-0075": id.trace.item_code
+  chapters/02-understanding-data/_multiple-choice.qmd:
+    constants: ["$15,000", "$1,500"]         # a generic data-entry error
+  chapters/02-understanding-data/_tutorial-02.qmd:
+    constants: ["$0.00"]                     # the Difference row of the trial balance check
+  chapters/02-understanding-data/chapter.qmd:
+    constants: ["$1,247.83", "$5,000", "$50,000", "$2,000,000", "4100", "4100.0", "41", "15"]   # generic illustrations
+    "$150": {key: val.freight.mean, format: "~10 $.0", note: "about the mean shipment freight"}
+  chapters/03-accounting-data-environment/_multiple-choice.qmd:
+    constants: ["1", "99.73", "4500"]        # generic question options
+  chapters/03-accounting-data-environment/_tutorial-02.qmd:
+    "135": id.trace.customer_id
+    "218": id.trace.item_id
+    "42": val.account_id.4010                # the item's RevenueAccountID, the same surrogate key as AccountID 42
+    "2": {key: id.trace.quantity, context: 'units'}
+    "FUR-DSK-0075": id.trace.item_code
+  chapters/03-accounting-data-environment/chapter.qmd:
+    constants: ["0450", "12", "4", "1"]      # customers 1, 4 and 12 are master-data rows (their names do not depend on the window)
+    review:
+      "62": "orders 62, 85 and 59 of the key figure: shared/calculations/foundations.key_example picks them by number; choose rows with the same shape in the new window (two orders of one customer, one of another)"
+      "85": "see 62"
+      "59": "see 62"
+
+  # ---- Part II: Chapters 4-8 and the Part II case ------------------------------------------------------
+  chapters/04-excel-essentials/_exercises.qmd:
+    constants: ["0.45"]                      # the MarginTarget parameter the exercise sets
+  chapters/04-excel-essentials/_key-terms.qmd:
+    constants: ["101", "111", "109"]         # SUBTOTAL function numbers
+  chapters/04-excel-essentials/_multiple-choice.qmd:
+    constants: ["1,000", "5,000", "6,200", "0.5", "0.99", "1.5"]   # generic rule thresholds and an input check
+    "8": val.promo.furniture_id
+  chapters/04-excel-essentials/_tutorial-01.qmd:
+    constants: ["1.2", "123", "0.1", "0.10", "10 percent"]   # the decimal icon, a generic rate, "0.10 for 10 percent"
+    review:
+      "0.1": "five consecutive invoice lines of which two carry a promotional discount: check the lines the step names in the new window"
+  chapters/04-excel-essentials/_tutorial-02.qmd:
+    constants: ["0.9", "90 percent", "0.95", "100 percent"]
+    "0.08": val.discount.rate.1
+    "0.1": val.discount.rate.2
+    "0.12": val.discount.rate.3
+    "8": {key: val.discount.rate.1, format: ".0p"}
+    "10": {key: val.discount.rate.2, format: ".0p"}
+    "12 percent": val.discount.rate.3
+  chapters/04-excel-essentials/_tutorial-03.qmd:
+    constants: ["0.5", "0.99", "0.9", "1.5", "1"]
+    "8": val.promo.furniture_id
+    "10 percent": val.promo.furniture_rate
+  chapters/04-excel-essentials/chapter.qmd:
+    "27934": {key: val.invoice_lines.last_row, note: "the last row of the SalesInvoiceLine Table (its lines plus the header)"}
+    constants: ["50", "0.9", "1.8 percent", "25", "$100 million", "45", "100", "10 percent"]   # Powell et al., Caulkins et al., generic
+  chapters/05-data-preparation/_exercises.qmd:
+    constants: ["0"]                         # IsApproved flag
+  chapters/05-data-preparation/_multiple-choice.qmd:
+    constants: ["GRP-TYP-9999"]
+    "FUR-DSK-0075": id.trace.item_code
+    "0075": {key: val.trace.item_number, format: "zero4 .0"}
+    "10 percent": val.promo.furniture_rate
+  chapters/05-data-preparation/_tutorial-01.qmd:
+    constants: ["GRP-TYP-9999", "12", "60"]
+    "FUR-DSK-0075": id.trace.item_code
+    "FUR-SDB-0002": val.item9.code
+    "8": val.promo.furniture_id
+  chapters/05-data-preparation/_tutorial-02.qmd:
+    "8": val.promo.furniture_id
+  chapters/05-data-preparation/chapter.qmd:
+    constants: ["12", "48", "160", "-1", "+1", "-4"]
+    "FUR-DSK-0075": id.trace.item_code
+    "FUR-SDB-0002": val.item9.code
+    review:
+      "3.74": "an invoice line of a sideboard with a fractional quantity: pick a line of the new window with the same shape (it is billed on the line after the traced one in the 2026 edition)"
+      "10646": "see 3.74"
+  chapters/06-descriptive-analytics/_exercises.qmd:
+    constants: ["$500,000", "10 percent", "$50,000"]   # thresholds the exercise sets
+  chapters/06-descriptive-analytics/_tutorial-01.qmd:
+    constants: ["$1,000", "15,000", "0%", "1,000"]   # the bin width and the last bin of the frequency table
+  chapters/06-descriptive-analytics/_tutorial-02.qmd:
+    constants: ["100 percent"]               # Services carries no standard cost
+  chapters/06-descriptive-analytics/_tutorial-03.qmd:
+    "8": val.promo.furniture_id
+    "9": val.promo.segment_id
+    "7": val.promo.collection_id
+    review:
+      "1600000": "the bridge chart's axis minimum: check that it still sits below the quarters' margins in the new window"
+      "1.6 million": "see 1600000"
+  chapters/06-descriptive-analytics/chapter.qmd:
+    constants: ["$0", "$1,000", "$2,000", "4"]
+    "1.5": {key: val.furniture.margin_drop, format: ".1p"}
+  chapters/07-analysis-and-modeling/_exercises.qmd:
+    constants: ["40", "50 percent", "$6 million", "$10 million", "$4 million", "5 percent", "3 percent"]
+  chapters/07-analysis-and-modeling/_key-terms.qmd:
+    constants: ["−1", "+1", "0.05"]
+  chapters/07-analysis-and-modeling/_multiple-choice.qmd:
+    constants: ["−0.80", "80 percent", "0.05", "$900,000", "30 percent", "$270,000", "$1,170,000", "$2,700,000", "$3,000,000"]
+    "0.17": val.trend.r2
+    "17 percent": val.trend.r2
+    "0.01": val.trend.p_with
+    "0.07": val.trend.p_without
+    "75 percent": val.commission.below_static
+  chapters/07-analysis-and-modeling/_tutorial-01.qmd:
+    constants: ["+1", "0.05", "34", "-1"]   # 34 is the month index after 33 months of data
+  chapters/07-analysis-and-modeling/_tutorial-02.qmd:
+    constants: ["7999"]                      # the upper bound of the expense accounts
+  chapters/07-analysis-and-modeling/_tutorial-03.qmd:
+    constants: ["0", "0.1", "0%", "15%", "15 percent", "0.05", "0.15", "0.4", "5 percent", "5%", "40 percent"]
+    "10%": val.promo.furniture_rate
+    "10 percent": val.promo.furniture_rate
+    "8": val.promo.furniture_id
+    "30": {key: val.promo.breakeven_lift, format: "floor5 .0p"}
+    "35 percent": {key: val.promo.breakeven_lift, format: "ceil5 .0 percent"}
+  chapters/07-analysis-and-modeling/chapter.qmd:
+    constants: ["−1", "+1", "95 percent", "0.05", "$600,000", "40 percent", "$1,500,000", "$2,000,000", "$500,000",
+                "$200,000", "$300,000", "0.40", "$2,250,000"]
+  chapters/08-audit-analytics/_exercises.qmd:
+    constants: ["0.5 percent", "2 percent", "5 percent", "15 percent", "40 percent", "$10", "50 percent", "80 percent",
+                "90 percent", "$50", "$4,800", "$5,199.99", "$5,000"]
+  chapters/08-audit-analytics/_key-terms.qmd:
+    constants: ["30 percent", "5 percent", "1"]
+  chapters/08-audit-analytics/_multiple-choice.qmd:
+    constants: ["$1,000", "$50,000", "5 percent", "11 percent", "50 percent", "30 percent", "$1", "0.015", "90"]
+    "0.013": {key: val.benford.mad, format: ".3"}
+  chapters/08-audit-analytics/_summary.qmd:
+    constants: ["$10,000", "$1,000"]
+  chapters/08-audit-analytics/_tutorial-01.qmd:
+    constants: ["10000", "50000", "100000", "+0.01", "$1,000", "$10,000", "$50,000", "1,000", "100,000", "0", "$1",
+                "$0.60", "$9.70", "10", "$2,000"]
+    review:
+      "2": "the first-digit chart: the columns for 1 and 2 below the line and those for 5 to 9 above it describe the payments' digit shape; check them against the new window"
+  chapters/08-audit-analytics/_tutorial-02.qmd:
+    constants: ["-9999", "-1", "50000", "20", "2"]
+  chapters/08-audit-analytics/_tutorial-03.qmd:
+    constants: ["$250,000", "2"]
+  chapters/08-audit-analytics/chapter.qmd:
+    constants: ["1881", "30 percent", "18 percent", "5 percent", "99", "1", "2", "0.000", "0.006", "0.012", "0.015", "29"]
+
+  # ---- Part III: Chapters 9-12 and the Part III case -----------------------------------------------------
+  chapters/09-sql-essentials/_multiple-choice.qmd:
+    constants: ["12", "10", "25", "2.0", "3.5"]
+    "93": val.account_id.5080                # the question asks why AccountID 93 stands for account 5080
+  chapters/09-sql-essentials/_tutorial-01.qmd:
+    "92": val.account_id.1090
+    "93": val.account_id.5080
+  chapters/09-sql-essentials/_tutorial-02.qmd:
+    constants: ["10"]
+    "800,000": {key: val.gl.rows, format: "floor100000 ,.0"}
+    "92": val.account_id.1090
+    "93": val.account_id.5080
+  chapters/09-sql-essentials/_tutorial-03.qmd:
+    constants: ["10", "$1,000"]
+  chapters/09-sql-essentials/chapter.qmd:
+    constants: ["2.0", "3.5", "1.0", "7", "1234.567", "1234.57", "-2", "1235.0", "1200", "12", "10", "50,000", "33,000"]
+    "800,000": {key: val.gl.rows, format: "floor100000 ,.0"}
+    "-2011.14": {key: val.variance.most_favorable, format: "- .2"}
+    "2011.14": {key: val.variance.most_favorable, format: "abs .2"}
+    "000296": {key: val.close.pl_seq, format: "zero6 .0"}
+    "93": val.account_id.5080
+  chapters/10-joining-and-summarizing/_exercises.qmd:
+    constants: ["20"]
+  chapters/10-joining-and-summarizing/_tutorial-01.qmd:
+    constants: ["$50,000", "50000", "30000"]
+    "93": val.account_id.5080
+  chapters/10-joining-and-summarizing/_tutorial-02.qmd:
+    "92": val.account_id.1090
+    "93": val.account_id.5080
+  chapters/10-joining-and-summarizing/chapter.qmd:
+    constants: ["6"]
+    "93": val.account_id.5080
+  chapters/11-analytical-queries/_exercises.qmd:
+    constants: ["$5,000", "$50", "$4,700", "$5,250", "$4,950.00", "$4,999.99"]   # the lowest nonzero approval limit and the bands the exercise sets
+  chapters/11-analytical-queries/_multiple-choice.qmd:
+    constants: ["10000", "25,000"]
+    review:
+      "202603": "the year and month of the WorkDate in the stem (2026-03-06), written as a number: follow the stem's date"
+  chapters/11-analytical-queries/_tutorial-01.qmd:
+    constants: ["36"]
+    "92": val.account_id.1090
+  chapters/11-analytical-queries/_tutorial-02.qmd:
+    "92": val.account_id.1090
+  chapters/11-analytical-queries/_tutorial-03.qmd:
+    constants: ["36"]
+  chapters/11-analytical-queries/chapter.qmd:
+    constants: ["0", "10"]
+    "92": val.account_id.1090
+    review:
+      "2461105.5": "the julianday of the chapter's example date in tbl-11-01 (2026-03-06 or the day before): recompute it if the example date changes"
+  chapters/12-sql-audit-analytics/_exercises.qmd:
+    constants: ["$1,000", "$10,000", "$50,000", "30", "1.0"]
+    "14": {key: val.open_period.start_day, format: ".0"}
+  chapters/12-sql-audit-analytics/_multiple-choice.qmd:
+    constants: ["3 percent", "2 percent", "$1", "1.5"]
+  chapters/12-sql-audit-analytics/_tutorial-02.qmd:
+    constants: ["0.03", "0.02", "3%"]
+  chapters/12-sql-audit-analytics/_tutorial-03.qmd:
+    constants: ["1.5", "0.5", "1"]
+    "64": val.plant.hourly_employees
+  chapters/12-sql-audit-analytics/chapter.qmd:
+    constants: ["0.0001", "14", "1.0"]
+  cases/part-3-case.qmd:
+    "64": val.plant.hourly_employees
+    "14": {key: val.open_period.start_day, format: ".0"}
+
+  # ---- Part IV: Chapters 13-16, the Part IV case and the appendix -----------------------------------
+  chapters/13-power-bi-essentials/_exercises.qmd:
+    constants: ["5%", "10"]                  # the concentration policy and the Top N filter the exercise sets
+  chapters/13-power-bi-essentials/_multiple-choice.qmd:
+    "80%": {key: val.revenue.growth_first_to_last, format: "~10 .0%"}
+  chapters/13-power-bi-essentials/_tutorial-01.qmd:
+    constants: ["123", "1,234.56"]
+  chapters/13-power-bi-essentials/_tutorial-03.qmd:
+    "80%": {key: val.revenue.growth_first_to_last, format: "~10 .0%"}
+  chapters/13-power-bi-essentials/chapter.qmd:
+    constants: ["13", "14", "15", "240", "30%", "11%", "10%", "4.5"]   # chapter numbers in tbl-13-01; Beattie and Jones; the contrast ratio
+  chapters/14-data-models-and-dax/_exercises.qmd:
+    constants: ["-1"]
+  chapters/14-data-models-and-dax/_tutorial-02.qmd:
+    constants: ["100%"]
+  chapters/14-data-models-and-dax/_tutorial-03.qmd:
+    constants: ["20%"]
+  chapters/14-data-models-and-dax/chapter.qmd:
+    constants: ["13", "14", "15", "16", "100 percent", "10000", "100"]
+  chapters/15-management-reports/_exercises.qmd:
+    constants: ["0.2", "0.01", "5", "8", "10", "12", "15 percent", "95 percent"]
+    "0.12": val.promo.segment_rate
+    "12 percent": {key: val.promo.segment_rate, format: ".0 percent"}
+    "1.903 percent": {key: val.promo.commission_rate, format: ".3 percent"}
+  chapters/15-management-reports/_multiple-choice.qmd:
+    constants: ["99 percent"]
+    "+26.9 percent": {key: val.cost_center.variance.Warehouse, format: "+ .1 percent"}
+  chapters/15-management-reports/_tutorial-02.qmd:
+    constants: ["0.05", "-0.05"]
+  chapters/16-audit-monitoring/_exercises.qmd:
+    constants: ["16.2", "30"]
+    "4": val.cost_center.manufacturing_id
+  chapters/16-audit-monitoring/_key-terms.qmd:
+    constants: ["1"]
+  chapters/16-audit-monitoring/_tutorial-01.qmd:
+    constants: ["1"]
+  chapters/16-audit-monitoring/_tutorial-03.qmd:
+    constants: ["1"]
+    "840": val.register.after_termination.1
+    "2646": val.register.after_termination.2
+    "5420": val.register.after_termination.3
+    "2": val.register.paid_before_approval.1
+    "2647": val.register.paid_before_approval.2
+    "5421": val.register.paid_before_approval.3
+    "3": val.register.unpaid_count
+  chapters/16-audit-monitoring/chapter.qmd:
+    constants: ["1"]
+  appendices/a-publishing-security/_tutorial-01.qmd:
+    constants: ["10"]                        # a CostCenterID row of the security table
+  appendices/a-publishing-security/_tutorial-02.qmd:
+    constants: ["2", "3"]                    # CostCenterIDs typed in the security table
+  appendices/a-publishing-security/appendix.qmd:
+    constants: ["25"]                        # the audiences an app supports
+  cases/part-2-case.qmd:
+    constants: ["5", "0", "40 percent"]
+    "8": {key: val.promo.collection_rate, format: ".0p"}
+    "10": {key: val.promo.furniture_rate, format: ".0p"}
+    "8 percent": val.promo.collection_rate
+    "10 percent": val.promo.furniture_rate
+    "12 percent": val.promo.segment_rate
+  cases/part-4-case.qmd:
+    constants: ["365", "28", "60", "90"]
+
+  # ---- Part V: Chapters 17-19 -------------------------------------------------------------------------
+  chapters/17-statements-for-a-lender/chapter.qmd:
+    constants: ["5%", "0.5%", "2%", "15%", "40%", "205"]   # materiality, Exercise 8.1's rates, ASC Subtopic 205-40
+  chapters/18-make-buy-or-reprice/chapter.qmd:
+    constants: ["8", "6", "325", "270", "180", "220", "$325", "$270", "$180", "$220", "$315", "18,000", "22,000", "25,000", "30,000",
+                "15,000", "8,000", "$18,000", "$22,000", "$25,000", "$30,000", "$15,000", "$8,000", "80%", "3%", "1.5%", "45", "40", "40%", "50%", "5%", "75%", "90%", "10%", "1%", "11.1%",
+                "85%", "60", "1.5"]      # the contract manufacturer's quote terms, the assumptions the text sets, Marn and Rosiello
+    "26.62": val.plan.rate
+    "14.14%": val.plan.burden
+    "1.18": val.plan.hours_ratio
+    "0.18": val.plan.indirect_ratio
+    "68,912.79": val.plan.standard_hours
+    "263,191.24": val.plan.salary
+    "293,499.96": val.plan.depreciation
+    review:
+      "1,450": "the quote's volume for each family tracks the base year's unit sales of that family (within 10%); recompute the quoted volumes from the new base year"
+      "3,200": "see 1,450"
+      "3,800": "see 1,450"
+      "5,000": "see 1,450"
+      "4,600": "see 1,450"
+      "700": "see 1,450"
+  chapters/19-customer-credits-audit/chapter.qmd:
+    constants: ["5%", "90%", "75%", "95%", "10%", "0%", "59", "29", "45", "22", "1%", "93", "46", "77", "38", "2%", "181", "132", "$5,000", "$10,000"]
+
+  # ---- the slides decks (slides/chapter-NN/index.qmd) ---------------------------------------------------
+  slides/chapter-01/index.qmd:
+    constants: ["1", "4", "3", "9"]          # customers 1 and 4, order 1, ItemIDs 3 and 9: master-data rows
+    "1.48": {key: val.furniture.margin_drop, format: ".2p"}
+    "1.48 percent": {key: val.furniture.margin_drop, format: ".2 percent"}
+    "1.48116": {key: val.furniture.margin_drop, format: ".5p"}
+    "81": val.order1.customer_id
+    "474.22": val.item3.standard_cost
+    "412.81": val.item9.standard_cost
+    review:
+      "62": "orders 62, 85 and 59 of the key figure (see chapter 3): choose rows with the same shape in the new window"
+      "85": "see 62"
+      "59": "see 62"
+  slides/chapter-02/index.qmd:
+    constants: ["$0.00", "$0", "$100", "0", "4", "7", "8", "6", "1"]   # a toy table; the numbered steps of a sentence
+    "41": val.invoice1.order_id
+    "42": val.account_id.4010
+    "526": val.gl.rows_after_window
+    review:
+      "2": "selected supplier 2 PurchaseInvoice records (the duplicated invoice numbers): follows id.supplier_invoice.duplicate; check the supplier number"
+  slides/chapter-04/index.qmd:
+    constants: ["0.90", "0.95", "0.50", "0.99", "103", "109"]
+    "8": val.promo.furniture_id
+    "10 percent": val.promo.furniture_rate
+  slides/chapter-05/index.qmd:
+    constants: ["GRP-TYP-9999", "12", "45"]
+    "8": val.promo.furniture_id
+  slides/chapter-06/index.qmd:
+    constants: ["15000", "100%"]
+    "8": val.promo.furniture_id
+    "9": val.promo.segment_id
+  slides/chapter-07/index.qmd:
+    constants: ["15 percent"]
+    "10 percent": val.promo.furniture_rate
+    "10%": val.promo.furniture_rate
+  slides/chapter-08/index.qmd:
+    constants: ["1,000"]
+  slides/chapter-09/index.qmd:
+    constants: ["1.0"]
+  slides/chapter-11/index.qmd:
+    constants: ["100", "36", "25"]
+  slides/chapter-18/index.qmd:
+    constants: ["75%", "90%"]
+  slides/chapter-19/index.qmd:
+    constants: ["5%", "75%", "$5,000", "$10,000"]
+
+  # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
+  shared/calculations/bi_ch13.py:
+    constants: ["10", "13", "12", "31", "0.02", "0.05"]
+  shared/calculations/bi_ch14.py:
+    constants: ["12", "31"]
+  shared/calculations/bi_ch15.py:
+    constants: ["0.02", "0.05"]
+    "8289648.80": val.opex.budget
+    "6471696.58": val.opex.actual
+    "621780.04": val.opex.flexed_commission
+    review:
+      "174758.96": "asserts the remaining variance as 174,758.96; the data give 174,758.966809, which rounds to 174,758.97 (the assert's 0.05 tolerance hides the cent); the figure script ch15.py states 174758.97"
+  shared/calculations/bi_ch16.py:
+    "851": val.je.entries
+    "17": [{context: 'JE_FLAGS', key: val.test.JE.Weekend}, {context: 'counts\[t\]', key: val.test.JE.Weekend}]
+    "6": [{context: 'JE_FLAGS', key: val.test.JE.Backdated}, {context: 'counts\[t\]', key: val.test.JE.Backdated}]
+    "7": [{context: 'JE_FLAGS', key: val.test.JE.SelfApproved}, {context: 'counts\[t\]', key: val.test.JE.SelfApproved}, {context: '\(2, {lit}\)', key: val.je.score.2}]
+    "9": [{context: 'JE_FLAGS', key: val.test.JE.AboveLimit}, {context: 'counts\[t\]', nth: 1, key: val.test.JE.AboveLimit}, {context: 'counts\[t\]', nth: 2, key: val.test.PO.SelfApproved}]
+    "4": [{context: 'JE_FLAGS', key: val.test.JE.RoundAmount}, {context: 'counts\[t\]', key: val.test.JE.RoundAmount}, {context: '\(4, 1\)', class: constant}]
+    "13": val.test.PO.AboveLimit
+    "3": [{context: 'counts\[t\]', nth: 1, key: val.test.PO.AfterTermination}, {context: 'counts\[t\]', nth: 2, key: val.test.PR.PaidBeforeApproval}, {context: 'counts\[t\]', nth: 3, key: val.test.PR.AfterTermination}]
+    "77": val.test.PR.SelfApproved
+    "818": val.je.score.0
+    "25": val.je.score.1
+    "2": constant
+    "151": val.exceptions.total
+    "15": val.exceptions.dispositions
+  shared/calculations/excel_analysis.py:
+    constants: ["9999", "0.012", "0.015", "36", "0.25", "0.35", "0.9", "4"]
+    "380_000": val.opening.receivables
+  shared/calculations/foundations.py:
+    review:
+      "59": "SalesOrderID 59, 62 and 85 (two orders of one customer, one of another) for the key figure: choose rows with the same shape in the new window"
+      "62": "see 59"
+      "85": "see 59"
+  shared/calculations/sql_ch09.py:
+    constants: ["$1,000"]
+  shared/calculations/sql_ch10.py:
+    constants: ["$50,000", "50000"]
+  shared/calculations/sql_ch12.py:
+    constants: ["3%", "0.03", "0.02", "1.5", "0.5"]
+
+  # ---- scripts/figures: assertions and strings that mirror what the figures and the text show --------------
+  scripts/figures/appendix_a.py:
+    "2734179.05": val.cost_center.budget.Sales
+    "1018872.21": val.cost_center.actual.Sales
+  scripts/figures/ch02.py:
+    constants: ["15", "9", "2"]
+  scripts/figures/ch03.py:
+    constants: ["12"]
+  scripts/figures/ch04.py:
+    "0.08": val.discount.rate.1
+    "0.10": val.discount.rate.2
+    "0.12": val.discount.rate.3
+    constants: ["860", "25.00", "30.00", "100.00", "250.00", "1,000.00", "5%", "10%", "$2", "0.5", "0.99", "12", "4", "2"]
+    "8": val.promo.furniture_id
+  scripts/figures/ch05.py:
+    constants: ["12", "7"]
+  scripts/figures/ch06.py:
+    constants: ["50", "$1,000", "$15,000", "100.00%", "100 percent", "860"]
+    "8": val.promo.furniture_id
+    review:
+      "$1,600,000": "the bridge chart's axis minimum (see Tutorial 6.3): check that it still sits below the quarters' margins"
+  scripts/figures/ch07.py:
+    constants: ["0.02", "0.045", "95%", "0.05", "10", "15%", "8", "9"]
+    "10.00%": {key: val.promo.furniture_rate, format: ".2%"}
+  scripts/figures/ch08.py:
+    constants: ["0.7", "0.25", "100.00%", "$1,000", "$2,000", "0.8"]
+    "380_000": val.opening.receivables
+    "18": val.je.opening_lines
+    "4": {context: 'strata\[3\]', key: val.payments.over_50k}
+    "8": {context: 'len\(shown\)', key: val.je.score2plus}
+  scripts/figures/ch09.py:
+    constants: ["50", "10", "6", "0.8"]
+    "92": val.account_id.1090
+    "93": val.account_id.5080
+  scripts/figures/ch10.py:
+    review:
+      "13014": "SAMPLE_WORK_ORDERS (three closed work orders and one released) are picked by number for Figure 10.1: choose work orders of the same shape in the new window"
+      "13015": "see 13014"
+      "13016": "see 13014"
+      "13017": "see 13014"
+    constants: ["0.02", "0.66", "1.7", "2.0", "10000", "1.1", "40", "0.7", "0.8", "1.5", "1.4", "1.55", "4", "3", "6"]
+    "71": val.tb.accounts
+    "67107722.36": val.tb.debits
+  scripts/figures/ch11.py:
+    constants: ["0.05", "0.06", "36", "0.3", "0.12", "0.25", "0.1", "24", "1.9", "15", "25", "12", "3", "2"]
+    "1.54": {key: val.ttm.peak, format: ".2"}
+    "6": val.pay.three_date_months
+    "9": [{context: 'len\(rows\) == 9', class: review, note: "the rows of the pay-dates pivot (the months with three pay dates and the neighbors): recount in the new window"}, {class: constant}]
+  scripts/figures/ch12.py:
+    constants: ["17", "18", "19", "21", "22", "0.02", "0.03", "24", "0.7", "0.1", "20", "0.17", "0.23", "0.45", "0.55", "0.6", "0.85", "0.9", "3%", "2%", "2", "3", "6"]
+    "15": val.cutoff.F.invoices
+    "90138.93": val.cutoff.F.amount
+    "8": [{context: '\({lit}, [0-9.]+\)', key: val.cutoff.P.invoices}, {context: 'before shipment', key: val.invoice_before_shipment.count}]
+    "19540.86": val.cutoff.P.amount
+    "13": val.test.PO.AboveLimit
+    "14": val.po.docs_flagged
+    "11": val.po.failing_two_tests
+    "12": {key: val.surge.days.F}
+    "32": {key: val.surge.days.P}
+    "49": {key: val.surge.days.C}
+    "64": val.plant.hourly_employees
+    "4": {key: val.employee.production_manager}
+  scripts/figures/ch13.py:
+    constants: ["5", "1%", "10", "12", "0.25", "0.1", "0.9", "4", "9"]
+    "9,522": val.year.lines
+    "29,756,420.08": val.year.revenue
+    "33,589,137.45": val.year.list
+    "362,110.75": val.year.discounts
+  scripts/figures/ch14.py:
+    "5110308.27": val.net_income.F
+    "5134354.71": val.net_income.P
+    "4503611.24": val.net_income.C
+    constants: ["0.02", "100", "36", "0.11", "0.5", "100.00%"]
+    "1461": val.date_table.days
+    "4156787.84": val.furniture.q4_revenue
+    "1645084.67": val.top_customer.revenue
+    "29756420.08": val.year.revenue
+    "9522": val.year.lines
+    "42.26": {key: val.furniture.margin.Q3, format: ".2p"}
+    "40.78": {key: val.furniture.margin.Q4, format: ".2p"}
+  scripts/figures/ch15.py:
+    constants: ["0.05", "13", "5%", "1.0", "1.5", "860", "6"]
+    "17395054.38": val.furniture.revenue
+    "29756420.08": val.year.revenue
+    "362110.06": val.year.adjusted_discount
+    "296053.58": val.promo.furniture_discount
+    "168": val.budget.lines_without_cost_center
+    "174758.97": val.opex.remaining
+    "1.121": {key: val.ttm.second_month, format: ".3"}
+    "1.375": {key: val.ttm.visual_first, format: ".3"}
+    "1.18": val.hours_ratio.F
+    "1.41": val.hours_ratio.P
+    "1.51": val.hours_ratio.C
+  scripts/figures/ch16.py:
+    constants: ["650", "496", "13", "6", "4", "2"]
+    "18": val.je.opening_lines
+    "56": val.exceptions.january
+    "136": val.exceptions.open
+    "19": val.docs.multi_exception
+    "18832": val.po.orders
+    "8197": val.pr.registers
+    "3": val.register.unpaid_count
+    "8": [{context: 'flagged', key: val.je.score2plus}, {context: 'tests', class: constant}]
+  scripts/figures/dbbrowser.py:
+    constants: ["12", "3.13"]
+  scripts/figures/powerbi.py:
+    constants: ["2.158", "12", "50"]
+
+  # ---- scripts/companion: the Excel, Power BI and SQL companion builders --------------------------------
+  scripts/companion/xlbuild/analysis.py:
+    "8": {context: 'PROMO = ', key: val.promo.furniture_id}
+    constants: ["100%", "0.5", "0.99", "0.9", "10", "15,000", "95%", "95.0%", "0.05", "$3", "15%", "5%"]
+    "10%": val.promo.furniture_rate
+    "30%": {key: val.promo.breakeven_lift, format: "floor5 .0%"}
+    "35%": {key: val.promo.breakeven_lift, format: "ceil5 .0%"}
+    review:
+      "1.6 million": "the bridge chart's axis minimum (Tutorial 6.3): check against the new quarters' margins"
+  scripts/companion/xlbuild/audit.py:
+    constants: ["0.012", "0.015", "1,000", "10,000", "50,000", "100,000", "$1,000", "$10,000", "$50,000", "$2,000", "100%",
+                "1899", "12", "30", "$10", "$250,000"]
+  scripts/companion/xlbuild/cap17.py:
+    constants: ["5%", "2", "12.25", "843.86", "10,337.285", "10,337.28", "10,337.29", "8.1", "21%", "$14"]
+    review:
+      "296,000": "Exercise 12.1's hour-based accrual at the earlier year-ends (about 296,000 and 335,000): recompute from the new window"
+      "335,000": "see 296,000"
+  scripts/companion/xlbuild/cap18.py:
+    review:
+      "1450": "QUOTE: the contract manufacturer's quoted volumes track the base year's unit sales of each family (within 10%); recompute them from the new base year"
+      "3200": "see 1450"
+      "3800": "see 1450"
+      "5000": "see 1450"
+      "4600": "see 1450"
+      "700": "see 1450"
+    constants: ["1.0", "999999", "40%", "50%", "0.025", "75%", "90%", "0.2", "0%", "100%", "10%", "80%", "1.5%", "0.5", "-0.05",
+                "5%", "0.0%"]
+    "68,912.79": val.plan.standard_hours
+    "68,912.7917": {key: val.plan.standard_hours, format: ",.4"}
+    "263,191.24": val.plan.salary
+    "293,499.96": val.plan.depreciation
+    "26.62": val.plan.rate
+    "1.1414": {key: val.plan.burden_factor, format: ".4"}
+    "0.18": val.plan.indirect_ratio
+    "1.18": val.plan.hours_ratio
+  scripts/companion/xlbuild/cap19.py:
+    constants: ["5%", "75%", "$0", "$25,000", "95%", "0.05", "0.95", "$5,000", "$10,000", "$14", "3"]
+  scripts/companion/xlbuild/case2.py:
+    constants: ["5%", "-0.02", "1,000", "2"]
+    "8 percent": val.promo.collection_rate
+    "10 percent": val.promo.furniture_rate
+    "12 percent": val.promo.segment_rate
+    "8%": val.promo.collection_rate
+    "10%": val.promo.furniture_rate
+    "12%": val.promo.segment_rate
+    "30%": {key: val.promo.breakeven_lift, format: "floor5 .0%"}
+    "35%": {key: val.promo.breakeven_lift, format: "ceil5 .0%"}
+  scripts/companion/xlbuild/ex04.py:
+    constants: ["100%", "0.45", "30 percent", "0.3", "100 percent", "2"]
+  scripts/companion/xlbuild/ex06.py:
+    constants: ["2,006.895", "2,006.90", "$3", "$500,000", "$50,000", "10 percent", "2"]
+  scripts/companion/xlbuild/ex07.py:
+    constants: ["$4 million", "4,000,000", "0.075", "1%", "3%", "0.03", "5%", "0.05", "$4", "$13", "0.5", "1.5", "10 percent", "2"]
+  scripts/companion/xlbuild/ex08.py:
+    constants: ["100", "0.5", "3", "2", "40 percent", "$10", "40%", "50%", "80%", "0.8", "90%", "0.9", "14", "80 percent",
+                "90 percent", "$5,000", "$50", "$5,000.00", "5,000"]
+  scripts/companion/xlbuild/expected.py:
+    constants: ["2"]
+  scripts/companion/xlbuild/notes.py:
+    constants: ["2"]
+  scripts/companion/xlbuild/solutions.py:
+    constants: ["2", "3"]
+  scripts/companion/pbibuild/audit_monitoring.py:
+    constants: ["12"]
+  scripts/companion/pbibuild/cap17.py:
+    constants: ["0.05", "5%", "1,000,000", "25,000"]
+  scripts/companion/pbibuild/cap18.py:
+    constants: ["0.8", "100%"]
+  scripts/companion/pbibuild/cap19.py:
+    constants: ["100"]
+  scripts/companion/pbibuild/ex13.py:
+    constants: ["4.5"]
+  scripts/companion/pbibuild/ex14.py:
+    constants: ["100%", "2"]
+  scripts/companion/pbibuild/ex15.py:
+    review:
+      "2435621.24": "FORECAST: the values the Analytics-pane forecast shows on the canvas (point, lower and upper bound), read through UI Automation in Desktop 2.158; read them again after a roll"
+    constants: ["1.5", "0.2", "0%", "0.21", "20%", "95%", "5 percent"]
+    "12%": val.promo.segment_rate
+    "12 percent": val.promo.segment_rate
+  scripts/companion/pbibuild/ex16.py:
+    constants: ["$1,000", "30", "2"]
+  scripts/companion/pbibuild/project.py:
+    constants: ["1.0", "4.2", "4.0", "250"]
+  scripts/companion/pbibuild/reports.py:
+    constants: ["100%", "20%", "0.2", "5%", "0.05"]
+  scripts/companion/sqlbuild/cap17.py:
+    constants: ["5%", "0.05", "0.5%", "2%", "15%", "40%", "0.005", "0.02", "0.15", "0.40", "1.0", "21%", "30", "60", "90", "31", "61"]
+  scripts/companion/sqlbuild/cap18.py:
+    constants: ["0.1", "80%", "99", "1.0"]
+  scripts/companion/sqlbuild/cap19.py:
+    constants: ["30", "5%", "75%", "11"]
+  scripts/companion/sqlbuild/case3.py:
+    constants: ["1.0", "1440", "0.5", "1.5", "12"]
+  scripts/companion/sqlbuild/ex09.py:
+    constants: ["2", "10"]
+  scripts/companion/sqlbuild/ex10.py:
+    constants: ["20", "10", "100", "100.0"]
+  scripts/companion/sqlbuild/ex11.py:
+    constants: ["100.0", "12", "1.000", "0.5", "4950", "4999.99", "$5,000", "$50", "$4,700", "$5,250", "$4,950.00", "$4,999.99",
+                "4700", "50", "5250"]
+  scripts/companion/sqlbuild/ex12.py:
+    constants: ["1.0", "30", "1,000", "10,000", "50,000", "1000", "10000", "50000", "$50,000", "0.2", "0.3"]
+  scripts/companion/sqlbuild/script.py:
+    constants: ["9.1"]
+
+  # ---- facts/notes: the generated-note modules. The notes compute their values from the window, so nothing here is
+  # rewritten; the literals are wording constants, the docstrings' history of corrections, and claims that mirror the text.
+  facts/notes/__init__.py:
+    constants: ["2,006.895", "2,006.90", "2,006.894999", "2,006.89"]
+  facts/notes/case3.py:
+    constants: ["19.12", "1,317,582", "1,317,562.72", "(1,317,563)", "1,317,563.31", "1,902,775", "1,902,775.50", "14.14%",
+                "1,902,776", "1440", "1%"]
+  facts/notes/case4.py:
+    constants: ["365", "617,265.17", "208,680.287", "408,584.875", "617,265.162", "617,265.16", "10 million"]
+  facts/notes/ch04.py:
+    constants: ["30 percent"]
+  facts/notes/ch05.py:
+    constants: ["2%", "15%"]
+    "FUR-SDB-0002": val.item9.code
+  facts/notes/ch06.py:
+    constants: ["100%"]
+  facts/notes/ch07.py:
+    constants: ["5%", "2.5%", "3%", "10 percent"]
+  facts/notes/ch08.py:
+    constants: ["$10", "5%", "4,950", "0.012", "0.015", "$1,000"]
+    "0.013": {key: val.benford.mad, format: ".3"}
+  facts/notes/ch10.py:
+    constants: ["0.05"]
+  facts/notes/ch11.py:
+    constants: ["5,000", "25,000", "250,000"]
+  facts/notes/ch13.py:
+    constants: ["8,692.03", "8,692.035176", "8,692.04", "2,116.66", "6,575.37", "2,297,493.18", "2,297,493.38", "0.08", "0.10",
+                "0.12", "5%"]
+  facts/notes/ch14.py:
+    constants: ["20%"]
+  facts/notes/ch15.py:
+    constants: ["1.5"]
+    "0.01903": {key: val.promo.commission_rate, format: ".5"}
+    "12 percent": {key: val.promo.segment_rate, format: ".0 percent"}
+    "1.903 percent": {key: val.promo.commission_rate, format: ".3 percent"}
+  facts/notes/ch16.py:
+    constants: ["$1,000", "$1"]
+  facts/notes/ch17.py:
+    constants: ["5%"]
+  facts/notes/ch18.py:
+    review:
+      "1450": "QUOTE: the contract manufacturer's quoted volumes (see the chapter's tbl-18-01): recompute them from the new base year"
+      "3200": "see 1450"
+      "3800": "see 1450"
+      "5000": "see 1450"
+      "4600": "see 1450"
+      "700": "see 1450"
+    constants: ["80%", "40%", "50%", "5%", "0.02", "10%", "90%", "1.0"]
+    "26.62": val.plan.rate
+    "14.14%": val.plan.burden
+    "1.18": val.plan.hours_ratio
+    "0.18": val.plan.indirect_ratio
+  facts/notes/ch19.py:
+    constants: ["5%"]
+  facts/notes/templates/ch08/mcq.md:
+    constants: ["30 percent", "$1", "$1,000", "10"]
+    review:
+      "46": "the invoice's days past due at the as-of date in the answer to question 8: recompute from the new window"

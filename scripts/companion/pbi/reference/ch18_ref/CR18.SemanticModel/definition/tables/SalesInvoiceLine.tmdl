@@ -1,0 +1,45 @@
+table SalesInvoiceLine
+
+	column SalesInvoiceLineID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SalesInvoiceLineID
+
+	column ItemID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ItemID
+
+	column InvoiceDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: InvoiceDate
+
+	column Quantity
+		dataType: double
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column LineTotal
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: LineTotal
+
+	column Year
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition SalesInvoiceLine = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("D:\codes projects\Accounting_Analytics\scripts\companion\pbi\reference\cr18_sales.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    Typed = Table.TransformColumnTypes(Promoted, {{"SalesInvoiceLineID", Int64.Type}, {"ItemID", Int64.Type}, {"InvoiceDate", type date}, {"Quantity", type number}, {"LineTotal", type number}}, "en-US"),
+			    WithYear = Table.AddColumn(Typed, "Year", each Date.Year([InvoiceDate]), Int64.Type)
+			in
+			    WithYear
+

@@ -1,0 +1,67 @@
+table Exceptions
+
+	measure Exceptions = COUNTROWS ( Exceptions )
+		formatString: #,0
+
+	measure Population =
+			SWITCH (
+			    SELECTEDVALUE ( Tests[Process] ),
+			    "Journal entries", COUNTROWS ( JournalEntry ),
+			    "Purchase orders", COUNTROWS ( PurchaseOrder ),
+			    "Payroll", COUNTROWS ( PayrollRegister )
+			)
+		formatString: #,0
+
+	measure 'Rate per 1,000' = DIVIDE ( [Exceptions], [Population] ) * 1000
+		formatString: 0.0
+
+	column TestID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: TestID
+
+	column DocumentNumber
+		dataType: string
+		summarizeBy: none
+		sourceColumn: DocumentNumber
+
+	column EventDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: EventDate
+
+	column Amount
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Amount
+
+	column EmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+	column Disposition
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Disposition
+
+	column Note
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Note
+
+	partition Exceptions = m
+		mode: import
+		source =
+			let
+			    Source = Table.Combine({#"JE Exceptions", #"PO Exceptions", #"Payroll Exceptions"}),
+			    Typed = Table.TransformColumnTypes(Source, {{"EventDate", type date}}),
+			    Merged = Table.NestedJoin(Typed, {"TestID", "DocumentNumber"}, Dispositions, {"TestID", "DocumentNumber"},
+			        "Dispositions", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "Dispositions", {"Disposition", "Note"})
+			in
+			    Expanded
+

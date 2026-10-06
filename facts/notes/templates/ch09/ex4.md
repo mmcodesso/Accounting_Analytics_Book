@@ -1,0 +1,6 @@
+<!-- Instructor notes, Exercise 9.4: {{ n }} work orders have a NULL ClosedDate: {% for s, k in status.items() %}{{ s }} {{ k }}{{ ', ' if not loop.last }}{% endfor %} (completed but not
+     closed). Every WorkOrderNumber carries the year of its ReleasedDate, and {% if by_year|length == 1 %}every open work order is a {{ by_year[0][0] }} work order{% else %}the open work orders are {% for y, k in by_year %}{{ y }} work orders ({{ k }}){{ ' and ' if not loop.last }}{% endfor %}{% endif %} (released
+     {{ released_low }} to {{ released_high }}); COALESCE shows not completed for the {{ not_completed }} released or in progress and a date for the {{ status['Completed'] }} completed. Due on or before {{ end }}: {{ due }} ({% for s, k in due_status %}{{ s }} {{ k }}{{ ', ' if not loop.last }}{% endfor %}). The oldest is {{ oldest.number }}, released {{ oldest.released }}
+     and due {{ oldest.due }}, still Released at the end of the data; the next are {{ next[0].number }} (due {{ next[0].due }}) and {{ next[1].number }} (due
+     {{ next[1].due }}). Hundreds of released work orders are past due without being started, a backlog worth raising with production. Their
+     variance will be recorded when they close, after the data ends. Counting needs one query per status (COUNT comes in Chapter 10). -->

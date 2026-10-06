@@ -1,0 +1,28 @@
+relationship 2747f41b-d118-5071-8bde-5b80b333a0b8
+	fromColumn: SalesInvoiceLine.ItemID
+	toColumn: Item.ItemID
+
+relationship fc4d568c-c77f-5f4b-b15a-8c109e83dc20
+	fromColumn: SalesInvoiceLine.CustomerID
+	toColumn: Customer.CustomerID
+
+relationship 97603761-1096-524f-a131-711936739c31
+	fromColumn: SalesInvoiceLine.InvoiceDate
+	toColumn: Date.Date
+
+relationship 57d194b3-bd35-5b27-92c8-91070f354079
+	fromColumn: SalesInvoiceLine.ShipmentDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship 62d2ef95-583f-54bb-bbbf-dc3d7d06ff88
+	fromColumn: GLEntry.AccountID
+	toColumn: Account.AccountID
+
+relationship cdb30dc1-3bc2-5d31-bf08-c4a2675a1bce
+	fromColumn: GLEntry.CostCenterID
+	toColumn: CostCenter.CostCenterID
+
+relationship bba00430-2f38-5937-9344-1eced625a23a
+	fromColumn: GLEntry.PostingDate
+	toColumn: Date.Date

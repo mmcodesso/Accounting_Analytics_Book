@@ -1,0 +1,129 @@
+table GLEntry
+
+	measure 'Cost Centers Shown' = CONCATENATEX ( DISTINCT ( CostCenter[CostCenterName] ), CostCenter[CostCenterName], ", ", CostCenter[CostCenterName], ASC )
+
+	measure 'Who Am I' = USERPRINCIPALNAME ()
+
+	/// Debits less credits, without the year-end closing entries.
+	measure 'GL Amount' =
+			CALCULATE (
+			    SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ),
+			    GLEntry[IsYearEndClose] = FALSE ()
+			)
+		formatString: #,0.00
+
+	/// Credit-positive: revenue positive, expenses negative.
+	measure 'P&L Amount' = - [GL Amount]
+		formatString: #,0.00
+
+	measure 'P&L Amount with Closes' = SUM ( GLEntry[Credit] ) - SUM ( GLEntry[Debit] )
+		formatString: #,0.00
+
+	measure 'Net Income' = CALCULATE ( [P&L Amount], Account[AccountType] IN { "Revenue", "Expense" } )
+		formatString: #,0.00
+
+	measure 'Net Income with Closes' = CALCULATE ( [P&L Amount with Closes], Account[AccountType] IN { "Revenue", "Expense" } )
+		formatString: #,0.00
+
+	measure 'Operating Expense' = CALCULATE ( [GL Amount], Account[AccountSubType] = "Operating Expense" )
+		formatString: #,0.00
+
+	measure 'Operating Expense PY' = CALCULATE ( [Operating Expense], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: #,0.00
+
+	measure 'Operating Expense YTD' = TOTALYTD ( [Operating Expense], 'Date'[Date] )
+		formatString: #,0.00
+
+	/// The average operating expense of the three months before the month shown.
+	measure 'Expected Operating Expense' =
+			VAR MonthStart = MIN ( 'Date'[Date] )
+			VAR PriorMonths =
+			    DATESBETWEEN ( 'Date'[Date], EDATE ( MonthStart, -3 ), MonthStart - 1 )
+			VAR MonthsInWindow =
+			    COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), PriorMonths ) )
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Date'[YearMonth] )
+			            && NOT ISBLANK ( [Operating Expense] )
+			            && MonthsInWindow > 0,
+			        DIVIDE ( CALCULATE ( [Operating Expense], PriorMonths ), MonthsInWindow )
+			    )
+		formatString: #,0.00
+
+	measure 'Operating Expense Deviation' = DIVIDE ( [Operating Expense] - [Expected Operating Expense], [Expected Operating Expense] )
+		formatString: 0.0%
+
+	column GLEntryID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: GLEntryID
+
+	column PostingDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PostingDate
+
+	column AccountID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: AccountID
+
+	column Debit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Debit
+
+	column Credit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Credit
+
+	column VoucherNumber
+		dataType: string
+		summarizeBy: none
+		sourceColumn: VoucherNumber
+
+	column SourceDocumentType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SourceDocumentType
+
+	column CostCenterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CostCenterID
+
+	column EntryType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EntryType
+
+	column IsYearEndClose
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: IsYearEndClose
+
+	partition GLEntry = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T3_GLEntry",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"GLEntryID", "PostingDate", "AccountID", "Debit", "Credit", "VoucherNumber",
+			        "SourceDocumentType", "CostCenterID"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"GLEntryID", Int64.Type}, {"PostingDate", type date}, {"AccountID", Int64.Type},
+			        {"Debit", type number}, {"Credit", type number}, {"VoucherNumber", type text}, {"SourceDocumentType", type text},
+			        {"CostCenterID", Int64.Type}}),
+			    Merged = Table.NestedJoin(Typed, {"VoucherNumber"}, JournalEntry, {"EntryNumber"}, "Entry", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "Entry", {"EntryType"}),
+			    Flagged = Table.AddColumn(Expanded, "IsYearEndClose",
+			        each [EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close"), type logical)
+			in
+			    Flagged
+

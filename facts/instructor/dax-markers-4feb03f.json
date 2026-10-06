@@ -1,0 +1,301 @@
+{
+ "commit": "4feb03f",
+ "files": {
+  "appendices/a-publishing-security/_tutorial-01.qmd": {
+   "fences": 5,
+   "markers": [
+    {
+     "kind": "skip",
+     "fence": 0
+    },
+    {
+     "kind": "skip",
+     "fence": 1
+    },
+    {
+     "kind": "skip",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    },
+    {
+     "kind": "measure",
+     "fence": 4
+    }
+   ]
+  },
+  "chapters/14-data-models-and-dax/_exercises.qmd": {
+   "fences": 5,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 0
+    },
+    {
+     "kind": "skip",
+     "fence": 1
+    },
+    {
+     "kind": "skip",
+     "fence": 2
+    },
+    {
+     "kind": "query",
+     "fence": 3
+    },
+    {
+     "kind": "query",
+     "fence": 4
+    }
+   ]
+  },
+  "chapters/14-data-models-and-dax/_tutorial-01.qmd": {
+   "fences": 1,
+   "markers": [
+    {
+     "kind": "table",
+     "fence": 0
+    }
+   ]
+  },
+  "chapters/14-data-models-and-dax/_tutorial-02.qmd": {
+   "fences": 10,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 0
+    },
+    {
+     "kind": "measure",
+     "fence": 1
+    },
+    {
+     "kind": "measure",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    },
+    {
+     "kind": "measure",
+     "fence": 4
+    },
+    {
+     "kind": "measure",
+     "fence": 5
+    },
+    {
+     "kind": "measure",
+     "fence": 6
+    },
+    {
+     "kind": "measure",
+     "fence": 7
+    },
+    {
+     "kind": "query",
+     "fence": 8
+    },
+    {
+     "kind": "query",
+     "fence": 9
+    }
+   ]
+  },
+  "chapters/14-data-models-and-dax/_tutorial-03.qmd": {
+   "fences": 9,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 1
+    },
+    {
+     "kind": "measure",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    },
+    {
+     "kind": "measure",
+     "fence": 4
+    },
+    {
+     "kind": "measure",
+     "fence": 5
+    },
+    {
+     "kind": "measure",
+     "fence": 6
+    },
+    {
+     "kind": "measure",
+     "fence": 7
+    },
+    {
+     "kind": "query",
+     "fence": 8
+    }
+   ]
+  },
+  "chapters/14-data-models-and-dax/chapter.qmd": {
+   "fences": 1,
+   "markers": [
+    {
+     "kind": "query",
+     "fence": 0
+    }
+   ]
+  },
+  "chapters/15-management-reports/_tutorial-01.qmd": {
+   "fences": 1,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 0
+    }
+   ]
+  },
+  "chapters/15-management-reports/_tutorial-02.qmd": {
+   "fences": 7,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 1
+    },
+    {
+     "kind": "measure",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    },
+    {
+     "kind": "measure",
+     "fence": 4
+    },
+    {
+     "kind": "skip",
+     "fence": 5
+    },
+    {
+     "kind": "query",
+     "fence": 6
+    }
+   ]
+  },
+  "chapters/15-management-reports/_tutorial-03.qmd": {
+   "fences": 11,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 0
+    },
+    {
+     "kind": "measure",
+     "fence": 1
+    },
+    {
+     "kind": "measure",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    },
+    {
+     "kind": "measure",
+     "fence": 4
+    },
+    {
+     "kind": "measure",
+     "fence": 5
+    },
+    {
+     "kind": "measure",
+     "fence": 6
+    },
+    {
+     "kind": "skip",
+     "fence": 7
+    },
+    {
+     "kind": "measure",
+     "fence": 8
+    },
+    {
+     "kind": "measure",
+     "fence": 9
+    },
+    {
+     "kind": "query",
+     "fence": 10
+    }
+   ]
+  },
+  "chapters/16-audit-monitoring/_tutorial-01.qmd": {
+   "fences": 9,
+   "markers": [
+    {
+     "kind": "table",
+     "fence": 6
+    },
+    {
+     "kind": "measure",
+     "fence": 7
+    },
+    {
+     "kind": "query",
+     "fence": 8
+    }
+   ]
+  },
+  "chapters/16-audit-monitoring/_tutorial-02.qmd": {
+   "fences": 10,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 6
+    },
+    {
+     "kind": "measure",
+     "fence": 7
+    },
+    {
+     "kind": "measure",
+     "fence": 8
+    },
+    {
+     "kind": "query",
+     "fence": 9
+    }
+   ]
+  },
+  "chapters/16-audit-monitoring/_tutorial-03.qmd": {
+   "fences": 4,
+   "markers": [
+    {
+     "kind": "measure",
+     "fence": 0
+    },
+    {
+     "kind": "query",
+     "fence": 1
+    },
+    {
+     "kind": "query",
+     "fence": 2
+    },
+    {
+     "kind": "measure",
+     "fence": 3
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,101 @@
+table JournalEntry
+
+	measure Entries = COUNTROWS ( JournalEntry )
+		formatString: #,0
+
+	measure 'Entry Amount' = SUM ( JournalEntry[TotalAmount] )
+		formatString: #,0.00
+
+	measure 'Line Debits' = SUM ( JournalLines[Debit] )
+		formatString: #,0.00
+
+	column JournalEntryID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: JournalEntryID
+
+	column EntryNumber
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EntryNumber
+
+	column PostingDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PostingDate
+
+	column EntryType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EntryType
+
+	column TotalAmount
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: TotalAmount
+
+	column CreatedByEmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CreatedByEmployeeID
+
+	column CreatedDate
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+	column ApprovedByEmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ApprovedByEmployeeID
+
+	column ApproverLimit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: ApproverLimit
+
+	column Weekend
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Weekend
+
+	column Backdated
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Backdated
+
+	column SelfApproved
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SelfApproved
+
+	column AboveLimit
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: AboveLimit
+
+	column RoundAmount
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RoundAmount
+
+	column RiskScore
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RiskScore
+
+	partition JournalEntry = m
+		mode: import
+		source =
+			let
+			    Source = JournalEntryFlags
+			in
+			    Source
+

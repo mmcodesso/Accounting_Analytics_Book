@@ -1,0 +1,26 @@
+table Steps
+
+	column Step
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Step]
+		sortByColumn: Order
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: [Order]
+
+	partition Steps = calculated
+		mode: import
+		source =
+			DATATABLE (
+			    "Step", STRING,
+			    "Order", INTEGER,
+			    {
+			        { "At list price", 1 },
+			        { "Price lists and overrides", 2 },
+			        { "Promotions", 3 }
+			    }
+			)
+

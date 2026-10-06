@@ -1,0 +1,55 @@
+table Employee
+
+	column EmployeeID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+	column EmployeeName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EmployeeName
+
+	column JobTitle
+		dataType: string
+		summarizeBy: none
+		sourceColumn: JobTitle
+
+	column CostCenterID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CostCenterID
+
+	column EmploymentStatus
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EmploymentStatus
+
+	column TerminationDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: TerminationDate
+
+	column MaxApprovalAmount
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: MaxApprovalAmount
+
+	partition Employee = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T74_Employee",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"EmployeeID", "EmployeeName", "JobTitle", "CostCenterID", "EmploymentStatus",
+			        "TerminationDate", "MaxApprovalAmount"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"EmployeeID", Int64.Type}, {"EmployeeName", type text},
+			        {"JobTitle", type text}, {"CostCenterID", Int64.Type}, {"EmploymentStatus", type text},
+			        {"TerminationDate", type date}, {"MaxApprovalAmount", type number}})
+			in
+			    Typed
+

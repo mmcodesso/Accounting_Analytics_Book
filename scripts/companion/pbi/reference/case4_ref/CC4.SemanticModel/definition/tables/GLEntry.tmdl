@@ -1,0 +1,72 @@
+table GLEntry
+
+	column GLEntryID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: GLEntryID
+
+	column PostingDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: PostingDate
+
+	column AccountID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: AccountID
+
+	column Debit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Debit
+
+	column Credit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Credit
+
+	column VoucherNumber
+		dataType: string
+		summarizeBy: none
+		sourceColumn: VoucherNumber
+
+	column SourceDocumentType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SourceDocumentType
+
+	column SourceDocumentID
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SourceDocumentID
+
+	column EntryType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: EntryType
+
+	column IsYearEndClose
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: IsYearEndClose
+
+	partition GLEntry = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T3_GLEntry",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"GLEntryID", "PostingDate", "AccountID", "Debit", "Credit", "VoucherNumber",
+			        "SourceDocumentType", "SourceDocumentID"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"GLEntryID", Int64.Type}, {"PostingDate", type date}, {"AccountID", Int64.Type},
+			        {"Debit", type number}, {"Credit", type number}, {"VoucherNumber", type text}, {"SourceDocumentType", type text},
+			        {"SourceDocumentID", Int64.Type}}),
+			    Merged = Table.NestedJoin(Typed, {"VoucherNumber"}, JournalEntry, {"EntryNumber"}, "JE", JoinKind.LeftOuter),
+			    Expanded = Table.ExpandTableColumn(Merged, "JE", {"EntryType"}),
+			    Flag = Table.AddColumn(Expanded, "IsYearEndClose", each [EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close"), type logical)
+			in
+			    Flag
+

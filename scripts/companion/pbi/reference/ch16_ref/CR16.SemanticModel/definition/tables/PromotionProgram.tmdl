@@ -1,0 +1,55 @@
+table PromotionProgram
+
+	column PromotionID
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: PromotionID
+
+	column PromotionCode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PromotionCode
+
+	column PromotionName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PromotionName
+
+	column ScopeType
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeType
+
+	column DiscountPct
+		dataType: double
+		formatString: 0%
+		summarizeBy: none
+		sourceColumn: DiscountPct
+
+	column EffectiveStartDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: EffectiveStartDate
+
+	column EffectiveEndDate
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: EffectiveEndDate
+
+	partition PromotionProgram = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents("D:\codes projects\Accounting_Analytics\datasets\CharlesRiver.xlsx"), null, true),
+			    Data = Source{[Item="T7_PromotionProgram",Kind="Table"]}[Data],
+			    Kept = Table.SelectColumns(Data, {"PromotionID", "PromotionCode", "PromotionName", "ScopeType", "DiscountPct",
+			        "EffectiveStartDate", "EffectiveEndDate"}),
+			    Typed = Table.TransformColumnTypes(Kept, {{"PromotionID", Int64.Type}, {"PromotionCode", type text},
+			        {"PromotionName", type text}, {"ScopeType", type text}, {"DiscountPct", type number},
+			        {"EffectiveStartDate", type date}, {"EffectiveEndDate", type date}})
+			in
+			    Typed
+
