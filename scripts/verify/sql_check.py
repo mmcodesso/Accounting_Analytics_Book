@@ -8,7 +8,9 @@ before a block:
     <!-- sql-check: error -->   a deliberate error example; it must fail
     <!-- sql-check: view -->    creates or drops a view; run on an in-memory copy of the
                                 statement as a TEMP view
-Every other block must run without error. The report lists each block's file, line,
+A block can also take its marker from scripts/verify/sql_check_markers.txt (file, first line of the
+block, mode), so the chapter text stays free of comments. Every other block must run without
+error. The report lists each block's file, line,
 row count of its last statement, run time, and the first rows with --show.
 """
 
@@ -24,6 +26,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from paths import DB, REPO  # noqa: E402
 SLOW = 5.0
+SIDECAR = Path(__file__).with_name("sql_check_markers.txt")
+
+
+def sidecar_markers() -> dict[tuple[str, str], str]:
+    """(chapter file, first line of the block) -> marker, from sql_check_markers.txt."""
+    found: dict[tuple[str, str], str] = {}
+    if SIDECAR.is_file():
+        for raw in SIDECAR.read_text(encoding="utf-8").splitlines():
+            if raw.strip() and not raw.lstrip().startswith("#"):
+                rest, mode = raw.rsplit(" | ", 1)
+                file, first = rest.split(" | ", 1)
+                found[(file.strip(), first.strip())] = mode.strip()
+    return found
+
+
+SIDE = sidecar_markers()
 
 
 def blocks(path: Path):
@@ -46,6 +64,9 @@ def blocks(path: Path):
             while k < len(lines) and not re.match(r"^\s*```\s*$", lines[k]):
                 body.append(lines[k][indent:] if lines[k][:indent].strip() == "" else lines[k])
                 k += 1
+            if not marker:
+                first = next((b.strip() for b in body if b.strip()), "")
+                marker = SIDE.get((path.relative_to(REPO).as_posix(), first), "")
             yield i + 1, marker, textwrap.dedent("\n".join(body))
             i = k + 1
         else:

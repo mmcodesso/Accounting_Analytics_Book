@@ -1,14 +1,14 @@
 """The facts registry: generated instructor notes, kept in step with the dataset.
 
-    python scripts/facts.py check [--db PATH]      # do the notes in the .qmd match the data? (exit 1 if not)
-    python scripts/facts.py sync  [--db PATH]      # write the rendered notes into the .qmd
-    python scripts/facts.py mark                   # migration: put a marker above each note that renders the same
+    python scripts/facts.py check [--db PATH]      # does every note render, and does every claim its wording makes hold? (exit 1 if not)
     python scripts/facts.py build [--db PATH] --out snapshot.json   # values, text, and claims of every note
     python scripts/facts.py diff OLD.json NEW.json [--out report.md]  # what a new dataset changes, note by note
+    python scripts/facts.py sync | mark            # retired: the chapters carry no notes (see below)
 
-A note is generated when a marker comment "<!-- notes: KEY -->" sits on the line before it (see
-facts/notes/__init__.py). Sync refuses to overwrite a note edited by hand since the last sync, unless
---force; port the edit to the template instead. Sync normally runs only on the edition's dataset.
+The notes are rendered from their templates (facts/notes/templates) into the solution files and
+Instructor-Notes-2026.zip (facts/instructor/package.py), never into the chapter text: the chapters stay clean
+(author's decision, 2026-10-05). `sync` and `mark` wrote notes into the .qmd between markers in the first design; they
+now refuse to run, unless --inline is given (the old behavior, only for a copy of the book that wants notes inline).
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ def cmd_check(args) -> int:
         n = notes.NOTES[key]
         found = notes.regions(REPO / n.file).get(key)
         if found is None:
-            status = "NO MARKER"
+            status = "ok (rendered; the chapters carry no notes)"
         elif found[2] == text:
             status = "ok"
         elif norm(found[2]) == norm(text):
@@ -54,7 +54,7 @@ def cmd_check(args) -> int:
             status = "EDITED BY HAND since the last sync"
         else:
             status = "DIFFERS from the data (run sync)"
-        bad = status not in ("ok", "ok (line breaks differ; sync rewraps)") or failed
+        bad = not status.startswith("ok") or failed
         problems += bool(bad)
         print(f"{'ok  ' if not bad else 'FAIL'} {key:10} {status}")
         for f in failed:
@@ -63,7 +63,18 @@ def cmd_check(args) -> int:
     return 1 if problems else 0
 
 
+def retired(args, name: str) -> bool:
+    """sync and mark write comments into the chapters, which stay clean: refuse unless --inline is given."""
+    if getattr(args, "inline", False):
+        return False
+    print(f"{name} is retired: the chapters carry no notes (rendered into the solution files and Instructor-Notes-2026.zip "
+          "by facts/instructor/package.py). Pass --inline only for a copy of the book that should carry them.")
+    return True
+
+
 def cmd_sync(args) -> int:
+    if retired(args, "sync"):
+        return 2
     d = Data(args.db)
     lock = notes.read_lock()
     by_file: dict[str, list[tuple[str, str]]] = {}
@@ -106,6 +117,8 @@ def cmd_sync(args) -> int:
 
 
 def cmd_mark(args) -> int:
+    if retired(args, "mark"):
+        return 2
     d = Data(args.db)
     for key, (text, _, _) in rendered_all(d).items():
         n = notes.NOTES[key]
@@ -247,6 +260,8 @@ def main() -> int:
     for name in ("check", "sync", "mark", "build"):
         p = sub.add_parser(name)
         p.add_argument("--db", type=Path, default=DB)
+        if name in ("sync", "mark"):
+            p.add_argument("--inline", action="store_true", help="write the notes into the chapters (retired)")
         if name == "sync":
             p.add_argument("--force", action="store_true")
         if name == "build":

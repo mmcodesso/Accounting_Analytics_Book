@@ -1,0 +1,7 @@
+# Blocks that need a sql-check marker but carry none in the chapter text, so the text stays free of comments.
+# sql_check.py reads this file when a block has no <!-- sql-check: ... --> marker on the line before it.
+# One block per line:  chapters/<path>.qmd | <first line of the block, as written> | skip, error or view
+chapters/11-analytical-queries/chapter.qmd | SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod) | skip
+chapters/11-analytical-queries/chapter.qmd | SUM(LaborHours) OVER w / SUM(StandardHours) OVER w | skip
+chapters/11-analytical-queries/chapter.qmd | DROP VIEW IF EXISTS MonthlyLaborEfficiency; | skip
+chapters/11-analytical-queries/_tutorial-03.qmd | -- Tutorial 11.3: the measure saved as a view | view

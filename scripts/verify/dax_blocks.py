@@ -5,18 +5,16 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "facts" / "instructor"))
+from daxblocks import ordered_blocks  # the markers, or the index archived from commit 4feb03f (chapters carry none)
+
 chapter = Path(sys.argv[1])
 out = Path(sys.argv[2])
 host = {"GL": "GLEntry"}           # table that hosts a measure in the reference model
 queries = []
 for f in sorted(chapter.glob("*.qmd")):
-    text = f.read_text(encoding="utf-8")
-    for m in re.finditer(r"<!-- dax-check: (\w+) -->\s*\n\s*```\s*\n(.*?)\n\s*```", text, re.S):
-        kind, body = m.group(1), m.group(2)
-        lines = body.split("\n")
-        indent = min(len(l) - len(l.lstrip()) for l in lines if l.strip())
-        body = "\n".join(l[indent:] for l in lines)
-        label = f"{f.name}:{text[:m.start()].count(chr(10)) + 1} {kind}"
+    for line, kind, body in ordered_blocks(f):
+        label = f"{f.name}:{line} {kind}"
         if kind == "query":
             queries.append((label, body))
         elif kind == "table":

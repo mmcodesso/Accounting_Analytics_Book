@@ -1,0 +1,84 @@
+name: Verify Against the Pinned Dataset
+
+# Dataset-dependent checks that publishing deliberately does not need (publish.yml is dataset-free). They read the
+# release pinned in _variables.yml, check its SHA-256, and run read-only: every query the SQL chapters teach, the
+# comparison of the chapter text with the scripts the figures and slides share, the figure standard (which recomputes
+# the crow's-foot endpoints and the values the figures assert), the {{< var >}} keys, the data contract (the storylines
+# and quirks the chapters rely on) and the classification of every literal in the text (facts/ROLL.md). Nothing is
+# deployed. The generated notes and the companion files need the support workbook and Office, so they stay local.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 6 * * 1"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "chapters/**"
+      - "cases/**"
+      - "shared/calculations/**"
+      - "scripts/figures/**"
+      - "scripts/verify/**"
+      - "facts/**"
+      - "visuals/src/**"
+      - "_variables.yml"
+      - ".github/workflows/verify-data.yml"
+
+concurrency:
+  group: "verify-data-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: python -m pip install pyyaml
+
+      - name: Check the variable keys
+        run: python scripts/verify/var_keys_check.py
+
+      - name: Read the pinned dataset
+        id: pin
+        run: python scripts/verify/pinned_dataset.py >> "${GITHUB_OUTPUT}"
+
+      - name: Cache the dataset
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: datasets/CharlesRiver.sqlite
+          key: charlesriver-sqlite-${{ steps.pin.outputs.sha }}
+
+      - name: Download the dataset
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p datasets
+          curl --fail --location --show-error --silent "${{ steps.pin.outputs.url }}" --output datasets/CharlesRiver.sqlite
+
+      - name: Verify the dataset checksum
+        run: python scripts/verify/pinned_dataset.py --verify datasets/CharlesRiver.sqlite
+
+      - name: Run the tutorial queries read-only
+        run: python scripts/verify/sql_check.py
+
+      - name: Compare the chapter text with the shared scripts
+        run: python scripts/verify/tutorial_queries_check.py
+
+      - name: Check the figure standard against the data
+        run: python scripts/figures/check_figures.py
+
+      - name: Check the data contract
+        run: python facts/contract.py
+
+      - name: Check the classification of the literals in the text
+        run: python facts/phase7_cli.py lint
