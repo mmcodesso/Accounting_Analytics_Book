@@ -685,7 +685,7 @@ def r1(d, claim):
     # posting matrix
     claim(sides(d, "CreditMemo") == {("Dr", "4060"), ("Dr", "4050"), ("Dr", "2050"), ("Cr", "1020"), ("Cr", "2060")},
           "credits post Dr 4060, 4050, 2050 and Cr 1020, 2060 only")
-    cm_post = {f"{s} {a}": gl_total(d, "CreditMemo", a, s) for s, a in sides(d, "CreditMemo")}
+    cm_post = {f"{s} {a}": gl_total(d, "CreditMemo", a, s) for s, a in sorted(sides(d, "CreditMemo"))}
     both = sum(1 for p in c.parts.values() if p[0] > 0 and p[1] > 0)
     claim(sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
           "returns post Dr 1040 and Cr 5010-5040")

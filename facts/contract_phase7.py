@@ -53,9 +53,33 @@ def t1(d):
                                         f"{out['id.trace.item_code']}, tier {out['id.trace.tier']}")
 
 
-@check("T2", "6, 12, 14, 16", "the revenue cutoff error exists: an invoice dated in P and posted in C for goods that shipped in P")
+@check("T2", "6, 12, 14, 16", "the revenue cutoff story has its shape: invoices numbered in C but dated in P are consecutive, "
+                              "are posted on one date, and exactly one of them shipped in P (a cutoff error); the rest shipped in C")
 def t2(d):
-    return found("cutoff_shipment", d)
+    ok, detail = found("cutoff_shipment", d)
+    if not ok:
+        return ok, detail
+    invoices = d.q("SELECT DISTINCT si.SalesInvoiceID, si.InvoiceNumber, g.PostingDate FROM SalesInvoice si JOIN GLEntry g "
+                   "ON g.SourceDocumentType = 'SalesInvoice' AND g.SourceDocumentID = si.SalesInvoiceID "
+                   "WHERE g.FiscalYear = ? AND si.InvoiceDate < ? ORDER BY si.InvoiceNumber", d.C, f"{d.C}-01-01")
+    numbers = [int(number.rsplit("-", 1)[1]) for _, number, _ in invoices]
+    problems = []
+    if len(invoices) < 2:
+        problems.append(f"{len(invoices)} invoice(s) dated in {d.P} and posted in {d.C}; the book tells of three")
+    if numbers and numbers != list(range(numbers[0], numbers[0] + len(numbers))):
+        problems.append(f"the invoice numbers are not consecutive: {numbers}")
+    if len({posted for _, _, posted in invoices}) > 1:
+        problems.append("they were not posted on one date")
+    early = 0
+    for sid, number, _ in invoices:
+        years = {s[:4] for (s,) in d.q("SELECT s.ShipmentDate FROM SalesInvoiceLine l JOIN ShipmentLine sl ON sl.ShipmentLineID = "
+                                         "l.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID WHERE l.SalesInvoiceID = ?", sid)}
+        early += str(d.P) in years
+        if not years <= {str(d.P), str(d.C)}:
+            problems.append(f"{number} shipped in a year other than {d.P} and {d.C}")
+    if early != 1:
+        problems.append(f"{early} of them shipped in {d.P}, not exactly one")
+    return not problems, "; ".join(problems) or f"{len(invoices)} consecutive invoices ({numbers[0]}-{numbers[-1]}), one posting date, one shipped in {d.P}"
 
 
 @check("T3", "2, 5, 9, 10, 11, 12, 16", "the year-end closes, the opening entry, the open pay periods, the Furniture promotion, "

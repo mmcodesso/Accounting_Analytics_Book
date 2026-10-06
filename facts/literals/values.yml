@@ -586,9 +586,9 @@ files:
     "8": [{context: '\({lit}, [0-9.]+\)', key: val.cutoff.P.invoices}, {context: 'before shipment', key: val.invoice_before_shipment.count}]
     "19540.86": val.cutoff.P.amount
     "13": val.test.PO.AboveLimit
-    "14": val.po.docs_flagged
+    "14": {context: 'len\(detail\) == {lit}', key: val.po.docs_flagged}
     "11": val.po.failing_two_tests
-    "12": {key: val.surge.days.F}
+    "12": {context: '\[{lit}, ', key: val.surge.days.F}
     "32": {key: val.surge.days.P}
     "49": {key: val.surge.days.C}
     "64": val.plant.hourly_employees
