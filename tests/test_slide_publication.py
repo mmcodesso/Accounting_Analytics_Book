@@ -145,6 +145,18 @@ class ArtifactTests(unittest.TestCase):
             write(root, "_book/slides/chapter-01/index.html", "<html></html>")
             self.assertTrue(any("Unapproved or removed" in error for error in verify_outputs(root, manifest, root / "_book")))
 
+    def test_site_wording_check_skips_only_the_companion_files_page(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = fixture(root)
+            listing = "<p>Instructor-Notes-2026.zip: the instructor notes and the answer key</p>"
+            write(root, "_book/front-matter/companion-files.html", listing)
+            write(root, "_book/chapters/01/index.html", listing)
+            errors = [error for error in verify_outputs(root, manifest, root / "_book") if "private-material marker" in error]
+            self.assertEqual(1, len(errors))
+            self.assertIn("index.html", errors[0])
+            self.assertNotIn("companion-files", errors[0])
+
 
 class ExportTests(unittest.TestCase):
     def test_export_sanitizes_book_sources_and_follows_includes(self) -> None:

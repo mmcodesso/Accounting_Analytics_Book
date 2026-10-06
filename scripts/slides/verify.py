@@ -22,8 +22,11 @@ PRIVATE_TEXT = re.compile(
     r"\b(?:instructor[ _-]+(?:answers?|solutions?|only|notes?|keys?)|"
     r"answer[ _-]+key|private[ _-]+(?:facts|answers?|solutions?))\b", re.I
 )
+# Everything is public (author's decision, 2026-10-05): the solutions and the instructor notes are release files, and
+# the Companion Files page lists them by name, so the wording check skips that one page of the assembled site.
+SOLUTION_PAGES = {"front-matter/companion-files.html"}
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
-INCLUDE = re.compile(r"\{\{<\s*include\s+[\"']?([^\s>\"']+)[\"']?\s*>\}\}")
+INCLUDE =re.compile(r"\{\{<\s*include\s+[\"']?([^\s>\"']+)[\"']?\s*>\}\}")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<?[^\s)>]+>?)")
 NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main",
       "p": "http://schemas.openxmlformats.org/presentationml/2006/main"}
@@ -141,9 +144,9 @@ def is_reveal_runtime_metadata(path: Path, output_root: Path) -> bool:
             and all((path.parent / name).is_file() for name in resources))
 
 
-def audit_text(text: str, label: str, *, comments: bool = True) -> list[str]:
+def audit_text(text: str, label: str, *, comments: bool = True, markers: bool = True) -> list[str]:
     errors = []
-    match = PRIVATE_TEXT.search(text)
+    match = PRIVATE_TEXT.search(text) if markers else None
     if match:
         errors.append(f"{label}: private-material marker '{match.group(0)}'")
     references = INCLUDE.findall(text) + MARKDOWN_LINK.findall(text)
@@ -378,7 +381,8 @@ def verify_outputs(root: Path, manifest: dict, site: Path | None = None,
                 if directory.is_dir() and directory.name not in approved:
                     errors.append(f"Unapproved or removed deck in assembled site: {directory.name}")
         for path in html_root.rglob("*.html"):
-            errors.extend(audit_text(path.read_text(encoding="utf-8-sig"), str(path), comments=False))
+            listed = path.relative_to(html_root).as_posix() in SOLUTION_PAGES
+            errors.extend(audit_text(path.read_text(encoding="utf-8-sig"), str(path), comments=False, markers=not listed))
     return errors
 
 
