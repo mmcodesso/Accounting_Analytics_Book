@@ -54,7 +54,8 @@ or relationship needed by both appears whole in each. The crop is cut from the b
 so a change to the figure flows into it, but a change to its layout can move what the crop shows: look at
 the detail slides again after the figure changes.
 
-**Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it. `columns` and
+**Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it (a caption's first
+sentence, when it goes on to define the table's symbols; put the definitions in the notes). `columns` and
 `rows` narrow it, each a comma-separated list of headers or first-column values; `rows` keeps every row
 whose first cell matches, so `rows="Quantitative"` takes all of a group. Column widths follow the content,
 so no column is narrower than its longest word:

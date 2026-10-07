@@ -181,7 +181,10 @@ local function book_table(args, kwargs)
   end
   -- The source line goes above the table, as the book places table captions; in PowerPoint, text
   -- after a table would start a new slide, and a table caption is drawn at a fixed place over long rows.
-  local lines = {'[Table ' .. found.number .. ' · ' .. found.caption .. ']{.source}', '',
+  -- It names the table by its caption's first sentence: a caption that goes on to define the table's
+  -- symbols would fill PowerPoint's one-line caption box, so the deck's notes carry the rest.
+  local title = found.caption:match('^(.-%.)%s') or found.caption
+  local lines = {'[Table ' .. found.number .. ' · ' .. title:gsub('%.$', '') .. ']{.source}', '',
                  line(found.header), '|' .. table.concat(dashes, '|') .. '|'}
   for _, row in ipairs(rows) do table.insert(lines, line(row)) end
   return blocks(table.concat(lines, '\n'))

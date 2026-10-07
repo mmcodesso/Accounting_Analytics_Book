@@ -1,0 +1,521 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter answers the question that opened Part I. Each module follows a section of the chapter, and the three guided tutorials take the analysis from a profile of the year to the explanation of the Furniture margin.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives are descriptive tools: statistics, conditional totals with control totals, and PivotTables with charts.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three add calculated fields, the margin bridge that explains a change, and statements built from the ledger.
+:::
+
+## Three requests for the management meeting
+
+- InvoiceLines is ready, and the controller wants three things for the quarterly meeting
+- A profile of what Charles River billed in the year, with a total that ties
+- Revenue and gross margin by product line and quarter, and the year's income statement
+- Most important: why did the Furniture margin fall from the third quarter to the fourth?
+
+::: {.notes}
+The earlier chapters supplied a clean, reconciled table and a clue, the Furniture Seasonal Promotion. This chapter gives you the tools first to describe what happened and then to explain why.
+:::
+
+# Descriptive and Diagnostic Analytics in Accounting
+
+## Describe what happened, then explain why
+
+- Descriptive: totals, averages, distributions and comparisons of the past
+- Statements, budget reports, ageing schedules and KPIs are all descriptive
+- Diagnostic: drill into a summary, compare it with an expectation, decompose a change
+- The tools: statistics, conditional totals, PivotTables, and a margin bridge
+
+::: {.notes}
+Descriptive analytics is not a warm-up: it is much of what accountants produce, and diagnosis begins when a report shows something nobody expected. The IMA's competency framework now has a whole domain for data analytics.
+:::
+
+# Summary Statistics
+
+## The mean and the median tell different stories
+
+- AVERAGE is pulled up by a few very large values
+- MEDIAN is the middle value, whatever the extremes
+- A mean well above the median means a right skew, common in accounting data
+- The average invoice line is about half again as large as the median line
+
+::: {.notes}
+A relatively small share of large lines carries a large share of the revenue. Report a typical transaction with the median, and use the mean and the large values for totals and for planning tests of dollar amounts.
+:::
+
+## Spread and extremes are also data checks
+
+- STDEV.S treats the values as a sample; STDEV.P as the whole population
+- A standard deviation is easiest to read relative to the mean
+- MIN and MAX catch values that should not exist before any statistic is trusted
+- PERCENTILE.INC: the top tenth of the lines carries nearly a third of revenue
+
+::: {.notes}
+For thousands of lines, STDEV.S and STDEV.P differ by a fraction of a percent; for an audit sample of a few dozen items, the choice matters. The year's smallest line is under two dollars, and the largest is a design services engagement, not a piece of furniture.
+:::
+
+## Statistics for part of a table need FILTER
+
+- AVERAGEIFS, MINIFS and MAXIFS accept criteria
+- MEDIAN, STDEV.S and PERCENTILE.INC do not, and there is no MEDIANIFS
+- `=MEDIAN(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=ReportYear))`
+- If no row meets the condition, FILTER returns #CALC!
+
+::: {.notes}
+FILTER returns the rows for which a condition is true, and any statistical function can then summarize them. It needs Microsoft 365 or a recent Excel, the same versions the Power Query tutorials already require.
+:::
+
+## Watch out: statistics can hide the data {.watch-out}
+
+- Anscombe built four data sets with the same means and fitted line that look nothing alike
+- A statistic of a mixed population may describe none of its members
+- The average line falls between small accessories and large design services
+- Sort, filter or chart the data first, and summarize groups that differ separately
+
+::: {.notes}
+Before relying on a statistic, look at the rows it summarizes. Tutorial 6.1 charts the line totals for that reason.
+:::
+
+# Conditional Aggregation and Control Totals
+
+## Conditional totals fail silently; a control total catches it
+
+- SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS and MAXIFS share one pattern of criteria
+- Keep criteria in cells: a column of groups, a named ReportYear
+- A misspelled criterion returns zero, and a typed list can leave a category out
+- A control total of the whole population must equal the sum of the parts
+
+::: {.notes}
+The difference between the control total and the sum of the categories must be zero. Auditors apply the same discipline when they foot a schedule, adding its columns, and cross-foot it, adding its rows.
+:::
+
+## Check your understanding {.check}
+
+What does each situation call for?
+
+1. Reporting the size of a typical invoice line
+2. The median of one year's lines
+3. A SUMIFS by item group that returns zero for one group
+4. Proving that a summary by group misses nothing
+
+::: {.notes}
+Ask students what would go wrong if they used the obvious alternative in each case.
+:::
+
+## Each situation has its tool {.answer}
+
+1. MEDIAN, because the lines are skewed to the right
+2. MEDIAN of FILTER, since there is no MEDIANIFS
+3. Check the criterion's spelling before trusting the zero
+4. A control total whose difference from the parts is zero
+
+::: {.notes}
+The third and fourth are the same lesson from two sides: conditional totals fail silently, so a summary needs an independent total to prove it complete.
+:::
+
+# Charting Descriptive Results
+
+## Choose the chart that answers the question
+
+{{< book-table tbl-06-01 >}}
+
+::: {.notes}
+The first decision is which kind of chart answers the question. Statistics that look alike can describe data that look nothing alike, so the chart is part of the analysis, not decoration.
+:::
+
+## A histogram shows shape; a PivotChart follows its table
+
+- A histogram counts the values in bins of equal width
+- Insert Statistic Chart draws one from every value in a range
+- For one year only, count each bin with COUNTIFS and chart it without gaps
+- A PivotChart shows its PivotTable's layout, filters and slicers, and refreshes with it
+
+::: {.notes}
+The histogram is the chart that shows the right skew of the invoice lines. Tutorial 6.1 builds the frequency table, because the built-in histogram cannot be limited to one fiscal year.
+:::
+
+## A chart should tell the truth
+
+- The value axis of a bar or column chart starts at zero
+- When a waterfall or line chart needs a truncated axis, say so
+- Sort bars by value unless the categories have a natural order
+- Label what the chart shows and means; drop decoration; never rely on color alone
+
+::: {.notes}
+The bar's length represents its value, which is why the axis starts at zero. The bridge in Tutorial 6.3 truncates its axis so that the small effects are visible, and its note says so.
+:::
+
+# Guided Tutorial 6.1: Profiling Fiscal 2026 and Proving the Total
+
+## Steps 1 to 5: parameters and measures
+
+{{< book-steps 6.1 1-5 >}}
+
+::: {.notes}
+A named ReportYear parameter drives every measure, so changing it re-profiles another year. The measures that accept criteria use the IFS functions, and the rest use FILTER.
+:::
+
+## Steps 6 to 10: groups, bins and chart
+
+{{< book-steps 6.1 6-10 >}}
+
+::: {.notes}
+The controller's report lists four product lines, and their total falls short of the control total. The frequency table and histogram then show how the year's lines are distributed.
+:::
+
+## The control total found a missing group
+
+{{< book-figure fig-06-01 >}}
+
+::: {.notes}
+The difference from the control total revealed the fifth group, Services, which the four product lines left out. Once it is added, both differences are zero, and the profile ties to the figures the controller already trusts.
+:::
+
+## The line totals are skewed to the right
+
+{{< book-figure fig-06-02 >}}
+
+::: {.notes}
+Most lines are moderate, and a long tail of large lines pulls the average above the median. The bins add up to the year's line count, a control total for the chart itself.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 6.1 lead="true" >}}
+
+::: {.notes}
+The profile gives the controller her first answer: how much was billed, how the lines are distributed, and how revenue divides among the five item groups. The next step is how each group moved from quarter to quarter.
+:::
+
+# PivotTables
+
+## Four areas build a PivotTable
+
+{{< book-figure fig-06-03 >}}
+
+::: {.notes}
+Insert a PivotTable from an Excel Table, so it covers every row the next refresh adds. Rows and Columns define the categories, Values holds what is summarized, and Filters limits the whole PivotTable without changing the source.
+:::
+
+## Summarize, group and refresh
+
+- Value Field Settings changes Sum to Count, Average or others, and names the field
+- Counting an ID counts rows; Σ Values in Rows stacks several measures
+- Use the period columns of InvoiceLines rather than calendar date grouping
+- A PivotTable summarizes a copy, so refresh it; GETPIVOTDATA references it safely
+
+::: {.notes}
+Date grouping follows the calendar and fails on a single text date, while period columns stay consistent with every other analysis. GETPIVOTDATA identifies a value by its field and items, not its cell, so it survives layout changes, and one slicer can control several PivotTables.
+:::
+
+## A calculated field works on totals
+
+- Its formula runs on the sums of the fields behind each cell, not on rows (Microsoft)
+- So a margin percentage is total margin over total revenue: a weighted margin
+- The cost must already be extended, quantity times standard cost, in the source
+- Never multiply fields in a calculated field; multiply row by row in the source
+
+::: {.notes}
+A calculated field defined as Quantity times UnitPrice multiplies the total quantity by the total of the unit prices, which is not revenue at any level. Ratios and differences of totals, such as margins and averages per unit, are what calculated fields do well.
+:::
+
+## Show Values As displays the same values differently
+
+{{< book-table tbl-06-02 >}}
+
+::: {.notes}
+The numbers behind the cells do not change; only their display does. The book's Figure 6.4 shows one PivotTable three ways, in which Furniture's fourth quarter shows lower revenue, a smaller share, and a decline from the third.
+:::
+
+## Watch out: a PivotTable sums every source row {.watch-out}
+
+- In the Part I case, a ledger summary by quarter showed nonsense in the fourth quarter
+- The year-end close debits revenue and credits cost of goods sold on the last day
+- Filter out the closing entries, or filter the source document types you need
+- Know which rows a source contains before you trust its totals
+
+::: {.notes}
+The same caution applies to any source. In a monthly close, a PivotTable of the ledger by account and period with a Difference From field gives the list of changes to explain in a flux analysis, but the explanations still need someone who knows the business.
+:::
+
+## Check your understanding {.check}
+
+Calculated field, or a column in the source?
+
+1. A margin percentage for every cell
+2. Revenue as quantity times unit price
+3. The average price per unit sold
+4. The extended standard cost of each line
+
+::: {.notes}
+The rule to apply: a calculated field works on totals, so ratios of totals belong there and row-by-row products do not.
+:::
+
+## Ratios of totals in the PivotTable; products in the source {.answer}
+
+1. Calculated field: total margin over total revenue
+2. Source column: multiplying totals would be wrong
+3. Calculated field: total revenue over total quantity
+4. Source column: quantity times standard cost, row by row
+
+::: {.notes}
+Tutorial 6.2 adds the extended cost to the query for exactly this reason, and Tutorial 6.3's per-unit measures are calculated fields.
+:::
+
+# Guided Tutorial 6.2: Revenue and Margin by Product Line and Quarter
+
+## Build the revenue and margin PivotTable in eight steps
+
+{{< book-steps 6.2 >}}
+
+::: {.notes}
+Students add the extended standard cost to InvoiceLines, build a PivotTable of revenue and margin by item group and quarter, read it as shares and as changes, compare the segments with the previous year, and chart the margins.
+:::
+
+## Every line held its margin but Furniture
+
+{{< book-figure fig-06-06 >}}
+
+::: {.notes}
+Accessories, Lighting and Textiles barely move from quarter to quarter. Services shows a margin of one hundred percent only because design services carry no standard cost; their staff cost is recorded through payroll.
+:::
+
+## The Furniture margin fell in the fourth quarter
+
+{{< book-figure fig-06-06 crop="0,0,1,0.579" >}}
+
+::: {.notes}
+Furniture's margin is lower than the other product lines' in every quarter, and it falls further in the fourth. The grand total of the PivotTable equals the control total on the Profile worksheet.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 6.2 lead="true" >}}
+
+::: {.notes}
+The PivotTable has described the problem precisely: the Furniture margin fell, the other lines did not, and the business as a whole kept growing. Why it fell is a diagnostic question.
+:::
+
+# From the Ledger to the Financial Statements
+
+## A trial balance groups the ledger by account
+
+- Group By in Power Query sums debits and credits by account before loading
+- A merge with the Account Table adds each account's number, name and subtype
+- Only rows posted on or before the reporting date belong in it
+- A pre-closing balance leaves out the year's own closes, so it shows the year's results
+
+::: {.notes}
+The database has no trial balance table, as Chapter 3 showed, so you build one. The earlier years' closing entries have already cleared their revenue and expense accounts, while the balance sheet accounts carry forward from the opening entry.
+:::
+
+## Debit and credit balances agree
+
+{{< book-figure fig-06-07 crop="0,0,1,0.415" >}}
+
+::: {.notes}
+A calculated column subtracts credits from debits, and two more columns put each balance on its side. Equal totals are the trial balance's control total.
+:::
+
+## A common-size statement ties to the closing entry
+
+{{< book-figure fig-06-07 crop="0,0.415,1,0.585" >}}
+
+::: {.notes}
+SUMIFS on AccountSubType builds each line, with the sign reversed for revenue, and each line is shown as a share of net revenue. Net income equals what the year's closing entry moved to retained earnings, and the balance sheet balances once net income is added to equity.
+:::
+
+## Watch out: an extract is only as complete as its dates {.watch-out}
+
+- The ledger already holds supplier payments of the next fiscal year
+- Without a date filter, a trial balance would mix two years
+- Filter by posting date before you group
+- Equal debits and credits show balance, not completeness: compare an independent figure
+
+::: {.notes}
+The closing entry is that independent figure here. Exercise 6.1 builds both the trial balance and the statements.
+:::
+
+# From Description to Diagnosis
+
+## Diagnosis drills down, compares and decomposes
+
+- Drill down: double-click a value for its rows, or add a finer field to Rows
+- Compare: the previous period, the same period last year, a budget or peers
+- Decompose: split the change into parts that add up exactly to it
+- Each part can then be assigned a cause
+
+::: {.notes}
+Tutorial 6.2's finding is descriptive: the Furniture margin fell and the other lines held. Management accountants measure the same effects against a budget as sales variances (Datar and Rajan); here the benchmark is the previous quarter.
+:::
+
+## A bridge splits the change into effects that add up
+
+{{< book-table tbl-06-03 >}}
+
+::: {.notes}
+In the formulas, U is units sold, M the margin per unit, LM the list margin per unit, K the price-list reduction per unit and D the promotional discount per unit, and each symbol's final digit names its quarter. Every invoice line records the list price as well as the price billed, so price splits into price-list reductions and promotional discounts, and the effects add up exactly to the change in margin, the bridge's control total.
+:::
+
+## Mix, cost and the level of the bridge
+
+- List prices and standard costs do not change, so the list margin moves only with mix
+- At standard cost, the cost effect is zero by construction
+- Actual cost differences sit in the ledger's variance accounts
+- Calculated by product type, the same change divides differently; state the level
+
+::: {.notes}
+If a cost effect were the suspected cause, the manufacturing variance account is where you would look next. Neither level is wrong, and Exercise 6.4 compares them; a report that states its level can be checked.
+:::
+
+## Check your understanding {.check}
+
+Which effect of the bridge does each change fall into?
+
+1. More units sold at the same margin per unit
+2. Sales shift toward items with a lower list margin
+3. A promotional discount on the lines
+4. A component becomes more expensive to buy
+
+::: {.notes}
+The fourth is the one to think about carefully, because of how InvoiceLines values cost.
+:::
+
+## Each change has its effect {.answer}
+
+1. Volume
+2. Mix
+3. Price: promotions
+4. Cost: zero at standard, so look in the variance accounts
+
+::: {.notes}
+Only the promotions effect is large for Furniture, as Tutorial 6.3 shows; the others are small by comparison.
+:::
+
+# Guided Tutorial 6.3: Explaining the Furniture Margin
+
+## Explain the margin in eight steps
+
+{{< book-steps 6.3 >}}
+
+::: {.notes}
+Students add the list amount and the discount to InvoiceLines, build a driver PivotTable of Furniture totals for the two quarters with per-unit calculated fields, calculate the bridge, chart it, and drill into the discounts by promotion.
+:::
+
+## Promotions explain the whole decline
+
+{{< book-figure fig-06-09 >}}
+
+::: {.notes}
+The promotions effect is larger than the whole decline, while volume, mix and price lists are small and partly offset one another. The axis starts above zero so the small effects are visible, and the note says so.
+:::
+
+## One promotion supplies most of the discounts
+
+{{< book-figure fig-06-10 >}}
+
+::: {.notes}
+The Furniture Seasonal Promotion priced orders placed in September and October, so the third quarter received only its September invoices, while the fourth received October's and the orders invoiced after it ended. The Design Trade Customer Promotion, in November, added a smaller amount.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 6.3 lead="true" >}}
+
+::: {.notes}
+The controller now has her answer, and it is one she can check. The margin before discounts did not fall, which confirms that discounts, not prices or costs, explain the decline.
+:::
+
+# Interpreting and Communicating Results
+
+## A finding says what, how you know, and what next
+
+- What: the Furniture margin fell by about a point and a half
+- Why: promotional discounts more than doubled; the rest barely moved
+- How you know: the bridge ties to the change, and the drill names the promotion
+- A PivotTable is a data product; the sentence is the finding
+
+::: {.notes}
+A typical management package shows each significant variance, its components and a short commentary naming the cause and, where needed, the action and its owner. A bridge makes that commentary checkable.
+:::
+
+## Expect first; claim only what the evidence shows
+
+- Auditors compare recorded amounts with expectations from plausible relationships
+- Decide in advance how large a difference is acceptable (PCAOB)
+- The bridge shows how much the discounts cost, not whether the promotion was wise
+- Match precision to the reader: cents in a workpaper, thousands in a memo
+
+::: {.notes}
+Fractional quantities make per-unit measures consistent between quarters but not literal units, so a finding should not depend on whole units. The same summaries return in Parts III and IV: a PivotTable is a SQL GROUP BY, and a calculated field is a Power BI measure.
+:::
+
+# Looking Ahead
+
+## Back to the controller's question
+
+- The Furniture margin fell because promotional discounts more than doubled
+- Most came from the Furniture Seasonal Promotion, invoiced well into the fourth quarter
+- Volume, mix, list prices and standard costs explain almost none of it
+- Next, Chapter 7 turns from what happened to what could happen
+
+::: {.notes}
+Knowing why the margin fell is the starting point for deciding what to do about it. Chapter 7 estimates what could happen next, with forecasts, budgets and what-if analysis.
+:::
+
+## Summary
+
+- The median describes a typical line; the mean and the large values carry the total
+- Conditional totals need a control total, because they fail silently
+- PivotTables summarize across dimensions; calculated fields work on totals
+- A pre-closing trial balance gives a common-size statement that ties to the close
+- A bridge decomposes a change into effects that add up exactly
+
+::: {.notes}
+Ask students which check in the chapter caught something that would otherwise have gone unnoticed: the missing Services group is the usual answer.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Control total, calculated field and margin bridge are the ideas the rest of Part II builds on.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 6.5 applies a substantive analytical procedure to quarterly revenue, the auditor's version of starting from an expectation. Chapter 7 turns to forecasting and budgets.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
