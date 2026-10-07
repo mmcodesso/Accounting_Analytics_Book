@@ -3,6 +3,7 @@
 -- They read _shared/book.json, which scripts/slides/prepare.py writes from the book at each build.
 --
 --   {{< book-figure fig-01-02 >}}                 the figure, with "Figure 1.2 · <caption>" under it
+--   {{< book-figure fig-03-07 crop="0,0,1,0.56" >}}   a detail: left, top, width, height as fractions
 --   {{< book-table tbl-01-02 columns="Tool,Main Workflow Stages" rows="SQL,Microsoft Excel" >}}
 --   {{< book-objectives >}} or {{< book-objectives 1-3 >}}  {{< book-terms >}}  {{< book-exercises >}}
 --   {{< book-steps 1.1 >}}  {{< book-checkpoint 1.1 answers="hide" >}}
@@ -67,17 +68,36 @@ local function tutorial(meta, id)
   error('No Guided Tutorial ' .. tostring(id) .. ' in this chapter')
 end
 
+local function crop_key(text)
+  -- The staged name of a crop, as scripts/slides/prepare.py writes it: 0,0,1,0.56 -> 0-0-1-0p56.
+  local parts = {}
+  for item in text:gmatch('[^,]+') do
+    local number = tonumber(item)
+    if not number then error('crop="' .. text .. '" needs four numbers: left, top, width, height') end
+    table.insert(parts, (string.format('%g', number):gsub('%.', 'p')))
+  end
+  if #parts ~= 4 then error('crop="' .. text .. '" needs four numbers: left, top, width, height') end
+  return table.concat(parts, '-')
+end
+
 local function book_figure(args, kwargs)
   local id = pandoc.utils.stringify(args[1] or '')
   local figure = book().figures[id]
   if not figure then error('No figure ' .. id .. ' in the book') end
   local name = figure.src:match('([^/]+)$')
+  local caption, alt = figure.caption, figure.alt
+  -- crop="left,top,width,height" (fractions of the figure) shows a detail, staged under its own name.
+  local crop = value(kwargs, 'crop')
+  if crop then
+    name = name:gsub('(%.%w+)$', '.crop-' .. crop_key(crop) .. '%1')
+    caption, alt = caption .. ' (detail)', 'Detail of: ' .. alt
+  end
   -- PowerPoint cannot draw the SVG's HTML labels, so it gets the PNG exported from the same source.
   if quarto.doc.is_format('pptx') then name = name:gsub('%.svg$', '.png') end
-  local attributes = 'fig-alt="' .. figure.alt .. '"'
+  local attributes = 'fig-alt="' .. alt .. '"'
   local width = value(kwargs, 'width')
   if width then attributes = attributes .. ' width="' .. width .. '"' end
-  return blocks('![Figure ' .. figure.number .. ' · ' .. figure.caption .. '](/_shared/visuals/' .. name ..
+  return blocks('![Figure ' .. figure.number .. ' · ' .. caption .. '](/_shared/visuals/' .. name ..
                 '){' .. attributes .. '}')
 end
 

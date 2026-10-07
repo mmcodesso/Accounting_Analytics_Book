@@ -1,0 +1,478 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter turns the database diagram from a web of lines into a map students can read. The modules follow the chapter's sections, with two guided tutorials: one reads an ER diagram, the other follows a real sale through the tables.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives build the vocabulary of relational databases: tables and types, keys, and the diagrams that show them.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three apply that vocabulary to accounting: the ledger and sub-ledgers as tables, the table groups, and the source-document trace across them.
+:::
+
+## Where in the database does the answer live?
+
+- You are the staff accountant from Chapter 1, and the controller's Furniture question is still open
+- She hands you the database diagram: dozens of tables in groups, joined by lines
+- Symbols at each end of a line show how many rows on each side can be associated
+- You cannot yet tell which tables hold furniture revenue, its cost, or how a sale reaches its postings
+
+::: {.notes}
+Before any query or report, you need to know how the data is organized. Ask students which names on the diagram they already recognize from their accounting courses, such as Account or SalesInvoice.
+:::
+
+# From Accounting Records to Database Tables
+
+## Familiar accounting records become related tables
+
+- The journal, the chart of accounts and each sub-ledger become tables
+- Cross-references become keys: CustomerID on an invoice, AccountID on a ledger entry
+- The database can enforce these links, and analytical tools can follow them
+- Part III's queries, Part IV's data models and Part II's imports all build on this structure
+
+::: {.notes}
+The accounting concepts have not changed; only where they are stored. The CPA model curriculum now expects new accountants to understand data repositories and the tools that extract data from them.
+:::
+
+# The Relational Database Model
+
+## A table stores one kind of thing
+
+{{< book-figure fig-03-01 >}}
+
+::: {.notes}
+Each row is one instance, here one customer; each column is one attribute. A table is a tidy dataset whose structure is defined in advance, which prevents the drift that happens in spreadsheets.
+:::
+
+## Every value is an integer, a real or text
+
+{{< book-table tbl-03-01 columns="Data Type,How Charles River Stores It,Charles River Example" >}}
+
+::: {.notes}
+SQLite has only a few storage classes, so dates are text in year-month-day form, which sorts in order, and true or false flags are 1 and 0. Excel and Power BI convert these on import, so check that each column arrives with the type you expect.
+:::
+
+## Watch out: not every number is a quantity {.watch-out}
+
+- Account numbers are stored as integers, so tools will happily add or average them
+- The result is meaningless: account numbers are identifiers, not amounts
+- Other systems store codes as text to prevent arithmetic and keep leading zeros
+
+::: {.notes}
+Before calculating with a numeric column, ask whether its values are quantities to calculate or codes to match.
+:::
+
+# Keys and Relationships
+
+## Keys connect the tables
+
+- A **primary key** identifies each row: unique and never blank; every Charles River table uses one integer surrogate key
+- Unique indexes protect document numbers, but not the number on a supplier's own invoice, which is how Chapter 2's duplicates got in
+- A **foreign key** refers to the primary key of another table
+- Charles River's foreign keys are logical, not declared, so referential integrity is tested, and Power BI relationships are defined by hand
+
+::: {.notes}
+A primary key plays the role an invoice or check number plays in accounting. Because the file declares no foreign keys, nothing stops an orphaned record from being added; the Chapter 2 tests found none in the ledger's account references.
+:::
+
+## A foreign key points to a primary key
+
+{{< book-figure fig-03-02 >}}
+
+::: {.notes}
+Each order's CustomerID matches exactly one customer. A foreign key need not share the name of the key it refers to: in BillOfMaterialLine, ComponentItemID refers to ItemID in Item.
+:::
+
+## Check your understanding {.check}
+
+What is each SalesOrderLine column?
+
+1. SalesOrderLineID
+2. SalesOrderID
+3. ItemID
+4. Quantity
+
+::: {.notes}
+Students can answer from the column names alone. Ask them which column crosses into another table group.
+:::
+
+## Keys and attributes in SalesOrderLine {.answer}
+
+1. The primary key, a surrogate key
+2. A foreign key to SalesOrder
+3. A foreign key to Item: a cross-group bridge key into Master Data
+4. Neither: an attribute of the line
+
+::: {.notes}
+The two foreign keys make SalesOrderLine the link between orders and products, which the next module calls a junction table.
+:::
+
+# Relationships and Cardinality
+
+## Relationships come in three cardinalities
+
+{{< book-figure fig-03-03 >}}
+
+::: {.notes}
+One-to-many is the most common in accounting data, such as one customer and many orders. One-to-one appears when a later stage has its own table, as a work order and its close. Many-to-many needs a junction table, such as SalesOrderLine between orders and items.
+:::
+
+## The many side multiplies rows in a join
+
+- **Optionality**: must a row take part? Every order has a customer, but some customers have no orders
+- A join that allows no match can silently drop the customers who never ordered
+- Joining customers to orders to lines repeats a customer once per line
+- Summing revenue by line is right; counting customers by line overstates them
+
+::: {.notes}
+Double counting is the most common mistake with related tables. Consider the cardinality of every join before you aggregate, a habit Part III's SQL chapters return to.
+:::
+
+## Check your understanding {.check}
+
+What is the cardinality of each relationship?
+
+1. Customer and SalesOrder
+2. WorkOrder and WorkOrderClose
+3. SalesOrder and Item
+4. CashReceipt and SalesInvoice
+
+::: {.notes}
+Ask students to say each relationship aloud in both directions before naming it.
+:::
+
+## Each pair has its cardinality {.answer}
+
+1. One to zero or many: a customer can have no orders
+2. One to zero or one: a work order is closed at most once
+3. Many-to-many, through the junction table SalesOrderLine
+4. Many-to-many, through CashReceiptApplication: one check can pay several invoices
+
+::: {.notes}
+The two many-to-many pairs show why junction tables exist: a relational database cannot store a many-to-many relationship directly.
+:::
+
+# Entity-Relationship Diagrams
+
+## An ER diagram is the map of a database
+
+- Each table is a rectangle: a header with its name, then its columns, keys marked PK and FK
+- A gray header marks a table from another table group
+- Solid lines link a primary key to a foreign key; heavier amber lines cross into another group
+- A dashed amber line is the source-document trace, which is not a foreign key at all
+
+::: {.notes}
+Consult the ER diagram before writing a query or building a model, as you would consult the chart of accounts before preparing a journal entry. Auditors request ER diagrams and data dictionaries when they plan an engagement.
+:::
+
+## Crow's foot symbols show how many rows on each side
+
+{{< book-figure fig-03-04 >}}
+
+::: {.notes}
+Read the Customer to SalesOrder line aloud: each sales order belongs to exactly one customer, and one customer can have zero or many sales orders. Each end of a line describes the table it touches.
+:::
+
+# The Accounting Data Model
+
+## The chart of accounts refers to itself
+
+{{< book-figure fig-03-05 >}}
+
+::: {.notes}
+ParentAccountID points to another row of the same Account table, a self-referencing relationship that builds the hierarchy of the financial statements. Summary accounts are marked Header, and nothing is posted to them.
+:::
+
+## The general ledger is a related table
+
+- Each GLEntry row is one side of a journal entry: a single debit or credit
+- Its AccountID points to the chart of accounts: one account, zero or many entries
+- Grouping the ledger by account and summing debits and credits gives the trial balance
+- GLEntry is by far the largest table in the database
+
+::: {.notes}
+This one-to-many link is the database equivalent of posting to a T-account. Header accounts have no entries, which is why the relationship is one to zero or many.
+:::
+
+## Sub-ledgers post through the source-document trace
+
+{{< book-figure fig-03-06 >}}
+
+::: {.notes}
+SourceDocumentType names the table a posting came from and SourceDocumentID holds the key of a row in it, so the same column points to a different table on each row. Payroll summary postings are the one exception: their source is a summary by cost center, not a table.
+:::
+
+# Exploring the Charles River Schema by Table Group
+
+## Master Data is small but shared everywhere
+
+- Item, Warehouse and Employee: reference data used across the database
+- Each item records the inventory, revenue and cost accounts it posts to
+- ItemID and the employee keys are cross-group bridge keys
+- Employee's ManagerID points to another employee in the same table
+
+::: {.notes}
+When Charles River sells a desk, the item's account mapping directs the revenue and the cost to the furniture accounts. Employee keys appear under role names, such as the sales representative on an order or the approver of a journal entry.
+:::
+
+## Order-to-Cash chains header and line tables
+
+- Customer, then sales orders and their lines, shipments, invoices and receipts
+- Each document has a header table and a line table
+- SalesOrderLine and CashReceiptApplication are junction tables
+- Beyond the core path: pricing, design services, commissions and returns
+
+::: {.notes}
+Order-to-Cash is the largest group in the database. Students do not need to memorize its tables; reading the ER diagram is what lets them find their way, which the next tutorial practices.
+:::
+
+## Manufacturing separates the plan from the run
+
+{{< book-figure fig-03-08 >}}
+
+::: {.notes}
+The bill of material is the recipe; the work order and its operations, material issues and completions record what actually happened. Variances arise where the two differ, and the work order close posts them to the ledger.
+:::
+
+# Guided Tutorial 3.1: Reading the Charles River O2C Entity-Relationship Diagram
+
+## Read the O2C diagram in six steps
+
+{{< book-steps 3.1 >}}
+
+::: {.notes}
+Students need only the diagram and the crow's foot reference. Keep the next three slides up while they work: the whole diagram, then its two halves enlarged.
+:::
+
+## The O2C core path
+
+{{< book-figure fig-03-07 >}}
+
+::: {.notes}
+Count the tables first, then find the primary key of each. Item has a gray header because it belongs to Master Data, and its line to SalesOrderLine is amber because it crosses groups.
+:::
+
+## Orders, lines and shipments
+
+{{< book-figure fig-03-07 crop="0,0,1,0.572" >}}
+
+::: {.notes}
+Read Customer to SalesOrder aloud, then find the junction table: SalesOrderLine sits between SalesOrder and Item, with one or many lines per order and zero or many per item. One order line can be shipped on several shipment lines.
+:::
+
+## Invoices and their settlement
+
+{{< book-figure fig-03-07 crop="0,0.39,1,0.61" >}}
+
+::: {.notes}
+Each shipment line is billed on at most one invoice line, and design services have no shipment line at all. CashReceiptApplication is the second junction table: one check can settle several invoices, and one invoice can be settled by several checks.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 3.1 answers="hide" >}}
+
+::: {.notes}
+The answers: two foreign keys, SalesOrderID and ItemID; SalesOrderLine and CashReceiptApplication; and one customer to zero or many orders.
+:::
+
+# The Accounting Core as the Integration Hub
+
+## Every business cycle posts to GLEntry
+
+- Order-to-Cash posts through invoices, shipments, receipts and their applications
+- Procure-to-Pay through goods receipts, supplier invoices and payments
+- Manufacturing through material issues, completions and work order closes; payroll through summaries, payments and remittances
+- JournalEntry holds the manual entries, such as accruals and adjustments
+
+::: {.notes}
+The Accounting Core has only a few tables but every group flows into it, which makes GLEntry the single source of truth for the financial position. Every balance on the statements can be traced back to the documents behind it.
+:::
+
+## The Accounting Core and its connections
+
+{{< book-figure fig-03-09 >}}
+
+::: {.notes}
+Start with the layout: the core tables across the top, and the source documents along the bottom, each joined to GLEntry by a dashed trace. The next two slides enlarge each half.
+:::
+
+## GLEntry is keyed to accounts and cost centers
+
+{{< book-figure fig-03-09 crop="0,0,1,0.61" >}}
+
+::: {.notes}
+Each ledger row points to one account through AccountID, and to a cost center through CostCenterID, a cross-group link drawn in amber; the circle at CostCenter's end means a row can have no cost center. Account refers to itself through ParentAccountID, and JournalEntry through ReversesJournalEntryID. The employees who create and approve each journal entry come from Master Data, under role names.
+:::
+
+## Each source document reaches GLEntry by the trace
+
+{{< book-figure fig-03-09 crop="0,0.36,1,0.64" >}}
+
+::: {.notes}
+Every dashed line is the same pair of columns, SourceDocumentType and SourceDocumentID, read with a different type. The circle at PayrollPayment's end means a payroll payment posting can point to no payment at all, which the next slide takes up. The circle at GLEntry's end of the MaterialIssue line means some material issues have no postings.
+:::
+
+## Watch out: the trace is not a foreign key {.watch-out}
+
+- A foreign key refers to one table; SourceDocumentID refers to a different table on each row
+- So the link has to be tested rather than trusted
+- At Charles River, a few PayrollPayment rows point to payments that do not exist
+
+::: {.notes}
+That handful of orphaned rows is exactly the kind of exception a trace test reveals. The SQL chapters of Part III write those tests for every source document type.
+:::
+
+# Guided Tutorial 3.2: Tracing a Sale from Sales Order to General Ledger
+
+## Trace one sale in seven steps
+
+{{< book-steps 3.2 >}}
+
+::: {.notes}
+Students follow the sale of two desks whose revenue posting Chapter 1 showed, in their working copy of the workbook. Filtering each worksheet on the key from the previous step is faster than scrolling.
+:::
+
+## One sale, from order to ledger
+
+{{< book-figure fig-03-10 >}}
+
+::: {.notes}
+Steps one to four follow the keys back through Order-to-Cash; step five uses the source-document trace to find the ledger postings, and step six translates the account. The same sale also posts from its shipment and from the cash application. The next two slides enlarge each half.
+:::
+
+## Keys lead from the order to its shipment
+
+{{< book-figure fig-03-10 crop="0,0,1,0.571" >}}
+
+::: {.notes}
+Each arrow names the key that links two cards: the order to its line, and the line to the shipment line that shipped it. The dashed amber line is the source-document trace from the shipment to its ledger postings, card A, which move the goods' standard cost from inventory to cost of goods sold.
+:::
+
+## The trace leads from the invoice to the ledger
+
+{{< book-figure fig-03-10 crop="0,0.571,1,0.429" >}}
+
+::: {.notes}
+The invoice line carries the sale's revenue, and the trace finds the invoice's postings in the GLEntry card: a debit to receivables and credits to revenue, freight and sales tax. Each posting's AccountID leads to the Account card, which names the account. Card B shows the cash receipt application that settles the invoice.
+:::
+
+## Checkpoint
+
+You should be able to:
+
+{{< book-checkpoint 3.2 >}}
+
+::: {.notes}
+The ledger stores AccountID, the Account table's surrogate key, so translating it into an account number takes a lookup. Students who can explain why one sale posts from several documents have the navigation skills the later chapters need.
+:::
+
+# Comparing Simple and Complex Table Groups
+
+## Three patterns run across the table groups
+
+- A group grows with the process it records: a few reference tables, or a whole revenue cycle
+- The same relational principles apply at every scale
+- Cross-group bridge keys, such as ItemID, AccountID and EmployeeID, tie the database together
+
+::: {.notes}
+Because the principles do not change with size, the SQL, Power BI and Excel techniques of the later Parts work the same way on every group. Bridge keys are what make questions across business functions answerable.
+:::
+
+## Three groups, three sizes
+
+{{< book-table tbl-03-02 rows="Key tables,Complexity profile" >}}
+
+::: {.notes}
+The chapter's table also compares the groups' relationships, bridge keys, header-and-line patterns and accounting depth. Master Data is small and static, Order-to-Cash the largest, and the Accounting Core small in structure but deep in scope.
+:::
+
+## Check your understanding {.check}
+
+What connects each pair?
+
+1. The items a customer ordered
+2. A journal entry and the employee who approved it
+3. A ledger entry and its cost center
+4. A ledger posting and the invoice behind it
+
+::: {.notes}
+Ask students to name the column and say whether it is a declared key, a logical key or something else.
+:::
+
+## Each connection has its key {.answer}
+
+1. ItemID, a bridge key from Order-to-Cash to Master Data
+2. An employee key under its role name, the approver on JournalEntry
+3. CostCenterID, a bridge to Organizational Planning
+4. The source-document columns: a logical reference, not a key
+
+::: {.notes}
+The last answer is the trap: the trace works like a key but can point to any source table, which is why it is tested.
+:::
+
+# Looking Ahead
+
+## Back to the controller's question
+
+- Furniture revenue is posted to the ledger from sales invoice lines
+- Its cost is posted from the shipments
+- The Item table's ItemGroup tells you which products are Furniture
+- Next, the Part I case: frame the question, test the data, reconcile the sub-ledger to the ledger
+
+::: {.notes}
+Students now have a map of where the answer lives. Part II begins with Excel, bringing the same tables into a workbook with Power Query.
+:::
+
+## Summary
+
+- Relational databases store tables of rows and columns with defined types
+- Primary keys identify rows; foreign keys connect tables, tested rather than enforced at Charles River
+- Cardinality and optionality decide how joins behave, and ER diagrams make them visible
+- The chart of accounts, the ledger and the sub-ledgers are related tables
+- Bridge keys tie the table groups together, and GLEntry integrates them
+
+::: {.notes}
+Return to the objectives and ask students which they feel least sure about. Reading an ER diagram is the skill most worth practicing before Part III.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Primary key, foreign key and referential integrity repeat from earlier chapters with more precision.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 3.6 assesses referential integrity across the database. The Part I case puts this chapter's map to work on the controller's question.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::

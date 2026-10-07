@@ -17,9 +17,8 @@ from pathlib import Path
 
 from . import book_index
 from .pptx_theme import theme_reference
-from .verify import load_manifest
+from .verify import crop_key, cited_figures_in, load_manifest
 
-FIGURE_CITE = re.compile(r'\{\{<\s*book-figure\s+([\w-]+)')
 PNG_SCALE = 2
 # Slide classes that get a background in both formats: (fill, bar) token names.
 BACKGROUNDS = {'divider': ('blue', 'amber'), 'in-practice': ('paper', 'teal'), 'watch-out': ('paper', 'coral'),
@@ -86,13 +85,51 @@ def write_metadata(root: Path, index: dict, decks: list[str]) -> None:
                           encoding='utf-8')
 
 
-def cited_figures(root: Path, decks: list[str]) -> list[str]:
-    found: list[str] = []
+def cited_figures(root: Path, decks: list[str]) -> list[tuple[str, tuple | None]]:
+    """Every (figure, crop) pair the decks cite, once each; crop is None for the whole figure."""
+    found: list[tuple[str, tuple | None]] = []
     for deck in decks:
-        for figure in FIGURE_CITE.findall((root / 'slides' / deck / 'index.qmd').read_text(encoding='utf-8-sig')):
-            if figure not in found:
-                found.append(figure)
+        for cited in cited_figures_in((root / 'slides' / deck / 'index.qmd').read_text(encoding='utf-8-sig')):
+            if cited not in found:
+                found.append(cited)
     return found
+
+
+def crop_svg(source: Path, target: Path, crop: tuple) -> None:
+    """The same drawing seen through a narrower window: the root viewBox, width and height shrink."""
+    from scripts.export_drawio_svgs import parse_svg_length, replace_or_add_svg_attr
+    text = source.read_text(encoding='utf-8')
+    tag = re.search(r'<svg\b[^>]*>', text)
+    if tag is None:
+        raise ValueError(f'{source} has no <svg> element')
+    root = tag.group(0)
+    box = re.search(r'\sviewBox=(["\'])([^"\']+)\1', root)
+    width = re.search(r'\swidth=(["\'])([^"\']+)\1', root)
+    height = re.search(r'\sheight=(["\'])([^"\']+)\1', root)
+    if not (box and width and height):
+        raise ValueError(f'{source}: the <svg> element needs viewBox, width and height to be cropped')
+    x, y, w, h = (float(value) for value in box.group(2).replace(',', ' ').split())
+    (full_width, unit), (full_height, _) = parse_svg_length(width.group(2)), parse_svg_length(height.group(2))
+    left, top, part_width, part_height = crop
+    root = replace_or_add_svg_attr(root, 'viewBox', f'{x + left * w:g} {y + top * h:g} {part_width * w:g} {part_height * h:g}')
+    root = replace_or_add_svg_attr(root, 'width', f'{part_width * full_width:g}{unit}')
+    root = replace_or_add_svg_attr(root, 'height', f'{part_height * full_height:g}{unit}')
+    # Draw.io sizes each label's foreignObject at 100% of the viewBox, from the origin. Under a narrower
+    # viewBox that box no longer reaches a detail low in the figure, and the browser skips its labels,
+    # so the crop pins it to the whole figure's size, which is what 100% meant before.
+    body = re.sub(r'<foreignObject\b[^>]*>', lambda match: match.group(0)
+                  .replace('width="100%"', f'width="{w:g}"').replace('height="100%"', f'height="{h:g}"'),
+                  text[tag.end():])
+    target.write_text(text[:tag.start()] + root + body, encoding='utf-8')
+
+
+def crop_png(source: Path, target: Path, crop: tuple) -> None:
+    from PIL import Image
+    left, top, width, height = crop
+    with Image.open(source) as image:
+        box = (round(left * image.width), round(top * image.height),
+               round((left + width) * image.width), round((top + height) * image.height))
+        image.crop(box).save(target, optimize=True)
 
 
 def figure_png(root: Path, source: Path, drawio_bin: Path | None) -> Path:
@@ -111,17 +148,28 @@ def stage_figures(root: Path, index: dict, decks: list[str], stage: Path, *, png
                   drawio_bin: Path | None = None) -> None:
     target = stage / 'visuals'
     target.mkdir(parents=True, exist_ok=True)
-    for identifier in cited_figures(root, decks):
+    for identifier, crop in cited_figures(root, decks):
         figure = index['figures'].get(identifier)
         if figure is None:
             raise ValueError(f'No figure {identifier} in the book')
         source = root / figure['src'].lstrip('/')
-        shutil.copy2(source, target / source.name)
+        # A crop is staged under its own name, so a deck can show a figure whole and in detail.
+        stem = source.stem + (f'.crop-{crop_key(crop)}' if crop else '')
+        if crop and source.suffix.lower() == '.svg':
+            crop_svg(source, target / f'{stem}.svg', crop)
+        elif crop:
+            crop_png(source, target / f'{stem}{source.suffix}', crop)
+        else:
+            shutil.copy2(source, target / source.name)
         if source.suffix.lower() == '.svg' and png:
             drawio = root / 'visuals/src' / f'{source.stem}.drawio'
             if not drawio.is_file():
                 raise ValueError(f'{identifier}: no Draw.io source to export for PowerPoint ({drawio})')
-            shutil.copy2(figure_png(root, drawio, drawio_bin), target / f'{source.stem}.png')
+            exported = figure_png(root, drawio, drawio_bin)
+            if crop:
+                crop_png(exported, target / f'{stem}.png', crop)
+            else:
+                shutil.copy2(exported, target / f'{stem}.png')
 
 
 def solid_png(path: Path, width: int, height: int, fill: str, bar: str, bar_width: int) -> None:

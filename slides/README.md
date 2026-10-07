@@ -21,8 +21,9 @@ Every deck follows the same sequence, so students always know where they are.
 | Tutorials | `# Guided Tutorial N.k: Title`, the step titles, one key figure, the checkpoint | `{{< book-steps N.k >}}`, `{{< book-checkpoint N.k >}}` |
 | Closing | `# Looking Ahead`: summary, key terms, practice and next chapter, About these slides | `{{< book-terms >}}`, `{{< book-exercises >}}`, `{{< book-next >}}` |
 
-A deck has about 30–40 teaching slides, depending on how many sections the chapter has, and 3–4
-check-and-answer pairs. `slides/chapter-01/index.qmd` and `slides/chapter-02/index.qmd` are the reference decks.
+A deck has about 30–45 teaching slides, depending on how many sections the chapter has, and 3–4
+check-and-answer pairs. `slides/chapter-01/index.qmd` and `slides/chapter-02/index.qmd` are the reference decks;
+`slides/chapter-03/index.qmd` shows a figure in detail.
 
 ## Slide patterns
 
@@ -37,6 +38,21 @@ Use only these patterns. Each slide's title states its point.
 
 {{< book-figure fig-01-02 >}}
 ```
+
+A tall or dense figure, such as a large ER diagram, can follow its whole view with details. `crop` takes
+the left edge, top edge, width and height as fractions of the figure, and the caption reads
+"Figure 3.7 · Caption (detail)":
+
+```markdown
+{{< book-figure fig-03-07 crop="0,0,1,0.572" >}}
+```
+
+Set the fractions by looking at the exported figure (`slides/_shared/visuals/`), and cut only through
+blank space at least a few pixels deep: the PNG that PowerPoint shows has a margin the SVG does not, so the
+same fractions land up to a few pixels apart in the two formats. Two details may overlap, so that a table
+or relationship needed by both appears whole in each. The crop is cut from the book's figure at every build,
+so a change to the figure flows into it, but a change to its layout can move what the crop shows: look at
+the detail slides again after the figure changes.
 
 **Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it. `columns` and
 `rows` narrow it, each a comma-separated list of headers or first-column values; `rows` keeps every row
@@ -135,7 +151,7 @@ on their own once the deck exists.
 | File | Role |
 |---|---|
 | `scripts/slides/book_index.py` | reads the book (`_quarto.yml` and each chapter, includes expanded) into `_shared/book.json`: titles, Parts, sections, objectives, figures, tables, key terms, tutorials, exercises |
-| `scripts/slides/prepare.py` | writes each deck's `_metadata.yml` (title, subtitle, footer, output names), stages the cited figures with a PNG for PowerPoint (exported by Draw.io from the same source, cached in `outputs/slide-png/`), the fragments, the backgrounds and the themed templates |
+| `scripts/slides/prepare.py` | writes each deck's `_metadata.yml` (title, subtitle, footer, output names), stages the cited figures with a PNG for PowerPoint (exported by Draw.io from the same source, cached in `outputs/slide-png/`) and each crop under its own name, the fragments, the backgrounds and the themed templates |
 | `shortcodes/book.lua` | the `book-*` shortcodes, which read `_shared/book.json` |
 | `filters/deck.lua` | numbers the dividers, fills the roadmap, gives dividers, callouts and checks their backgrounds |
 | `filters/images.lua` | swaps a hand-placed SVG for its PNG in PowerPoint |

@@ -162,6 +162,34 @@ NOTES = re.compile(r"^:{3,}\s*\{?\.notes\}?\s*$", re.M)
 SLIDE_HEADING = re.compile(r"^(#{1,2})\s+(.+?)\s*(?:\{[^}]*\})?\s*$", re.M)
 AUTHOR_NAME = re.compile(r"\b(?:Codesso|Mauricio)\b", re.I)
 CITATION = re.compile(r"\{\{<\s*book-(figure|table|steps|checkpoint)\s+([\w.-]+)")
+FIGURE_CITE = re.compile(r"\{\{<\s*book-figure\s+([\w-]+)([^>]*)>\}\}")
+CROP = re.compile(r'crop\s*=\s*"([^"]*)"')
+
+
+def parse_crop(text: str) -> tuple[float, float, float, float]:
+    """A figure crop as fractions of the figure: left, top, width, height, all inside 0 to 1."""
+    try:
+        left, top, width, height = (float(part) for part in text.split(","))
+    except ValueError as exc:
+        raise ValueError(f'crop="{text}" needs four numbers: left, top, width, height') from exc
+    if (min(left, top) < 0 or width <= 0 or height <= 0
+            or left + width > 1 + 1e-9 or top + height > 1 + 1e-9):
+        raise ValueError(f'crop="{text}" must lie inside the figure (fractions from 0 to 1)')
+    return left, top, width, height
+
+
+def crop_key(crop: tuple[float, float, float, float]) -> str:
+    """The crop's part of a staged file name, as the shortcode writes it: 0,0,1,0.56 -> 0-0-1-0p56."""
+    return "-".join(f"{value:g}".replace(".", "p") for value in crop)
+
+
+def cited_figures_in(text: str) -> list[tuple[str, tuple[float, float, float, float] | None]]:
+    """Each figure a deck cites, with its crop if it has one."""
+    found = []
+    for identifier, arguments in FIGURE_CITE.findall(text):
+        crop = CROP.search(arguments)
+        found.append((identifier, parse_crop(crop.group(1)) if crop else None))
+    return found
 
 
 def deck_text(text: str) -> str:
@@ -196,6 +224,10 @@ def verify_sources(root: Path, decks: list[str], index: dict) -> tuple[list[str]
                       else source.parent / include).resolve()
             if not target.is_relative_to(root / "slides"):
                 errors.append(f"{label}: include must use the staged slide inputs: {include}")
+        try:
+            cited_figures_in(text)
+        except ValueError as exc:
+            errors.append(f"{label}: {exc}")
         for kind, identifier in CITATION.findall(text):
             if kind == "figure" and identifier not in index["figures"]:
                 errors.append(f"{label}: no figure {identifier} in the book")

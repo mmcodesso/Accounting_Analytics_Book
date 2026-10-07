@@ -22,8 +22,8 @@ from scripts import build_all
 from scripts.slides import book_index, pptx_finish
 from scripts.slides import prepare as prep
 from scripts.slides.pptx_theme import NS, q
-from scripts.slides.verify import (audit_text, load_manifest, safe_path, verify_local_links, verify_outputs,
-                                   verify_pptx, verify_sources)
+from scripts.slides.verify import (audit_text, crop_key, load_manifest, parse_crop, safe_path, verify_local_links,
+                                   verify_outputs, verify_pptx, verify_sources)
 
 
 def write(root: Path, rel: str, text: str = "fixture") -> Path:
@@ -256,6 +256,14 @@ class SourceCheckTests(unittest.TestCase):
             self.assertEqual([], errors)
             self.assertTrue(any("'Something Else'" in warning for warning in warnings))
 
+    def test_a_crop_must_lie_inside_its_figure(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            write(root, "slides/chapter-01/index.qmd", DECK.replace(
+                "{{< book-figure fig-01-01 >}}", '{{< book-figure fig-01-01 crop="0.5,0,0.6,1" >}}'))
+            self.assertTrue(any("must lie inside the figure" in error for error in self.check(root)[0]))
+
     def test_private_markers_and_paths(self) -> None:
         self.assertEqual([], audit_text("Compare alternative solutions to the business question.", "slide"))
         self.assertTrue(audit_text("Instructor answer: revenue is 400.", "slide"))
@@ -291,7 +299,36 @@ class PrepareTests(unittest.TestCase):
             written = (root / "slides/chapter-01/_metadata.yml").read_text(encoding="utf-8")
             self.assertEqual("chapter-01", load_manifest(root / "slides/chapter-01/_metadata.yml")["book-chapter"])
             self.assertIn("Generated", written.splitlines()[0])
-            self.assertEqual(["fig-01-01"], prep.cited_figures(root, ["chapter-01"]))
+            self.assertEqual([("fig-01-01", None)], prep.cited_figures(root, ["chapter-01"]))
+
+    def test_crops_are_parsed_named_and_cited_once(self) -> None:
+        self.assertEqual((0, 0.25, 1, 0.5), parse_crop("0, 0.25, 1, 0.5"))
+        self.assertEqual("0-0p25-1-0p5", crop_key((0, 0.25, 1, 0.5)))
+        for bad in ("0,0,1", "0,0,0,1", "a,b,c,d", "0.6,0,0.5,1"):
+            with self.subTest(crop=bad), self.assertRaises(ValueError):
+                parse_crop(bad)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            deck = DECK + '\n## Detail\n\n{{< book-figure fig-01-01 crop="0,0,0.5,1" >}}\n\n' \
+                          '::: {.notes}\nThe left half of the figure, enlarged.\n:::\n'
+            write(root, "slides/chapter-01/index.qmd", deck + deck[deck.index("## Detail"):])
+            self.assertEqual([("fig-01-01", None), ("fig-01-01", (0, 0, 0.5, 1))],
+                             prep.cited_figures(root, ["chapter-01"]))
+
+    def test_an_svg_crop_narrows_the_view_box(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            source = write(Path(temp), "figure.svg", '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" '
+                           'width="800px" height="600px" viewBox="-0.5 -0.5 800 600"><rect width="10"/>'
+                           '<foreignObject width="100%" height="100%"><div/></foreignObject></svg>')
+            target = Path(temp) / "crop.svg"
+            prep.crop_svg(source, target, (0.25, 0.5, 0.5, 0.5))
+            root = ET.fromstring(target.read_text(encoding="utf-8"))
+            self.assertEqual("199.5 299.5 400 300", root.get("viewBox"))
+            self.assertEqual(("400px", "300px"), (root.get("width"), root.get("height")))
+            self.assertEqual("10", root[0].get("width"))
+            # A label box keeps the whole figure's size, so labels low in the figure are still drawn.
+            self.assertEqual(("800", "600"), (root[1].get("width"), root[1].get("height")))
 
     def test_background_images_are_valid_pngs(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -323,6 +360,28 @@ class PowerPointTests(unittest.TestCase):
         header_run = table.find('a:tr/a:tc//a:rPr', NS)
         self.assertEqual("1", header_run.get("b"))
         self.assertEqual("FFFFFF", header_run.find('a:solidFill/a:srgbClr', NS).get('val'))
+
+    def test_a_long_caption_takes_its_room_from_the_picture(self) -> None:
+        def slide(caption: str) -> ET.Element:
+            return ET.fromstring(
+                f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree>'
+                '<p:pic><p:spPr><a:xfrm><a:off x="3000000" y="1400000"/><a:ext cx="5000000" cy="4000000"/></a:xfrm>'
+                '</p:spPr></p:pic><p:sp><p:nvSpPr><p:cNvPr id="1" name="TextBox 3"/><p:cNvSpPr txBox="1"/></p:nvSpPr>'
+                '<p:spPr><a:xfrm><a:off x="546100" y="5400000"/><a:ext cx="11087100" cy="508000"/></a:xfrm></p:spPr>'
+                f'<p:txBody><a:p><a:r><a:rPr/><a:t>{caption}</a:t></a:r></a:p></p:txBody></p:sp>'
+                '</p:spTree></p:cSld></p:sld>')
+        tokens = {"colors": {"gray": "5D6D7E"}, "sizes": {"evidence": 20}}
+        short, long = slide("Figure 3.7 · A caption that fits"), slide("Figure 3.9 · " + "A long caption " * 8)
+        for xml in (short, long):
+            pptx_finish.format_captions(xml, tokens)
+        self.assertEqual("4000000", short.find('.//p:pic//a:ext', NS).get("cy"))
+        picture, box = long.find('.//p:pic//a:xfrm', NS), long.find('.//p:sp//a:xfrm', NS)
+        extra = 20 * 1.2 * 12700
+        self.assertEqual(str(round(4000000 - extra)), picture.find('a:ext', NS).get("cy"))
+        self.assertEqual(str(round(5400000 - extra)), box.find('a:off', NS).get("y"))
+        center = 2 * int(picture.find('a:off', NS).get("x")) + int(picture.find('a:ext', NS).get("cx"))
+        self.assertAlmostEqual(2 * 3000000 + 5000000, center, delta=1)
+        self.assertEqual("2000", long.find('.//a:rPr', NS).get("sz"))
 
     @unittest.skipUnless(shutil.which("quarto"), "needs Quarto for Pandoc's default template")
     def test_the_template_carries_footer_backgrounds_and_no_name(self) -> None:
