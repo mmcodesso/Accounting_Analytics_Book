@@ -1,5 +1,0 @@
-```sql
-SELECT AccountID, AccountNumber, AccountName
-FROM Account
-WHERE AccountNumber IN (1090, 5080);
-```

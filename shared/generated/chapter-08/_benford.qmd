@@ -1,5 +1,0 @@
-| Population | First-digit MAD | Book interpretation |
-| --- | --- | --- |
-| All payments | 0.01295 | Marginally acceptable conformity |
-| Full payments | 0.00755 | Acceptable conformity |
-| Partial payments | 0.04496 | Nonconformity |

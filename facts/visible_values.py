@@ -30,7 +30,7 @@ facts/literals/values.yml (the classification; hand-written parts in facts/liter
 - check(d=None) -> [str]: every keyed literal whose key, written in its format, differs from what the text shows (empty on
   the edition's dataset; a literal that is wrong in the text is classified "review" instead of keyed).
 - scope_files(code=True): the files in scope (the book's .qmd files and shared/fragments, the slides decks, and the code
-  that mirrors the text); generated regions and files (shared/generated, slides/_shared) are never in scope.
+  that mirrors the text); generated regions and files (slides/_shared) are never in scope.
 
 What counts as an exact value. A numeric literal written with digits in a file in scope, outside what agent A's registry
 classifies: years (any bare 1900-2099 number), ISO and spelled dates, clock times, year-quarters and year-months, and

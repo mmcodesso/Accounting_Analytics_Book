@@ -1,4 +1,0 @@
-| Fiscal 2026 check | Variance |
-| --- | --- |
-| Sum of item groups | $2,265,636.88 |
-| Account 5080 close postings | $2,265,636.88 |

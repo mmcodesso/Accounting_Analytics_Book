@@ -1,5 +1,0 @@
-| Record | Field | Value |
-| --- | --- | --- |
-| GLEntry 126312 | AccountID | 42 |
-| Account row | AccountID | 42 |
-| Account row | AccountNumber | 4010 |

@@ -56,8 +56,6 @@ constant:
     - {rx: "'SI-2025-006733 to 006735'|'SI-2025-000001 and 000002'", why: "a docstring's example of a number format"}
   chapters/05-data-preparation/*.qmd:
     - {rx: 'FUR-DSK-0075|FUR-SDB-0002', why: "item master examples of the code pattern (master data is the same in every build)"}
-  slides/chapter-05/index.qmd:
-    - {rx: 'FUR-DSK-0075|FUR-SDB-0002', why: "item master examples of the code pattern"}
   facts/notes/ch05.py:
     - {rx: 'FUR-SDB-0002', why: "an item master example"}
   scripts/figures/ch05.py:

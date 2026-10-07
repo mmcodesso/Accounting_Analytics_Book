@@ -1,7 +1,0 @@
-| Furniture FY2026 | Margin at standard cost |
-| --- | --- |
-| Static budget | $29,059,986.29 |
-| Sales-volume variance | ($20,849,349.42) |
-| Flexible budget | $8,210,636.87 |
-| Flexible-budget variance | ($845,390.92) |
-| Actual | $7,365,245.96 |

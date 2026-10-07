@@ -15,11 +15,11 @@ dataset in DIR/data, and then, as a roll would:
     and lints the rewritten copy against the new registry;
  4. runs, in the copy, with CHARLESRIVER_DATA at the new dataset: the figure builders (keeping going after a failure),
     check_figures, sql_check, tutorial_queries_check, var_keys_check, the SQL companion build, and
-    scripts/build_all.py --check (provenance of the slide decks); with --render, a Quarto HTML render of chapters 3 and
-    11 and a search of the pages for the old edition's IDs and dates.
+    scripts/build_all.py --check (the slide decks cite figures and tables that exist); with --render, a Quarto HTML
+    render of chapters 3 and 11 and a search of the pages for the old edition's IDs and dates.
 
 Every step is timed. DIR/rehearsal-report.md lists each step with its seconds and result, then "Needs a human": the
-failing figures with the storyline each one tests, the notes with failing claims, the provenance reviews, and the
+failing figures with the storyline each one tests, the notes with failing claims, and the
 rest. A step ends OK, NEEDS A HUMAN (it ran and found something to decide), or FAILED (it crashed or could not run).
 The exit status is 1 only when a step FAILED. Excel and Power BI builds are not run (see the runbook for estimates).
 """
@@ -316,8 +316,8 @@ def rehearse(args: argparse.Namespace) -> int:
         s.status = OK
         s.detail = f"SHA-256 {ctx['sqlite_sha'][:12]}...; " + ("stand-in workbook (the build has no CharlesRiver.xlsx)" if placed.get("stand_in") else "workbook found")
         if placed.get("stand_in"):
-            st.limits.append("The new build has no CharlesRiver.xlsx (a stand-in file carries the pinned hash): figures that read the "
-                             "workbook, and `build_all.py --refresh-shared`, need the real workbook of the new build.")
+            st.limits.append("The new build has no CharlesRiver.xlsx (a stand-in file carries the pinned hash): the figures that read "
+                             "the workbook need the real workbook of the new build.")
 
     @step(st, "contract on the new build")
     def _(s):
@@ -519,41 +519,13 @@ def rehearse(args: argparse.Namespace) -> int:
 
     @step(st, "slides: build_all --check")
     def _(s):
+        # The decks cite the book's figures and tables by ID and follow the rolled text on the next build;
+        # there is no slide review. The check fails only if a deck cites something the book no longer has.
         code, text = sh(st, "build_all_check", py("scripts/build_all.py", "--check"))
         if code == 0:
-            s.status, s.detail = OK, "provenance and closure pass"
+            s.status, s.detail = OK, "every cited figure, table and tutorial exists"
             return
-        lines = [re.sub(r"^ERROR:\s*", "", l.strip()) for l in text.splitlines() if l.strip()]
-        if not lines or "Traceback" in text:
-            s.status, s.detail = FAILED, "build_all --check crashed: " + tidy(text[-300:], 240)
-            return
-        review: dict[str, list[str]] = {}
-        refresh, other = set(), []
-        for l in lines:
-            m = re.match(r"(chapter-\d+): editorial review required after change to (\S+)", l)
-            if m:
-                review.setdefault(m.group(1), []).append(m.group(2))
-                continue
-            m = re.match(r"(chapter-\d+)(?: storytelling)?: .*--refresh-shared", l)
-            if m:
-                refresh.add(m.group(1))
-                continue
-            other.append(l)
-        s.status = HUMAN
-        s.detail = (f"{sum(len(v) for v in review.values())} changed chapter files need the review of {len(review)} deck(s); "
-                    f"{len(refresh)} deck(s) need --refresh-shared")
-        ctx["provenance"] = review
-        def where(files):
-            by_dir: dict[str, list[str]] = {}
-            for f in files:
-                by_dir.setdefault(str(Path(f).parent.as_posix()), []).append(Path(f).name)
-            return "; ".join(f"{d}/ {', '.join(names)}" for d, names in by_dir.items())
-        st.need("Slide decks whose chapter changed: each needs the author's editorial review before it is re-approved",
-                *(f"{deck}: {where(v)}" for deck, v in sorted(review.items())))
-        if refresh or other:
-            st.need("Shared slide facts to refresh (`python scripts/build_all.py --refresh-shared`; it needs the new SQLite and workbook)",
-                    f"decks: {', '.join(sorted(refresh))}" if refresh else "none by deck",
-                    *(tidy(o, 200) for o in other if "run --refresh-shared" not in o or True))
+        s.status, s.detail = FAILED, f"exit {code}: " + tidy(text[-300:], 240)
 
     if args.render:
         @step(st, "HTML render of chapters 3 and 11")

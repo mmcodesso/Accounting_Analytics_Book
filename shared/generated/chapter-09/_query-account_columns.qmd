@@ -1,5 +1,0 @@
-```sql
-SELECT AccountID, AccountNumber, AccountName,
-    AccountType, AccountSubType
-FROM Account;
-```

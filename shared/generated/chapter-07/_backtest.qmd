@@ -1,5 +1,0 @@
-| Forecast method | Quarter error | Monthly MAPE |
-| --- | --- | --- |
-| Trend | +4.72% | 4.88% |
-| Mean | +0.03% | 3.65% |
-| Same quarter last year | +0.32% | 11.48% |

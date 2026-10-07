@@ -42,8 +42,8 @@ CODE_GLOBS = ["shared/calculations/*.py", "scripts/figures/*.py", "scripts/compa
 # Code of the slide project that mirrors the text (the refresh scripts and their tests): scanned for years, IDs and
 # dates; the exact values in them are the slide project's own facts (facts/visible_values.py does not scan them).
 YEAR_ONLY_GLOBS = ["scripts/slides/*.py", "tests/test_slide*.py"]
-# Generated, never classified or rewritten (scripts/build_all.py --refresh-shared rebuilds them):
-# shared/generated/, slides/_shared/, slides/_variables.yml, slides/_build/.
+# Generated, never classified or rewritten (the slide build writes them from the book):
+# slides/_shared/, slides/_variables.yml, slides/_build/.
 
 
 def excluded(rel: str) -> bool:

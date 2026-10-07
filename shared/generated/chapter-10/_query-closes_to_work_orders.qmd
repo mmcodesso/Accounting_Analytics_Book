@@ -1,6 +1,0 @@
-```sql
-SELECT woc.WorkOrderCloseID, woc.CloseDate, wo.WorkOrderNumber,
-    wo.ItemID, woc.TotalVarianceAmount
-FROM WorkOrderClose AS woc
-    INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID;
-```

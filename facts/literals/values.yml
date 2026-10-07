@@ -447,51 +447,9 @@ files:
   chapters/19-customer-credits-audit/chapter.qmd:
     constants: ["5%", "90%", "75%", "95%", "10%", "0%", "59", "29", "45", "22", "1%", "93", "46", "77", "38", "2%", "181", "132", "$5,000", "$10,000"]
 
-  # ---- the slides decks (slides/chapter-NN/index.qmd) ---------------------------------------------------
+  # ---- the slide decks (slides/chapter-NN/index.qmd); their figures and tables come from the book ---------
   slides/chapter-01/index.qmd:
-    constants: ["1", "4", "3", "9"]          # customers 1 and 4, order 1, ItemIDs 3 and 9: master-data rows
-    "1.48": {key: val.furniture.margin_drop, format: ".2p"}
-    "1.48 percent": {key: val.furniture.margin_drop, format: ".2 percent"}
-    "1.48116": {key: val.furniture.margin_drop, format: ".5p"}
-    "81": val.order1.customer_id
-    "474.22": val.item3.standard_cost
-    "412.81": val.item9.standard_cost
-    review:
-      "62": "orders 62, 85 and 59 of the key figure (see chapter 3): choose rows with the same shape in the new window"
-      "85": "see 62"
-      "59": "see 62"
-  slides/chapter-02/index.qmd:
-    constants: ["$0.00", "$0", "$100", "0", "4", "7", "8", "6", "1"]   # a toy table; the numbered steps of a sentence
-    "41": val.invoice1.order_id
-    "42": val.account_id.4010
-    "526": val.gl.rows_after_window
-    review:
-      "2": "selected supplier 2 PurchaseInvoice records (the duplicated invoice numbers): follows id.supplier_invoice.duplicate; check the supplier number"
-  slides/chapter-04/index.qmd:
-    constants: ["0.90", "0.95", "0.50", "0.99", "103", "109"]
-    "8": val.promo.furniture_id
-    "10 percent": val.promo.furniture_rate
-  slides/chapter-05/index.qmd:
-    constants: ["GRP-TYP-9999", "12", "45"]
-    "8": val.promo.furniture_id
-  slides/chapter-06/index.qmd:
-    constants: ["15000", "100%"]
-    "8": val.promo.furniture_id
-    "9": val.promo.segment_id
-  slides/chapter-07/index.qmd:
-    constants: ["15 percent"]
-    "10 percent": val.promo.furniture_rate
-    "10%": val.promo.furniture_rate
-  slides/chapter-08/index.qmd:
-    constants: ["1,000"]
-  slides/chapter-09/index.qmd:
-    constants: ["1.0"]
-  slides/chapter-11/index.qmd:
-    constants: ["100", "36", "25"]
-  slides/chapter-18/index.qmd:
-    constants: ["75%", "90%"]
-  slides/chapter-19/index.qmd:
-    constants: ["5%", "75%", "$5,000", "$10,000"]
+    constants: ["50", "500,000"]    # the chapter's generic audit-sampling illustration
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

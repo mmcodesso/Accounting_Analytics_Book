@@ -1,5 +1,0 @@
-| Year | Aggregate difference | Lines above one cent |
-| --- | --- | --- |
-| 2024 | $5.29 | 0 |
-| 2025 | $4.81 | 0 |
-| 2026 | $4.23 | 0 |

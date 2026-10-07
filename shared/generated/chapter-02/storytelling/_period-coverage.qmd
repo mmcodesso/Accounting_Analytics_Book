@@ -1,5 +1,0 @@
-| Population boundary | Observed coverage |
-| --- | --- |
-| Review period | Fiscal 2024–2026 |
-| Ledger posting dates | 01 Jan 2024 to 23 Feb 2027 |
-| Fiscal 2027 tail | 526 DisbursementPayment postings |

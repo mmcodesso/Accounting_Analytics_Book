@@ -1,456 +1,146 @@
-# Chapter presentations
+# Chapter slides
 
-This independent Quarto project renders one chapter source to Reveal.js and
-PowerPoint. The inventory contains all 19 numbered chapters. Chapter 1's 47-slide
-storytelling revision was approved on 5 October 2026; the other decks retain their approval.
-Each deck includes public teaching notes and both output formats.
+Each chapter can have one deck, `slides/chapter-NN/index.qmd`, which Quarto renders twice: a Reveal.js
+deck for the browser and a native PowerPoint file. A deck is published as soon as its source exists,
+like a chapter. There is no approval or review step, and editing a chapter never blocks a build.
 
-## Source files and disposable outputs
+A deck holds only its slides. The title slide, the footer, and every figure and table come from the book
+at each build, so when a chapter changes, its deck changes with it.
 
-Keep everything needed to edit, build, or review the presentations in repository
-source folders. `outputs/` is ignored and contains disposable build products.
+## The deck standard
 
-| Location | What belongs there |
-|---|---|
-| `slides/chapter-NN/index.qmd` | Slide narrative and all public speaker notes |
-| `slides/theme/` and `slides/filters/` | Presentation styling, reference template, and filters |
-| `slides/manifest.yml` | Chapter inventory, approval, and dependency provenance |
-| `shared/` and `visuals/src/` | Public calculations, fragments, approved generated facts, and figure authorities |
-| `scripts/slides/` and `tests/` | Reusable preparation, validation, and packaging code |
-| `slides/reviews/` | Durable acceptance records and editorial decisions |
-| `slides/_build/` and `outputs/` | Rendered decks, ZIPs, staged source copies, logs, screenshots, and temporary reports |
+Every deck follows the same sequence, so students always know where they are.
 
-The public export contains copies of `.qmd`, Python, and other source files for
-manual transfer. Edit their originals in the source folders, then regenerate
-the export. Those copies are never the sole authority. Virtual environments,
-temporary public checkouts, and validation fixtures are also disposable; their
-requirements and preparation code remain in the repository.
-
-The tracked acceptance snapshots preserve the Chapter 1 review and the earlier
-all-chapter review even when temporary reports are deleted. They identify the
-reviewed artifacts and remaining limitations. Automatic builds never rewrite
-these records or approve a new revision. Retain an intentional review record
-when accepting later changes; keep raw logs and screenshots in `outputs/`.
-
-Regenerate the site, public source overlay, and transfer ZIPs from repository
-sources with:
-
-```sh
-python scripts/build_all.py
-python scripts/build_all.py --export-public
-python scripts/slides/package_release.py
-```
-
-The ZIPs are `outputs/chapter-slides.zip` and
-`outputs/chapter-slides-public-source.zip`. Packaging checks the current site
-and export inventory and includes only allowlisted source files. No previous
-ZIP, saved screenshot, or review report is required.
-
-To repeat the dataset-free Chapter 1 render using only the sanitized export:
-
-```sh
-python outputs/public-export/scripts/build_all.py --slides-only --chapter chapter-01
-```
-
-After deployment, compare the public deck, notes, book links, and local runtime
-resources with the local render:
-
-```sh
-python scripts/slides/verify_published.py --chapter chapter-01
-```
-
-This writes a fresh diagnostic report under `outputs/build/chapter-01/`; it
-does not alter the tracked acceptance record or deploy anything.
-
-## Chapter inventory
-
-| Chapter | Status | Teaching slides | Module dividers | Total including opening |
-|---|---|---:|---:|---:|
-| 1 | Approved | 41 | 5 | 47 |
-| 2 | Approved | 45 | 4 | 50 |
-| 3 | Approved | 40 | 4 | 45 |
-| 4 | Approved | 30 | 4 | 35 |
-| 5 | Approved | 29 | 3 | 33 |
-| 6 | Approved | 30 | 4 | 35 |
-| 7 | Approved | 30 | 4 | 35 |
-| 8 | Approved | 34 | 4 | 39 |
-| 9 | Approved | 32 | 4 | 37 |
-| 10 | Approved | 34 | 4 | 39 |
-| 11 | Approved | 33 | 3 | 37 |
-| 12 | Approved | 37 | 4 | 42 |
-| 13 | Approved | 30 | 3 | 34 |
-| 14 | Approved | 32 | 3 | 36 |
-| 15 | Approved | 30 | 3 | 34 |
-| 16 | Approved | 30 | 3 | 34 |
-| 17 | Approved | 26 | 4 | 31 |
-| 18 | Approved | 27 | 4 | 32 |
-| 19 | Approved | 29 | 3 | 33 |
-
-The intended audience has introductory financial and managerial accounting
-knowledge. No prior analytics, programming, or accounting information systems
-course is required.
-
-## Default teaching structure
-
-Use a recurring accounting investigation within each module. The stages guide
-teaching, rather than impose six slides or a fixed chapter length.
-
-| Stage | Purpose | Observable student work |
+| Part | Slides | How |
 |---|---|---|
-| Situation | Business event, decision maker, consequence | Recognize the accounting context |
-| Question | Question, population, period, measure | Clarify what must be explained or decided |
-| Evidence | Relevant records, figures, results | Observe, compare, locate, predict |
-| Method | Needed concept and visible intermediate steps | Follow a worked process |
-| Check | Verify understanding or a result | Calculate, match, diagnose, explain |
-| Interpretation | Supported conclusion, limits, next evidence | Produce a qualified response |
+| Opening | Title: "Chapter N: Title" with the book's title | generated; the deck has no YAML |
+| | In this chapter: the Part, the chapter's place in it, and the deck's modules | `::: {.roadmap}` |
+| | Learning objectives | `{{< book-objectives >}}` |
+| | Opening scenario: who, the business question, why it matters | written |
+| Modules | one per numbered section of the chapter: a divider `# <section title>`, then 2–6 slides | dividers get the book's section number |
+| Tutorials | `# Guided Tutorial N.k: Title`, the step titles, one key figure, the checkpoint | `{{< book-steps N.k >}}`, `{{< book-checkpoint N.k >}}` |
+| Closing | `# Looking Ahead`: summary, key terms, practice and next chapter, About these slides | `{{< book-terms >}}`, `{{< book-exercises >}}`, `{{< book-next >}}` |
 
-Repeat the sequence where useful. Concept chapters emphasize comparisons and
-processes, software chapters intermediate results and troubleshooting, and
-cases competing explanations and decisions. These teaching stages differ from
-the book's six-stage analytical workflow.
+A full deck has about 30–35 teaching slides and 3–4 check-and-answer pairs. `slides/chapter-01/index.qmd`
+is the reference deck.
 
-Each teaching slide has one principal purpose, an evidence source or student
-task, and public notes stating **Purpose, Evidence, Timing, Narration, Expected
-response, Misconception, and Transition**. Ordinary explanations allow 45–90
-seconds; activities state a longer practical timing. Every activity names an
-observable output. Keep its instructions visible throughout student work.
+## Slide patterns
 
-Selected checks use a separate response slide, preserving the pause in both
-formats. Fragments pace explanations in Reveal, while essential reasoning stays
-complete in static PowerPoint. Do not hide a required instruction in a fragment
-or rely on animation inside a diagram. Use one teaching purpose per figure view,
-with consistent link meanings and attribution.
+Use only these patterns. Each slide's title states its point.
 
-## Chapter 1 recording modules
+**Concept.** At most five bullets of about twelve words each.
 
-The five modules can be taught together or recorded separately:
-
-| Module | Purpose |
-|---|---|
-| The controller's question | Define and interpret a qualified margin preview |
-| Questions and workflow | Distinguish analytics types and the six stages |
-| Tools and the Charles River business | Connect tool choices, activities, and tables |
-| Tracing one revenue posting | Follow a public invoice-line example into the ledger |
-| Guided exploration | Complete Tutorial 1.1 and transition to assigned practice |
-
-Speaker notes give each teaching slide a purpose, suggested timing, narration,
-questions for students, and a transition. Ordinary explanation slides allow
-approximately 45–90 seconds. Workbook activity slides allow two to three minutes.
-Use those timings as prompts rather than automatic advancement. Notes travel in
-both outputs and are public. The tutorial checkpoint responses are already
-public in the book. Exercise, comprehensive-case, and capstone solutions belong
-outside this project and its dependencies.
-
-The Furniture exhibit previews Chapter 6's public calculation. Its measure is
-**invoice-based margin at standard cost**. It does not reconcile financial-statement
-gross profit or reveal the diagnostic explanation. The posting trace checks one
-revenue credit, not a complete journal entry. Its displayed values and identifiers
-come from the prepared public facts through the `slide.trace` variables.
-
-The 2026 margin comparison and **5 March 2025** navigation trace have distinct
-evidence boundaries. The trace verifies one invoice line against one revenue
-credit and provides no diagnosis of the 2026 decline. Review the complete
-storyboard and original-slide dispositions in
-[the implementation record](reviews/chapter-01-storytelling.md).
-
-Focused, dataset-free authoring checks and renders:
-
-```text
-python scripts/build_all.py --check --chapter chapter-01
-python scripts/build_all.py --slides-only --chapter chapter-01
-python scripts/build_all.py --preview chapter-01
-```
-
-Explicit authoring refresh, followed by the focused build:
-
-```text
-python scripts/build_all.py --slides-only --chapter chapter-01 --refresh-shared
-```
-
-Focused renders use isolated Quarto output directories before replacing the
-selected chapter. Other decks and approved release bundles remain intact. The
-chapter report is `outputs/build/chapter-01/build-report.json`. Chapter selection
-is rejected for full-site assembly and public export: those operations validate
-the whole inventory. The preview watcher uses selected-chapter checks as well.
-
-`scripts/slides/refresh_storytelling.py` owns supplemental Chapter 1 views and
-native table fragments in `shared/generated/chapter-01/storytelling/`. It reads
-the pinned database only on explicit refresh, verifies its unchanged checksum,
-and records generator, canonical-input, and artifact hashes. The original
-`refresh.py` and the provenance of other chapter generators remain unchanged.
-
-## Teaching Chapters 2-3
-
-Chapter 2 follows an internal auditor's readiness assessment for fiscal
-2024–2026: meaning and sources, operational quality, tidy observations, then
-Accounting Core checks and a qualified supervisor response. Its 50-slide deck
-retains four recording modules and covers all steps of public Tutorials 2.1 and
-2.2. Separate prompt/response slides keep reasoning pauses in both formats.
-Budget and quality exhibits preserve the book's public example values.
-
-The whole-extract ledger totals include the 2027 supplier-payment posting tail;
-they are not restricted to the review period. The dated 2025 trace establishes
-one line-to-credit match rather than the entire journal entry or recognition.
-See [the Chapter 2 review record](reviews/chapter-02-storytelling.md) for all
-original-slide dispositions and current acceptance status.
-
-```text
-python scripts/build_all.py --check --chapter chapter-02
-python scripts/build_all.py --slides-only --chapter chapter-02
-python scripts/build_all.py --refresh-shared --slides-only --chapter chapter-02
-python scripts/build_all.py --preview chapter-02
-```
-
-`scripts/slides/refresh_chapter02_storytelling.py` owns the supplemental views
-and native fragments in `shared/generated/chapter-02/storytelling/`. A focused
-refresh does not regenerate Chapter 1 or the existing foundations artifacts.
-Ordinary builds remain dataset-free. The author authorized publication of the
-revised deck on 5 October 2026. It is included in default publication and public
-source exports. Native PowerPoint inspection and Excel formula execution remain
-unverified; the review record distinguishes performed checks from those limits.
-
-Chapter 3 covers tables and types, keys, cardinality, table groups, and the public
-Tutorial 3.2 sale. Focused ER views use the book's observed-cardinality function.
-They omit unrelated fields and retain the distinction between logical key links
-and the source-document trace. The financial tables remain native PowerPoint
-tables. The shipment exhibit explicitly selects the item-cost postings, while
-the invoice exhibit shows that invoice's complete posting group.
-
-## Teaching Chapters 4-8
-
-The five decks form the Excel teaching sequence. Chapter 4 builds a reviewable
-workbook, Chapter 5 prepares related attributes, Chapter 6 profiles and explains
-the Furniture margin, Chapter 7 tests forecasts and management decisions, and
-Chapter 8 documents audit procedures and their follow-up.
-
-Each deck includes its chapter's public guided activities and checkpoints.
-Use the matching start file on the book's Companion Files page when joining
-mid-sequence. Chapters 4-7 extend the Furniture Analysis workbook; Chapter 8
-starts AuditAnalytics.xlsx. Financial tables and code remain native editable
-PowerPoint content. Cropped reference panels and focused charts are embedded
-figures with public sources or chart data included in the source export.
-
-The notes distinguish standard-cost margin from ledger gross profit, the
-forecast's planning range from a formal prediction interval, assumed promotion
-lift from observed demand, and audit flags from supported findings. Chapter 8's
-sample size is a teaching selection, not a general audit sample-size rule.
-
-Use `chapter-04` through `chapter-08` with the preview command below. Review both
-formats and the public notes when revising a deck. Future drafts use `pilot`
-until author approval is recorded in the manifest. Default site assembly and source export include
-approved decks. `--include-pilot` is an explicit local review option.
-
-## Authoring conventions
-
-Sparse teaching slides keep their titles at the top and center the content
-below them. Selected Reveal slides introduce one point, comparison column, or
-table row at a time. The first item is visible on arrival; press **Right Arrow**
-or **Space** to reveal the next item, and **Left Arrow** to go back. Earlier
-items stay visible and the layout stays in place. There is no automatic advance.
-PowerPoint shows the complete content as editable text and tables.
-The preview stays in slide mode on narrow screens so advancing remains explicit.
-
-Opt into these treatments on a teaching-slide heading:
+**Figure.** The book's figure, with "Figure 1.2 · Caption" under it and the book's alt text:
 
 ```markdown
-## Explain the finding {#ch01-example .balanced .stepwise}
+## Six stages take a question to a recommendation
+
+{{< book-figure fig-01-02 >}}
 ```
 
-- `.balanced` centers the content beneath the title with more space between points.
-- `.stepwise` reveals paragraphs, list items, or comparison columns in sequence.
-- `.step-rows` reveals table rows in sequence, keeping the heading and first row visible.
-- A `.persistent` fenced div keeps an accounting qualification or instruction
-  visible throughout a stepped explanation. PowerPoint includes it as native text.
+**Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it. `columns` and
+`rows` narrow it, each a comma-separated list of headers or first-column values:
 
-Omit the step class when students need the complete exhibit or instructions at
-once. Keep a brief delivery cue in the public notes for slides taught in steps.
-These classes affect Reveal; PowerPoint spacing comes from the reference layouts.
+```markdown
+{{< book-table tbl-01-03 columns="Table Group,Primary Accounting Use" rows="Accounting Core,Master Data" >}}
+```
 
-- Keep one `chapter-NN/index.qmd` source for both formats. Use `#` for module
-  dividers, `##` for teaching slides, and unique `chNN-` identifiers.
-- Set per-format filenames to `index.html` and `chapter-NN.pptx` in the chapter's
-  metadata. Keep chapter prose and slides as separate teaching narratives.
-- Give each teaching slide a `.notes` block. Include an accounting qualification
-  where it changes the interpretation, and distinguish evidence from hypotheses.
-- Use native Markdown text, lists, and simple tables so PowerPoint content stays
-  editable. Prefer at most two balanced columns. Split crowded slides rather
-  than reducing instructional text below the approved size.
-- Put explanatory prose before a table. Pandoc's PowerPoint writer can start an
-  untitled extra slide when prose follows a table. Artifact checks reject slide
-  counts that differ from the source's opening, module, and teaching slides.
-- Reference staged images under `/_shared/` and provide meaningful `fig-alt`
-  text. The presentation filter selects PNG derivatives for PowerPoint.
-  Embedded graphics can be resized or replaced, while their canonical sources
-  remain the place to edit their internal labels and shapes.
-- Include small shared definitions and references from `shared/fragments/`
-  through the staged `/_shared/fragments/` paths. Shared fragments have no
-  headings, YAML, page breaks, or book-only cross-references.
-- Use root variable shortcodes for edition and dataset information. Preparation
-  copies `_variables.yml`; never maintain a separate presentation copy manually.
-- Use explicit published book URLs for further instructions. Keep the essential
-  teaching sequence usable without animation or interactivity.
-- Identify source and license. Adaptations retain CC BY-SA 4.0 credit unless a
-  particular asset states separate terms.
+A long table goes on two slides, each with its own rows.
 
-## Sources and generated inputs
+**Comparison.** Two columns (`:::: {.columns}` with two `::: {.column}`); PowerPoint takes at most two.
 
-Canonical book figure builders and Draw.io sources continue to own their
-content. Focused presentation views and the native margin table live in
-`shared/generated/chapter-01/`. The public calculation consumes the pinned
-dataset through a read-only connection during an explicit authoring refresh.
-Ordinary public builds consume the reviewed generated facts without a dataset.
+**Callout.** `## In Practice: …`, `## Watch out: …` or `## Connecting the Dots: …` with the class
+`.in-practice`, `.watch-out` or `.connecting-dots`. The slide gets the book's teal, coral or amber bar.
 
-Chapter 2–3 generated examples live in their corresponding `shared/generated/`
-folders. `shared/calculations/foundations.py` supplies public book and slide
-examples, and `scripts/slides/refresh_foundations.py` writes the presentation
-views, native table includes, and prepared variable values. Source hashes and
-artifact hashes enforce the same explicit-refresh contract as Chapter 1.
+**Check and answer.** A question slide, then its answer on the next slide, so the pause works in both
+formats:
 
-Chapter 4-8 public exhibits are prepared by `scripts/slides/refresh_excel.py`.
-The book and decks share `shared/calculations/excel_analysis.py` for the margin
-bridge, forecast backtest, flexible budget, promotion model, and audit examples.
-The explicit refresh checks the pinned dataset, rebuilds canonical book diagrams,
-exports them, and then prepares the focused slide views. Ordinary builds check
-provenance and consume the committed artifacts without opening the dataset.
+```markdown
+## Check your understanding {.check}
 
-`slides/_shared/`, the copied variables, and `_build/` are disposable prepared
-inputs and outputs. Do not edit them. Modify the corresponding canonical source,
-then prepare and render again. A changed chapter source needs editorial review
-of its deck even when no shared fragment changed.
+Which stage of the workflow usually takes the most time?
 
-## Teaching Chapters 9-12
+## Preparing and cleaning the data {.answer}
+```
 
-The SQL decks follow the public manufacturing-variance tutorials. Chapter 9
-introduces SELECT, filters, NULLs, types, and ranking. Chapter 10 adds joins,
-aggregation, grain controls, and comparable labor/output populations. Chapter 11
-builds monthly measures with CASE, dates, windows, CTEs, and a saved view.
-Chapter 12 tests document traces, cutoff, purchasing controls, and labor evidence.
+**Notes.** Every `##` slide ends with 2–4 sentences of talk track in `::: {.notes}`, and a check slide's
+notes or its answer slide give the answer.
 
-Query definitions in `shared/calculations/sql_ch09.py` through `sql_ch12.py`
-serve both book figures and slide exhibits. `scripts/slides/refresh_sql.py`
-executes only public SELECT queries against the read-only pinned database.
-It evaluates the view definition as a CTE without creating a database object.
-Ordinary builds use committed facts, tables, SQL excerpts, and chart data.
-Changing a shared query requires the explicit shared refresh.
+## Rules
 
-SQL examples and results occupy successive slides. Clauses taken from longer
-queries are identified in the narration; structural patterns with ellipses are
-explicitly labeled. The book and its public tutorial scripts supply the complete
-procedures. The `sql-example` class increases Reveal code type without changing
-earlier decks. Native PowerPoint code text and result tables remain editable.
+- No YAML front matter, and no author name anywhere.
+- No data values, document IDs or dates typed into slides or notes. They stay in the book's figures and
+  tables, which the slides pull in. Describe counts qualitatively, as the chapters do. A literal the
+  chapter itself uses (an illustration, a framework's year) needs a rule in `facts/literals/`, which
+  `python facts/phase7_cli.py lint` checks.
+- Put text before a table, never after it: in PowerPoint, text after a table starts an untitled slide.
+- Use `::: {.incremental}` for bullets that appear one at a time. A `. . .` pause prints as text in
+  PowerPoint.
+- Write to the student as "you", as the chapters do.
 
-Use `chapter-09` through `chapter-12` in the preview command.
+## Other shortcodes
 
-## Teaching Chapters 13-16
+| Shortcode | Shows |
+|---|---|
+| `{{< book-objectives >}}` | the chapter's learning objectives, verbatim |
+| `{{< book-steps 1.1 >}}` | the step titles of Guided Tutorial 1.1 |
+| `{{< book-checkpoint 1.1 answers="hide" >}}` | the tutorial's checkpoint, without the answers in parentheses |
+| `{{< book-terms >}}` | the chapter's key terms, in one paragraph |
+| `{{< book-exercises >}}` | the exercise titles, by perspective |
+| `{{< book-next >}}`, `{{< book-title >}}`, `{{< book-link >}}` | the next chapter, the book's title, and the chapter's web address (inline) |
 
-The Power BI decks move from prepared tables and filter paths to explicit DAX
-measures, management reporting pages, and an exception register. Static states
-show what a selection changes and how a filtered visual window differs from a
-model measure. The short code examples and simple financial tables are editable
-PowerPoint content; the focused model and monitoring diagrams are graphics.
+Shared definitions can be included as in the book: `{{< include /_shared/fragments/_accounting-analytics.qmd >}}`.
 
-`shared/calculations/bi_ch13.py` through `bi_ch16.py` supply the public calculations
-to both the canonical book figure builders and `scripts/slides/refresh_bi.py`.
-Their database functions accept the caller's read-only connection. Ordinary
-builds read committed examples without Power BI Desktop or the private dataset.
-The explicit shared refresh checks the dataset checksum and recreates the facts,
-tables, focused diagrams, and chart data. The separate tutorial instructions in
-the book remain the complete procedure for working inside Power BI Desktop.
-
-Use `chapter-13` through `chapter-16` in the preview command. Check model meaning,
-formula/result sequences, interaction explanations, and public teaching notes.
-These slides do not execute the Power BI tutorials or substitute for inspecting
-the actual Power BI report. The public notes identify the Key Measures home
-table and Companion Files starting points for students joining mid-sequence.
-
-## Teaching Chapters 17-19
-
-The capstone decks brief the independent work. Chapter 17 organizes the lender
-package around its four milestones. Chapter 18 structures the make, buy, and
-reprice decision. Chapter 19 connects audit planning, fieldwork, evaluation,
-and continuing monitoring. Each deck identifies the required files, evidence,
-decision points, and deliverables without disclosing computed case solutions.
-
-These briefings use public requirements directly, with editable text and simple
-tables. They do not need new generated data. Links point to the relevant book
-requirements, and source hashes flag later requirement changes for review.
-The instructor can pause at milestone checkpoints and assign independent work.
-Chapter 19 distinguishes planned external procedures from work actually performed.
-
-Use `chapter-17` through `chapter-19` in the preview command. Review the assignment
-scope, pacing, checkpoints, and public narration when revising the assignment.
-
-## Local workflow
+## Commands
 
 From the repository root:
 
 ```sh
-python scripts/build_all.py
-python scripts/build_all.py --refresh-shared
-python scripts/build_all.py --preview chapter-01
+python scripts/build_all.py --check                         # fast source checks (no Quarto, no dataset)
+python scripts/build_all.py --slides-only --chapter chapter-01   # render one deck in both formats
+python scripts/build_all.py --preview chapter-01            # live browser preview
+python scripts/build_all.py                                 # the book and every deck
 ```
 
-The full build stages the book downloads and both slide formats independently,
-renders book HTML last, and then assembles the site. Use the ordinary `quarto
-preview` command for book editing. A browser preview checks HTML appearance,
-navigation, notes, and resources. Review the separate PowerPoint output in
-PowerPoint for layout, reading order, notes, hyperlinks, and direct editing of
-text and table cells.
+Rendered decks land in `slides/_build/` (`revealjs/chapter-NN/index.html`, `pptx/chapter-NN/chapter-NN.pptx`);
+the full build assembles them into `_book/slides/`.
 
-To browse the assembled book, slide links, and downloads, run this from the
-repository root after the full build:
+To look at a deck the way students will see it:
 
-```sh
-python -m http.server 8002 --bind 127.0.0.1 --directory _book
-```
-
-Open `http://127.0.0.1:8002/front-matter/downloads.html`. Keeping the server's
-working directory at the repository root lets later builds replace `_book` on
-Windows. The preview is local to this computer.
-
-Future pilots remain review artifacts until their approval status allows
-publication. Automated checks supplement visual review. They cannot
-establish that every slide is readable in a classroom or that native PowerPoint
-behavior has been inspected.
-
-For automated browser review, install the optional review requirements and use
-an existing Chrome installation:
-
-```sh
-python -m pip install -r scripts/slides/requirements-review.txt
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slides/powerpoint_check.ps1 -Deck slides/_build/pptx/chapter-01/chapter-01.pptx
 python scripts/slides/browser_check.py --chapter chapter-01
 ```
 
-The browser checker serves only the generated Reveal directory on a temporary
-loopback port. It records keyboard and speaker-view behavior, resources, image
-alt text, and element bounds in desktop and narrow views. Screenshots, a contact
-sheet, and `outputs/build/browser-review.json` support visual inspection.
-`--chrome PATH` selects a nonstandard Chrome installation. The checker does not
-download a browser, inspect native PowerPoint, or establish screen-reader
-accessibility. Remote runtime dependencies fail the check because published
-decks must carry their required resources locally.
+The first exports every PowerPoint slide as an image to `outputs/build/powerpoint-review/` and flags text that
+overflows its box (a table that runs off the slide is not flagged, so look at the images). The second takes
+screenshots of the Reveal deck in `outputs/build/browser-review/` and checks layout, notes and resources; it needs
+`scripts/slides/requirements-review.txt` and Chrome.
 
-On Windows with Microsoft PowerPoint installed, the native artifact checker
-opens a dedicated hidden copy, exports each slide, checks text/table fit, and
-tests editing and reopening a separate copy:
+## Starting a deck for chapter N
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slides/powerpoint_check.ps1
-```
+1. Create `slides/chapter-NN/index.qmd`, starting from Chapter 1's deck structure.
+2. Write a `#` divider for each numbered section, using the section's exact title so it gets its number.
+3. Cite the chapter's figures and tables by ID; check their IDs in the chapter.
+4. Run `python scripts/build_all.py --check`, then `--slides-only --chapter chapter-NN`, and look at both formats.
 
-It saves images and a report under `outputs/build/powerpoint-review/`. It leaves
-the generated deck unchanged. Inspect the rendered slides individually and
-review the notes. Slide-show UI behavior, reading order, and screen-reader
-behavior still require an interactive review.
+The chapter page's "View slides · Download PowerPoint" links and the Downloads page's Slides column appear
+on their own once the deck exists.
 
-The propagation acceptance script runs isolated theme, layout, fragment,
-variable, diagram, and calculation experiments:
+## How it works
 
-```sh
-python scripts/slides/propagation_check.py
-```
+| File | Role |
+|---|---|
+| `scripts/slides/book_index.py` | reads the book (`_quarto.yml` and each chapter, includes expanded) into `_shared/book.json`: titles, Parts, sections, objectives, figures, tables, key terms, tutorials, exercises |
+| `scripts/slides/prepare.py` | writes each deck's `_metadata.yml` (title, subtitle, footer, output names), stages the cited figures with a PNG for PowerPoint (exported by Draw.io from the same source, cached in `outputs/slide-png/`), the fragments, the backgrounds and the themed templates |
+| `shortcodes/book.lua` | the `book-*` shortcodes, which read `_shared/book.json` |
+| `filters/deck.lua` | numbers the dividers, fills the roadmap, gives dividers, callouts and checks their backgrounds |
+| `filters/images.lua` | swaps a hand-placed SVG for its PNG in PowerPoint |
+| `theme/tokens.yml` | colors, fonts and sizes for both formats |
+| `theme/reveal.scss` | the Reveal design |
+| `scripts/slides/pptx_theme.py` | the PowerPoint template, built from Pandoc's default: layouts, backgrounds, footer, slide numbers, text sizes |
+| `scripts/slides/pptx_finish.py` | after rendering, formats PowerPoint's tables and figure captions like Reveal's (PowerPoint draws only built-in table styles) |
+| `scripts/slides/verify.py` | the source checks of `--check` and the checks of the rendered decks and the assembled site |
 
-That authoring check requires the pinned dataset and `rsvg-convert`, in addition
-to Quarto and the build requirements. Set `CHARLESRIVER_DATA` to point at an
-existing dataset directory. Its deliberate test changes stay under
-`outputs/build/propagation-check/` and must never be published.
+Everything under `_shared/`, `_build/`, each deck's `_metadata.yml` and `slides/_variables.yml` is generated and
+gitignored; edit the sources above instead.

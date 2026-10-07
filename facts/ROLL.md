@@ -11,9 +11,7 @@ Everything is public. The chapters stay clean: no hidden comments, notes or mark
 | The dataset build and its release | The wording of notes whose claims fail on the new data (`facts/notes/templates`) |
 | The years, document IDs, dates and exact values in the text, the slides and the code that mirrors them (`facts/roll_text.py`) | Figure assertions on storylines the new data tells differently (the preflight and rehearsal list them) |
 | The companion and solution files, rebuilt and verified against the new data | Weekdays and prose tied to the old window ("the first Friday", start-up months) |
-| The instructor-notes package | The slides: each deck's review provenance is invalidated when its chapter text changes (`scripts/build_all.py --check` fails until the author reviews) |
-
-The slides review is the largest human cost. Plan for it first.
+| The instructor-notes package | A look at the slide decks: they show the book's figures and tables by ID and follow the rolled text on the next build, with no review step |
 
 ## Steps
 
@@ -29,7 +27,7 @@ The three book scenarios (`cutoff_invoices`, `traced_sale`, `stranded_work_order
 
 The same code with the window 2024-2026 rebuilds v2026.1 table for table (83 of 83; checked on 2026-10-06 after the last change to the scenarios), so the scenarios change nothing on the shipped window.
 
-Keep the exports the release needs switched on (`export_sqlite`, `export_excel`, the CSV bundle, `export_support_excel`): the tutorials read `CharlesRiver.xlsx`, and the builds of the rehearsals switched the workbook and CSV exports off to save time, so a rehearsal's dataset has no workbook (the five figures that read it, and the slides' `--refresh-shared`, need the real one).
+Keep the exports the release needs switched on (`export_sqlite`, `export_excel`, the CSV bundle, `export_support_excel`): the tutorials read `CharlesRiver.xlsx`, and the builds of the rehearsals switched the workbook and CSV exports off to save time, so a rehearsal's dataset has no workbook (the five figures that read it need the real one).
 
 ### 2. Preflight (about 3 minutes)
 
@@ -59,9 +57,8 @@ The first call is a dry run: read the report (rewrites by file; anything unresol
 
 A new literal that the lint does not know must be classified in `facts/literals/` before the text is committed.
 
-### 5. Refresh the shared facts and the figures
+### 5. Refresh the figures
 
-    python scripts/build_all.py --refresh-shared
     python scripts/figures/build.py
     python scripts/figures/check_figures.py --exports
     python scripts/export_drawio_svgs.py
@@ -72,7 +69,7 @@ A figure builder that fails asserts a storyline the new data tells differently: 
 
 - Revise the notes whose claims fail (`facts/notes/templates/<chapter>/<note>.md` and `facts/notes/<chapter>.py`); rerun the preflight until the list is as short as the data allow. A claim is kept only where an exercise or storyline depends on that exact condition.
 - Fix the figure assertions and any prose the roll could not follow.
-- Review each deck and update `slides/manifest.yml` provenance; `python scripts/build_all.py --check` and `python -m unittest discover -s tests -p 'test_slide*.py'` must pass before a push (the publish workflow runs both).
+- Look through the slide decks (`python scripts/build_all.py --slides-only`); `python scripts/build_all.py --check` and `python -m unittest discover -s tests -p 'test_*.py'` must pass before a push (the publish workflow runs both).
 - Rewrite `facts/baseline-2026.md`, or retire it: it is hand-written prose of data facts that the registry and the notes now carry.
 
 ### 7. Verify
@@ -126,9 +123,9 @@ The rehearsal of 2026-10-06 rolled the 2026 edition to a fiscal 2025-2027 build 
 | The figure standard | 160 figures checked, 0 problems |
 | An HTML render of Chapters 3 and 11 | none of the old document IDs or dates remains |
 
-What a person has to do (the sizes of the 2026-10-06 rehearsal; plan a day or two for the first two, and the slides review is the largest cost):
+What a person has to do (the sizes of the 2026-10-06 rehearsal; plan a day or two for the first two):
 
-- **Slides.** 67 chapter files changed, so each of the 19 decks needs the author's review; 16 decks need `python scripts/build_all.py --refresh-shared` with the new SQLite and workbook.
+- **Slides.** No review step since 2026-10-07: the decks cite the book's figures and tables by ID and pick up the rolled text and figures on the next build. Look through them once.
 - **Figures.** 29 of 160 fail to build: 5 need the new `CharlesRiver.xlsx`, 23 assert a storyline that the new window tells differently (Part III: the manufacturing variance by group, hours per standard hour, the start-up months, overtime share, the year-to-date gap, the surge days; Part II: the Furniture margin bridge, the first invoice lines; Part IV: the budget variance, the Chapter 16 exception counts; the rest are one-number assertions) and 1 is a layout error (Figure 7.1's trend line leaves its frame). Read each message, then fix the figure's wording and assertion, or plant the condition in the generator.
 - **Notes.** 14 of 161 have a claim that fails on the new data (the Part II case commission rate, Chapter 7's offsetting months, Chapter 18's make-or-buy conditions, Chapter 19's expectation, and similar). Revise the template wording (`facts/notes/templates`), keeping a claim only where an exercise or storyline depends on that exact condition.
 - **Prose** tied to the old calendar (weekdays, "the first Friday", start-up months) is not rewritten.

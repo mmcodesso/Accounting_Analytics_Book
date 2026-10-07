@@ -1,4 +1,0 @@
-| AccountID | AccountNumber | AccountName | ParentAccountID |
-| --- | --- | --- | --- |
-| 41 | 4000 | Revenue | — |
-| 42 | 4010 | Sales Revenue - Furniture | 41 |

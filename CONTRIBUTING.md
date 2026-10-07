@@ -227,23 +227,33 @@ these build dependencies.
 
 ## Chapter slides
 
-`slides/` is a separate Quarto project. Each chapter's `index.qmd` supplies both
-Reveal.js and PowerPoint. Use Python 3.13, Quarto 1.9.36, and Draw.io 29.6.6,
-with the usual book dependencies above, then install the pinned Python package:
+`slides/` is a separate Quarto project. Each chapter's deck, `slides/chapter-NN/index.qmd`,
+renders to both Reveal.js and PowerPoint. A deck is published as soon as it exists, like a
+chapter; there is no approval step, and editing a chapter never blocks the build. Use
+Python 3.13, Quarto 1.9.36, and Draw.io 29.6.6, with the usual book dependencies above,
+then install the pinned Python package:
 
 ```sh
 python -m pip install -r scripts/slides/requirements.txt
 python scripts/build_all.py --check
-python -m unittest discover -s tests -p 'test_slide*.py' -v
-python scripts/build_all.py --slides-only
+python -m unittest discover -s tests -p 'test_*.py' -v
+python scripts/build_all.py --slides-only --chapter chapter-01
 python scripts/build_all.py --preview chapter-01
 python scripts/build_all.py
 ```
 
+A deck cites the book's own figures and tables by ID (`{{< book-figure fig-01-02 >}}`,
+`{{< book-table tbl-01-02 >}}`), so its title, figures, captions, alt text and tables always
+match the chapter. `slides/README.md` describes the deck standard every chapter follows, the
+slide patterns, the shortcodes, and how to start a deck. `--check` needs neither Quarto nor
+the dataset: it fails only if a deck cites something the book lacks, a slide has no notes,
+or a deck names the author.
+
 The full build preserves PDF, EPUB, and DOCX downloads, renders both presentation
 formats separately, renders book HTML last, then assembles `_book/`. It exports
 Draw.io SVGs, vector PDFs, and the cover once before the book renders;
-all four book formats reuse those files. `visuals/export-manifest.json` records
+all four book formats reuse those files, and the slides export a PNG of each figure
+they cite for PowerPoint. `visuals/export-manifest.json` records
 source/output checksums and export settings so GitHub Actions can skip unchanged
 figures despite unreliable checkout timestamps. Commit that manifest with changed
 sources and exports. Missing or changed outputs, changed sources, and changed
@@ -252,42 +262,13 @@ everything. Existing local exports without manifest entries are adopted once whe
 their timestamps are current and default settings are used; CI never trusts those
 timestamps. Standalone
 `quarto render` commands continue to export through the pre-render hook.
-Publication uses committed public facts and needs no local dataset. `--slides-only` includes
-review drafts; `--include-pilot` also places them in a local full-build site.
-CI never enables that flag, and pull requests build without deploying.
+Pull requests build without deploying.
 
-Edit slide palette/type in `slides/theme/tokens.yml`, Reveal layout in
-`slides/theme/reveal.scss`, and PowerPoint geometry in `reference-base.pptx`.
-Do not edit staged `_shared/` inputs, the generated `_variables.yml`, or `_build/`.
-To refresh shared facts and figures after an authoritative calculation change,
-run `python scripts/build_all.py --refresh-shared`. This authoring-only operation
-requires the SQLite and workbook files pinned in `_variables.yml` and
-`rsvg-convert`; it verifies their checksums, opens the database read-only, and
-updates the public derived files and the book figure sources that share those
-calculations. The current shared figure builders cover Chapters 1-4 and 6-16.
-The workbook supplies worksheet names for the existing book figure builder.
-Set `CHARLESRIVER_DATA` to use an existing dataset directory outside this checkout.
-Commit those generated inputs with their generator changes.
-
-Every teaching slide has public `.notes` for narration and discussion; assessment
-solutions do not belong in a deck or its notes. All 19 numbered chapters have
-decks, all `approved` in `slides/manifest.yml` after author review. Future drafts
-use `pilot` until the author approves their rendered formats and notes. The final
-three decks brief the independent capstone work without disclosing its solutions.
-Only `approved` entries receive public links and packaged downloads. Chapter
-revisions invalidate recorded source hashes: review the teaching narrative before
-updating review provenance. See `slides/README.md` for the chapter inventory and
-the centered-content and progressive-reveal authoring conventions.
-
-Use `python scripts/build_all.py --export-public` to prepare the manual transfer
-bundle. Follow its `TRANSFER.md` and inventory: replace export-owned directories
-as units, review shared root-file edits separately, and remove listed obsolete
-files. `--include-pilot` creates a review-only bundle. Validate an overlay against
-an existing public checkout with
-`python scripts/slides/export_public.py --public-checkout /path/to/public/book`;
-the command checks a disposable copy and leaves that checkout unchanged. Render
-and inspect the public checkout before publishing; automated checks do not stand
-in for browser or native PowerPoint review.
+Edit the slide palette and type in `slides/theme/tokens.yml`, the Reveal design in
+`slides/theme/reveal.scss`, and the PowerPoint template in `scripts/slides/pptx_theme.py`.
+Do not edit the generated `slides/_shared/`, `slides/_variables.yml`, the decks'
+`_metadata.yml`, or `slides/_build/`. Every slide has notes for the speaker; assessment
+solutions do not belong in a deck or its notes.
 
 ## License
 

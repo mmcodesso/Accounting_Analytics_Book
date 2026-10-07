@@ -1,6 +1,0 @@
-| Account | Debit | Credit |
-| --- | --- | --- |
-| 1020 Accounts Receivable | $787.48 | — |
-| 4010 Sales Revenue - Furniture | — | $688.42 |
-| 4050 Freight Revenue | — | $51.00 |
-| 2050 Sales Tax Payable | — | $48.06 |

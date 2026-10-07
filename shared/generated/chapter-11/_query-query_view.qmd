@@ -1,6 +1,0 @@
-```sql
-SELECT *
-FROM MonthlyLaborEfficiency
-WHERE Month >= '2026-01'
-ORDER BY Month;
-```

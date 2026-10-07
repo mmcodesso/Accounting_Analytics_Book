@@ -321,11 +321,12 @@ def inspect_deck(context, url: str, chapter: str, screenshots: Path) -> dict:
                 page.keyboard.press("s")
             popup = popup_info.value
             popup.wait_for_load_state("domcontentloaded")
-            popup.wait_for_function("() => document.body.innerText.includes('Purpose:')", timeout=10000)
-            body = popup.locator("body").inner_text()
+            # The speaker view shows the current slide's notes; look for their opening words.
+            opening = " ".join(note_slide["notes"].split()[:6])
+            popup.wait_for_function(r"(text) => document.body.innerText.replace(/\s+/g, ' ').includes(text)",
+                                    arg=opening, timeout=10000)
             popup.screenshot(path=str(screenshots / "speaker-view.png"))
-            result["checks"]["speakerView"] = {"passed": True, "url": popup.url,
-                                                "notesVisible": "Purpose:" in body}
+            result["checks"]["speakerView"] = {"passed": True, "url": popup.url, "notesVisible": True}
             popup.close()
         except Exception as exc:
             result["checks"]["speakerView"] = {"passed": False, "error": str(exc)}

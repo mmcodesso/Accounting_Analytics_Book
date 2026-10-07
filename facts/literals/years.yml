@@ -173,9 +173,6 @@ files:
     - {rx: 'RLS guidance {Y}', class: real, why: "a Microsoft Learn page date"}
   back-matter/closing.qmd:
     - {rx: 'in effect since {Y}', class: real, why: "the IIA standards took effect in 2025"}
-  slides/chapter-19/index.qmd:
-    - {rx: "IIA's {Y} Global Internal Audit Standards", class: real, why: "the standards' name"}
-    - {rx: 'the {Y} second edition of the COSO', class: real, why: "a publication year"}
   scripts/figures/powerbi.py:
     - {rx: 'Power BI Desktop 2\.158 \(September {Y}\)', class: real, why: "the pinned software release"}
   scripts/figures/ch02.py:

@@ -72,9 +72,6 @@ files:
     - {rx: '*', class: real, why: "Microsoft Learn page dates"}
   appendices/b-publishing-security/_exercises.qmd:
     - {rx: '*', class: real, why: "Microsoft Learn page dates"}
-  # --- the slides --------------------------------------------------------------------------------
-  slides/chapter-02/index.qmd:
-    - {rx: 'earliest shipment {Y}', key: date.invoice_before_shipment.first_ship}
   # --- code that mirrors the text ----------------------------------------------------------------
   scripts/slides/verify.py:
     - {rx: "author's decision, {Y}", class: real, why: "the date of the author's decision, in a comment"}
@@ -85,8 +82,3 @@ files:
     - {rx: 'decision {Y}', class: real, why: "the date of an author's decision"}
     - {rx: "'{Y} and 01-04'", class: constant, why: "a docstring's example of a date format"}
     - {rx: "-> '{Y}'", class: constant, why: "a docstring's example of a date format"}
-  scripts/slides/refresh_chapter02_storytelling.py:
-    - {rx: '''SI-\d{4}-\d+'',''{Y}'',\d+', key: date.invoice_before_shipment}
-    - {rx: '''SI-\d{4}-\d+'',''[\d-]+'',\d+,''{Y}''', key: date.invoice_before_shipment.first_ship}
-  tests/test_slide_public_assets.py:
-    - {rx: '*', class: shift, why: "invented rows of a test fixture, tied to the years the test filters on"}

@@ -1,4 +1,0 @@
-| All invoice lines | Rows | Revenue |
-| --- | --- | --- |
-| Before header merge | 27,933 | $86,446,845.84 |
-| After header merge | 27,933 | $86,446,845.84 |

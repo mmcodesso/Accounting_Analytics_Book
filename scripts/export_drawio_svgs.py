@@ -590,6 +590,32 @@ def export_cover_png(
     temp_output.replace(output)
 
 
+def export_png(drawio_bin: Path, source: Path, output: Path, *, scale: float = 2, border: int = 8) -> None:
+    """A raster copy of one figure for the PowerPoint slides, which cannot draw the SVG's HTML labels."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temp_output = output.with_name(f".{output.stem}.tmp.png")
+    if temp_output.exists():
+        temp_output.unlink()
+
+    command = [
+        str(drawio_bin),
+        "-x",
+        "-f",
+        "png",
+        "--scale",
+        format_number(scale),
+        "--border",
+        str(border),
+        "-o",
+        str(temp_output),
+        str(source),
+    ]
+    run_drawio(command, source, temp_output, "PNG")
+    read_png_dimensions(temp_output)
+    temp_output.write_bytes(compress_png_losslessly(temp_output.read_bytes()))
+    temp_output.replace(output)
+
+
 def cover_targets(output: Path, width: int, height: int, skip_pdf: bool) -> list[tuple[Path, dict]]:
     targets = [
         (output, {"width": width, "height": height}),

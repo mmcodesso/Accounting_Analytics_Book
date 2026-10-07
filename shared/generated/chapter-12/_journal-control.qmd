@@ -1,4 +1,0 @@
-| Population | Entries | Amount |
-| --- | --- | --- |
-| JournalEntry | 851 | $129,860,610.27 |
-| Related ledger debits | 851 | $129,860,610.27 |

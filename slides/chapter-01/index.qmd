@@ -1,491 +1,341 @@
----
-title: "Accounting Analytics: An Integrated Approach"
-subtitle: "Chapter 1: The Role of Analytics in Accounting"
-format:
-  revealjs:
-    output-file: index.html
-  pptx:
-    output-file: chapter-01.pptx
----
+## In this chapter
 
-# The controller's question {#ch01-module-question}
-
-::: {.notes}
-Recording module 1. Adopt the role of a new staff accountant. Agree the scope and give a qualified descriptive response. The diagnostic cause remains open.
-:::
-
-## Your first week at Charles River {#ch01-controller .balanced .stepwise}
-
-Charles River is a home furnishings company near Boston.
-
-You are its new **staff accountant**. The controller asks:
-
-**“Why did Furniture margin decline in the latest quarter?”**
-
-What must you clarify before opening the data?
-
-::: {.notes}
-Purpose: create a reason to investigate. Evidence: Chapter 1 opening scenario. Timing: 60–90 seconds. Narration: accounting knowledge helps you recognize the question, while its evidence sits across operating records and the ledger. Reveal the company, role, and request, then pause. Expected response: clarify the period, population, rate or dollars, and cost basis. Misconception: a familiar ratio makes the scope self-evident. Transition: the learning outcomes describe what we need to respond.
-:::
-
-## What you will be able to do {#ch01-objectives .balanced .stepwise}
-
-- Explain how data and technology change accounting work.
-- Distinguish four analytics types across accounting roles.
-- Describe the six stages of an analytical workflow.
-- Choose a useful role for Excel, SQL, or Power BI.
-- Connect Charles River activity, tables, and ledger postings.
-
-::: {.notes}
-Purpose: preserve all five book learning objectives. Evidence: Chapter 1 Learning Objectives. Timing: 60 seconds. Narration: students bring financial and managerial accounting knowledge. No database, programming, AIS, or audit course is assumed. Reveal each outcome and relate it to the request. Professional expectations add data skills to accounting judgment. Expected response: identify a familiar skill and a new skill. Misconception: this chapter requires mastery of all three tools. Transition: agree the scope of this first investigation.
-:::
-
-## The agreed scope {#ch01-scope .balanced .stepwise}
-
-- **Population:** Furniture invoice lines
-- **Period:** fiscal 2026
-- **Comparison:** Q4 against Q3
-- **Measure:** invoice-based margin at standard cost
-
-::: {.notes}
-Purpose: define scope before results. Evidence: approved quarterly invoice calculation shared with Chapter 6. Timing: 60–75 seconds. Narration: these choices define a preview of the broader controller question. Invoice lines provide revenue and quantity, Item provides standard cost, and invoice dates define periods. Expected response: explain how using order dates could alter the population. Misconception: this operational measure automatically equals financial-statement gross profit. That needs a separate reconciliation. Transition: define the calculation in execution order.
-:::
-
-## The margin calculation {#ch01-margin-definition .balanced .stepwise}
-
-**Extended standard cost** = quantity × item standard cost
-
-**Margin** = invoiced revenue − extended standard cost
-
-**Margin rate** = total margin ÷ total invoiced revenue
-
-::: {.persistent}
-This invoice measure requires a separate **financial-statement reconciliation**.
+::: {.roadmap}
 :::
 
 ::: {.notes}
-Purpose: define the measure before displaying it. Evidence: shared invoice_margin calculation and Chapter 6 figure. Timing: 75–90 seconds. Narration: extend cost first, subtract from the corresponding revenue, then aggregate before dividing. Credit memos and actual ledger cost postings need separate consideration. Expected response: explain why averaging line percentages can differ from dividing totals. Revenue weights the aggregate rate. Misconception: standard cost necessarily equals actual recognized cost. Reveal each step; the qualification stays visible throughout. Transition: observe the four-quarter pattern.
+This chapter sets up everything the book builds on: the questions analytics answers, the six-stage workflow, the three tools, and the Charles River dataset. Each module on this slide matches a section of the chapter, so students can read along in the same order.
 :::
 
-## Furniture margin through 2026 {#ch01-margin-chart}
+## Learning objectives
 
-![Charles River data; shared Chapter 6 calculation.](/_shared/generated/chapter-01/furniture-margin.svg){width="92%" fig-alt="Fiscal 2026 Furniture invoice-based margin at standard cost: Q1 43.05 percent, Q2 43.15 percent, Q3 42.26 percent, Q4 40.78 percent. The vertical scale starts at zero."}
+{{< book-objectives >}}
 
 ::: {.notes}
-Purpose: observe a pattern before explaining it. Evidence: pinned Charles River v2026.1, Furniture invoice lines, unrounded quarterly facts, and shared Chapter 6 calculation. Timing: 60–75 seconds. Narration: read the year and measure, then compare direct labels. Q4 is below Q3 and the first two quarters. Expected response: describe the decline without assigning a cause. Misconception: a downward chart proves a price or cost mechanism. Attribution: Codesso, Accounting Analytics Chapter 6 calculation, CC BY-SA 4.0. Transition: verify the last two rates from totals.
+Read the five objectives aloud. The summary at the end of the deck returns to each one, so students can check what they can now do.
 :::
 
-## How large was the change? {#ch01-margin-table .balanced}
+## Your first week at Charles River
 
-Verify each rate from the totals. Report the change in **percentage points**.
-
-{{< include /_shared/generated/chapter-01/_furniture-table.qmd >}}
+- You are the new staff accountant at a home furnishings company near Boston
+- The controller asks: **why did Furniture margins decline in the latest quarter?**
+- The data sits in several tables: sales orders, product costs, the general ledger
+- Answering takes more than accounting knowledge: you must extract, prepare, analyze and communicate data
 
 ::: {.notes}
-Purpose: make the financial table a verification task. Evidence: the chart's same unrounded quarterly facts, generated by the shared calculation. Timing: 2 minutes. Narration: leave the entire table and instruction visible. Divide total margin by revenue for each quarter, then subtract rates. Displayed dollar totals are rounded. Expected response: Q3 42.26 percent and Q4 40.78 percent, a decline of about 1.48 percentage points. Misconception: calling this a 1.48 percent decline confuses rate difference with relative change. Attribution: Charles River and Chapter 6 calculation, CC BY-SA 4.0. Transition: advance after students state their result.
+This is the question Part I prepares students to answer, and Chapter 6 answers it with Excel. Ask what they would need to know before they could even start, then point out that this chapter is that starting point.
 :::
 
-## Our initial response {#ch01-first-conclusion .balanced .stepwise}
+# The Changing Landscape of Accounting Work
 
-{{< include /_shared/generated/chapter-01/storytelling/_initial-response.qmd >}}
+## From samples to whole populations
+
+- Ledgers once held a few thousand entries a year; today's systems record millions
+- Sampling 50 of 500,000 transactions examines one hundredth of one percent of the evidence
+- The technology that creates the data can also test every transaction
 
 ::: {.notes}
-Purpose: model a qualified answer. Evidence: unrounded 2026 Q3/Q4 public facts. Timing: 60–75 seconds. Narration: the unrounded difference is about 1.48116 percentage points, displayed as 1.48. Reveal observation, qualification, and next evidence separately. Expected response: distinguish what changed from why it changed. Misconception: the descriptive preview resolves the diagnostic question. No cause has been established. The standard-cost and invoice-population qualifications define the result's reach. Transition: introduce the concepts needed to develop the investigation.
+Growth in data is both the challenge and the opportunity. Manual review cannot keep pace, but analyzing whole populations brings more evidence to a conclusion and finds patterns that sampling would miss.
 :::
 
-# Questions and workflow {#ch01-module-workflow}
+## The work shifts toward judgment
+
+- Software now matches invoices, prepares reconciliations and drafts analyses
+- Accountants frame the question, judge whether the data is reliable, and decide
+- The profession expects analytics: the CPA Evolution model curriculum, the IMA competency framework, IFAC's International Education Standards
 
 ::: {.notes}
-Recording module 2. Introduce analytics and judgment, the kinds of question an accountant asks, and the analytical workflow.
+Automation has not removed the need for accountants; it changes what they contribute. Early field evidence shows accountants using generative AI spending more time on client communication and review, and that relying on wrong AI suggestions raises the risk of error. Surveys of finance leaders name the lack of analytics skills as a leading barrier to adopting new technology.
 :::
 
-## Analytics needs accounting judgment {#ch01-definition .balanced}
+# Defining Accounting Analytics
+
+## What accounting analytics means
 
 {{< include /_shared/fragments/_accounting-analytics.qmd >}}
 
-Tools process records. **Accountants judge the question, evidence, and conclusion.**
+- **Data analytics**: the same kind of work in any field
+- **Business intelligence**: the tools that collect, store and present data for decisions
+- **Big data**: data too large or complex for traditional processing
 
 ::: {.notes}
-Purpose: combine the shared definition and accountant contribution. Evidence: shared definition and Chapter 1 changing landscape. Timing: 75–90 seconds. Narration: transaction volume and automation support repeated analyses. Accountants define populations, assess evidence, and interpret results. Professional expectations add data skills to accounting knowledge. Expected response: give one way a correct rate could answer the wrong question. Misconception: examining every row guarantees reliability. Missing populations or unsuitable definitions undermine conclusions. Sources: Vasarhelyi, Kogan, and Tuttle (2015); Earley (2015). Transition: classify four Furniture questions.
+Accounting analytics draws on all three related terms but applies them to the data, questions and standards of the accounting profession. The definition comes from the chapter's key terms.
 :::
 
-## Four questions about Furniture {#ch01-four-types .balanced}
+## Four types of analytics answer four questions
 
-Match each question to an analytics type:
-
-1. What happened to quarterly margin?
-2. Why did the margin change?
-3. What might next quarter's sales be?
-4. Which product mix should we choose under constraints?
+{{< book-figure fig-01-01 >}}
 
 ::: {.notes}
-Purpose: elicit classification before labels. Evidence: Chapter 1 continuum and Furniture scenario. Timing: 90 seconds. Narration: keep all questions visible while students assign descriptive, diagnostic, predictive, and prescriptive. One project can use several types. Expected response: the four types in that order. Misconception: the categories rank professional value. A reliable descriptive summary can be the right deliverable. Ask which question our chart answered and which the controller asked. Transition: compare with Figure 1.1.
+Descriptive asks what happened, diagnostic why it happened, predictive what might happen, and prescriptive what we should do. The types form a continuum of increasing complexity, and most real projects combine more than one.
 :::
 
-## The output determines the type {#ch01-types-response}
+## Check your understanding {.check}
 
-![Adapted from Figure 1.1; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/analytics-types.svg){width="95%" fig-alt="Descriptive asks what happened; diagnostic why it happened; predictive what might happen; prescriptive what should we do. A single investigation can ask several types of question."}
+Which type of analytics does each question call for?
+
+1. What was revenue by item group last quarter?
+2. Why did the Furniture margin fall?
+3. What will revenue be next quarter?
+4. Which product mix maximizes contribution margin, given machine hours?
 
 ::: {.notes}
-Purpose: provide the classification response. Evidence: Figure 1.1 Draw.io labels adapted for teaching. Timing: 60–75 seconds. Narration: map the previous questions left to right. The rate comparison is descriptive, while explanation requires diagnostic work. Forecasts and constrained choices produce different outputs. Expected response: distinguish description and diagnosis in one sentence. Misconception: a chart makes analysis diagnostic. Its question and evidence determine the type. Attribution: Codesso, Accounting Analytics Figure 1.1, CC BY-SA 4.0. Transition: connect questions to accounting roles.
+Give students a minute to classify each question, alone or in pairs, before moving to the answers.
 :::
 
-## Analytics across accounting roles {#ch01-roles .balanced .step-rows}
+## Each question has its type {.answer}
 
-Which role best fits the controller's request?
+1. Descriptive: a summary of what happened
+2. Diagnostic: the controller's question, broken into its drivers
+3. Predictive: a forecast built from historical trends
+4. Prescriptive: an optimization subject to constraints, as with Excel's Solver
 
-| Role | Question | Evidence |
-|---|---|---|
-| Financial accounting | Does the balance reconcile? | Ledger and subsidiary detail |
-| Managerial accounting | Why did performance change? | Revenue, cost, operations |
-| Auditing | Which items need follow-up? | Transactions, control evidence |
+Descriptive is not "basic": most accounting analytics is descriptive, and a poorly built summary misleads as easily as a sophisticated model.
 
 ::: {.notes}
-Purpose: connect analytical questions to professional contexts. Evidence: Chapter 1's three accounting perspectives. Timing: 75 seconds. Narration: reveal each row. Auditors may use descriptive summaries or predictive expectations just as managers do. Explain auditing as evaluating evidence about transactions and controls. Expected response: managerial accounting best matches the performance question, with reporting concerns also relevant. Misconception: selected exceptions are necessarily misstatements. They require follow-up. Transition: all these perspectives use a common analytical workflow.
+The value of analytics lies in the quality of the question and the rigor of the process, not in complexity. The book emphasizes descriptive, diagnostic and predictive work because accountants do it most often.
 :::
 
-## The six-stage analytical workflow {#ch01-workflow}
+# Analytics Across Accounting Roles
 
-![Focused Figure 1.2; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/workflow.svg){width="95%" fig-alt="Six stages: define the question, identify and access data, prepare and clean, analyze, visualize, and communicate. Duplicate-line checks belong in preparation."}
+## Three perspectives use the same skills
+
+- **Financial reporting**: the close, reconciliations, and fluctuation analysis before the statements are issued
+- **Managerial accounting**: explaining results against plan, forecasting, finding operational drivers
+- **Auditing**: testing whole populations, sharper risk assessment, continuous monitoring
 
 ::: {.notes}
-Purpose: introduce the course's analytical process. Evidence: Figure 1.2 and shared WORKFLOW_STAGES. Timing: 75–90 seconds. Narration: follow the controller's question through definition, access, preparation, analysis, visualization, and communication. These six analytical stages differ from the teaching stages structuring this deck. Work can revisit earlier stages. Expected response: place a duplicate-line check in preparation and explain why it affects analysis. Misconception: the stages form an irreversible sequence. Attribution: Codesso, Figure 1.2, CC BY-SA 4.0. Transition: identify concrete checks before trusting the margin.
+The book's exercises are organized around these three perspectives. One technique can serve all three: a duplicate-payment analysis supports controls assurance in an audit, vendor management in procurement, and cash flow review in controllership.
 :::
 
-## Checks that could change the result {#ch01-preparation .balanced .stepwise}
+## The controller's question is diagnostic
 
-- Does each invoice line appear once?
-- Does every included line match an Item record?
-- Do invoice dates belong to the agreed year and quarter?
-- Does the cost basis match the defined measure?
+{{< book-table tbl-01-01 rows="Diagnostic" >}}
 
 ::: {.notes}
-Purpose: make preparation concrete. Evidence: invoice-line population and Item relationship in the shared calculation. Timing: 75–90 seconds. Narration: reveal each check and invite a consequence. Repeated lines inflate totals, missing matches can remove evidence, and unsuitable dates or costs alter comparisons. Expected response: choose a check and explain its potential effect. Misconception: clean formatting guarantees a correct population. Do not invent a dataset failure or disclose the diagnostic cause. Transition: locate the activities and tool roles behind the records.
+The chapter's table gives an example for every type in every perspective; this is its Diagnostic row. The managerial cell is the controller's question: decomposing the Furniture margin decline into its price, volume, mix and cost effects.
 :::
 
-# Tools and the Charles River business {#ch01-module-tools}
+# The Accounting Analytics Workflow
+
+## Six stages take a question to a recommendation
+
+{{< book-figure fig-01-02 >}}
 
 ::: {.notes}
-Recording module 3. Connect business activity to tools, table groups, and shared keys. Use an architecture overview followed by focused views.
+Every project in the book follows these six stages, whatever the tool. The note under the figure shows which Parts of the book develop each stage.
 :::
 
-## A business behind the tables {#ch01-business .balanced .stepwise}
+## The controller's question, stage by stage
 
-Charles River sells **Furniture, Lighting, Textiles, and Accessories**.
-
-It combines purchased goods, in-house manufacturing, and design services.
-
-Orders, shipments, invoices, payroll, and planning describe different parts of that business.
+| Stage | For the Furniture margin |
+|-------------------------------|-----------------------------------------------------------------------|
+| 1. Define the question | Why did Furniture margins decline in the latest quarter? |
+| 2. Access the data | Invoiced sales, product costs, the revenue and cost of goods sold accounts |
+| 3. Prepare and clean | Link every invoice line to a product; treat returns consistently |
+| 4. Analyze | Margin by quarter and item group, split into volume, mix, price and cost |
+| 5. Visualize | One chart of margin by quarter, each driver highlighted |
+| 6. Communicate | A short memo to the controller |
 
 ::: {.notes}
-Purpose: give the architecture business context. Evidence: Chapter 1 company description and Tutorial 1.1. Timing: 60–90 seconds. Narration: the fictional company supplies a coherent setting across the course. Manufacturing and design services create records beyond finished-goods sales. The dataset spans multiple years, so dates matter among examples. Expected response: name an operating record that helps interpret a financial result. Misconception: every Item is a finished good sold to customers. Services, raw materials, packaging, and capital equipment also appear. Transition: choose tools according to the work.
+Walk the question down the stages. A vague question produces a vague answer, so the first stage shapes every decision that follows, from the data to the chart.
 :::
 
-## Which tool supports this task? {#ch01-tools}
+## Check your understanding {.check}
 
-Choose a starting tool: retrieve related records, check a small calculation, or share an interactive report.
-
-![Adapted from Figure 1.3; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/tools-workflow.svg){width="94%" fig-alt="SQL commonly supports access, preparation, analysis; Excel preparation and analysis; Power BI analysis and visualization. Every tool supports communication. Their capabilities overlap."}
+Which stage of the workflow usually takes the most time, and why does it matter so much?
 
 ::: {.notes}
-Purpose: replace a catalog with a justified choice. Evidence: Figure 1.3 workflow mapping. Timing: 90 seconds. Narration: SQL is a language for database records, Excel supports visible calculation and modeling, and Power BI supports interactive reports. The figure emphasizes course uses, not exclusive capabilities. Expected response: SQL for related database records, Excel for a small calculation, Power BI for an interactive report, each with a reason. Misconception: only Power BI communicates or only SQL prepares data. Attribution: Codesso, Figure 1.3, CC BY-SA 4.0. Transition: inspect how evidence is grouped.
+Let students answer before advancing. Many will guess the analysis stage.
 :::
 
-## Where the evidence lives {#ch01-architecture-overview}
+## Preparing and cleaning the data {.answer}
 
-![Group overview of Figure 1.4; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/architecture-overview.svg){width="96%" fig-alt="Operating groups, Accounting Core, fixed assets and financing, master data, and planning groups. Design Services belongs within Order-to-Cash. Dashed arrows mean ledger postings; solid arrows mean shared keys."}
+- Raw data has missing values, duplicates, inconsistent formats and wrong types
+- Analysis performed on dirty data produces unreliable results
+- Parts II and III both teach preparation techniques
 
 ::: {.notes}
-Purpose: establish architecture without dense lists. Evidence: Figure 1.4 group names and relationships. Timing: 75 seconds. Narration: locate operating cycles, the core, and reference/planning context. Fixed Assets and Financing creates postings too. Design Services belongs within Order-to-Cash. Read the actual legend: dashed postings, solid shared keys. Expected response: identify where the ledger and item costs live. Misconception: every arrow has identical meaning. Attribution: Codesso, Figure 1.4, CC BY-SA 4.0. Transition: enlarge the operating side.
+Preparation is often the most time-consuming stage and among the most important. The workflow parallels the data analysis process of data science; what makes accounting analytics distinctive is its data, its questions and the professional standards that govern it.
 :::
 
-## Operating activity reaches the ledger {#ch01-operating-groups}
+# The Tools of This Book
 
-![Operating focus of Figure 1.4; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/architecture-operating.svg){width="96%" fig-alt="Order-to-Cash, Procure-to-Pay, Manufacturing, and Payroll and Time connect through dashed posting links to Accounting Core. Sample records include invoices, work orders, and payroll registers."}
+## Each tool fits different stages
+
+{{< book-table tbl-01-02 columns="Tool,Strongest For,Main Workflow Stages,Where in This Book" >}}
 
 ::: {.notes}
-Purpose: connect operations and accounting evidence. Evidence: Figure 1.4 operating groups and posting links. Timing: 75 seconds. Narration: trace each cycle into the core. Invoices, shipment events, manufacturing events, and payroll create accounting evidence. Example names locate records rather than catalog every table. Expected response: pair a business event with its group and source record. Misconception: the operating record and ledger entry are interchangeable. They describe different aspects of the event. Attribution: Codesso, Figure 1.4, CC BY-SA 4.0. Transition: distinguish shared context from postings.
+Excel, SQL and Power BI are widely used in practice and need no programming background. Part of becoming an effective analyst is knowing which one fits which task.
 :::
 
-## Reference and planning provide context {#ch01-shared-groups}
+## The three tools across the workflow
 
-![Reference/planning focus of Figure 1.4; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/architecture-reference.svg){width="96%" fig-alt="Fixed Assets and Financing has a dashed posting link. Master Data and planning groups use solid shared-key links including ItemID, EmployeeID, CostCenterID, and AccountID."}
+{{< book-figure fig-01-03 >}}
 
 ::: {.notes}
-Purpose: distinguish posting evidence from shared context. Evidence: Figure 1.4 right-hand groups and legend. Timing: 75 seconds. Narration: Item supplies costs and products, while budgets and forecasts express plans. Solid links mean shared keys. Fixed Assets and Financing uses a posting connection. This is a conceptual group view, not a new literal table relationship. Expected response: identify the shared ItemID needed to link invoice detail and cost. Misconception: a forecast is a realized posting. Attribution: Codesso, Figure 1.4, CC BY-SA 4.0. Transition: match real repeated CustomerID values.
+SQL handles most of the data access and preparation, Excel dominates preparation and analysis, and Power BI leads in visualization. All three contribute to communicating results.
 :::
 
-## Which orders belong to one customer? {#ch01-keys .balanced}
+## Check your understanding {.check}
 
-Group orders by **CustomerID**. Which customer has more than one order?
+Which tool would you reach for first?
 
-{{< include /_shared/generated/chapter-01/storytelling/_key-task.qmd >}}
+1. Join a year of invoices to their shipments and test every line
+2. Build a forecasting model a reviewer can trace cell by cell
+3. Share a budget report that each manager filters to their own cost center
 
 ::: {.notes}
-Purpose: teach a key through actual records. Evidence: authoritative Chapter 3 key_example from read-only queries. Timing: 90 seconds. Narration: keep instructions and rows visible. Group by identifier rather than worksheet position. Expected response: orders 62 and 85 belong to customer 1; order 59 to customer 4. Misconception: repeating CustomerID in SalesOrder duplicates a customer. Many orders can refer to one customer. This example differs from the Tutorial 1.1 order-1 lookup. Transition: locate the matched Customer rows.
+Ask students to name the tool and the reason, using the table from two slides back.
 :::
 
-## The customer match {#ch01-key-response .balanced}
+## Choosing the tool {.answer}
 
-CustomerID uniquely identifies a **Customer** row and can repeat in **SalesOrder**.
-
-{{< include /_shared/generated/chapter-01/storytelling/_key-response.qmd >}}
+1. SQL: a whole population, joined across related tables
+2. Excel: modeling and workpapers a reviewer can trace
+3. Power BI: a report its audience explores on its own
 
 ::: {.notes}
-Purpose: explain the repeated-key response. Evidence: Chapter 3 public key example and Customer rows. Timing: 60–75 seconds. Narration: customer 1 is Walters PLC; customer 4 is Edwards, Stanley and Rivera. Orders 62 and 85 refer to one Customer row. CustomerID is a primary key in Customer and a foreign key in SalesOrder. Expected response: explain those two roles. Misconception: matching worksheet row numbers establishes a link. Stored values establish it. Attribution: Charles River and Chapter 3 example, CC BY-SA 4.0. Transition: connect records to the business process.
+The capstone cases of Part V prescribe no fixed order of tools. A step that needs a whole population or a join goes to SQL, a model that needs judgment to Excel, and a result a reader needs to explore to Power BI.
 :::
 
-# Tracing one revenue posting {#ch01-module-trace}
+# The Charles River Accounting Dataset
+
+## Meet Charles River
+
+- A fictional mid-size home furnishings company in the greater Boston area
+- Sells furniture, lighting, textiles and accessories to wholesale and business customers
+- Manufactures some product lines and runs a design practice billed by the hour
+- One integrated database, used in every chapter of the book
 
 ::: {.notes}
-Recording module 4. Show the goods process forward, then trace one dated posting backward. The 2025 navigation example differs from the 2026 margin investigation.
+Working with one company means learning one business deeply rather than several superficially. The About the Dataset section of the front matter and the dataset website document every table.
 :::
 
-## From order to accounting evidence {#ch01-process-forward}
+## Table groups connect through the general ledger
 
-![Goods-sale process, Figure 1.5; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/o2c-forward.svg){width="96%" fig-alt="Customer, SalesOrder, SalesOrderLine, Shipment, SalesInvoice, CashReceipt, CashReceiptApplication form the goods-sale process. Item supplies master data. Gray links show sequence, dashed amber links postings, solid amber links master keys."}
+{{< book-figure fig-01-04 >}}
 
 ::: {.notes}
-Purpose: establish forward process before reverse tracing. Evidence: Figure 1.5 labels and posting annotations. Timing: 90 seconds. Narration: follow customer through orders, shipment, invoice, receipt, and application. Item is reference data. Relate events to accounting evidence in this dataset. The goods-sale process does not describe every service invoice. An invoice alone does not establish appropriate recognition. Expected response: identify invoice detail as a revenue source and explain why cash needs a different check. Misconception: every sale has a shipment. Attribution: Codesso, Figure 1.5, CC BY-SA 4.0. Transition: switch explicitly to 2025.
+Each business cycle posts its financial activity to GLEntry in the Accounting Core. Shared keys such as ItemID, AccountID, EmployeeID and CostCenterID connect the groups to one another.
 :::
 
-## One posting, traced backward {#ch01-source-trace}
+## Five table groups record the business cycles
 
-![5 March 2025 trace, Figure 1.6; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/source-trace-dated.svg){width="96%" fig-alt="Dated 5 March 2025, separate from the 2026 comparison. GLEntry 126312 links to SalesInvoice 7947 and line 10645. Its 688.42-dollar revenue credit is one posting, not the complete journal entry."}
+{{< book-table tbl-01-03 columns="Table Group,Primary Accounting Use" rows="Order-to-Cash (O2C),Procure-to-Pay (P2P),Manufacturing,Payroll and Time,Fixed Assets and Financing" >}}
 
 ::: {.notes}
-Purpose: navigate from ledger to source. Evidence: Figure 1.6 and source_trace facts, dated 2025-03-05. Timing: 75–90 seconds. Narration: start at GLEntry 126312, identify SalesInvoice as source type, locate document 7947, then line 10645. State the date first. Expected response: repeat the route using fields rather than visual proximity. Misconception: this example explains the 2026 decline. It teaches navigation. Attribution: Codesso, Figure 1.6 and Charles River data, CC BY-SA 4.0. Transition: match each field with its purpose.
+Each business cycle has its own table group, and each serves different accounting work. The design services tables sit within Order-to-Cash, giving a service revenue cycle alongside the product cycle.
 :::
 
-## Which field tells you where to look? {#ch01-source-fields .balanced}
+## Four hold the ledger, master data and plans
 
-In GLEntry, match each purpose to a field:
-
-- Identify the kind of source table.
-- Locate the particular document.
-- Locate the particular line.
-
-Fields: **SourceDocumentType, SourceDocumentID, SourceLineID**.
+{{< book-table tbl-01-03 columns="Table Group,Primary Accounting Use" rows="Accounting Core,Master Data,Organizational Planning,Demand Planning and MRP" >}}
 
 ::: {.notes}
-Purpose: test navigation before giving a response. Evidence: GLEntry fields in Tutorial 1.1 and the dated trace. Timing: 90 seconds. Narration: keep all choices visible. Write three matches and identify the first source table to open. Expected response: type selects SalesInvoice, document ID identifies 7947, and line ID identifies 10645 in SalesInvoiceLine. Misconception: SourceLineID is a ledger row number or worksheet position. It identifies a source line. Transition: check the field mapping against stored values.
+The Accounting Core holds the general ledger every cycle posts to; the other three groups supply reference data and plans. The book introduces the groups progressively, from Order-to-Cash and the Accounting Core in the Excel chapters to every group in the capstone cases.
 :::
 
-## The source-field response {#ch01-source-fields-response .balanced}
+## Order-to-Cash, from order to ledger
 
-For **GLEntry {{< var slide.trace.gl_entry_id >}}**, dated **5 March 2025**:
-
-{{< include /_shared/generated/chapter-01/storytelling/_source-fields.qmd >}}
+{{< book-figure fig-01-05 >}}
 
 ::: {.notes}
-Purpose: provide a field-level response. Evidence: approved source_trace facts. Timing: 60–75 seconds. Narration: explain source type, document ID, and line ID. The type specifies the table context before identifiers narrow the search. IDs from different tables can share the same numeric value. Expected response: explain why an ID alone is insufficient. Misconception: any occurrence of 7947 proves this relationship. Native cells and text remain editable in PowerPoint. Attribution: Codesso, Figure 1.6 and Tutorial 1.1, CC BY-SA 4.0. Transition: verify this line's amount.
+Follow the path from the customer's order to the shipment, the invoice and the cash receipt. Each stage creates its own records, and the shipment, the invoice, the receipt and its application each post to the general ledger.
 :::
 
-## Does the line agree with the credit? {#ch01-amount-task .balanced}
+## Every posting names its source
 
-SalesInvoice {{< var slide.trace.invoice_id >}}, line {{< var slide.trace.invoice_line_id >}}
-
-**Quantity:** {{< var slide.trace.quantity >}} units
-
-**Unit price:** {{< var slide.trace.unit_price >}}
-
-Calculate the line amount. Compare it with the **{{< var slide.trace.credit >}} revenue credit**.
+{{< book-figure fig-01-06 >}}
 
 ::: {.notes}
-Purpose: pause for amount verification. Evidence: invoice line and GLEntry facts, 5 March 2025. Timing: 90 seconds. Narration: multiply quantity by price and record whether the result agrees with the selected credit. Keep all instructions visible. Expected response: 2 times 344.21 dollars equals 688.42 dollars. Misconception: agreement verifies the invoice total, all journal lines, or settlement. Only one line and credit are compared. Transition: display the response after students complete it.
+{{< include /_shared/fragments/_source-to-ledger-traceability.qmd >}}
+
+Here one revenue credit leads back to its invoice and invoice line; Tutorial 3.2 traces the same invoice through every table it touches.
 :::
 
-## The amount agrees {#ch01-worked-calculation .balanced .stepwise}
+## Watch out: real ERP data is messier {.watch-out}
 
-{{< var slide.trace.quantity >}} × {{< var slide.trace.unit_price >}} = **{{< var slide.trace.line_total >}}**
-
-It matches **GLEntry {{< var slide.trace.gl_entry_id >}}'s {{< var slide.trace.credit >}} credit**.
-
-This verifies **one line-to-posting relationship**.
+- Charles River is fictional, built to show realistic structures and problems
+- Real systems can hold hundreds of tables, custom fields and harder data quality problems
+- The skills transfer, but practice calls for more adaptation and judgment
 
 ::: {.notes}
-Purpose: model arithmetic and its limited conclusion. Evidence: approved source_trace facts from the read-only helper. Timing: 60–75 seconds. Narration: reveal calculation, agreement, and conclusion separately. Native PowerPoint text preserves the formula's editability. Expected response: name the two agreeing records and amount. Misconception: a matching credit tests the complete journal entry. Other debits and credits need separate checks. Transition: return to the process and mark only this checked credit.
+Set expectations early: the dataset is clean enough to learn on, so students should expect real data to need more preparation and more judgment about what it means.
 :::
 
-## The boundary of this check {#ch01-trace-limit}
+# Guided Tutorial 1.1: Exploring the Charles River Database
 
-![Checked credit, Figures 1.5–1.6; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/checked-credit.svg){width="96%" fig-alt="Only invoice 7947 line 10645 and the 688.42-dollar credit in GLEntry 126312 are marked checked. Other postings, cash, and applications require separate checks. This 2025 agreement does not verify the whole sale."}
+## Explore the workbook in seven steps
+
+{{< book-steps 1.1 >}}
 
 ::: {.notes}
-Purpose: prevent overclaiming. Evidence: Figures 1.5–1.6 and approved trace. Timing: 75–90 seconds. Narration: point to the marked credit. We have not established the full journal entry, settlement, completeness, or revenue recognition. This 2025 check cannot explain the 2026 margin decline. Expected response: name an additional procedure required for a broader conclusion. Misconception: a checked arrow verifies the entire invoice-to-ledger relationship. Only one credit is marked. Attribution: Codesso, Figures 1.5–1.6, CC BY-SA 4.0. Transition: practice locating evidence in the workbook.
+Students need Excel and CharlesRiver.xlsx from the Downloads page. The goal is familiarity with the tables, not analysis; allow ten to fifteen minutes and point them to the book for each step's details.
 :::
 
-# Guided exploration {#ch01-module-tutorial}
+## Keys link the worksheets
+
+{{< book-figure fig-01-07 >}}
 
 ::: {.notes}
-Recording module 5. Complete Tutorial 1.1, then ask students to compose a qualified controller update before showing the model response.
+CustomerID is the primary key of the Customer worksheet and a foreign key in SalesOrder, linking each order to the customer who placed it. Chapter 3 studies keys in depth, and Part III uses them in every SQL join.
 :::
 
-## A workbook map for Tutorial 1.1 {#ch01-tutorial-setup .balanced}
+## Checkpoint
 
-Open **CharlesRiver.xlsx** and browse its worksheet tabs.
-
-Find Customer, SalesOrder, Item, Account, GLEntry, WorkOrder, and PayrollRegister.
-
-Output: a worksheet-to-table-group map in your exploration notes.
-
-[Dataset](https://charlesriver.accountinganalyticshub.com/) · [Full Tutorial 1.1](https://aa.accountinganalyticshub.com/chapters/01-role-of-analytics/chapter.html#guided-tutorial-1.1-exploring-the-charles-river-database)
+{{< book-checkpoint 1.1 answers="hide" >}}
 
 ::: {.notes}
-Purpose: set up the full tutorial. Evidence: Tutorial 1.1 Step 1 and Table 1.3. Timing: 2–3 minutes. Narration: each worksheet is a database table with existing filters. Locate seven sheets and use the book's group catalog as reference. Expected response: Customer/SalesOrder in Order-to-Cash, Item in Master Data, Account/GLEntry in Accounting Core, WorkOrder in Manufacturing, PayrollRegister in Payroll and Time. Misconception: worksheet order defines a key relationship. Transition: inspect Customer, then follow an order's CustomerID.
+The answers: Furniture, Lighting, Textiles and Accessories; SourceDocumentType, SourceDocumentID and SourceLineID; and the Account worksheet. Students who can answer all three are ready for the exercises.
 :::
 
-## Who placed order 1? {#ch01-tutorial-customer}
+# Looking Ahead
 
-Inspect Customer headers and its CustomerSegment filter. Use order 1's CustomerID to find the name.
+## Five parts, one dataset
 
-![Worksheet mock, Figure 1.7; Codesso, CC BY-SA 4.0.](/_shared/generated/chapter-01/storytelling/salesorder-task.svg){width="96%" fig-alt="SalesOrder worksheet mock: order 1 has CustomerID 81. The highlighted CustomerID column is the value to locate in Customer. The name appears on the response slide."}
+{{< book-figure fig-01-08 >}}
 
 ::: {.notes}
-Purpose: practice Tutorial 1.1 Steps 2–3. Evidence: Figure 1.7 mock and approved SalesOrder sample. Timing: 2–3 minutes. Narration: inspect CustomerID, CustomerName, CustomerSegment, Region, CreditLimit, and PaymentTerms. Browse segment labels, then locate order 1 and match its CustomerID in Customer. Output: identifier, name, and one segment label. Expected response: CustomerID 81, Koch-Ali. Misconception: order 1 necessarily belongs to customer 1. Attribution: Codesso, Figure 1.7 and Tutorial 1.1, CC BY-SA 4.0. Transition: show the match after lookup.
+Part I lays the foundations, Parts II to IV teach one tool each, and Part V's capstone cases use all three. Each Part introduces more of the Charles River table groups, and a comprehensive case closes each of Parts I to IV.
 :::
 
-## The lookup response {#ch01-customer-response .balanced}
+## Summary
 
-Match **identifier values**, even when worksheet rows differ.
-
-{{< include /_shared/generated/chapter-01/storytelling/_customer-response.qmd >}}
+- Data growth, automation and AI move accountants toward questions, judgment and communication
+- Four types of analytics: descriptive, diagnostic, predictive and prescriptive
+- Six stages take every project from a question to a recommendation
+- SQL extracts, Excel prepares and models, Power BI presents
+- Charles River's table groups post to one ledger that traces back to its sources
 
 ::: {.notes}
-Purpose: confirm the tutorial lookup. Evidence: read-only SalesOrder/Customer join. Timing: 60 seconds. Narration: order 1 refers to customer 81, Koch-Ali. This differs from orders 62/85 and customer 1 in the repeated-key lesson. Expected response: explain why worksheet row positions have no role. Misconception: an identifier is a spreadsheet row number. Its stored value carries the link. Attribution: Charles River, Tutorial 1.1, CC BY-SA 4.0. Transition: explore Item fields for product and cost analysis.
+Return to the learning objectives and ask students which one they feel least sure about. That is the section to reread before the exercises.
 :::
 
-## Item records describe goods and costs {#ch01-tutorial-item .balanced}
+## Key terms
 
-Filter **ItemGroup**. Compare one Purchased and one Manufactured Furniture item.
-
-Record **ItemID, SupplyMode, StandardCost, and ListPrice**.
-
-Which field supplies the cost basis in our preview?
+{{< book-terms >}}
 
 ::: {.notes}
-Purpose: complete Tutorial 1.1 Step 4 with an observable output. Evidence: Item worksheet and public read-only examples. Timing: 2–3 minutes. Narration: inspect columns and distinguish finished goods from Services, Raw Materials, Packaging, and Capex. Services includes sold design services and purchased operating services. Expected response: StandardCost supplies the preview's cost field. Example rows are ItemID 3, Purchased, 474.22 dollars; ItemID 9, Manufactured, 412.81 dollars. Students may select other suitable rows. Misconception: ListPrice equals standard cost. Transition: inspect account classifications and hierarchy.
+Every term is defined at the end of the chapter. Ask students to pick three and explain them to a partner in their own words.
 :::
 
-## Account IDs and account numbers {#ch01-tutorial-account .balanced}
+## Practice and next steps
 
-Locate AccountID **42**. Identify its account number and its parent row.
+{{< book-exercises >}}
 
-{{< include /_shared/generated/chapter-01/storytelling/_account-focus.qmd >}}
+Next: {{< book-next >}}
 
 ::: {.notes}
-Purpose: complete Tutorial 1.1 Step 5 and distinguish identifiers. Evidence: Figure 3.5 rows, re-queried from Account. Timing: 2 minutes. Narration: inspect AccountType too. Output: explain AccountID 42, account number 4010, and ParentAccountID 41 referring to Revenue, account number 4000. AccountID links records while AccountNumber expresses the chart of accounts. Expected response: a sentence describing that parent relationship. Misconception: ParentAccountID stores an account number. Attribution: Codesso, Figure 3.5 and Tutorial 1.1, CC BY-SA 4.0. Transition: inspect the ledger and both operating worksheets.
+Assign one exercise from each perspective. The next chapter looks at accounting data itself, its types and its quality; the controller's question returns in Chapter 6, answered with Excel.
 :::
 
-## Ledger, manufacturing, and payroll {#ch01-tutorial-ledger .balanced}
+## About these slides
 
-1. In **GLEntry**, inspect fields and SourceDocumentType filters.
-2. In **WorkOrder**, inspect manufacturing fields.
-3. In **PayrollRegister**, inspect payroll fields.
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
 
-Output: one source type and a business question for **each** operational worksheet.
+{{< book-link >}}
 
 ::: {.notes}
-Purpose: complete Tutorial 1.1 Steps 6–7. Evidence: public GLEntry, WorkOrder, and PayrollRegister instructions. Timing: 3–4 minutes. Narration: inspect debit/credit, posting date, AccountID, and source fields. Browse source types, then open both operational sheets. Expected response: one observed source type and a question for each sheet, such as production status and payroll by period. Misconception: an unlabeled either/or route satisfies the complete instructions. Both sheets are required here. Transition: consolidate evidence locations at the checkpoint.
-:::
-
-## Tutorial 1.1 checkpoint {#ch01-tutorial-checkpoint .balanced}
-
-- Name the four finished-goods product families.
-- Identify the three GLEntry source-tracing fields.
-- Name the chart-of-accounts worksheet.
-- Demonstrate the order-1 customer lookup.
-
-::: {.notes}
-Purpose: verify public tutorial outcomes. Evidence: Tutorial 1.1 checkpoint and practiced lookup. Timing: 2 minutes. Narration: keep all questions visible and ask students to point to evidence. Expected response: Furniture, Lighting, Textiles, Accessories; SourceDocumentType, SourceDocumentID, SourceLineID; Account; CustomerID 81, Koch-Ali. These are public tutorial responses. Misconception: naming tables shows their relationships were checked. Ask for a demonstrated value match. Transition: diagnose two interpretation errors.
-:::
-
-## Two claims to diagnose {#ch01-mistakes .balanced}
-
-“Margin fell 1.48 percent, so we know what caused it.”
-
-“The $688.42 agreement proves the whole sale is correct.”
-
-Rewrite each claim so it says only what the evidence supports.
-
-::: {.notes}
-Purpose: elicit corrections before responses. Evidence: 2026 facts and separate 2025 line-to-credit check. Timing: 2 minutes. Narration: write a corrected sentence for each claim; keep the task visible. Expected response: percentage points with invoice/standard-cost scope and unresolved cause; one matched line and revenue credit. Misconception: correct arithmetic justifies all surrounding accounting conclusions. Ask what extra evidence is needed. Transition: compare with corrected claims.
-:::
-
-## Corrections that respect the evidence {#ch01-mistakes-response .balanced .stepwise}
-
-The rate fell about **1.48 percentage points**. Its cause needs investigation.
-
-The amount agrees for **one invoice line and one revenue credit**.
-
-The 2025 example does not explain the **2026** change.
-
-::: {.notes}
-Purpose: model qualified corrections. Evidence: approved unrounded margin facts and trace. Timing: 75 seconds. Narration: reveal each correction and compare student sentences. Invoice and standard-cost qualifications still apply. Matching amounts establish neither completeness nor settlement, recognition, or the full entry. Expected response: explain missing evidence preventing a stronger claim. Misconception: a limitation weakens a useful finding. Clear boundaries make findings reviewable. Transition: compose an actionable controller update.
-:::
-
-## Your update to the controller {#ch01-controller-update .balanced}
-
-Write a short update stating:
-
-- What changed, with period and measure
-- What the evidence establishes and leaves open
-- Which records or checks you would request next
-
-Explain how the **2025 trace** helps with the **2026 question**.
-
-::: {.notes}
-Purpose: replace generic recap with a professional student output. Evidence: the request and completed public checks. Timing: 3 minutes. Narration: keep instructions visible; write three or four sentences and compare with a partner. Expected response: Q3/Q4 rate decline, invoice/standard-cost scope, unresolved explanation, and request for transaction detail and reconciliation. The trace teaches navigation. Misconception: a polished report must supply a cause when evidence is insufficient. Transition: compare the student-authored update with a model.
-:::
-
-## A model controller update {#ch01-model-update .balanced .stepwise}
-
-{{< include /_shared/generated/chapter-01/storytelling/_model-update.qmd >}}
-
-::: {.notes}
-Purpose: provide a response after students draft their own. Evidence: unrounded quarterly calculation and dated trace formatted from public facts. Timing: 90 seconds. Narration: reveal observation, next work, and navigation boundary separately. No diagnostic cause is proposed. Expected response: identify one qualification to add to their draft. Misconception: this response supplies an assessment solution. It concerns the public teaching scenario and completed public checks. Exercise and case solutions remain outside the deck. Transition: identify next skills and practice.
-:::
-
-## The next investigation skills {#ch01-next .balanced .stepwise}
-
-**Chapter 2:** evaluate data types and quality.
-
-**Chapter 3:** work with keys and relationships.
-
-**Chapter 6:** return to the Furniture investigation.
-
-[Chapter 1 practice](https://aa.accountinganalyticshub.com/chapters/01-role-of-analytics/chapter.html#questions-and-exercises) · [Book map, Figure 1.8](https://aa.accountinganalyticshub.com/chapters/01-role-of-analytics/chapter.html#fig-01-08)
-
-::: {.notes}
-Purpose: connect today's outputs to next tasks. Evidence: chapter organization and practice. Timing: 60 seconds. Narration: quality checks and record relationships strengthen the subsequent margin investigation. Retain the worksheet map and controller update. Figure 1.8 remains in the linked book. Expected response: name a next skill needed for follow-up. Misconception: Chapter 1 resolves the diagnostic investigation. Assign course-selected practice without assessment responses. Transition: identify sources and reuse terms.
-:::
-
-## References and further reading {#ch01-references .balanced}
-
-- Codesso. ({{< var edition >}}). *Accounting analytics: An integrated approach*. [Book](https://aa.accountinganalyticshub.com/)
-- Vasarhelyi, Kogan, and Tuttle (2015): big data in accounting
-- Earley (2015): opportunities and challenges in audit analytics
-
-[Full Chapter 1 references](https://aa.accountinganalyticshub.com/chapters/01-role-of-analytics/chapter.html#references)
-
-::: {.notes}
-Purpose: identify readings about accounting work and evidence. Evidence: Chapter 1 references. Timing: 45 seconds. Narration: Vasarhelyi and colleagues provide data context; Earley explains audit opportunities and challenges. The complete chapter includes additional sources. Expected response: locate a relevant reading. Misconception: this fictional dataset documents real company performance. It is educational data. Transition: close with attribution and sharing conditions.
-
-{{< include /_shared/fragments/_reference-vasarhelyi-2015.qmd >}}
-
-{{< include /_shared/fragments/_reference-earley-2015.qmd >}}
-:::
-
-## Attribution and reuse {#ch01-credits .balanced}
-
-Adapted from Codesso ({{< var edition >}}), *Accounting analytics: An integrated approach*.
-
-Adapted figures, teaching narrative, and **public speaker notes**.
-
-[Book](https://aa.accountinganalyticshub.com/) · [Charles River dataset](https://charlesriver.accountinganalyticshub.com/)
-
-[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
-
-::: {.notes}
-Purpose: close with attribution. Evidence: repository license and book. Timing: 45 seconds. Narration: the narrative adapts Chapter 1 and Tutorial 1.1. Focused views retain Draw.io authorities. Margin facts reuse Chapter 6 and key/account examples reuse Chapter 3. Native prose and small tables remain editable in PowerPoint; graphics have matching SVG/PNG inputs. Expected response: retain credit and identify changes in CC BY-SA adaptations. Misconception: speaker notes are private. Both formats include public notes. Transition: end recording or begin assigned practice.
+Students can find each figure and table, with the full explanation, in the online chapter.
 :::

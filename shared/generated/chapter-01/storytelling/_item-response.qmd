@@ -1,4 +1,0 @@
-| ItemID | SupplyMode | StandardCost |
-| --- | --- | --- |
-| 3 | Purchased | $474.22 |
-| 9 | Manufactured | $412.81 |

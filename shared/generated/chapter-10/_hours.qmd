@@ -1,8 +1,0 @@
-| Work year | Labor type | Hours / standard hour |
-| --- | --- | --- |
-| 2024 | Direct | 0.85 |
-| 2024 | Indirect | 0.33 |
-| 2025 | Direct | 0.87 |
-| 2025 | Indirect | 0.54 |
-| 2026 | Direct | 0.94 |
-| 2026 | Indirect | 0.57 |

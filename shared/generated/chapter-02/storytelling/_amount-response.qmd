@@ -1,5 +1,0 @@
-**2 × $344.21 = $688.42**
-
-Invoice line **10645** agrees with revenue credit **126312**.
-
-The invoice grand total of **$787.48** has a different scope.

@@ -1,6 +1,0 @@
-| Invoice component | Amount |
-| --- | --- |
-| SubTotal | $688.42 |
-| FreightAmount | $51.00 |
-| TaxAmount | $48.06 |
-| GrandTotal | $787.48 |

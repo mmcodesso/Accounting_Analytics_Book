@@ -1,5 +1,0 @@
-| Self-approval process | Failures | Population | Per 1,000 |
-| --- | --- | --- | --- |
-| JE | 7 | 851 | 8.23 |
-| PO | 9 | 18,832 | 0.48 |
-| PR | 77 | 8,197 | 9.39 |

@@ -1,5 +1,0 @@
-| Work year | Surge days | Employees per day | Share of overtime |
-| --- | --- | --- | --- |
-| 2024 | 12 | 64 | 35.5% |
-| 2025 | 32 | 64 | 58.9% |
-| 2026 | 49 | 64 | 70.5% |

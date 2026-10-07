@@ -1,4 +1,0 @@
-| Furniture margin rate | Q3 | Q4 |
-| --- | --- | --- |
-| After promotions | 42.26% | 40.78% |
-| Before promotions | 43.53% | 43.73% |

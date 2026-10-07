@@ -1,6 +1,0 @@
-```sql
-SELECT ROUND(SUM(gl.Debit) - SUM(gl.Credit), 2) AS LedgerVariance
-FROM GLEntry AS gl
-WHERE gl.AccountID = 93 AND gl.FiscalYear = 2026
-    AND gl.SourceDocumentType = 'WorkOrderClose';
-```

@@ -1,7 +1,0 @@
-```sql
-SELECT strftime('%Y-%m', lt.WorkDate) AS WorkMonth,
-    COUNT(DISTINCT lt.WorkDate) AS DaysWithTime,
-    ROUND(SUM(CASE lt.LaborType WHEN 'Direct Manufacturing'
-        THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END), 0)
-        AS DirectHours,
-```

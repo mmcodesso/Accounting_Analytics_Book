@@ -3,7 +3,6 @@ project:
   resources:
     - '!slides/**'
     - '!shared/calculations/**'
-    - '!shared/generated/**'
     - '!outputs/**'
     - supplementary/**/*.zip
     - supplementary/**/*.sql

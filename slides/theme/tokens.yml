@@ -1,3 +1,5 @@
+# The slide design tokens, shared by Reveal.js (through _shared/theme/tokens.scss) and PowerPoint
+# (through the reference document). The colors are the book's figure palette (scripts/figures/drawio.py).
 font: Arial
 fallback_font: Liberation Sans
 code_font: Consolas
@@ -10,9 +12,13 @@ colors:
   coral: 'B03A2E'
   amber: '8A5D00'
   tint: 'EAF2F8'
+  rule: 'D5D8DC'
+  highlight: 'F39C12'
+# Sizes in points (PowerPoint); Reveal.js uses the same sizes at 4/3 px per point.
 sizes:
-  opening: 42
+  opening: 40
   title: 32
   body: 24
   evidence: 20
+  table: 18
   attribution: 14

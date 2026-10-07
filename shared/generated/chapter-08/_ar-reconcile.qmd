@@ -1,5 +1,0 @@
-| Receivables reconciliation | Amount |
-| --- | --- |
-| Open invoice detail | $4,418,804.32 |
-| Account 1020 balance | $4,798,804.32 |
-| Difference to investigate | $380,000.00 |

@@ -54,3 +54,4 @@ slides/_variables.yml
 slides/_shared/
 slides/_build/
 slides/.quarto/
+slides/chapter-*/_metadata.yml

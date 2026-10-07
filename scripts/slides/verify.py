@@ -1,12 +1,13 @@
-"""Validate public slide inputs and assembled artifacts without opening the dataset.
+"""Check the slide decks and their rendered artifacts without opening the dataset.
 
-These checks establish packaging and disclosure invariants. They do not substitute
-for browser, accessibility, or native PowerPoint visual review.
+Source checks (no Quarto needed): every cited book figure, table and tutorial exists, every
+slide has notes, no deck names the author, and no deck carries private-material wording.
+Artifact checks: slide counts, notes and native tables in PowerPoint, local links in Reveal,
+and the wording scan of the assembled site. They do not replace looking at the slides.
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import posixpath
 import re
@@ -50,7 +51,7 @@ REVEAL_PLUGIN_METADATA = {
 
 
 def load_manifest(path: Path) -> dict:
-    """Read JSON-format manifests or YAML configuration without silent overrides."""
+    """Read a JSON or YAML configuration file, rejecting duplicate keys instead of silently overriding."""
     text = path.read_text(encoding="utf-8-sig")
 
     def unique_mapping(pairs):
@@ -61,8 +62,8 @@ def load_manifest(path: Path) -> dict:
             result[key] = value
         return result
 
-    # Our manifest is JSON (a strict YAML subset). A broken JSON document must
-    # not fall through to YAML and obscure its original location and error.
+    # JSON is a strict YAML subset. A broken JSON document must not fall
+    # through to YAML and obscure its original location and error.
     if text.lstrip().startswith(("{", "[")):
         try:
             result = json.loads(text, object_pairs_hook=unique_mapping)
@@ -72,7 +73,7 @@ def load_manifest(path: Path) -> dict:
         try:
             import yaml
         except ImportError as exc:
-            raise RuntimeError("Install the slide requirements to read YAML manifests.") from exc
+            raise RuntimeError("Install the slide requirements (PyYAML) to read YAML files.") from exc
 
         class UniqueLoader(yaml.SafeLoader):
             def construct_mapping(self, node, deep=False):
@@ -99,17 +100,8 @@ def load_manifest(path: Path) -> dict:
     return result
 
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def source_sha256(path: Path) -> str:
-    """Review provenance survives Git CRLF/LF conversion across platforms."""
-    return hashlib.sha256(path.read_text(encoding="utf-8-sig").encode("utf-8")).hexdigest()
-
-
 def safe_path(root: Path, value: str, *, public: bool = False) -> Path:
-    """Resolve a manifest path with the same safety rules on Windows and Linux."""
+    """Resolve a repository path with the same safety rules on Windows and Linux."""
     value = str(value).replace("\\", "/")
     path = PurePosixPath(value)
     if not value or path.is_absolute() or re.match(r"^[a-zA-Z]:", value) or ".." in path.parts:
@@ -121,11 +113,6 @@ def safe_path(root: Path, value: str, *, public: bool = False) -> Path:
     if not target.is_relative_to(root.resolve()):
         raise ValueError(f"Input resolves outside the repository: {value}")
     return target
-
-
-def active_chapters(manifest: dict, *, public_only: bool = False) -> list[dict]:
-    states = {"approved"} if public_only else {"pilot", "approved"}
-    return [chapter for chapter in manifest.get("chapters", []) if chapter.get("status") in states]
 
 
 def is_reveal_runtime_metadata(path: Path, output_root: Path) -> bool:
@@ -171,64 +158,67 @@ def audit_text(text: str, label: str, *, comments: bool = True, markers: bool = 
     return errors
 
 
-def verify_sources(root: Path, manifest: dict) -> list[str]:
+NOTES = re.compile(r"^:{3,}\s*\{?\.notes\}?\s*$", re.M)
+SLIDE_HEADING = re.compile(r"^(#{1,2})\s+(.+?)\s*(?:\{[^}]*\})?\s*$", re.M)
+AUTHOR_NAME = re.compile(r"\b(?:Codesso|Mauricio)\b", re.I)
+CITATION = re.compile(r"\{\{<\s*book-(figure|table|steps|checkpoint)\s+([\w.-]+)")
+
+
+def deck_text(text: str) -> str:
+    """The deck without fenced code, so a heading or note inside an example does not count."""
+    return re.sub(r"(?ms)^(`{3,}|~{3,}).*?^\1\s*$", "", text)
+
+
+def slide_headings(text: str) -> list[tuple[int, str]]:
+    return [(len(level), title) for level, title in SLIDE_HEADING.findall(deck_text(text))]
+
+
+def verify_sources(root: Path, decks: list[str], index: dict) -> tuple[list[str], list[str]]:
+    """Errors and warnings for every deck source; nothing here depends on chapter text changing."""
     root = root.resolve()
     errors: list[str] = []
-    if manifest.get("version") != 1:
-        errors.append("Unsupported slide manifest version; expected 1")
-    ids: set[str] = set()
-    for chapter in manifest.get("chapters", []):
-        identifier = chapter.get("id", "")
-        if not re.fullmatch(r"chapter-\d{2}", identifier) or identifier in ids:
-            errors.append(f"Invalid or duplicate chapter id: {identifier}")
-        ids.add(identifier)
-        if chapter.get("status") not in {"pilot", "approved", "planned", "draft", "deferred"}:
-            errors.append(f"{identifier}: invalid approval status")
-    for chapter in active_chapters(manifest):
-        identifier = chapter["id"]
-        try:
-            source = safe_path(root / "slides", chapter["source"], public=True)
-        except (KeyError, ValueError) as exc:
-            errors.append(f"{identifier}: {exc}")
-            continue
-        if not source.is_file():
-            errors.append(f"Missing slide source: {source}")
+    warnings: list[str] = []
+    for deck in decks:
+        source = root / "slides" / deck / "index.qmd"
+        label = str(source.relative_to(root))
+        chapter = index["chapters"].get(deck)
+        if chapter is None:
+            errors.append(f"{label}: no matching chapter in the book")
             continue
         text = source.read_text(encoding="utf-8-sig")
-        errors.extend(audit_text(text, str(source.relative_to(root))))
+        errors.extend(audit_text(text, label))
+        if text.lstrip().startswith("---"):
+            errors.append(f"{label}: decks carry no YAML; the title and footer come from the book")
+        if AUTHOR_NAME.search(text):
+            errors.append(f"{label}: names the author; slides carry no author name")
         for include in INCLUDE.findall(text):
             target = ((root / "slides" / include.lstrip("/")) if include.startswith("/")
                       else source.parent / include).resolve()
             if not target.is_relative_to(root / "slides"):
-                errors.append(f"{identifier}: include must use prepared public slide inputs: {include}")
-        # Every level-two teaching slide has public narration. Level-one module
-        # dividers and the metadata-driven title slide are intentionally exempt.
-        for section in re.split(r"(?m)^##\s+", text)[1:]:
+                errors.append(f"{label}: include must use the staged slide inputs: {include}")
+        for kind, identifier in CITATION.findall(text):
+            if kind == "figure" and identifier not in index["figures"]:
+                errors.append(f"{label}: no figure {identifier} in the book")
+            elif kind == "table" and identifier not in index["tables"]:
+                errors.append(f"{label}: no table {identifier} in the book")
+            elif kind in {"steps", "checkpoint"} and not any(
+                    tutorial["id"] == identifier for tutorial in chapter["tutorials"]):
+                errors.append(f"{label}: no Guided Tutorial {identifier} in {deck}")
+        body = deck_text(text)
+        # Every ## slide has notes for the speaker. # module dividers and the title slide are exempt.
+        for section in re.split(r"(?m)^##\s+", body)[1:]:
             title = section.splitlines()[0]
             section = re.split(r"(?m)^#\s+", section)[0]
-            if not re.search(r"^:{3,}\s*\{?\.notes\}?\s*$", section, re.M):
-                errors.append(f"{identifier}: teaching slide '{title}' has no public notes")
-        hashes = chapter.get("reviewed_source_hashes", {})
-        for rel in chapter.get("book_sources", []):
-            try:
-                path = safe_path(root, rel, public=True)
-                if not path.is_file():
-                    errors.append(f"{identifier}: missing book review input {rel}")
-                elif hashes.get(rel) != source_sha256(path):
-                    errors.append(f"{identifier}: editorial review required after change to {rel}")
-            except ValueError as exc:
-                errors.append(str(exc))
-    for field in ("public_assets", "public_fragments"):
-        for rel in manifest.get(field, []):
-            try:
-                path = safe_path(root, rel, public=True)
-                if not path.is_file():
-                    errors.append(f"Missing {field} input: {rel}")
-                elif path.suffix.lower() in {".qmd", ".md", ".txt", ".json", ".svg", ".drawio"}:
-                    errors.extend(audit_text(path.read_text(encoding="utf-8-sig"), rel))
-            except ValueError as exc:
-                errors.append(str(exc))
-    return errors
+            notes = re.search(r"(?ms)^:{3,}\s*\{?\.notes\}?\s*$(.*?)^:{3,}\s*$", section)
+            if not notes:
+                errors.append(f"{label}: slide '{title}' has no notes")
+            elif len(" ".join(notes.group(1).split())) <= 20:
+                errors.append(f"{label}: slide '{title}' has notes too short to be useful")
+        sections = {section["title"].casefold() for section in chapter["sections"]}
+        for level, title in slide_headings(text):
+            if level == 1 and title.casefold() not in sections and not title.startswith("Guided Tutorial"):
+                warnings.append(f"{label}: divider '{title}' matches no section of the chapter, so it is not numbered")
+    return errors, warnings
 
 
 class ResourceParser(HTMLParser):
@@ -342,19 +332,19 @@ def verify_pptx(path: Path, *, expected_notes: int = 1, expected_slides: int | N
     return errors
 
 
-def verify_outputs(root: Path, manifest: dict, site: Path | None = None,
-                   build_root: Path | None = None) -> list[str]:
+def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
+                   build_root: Path | None = None, book_url: str = "") -> list[str]:
     errors: list[str] = []
     staging = build_root or root / "slides/_build"
     html_root = Path(site) if site else staging / "revealjs"
     deck_root = html_root / "slides" if site else html_root
     pptx_root = deck_root if site else staging / "pptx"
-    for chapter in active_chapters(manifest, public_only=site is not None):
-        identifier = chapter["id"]
-        html_path = deck_root / identifier / "index.html"
-        pptx_path = pptx_root / identifier / f"{identifier}.pptx"
-        source = safe_path(root / "slides", chapter["source"]).read_text(encoding="utf-8-sig")
-        expected_notes = len(re.findall(r"(?m)^:{3,}\s*\{?\.notes\}?\s*$", source))
+    for deck in decks:
+        html_path = deck_root / deck / "index.html"
+        pptx_path = pptx_root / deck / f"{deck}.pptx"
+        source = (root / "slides" / deck / "index.qmd").read_text(encoding="utf-8-sig")
+        body = deck_text(source)
+        expected_notes = len(NOTES.findall(body))
         if not html_path.is_file():
             errors.append(f"Missing Reveal deck: {html_path}")
         else:
@@ -363,23 +353,21 @@ def verify_outputs(root: Path, manifest: dict, site: Path | None = None,
             parser = ResourceParser()
             parser.feed(text)
             if parser.notes < expected_notes:
-                errors.append(f"{identifier}: Reveal has {parser.notes} notes; expected {expected_notes}")
+                errors.append(f"{deck}: Reveal has {parser.notes} notes; expected {expected_notes}")
         if not pptx_path.is_file():
             errors.append(f"Missing PowerPoint deck: {pptx_path}")
         else:
-            requirements = chapter.get("artifact_checks", {})
             errors.extend(verify_pptx(pptx_path, expected_notes=expected_notes,
-                                      expected_slides=1 + len(re.findall(r'(?m)^#{1,2}\s+', source)),
-                                      require_table=requirements.get("native_table", identifier == "chapter-01"),
-                                      require_media=requirements.get("embedded_media", True)))
+                                      expected_slides=1 + len(slide_headings(source)),
+                                      require_table=bool(re.search(r"book-table|^\|", body, re.M)),
+                                      require_media=bool(re.search(r"book-figure|!\[", body))))
     if html_root.exists():
-        errors.extend(verify_local_links(html_root, book_url=manifest.get("book_url", "")))
+        errors.extend(verify_local_links(html_root, book_url=book_url))
     if site:
-        approved = {item["id"] for item in active_chapters(manifest, public_only=True)}
         if deck_root.exists():
             for directory in deck_root.glob("chapter-*"):
-                if directory.is_dir() and directory.name not in approved:
-                    errors.append(f"Unapproved or removed deck in assembled site: {directory.name}")
+                if directory.is_dir() and directory.name not in decks:
+                    errors.append(f"Deck in the assembled site has no source: {directory.name}")
         for path in html_root.rglob("*.html"):
             listed = path.relative_to(html_root).as_posix() in SOLUTION_PAGES
             errors.extend(audit_text(path.read_text(encoding="utf-8-sig"), str(path), comments=False, markers=not listed))
@@ -387,21 +375,27 @@ def verify_outputs(root: Path, manifest: dict, site: Path | None = None,
 
 
 def main() -> int:
+    from scripts.slides import book_index
+    from scripts.slides.prepare import deck_ids
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--outputs", action="store_true")
     parser.add_argument("--site", type=Path)
     args = parser.parse_args()
-    manifest = load_manifest(args.root / "slides/manifest.yml")
-    errors = verify_sources(args.root, manifest)
+    decks = deck_ids(args.root)
+    errors, warnings = verify_sources(args.root, decks, book_index.build(args.root))
     if args.outputs or args.site:
-        errors.extend(verify_outputs(args.root, manifest, site=args.site))
+        errors.extend(verify_outputs(args.root, decks, site=args.site))
+    for warning in warnings:
+        print(f"WARNING: {warning}")
     for error in errors:
         print(f"ERROR: {error}")
     if not errors:
-        print("Slide packaging checks passed; native/browser visual review remains separate.")
+        print("Slide checks passed; looking at the slides remains a separate step.")
     return bool(errors)
 
 
 if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     raise SystemExit(main())

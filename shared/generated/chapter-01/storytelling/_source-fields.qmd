@@ -1,5 +1,0 @@
-| Field in GLEntry | Value | Record to locate |
-| --- | --- | --- |
-| SourceDocumentType | SalesInvoice | SalesInvoice table |
-| SourceDocumentID | 7947 | SalesInvoiceID |
-| SourceLineID | 10645 | SalesInvoiceLineID |

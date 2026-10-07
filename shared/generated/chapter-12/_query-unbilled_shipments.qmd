@@ -1,8 +1,0 @@
-```sql
-SELECT s.ShipmentNumber, s.ShipmentDate, s.DeliveryDate,
-    ROUND(sl.ExtendedStandardCost, 2) AS StandardCost,
-    ROUND(sl.QuantityShipped * sol.UnitPrice * (1 - sol.Discount), 2)
-        AS SalesValue
-FROM ShipmentLine AS sl
-    INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID
-```

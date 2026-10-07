@@ -1,6 +1,0 @@
-| Fiscal 2026 measure | Value |
-| --- | --- |
-| Invoice lines | 9,522 |
-| Mean line | $3,125.02 |
-| Median line | $2,129.62 |
-| Largest line | $30,342.90 |

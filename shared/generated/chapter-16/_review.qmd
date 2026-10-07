@@ -1,6 +1,0 @@
-| Tutorial 16.3 disposition | Exceptions |
-| --- | --- |
-| Expected | 6 |
-| Deficiency | 6 |
-| Follow up | 3 |
-| Open | 136 |

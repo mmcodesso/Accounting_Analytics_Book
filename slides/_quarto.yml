@@ -1,82 +1,76 @@
-{
-  "project": {
-    "type": "default",
-    "output-dir": "_build/revealjs",
-    "render": [
-      "chapter-01/index.qmd",
-      "chapter-02/index.qmd",
-      "chapter-03/index.qmd",
-      "chapter-04/index.qmd",
-      "chapter-05/index.qmd",
-      "chapter-06/index.qmd",
-      "chapter-07/index.qmd",
-      "chapter-08/index.qmd",
-      "chapter-09/index.qmd",
-      "chapter-10/index.qmd",
-      "chapter-11/index.qmd",
-      "chapter-12/index.qmd",
-      "chapter-13/index.qmd",
-      "chapter-14/index.qmd",
-      "chapter-15/index.qmd",
-      "chapter-16/index.qmd",
-      "chapter-17/index.qmd",
-      "chapter-18/index.qmd",
-      "chapter-19/index.qmd"
-    ],
-    "resources": [
-      "_shared/generated/**/*.svg",
-      "_shared/generated/**/*.png",
-      "!_build/**",
-      "!theme/**",
-      "!manifest.yml",
-      "!README.md",
-      "!_shared/**/*.qmd",
-      "!_shared/**/*.json"
-    ]
-  },
-  "lang": "en",
-  "metadata-files": [
-    "_shared/theme/metadata.yml"
-  ],
-  "slide-level": 2,
-  "filters": [
-    "../filters/strip-comments.lua",
-    "filters/images.lua",
-    "filters/teaching.lua"
-  ],
-  "format": {
-    "revealjs": {
-      "theme": [
-        "default",
-        "_shared/theme/tokens.scss",
-        "theme/reveal.scss"
-      ],
-      "width": 1280,
-      "height": 720,
-      "margin": 0.08,
-      "center": false,
-      "transition": "none",
-      "background-transition": "none",
-      "incremental": false,
-      "include-after-body": {
-        "text": "<script>\n(() => {\n  const keepSlideMode = () => {\n    Reveal.configure({ scrollActivationWidth: 0 });\n    if (Reveal.isScrollView()) Reveal.toggleScrollView(false);\n  };\n  if (Reveal.isReady()) keepSlideMode();\n  else Reveal.on('ready', keepSlideMode);\n})();\n</script>\n"
-      },
-      "controls": true,
-      "progress": true,
-      "slide-number": "c/t",
-      "menu": true,
-      "history": true,
-      "embed-resources": false,
-      "code-copy": false,
-      "auto-stretch": false,
-      "html-math-method": "mathml"
-    },
-    "pptx": {
-      "reference-doc": "_shared/theme/reference.pptx",
-      "incremental": false
-    }
-  },
-  "execute": {
-    "enabled": false
-  }
-}
+# The chapter slide decks: one project, two formats (Reveal.js for the browser, native PowerPoint).
+# Build with scripts/build_all.py, which first writes the generated inputs under _shared/ and each
+# deck's _metadata.yml (title, footer, output names) from the book. See README.md.
+project:
+  type: default
+  output-dir: _build/revealjs
+  render:
+    - "chapter-*/index.qmd"
+  # A default project copies the files it finds to the output; publish only what the decks show,
+  # and never the build tree itself (a render would otherwise copy _build into its own output).
+  resources:
+    - "_shared/visuals/*"
+    - "_shared/theme/*.png"
+    - "!_build/**"
+    - "!theme/**"
+    - "!filters/**"
+    - "!shortcodes/**"
+    - "!README.md"
+    - "!_variables.yml"
+    - "!_shared/**/*.qmd"
+    - "!_shared/**/*.json"
+    - "!_shared/**/*.pptx"
+    - "!_shared/**/*.scss"
+    - "!_shared/**/*.yml"
+
+lang: en
+metadata-files:
+  - _shared/theme/metadata.yml
+slide-level: 2
+
+filters:
+  - ../filters/strip-comments.lua
+  - filters/images.lua
+  - filters/deck.lua
+shortcodes:
+  - shortcodes/book.lua
+
+format:
+  revealjs:
+    theme: [default, _shared/theme/tokens.scss, theme/reveal.scss]
+    width: 1280
+    height: 720
+    margin: 0.04
+    center: false
+    transition: none
+    background-transition: none
+    incremental: false
+    controls: true
+    progress: true
+    slide-number: c/t
+    menu: true
+    history: true
+    embed-resources: false
+    code-copy: false
+    auto-stretch: true
+    html-math-method: mathml
+    title-slide-attributes:
+      data-background-color: "#1A5276"
+      data-state: title-state
+    include-after-body:
+      text: |
+        <script>
+        (() => {
+          const keepSlideMode = () => {
+            Reveal.configure({ scrollActivationWidth: 0 });
+            if (Reveal.isScrollView()) Reveal.toggleScrollView(false);
+          };
+          if (Reveal.isReady()) keepSlideMode();
+          else Reveal.on('ready', keepSlideMode);
+        })();
+        </script>
+  pptx:
+    incremental: false
+
+execute:
+  enabled: false

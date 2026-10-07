@@ -17,7 +17,7 @@ new one, and writes the report: the diff of a rolled checkout is the impact repo
   (facts/visible_values.py): $29,756,420.08, 29.8M, 47.49%, 27,933.
 
 It leaves alone the real-world years (citations, standards, software releases, Learn dates), the constants
-(teaching thresholds, worked examples), the generated directories (shared/generated, slides/_shared,
+(teaching thresholds, worked examples), the generated directories (slides/_shared,
 slides/_variables.yml, slides/_build), and the generated note regions if any reappear (`facts.py sync` rewrites
 those). A literal whose key has no value in the new registry (a selection rule found no document) is not
 rewritten and is listed under "Unresolved"; so are literals the new dataset cannot support in the same words

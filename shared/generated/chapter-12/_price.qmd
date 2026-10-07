@@ -1,5 +1,0 @@
-| Price test | Invoice lines |
-| --- | --- |
-| Population | 40,293 |
-| Above 3% difference | 0 |
-| Above 2% difference | 5,109 |

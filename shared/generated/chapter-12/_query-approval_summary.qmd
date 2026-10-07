@@ -1,8 +1,0 @@
-```sql
-WITH ApprovalExceptions AS (
-    SELECT 'Self-approved' AS Test, po.PONumber, po.OrderTotal
-    FROM PurchaseOrder AS po
-    WHERE po.CreatedByEmployeeID = po.ApprovedByEmployeeID
-    UNION ALL
-    SELECT 'Above approver limit', po.PONumber, po.OrderTotal
-```

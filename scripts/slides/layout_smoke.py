@@ -2,8 +2,8 @@
 """Exercise all seven Pandoc PowerPoint layout choices using an isolated fixture.
 
 Selection rules: https://pandoc.org/MANUAL.html#powerpoint-layout-choice
-The existing prepared reference is copied; canonical deck/template inputs are
-never modified. Outputs and the actual slide-to-layout map go to outputs/build.
+The fixture uses the slide template built in code (scripts/slides/pptx_theme.py) from Pandoc's
+default; deck sources are never touched. Outputs and the slide-to-layout map go to outputs/build.
 """
 
 from __future__ import annotations
@@ -14,7 +14,6 @@ import json
 import os
 from pathlib import Path
 import posixpath
-import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -22,7 +21,9 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from scripts.slides.prepare import LAYOUTS, find_quarto
+from scripts.slides.pptx_theme import LAYOUTS, theme_reference
+from scripts.slides.prepare import find_quarto, pandoc_reference
+from scripts.slides.verify import load_manifest
 
 FIXTURE = """---
 title: "Layout smoke test"
@@ -126,7 +127,9 @@ def main() -> int:
         raise ValueError("Unsafe layout smoke output directory")
     output = parent / datetime.now(timezone.utc).strftime("run-%Y%m%dT%H%M%S-%fZ")
     output.mkdir(parents=True)
-    shutil.copy2(root / "slides/_shared/theme/reference.pptx", output / "reference.pptx")
+    base = pandoc_reference(quarto, output / "pandoc-default.pptx")
+    theme_reference(base, output / "reference.pptx", load_manifest(root / "slides/theme/tokens.yml"),
+                    footer="Layout smoke test")
     (output / "_quarto.yml").write_text("project:\n  type: default\n  render: [layouts.qmd]\n", encoding="utf-8")
     (output / "layouts.qmd").write_text(FIXTURE, encoding="utf-8")
     with (output / "render.log").open("w", encoding="utf-8") as log:
@@ -136,7 +139,7 @@ def main() -> int:
     missing = sorted(LAYOUTS - {item["layout"] for item in mapped})
     report = {"status": "passed" if not missing and len(mapped) == 7 else "failed",
               "quarto_version": subprocess.check_output([quarto, "--version"], text=True).strip(),
-              "reference": "slides/_shared/theme/reference.pptx (copied)",
+              "reference": "pptx_theme.theme_reference on Pandoc's default",
               "missing_layouts": missing, "slides": mapped,
               "selection_rules_source": "https://pandoc.org/MANUAL.html#powerpoint-layout-choice"}
     path = output / "report.json"

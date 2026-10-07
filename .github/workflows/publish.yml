@@ -34,10 +34,12 @@ jobs:
       - name: Install slide build dependencies
         run: python -m pip install -r scripts/slides/requirements.txt
 
-      - name: Validate public slide sources and regression tests
+      - name: Check the slide sources and run the regression tests
+        # Dataset-free and Quarto-free: every cited book figure and table exists, every slide has notes,
+        # no deck names the author. Editing a chapter never fails this step.
         run: |
           python scripts/build_all.py --check
-          python -m unittest discover -s tests -p 'test_slide*.py' -v
+          python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Set up Quarto with TinyTeX
         uses: quarto-dev/quarto-actions/setup@v2
@@ -79,8 +81,8 @@ jobs:
           test -s /tmp/drawio-smoke.svg
 
       - name: Build book and chapter slides
-        # The default is dataset-free and publishes only manifest-approved decks.
-        # Pilot decks are rendered for validation but omitted from the assembled site.
+        # Dataset-free. Every deck in slides/chapter-NN/index.qmd is rendered and published;
+        # there is no approval step. Draw.io exports each cited figure as a PNG for PowerPoint.
         run: python scripts/build_all.py
 
       - name: Upload artifact

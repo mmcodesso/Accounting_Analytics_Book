@@ -1,5 +1,0 @@
-| Shipment | Status | Delivery date |
-| --- | --- | --- |
-| SH-2024-000001 | Delivered | 2024-01-08 |
-| SH-2024-000004 | In Transit | 2024-01-10 |
-| SH-2024-000038 | In Transit | 2024-01-20 |
