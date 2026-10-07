@@ -1,0 +1,465 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter turns from explaining the past to estimating the future and evaluating decisions. Each module follows a section of the chapter, and each guided tutorial answers one of the controller's three requests.
+:::
+
+## Learning objectives
+
+{{< book-objectives >}}
+
+::: {.notes}
+The objectives run from measuring relationships and forecasting, through budgets and variances, to models that evaluate a decision. Each pairs a tool with the test that makes it trustworthy.
+:::
+
+## A forecast, a budget review and a decision
+
+- The controller is preparing the planning meeting for next year
+- She needs a revenue forecast she can defend against the sales team
+- She wants to know how the year compared with a budget she suspects
+- And whether to repeat the Furniture Seasonal Promotion
+
+::: {.notes}
+Each request asks what could happen rather than what did happen. The chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
+:::
+
+# From Explaining to Predicting and Deciding
+
+## From what happened to what could happen
+
+- Predictive analytics estimates what is likely, such as next quarter's revenue
+- Prescriptive analytics recommends what to do, such as whether to repeat a promotion
+- A forecast cannot be checked against the records until the period is over
+- So every model here is paired with a test
+
+::: {.notes}
+The tests are a residual plot that shows where a regression fails, a backtest that compares a forecast with what happened, a flexible budget that separates volume from price, and a documented list of assumptions. Part II has now used all four analytics types from Chapter 1.
+:::
+
+# Correlation and Regression
+
+## Correlation measures a straight-line relationship
+
+- CORREL, or the ToolPak's correlation matrix, ranges from −1 to +1
+- It measures only linear association, so a curve can show almost none
+- It says nothing about cause: a third variable may drive both
+- One unusual observation can change it, and the conclusion with it
+
+::: {.notes}
+With the start-up month included, monthly revenue seems to move with the number of customers invoiced; without it, revenue moves more with the average size of a line, as Tutorial 7.1 shows. Look at the data before reading any coefficient. The ToolPak is an add-in you enable under File, Options, Add-ins.
+:::
+
+## Regression fits a least-squares line
+
+- The line minimizes the squared vertical distances from the points
+- The intercept is the value at zero; the slope is the change per unit of x
+- Accountants use it to split mixed costs and model costs against activity
+- Auditors use it to build expectations to compare with recorded amounts
+
+::: {.notes}
+Datar and Rajan treat regression as one of the quantitative methods for estimating how costs behave. The dependent variable is the one you want to explain; the independent variable is the one you explain it with.
+:::
+
+## Read four numbers in the regression output
+
+{{< book-figure fig-07-02 >}}
+
+::: {.notes}
+R Square is the share of the variation the line explains, and Significance F the chance of a fit this good if there were no relationship. The slope's p-value below the conventional five percent threshold marks it as statistically significant, and with one x variable it equals Significance F.
+:::
+
+## One start-up month makes a trend
+
+{{< book-figure fig-07-01 >}}
+
+::: {.notes}
+Fitted to all the months, the line slopes upward and its slope is significant, but almost all of that comes from the start-up month, when the company issued about half its usual invoices. Without that month, the line is nearly flat and its slope is no longer significant.
+:::
+
+## Watch out: a significant slope does not prove a trend {.watch-out}
+
+- One unusual point at an end can tilt a line enough to make its slope significant
+- Data sets with identical lines and fit statistics can look nothing alike (Anscombe)
+- Plot the data and the residuals before you report a regression
+- Investigate a point that stands apart; report with and without it if it stays
+
+::: {.notes}
+A residual plot should look like a patternless band around zero. A single point far from the rest, or a curve, means the line describes the data poorly.
+:::
+
+# Forecasting and Backtesting
+
+## Trend functions extend the line
+
+- FORECAST.LINEAR gives the line's value at a new x; TREND gives several
+- TREND spills its values into a spill range; `A5#` refers to the whole range
+- A formula returns #SPILL! rather than overwrite cells in its way
+- UNIQUE and SORT are dynamic arrays too, like Chapter 6's FILTER
+
+::: {.notes}
+Add Trendline draws the same line on a chart and can show its equation and R Square. These tools make a linear forecast quick to produce, which is exactly why it needs testing: extending a line assumes the past continues, and that it was a line.
+:::
+
+## A forecast must beat the simple benchmarks
+
+{{< book-table tbl-07-01 >}}
+
+::: {.notes}
+Hyndman and Athanasopoulos recommend comparing every method with these four, because a method that cannot beat them is not worth using. Each is a single Excel formula.
+:::
+
+## A backtest forecasts a period with a known answer
+
+- Fit the method to an earlier part of the history, and hold back a later part
+- Forecast the held-back part and compare with what actually happened
+- Express each error as a percentage of the actual; average them for MAPE
+- The most recent quarter with actual results is the natural holdout
+
+::: {.notes}
+A backtest cannot guarantee future performance, but a method that fails on the recent past should not be trusted with the next quarter. Budgets are negotiated as well as calculated, and a record of past forecast errors gives the finance team an objective reference when managers build in slack or push for optimism.
+:::
+
+## Check your understanding {.check}
+
+What does each result tell you?
+
+1. An R Square near zero
+2. A slope whose p-value is well below five percent
+3. One residual far from all the others
+4. The method with the smallest backtest error
+
+::: {.notes}
+Ask students what they would do next in each case, not only what it means.
+:::
+
+## Each result calls for a next step {.answer}
+
+1. The line explains little of the variation
+2. A slope unlikely to be zero, unless one point drives it
+3. An influential point: investigate, and report with and without it
+4. The method to use, with its error as a range
+
+::: {.notes}
+The second and third belong together: Charles River's significant trend came from the start-up month alone.
+:::
+
+# Guided Tutorial 7.1: Forecasting Revenue and Testing the Forecast
+
+## Forecast and test in nine steps
+
+{{< book-steps 7.1 >}}
+
+::: {.notes}
+Students build the monthly revenue series and prove it complete, measure what moves with revenue, fit the trend with and without the start-up month, and backtest three forecasts of the year's last quarter before forecasting the next one.
+:::
+
+## The mean beat the trend in the backtest
+
+{{< book-figure fig-07-03 >}}
+
+::: {.notes}
+The trend overshoots the quarter by several percent, while the mean of the earlier months is almost exactly right. The same quarter of the previous year is close on the total but has the largest monthly errors.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 7.1 lead="true" >}}
+
+::: {.notes}
+The controller now has a forecast she can defend. It is not the most sophisticated method you could build, but it performed best on the most recent quarter with an answer, and its range tells her how much to rely on it.
+:::
+
+# Budgets, Flexible Budgets, and Variances
+
+## A budget is built from drivers
+
+- BudgetLine holds the detail; its DriverType records how each amount was set
+- Revenue is forecast units times a planned net price; COGS the same units at standard
+- Commissions follow revenue; payroll taxes and benefits follow salaries
+- Each driver can be tested on its own
+
+::: {.notes}
+The master budget combines the operating budgets with the financial budgets for cash and the balance sheet. For Charles River, the operating-expense budget turns out close to what was spent, and of the two sales assumptions, price is close to reality and volume is not.
+:::
+
+## Watch out: a summary may not hold all its detail {.watch-out}
+
+- The Budget Table summarizes the budget by cost center
+- Lines with no cost center, such as rent, utilities and insurance, are missing
+- A total taken from the summary is smaller than the budget's true total
+- Reconcile a summary to its detail before you rely on it
+
+::: {.notes}
+It is the same control as reconciling invoice lines to invoice totals in Chapter 4. Exercise 7.2 asks students to reconcile the Budget Table to BudgetLine.
+:::
+
+## A flexible budget separates volume from price
+
+{{< book-figure fig-07-04 >}}
+
+::: {.notes}
+The flexible budget keeps the budget's prices and costs per unit but uses the actual volume, so it shows what would have happened if everything except volume had gone to plan (Datar and Rajan). Variable costs flex with volume; fixed costs stay at their budgeted amounts.
+:::
+
+## Two variances connect the three levels
+
+{{< book-table tbl-07-02 >}}
+
+::: {.notes}
+Both Charles River's budget and its results value units at standard cost, so for its product lines the flexible-budget variance is entirely a price variance. A static budget whose volume is far from reality says more about the forecast than about performance.
+:::
+
+## Flex the costs that vary
+
+- A commission tied to revenue is variable: flex it to the rate times actual revenue
+- Salaries and rent are fixed over the range and stay at their budget
+- A commission far below the static budget is mostly smaller sales, not savings
+- Test a driver directly, such as actual burden over actual salaries
+
+::: {.notes}
+Comparing each expense with the right benchmark is the point. Tutorial 7.2 finds that the two largest expense variances come from a burden rate set too high and a commission budget that was never flexed.
+:::
+
+## Check your understanding {.check}
+
+What does each finding mean?
+
+1. The budget planned several times the units sold
+2. On the units sold, prices fell short of plan
+3. Commission expense is far below the static budget
+4. Actual payroll burden is a lower rate than budgeted
+
+::: {.notes}
+Ask students who would answer for each finding, using the last column of the variance table.
+:::
+
+## Each finding has its meaning {.answer}
+
+1. A sales-volume variance that measures the forecast, not the business
+2. A flexible-budget variance, here entirely a price variance
+3. Mostly volume: compare it with the flexed commission instead
+4. A rate assumption, not a saving in spending
+
+::: {.notes}
+Only the second is something pricing managers can act on; the others are about how the budget was built.
+:::
+
+# Guided Tutorial 7.2: Comparing 2026 with the Budget
+
+## Steps 1 to 6: flex the sales budget
+
+{{< book-steps 7.2 1-6 >}}
+
+::: {.notes}
+Students import the budget lines, extract the planned price of each item and month, price the year's invoice lines at those prices, and build the flexible-budget report with its two variances and a split of the price variance.
+:::
+
+## Steps 7 to 11: prices and expenses
+
+{{< book-steps 7.2 7-11 >}}
+
+::: {.notes}
+They then chart Furniture prices by month, import the operating expenses from the ledger, compare them with their budget, and test the drivers of the two exceptions.
+:::
+
+## Flexed, the plan's prices were slightly optimistic
+
+{{< book-figure fig-07-05 >}}
+
+::: {.notes}
+The sales-volume variances are very large and unfavorable, because the plan's volume was far from reality. The flexible-budget variances are small and unfavorable in every line, a similar small price gap before discounts plus the promotional discounts.
+:::
+
+## The promotion cost more, and later, than planned
+
+{{< book-figure fig-07-06 >}}
+
+::: {.notes}
+The budget planned the promotion's lower prices in September and October. The actual price after promotions fell sharply in those months and recovered only partly through December, because the promotion's orders kept being invoiced after it ended.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 7.2 lead="true" >}}
+
+::: {.notes}
+The static budget cannot judge the year because its volume was far from reality. Flexed, the plan's prices were slightly optimistic in every line, and the operating expenses were close once the burden rate and the flexed commission are corrected.
+:::
+
+# Cost-Volume-Profit Analysis and What-If Tools
+
+## Contribution margin covers fixed costs, then profit
+
+- Contribution margin is revenue less variable costs
+- Profit is the contribution margin less fixed costs
+- Break-even revenue is fixed costs divided by the contribution margin ratio
+- The margin of safety is how far revenue sits above break-even
+
+::: {.notes}
+A target profit works the same way: revenue must cover the fixed costs plus the target, divided by the contribution margin ratio. Exercise 7.3 applies these relationships to Charles River, with the operating-expense budget as the fixed costs.
+:::
+
+## A price cut must be repaid by volume
+
+- A discount lowers the contribution margin of every unit that receives it
+- Volume must rise enough to replace the margin lost
+- The lift needed depends only on the margins before and after the cut
+- Fixed costs do not enter, because the decision does not change them
+
+::: {.notes}
+This is the logic Tutorial 7.3 applies to the Furniture Seasonal Promotion. The break-even lift is the volume increase at which the promotion's contribution equals what the same orders would have earned at full price.
+:::
+
+## Four tools ask what-if questions
+
+{{< book-table tbl-07-03 >}}
+
+::: {.notes}
+Scenario Manager compares named sets of inputs, a data table recalculates across a range of one or two inputs, and Goal Seek works backward to a target. Solver handles many inputs and constraints; for a linear model its Simplex LP method finds the optimum, and its Sensitivity report gives each constraint's shadow price, but only without integer constraints, as in Exercise 7.4.
+:::
+
+## Document every assumption and its sensitivity
+
+- State each key assumption, the value used, and its source
+- Add how sensitive the conclusion is to it
+- An assumption that can move far without changing the answer needs little evidence
+- One that reverses the answer with a small change deserves the most scrutiny
+
+::: {.notes}
+An assumption that is not written down cannot be reviewed. Data tables and Goal Seek supply the evidence for the sensitivity column, as Tutorial 7.3 shows.
+:::
+
+## Check your understanding {.check}
+
+Which what-if tool answers each question?
+
+1. Results under three named sets of inputs
+2. The margin across a range of discount rates
+3. The volume lift at which a promotion breaks even
+4. The product mix that maximizes margin within capacity
+
+::: {.notes}
+Ask students what they would need to set up in the model before each tool could work: inputs kept in cells apart from the formulas.
+:::
+
+## Each question has its tool {.answer}
+
+1. Scenario Manager
+2. A data table
+3. Goal Seek
+4. Solver
+
+::: {.notes}
+All four need a model whose inputs sit in cells, separate from its calculations, which is how Tutorial 7.3 builds the Model worksheet.
+:::
+
+# Guided Tutorial 7.3: Should Charles River Repeat the Furniture Promotion?
+
+## Model the promotion in eight steps
+
+{{< book-steps 7.3 >}}
+
+::: {.notes}
+Students calculate the model's inputs from the data, compare scenarios, map the result across discounts and lifts with a data table, find the break-even lift with Goal Seek, and check that lift against the order data.
+:::
+
+## The model keeps inputs apart from results
+
+{{< book-figure fig-07-07 >}}
+
+::: {.notes}
+The discount and the lift are the inputs in blue; the units, prices, costs and commission rate are calculated from the data. The difference between the contribution with and without the promotion is negative at the year's discount and no lift.
+:::
+
+## Every discount scenario loses margin
+
+{{< book-figure fig-07-08 >}}
+
+::: {.notes}
+The difference is zero when the promotion ends and negative in every other scenario, including a repeat with a lift and a deeper discount. Scenario Manager builds this summary from named scenarios in one step.
+:::
+
+## The volume lift is the assumption that matters
+
+{{< book-table tbl-07-05 columns="Assumption,Value used,Sensitivity" >}}
+
+::: {.notes}
+The book's table also records the basis of each assumption, such as the promotion's discount in the PromotionProgram Table and the commission rate over all revenue. The break-even lift is almost a third, and the order data shows no lift at all, so the lift decides the recommendation.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 7.3 lead="true" >}}
+
+::: {.notes}
+Repeated as it ran, the promotion would cost margin unless it lifted volume by roughly a third, and the orders show no lift. A smaller discount, or one limited to the items and customers most likely to respond, has a far lower bar to clear, and the model shows how low.
+:::
+
+# Communicating Forecasts and Models
+
+## Give the range, the meaning and the key assumption
+
+- Give a forecast as a range, with its method and the period it was fitted to
+- Say which variances are meaningful: the volume variance measures the forecast
+- State the assumption that matters most, and how far it would have to move
+- Record when each assumption was last reviewed, and revisit it
+
+::: {.notes}
+A forecast presented as a single number invites more confidence than it deserves. The same questions recur in later Parts: a SQL query can produce the monthly series, and an interactive report can let a manager drill from a product line to its months, but a model deserves trust only after it has been tested.
+:::
+
+# Looking Ahead
+
+## Back to the controller's three requests
+
+- Forecast: the mean beat the trend, so next quarter is stated as a range
+- Budget: the volume assumption failed; flexed, prices were slightly optimistic
+- Promotion: as it ran, it needed a third more volume, and saw none
+- Next, Chapter 8 looks at the Charles River data through the auditor's eyes
+
+::: {.notes}
+Along the way, students have seen several conditions an auditor would want to examine, from invoices whose dates and numbers disagree to a planning forecast that has run well above actual demand. Chapter 8 takes those up.
+:::
+
+## Summary
+
+- Correlation and regression measure relationships; plots show what they hide
+- A forecast earns trust by beating simple benchmarks in a backtest
+- A flexible budget separates the volume assumption from prices and costs
+- Contribution margin and break-even frame a decision; what-if tools explore it
+- Every model documents its assumptions and how sensitive the answer is to each
+
+::: {.notes}
+Ask students which test in the chapter changed a conclusion: the start-up month and the backtest are the usual answers.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Backtest, flexible budget and break-even point are the ideas the later chapters rely on most.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 7.6 evaluates management's own demand forecast, the auditor's version of a backtest. Chapter 8 turns to audit analytics.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::

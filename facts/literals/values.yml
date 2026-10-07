@@ -454,6 +454,8 @@ files:
     constants: ["4100"]             # the chapter's generic packed-column example, "4100-Sales-Domestic"
   slides/chapter-04/index.qmd:
     constants: ["$100 million"]     # Powell et al.'s largest confirmed spreadsheet error, as the chapter cites it
+  slides/chapter-07/index.qmd:
+    constants: ["−1", "+1"]         # the range of a correlation coefficient, as the chapter states it
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:
