@@ -1,0 +1,63 @@
+## Guided Tutorial C.3: Adding a Measures Table and a First Measure
+
+**Context and objective.** In this tutorial, you will give the model of Guided Tutorial C.1 a table of its own for measures, write a first measure in the model editor, and test it with a DAX query. Chapter 14 teaches measures and DAX; this tutorial shows only where the browser keeps the commands, so that you can follow Tutorial 14.2 and the chapters after it.
+
+**Prerequisites.** You need the Charles River Reports semantic model and report from Guided Tutorials C.1 and C.2, and a text editor for the test. With a Pro license, first choose **File > Save to version history** in the model editor, so that you can return to the model as it is now.
+
+**Step-by-step instructions.**
+
+**Step 1. Open the model for editing.**
+
+a. In **My workspace**, open the **Charles River Reports** semantic model, the item whose type is Semantic model.
+b. If the menu at the top right reads **Viewing**, open it and choose **Editing**.
+
+**Step 2. Create the Key Measures table with Enter data.** Tutorial 14.2 keeps its measures in a table named Key Measures, typed with Enter data; in the browser, Enter data is in Power Query Online.
+
+a. Choose **Transform data** on the model editor's ribbon.
+b. In Power Query Online, choose **Home > Enter data**.
+c. In the **Create table** dialog, leave the grid as it is, type `Key Measures` in **Name**, and click **OK**.
+d. Click **Save** at the bottom right to apply the change to the model.
+
+The dialog is Desktop's Enter data, with the same grid and the same one empty column, Column1. After a few seconds, Power Query closes and Key Measures appears in the **Data** pane. The other tables the chapters type by hand, such as the Steps table of Tutorial 15.1, are created the same way, and the settings icon of their Source step reopens **Create table** to change them.
+
+**Step 3. Write the measure.**
+
+a. Select **Key Measures** in the **Data** pane, and choose **New measure** on the ribbon.
+b. In the formula bar that opens above the diagram, replace the text with `Revenue = SUM ( SalesInvoiceLine[LineTotal] )`, and press Enter.
+c. In the **Properties** pane, under **Formatting**, turn on **Thousands separator**.
+
+New measure adds the measure to the table selected in the **Data** pane, so selecting Key Measures first puts Revenue there. **Properties** holds what Desktop's Measure tools tab does, including **Display folder** and **Is hidden**.
+
+**Step 4. Hide Column1.**
+
+a. Select Column1 in the Key Measures table.
+b. In the **Properties** pane, turn on **Is hidden**.
+
+With its only column hidden, Key Measures moves to the top of the **Data** pane, as it does in Desktop, where a table that holds only measures is easy to find.
+
+**Step 5. Test the measure in DAX query view, and keep the test.**
+
+a. Select **DAX query view** at the bottom of the model editor.
+b. Replace the sample query with the query below, and click **Run**.
+c. Copy the query into a text file named `Tests.dax`, and save the file with your work.
+
+```
+EVALUATE
+SUMMARIZECOLUMNS (
+    SalesInvoice[FiscalYear],
+    "Revenue", ROUND ( [Revenue], 2 )
+)
+ORDER BY SalesInvoice[FiscalYear]
+```
+
+The **Results** grid shows one row for each fiscal year, and the status below it reports the number of columns and rows. The banner above the editor says that DAX queries are discarded on close, which is why the test goes in Tests.dax. @fig-c-05 shows the query and its result.
+
+![Testing the Revenue Measure in DAX Query View.](/visuals/svg/fig-c-05-dax-query-measure.svg){#fig-c-05 fig-alt="A mock of DAX query view in the model editor of the Power BI service. A banner says that DAX queries are discarded on close. The editor holds a query that evaluates SUMMARIZECOLUMNS of FiscalYear and the rounded Revenue measure, and the Results grid shows one row for each of the three fiscal years. The Data pane lists Key Measures first, with Revenue inside it."}
+
+**Checkpoint.** Confirm the following before you go on to Chapter 14:
+
+- Key Measures is at the top of the **Data** pane, with Revenue inside it and Column1 hidden.
+- The query's revenue for each fiscal year equals the Validation page's line total for that year.
+- Tests.dax holds the query.
+
+A measure written in the browser is the same measure as one written in Desktop, and the model now has the place Tutorial 14.2 keeps its measures in.

@@ -1,0 +1,86 @@
+## Guided Tutorial C.2: Building the Sales and Discounts Page in the Browser
+
+**Context and objective.** In this tutorial, you will build Tutorial 13.2's Sales and Discounts page in the report editor of the service and check it against the Validation page. Tutorial 13.2 explains what each visual shows; this tutorial follows its steps and stops at the four places where the browser differs: the missing card, the invoice count, the display units, and the order of the months.
+
+**Prerequisites.** You need the Charles River Reports report and semantic model from Guided Tutorial C.1.
+
+**Step-by-step instructions.**
+
+**Step 1. Open the report for editing, and add the page.**
+
+a. Select **My workspace** in the navigation pane, and open the **Charles River Reports** report, the item whose type is Report.
+b. Choose **Edit** on the menu bar to switch from Reading view to Editing view.
+c. Click the plus sign beside the page tabs, double-click the new tab, and rename it `Sales and Discounts`.
+d. Drag the tab to the left of **Validation**.
+
+**Step 2. Add the year slicer.**
+
+a. Select **Slicer** in the **Visualizations** pane, and select FiscalYear in the SalesInvoice table of the **Data** pane.
+b. Select **Format visual**, and under **Visual > Slicer settings > Options**, set **Style** to **Tile**.
+c. Under **Selection**, turn on **Single select**, and click **2026** in the slicer.
+
+A slicer on a number column starts with the style **Between**, a range with two handles; **Tile** turns it into the buttons of Tutorial 13.2.
+
+**Step 3. Bring back the card visual, if it is missing.** The list of visuals in the service can lack the card, which Tutorial 13.2 uses for its four totals.
+
+a. Look for **Card** among the visual types of the **Visualizations** pane, between **Gauge** and **KPI**.
+b. If it is not there, click the **…** below the visual types, choose **Restore default visuals**, and click **OK**.
+
+Restoring the default visuals adds the card to the list, and also an older card and a multi-row card further down. Use the one between **Gauge** and **KPI**, the card of Tutorial 13.2, whose wells are **Value**, **Categories**, and **Tooltips**.
+
+**Step 4. Add the cards.**
+
+a. Select **Card**, and select LineTotal, ListAmount, and DiscountAmount in the SalesInvoiceLine table. They go to **Value**.
+b. Drag SalesInvoiceID from the SalesInvoiceLine table into **Value**, below DiscountAmount.
+c. Click the arrow beside it in the well, and choose **Count (Distinct)**.
+d. For each of the four fields, click its arrow, choose **Rename for this visual**, and type `Revenue`, `At list price`, `Discounts`, and `Invoices`.
+
+Selecting SalesInvoiceID's check box instead of dragging it puts it in **Categories**, because a key that a relationship uses is set not to summarize, and the card then splits into one small card per invoice. Dragged into **Value** and counted, it gives the number of invoices, from the lines, as Tutorial 13.2 explains.
+
+**Step 5. Show the full amounts.** The cards show their values abbreviated, in thousands (K) or millions (M), until each card's display units are set.
+
+a. Select **Format visual**, and expand **Visual > Callout**.
+b. Under **Apply settings to**, set **Cards** to **Revenue**.
+c. Under **Value**, set **Display units** to **None**.
+d. Repeat the two actions for At list price, Discounts, and Invoices.
+
+**Display units** appears under **Value** only when **Apply settings to** names one card, not **All**, which is why it is set four times. The four cards now show fiscal 2026 in full, as on the Validation page.
+
+**Step 6. Chart the discounts by month, in month order.**
+
+a. Select **Line chart**, and select Month and DiscountAmount. Month goes to **X-axis** and DiscountAmount to **Y-axis**.
+b. Read the labels under the axis. If the months are not in order, click the chart's **More options** (**…**) and choose **Sort by > Month**.
+c. Open **More options** again, and choose **Sort by > Sort ascending**.
+d. In **Format visual > General > Title**, replace the text with `Promotional discounts by month`.
+
+The chart can arrive sorted by DiscountAmount, largest first, which turns the autumn promotions into a falling line. Sorted by Month, ascending, the line stays near zero through August and rises sharply in September and October, as in Tutorial 13.2. @fig-c-04 shows the page at this point, with the commands of Steps 3, 5, and 6.
+
+![The Sales and Discounts Page in the Report Editor.](/visuals/svg/fig-c-04-cards-and-sort.svg){#fig-c-04 fig-alt="A mock of the report editor of the Power BI service. The page Sales and Discounts has a tile slicer with 2026 selected, four cards with the full values of revenue, the amount at list price, discounts, and invoices, and a line chart of promotional discounts by month in month order, flat until a sharp rise in September and October. Three notes name the commands that differ from Desktop: Restore default visuals under the visual types, Display units set card by card under Callout, and Sort by in the chart's More options."}
+
+**Step 7. Add the bar chart, the matrix, and the drop-down slicers.**
+
+a. Add the **Clustered bar chart** of DiscountAmount by ItemGroup, with its title, as in Tutorial 13.2, Step 4.
+b. Add the **Matrix** of LineTotal by ItemGroup and ProductType, with Period on **Columns**, as in Tutorial 13.2, Step 5.
+c. Add two **Slicer** visuals, for CustomerSegment and Region, and set each one's **Style** to **Dropdown**.
+
+These visuals, their wells, and their format settings are the same as in Desktop.
+
+**Step 8. Describe the charts for screen readers.**
+
+a. Select the line chart, and in **Format visual > General > Alt text**, type a description of what it shows, such as `Promotional discounts by month, fiscal 2026: near zero until a sharp rise in September and October.`
+b. Do the same for the bar chart.
+
+**Step 9. Explore the page, and save it.**
+
+a. Click the **Furniture** bar, and read the cards and the line; click the bar again to clear the selection.
+b. Click the **Save this report** button.
+
+The report keeps the name you gave it in Guided Tutorial C.1, so the button saves it without asking.
+
+**Checkpoint.** Confirm that your page does the following:
+
+- With 2026 selected, the four cards match the Validation page: revenue, list amount, discounts, and the number of invoices.
+- The months of the line chart are in order, and the discount line rises sharply in September and October.
+- Furniture leads the bar chart, and both charts have alt text.
+
+The report editor of the service built the same page as Desktop's Report view, and Tutorial 13.3's charts can be added the same way.

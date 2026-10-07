@@ -10,8 +10,8 @@ heading and the instructor note; per chapter, the multiple-choice answer key wit
 Where each text comes from:
   * headings and their order: the public .qmd files as they are now (the includes of each chapter.qmd are expanded);
   * generated notes: the templates rendered through the registry on the dataset (facts/instructor/source.py);
-  * the notes that never had a template (Exercise A.1, Requirement 1 of the Part I case, the notes of Guided
-    Tutorial A.2) and eleven answer keys: the literal comments archived from commit 4feb03f (baseline-4feb03f.json).
+  * the notes that never had a template (Exercise B.1, Requirement 1 of the Part I case, the notes of Guided
+    Tutorial B.2) and eleven answer keys: the literal comments archived from commit 4feb03f (baseline-4feb03f.json).
 Nothing else is written: after building, the script checks that every number in every file occurs in the notes used,
 in a heading of the book, or in the stamp (the dataset release and the SHA-256 values of _variables.yml).
 """
@@ -82,9 +82,13 @@ def book_units() -> list[Unit]:
             letter = re.match(r"appendices/([a-z])-", path).group(1).upper()
             title = re.search(r"^# (.+?)\s*\{", text, flags=re.M).group(1)
             units.append(Unit("appendix", path, letter, title, f"appendix-{letter.lower()}"))
+    for u in units:
+        u.lines = expand(u.path)
+    # a reference appendix (the quick reference) has no tutorials, exercises or questions, so it has no notes
+    units = [u for u in units if u.kind != "appendix" or any(
+        origin.endswith(("_tutorial-01.qmd", "_exercises.qmd", "_multiple-choice.qmd")) for origin, _ in u.lines)]
     for i, u in enumerate(units, 1):
         u.slug = f"{i:02d}-{u.slug}"
-        u.lines = expand(u.path)
     return units
 
 
@@ -167,11 +171,11 @@ def answer_key(comment: str) -> tuple[list[str], list[tuple[int, str, str]]]:
 
 
 def claude_keys() -> dict[str, str]:
-    """The keys CLAUDE.md lists as 'Multiple-choice keys used so far' (chapter number or 'A' -> letters)."""
+    """The keys CLAUDE.md lists as 'Multiple-choice keys used so far' (chapter number or appendix letter -> letters)."""
     text = (REPO / "CLAUDE.md").read_text(encoding="utf-8")
     line = next(l for l in text.split("\n") if "Multiple-choice keys used so far" in l)
     keys = {m.group(1): m.group(2) for m in re.finditer(r"\bch(\d+) ([A-D]+)", line)}
-    keys["A"] = re.search(r"appendix A ([A-D]+)", line).group(1)
+    keys.update({m.group(1): m.group(2) for m in re.finditer(r"\bappendix ([A-Z]) ([A-D]+)", line)})
     return keys
 
 
@@ -258,7 +262,7 @@ def render_unit(u: Unit, v: dict, keys_expected: dict[str, str]) -> Result:
             add_note(2, f"Guided Tutorial {tid}: {title}", comment, "tutorial", f"Tutorial {tid}")
             continue
         if origin.endswith("_multiple-choice.qmd") and hm and len(hm.group(1)) == 2:
-            number = u.number if u.kind == "chapter" else "A"
+            number = u.number
             pat = rf"<!--\s*Answer key, (?:Chapter|Appendix) {number}\b"
             comment = note_for(origin, "mcq", pat)
             emitted.clear()

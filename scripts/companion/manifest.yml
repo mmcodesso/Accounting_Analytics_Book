@@ -27,12 +27,12 @@ chains:
     audience: public
   - id: ch13-15-reports
     tool: pbi
-    chapters: [13, 14, 15, "A"]      # "A": the appendix on publishing and security (Guided Tutorial A.1)
+    chapters: [13, 14, 15, "B"]      # "B": the appendix on publishing and security (Guided Tutorial B.1)
     file: Charles River Reports.pbip
     builder: pbibuild.reports        # scripts/companion/pbibuild/reports.py, one function per tutorial
     table: SalesInvoiceLine          # the model has loaded once this table is in the engine
-    also:                            # Guided Tutorial A.1 Step 1 starts in internal audit's file of Chapter 16
-      "Start of Tutorial A.1": {chain: ch16-monitoring, after: "16.3"}
+    also:                            # Guided Tutorial B.1 Step 1 starts in internal audit's file of Chapter 16
+      "Start of Tutorial B.1": {chain: ch16-monitoring, after: "16.3"}
     audience: public
   - id: ch16-monitoring
     tool: pbi
@@ -139,12 +139,12 @@ solutions:                           # instructor files, built with --solutions 
     base: {chain: ch16-monitoring, after: "16.3"}   # the reader's Save as copy starts here
     builder: pbibuild.ex16
     audience: instructor
-  - id: appendix-a-exercises-pbi
+  - id: appendix-b-exercises-pbi
     tool: pbi
-    chapter: "A"
-    file: Appendix A Exercises - Solutions.pbip
-    base: {chain: ch13-15-reports, after: "A.1"}   # the reader's Save as copy starts here
-    builder: pbibuild.exa
+    chapter: "B"
+    file: Appendix B Exercises - Solutions.pbip
+    base: {chain: ch13-15-reports, after: "B.1"}   # the reader's Save as copy starts here
+    builder: pbibuild.exb
     audience: instructor
   - id: part2-case
     tool: excel

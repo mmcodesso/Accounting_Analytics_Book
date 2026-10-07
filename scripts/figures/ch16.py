@@ -5,7 +5,7 @@ entry flags (Weekend by CreatedDate, Backdated, SelfApproved, AboveLimit against
 MaxApprovalAmount, RoundAmount), the purchase order and payroll flags of Chapter 12 and Exercise
 12.5, the exception register that stacks them, and the dispositions of Tutorial 16.3, whose
 measures and tests were checked against Power BI Desktop 2.158's engine on a reference model of
-the tutorials. The security and sharing figures moved with their text to appendix_a.py.
+the tutorials. The security and sharing figures moved with their text to appendix_b.py.
 """
 
 from __future__ import annotations

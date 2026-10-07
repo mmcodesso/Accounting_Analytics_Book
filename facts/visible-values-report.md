@@ -1,10 +1,10 @@
 | File | key | constant | review | computed | structural | UNCLASSIFIED |
 |---|---:|---:|---:|---:|---:|---:|
-| appendices/a-publishing-security/_exercises.qmd | 0 | 0 | 0 | 0 | 16 | 0 |
-| appendices/a-publishing-security/_multiple-choice.qmd | 0 | 0 | 0 | 0 | 8 | 0 |
-| appendices/a-publishing-security/_tutorial-01.qmd | 0 | 1 | 0 | 0 | 28 | 0 |
-| appendices/a-publishing-security/_tutorial-02.qmd | 0 | 2 | 0 | 0 | 10 | 0 |
-| appendices/a-publishing-security/appendix.qmd | 0 | 1 | 0 | 0 | 12 | 0 |
+| appendices/b-publishing-security/_exercises.qmd | 0 | 0 | 0 | 0 | 16 | 0 |
+| appendices/b-publishing-security/_multiple-choice.qmd | 0 | 0 | 0 | 0 | 8 | 0 |
+| appendices/b-publishing-security/_tutorial-01.qmd | 0 | 1 | 0 | 0 | 28 | 0 |
+| appendices/b-publishing-security/_tutorial-02.qmd | 0 | 2 | 0 | 0 | 10 | 0 |
+| appendices/b-publishing-security/appendix.qmd | 0 | 1 | 0 | 0 | 12 | 0 |
 | back-matter/closing.qmd | 0 | 0 | 0 | 0 | 6 | 0 |
 | cases/part-1-case.qmd | 0 | 0 | 0 | 0 | 23 | 0 |
 | cases/part-2-case.qmd | 6 | 3 | 0 | 0 | 49 | 0 |
@@ -347,7 +347,7 @@
 | scripts/companion/xlbuild/ex08.py | 0 | 33 | 0 | 0 | 54 | 0 |
 | scripts/companion/xlbuild/expected.py | 0 | 3 | 0 | 0 | 1 | 0 |
 | scripts/companion/xlbuild/xl.py | 0 | 4 | 0 | 0 | 3 | 0 |
-| scripts/figures/appendix_a.py | 2 | 0 | 0 | 0 | 6 | 0 |
+| scripts/figures/appendix_b.py | 2 | 0 | 0 | 0 | 6 | 0 |
 | scripts/figures/ch01.py | 2 | 0 | 0 | 0 | 3 | 0 |
 | scripts/figures/ch02.py | 0 | 3 | 0 | 0 | 8 | 0 |
 | scripts/figures/ch03.py | 0 | 1 | 0 | 0 | 6 | 0 |

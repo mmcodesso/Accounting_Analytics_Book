@@ -1,0 +1,17 @@
+{{< pagebreak >}}
+
+## Key Terms
+
+**Excel date.** A date stored in a workbook as a number, a count of days in which 1 is 1 January 1900, which Excel displays as a date because of the cell's format. Power BI Desktop reads such a cell as a date, while Power Query Online in the Power BI service reads the bare number, which must then be typed as a date.
+
+**Model editor.** The part of the Power BI service that opens a semantic model in a browser to view it or, in Editing mode, to change it: its relationships, measures, calculated tables, properties, and roles. Changes made in Editing mode are saved as they are made, with no undo.
+
+**My workspace.** A user's private area in the Power BI service, where even a free license can create semantic models and reports for personal use. Its content is not shared with others.
+
+**Power BI service.** The website at app.powerbi.com where Power BI reports are published, shared, and read in a browser, and where dashboards are built. It also builds semantic models with Power Query Online and edits them in the model editor, so most of the work of Power BI Desktop can be done in a browser.
+
+**Power Query Online.** The browser version of the Power Query Editor, used by the Power BI service and other Microsoft services to get and shape data. It offers the same steps as the editor in Excel and Power BI Desktop, with some commands in different places and some steps named differently.
+
+**Tenant setting.** A setting that an organization's Power BI administrator controls for all its users or for some of them, such as whether users can edit semantic models in the browser. A feature turned off in the tenant settings is unavailable whatever the user's license.
+
+**Version history.** The last few saved versions of a semantic model edited in the Power BI service, each of which can be restored. It needs a Pro license, keeps up to five versions, and is not a substitute for version control.

@@ -3,7 +3,7 @@ name: Verify Against the Pinned Dataset
 # Dataset-dependent checks that publishing deliberately does not need (publish.yml is dataset-free). They read the
 # release pinned in _variables.yml, check its SHA-256, and run read-only: every query the SQL chapters teach, the
 # comparison of the chapter text with the scripts the figures and slides share, the figure standard (which recomputes
-# the crow's-foot endpoints and the values the figures assert), the {{< var >}} keys, the data contract (the storylines
+# the crow's-foot endpoints and the values the figures assert), the {{< var >}} keys, the coverage of the quick reference and competency map appendices, the data contract (the storylines
 # and quirks the chapters rely on) and the classification of every literal in the text (facts/ROLL.md). Nothing is
 # deployed. The generated notes and the companion files need the support workbook and Office, so they stay local.
 
@@ -16,6 +16,7 @@ on:
     paths:
       - "chapters/**"
       - "cases/**"
+      - "appendices/**"
       - "shared/calculations/**"
       - "scripts/figures/**"
       - "scripts/verify/**"
@@ -47,6 +48,12 @@ jobs:
 
       - name: Check the variable keys
         run: python scripts/verify/var_keys_check.py
+
+      - name: Check the quick reference against the chapters
+        run: python scripts/verify/quick_reference_check.py
+
+      - name: Check the competency map against the exercises
+        run: python scripts/verify/competency_map_check.py
 
       - name: Read the pinned dataset
         id: pin

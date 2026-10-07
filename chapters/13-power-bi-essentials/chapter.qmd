@@ -70,7 +70,7 @@ Three panes on the right side of Report view do most of the work. The Data pane 
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Power BI Desktop runs only on Windows. If you use a Mac, the Power BI chapters need a Windows environment, such as a campus computer lab or a virtual machine. Some institutions also let students build reports and edit their models in the Power BI service, in any browser, by signing in with their school account. Whether that is available depends on your institution's settings, and the tutorials are written for Desktop, so check with your instructor before you rely on it.
+Power BI Desktop runs only on Windows. If you use a Mac, you can follow the Power BI chapters in a Windows environment, such as a campus computer lab or a virtual machine, or in the Power BI service, in any browser, by signing in with your school account. The service builds the same model and report, with some commands in other places: [the appendix on Power BI in the browser](#sec-appendix-browser) rebuilds this chapter's model and its first page there, and lists what changes in the rest of Part IV. Whether the browser is open to you depends on your license and your institution's settings, so check with your instructor before you rely on it.
 :::
 
 

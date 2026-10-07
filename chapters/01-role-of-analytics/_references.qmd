@@ -26,9 +26,9 @@ Franke, F., & Hiebl, M. R. W. (2023). Big data and decision quality: The role of
 
 Hirsch, B., Seubert, A., & Sohn, M. (2015). Visualisation of data in management accounting reports: How supplementary graphs improve every-day management judgments. *Journal of Applied Accounting Research*, *16*(2), 221–239. <https://doi.org/10.1108/JAAR-08-2012-0059>
 
-Institute of Management Accountants. (2025). *IMA competency framework*. <https://www.imanet.org/career-resources/competency-framework>
+Institute of Management Accountants. (2025). *IMA expanded management accounting competency framework: Advancing competencies for the 21st-century management accountant*. <https://mc-69e30ef4-758e-4371-ac6f-2657-cdn-endpoint.azureedge.net/-/media/IMA/Files/Home/Career-Resources/Competency-Framework/Competency-Framework-White-Paper.ashx>
 
-International Accounting Education Standards Board. (2019). *Revisions to IES 2, 3, 4 and 8*. International Federation of Accountants. <https://www.ifac.org/education/publications/revisions-ies-2-3-4-and-8>
+International Federation of Accountants. (2025). *International Education Standard (IES) 2: Initial professional development—Technical competence (2026)*. <https://education.ifac.org/part/ies-2>
 
 Kokina, J., Blanchette, S., Davenport, T. H., & Pachamanova, D. (2025). Challenges and opportunities for artificial intelligence in auditing: Evidence from the field. *International Journal of Accounting Information Systems*, *56*, Article 100734. <https://doi.org/10.1016/j.accinf.2025.100734>
 

@@ -1,0 +1,103 @@
+# The Exercises and Professional Competencies {#sec-appendix-competencies}
+
+This appendix maps the book's exercises, comprehensive cases, and capstone cases to the competency areas of four frameworks that accounting programs use to plan courses and to document what their students learn. It is written for instructors who align a course with the CPA Evolution model curriculum, with the management accounting competencies of the Institute of Management Accountants (IMA), with the International Education Standards of the International Federation of Accountants (IFAC), or with the accounting accreditation standards of AACSB International. An entry means that the item practices the competency as one of its main tasks, not that it covers everything the framework expects. Each item is mapped to at most three competencies in each framework, the ones its requirements exercise most directly.
+
+The tables use short labels. A number such as 6.5 is Exercise 6.5, B.1 is an exercise of [the appendix on publishing, securing, and sharing reports](#sec-appendix-publishing), and C.1 one of [the appendix on Power BI in the browser](#sec-appendix-browser). Part II R5 is Requirement 5 of the comprehensive case that closes Part II, and Ch. 19 R4 is Requirement 4 of the capstone case in Chapter 19. Every exercise and requirement in the book appears at least once in each table.
+
+
+## The Frameworks
+
+The CPA Evolution model curriculum of the American Institute of Certified Public Accountants (AICPA) and the National Association of State Boards of Accountancy (NASBA) describes what accounting programs can teach to prepare candidates for the CPA Exam (AICPA & NASBA, 2021). Its core covers accounting and data analytics, audit and accounting information systems, and tax, and three disciplines build on it. @tbl-d-01 uses the curriculum's own structure: Core S1 is the core section on accounting and data analytics, Core S2 the core section on audit and accounting information systems, BAR the business analysis and reporting discipline, and ISC the information systems and controls discipline, each followed by the module (M) and, where it matters, the topic (T).
+
+IMA's expanded management accounting competency framework organizes the competencies of management accountants into ten domains, each with embedded competencies described at three proficiency tiers: foundational, proficient, and expert (IMA, 2025). @tbl-d-02 lists the domains and competencies that the book practices. It leaves the tier to the instructor, because the same item can be assigned at different depths.
+
+IFAC's International Education Standards set out the competence that professional accountants develop in their initial professional development. Revised versions, issued in 2025, take effect in July 2026: IES 2 sets out the areas of technical competence, IES 3 the professional skills, and IES 4 the professional values, ethics, and attitudes (IFAC, 2025a, 2025b, 2025c). @tbl-d-03 uses the standards' area letters, such as IES 2 (i) for information and communications technologies, and paraphrases their learning outcomes.
+
+AACSB International's standards for accounting accreditation include Standard A5, Digital Agility. It expects the curriculum to integrate the technologies of accounting practice, students to judge whether a technology fits a task and to interpret and communicate its results, and students to learn new technologies as the profession changes (AACSB International, 2026). @tbl-d-04 maps the items to the standard's three parts, with Part 5.1 divided by the tool each item uses.
+
+
+## Using the Map
+
+The tables work in two directions. To choose assignments, start from a competency that the course must cover and pick from the items in its row. To document a course, start from the items the course assigns and collect the rows in which they appear. The solutions on the [Downloads](#sec-downloads) page give the expected results of every item, which helps when an item serves as evidence of what students learned.
+
+For the AACSB table that lists each course's technologies, describe the Excel work as Power Query, data models, and analysis tools rather than as spreadsheet use, because Standard A5 leaves ordinary productivity software out of that table (AACSB International, 2026). The SQL and Power BI work fits the table as it is.
+
+The frameworks change more often than the exercises do. IFAC's standards were revised in 2025 and AACSB's accounting standards in 2026, so check the current version of a framework before relying on a code from these tables.
+
+
+## The Map
+
+The four tables follow the order of the frameworks above.
+
+| Competency | Exercises | Cases and capstones |
+|:----------------------------------|:------------------------------------|:------------------------------|
+| Core S1 M1–M3: financial statements, accounts, and transactions | 1.1, 1.2, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1, 6.1, 6.2, 8.1, 8.2, 9.1, 9.2, 10.1, 11.1, 12.1, 12.2, 14.1, 14.2, 15.1, 16.1, C.1 | Part I R4; Part II R2; Part III R5; Part IV R2; Ch. 17 R1, R3, R5, R6, R7 |
+| Core S1 M4: financial statement analysis and performance measures | 2.4, 3.4, 5.4, 7.2, 8.3, 11.2, 14.3 | Part IV R3, R4 |
+| Core S1 M8 T2: financial data (extraction, transformation, and cleansing) | 2.1, 2.2, 2.3, 2.4, 2.5, 4.1, 4.5, 5.1, 5.2, 7.2, 9.6, 13.1, 13.5, C.1 | Part I R3; Part II R1; Part IV R1 |
+| Core S1 M8 T3–T4: data mining and analysis of financial data | 1.4, 4.2, 4.4, 5.3, 5.4, 6.4, 6.6, 8.4, 10.3, 11.2, 11.3, 11.4, 12.3, 13.2, 13.3, 16.3, C.2 | Part I R1; Part II R2, R3; Ch. 18 R1, R3; Ch. 19 R5 |
+| Core S1 M8 T5–T6: visualization and communicating results | 6.2, 13.1, 13.3, 13.4, 13.6, 15.1, 15.2, 15.3, 16.3, 16.4, C.2 | Part I R6; Part II R6; Part III R6; Part IV R6; Ch. 17 R2, R9; Ch. 18 R5, R10; Ch. 19 R5, R9 |
+| Core S1 M8 T7: data ethics | B.1 | Part I R5 |
+| Core S2 M4: information technology and IT controls | 3.2, 3.3, 3.6, 10.5, 14.5, C.3 | Part I R2; Ch. 19 R1 |
+| Core S2 M5: risk of fraud and noncompliance | 1.6, 2.6, 5.5, 8.5, 10.6, 11.5, 11.6, 12.5, 16.6 | Part I R5; Part III R2; Ch. 19 R3 |
+| Core S2 M7: materiality | — | Ch. 17 R5; Ch. 18 R9; Ch. 19 R3 |
+| Core S2 M8: audit evidence and tests of controls | 4.6, 5.6, 8.5, 8.6, 12.4, 12.6, 15.6 | Part II R5; Ch. 19 R4, R6, R8 |
+| Core S2 M9: audit procedures, analytical procedures, and audit data analytics | 1.5, 1.6, 2.6, 3.5, 4.5, 5.2, 6.5, 6.6, 7.5, 7.6, 8.1, 8.2, 9.5, 10.2, 11.5, 12.1, 12.2, 12.6, 14.6, 15.5, 16.1, 16.2, 16.5 | Part I R4; Part III R2; Part IV R5; Ch. 17 R3, R4, R8; Ch. 19 R2, R7, R10 |
+| BAR M5: cost accounting and variance analysis | 1.3, 2.3, 3.3, 4.3, 4.4, 6.3, 6.4, 9.2, 9.3, 9.4, 10.4, 11.3, 12.3, 14.4 | Part III R3, R4; Part IV R4; Ch. 18 R1, R2, R3, R4, R9 |
+| BAR M8: planning techniques, forecasting, and decision models | 7.1, 7.3, 7.4, 15.4 | Part II R3, R4; Part III R4; Ch. 18 R6, R7, R8 |
+| BAR M9: financial statement analysis and working capital | 8.3, 8.4 | Part IV R2, R3; Ch. 17 R2 |
+| BAR M10: advanced data analytics (data models and joins, predictive analysis, dashboards) | 3.1, 3.4, 7.1, 7.4, 7.5, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 11.1, 13.4, 14.1, 14.2, 14.3, 14.4, 14.5, 15.2, 15.3, 15.4, 15.5, 16.5 | Part III R1; Part IV R1; Ch. 17 R1, R7; Ch. 18 R5 |
+| ISC M2: tests of internal controls, logical access, and change management | 4.6, 8.5, 8.6, 11.6, 12.4, 12.5, 16.4, 16.6, B.2, C.3 | Part II R5; Ch. 19 R4, R10 |
+| ISC M4: use and management of data | 1.1, 1.2, 1.3, 1.5, 2.5, 3.5, 3.6, 5.6, 9.1, 9.4, 9.5, 9.6, 13.2, 13.5, 14.6, 15.6 | Part I R2; Part III R1; Ch. 19 R1 |
+| ISC M5: information security | B.1, B.2 | — |
+
+: The exercises and the CPA Evolution model curriculum {#tbl-d-01}
+
+| Competency | Exercises | Cases and capstones |
+|:----------------------------------|:------------------------------------|:------------------------------|
+| Data Analytics and Insights: Data Analysis | 1.4, 2.6, 4.2, 4.3, 4.4, 5.3, 5.4, 5.5, 6.4, 6.5, 6.6, 8.4, 10.3, 10.6, 11.2, 11.3, 11.4, 14.3, 14.4, C.2 | Ch. 18 R1; Ch. 19 R5 |
+| Data Analytics and Insights: Data Governance | 2.5, 3.5, 3.6, 5.6, 9.6, 10.5, 13.5, 14.5, 14.6, C.3 | Part I R3 |
+| Data Analytics and Insights: Data Literacy | 1.1, 1.2, 1.3, 1.5, 1.6, 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 3.5, 5.2, 7.2, 9.5, 9.6, 13.2, 13.5, 15.6 | Part I R1, R2, R3, R5; Ch. 19 R1 |
+| Data Analytics and Insights: Data Visualization | 6.2, 13.3, 13.4, 13.6, 15.1, 15.2, 15.3, 16.3, C.2 | Ch. 18 R5; Ch. 19 R5 |
+| Data Analytics and Insights: Statistical Analysis | 6.5, 6.6, 7.5, 15.5, 16.5 | Part II R3; Ch. 19 R6 |
+| Data Analytics and Insights: Applied Forecasting; Predictive & Prescriptive Analytics | 7.1, 7.4, 7.5, 7.6, 15.4, 15.5 | — |
+| Data Analytics and Insights: Data Tools & Techniques | 4.1, 4.5, 5.1, 9.1, 9.2, 9.3, 10.1, 10.2, 10.3, 11.1, 11.5, 12.6, 13.1, 14.1, 14.2, 16.5, C.1 | Part II R1; Part III R1; Part IV R1 |
+| Reporting and Control: Financial Recordkeeping; Financial Statement Preparation | 1.1, 1.2, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1, 5.2, 6.1, 8.1, 8.2, 9.1, 10.1, 10.2, 11.1, 12.1, 12.2, 13.1, 14.1, 14.2, 15.1, 16.1, 16.2, C.1 | Part I R4; Part II R2; Part III R5; Ch. 17 R1, R3, R4, R5, R6, R7; Ch. 18 R9; Ch. 19 R2 |
+| Reporting and Control: Financial Statement Analysis | 6.2, 8.1, 8.3, 12.2, 13.2, 16.1 | Part IV R2, R3; Ch. 17 R2, R8 |
+| Reporting and Control: Cost Accounting | 1.3, 2.3, 4.3, 6.3, 9.2, 9.3, 9.4, 10.4, 11.3, 12.3 | Part III R3; Ch. 18 R1, R2, R4, R9 |
+| Reporting and Control: Internal Control | 1.5, 1.6, 2.6, 3.6, 4.5, 4.6, 5.5, 5.6, 7.6, 8.2, 8.5, 8.6, 9.5, 10.5, 10.6, 11.5, 11.6, 12.1, 12.4, 12.5, 12.6, 14.5, 14.6, 15.6, 16.2, 16.4, 16.6, B.2, C.3 | Part I R5; Part II R5; Part III R2; Part IV R5; Ch. 19 R1, R2, R3, R4, R7, R8, R10 |
+| Strategy, Planning, and Performance: Budgeting and Forecasting | 2.4, 3.4, 7.1, 7.2 | Part II R4; Part III R4 |
+| Strategy, Planning, and Performance: Decision Analysis | 1.4, 7.3, 7.4, 15.4 | Part I R1; Part II R3, R4; Ch. 18 R6, R7, R8 |
+| Strategy, Planning, and Performance: Performance Management | 5.3, 5.4, 6.3, 8.3, 8.4, 11.2, 12.4, 13.3, 14.3, 15.2, 15.3, 16.4 | Part IV R3 |
+| Strategy, Planning, and Performance: Strategic Cost Management | 4.4, 6.4, 10.4, 14.4 | Part II R2; Part IV R4; Ch. 18 R2, R3, R4, R7 |
+| Cybersecurity and Data Privacy: Cybersecurity Awareness & Securing Data | B.1, B.2 | — |
+| Leadership: Communication Skills | 13.4, 13.6 | Part I R6; Part II R6; Part III R6; Part IV R6; Ch. 17 R9; Ch. 18 R10; Ch. 19 R9 |
+| Business Acumen and Operations: Operational Knowledge | 3.3, 9.4, 11.4, 12.3, 16.3 | Part III R3; Part IV R4; Ch. 18 R3 |
+
+: The exercises and IMA's management accounting competencies {#tbl-d-02}
+
+| Competency | Exercises | Cases and capstones |
+|:----------------------------------|:------------------------------------|:------------------------------|
+| IES 2 (a): financial accounting and reporting | 1.1, 1.2, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1, 5.2, 6.1, 6.2, 8.1, 8.2, 9.1, 9.2, 10.1, 10.2, 11.1, 11.2, 12.1, 12.2, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, C.1 | Part I R4; Part II R2; Part III R5; Part IV R2; Ch. 17 R1, R2, R3, R4, R5, R6, R7, R8; Ch. 18 R9 |
+| IES 2 (b): management accounting | 1.3, 1.4, 2.3, 2.4, 3.3, 3.4, 4.3, 4.4, 5.3, 5.4, 6.3, 6.4, 7.1, 7.2, 7.3, 7.4, 8.3, 8.4, 9.2, 9.3, 9.4, 10.3, 10.4, 11.3, 11.4, 12.3, 12.4, 13.3, 13.4, 14.3, 14.4, 15.3, 15.4, 16.3, C.2 | Part II R3, R4; Part III R3, R4; Part IV R3, R4; Ch. 18 R1, R2, R3, R4, R6, R7, R8, R9 |
+| IES 2 (f): audit | 1.5, 1.6, 2.5, 2.6, 3.5, 4.5, 4.6, 5.5, 6.5, 6.6, 7.5, 7.6, 8.1, 8.2, 8.5, 8.6, 9.5, 9.6, 10.2, 10.5, 10.6, 11.5, 11.6, 12.1, 12.2, 12.5, 12.6, 13.5, 14.6, 15.5, 15.6, 16.1, 16.2, 16.5, 16.6 | Part I R4; Part II R5; Part III R2; Part IV R5; Ch. 17 R4; Ch. 19 R2, R3, R4, R5, R6, R7 |
+| IES 2 (g): governance, risk management, and internal control | 4.6, 5.6, 8.3, 8.5, 8.6, 11.6, 12.4, 12.5, 16.4, 16.6, B.1, B.2, C.3 | Part II R5; Ch. 19 R1, R4, R8, R10 |
+| IES 2 (i): using information and communications technologies to analyze data | 1.2, 2.1, 2.2, 2.3, 2.4, 3.1, 3.4, 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.3, 5.4, 6.1, 6.2, 6.3, 6.6, 7.1, 7.4, 8.4, 9.1, 9.3, 9.4, 9.5, 10.1, 10.3, 10.4, 11.1, 11.2, 11.3, 11.4, 12.6, 13.1, 14.1, 14.2, 14.3, 14.4, 15.1, 15.2, 15.4, 16.4, 16.5, C.1, C.2 | Part I R3; Part II R1; Part III R1; Part IV R1; Ch. 17 R1; Ch. 19 R5 |
+| IES 2 (i): judging the adequacy of information and communications technology processes and controls | 3.6, 5.6, 9.6, 10.5, 13.5, 14.5, 14.6, B.2, C.3 | Ch. 19 R10 |
+| IES 3 (a): intellectual skills, evaluating data and information from several sources | 1.1, 1.3, 1.4, 1.5, 2.1, 2.5, 3.2, 3.3, 3.5, 6.4, 7.2, 12.3 | Part I R1, R2; Part II R3; Ch. 19 R1 |
+| IES 3 (b): interpersonal and communication skills | 13.3, 13.4, 13.6, 15.3, 16.3 | Part I R6; Part II R6; Part III R6; Part IV R6; Ch. 17 R9; Ch. 18 R5, R10; Ch. 19 R9 |
+| IES 4 (a): professional skepticism and professional judgment | 1.6, 2.6, 3.6, 5.2, 5.5, 6.5, 7.5, 7.6, 10.6, 11.5, 13.2, 13.6, 14.5, 15.5, 15.6 | Part I R5; Part III R2; Ch. 17 R2, R5, R8; Ch. 18 R1; Ch. 19 R3, R7, R8 |
+| IES 4 (b): ethical principles in handling data and information | B.1 | — |
+
+: The exercises and IFAC's International Education Standards {#tbl-d-03}
+
+| Competency | Exercises | Cases and capstones |
+|:----------------------------------|:------------------------------------|:------------------------------|
+| 5.1 Technology integration: Excel with Power Query and data models (Part II) | 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.6, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6 | Part I R3, R4; Part II R1, R2, R3, R4, R5; Ch. 17 R1, R5, R6, R7; Ch. 18 R4, R6, R7, R8, R9; Ch. 19 R6 |
+| 5.1 Technology integration: SQL (Part III) | 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6 | Part III R1, R2, R3, R4, R5; Ch. 17 R1, R3, R4, R7, R8; Ch. 18 R1, R2, R3, R9; Ch. 19 R1, R2, R4, R7 |
+| 5.1 Technology integration: Power BI (Part IV) | 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, B.1, B.2, C.1, C.2, C.3 | Part IV R1, R2, R3, R4, R5; Ch. 17 R2; Ch. 18 R5; Ch. 19 R5, R10 |
+| 5.2 Technology judgment, interpretation, and communication | 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 3.2, 3.3, 3.4, 3.5, 6.5, 7.6, 13.4, 13.6, 15.5, C.3 | Part I R1, R2, R5, R6; Part II R6; Part III R6; Part IV R6; Ch. 17 R9; Ch. 18 R10; Ch. 19 R3, R8, R9 |
+| 5.3 Learning to learn and continuous technological adaptability | 11.5, 12.6, 14.4, 15.2, 16.5, C.1, C.3 | Ch. 17 R9; Ch. 18 R10; Ch. 19 R10 |
+
+: The exercises and AACSB's Standard A5, Digital Agility {#tbl-d-04}
+
+{{< include _references.qmd >}}

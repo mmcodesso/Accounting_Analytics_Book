@@ -98,6 +98,10 @@ rules:
     class: constant
     files: ["facts/notes/templates/*"]
     literal: '.*'
+  - name: the quick reference and competency map appendices (chapter, exercise and requirement references, function arguments; they state no data values)
+    class: constant
+    files: ["appendices/a-quick-reference/appendix.qmd", "appendices/d-competencies/appendix.qmd"]
+    literal: '.*'
   - name: worksheet row numbers named in the steps (row 15, rows 22 to 26)
     class: constant
     literal: '\d{1,3}'
@@ -403,11 +407,11 @@ files:
     "3": val.register.unpaid_count
   chapters/16-audit-monitoring/chapter.qmd:
     constants: ["1"]
-  appendices/a-publishing-security/_tutorial-01.qmd:
+  appendices/b-publishing-security/_tutorial-01.qmd:
     constants: ["10"]                        # a CostCenterID row of the security table
-  appendices/a-publishing-security/_tutorial-02.qmd:
+  appendices/b-publishing-security/_tutorial-02.qmd:
     constants: ["2", "3"]                    # CostCenterIDs typed in the security table
-  appendices/a-publishing-security/appendix.qmd:
+  appendices/b-publishing-security/appendix.qmd:
     constants: ["25"]                        # the audiences an app supports
   cases/part-2-case.qmd:
     constants: ["5", "0", "40 percent"]
@@ -532,7 +536,7 @@ files:
     constants: ["3%", "0.03", "0.02", "1.5", "0.5"]
 
   # ---- scripts/figures: assertions and strings that mirror what the figures and the text show --------------
-  scripts/figures/appendix_a.py:
+  scripts/figures/appendix_b.py:
     "2734179.05": val.cost_center.budget.Sales
     "1018872.21": val.cost_center.actual.Sales
   scripts/figures/ch02.py:
@@ -593,6 +597,9 @@ files:
     "49": {key: val.surge.days.C}
     "64": val.plant.hourly_employees
     "4": {key: val.employee.production_manager}
+  scripts/figures/appendix_c.py:
+    constants: ["1.5", "380", "6", "9", "10"]   # a line width, layout bounds, and the month index of an assertion
+    "29756420.08": val.year.revenue
   scripts/figures/ch13.py:
     constants: ["5", "1%", "10", "12", "0.25", "0.1", "0.9", "4", "9"]
     "9,522": val.year.lines

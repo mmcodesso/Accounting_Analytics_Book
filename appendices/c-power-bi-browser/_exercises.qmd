@@ -1,0 +1,71 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on the exercises in the Charles River Reports semantic model and report you built in the browser, after Guided Tutorial C.3. Build each exercise on its own report page, named after it (such as `Ex C.2`), and keep each query you write in your Tests.dax file, under a comment line that names the exercise.
+
+### Financial Accounting Exercises
+
+**Exercise C.1: Control Totals by Quarter**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** Before anyone reads the report built in the browser, the controller wants its totals proved by quarter, in a query that does not depend on any page.
+
+**Requirements.**
+
+(1) In the model editor, add three measures to Key Measures: `List Amount` and `Discounts`, which sum ListAmount and DiscountAmount, and `Invoice Lines`, which counts the rows of SalesInvoiceLine with COUNTROWS. Format the two amounts with a thousands separator.
+
+(2) In DAX query view, write a query that returns, for each FiscalYear and Period of SalesInvoice, the invoice lines, revenue, list amount, and discounts, with the amounts rounded to the cent. Run it, and record the four rows of fiscal 2026.
+
+(3) Add up the four quarters of fiscal 2026, and compare the sums with the fiscal 2026 row of the Validation page. Record any difference.
+
+(4) Say which quarter of fiscal 2026 carries the largest share of the year's discounts, give the share, and name the promotions behind it.
+
+(5) Explain why a test kept as a query in Tests.dax remains evidence after someone changes the report's pages, and why in the browser it must be kept outside DAX query view.
+
+**Deliverable.** Tests.dax with the query and its fiscal 2026 rows, and short answers to requirements (3) to (5).
+
+### Managerial Accounting Exercises
+
+**Exercise C.2: Which Customers Got the Discounts, and When**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** The sales manager, who works on a Mac, wants to see which customer segments received the promotions' discounts, and in which months, before planning next year's calendar.
+
+**Requirements.**
+
+(1) Use the Discounts measure of Exercise C.1, or create it in Key Measures if you have not done that exercise.
+
+(2) On a page `Ex C.2`, add a year slicer as tiles set to fiscal 2026 and a matrix of Discounts with CustomerSegment on **Rows** and Month on **Columns**.
+
+(3) Add a line chart of Discounts by Month with CustomerSegment in **Legend**, and check that its months are in order.
+
+(4) Name the segment whose discounts peak in November, and the promotion that explains it. Name the months in which the other segments' discounts peak, and the promotion behind them.
+
+(5) Say which segment received no discounts at all, and in two sentences what the pattern means for a promotion calendar aimed at one segment.
+
+**Deliverable.** The page, and the answers to requirements (4) and (5).
+
+### Auditing Exercises
+
+**Exercise C.3: A Change, Recorded and Restored**
+
+**Table group:** Order-to-Cash
+
+**Scenario.** Internal audit wants evidence that the model built in the browser can be returned to a known state after a mistake. The exercise needs a Pro license, because version history does; without one, do requirements (2), (3), and (5), and restore the formula by hand from your notes.
+
+**Requirements.**
+
+(1) In the model editor, choose **File > Save to version history**, with the description `Before Exercise C.3`.
+
+(2) Run the test of Guided Tutorial C.3 from Tests.dax, and record its fiscal 2026 revenue.
+
+(3) Change the Revenue measure to sum ListAmount instead of LineTotal, run the test again, and record what changed.
+
+(4) Choose **File > Version history**, restore the version of requirement (1), and run the test a third time.
+
+(5) Write a change log entry: what changed, when, the test results before and after, and how the model was restored. Explain what version history records and what it does not, compared with the Power BI project under version control of Chapter 16.
+
+**Deliverable.** The three test results and the change log entry.

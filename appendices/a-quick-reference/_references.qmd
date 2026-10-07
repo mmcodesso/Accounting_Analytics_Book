@@ -1,0 +1,21 @@
+{{< pagebreak >}}
+
+## References
+
+Microsoft. (n.d.). *Excel functions (alphabetical)*. Microsoft Support. <https://support.microsoft.com/en-us/office/excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188>
+
+Microsoft. (2023). *DAX function reference*. Microsoft Learn. <https://learn.microsoft.com/en-us/dax/dax-function-reference>
+
+Microsoft. (2025). *Power Query M function reference*. Microsoft Learn. <https://learn.microsoft.com/en-us/powerquery-m/power-query-m-function-reference>
+
+Microsoft. (2026). *Visual calculations overview*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview>
+
+SQLite. (n.d.-a). *Built-in aggregate functions*. <https://www.sqlite.org/lang_aggfunc.html>
+
+SQLite. (n.d.-b). *Built-in scalar SQL functions*. <https://www.sqlite.org/lang_corefunc.html>
+
+SQLite. (n.d.-c). *Date and time functions*. <https://www.sqlite.org/lang_datefunc.html>
+
+SQLite. (n.d.-d). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.org/quirks.html>
+
+SQLite. (n.d.-e). *Window functions*. <https://www.sqlite.org/windowfunctions.html>

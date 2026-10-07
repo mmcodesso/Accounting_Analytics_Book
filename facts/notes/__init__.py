@@ -33,7 +33,7 @@ REPO = FACTS.parent
 TEMPLATES = HERE / "templates"
 LOCK = FACTS / "notes.lock.json"
 MARKER = re.compile(r"<!-- notes: (?P<key>[\w.-]+) -->\r?\n(?P<comment><!--.*?-->)", re.S)
-CHAPTERS = ["ch02", "case1", "ch04", "ch05", "ch06", "ch07", "ch08", "case2", "ch09", "ch10", "ch11", "ch12", "case3", "ch13", "ch14", "ch15", "ch16", "appendix_a", "case4", "ch17", "ch18", "ch19"]          # the modules with notes, in book order
+CHAPTERS = ["ch02", "case1", "ch04", "ch05", "ch06", "ch07", "ch08", "case2", "ch09", "ch10", "ch11", "ch12", "case3", "ch13", "ch14", "ch15", "ch16", "appendix_b", "appendix_c", "case4", "ch17", "ch18", "ch19"]          # the modules with notes, in book order
 
 
 @dataclass

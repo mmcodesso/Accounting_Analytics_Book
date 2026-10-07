@@ -152,7 +152,15 @@ files:
     - {rx: 'Codesso, M\. \({Y}\)', class: edition, why: "the book's own citation carries the edition's year"}
   front-matter/preface.qmd:
     - {rx: 'framework for management accountants in {Y}', class: real, why: "IMA framework published in 2025"}
+    - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
+    - {rx: 'Technical competence \({Y}\)', class: real, why: "the title of the 2026 revision of IES 2, in the preface's reference list"}
+  appendices/d-competencies/appendix.qmd:
+    - {rx: 'Revised versions, issued in {Y}', class: real, why: "IFAC issued the revised IES in 2025"}
+    - {rx: 'take effect in July {Y}', class: real, why: "the revised IES take effect on 1 July 2026"}
+    - {rx: 'standards were revised in {Y}', class: real, why: "IFAC's 2025 revision of the IES"}
+    - {rx: 'accounting standards in {Y}', class: real, why: "AACSB's 2026 accounting standards"}
   chapters/01-role-of-analytics/chapter.qmd:
+    - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
     - {rx: 'CPA Exam that took effect in January {Y}', class: real, why: "the CPA Evolution exam took effect in January 2024"}
     - {rx: 'competency framework in {Y}', class: real, why: "IMA framework published in 2025"}
     - {rx: 'In a {Y} survey by the AICPA', class: real, why: "a 2025 survey"}
@@ -161,7 +169,7 @@ files:
     - {rx: 'amended its standards in {Y}', class: real, why: "PCAOB amendments of 2024"}
   chapters/14-data-models-and-dax/_multiple-choice.qmd:
     - {rx: 'into February {Y}', class: role, why: "the ledger's last month (N); Microsoft is the date-table guidance"}
-  appendices/a-publishing-security/_exercises.qmd:
+  appendices/b-publishing-security/_exercises.qmd:
     - {rx: 'RLS guidance {Y}', class: real, why: "a Microsoft Learn page date"}
   back-matter/closing.qmd:
     - {rx: 'in effect since {Y}', class: real, why: "the IIA standards took effect in 2025"}

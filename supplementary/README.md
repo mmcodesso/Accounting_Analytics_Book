@@ -22,7 +22,7 @@ A start file holds the work as it stands at the end of the previous tutorial, so
 | Chapter14-companion.zip | The same project at the start of Tutorials 14.1, 14.2, and 14.3, and at the end of Chapter 14 |
 | Chapter15-companion.zip | The same project at the start of Tutorials 15.1, 15.2, and 15.3, and at the end of Chapter 15 |
 | Chapter16-companion.zip | Audit Monitoring at the start of Tutorials 16.2 and 16.3 (with Charles River Reports at the end of Chapter 15) and at the end of Chapter 16 |
-| AppendixA-companion.zip | Charles River Reports and Audit Monitoring at the start of Guided Tutorial A.1, and Charles River Reports at the start of A.2 |
+| AppendixB-companion.zip | Charles River Reports and Audit Monitoring at the start of Guided Tutorial B.1, and Charles River Reports at the start of B.2 |
 
 ## Solutions (`solutions/`)
 
@@ -45,7 +45,7 @@ Try the work first, then compare it with the solution. Every file explains itsel
 | Chapter14-exercises-pbi.zip | Chapter 14 Exercises - Solutions, a Power BI project |
 | Chapter15-exercises-pbi.zip | Chapter 15 Exercises - Solutions, a Power BI project |
 | Chapter16-exercises-pbi.zip | Chapter 16 Exercises - Solutions, a Power BI project |
-| AppendixA-exercises-pbi.zip | The exercises of the appendix on publishing and security |
+| AppendixB-exercises-pbi.zip | The exercises of the appendix on publishing and security |
 | PartIV-case.zip | Charles River Cash Case, the Part IV case |
 | Chapter17-capstone-excel.zip | Charles River Lender Package.xlsx, the Excel part of the Chapter 17 capstone |
 | Chapter17-capstone-pbi.zip | Charles River Lender Review, the Power BI part (reads Charles River Lender Package.xlsx from C:\CharlesRiver) |

@@ -102,6 +102,18 @@ def build_index() -> dict:
     return dict(commit=arch.COMMIT, files=files)
 
 
+# Folders renamed since commit 4feb03f: the publishing appendix became the second appendix on 2026-10-06.
+MOVED = {"appendices/a-publishing-security/": "appendices/b-publishing-security/"}
+
+
+def moved(path: str) -> str:
+    """The current path of a file the 4feb03f tree had at `path`."""
+    for old, new in MOVED.items():
+        if path.startswith(old):
+            return new + path[len(old):]
+    return path
+
+
 def check() -> int:
     sys.path.insert(0, str(HERE))
     import archive as arch
@@ -110,10 +122,10 @@ def check() -> int:
         old = arch.read(path).replace(CRLF, LF)
         if "<!-- dax-check:" not in old:
             continue
-        current = (REPO / path).read_text(encoding="utf-8")
+        current = (REPO / moved(path)).read_text(encoding="utf-8")
         for kind in sorted(set(re.findall(r"<!-- dax-check: (\w+) -->", old)) | {"measure", "column", "table", "query", "skip"}):
             want = blocks_with_markers(old, kind)
-            got = dax_blocks(REPO / path, kind, text=current)
+            got = dax_blocks(REPO / moved(path), kind, text=current)
             total += len(want)
             if want != got:
                 differences += 1

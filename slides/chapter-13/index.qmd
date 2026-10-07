@@ -59,7 +59,7 @@ A report can contain several pages of visuals.
 The service supports publishing, sharing, and dashboards.
 
 ::: {.notes}
-Purpose: clarify the product vocabulary used in the book. Allow 60-90 seconds. The chapter tutorials work in Desktop. A service dashboard is a separate surface of pinned tiles, while a report supports the pages and interactions we are building. A locally saved PBIX is the working artifact for this chapter. Licensing and distribution choices belong to the publishing guidance, not this exercise. Misconception to address: every report page is a service dashboard. Pause and ask: What file will you save after today's tutorial? Transition: prepare the source connection.
+Purpose: clarify the product vocabulary used in the book. Allow 60-90 seconds. The chapter tutorials work in Desktop. A service dashboard is a separate surface of pinned tiles, while a report supports the pages and interactions we are building. A locally saved PBIX is the working artifact for this chapter. Students without Windows can build the same model and report in the service, in a browser, where their institution allows it; their working artifact is then the semantic model and report in My workspace, and the book's appendix on Power BI in the browser walks through this chapter's model and first page and lists what changes. Licensing and distribution choices belong to the publishing guidance, not this exercise. Misconception to address: every report page is a service dashboard. Pause and ask: What file will you save after today's tutorial? Transition: prepare the source connection.
 :::
 
 ## Choose the named Excel Tables {#ch13-06 .balanced .stepwise}

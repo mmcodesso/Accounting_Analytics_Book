@@ -60,7 +60,10 @@ book:
         - chapters/19-customer-credits-audit/chapter.qmd
     - back-matter/closing.qmd
   appendices:
-    - appendices/a-publishing-security/appendix.qmd
+    - appendices/a-quick-reference/appendix.qmd
+    - appendices/b-publishing-security/appendix.qmd
+    - appendices/c-power-bi-browser/appendix.qmd
+    - appendices/d-competencies/appendix.qmd
 
 
 format:

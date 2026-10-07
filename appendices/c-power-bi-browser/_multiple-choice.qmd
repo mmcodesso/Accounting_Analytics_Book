@@ -1,0 +1,59 @@
+{{< pagebreak >}}
+
+## Multiple Choice Questions
+
+**1.** Why does Guided Tutorial C.1 upload CharlesRiver.xlsx instead of reading it from a folder on your computer, as Tutorial 13.1 does?
+
+A.  The service cannot read Excel Tables, only the worksheets that hold them
+B.  Uploading converts the workbook into CSV files, which the service loads faster
+C.  Power Query Online reads the workbook from a copy in your OneDrive for work or school
+D.  Uploading turns off the detection of column types from the first rows
+
+**2.** In Power Query Online, the InvoiceDate column of SalesInvoice shows five-digit numbers. What explains it, and what should you do?
+
+A.  The workbook stores it as an Excel date, a count of days, and Power Query Online reads the number; set the column's type to Date
+B.  The upload damaged the workbook's dates; upload the file again under another name
+C.  The column holds document numbers that were placed under the wrong heading; remove it with Choose columns
+D.  Power Query Online shows every date as a number until the model is created; leave it as it is
+
+**3.** You want Tutorial 13.2's cards, but the Visualizations pane of the report editor has no Card. What should you do?
+
+A.  Build the four totals with a table visual, because the service has no card visual
+B.  Switch the report from Editing view to Reading view, where the card appears
+C.  Open the semantic model in Editing mode and add the card there
+D.  Click the … below the visual types and choose Restore default visuals
+
+**4.** You close a model in the browser, and the DAX query tab that held your tests is gone when you open the model again. What explains it?
+
+A.  The query had an error, so the service removed its tab
+B.  DAX query view in the browser discards its tabs on close, so the tests belong in a text file
+C.  The model was open in Viewing mode, where query tabs are never saved
+D.  The report that reads the model was saved after the query was written
+
+**5.** With a card selected, you select the check box of SalesInvoiceID in the SalesInvoiceLine table, and the card splits into thousands of small cards. Why?
+
+A.  The card visual shows one card per row of any table it reads
+B.  A key that a relationship uses is set not to summarize, so it went to Categories; drag it into Value and choose Count (Distinct)
+C.  SalesInvoiceID is a text column, which a card cannot count
+D.  The year slicer was not set to Single select, so the card repeats for each year
+
+**6.** A line chart of discounts by month falls steadily from left to right, and its axis reads 2026-10, 2026-09, 2026-11, and so on. What happened?
+
+A.  The promotions really declined across the year, and the chart shows it
+B.  The Month column is text, which a line chart cannot order
+C.  The chart lost its date table when the report was saved
+D.  The chart is sorted by its values; sort it by Month, ascending, from its More options
+
+**7.** You add a table with Enter data in Power Query Online, opened from the model editor's Transform data. What applies the new table to the model?
+
+A.  Home > Close & Apply, as in Power BI Desktop
+B.  Refresh on the model editor's ribbon
+C.  Save, at the bottom right of Power Query Online
+D.  Create a semantic model only, from the arrow beside Create a report
+
+**8.** Guided Tutorial C.1 sets the type of Discount by hand, as Tutorial 13.1 does. Why is that still needed in Power Query Online?
+
+A.  Power Query Online also types each column from its first 200 rows, where every Discount is zero
+B.  The browser rounds every decimal column to two places unless it is typed
+C.  Power Query Online reads every number in a workbook as text until it is typed
+D.  The Key Measures table needs a decimal column for every rate

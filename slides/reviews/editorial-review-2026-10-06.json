@@ -1,0 +1,48 @@
+{
+ "status": "passed",
+ "sources": [
+  {
+   "chapter": "chapter-01",
+   "source": "chapters/01-role-of-analytics/_references.qmd",
+   "previous_review_sha256": "67175a9c9879b1b73d4ded4340f3fe584e467de276a4cef3b81ee628cb107413",
+   "reviewed_sha256": "aecdef83370ca14c62d80ddf8ee3bbfd7ab1d67fdfc7c3188dae0c68a6baa6b2",
+   "decision": "Reference entries updated (IFAC IES 2 (2026); IMA's 2025 framework at its white-paper URL). The deck's reference slide lists the book, Vasarhelyi et al. (2015), and Earley (2015) only; unchanged."
+  },
+  {
+   "chapter": "chapter-01",
+   "source": "chapters/01-role-of-analytics/_summary.qmd",
+   "previous_review_sha256": "fda4c40a51aef40de02257cb51be430b788cfbbcc24707098b2b9d55bb5027c8",
+   "reviewed_sha256": "0f4c94cbe2437803963b1beae794e6260a11cb0db8156fc288b4db898c0a011b",
+   "decision": "Summary now names IFAC instead of IAESB. No slide restates the summary's list of professional bodies; unchanged."
+  },
+  {
+   "chapter": "chapter-01",
+   "source": "chapters/01-role-of-analytics/chapter.qmd",
+   "previous_review_sha256": "008d50d583cc500954fb2fdbdd0cf8b39399244f27679e5a83caf43eb4a4e366",
+   "reviewed_sha256": "a3b19414fd04c41b114eefac42b8b9fd26871f9de1917d100d27ed62f59f68b5",
+   "decision": "Citation update only: IAESB (2019) became IFAC (2025), IES 2 (2026), and the professional bodies now read AICPA, NASBA, IMA, and IFAC. The deck cites neither source and names no professional body, so slides and notes remain unchanged."
+  },
+  {
+   "chapter": "chapter-06",
+   "source": "chapters/06-descriptive-analytics/_references.qmd",
+   "previous_review_sha256": "5394aca5733a8b4078305951290b0d1bd740bb846dd929a3ef1d840039bdbf9c",
+   "reviewed_sha256": "824fdc2974a3562ee85b8f00dd7a61c68769fb227e4c1cbed57160e3a36ae90e",
+   "decision": "IMA reference updated to its 2025 white-paper title and URL. The deck cites Anscombe (1973) only; unchanged."
+  },
+  {
+   "chapter": "chapter-13",
+   "source": "chapters/13-power-bi-essentials/chapter.qmd",
+   "previous_review_sha256": "ac621d4b5278fe5d83d1b5632dcbaae046ae91876c18c22b0c7fc66f081ad76c",
+   "reviewed_sha256": "ee4bcf819e408f5a5c4ba21ffc2a8014e8f87b4711d622b0ea70c07e40c0aeac",
+   "decision": "The In Practice on Mac users now names the browser path and links the appendix on Power BI in the browser. Added the browser path, its working artifact (the model and report in My workspace), and the appendix to the public notes of slide ch13-05; slide narrative and visual layout remain unchanged."
+  }
+ ],
+ "notes_updated": [
+  {
+   "chapter": "chapter-13",
+   "slide_id": "ch13-05",
+   "addition": "Students without Windows can build the same model and report in the service, in a browser, where their institution allows it; their working artifact is then the semantic model and report in My workspace, and the book's appendix on Power BI in the browser walks through this chapter's model and first page and lists what changes."
+  }
+ ],
+ "approved_by": "Author, 2026-10-06: \"fix the slides\", then \"I aprove\" after reviewing these decisions."
+}

@@ -225,12 +225,12 @@ def build_extra(extra: dict, variables: dict, out: Path) -> Path:
 # --- Excel chains ----------------------------------------------------------------------------------------------
 
 def chapter_id(text: str) -> int | str:
-    """A chapter number, or an appendix letter ("A")."""
+    """A chapter number, or an appendix letter ("B")."""
     return int(text) if str(text).isdigit() else str(text).upper()
 
 
 def folder_name(ch: int | str) -> str:
-    """The build folder of a chapter (Chapter13) or an appendix (AppendixA)."""
+    """The build folder of a chapter (Chapter13) or an appendix (AppendixB)."""
     return f"Chapter{ch:02d}" if isinstance(ch, int) else f"Appendix{ch}"
 
 
@@ -248,7 +248,7 @@ def tutorials_in(chapter: int | str) -> int:
 
 def checkpoint_roles(t: str, chapters: list[int | str]) -> list[tuple[int | str, str]]:
     """The folders the end file of tutorial t goes into: (chapter of the folder, folder name). An appendix that
-    follows a chain's last chapter (chapters [13, 14, 15, "A"]) starts from that chapter's end file."""
+    follows a chain's last chapter (chapters [13, 14, 15, "B"]) starts from that chapter's end file."""
     head, k = t.split(".")
     ch, k = chapter_id(head), int(k)
     if k < tutorials_in(ch):

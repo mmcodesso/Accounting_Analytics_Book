@@ -10,7 +10,7 @@ Domino, M. A., Schrag, D., Webinger, M., & Troy, C. (2021). Linking data analyti
 
 Financial Accounting Standards Board. (2014). *Revenue from contracts with customers (Topic 606)* (Accounting Standards Update No. 2014-09). <https://storage.fasb.org/ASU%202014-09_Section%20A.pdf>
 
-Institute of Management Accountants. (2025). *IMA competency framework*. <https://www.imanet.org/career-resources/competency-framework>
+Institute of Management Accountants. (2025). *IMA expanded management accounting competency framework: Advancing competencies for the 21st-century management accountant*. <https://mc-69e30ef4-758e-4371-ac6f-2657-cdn-endpoint.azureedge.net/-/media/IMA/Files/Home/Career-Resources/Competency-Framework/Competency-Framework-White-Paper.ashx>
 
 Microsoft. (2026a). *Calculate values in a PivotTable*. Microsoft Support. <https://support.microsoft.com/en-us/office/calculate-values-in-a-pivottable-11f41417-da80-435c-a5c6-b0185e59da77>
 

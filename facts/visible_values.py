@@ -538,7 +538,7 @@ CELL_DOLLAR = re.compile(r"(?:[A-Z}{]|\$)\$?$")
 MODULE_CHAPTERS = {"analysis": range(4, 8), "audit": [8], "case2": range(4, 9), "case3": range(9, 13),
                    "case4": range(13, 17), "reports": range(13, 16), "audit_monitoring": [16], "excel_analysis": range(4, 8),
                    "chapter01": [1], "foundations": [2, 3], "invoice_margin": [1, 2, 3, 6], "expected": range(4, 9),
-                   "notes": range(4, 20), "solutions": range(4, 20), "exa": [], "appendix_a": []}
+                   "notes": range(4, 20), "solutions": range(4, 20), "exb": [], "appendix_b": []}
 
 
 def module_chapters(path: str) -> set[int]:

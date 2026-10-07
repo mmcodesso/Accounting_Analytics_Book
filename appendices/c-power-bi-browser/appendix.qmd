@@ -1,0 +1,101 @@
+# Power BI in the Browser {#sec-appendix-browser}
+
+Power BI Desktop runs only on Windows. The Power BI service, at app.powerbi.com, does most of the same work in any browser, on a Mac, a Chromebook, or a Windows computer without Desktop: it builds a semantic model from CharlesRiver.xlsx with Power Query, relates the model's tables, holds its measures and tests them with DAX queries, and builds the report's pages (Microsoft, 2026b). This appendix gives you a starting point for that path. Its three tutorials rebuild Chapter 13's model and its Sales and Discounts page in the browser and add a first measure, and its last section lists what else changes, so that you can follow the rest of Part IV on your own.
+
+The browser's tools do the same work as Desktop's. What changes is where a command lives, a few defaults, and how your work is saved, and the tutorials stop at each of those places. The companion start files of the Power BI chapters are Power BI projects, which only Desktop can open, so in the browser you build your own model from the workbook in Guided Tutorial C.1 and carry it through the chapters.
+
+
+## What the Browser Needs
+
+You sign in to the service with your school account; a personal email address does not work. What you can do then depends on your license and on settings your institution controls. A free license lets you build semantic models and reports in My workspace, your private area of the service, for your own use (Microsoft, 2026c). A Pro license, which some institutions give their students, adds shared workspaces, where you can work with others, and a model's version history (Microsoft, 2025d). Editing a model in the browser also depends on a setting of your institution's Power BI administrator, *Users can edit semantic models in the Power BI service* (Microsoft, 2026d). If the service does not let you create or edit a model, ask your instructor, and use Desktop in a campus computer lab or a Windows virtual machine instead.
+
+@tbl-c-01 compares the two ways of working. Most of the differences are in where a command lives, not in what it does.
+
+| Task | Power BI Desktop | Power BI service in a browser |
+|:--------------------|:--------------------------|:--------------------------|
+| Read the workbook | From a folder on your computer | From a copy uploaded to your OneDrive for work or school |
+| Shape the data | The Power Query Editor | Power Query Online, with the same steps; most dates arrive as numbers |
+| Relate tables, write measures | Model view and the ribbon | The model editor, in Editing mode |
+| Look at a table's rows | Table view | A DAX query, or a table visual |
+| Test with DAX queries | DAX query view, tabs saved in the file | DAX query view, tabs discarded on close |
+| Build report pages | Report view | The report editor, in a browser tab of its own |
+| Save | The .pbix file | The model as you work; the report with its Save button |
+| Test a role | View as | Test as role, in the workspace |
+| Use the companion start files | Yes | No |
+
+: Power BI Desktop and the Power BI service {#tbl-c-01}
+
+{{< include _tutorial-01.qmd >}}
+
+
+## Reports in the Browser
+
+A report built in the service opens in Editing view, the report editor, in a browser tab of its own. Once it is saved, it opens in Reading view, the view its readers use, and Edit returns it to the report editor (Microsoft, 2025b). The editor has the panes of Desktop's Report view: Filters; Visualizations, with Build visual, Format visual, and Analytics; and Data. Its commands sit on a short menu bar and a row of buttons rather than a ribbon. A report is saved in the workspace, beside the semantic model it reads, and several reports can read the same model.
+
+Visuals, wells, slicers, and format settings work as in Desktop, with four differences that Tutorial 13.2's page runs into. The Card visual can be missing from the list of visuals until you restore the default visuals. A key column that a relationship uses is set not to summarize, so placing it in a visual makes it a category, not a count, until you move it to the value well and choose Count (Distinct). A card's display units are set card by card. And a line chart whose axis is a text column, such as Month, can arrive sorted by its values rather than by its categories.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A line chart sorted by its values still draws a line, and the line looks like a trend. With the months ordered from the largest discount to the smallest, the promotions of the autumn become a steady decline across the year. Read the axis labels of every line chart before you read the line, and sort a time axis by its time column.
+:::
+
+{{< include _tutorial-02.qmd >}}
+
+
+## Measures in the Browser
+
+The model editor opens a semantic model in Viewing mode, which shows the model without changing it, or in Editing mode, which changes it (Microsoft, 2026b). A model you have just created opens in Editing mode. In Editing mode, every change is saved as you make it, and there is no undo. A Pro license keeps the model's last versions in its version history, from which an earlier version can be restored (Microsoft, 2025d). Before a large change, such as the restructuring of Tutorial 14.1, save a version first.
+
+Measures are written as in Desktop. New measure opens a formula bar above the model's diagram and adds the measure to the table selected in the Data pane, and the Properties pane holds what Desktop's Measure tools tab does: the name, the format, the display folder, and whether the measure is hidden. A small table typed by hand, such as the Key Measures table of Tutorial 14.2, is created with Enter data in Power Query Online, which Transform data opens, and its Save button applies the new table to the model. The same Enter data creates the other tables the chapters type by hand: Steps in Tutorial 15.1, Tests and Dispositions in Chapter 16, and Security in the appendix on publishing and security.
+
+DAX query view runs queries as Desktop's does, from the tab below the model's diagram. Its query tabs survive as long as you keep the model open, but they are discarded when you close it, so keep the tests you write in the chapters, such as the Tests tab of Tutorial 14.2, in a text file, and paste them back when you need them (Microsoft, 2025a).
+
+{{< include _tutorial-03.qmd >}}
+
+
+## Following Part IV in the Browser
+
+With the three tutorials done, you can follow the rest of Part IV in the browser. Where a tutorial starts from a companion file, start instead from your own model and report as they stood at the end of the tutorial before it. Five differences recur:
+
+- The workbook stores nearly all of its dates as Excel dates, and each of them arrives as a number, as InvoiceDate did in Guided Tutorial C.1. Set each such column you load to Date, or to Date/Time where its time matters, such as JournalEntry's CreatedDate in Chapter 16. A column that already shows dates, such as Customer's CustomerSince, which the workbook stores as text, needs no change.
+- Tables added later, such as the ledger of Tutorial 14.3, come in through Transform data. In Power Query Online, choose Home > Get data > Excel workbook, keep Link to file, click Browse OneDrive..., and pick the copy you uploaded, which is in My files > Apps > Microsoft Power Query > Uploaded Files. Click Next, select the new Tables in Choose data, click Create, and click Save to add them to the model. Recent data offers only the Tables the model already reads.
+- A step that reads Table view's row count reads a DAX query with COUNTROWS, or the total row of a table visual, instead.
+- The tests you keep in DAX query view go in your text file as well.
+- Guided Tutorial B.1's View as becomes Test as role, in the semantic model's security settings in the workspace, and Guided Tutorial B.2 skips Publish, because your model is already in the service.
+
+@tbl-c-02 gives the browser's names for the commands of the Power BI chapters that differ from Desktop's.
+
+| In Power BI Desktop | In the browser |
+|:--------------------------------|:--------------------------------|
+| Home > Get data > Excel workbook, then the Navigator | Create > Get Data > Excel workbook > Upload file, then Choose data |
+| The Removed Other Columns step | The Choose columns step |
+| View > Column quality, Column distribution | View > Data view > Enable column profile, then its options |
+| Home > Close & Apply | Create a semantic model only, the first time; Save, later |
+| File > Options and settings > Options | File > Options, in the model editor |
+| Table view | DAX query view, or a table visual |
+| Column tools > Summarization > Don't summarize | Properties > Advanced > Summarize by > None |
+| Column tools > Sort by column | Properties > Advanced > Sort by column |
+| Table tools > Mark as date table | Right-click the table > Mark as date table |
+| Home > Enter data | Transform data > Home > Enter data |
+| Card > Callout values > Display units | Card > Callout > Value > Display units, card by card |
+| Format > Edit interactions | The visual interactions button > Edit interactions |
+| Insert > Buttons > Navigator > Page navigator | Buttons > Navigator > Page navigator |
+| Design > Themes | View > Theme |
+| Optimize > Performance analyzer | View > Performance analyzer |
+| Modeling > View as | Test as role, in the semantic model's security settings |
+| File > Save | Saved as you work in the model editor; Save in the report editor |
+
+: Desktop commands and their names in the browser {#tbl-c-02}
+
+::: {.callout-tip .in-practice icon=false}
+## In Practice
+A model's version history in the service is a modest form of the change control that Chapter 16 asks of a report. Each version records the model as it stood, and restoring one undoes a change that broke a test. It is not a substitute for a Power BI project under version control, because it keeps only the last few versions and does not say who changed what, but it gives a team without Desktop a way back from a mistake.
+:::
+
+{{< include _key-terms.qmd >}}
+
+{{< include _multiple-choice.qmd >}}
+
+{{< include _exercises.qmd >}}
+
+{{< include _references.qmd >}}

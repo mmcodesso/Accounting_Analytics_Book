@@ -252,7 +252,7 @@
      242764.56
     ]
    },
-   "text": "<!-- Instructor notes, Exercise 4.1: invoices by fiscal year 2024 / 2025 / 2026: 6,735 / 7,008 / 7,171 (20,914 in all).\n     SubTotal 27,313,723.48 / 29,376,702.28 / 29,756,420.08 (86,446,845.84); FreightAmount 192,134.79 / 214,544.33 / 214,588.22;\n     TaxAmount 1,787,880.84 / 1,923,431.50 / 1,948,116.12; GrandTotal 29,293,739.11 / 31,514,678.11 / 31,919,124.42.\n     SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted (158 / 232 / 222 credit memos,\n     SubTotal 145,655.35 / 201,104.38 / 242,764.56), sales tax is a liability collected for the government rather than revenue, and freight\n     billed is recorded in its own revenue account (4050). Grid formula, for example\n     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[InvoiceDate],\">=\"&DATE($A5,1,1),SalesInvoice[InvoiceDate],\"<=\"&DATE($A5,12,31)),\n     pasted (not filled) across, with the sum column changed per measure or locked with [[Col]:[Col]]. -->",
+   "text": "<!-- Instructor notes, Exercise 4.1: invoices by fiscal year 2024 / 2025 / 2026: 6,735 / 7,008 / 7,171 (20,914 in all).\n     SubTotal 27,313,723.48 / 29,376,702.28 / 29,756,420.08 (86,446,845.84); FreightAmount 192,134.79 / 214,544.33 / 214,588.22;\n     TaxAmount 1,787,880.84 / 1,923,431.50 / 1,948,116.12; GrandTotal 29,293,739.11 / 31,514,678.11 / 31,919,124.42.\n     SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted (158 / 232 / 222 credit memos,\n     SubTotal 145,655.35 / 201,104.38 / 242,764.56), sales tax is a liability collected for the government rather than revenue, and freight\n     billed is recorded in its own revenue account (4050). Grid formula, for example\n     =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[[InvoiceDate]:[InvoiceDate]],\">=\"&DATE($A5,1,1),SalesInvoice[[InvoiceDate]:[InvoiceDate]],\"<=\"&DATE($A5,12,31)),\n     entered once and filled right and down: filling across shifts SubTotal to the adjacent FreightAmount, TaxAmount, and GrandTotal\n     columns, as the grid needs, while the locked [[InvoiceDate]:[InvoiceDate]] and the mixed $A5 stay put (the Watch out on structured\n     references). Pasted instead of filled, the formula keeps SubTotal in every column. -->",
    "failed": []
   },
   "ch04.ex2": {
@@ -1061,7 +1061,7 @@
     "others_shipped": "on 2026-01-01",
     "freight": 212820.03
    },
-   "text": "<!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at 2026-12-31 (GLEntry with PostingDate before 2027-01-01, without\n     JE-2026-000296 and JE-2026-000297, 45 rows) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both\n     67,107,722.36. Revenue and expense accounts show only fiscal 2026 because the 2024 and 2025 closing entries zeroed them.\n     Income statement: operating revenue 29,973,822.48 (100.82% of net revenue); sales returns and allowances -242,764.56 (4060); net\n     revenue 29,731,057.92; cost of goods sold -18,634,303.63 (62.68%; includes freight-out 5050, purchase price variance 5060, and\n     manufacturing variance 5080); gross margin 11,096,754.29 (37.32%); operating expenses -6,471,696.58 (21.77%); operating income\n     4,625,057.71 (15.56%); other income and expense -121,446.47 (loss on asset disposal 7020 of 92,500.00, an account typed Revenue with\n     subtype Other Income or Expense, and interest expense 7030 of 28,946.47); net income 4,503,611.24 (15.15%), equal to JE-2026-000297.\n     Balance sheet: assets 39,328,524.11 = liabilities 13,896,428.43 + equity 20,928,484.44 + net income 4,503,611.24. The balances\n     include the unsupported opening balances found in Chapter 8. Revenue reconciliation, account balance vs InvoiceLines 2026: 4010\n     17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020\n     5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030\n     3,278,211.11 vs Textiles, equal; 4040\n     1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080\n     1,213,344.00 vs Services, equal. The differences are\n     SI-2026-013742 (Furniture, dated 2025-12-04), SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03),\n     dated in 2025 with the next year's number and posted 2026-01-01. InvoiceLines assigns them to fiscal 2025 by their invoice dates,\n     the ledger to fiscal 2026. The date that determines the period is the delivery of the goods, not the invoice date or number (every\n     shipment is delivered in the year it ships). Only SI-2026-013742 shipped in 2025 (on 2025-12-06), so its 3,233.18 is a revenue cutoff error; the other\n     two shipped on 2026-01-01, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for\n     every invoice. Freight revenue (4050, 212,820.03) has no invoice line. -->",
+   "text": "<!-- Instructor notes, Exercise 6.1: the pre-closing trial balance at 2026-12-31 (GLEntry with PostingDate before 2027-01-01, without\n     the 45 GL rows of the closes JE-2026-000296 and JE-2026-000297) has 71 accounts, 4 of them with a zero balance; debit and credit balances are both\n     67,107,722.36. Revenue and expense accounts show only fiscal 2026 because the 2024 and 2025 closing entries zeroed them.\n     Income statement: operating revenue 29,973,822.48 (100.82% of net revenue); sales returns and allowances -242,764.56 (4060); net\n     revenue 29,731,057.92; cost of goods sold -18,634,303.63 (62.68%; includes freight-out 5050, purchase price variance 5060, and\n     manufacturing variance 5080); gross margin 11,096,754.29 (37.32%); operating expenses -6,471,696.58 (21.77%); operating income\n     4,625,057.71 (15.56%); other income and expense -121,446.47 (loss on asset disposal 7020 of 92,500.00, an account typed Revenue with\n     subtype Other Income or Expense, and interest expense 7030 of 28,946.47); net income 4,503,611.24 (15.15%), equal to JE-2026-000297.\n     Balance sheet: assets 39,328,524.11 = liabilities 13,896,428.43 + equity 20,928,484.44 + net income 4,503,611.24. The balances\n     include the unsupported opening balances found in Chapter 8. Revenue reconciliation, account balance vs InvoiceLines 2026: 4010\n     17,398,287.56 vs Furniture 17,395,054.38 (+3,233.18); 4020\n     5,998,649.16 vs Lighting 5,997,536.93 (+1,112.23); 4030\n     3,278,211.11 vs Textiles, equal; 4040\n     1,872,510.62 vs Accessories 1,872,273.66 (+236.96); 4080\n     1,213,344.00 vs Services, equal. The differences are\n     SI-2026-013742 (Furniture, dated 2025-12-04), SI-2026-013741 (Lighting, 2025-11-29), and SI-2026-013743 (Accessories, 2025-12-03),\n     dated in 2025 with the next year's number and posted 2026-01-01. InvoiceLines assigns them to fiscal 2025 by their invoice dates,\n     the ledger to fiscal 2026. The date that determines the period is the delivery of the goods, not the invoice date or number (every\n     shipment is delivered in the year it ships). Only SI-2026-013742 shipped in 2025 (on 2025-12-06), so its 3,233.18 is a revenue cutoff error; the other\n     two shipped on 2026-01-01, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for\n     every invoice. Freight revenue (4050, 212,820.03) has no invoice line. -->",
    "failed": []
   },
   "ch06.ex2": {
@@ -1376,9 +1376,18 @@
      }
     ],
     "largest": "largest",
+    "example": {
+     "group": "Lighting",
+     "q": 1,
+     "diff": 215084.8,
+     "driver": "volume",
+     "units": 0.151915,
+     "price": 0.005992
+    },
+    "furniture_q4_missed": true,
     "lines": "the largest product line"
    },
-   "text": "<!-- Instructor notes, Exercise 6.5: flagged (over 10% and over $50,000): Lighting Q1 +215,084.80 (+15.9%), Textiles Q4 +166,764.46 (+24.4%), Accessories Q2 -76,547.35 (-15.0%), Services Q2 -66,187.40 (-20.9%), Services Q3 -52,688.80 (-16.4%), Services Q4 +77,195.65 (+26.9%).\n     Not flagged: Furniture Q4 -315,983.47 (-7.1%), the largest dollar difference, and Furniture Q2 +266,724.77 (+6.2%). A percentage test\n     alone misses large dollar differences in the largest product line; a tolerable amount based on materiality, or an expectation that\n     reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it\n     ignores growth and known events, which students may note. Follow-up examples: for Furniture Q4, the promotion discounts (Tutorial 6.3)\n     and the late-invoiced promotion lines (Tutorial 5.2); for Services, engagement and time records by quarter. -->",
+   "text": "<!-- Instructor notes, Exercise 6.5: flagged (over 10% and over $50,000): Lighting Q1 +215,084.80 (+15.9%), Textiles Q4 +166,764.46 (+24.4%), Accessories Q2 -76,547.35 (-15.0%), Services Q2 -66,187.40 (-20.9%), Services Q3 -52,688.80 (-16.4%), Services Q4 +77,195.65 (+26.9%).\n     Not flagged: Furniture Q4 -315,983.47 (-7.1%), the largest dollar difference, and Furniture Q2 +266,724.77 (+6.2%). A percentage test\n     alone misses large dollar differences in the largest product line; a tolerable amount based on materiality, or an expectation that\n     reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it\n     ignores growth and known events, which students may note. Follow-up examples: Lighting Q1, the largest flagged\n     difference, is mostly volume (units +15.2%, price per unit +0.6%), so the evidence is its invoice lines\n     by customer and item, traced to their orders and shipping documents, and the question is which customers bought more and why; for\n     Services, engagement and time records by quarter. Furniture Q4, which the threshold misses, would still call for the promotion\n     discounts (Tutorial 6.3) and the late-invoiced promotion lines (Tutorial 5.2). -->",
    "failed": []
   },
   "ch06.ex6": {
@@ -1520,7 +1529,7 @@
     "main": 8,
     "reversed": 7
    },
-   "text": "<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08; Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.89; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66, 923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of\n     revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez, Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816), Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10, 662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:\n     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, September to October 2025) and 6 (Wholesale, November 2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are\n     left for the audit work later in Part II. -->",
+   "text": "<!-- Instructor notes, Exercise 6.6: 2026 by group (lines, revenue, average, median): Furniture 3,496, 17,395,054.38, 4,975.70, 4,467.08; Lighting 2,496, 5,997,536.93, 2,402.86, 2,006.90; Textiles 1,359, 3,278,211.11, 2,412.22, 1,778.18; Accessories 2,027, 1,872,273.66, 923.67, 815.28; Services 144, 1,213,344.00, 8,426.00, 7,803.20. 209 customers invoiced in 2026; top 5 hold 9.9% and top 10 hold 17.8% of\n     revenue, all in the Strategic segment (largest: Glenn-Estrada, Wright PLC, Eaton, Robertson and Grant, Richardson, Porter and Chavez, Thomas Ltd), so concentration is low. Pricing by revenue: Segment Price List 83.6% (8,405 lines), Customer Price List 10.7% (816), Base List 4.1% (144, the hourly design services only), Approved Override 1.6% (157). Promotions in 2026 (lines, discount): 5: 10, 662.89; 6: 54, 6,858.14; 7: 68, 30,478.57; 8: 576, 296,053.58; 9: 88, 28,057.57. Promotion lines as a share of each group's lines:\n     Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0%. Promotions 5 (Textiles, September to October 2025) and 6 (Wholesale, November 2025) have lines invoiced in January to March 2026, the same late-invoicing pattern as promotion 8. Promotion 7's effective dates are\n     left for the audit work later in Part II. -->",
    "failed": []
   },
   "ch07.ex1": {
@@ -1901,12 +1910,26 @@
      "January",
      "February"
     ],
+    "accrual_rows": 27933,
+    "misdated": 9,
+    "other_month": 6,
+    "low": 0.015,
+    "high": 0.04,
+    "share": [
+     0.620114,
+     0.406813
+    ],
+    "share_year": 0.513094,
+    "rate": [
+     0.018287,
+     0.020226
+    ],
     "accruals": 570717.47,
     "adj_rows": 232,
     "adj_amount": 4369.54,
     "gl": 566347.93
    },
-   "text": "<!-- Instructor notes, Exercise 7.5: revenue on invoice count: R2 0.725 with January 2024, 0.432 without it (slope about 3,563 per invoice); the\n     residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot\n     reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954.\n     2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%.\n     The January and February differences nearly offset, which suggests timing of accruals between months rather than a misstatement;\n     evidence: accrual dates against invoice dates, and credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment\n     rows (232, from credit memos) 4,369.54 = GL 566,347.93. -->",
+   "text": "<!-- Instructor notes, Exercise 7.5: revenue on invoice count: R2 0.725 with January 2024, 0.432 without it (slope about 3,563 per invoice); the\n     residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot\n     reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954.\n     2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%.\n     The January and February differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its\n     invoice's date except 9 of 27,933 (the invoices dated before their first shipment, Tutorial 2.1; 6 of them in another month). The cause is the\n     customer mix: commission rates run from 1.5% (Wholesale) to 4% (design services), and Wholesale was 62% of January's commission\n     base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%, which one regression slope\n     cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment\n     rows (232, from credit memos) 4,369.54 = GL 566,347.93. -->",
    "failed": []
   },
   "ch07.ex6": {
@@ -8695,7 +8718,7 @@
      ]
     ]
    },
-   "text": "<!-- Instructor notes, Exercise 15.6 (SQL): direct lines that join both an operation and a clock entry: 51,097. Disagreements by year\n     (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.5; 15,522 in\n     all. 2026 matrix (hours; the first row in full, the others with their largest off-diagonal cell): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9, Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8, at Finishing and Test 698.3; Finishing operations at Finishing 8,101.6, at Assembly 1,354.8; Cutting operations at Cutting 3,696.8, at Assembly 573.9; QA operations at QA 674.9, at Assembly 420.8.\n     After the operation's end: 2,243 of the 3,137 disagreeing\n     lines (72%) against 5,823 of the 13,905 direct lines that join both paths (42%; 13,913 direct lines in all), so the disagreement concentrates in the late time of Chapter 12. Indirect\n     2026 by clock work center: Assembly 16,830.0, Finishing and Test 9,561.6, Cutting 7,477.9, Packing 3,354.4, QA 1,249.0. Conclusion:\n     the operation path answers \"what work was the time charged to\"; the clock path \"where the employee was\"; neither alone supports\n     the Packing finding, which needs corroboration (Chapter 12). -->",
+   "text": "<!-- Instructor notes, Exercise 15.6 (SQL): direct lines that join both an operation and a clock entry: 51,097. Disagreements by year\n     (lines / of / hours): 2024 8,939 / 21,401 / 18,573.2; 2025 3,446 / 15,791 / 12,080.0; 2026 3,137 / 13,905 / 14,732.6; 15,522 in\n     all. 2026 matrix (hours; the first row in full, the others with their largest off-diagonal cell): Packing operations clocked at Packing 24,413.5, at Assembly 4,325.8, Finishing and Test 2,311.9, Cutting 1,689.9, QA 285.9; Assembly operations at Assembly 11,122.8, at Finishing and Test 698.3; Finishing operations at Finishing 8,101.6, at Assembly 1,354.8; Cutting operations at Cutting 3,696.8, at Assembly 573.9; QA operations at QA 674.9, at Assembly 420.8.\n     After the operation's end: 2,243 of the 3,137 disagreeing\n     lines (72%) against 5,823 of the 13,905 direct lines that join both paths (42%; 13,913 direct lines in all), so the disagreement concentrates in the late time of Chapter 12. Indirect\n     2026 by clock work center: Assembly 16,830.0, Finishing and Test 9,561.6, Cutting 7,477.9, Packing 3,354.4, QA 1,249.0. Conclusion:\n     the operation path answers \"what work was the time charged to\"; the clock path \"where the employee was\"; neither alone supports\n     the Packing finding, which needs corroboration (Chapter 12). -->",
    "failed": []
   },
   "ch15.mcq": {
@@ -9425,7 +9448,7 @@
     ],
     "entries": 5952
    },
-   "text": "<!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the\n     first is 2024-05-31, then surge days in 26 of the 30 months from July 2024 (about 3 a month), up to 7 in October 2026; every surge day has all 64 hourly\n     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705\n     of the year's manufacturing overtime; overtime on other days did not grow (6,273, 6,426, 5,918). All 5,952 surge entries\n     were approved by the Production Manager on the work date. Distinct values of total hours: Group By with \"Count Distinct Rows\"\n     on the hours column; one value means everyone clocked the same hours. (5) The production manager approved every entry the\n     test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found\n     can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The\n     Plant page's overtime share is a management measure; the surge-day test is an audit test. -->",
+   "text": "<!-- Instructor notes, Exercise 16.3 (SQL; Chapter 12 H8): surge days 12 in 2024, 32 in 2025, 49 in 2026 (93 in all); the\n     first is 2024-05-31, then surge days in 26 of the 30 months from July 2024 (about 3 a month), up to 7 in October 2026; every surge day has all 64 hourly\n     manufacturing employees at 8.0 regular plus 4.5 overtime hours. Surge overtime 3,456, 9,216, and 14,112 hours, 0.355, 0.589, and 0.705\n     of the year's manufacturing overtime; overtime on other days did not grow (6,273, 6,426, 5,918). All 5,952 surge entries\n     were approved by the Production Manager on the work date. Distinct values of total hours: Group By's \"Count Distinct Rows\"\n     counts distinct rows, not the values of one column, so the aggregation is written List.Count ( List.Distinct (\n     [TotalHours] ) ) (or only WorkDate and TotalHours are kept before grouping); one value means everyone clocked the\n     same hours. (5) The production manager approved every entry the\n     test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found\n     can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The\n     Plant page's overtime share is a management measure; the surge-day test is an audit test. -->",
    "failed": []
   },
   "ch16.ex4": {
@@ -9638,8 +9661,8 @@
    "text": "<!-- Answer key, Chapter 16 (for instructors; HTML comments are removed from every rendered format):\n     1 C, 2 A, 3 D, 4 B, 5 A, 6 C, 7 B, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B.\n     1 C: continuous monitoring is management's ongoing review of its own controls (Tronto & Killingsworth, 2021).\n     2 A: rule tests produce exceptions; analytical tests produce anomalies (Kogan et al., 2014).\n     3 D: with a weak system, early notification increased the inclination to commit fraud (Gonzalez & Hoffman, 2018).\n     4 B: unpivoting turns the selected columns into Attribute and Value rows.\n     5 A: Append matches by name, so OrderDate becomes its own column and EventDate stays null for orders.\n     6 C: rates need populations; a count alone hides volume (hundreds of entries against thousands of orders).\n     7 B: an exception in every period points to design (one approver approves every register, including the approver's own).\n     8 D: the register is rebuilt at every refresh; a merge on the test and the document attaches each conclusion again,\n          while text typed beside query output can end up beside a different row (Chapter 8).\n     9 B: a null disposition means no conclusion yet, an open exception (a mistyped disposition leaves its intended\n          exception open, which Test 3 detects, but the null itself marks the exception as open).\n     10 A: several failed tests raise the suspicion (risk score; Li et al.'s suspicion scores), and new comes before explained.\n     11 C: a recurring exception by design is one finding; the response is a change to the control.\n     12 D: Data Through is the earliest of the populations' last dates; the last pay date is December 18 (open pay periods).\n     13 A: a .pbip stores the model and report as text files that version control compares line by line.\n     14 B: a .pbix holds the model's data, every row, and a copy sits outside change control and goes stale. -->",
    "failed": []
   },
-  "appendix_a.t1": {
-   "file": "appendices/a-publishing-security/_tutorial-01.qmd",
+  "appendix_b.t1": {
+   "file": "appendices/b-publishing-security/_tutorial-01.qmd",
    "values": {
     "flagged": [
      {
@@ -9867,11 +9890,11 @@
     "former": "employee083",
     "n_centers": "ten"
    },
-   "text": "<!-- Guided Tutorial A.1 expected values (SQL twins; CR16 reference model in Desktop 2.158, roles tested through ADOMD.NET with\n     Roles= and literal-UPN test roles; the rule with USERPRINCIPALNAME returned no rows for the Windows identity, as expected):\n     Access review: Executive 81 Daniel Diaz, Account Executive, Terminated 2024-04-26; Sales 83 Cassandra Cardenas, Sales Representative, Terminated 2024-06-21; Warehouse 85 Dean Cook, Inventory Specialist, Terminated 2024-09-13; Research and Development 13 Melinda Murphy, Product Analyst, Active; the other six are their departments' managers (4, 10, 5, 11, 12, 14).\n     Actual Sales Manager employee 6 (Carrie Schultz), Warehouse Manager employee 7 (Robert Fisher). Every address in the\n     Security table is the Email of an active employee whose own CostCenterID is the cost center the table gives them (1, 6, 7, 4, 10, 5, 11, 12, 14). 2026, Operating Expense: Sales Manager sees Sales only, budget 2,734,179.05, actual 1,018,872.21,\n     flexed 1,090,985.80 (unchanged); Income Statement net income 11,306,186.32 (Sales revenue 28,517,713.92 less Sales\n     expenses 17,211,527.60), 2.51 times the company's 4,503,611.24; Revenue measure 29,756,420.08 (all sales); Plant blank.\n     Warehouse Manager: 353,015.28 / 447,856.23; net income -447,856.23; Plant hours blank (standard hours still 66,997.8,\n     completions unrelated to CostCenter). Production Manager: Budget page empty (Manufacturing has COGS budget lines only);\n     Plant 101,237 hours / 66,997.8 standard / 1.511; net income -2,412,332.31; 67 employees. employee083: nothing (no cost\n     centers, no employees, no items, Revenue blank); the Customer table still lists 220 customers. Finance (no rules) and no\n     role: everything (net income 4,503,611.24; Cost Centers Shown lists all ten). Who Am I in Desktop without View as returned\n     the Windows identity (machine\\user on a local account). Labels to confirm in 2.158: the View as roles dialog (Other user,\n     role check boxes, OK), the bar shown while viewing as, and Stop viewing; UI Automation reads Manage security roles (New\n     role, Tables, Switch to DAX editor, Save, Close) and Modeling > Security (Manage roles, View as). -->",
+   "text": "<!-- Guided Tutorial B.1 expected values (SQL twins; CR16 reference model in Desktop 2.158, roles tested through ADOMD.NET with\n     Roles= and literal-UPN test roles; the rule with USERPRINCIPALNAME returned no rows for the Windows identity, as expected):\n     Access review: Executive 81 Daniel Diaz, Account Executive, Terminated 2024-04-26; Sales 83 Cassandra Cardenas, Sales Representative, Terminated 2024-06-21; Warehouse 85 Dean Cook, Inventory Specialist, Terminated 2024-09-13; Research and Development 13 Melinda Murphy, Product Analyst, Active; the other six are their departments' managers (4, 10, 5, 11, 12, 14).\n     Actual Sales Manager employee 6 (Carrie Schultz), Warehouse Manager employee 7 (Robert Fisher). Every address in the\n     Security table is the Email of an active employee whose own CostCenterID is the cost center the table gives them (1, 6, 7, 4, 10, 5, 11, 12, 14). 2026, Operating Expense: Sales Manager sees Sales only, budget 2,734,179.05, actual 1,018,872.21,\n     flexed 1,090,985.80 (unchanged); Income Statement net income 11,306,186.32 (Sales revenue 28,517,713.92 less Sales\n     expenses 17,211,527.60), 2.51 times the company's 4,503,611.24; Revenue measure 29,756,420.08 (all sales); Plant blank.\n     Warehouse Manager: 353,015.28 / 447,856.23; net income -447,856.23; Plant hours blank (standard hours still 66,997.8,\n     completions unrelated to CostCenter). Production Manager: Budget page empty (Manufacturing has COGS budget lines only);\n     Plant 101,237 hours / 66,997.8 standard / 1.511; net income -2,412,332.31; 67 employees. employee083: nothing (no cost\n     centers, no employees, no items, Revenue blank); the Customer table still lists 220 customers. Finance (no rules) and no\n     role: everything (net income 4,503,611.24; Cost Centers Shown lists all ten). Who Am I in Desktop without View as returned\n     the Windows identity (machine\\user on a local account). Labels to confirm in 2.158: the View as roles dialog (Other user,\n     role check boxes, OK), the bar shown while viewing as, and Stop viewing; UI Automation reads Manage security roles (New\n     role, Tables, Switch to DAX editor, Save, Close) and Modeling > Security (Manage roles, View as). -->",
    "failed": []
   },
-  "appendix_a.ex2": {
-   "file": "appendices/a-publishing-security/_exercises.qmd",
+  "appendix_b.ex2": {
+   "file": "appendices/b-publishing-security/_exercises.qmd",
    "values": {
     "center": "Research and Development",
     "cc": 8,
@@ -9919,11 +9942,11 @@
     ],
     "n_employees": 120
    },
-   "text": "<!-- Instructor notes, Exercise A.2 (SQL twins; the CR16 reference model): (2) one cost center, Research and Development (8),\n     whose manager of record is a Product Analyst. Security is unrelated, so RELATEDTABLE cannot be used; EXCEPT ( VALUES (\n     CostCenter[CostCenterID] ), VALUES ( Security[CostCenterID] ) ), or a FILTER on CostCenter with a COUNTROWS ( FILTER (\n     Security, ... ) ) = 0 test, finds it. (3) none: nine users, nine cost centers. (4) all nine names match the Email\n     of an active employee (1 Chief Executive Officer, 6 Sales Manager, 7 Warehouse Manager, 4 Production Manager, 10 Purchasing Manager, 5 Accounting Manager, 11 Customer Service Manager, 12 Marketing Manager, 14 Design Services Manager),\n     each in the cost center the table gives them, so no user is flagged; LOOKUPVALUE ( AccessEmployees[EmployeeID],\n     AccessEmployees[Email], Security[UserPrincipalName] ) inside ADDCOLUMNS. (5) every row of AccessEmployees, all 120\n     employees with their addresses and termination dates, because no rule filters an unrelated table (the same reason the\n     Customer table still lists every customer for a user missing from the security table). A rule of FALSE () on the table\n     for Cost Center Managers, or keeping the table out of the published file, closes it. Run the review whenever the table\n     changes and at least quarterly, with the controller's approval recorded. -->",
+   "text": "<!-- Instructor notes, Exercise B.2 (SQL twins; the CR16 reference model): (2) one cost center, Research and Development (8),\n     whose manager of record is a Product Analyst. Security is unrelated, so RELATEDTABLE cannot be used; EXCEPT ( VALUES (\n     CostCenter[CostCenterID] ), VALUES ( Security[CostCenterID] ) ), or a FILTER on CostCenter with a COUNTROWS ( FILTER (\n     Security, ... ) ) = 0 test, finds it. (3) none: nine users, nine cost centers. (4) all nine names match the Email\n     of an active employee (1 Chief Executive Officer, 6 Sales Manager, 7 Warehouse Manager, 4 Production Manager, 10 Purchasing Manager, 5 Accounting Manager, 11 Customer Service Manager, 12 Marketing Manager, 14 Design Services Manager),\n     each in the cost center the table gives them, so no user is flagged; LOOKUPVALUE ( AccessEmployees[EmployeeID],\n     AccessEmployees[Email], Security[UserPrincipalName] ) inside ADDCOLUMNS. (5) every row of AccessEmployees, all 120\n     employees with their addresses and termination dates, because no rule filters an unrelated table (the same reason the\n     Customer table still lists every customer for a user missing from the security table). A rule of FALSE () on the table\n     for Cost Center Managers, or keeping the table out of the published file, closes it. Run the review whenever the table\n     changes and at least quarterly, with the controller's approval recorded. -->",
    "failed": []
   },
-  "appendix_a.mcq": {
-   "file": "appendices/a-publishing-security/_multiple-choice.qmd",
+  "appendix_b.mcq": {
+   "file": "appendices/b-publishing-security/_multiple-choice.qmd",
    "values": {
     "terminated": [
      81,
@@ -9951,7 +9974,328 @@
      }
     ]
    },
-   "text": "<!-- Answer key, Appendix A (for instructors; HTML comments are removed from every rendered format):\n     1 D, 2 B, 3 C, 4 D, 5 A, 6 C, 7 A, 8 B.\n     1 D: a rule filters its table and, through active relationships, the tables on the many side.\n     2 B: row-level security applies to Viewers and app readers, not to Admin, Member, or Contributor.\n     3 C: managers of record 81, 83, 85 are terminated; the Sales and Warehouse Managers are not recorded.\n     4 D: deny by default; a user in the role but missing from the table sees no sales (and no cost centers).\n     5 A: object-level security hides tables and columns from a role; row-level security hides rows.\n     6 C: Publish to web needs no sign-in, exposes all the model's data, and does not support row-level security.\n     7 A: a local file is an on-premises source; a gateway (or moving the file to OneDrive or SharePoint) is needed.\n     8 B: no setting secures a page by role, and app audiences show whole reports, so finance's pages go in a separate report;\n          on the pages managers keep, a card naming the cost centers shown tells them what they see. A hidden page can still be\n          reached, so hiding it is not security. -->",
+   "text": "<!-- Answer key, Appendix B (for instructors; HTML comments are removed from every rendered format):\n     1 D, 2 B, 3 C, 4 D, 5 A, 6 C, 7 A, 8 B.\n     1 D: a rule filters its table and, through active relationships, the tables on the many side.\n     2 B: row-level security applies to Viewers and app readers, not to Admin, Member, or Contributor.\n     3 C: managers of record 81, 83, 85 are terminated; the Sales and Warehouse Managers are not recorded.\n     4 D: deny by default; a user in the role but missing from the table sees no sales (and no cost centers).\n     5 A: object-level security hides tables and columns from a role; row-level security hides rows.\n     6 C: Publish to web needs no sign-in, exposes all the model's data, and does not support row-level security.\n     7 A: a local file is an on-premises source; a gateway (or moving the file to OneDrive or SharePoint) is needed.\n     8 B: no setting secures a page by role, and app audiences show whole reports, so finance's pages go in a separate report;\n          on the pages managers keep, a card naming the cost centers shown tells them what they see. A hidden page can still be\n          reached, so hiding it is not security. -->",
+   "failed": []
+  },
+  "appendix_c.t1": {
+   "file": "appendices/c-power-bi-browser/_tutorial-01.qmd",
+   "values": {
+    "n": 27933,
+    "items": 223,
+    "first_number": "SI-2024-000001",
+    "first_date": "2024-01-01",
+    "first_serial": 45292,
+    "years": [
+     {
+      "year": 2024,
+      "n": 9040,
+      "rev": 27313723.48,
+      "list": 30596029.9117,
+      "disc": 126607.63557
+     },
+     {
+      "year": 2025,
+      "n": 9371,
+      "rev": 29376702.28,
+      "list": 33030575.8509,
+      "disc": 234534.722688
+     },
+     {
+      "year": 2026,
+      "n": 9522,
+      "rev": 29756420.08,
+      "list": 33589137.4518,
+      "disc": 362110.745964
+     }
+    ],
+    "empty": 25825,
+    "discounts": [
+     "0",
+     "0.08",
+     "0.10",
+     "0.12"
+    ],
+    "groups": 5
+   },
+   "text": "<!-- Guided Tutorial C.1 expected values (read-only twin of Tutorial 13.1's model; the same steps were run in the Power BI service):\n     Power Query Online reads InvoiceDate as a whole number, the Excel date: the first invoice, SI-2024-000001, shows 45292, which\n     reads 2024-01-01 once the type is Date. Discount comes in as a whole number (Replace current keeps the rates); PromotionID has no type.\n     Item keeps 223 items after the ListPrice filter. Profile (Step 6): first 1,000 lines PromotionID 100% empty and Discount one value;\n     entire data set PromotionID empty on 25,825 of 27,933 lines (92%), Discount 4 distinct values (0, 0.08, 0.10, 0.12).\n     Validation page by fiscal year: 2024 9,040 lines, 27,313,723.48, list 30,596,029.91,\n     discounts 126,607.64; 2025 9,371, 29,376,702.28, 33,030,575.85,\n     234,534.72; 2026 9,522, 29,756,420.08, 33,589,137.45,\n     362,110.75 (Tutorial 13.1). The item group table has 5 rows and no (Blank).\n     SalesInvoiceLineID comes in as Count of SalesInvoiceLineID: the service sets the keys that relationships use not to summarize. -->",
+   "failed": []
+  },
+  "appendix_c.t2": {
+   "file": "appendices/c-power-bi-browser/_tutorial-02.qmd",
+   "values": {
+    "C": 2026,
+    "rev": 29756420.08,
+    "list": 33589137.4518,
+    "disc": 362110.745964,
+    "invoices": 7171,
+    "lines": 9522,
+    "months": [
+     [
+      "Jan",
+      6602.694932
+     ],
+     [
+      "Feb",
+      844.802808
+     ],
+     [
+      "Mar",
+      7670.522
+     ],
+     [
+      "Apr",
+      14950.851912
+     ],
+     [
+      "May",
+      6751.6202
+     ],
+     [
+      "Jun",
+      822.349176
+     ],
+     [
+      "Jul",
+      0.0
+     ],
+     [
+      "Aug",
+      356.753656
+     ],
+     [
+      "Sep",
+      95996.97067
+     ],
+     [
+      "Oct",
+      136935.59284
+     ],
+     [
+      "Nov",
+      73447.228254
+     ],
+     [
+      "Dec",
+      17731.359516
+     ]
+    ],
+    "ranked": [
+     "Oct",
+     "Sep",
+     "Nov",
+     "Dec"
+    ],
+    "furniture": 0.960658,
+    "autumn": "Furniture Seasonal Promotion"
+   },
+   "text": "<!-- Guided Tutorial C.2 expected values: cards for fiscal 2026 (Display units None): Revenue 29,756,420.08, At list price 33,589,137.45,\n     Discounts 362,110.75, Invoices 7,171 (Count (Distinct) of the lines' SalesInvoiceID; a plain count gives 9,522, the lines).\n     Discounts by month: Jan 6,602.69; Feb 844.80; Mar 7,670.52; Apr 14,950.85; May 6,751.62; Jun 822.35; Jul 0.00; Aug 356.75; Sep 95,996.97; Oct 136,935.59; Nov 73,447.23; Dec 17,731.36. Sorted by value, the axis\n     starts Oct, Sep, Nov, Dec, which draws a falling line; sorted by Month, ascending, the line rises in the Furniture Seasonal Promotion's months.\n     Furniture holds 96.1% of the year's discounts, so it leads the bar chart. -->",
+   "failed": []
+  },
+  "appendix_c.t3": {
+   "file": "appendices/c-power-bi-browser/_tutorial-03.qmd",
+   "values": {
+    "years": [
+     {
+      "year": 2024,
+      "n": 9040,
+      "rev": 27313723.48,
+      "list": 30596029.9117,
+      "disc": 126607.63557
+     },
+     {
+      "year": 2025,
+      "n": 9371,
+      "rev": 29376702.28,
+      "list": 33030575.8509,
+      "disc": 234534.722688
+     },
+     {
+      "year": 2026,
+      "n": 9522,
+      "rev": 29756420.08,
+      "list": 33589137.4518,
+      "disc": 362110.745964
+     }
+    ]
+   },
+   "text": "<!-- Guided Tutorial C.3 expected values: the Revenue measure by fiscal year, rounded in the query: 2024 27313723.48; 2025 29376702.28; 2026 29756420.08\n     (the Results grid shows the raw values, without the format), equal to the Validation page's line totals. Key Measures moves to the top of\n     the Data pane once Column1 is hidden. -->",
+   "failed": []
+  },
+  "appendix_c.ex1": {
+   "file": "appendices/c-power-bi-browser/_exercises.qmd",
+   "values": {
+    "C": 2026,
+    "quarters": [
+     {
+      "q": 1,
+      "n": 2472,
+      "rev": 7546851.67,
+      "list": 8432384.1156,
+      "disc": 15118.01974,
+      "promos": [
+       [
+        "Harbor Collection Promotion",
+        7596.99092
+       ],
+       [
+        "Wholesale Customer Promotion",
+        6858.13764
+       ],
+       [
+        "Textiles Seasonal Promotion",
+        662.89118
+       ]
+      ]
+     },
+     {
+      "q": 2,
+      "n": 2377,
+      "rev": 7654417.42,
+      "list": 8579566.0731,
+      "disc": 22524.821288,
+      "promos": [
+       [
+        "Harbor Collection Promotion",
+        22524.821288
+       ]
+      ]
+     },
+     {
+      "q": 3,
+      "n": 2341,
+      "rev": 7267963.31,
+      "list": 8212248.0514,
+      "disc": 96353.724326,
+      "promos": [
+       [
+        "Furniture Seasonal Promotion",
+        95996.97067
+       ],
+       [
+        "Harbor Collection Promotion",
+        356.753656
+       ]
+      ]
+     },
+     {
+      "q": 4,
+      "n": 2332,
+      "rev": 7287187.68,
+      "list": 8364939.2117,
+      "disc": 228114.18061,
+      "promos": [
+       [
+        "Furniture Seasonal Promotion",
+        200056.60669
+       ],
+       [
+        "Design Trade Customer Promotion",
+        28057.57392
+       ]
+      ]
+     }
+    ],
+    "year": {
+     "n": 9522,
+     "rev": 29756420.08,
+     "list": 33589137.4518,
+     "disc": 362110.745964
+    },
+    "top": {
+     "q": 4,
+     "n": 2332,
+     "rev": 7287187.68,
+     "list": 8364939.2117,
+     "disc": 228114.18061,
+     "promos": [
+      [
+       "Furniture Seasonal Promotion",
+       200056.60669
+      ],
+      [
+       "Design Trade Customer Promotion",
+       28057.57392
+      ]
+     ]
+    },
+    "share": 0.629957
+   },
+   "text": "<!-- Instructor notes, Exercise C.1: fiscal 2026 by quarter (lines, revenue, list amount, discounts):\n     Q1 2,472, 7,546,851.67, 8,432,384.12, 15,118.02; Q2 2,377, 7,654,417.42, 8,579,566.07, 22,524.82; Q3 2,341, 7,267,963.31, 8,212,248.05, 96,353.72; Q4 2,332, 7,287,187.68, 8,364,939.21, 228,114.18.\n     The quarters add up to the Validation row: 9,522 lines, 29,756,420.08, 33,589,137.45, 362,110.75 (the discounts may differ from\n     the sum of the rounded quarters by a cent). (4) Q4 carries 63.0% of the year's discounts: Furniture Seasonal Promotion 200,056.61; Design Trade Customer Promotion 28,057.57.\n     The Furniture Seasonal Promotion ran in September and October, but its orders were invoiced through December. (5) A query in Tests.dax does not\n     change when a page is edited, and DAX query view in the browser discards its tabs on close. -->",
+   "failed": []
+  },
+  "appendix_c.ex2": {
+   "file": "appendices/c-power-bi-browser/_exercises.qmd",
+   "values": {
+    "C": 2026,
+    "trade": "Design Trade Customer Promotion",
+    "trade_month": "November",
+    "autumn": "Furniture Seasonal Promotion",
+    "autumn_months": "September and October",
+    "peaks": [
+     [
+      "Design Trade",
+      "November",
+      27595.868514,
+      59673.46727
+     ],
+     [
+      "Small Business",
+      "September",
+      4070.02909,
+      13279.028388
+     ],
+     [
+      "Strategic",
+      "October",
+      46330.2466,
+      104232.111186
+     ],
+     [
+      "Wholesale",
+      "October",
+      74453.77467,
+      184926.13912
+     ]
+    ],
+    "others": [
+     [
+      "Small Business",
+      "September"
+     ],
+     [
+      "Strategic",
+      "October"
+     ],
+     [
+      "Wholesale",
+      "October"
+     ]
+    ],
+    "no_discount": [
+     "Design Services"
+    ]
+   },
+   "text": "<!-- Instructor notes, Exercise C.2: fiscal 2026 discounts by segment, with each segment's peak month:\n     Design Trade peaks in November (27,595.87 of 59,673.47); Small Business peaks in September (4,070.03 of 13,279.03); Strategic peaks in October (46,330.25 of 104,232.11); Wholesale peaks in October (74,453.77 of 184,926.14).\n     (4) Design Trade peaks in November, the month of the Design Trade Customer Promotion; Small Business peaks in September, Strategic peaks in October, Wholesale peaks in October, the months of the\n     Furniture Seasonal Promotion (September and October). (5) Design Services received no discounts. A segment promotion reaches one segment, while\n     an item-group promotion reaches every segment that buys the group, so a calendar aimed at one segment should use a segment promotion. -->",
+   "failed": []
+  },
+  "appendix_c.ex3": {
+   "file": "appendices/c-power-bi-browser/_exercises.qmd",
+   "values": {
+    "C": 2026,
+    "rev": 29756420.08,
+    "list": 33589137.4518,
+    "diff": 3832717.3718
+   },
+   "text": "<!-- Instructor notes, Exercise C.3: the test's fiscal 2026 revenue is 29,756,420.08 before the change, 33,589,137.45 with ListAmount\n     (higher by 3,832,717.37, the price reductions and discounts), and 29,756,420.08 again after the restore. Version history records\n     the model's state, not who changed it or why, keeps only the last few versions, and needs a Pro license; a Power BI project under version\n     control (Chapter 16) records every change with its author and message and can be reviewed before it is merged. -->",
+   "failed": []
+  },
+  "appendix_c.mcq": {
+   "file": "appendices/c-power-bi-browser/_multiple-choice.qmd",
+   "values": {
+    "serial": 45292,
+    "date": "2024-01-01"
+   },
+   "text": "<!-- Answer key, Appendix C (for instructors; HTML comments are removed from every rendered format):\n     1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 C, 8 A.\n     1 C: Power Query Online reads uploaded files from the user's OneDrive for work or school.\n     2 A: the workbook stores InvoiceDate as an Excel date; the first invoice reads 45292, which is 2024-01-01 once typed as Date.\n     3 D: Restore default visuals, under the … below the visual types, brings the card back.\n     4 B: DAX query view in the browser discards its tabs on close; keep the tests in a text file.\n     5 B: keys used by relationships are set not to summarize, so the field lands in Categories; drag it to Value and choose Count (Distinct).\n     6 D: the chart is sorted by its values; More options > Sort by > Month, then Sort ascending.\n     7 C: Power Query Online's Save applies its changes to the model; Close & Apply is Desktop's.\n     8 A: Power Query Online also types each column from its first 200 rows, where Discount is zero. -->",
    "failed": []
   },
   "case4.r1": {
@@ -16889,7 +17233,7 @@
      }
     }
    },
-   "text": "<!-- Instructor notes, Milestone 2 checkpoints: committed cost 4,119,063.77; 39.97 an hour (crew 34.11); unused capacity 29,243.7 hours,\n     1,168,726; time-driven group margins Furniture 38.23%, Lighting 41.23%, Textiles 45.96%; explorer margins 12,739,803.20 (standard),\n     10,661,488.02 (absorption), 11,731,216.94 (time-driven) on revenue of 28,543,076.08. -->",
+   "text": "<!-- Instructor notes, Milestone 2 checkpoints: committed cost 4,119,063.77; 39.97 an hour (crew 34.11); unused capacity 29,243.7 hours,\n     1,168,726; time-driven group margins Furniture 38.23%, Lighting 41.23%, Textiles 45.96%; explorer margins (item costs unrounded, as the explorer reads them) 12,739,803.20 (standard),\n     10,661,488.03 (absorption), 11,731,216.94 (time-driven) on revenue of 28,543,076.08. -->",
    "failed": []
   },
   "ch18.m3": {
@@ -19130,6 +19474,8 @@
     "unused_positions": 17.848937,
     "n_buy": "three",
     "supervision": 101245.751791,
+    "crew_hours": 17299.177552,
+    "crew_cost": 590117.070957,
     "headroom": [
      {
       "short": "Cutting",
@@ -19194,7 +19540,7 @@
      }
     ]
    },
-   "text": "<!-- Instructor notes, Requirement 7: buying BNH, NGT, and TBL frees (2026 production) Cutting 3,884, Assembly 7,607, Finishing 4,596, Packing 1,708 hours, 17,795 in all; plant use of practical capacity falls from 71.6% to 54.4%. The plant already leaves 29,243.7\n     practical hours unused, 17.85 positions, more than buying would free: fitting the crew to the work matters more than outsourcing,\n     and the production manager's point that idle capacity is not the products' fault is right but cuts both ways, because it is still a\n     cost. If the crew is kept, the supervision and equipment the three families carried (about 101,246) spreads over the rest, and their\n     absorption cost rises. Practical capacity over 2026 use (sales basis): Cutting 1.80, Assembly 1.40, Finishing 1.40, Packing 1.58, QA 10.24, so growth of about 40% reaches the first limit. Solver (Simplex LP, buying the quoted families at their crew-kept extra\n     cost): +40%, Finishing binds (shadow price about 6.01 an hour), buy about 151 BNH, extra cost about 391; +50%, Assembly binds (about 49.98), buy all 2,182 BNH and about 2,311 NGT, extra cost about 86,177. -->",
+   "text": "<!-- Instructor notes, Requirement 7: buying BNH, NGT, and TBL frees (2026 production) Cutting 3,884, Assembly 7,607, Finishing 4,596, Packing 1,708 hours, 17,795 in all; plant use of practical capacity falls from 71.6% to 54.4%. The plant already leaves 29,243.7\n     practical hours unused, 17.85 positions, more than buying would free: fitting the crew to the work matters more than outsourcing,\n     and the production manager's point that idle capacity is not the products' fault is right but cuts both ways, because it is still a\n     cost. If the crew is kept, its 17,299 hours on those families (about 590,117, sales basis) become unused capacity, and the supervision and equipment the three families carried (about 101,246) spreads over the rest, so their\n     absorption cost rises. Practical capacity over 2026 use (sales basis): Cutting 1.80, Assembly 1.40, Finishing 1.40, Packing 1.58, QA 10.24, so growth of about 40% reaches the first limit. Solver (Simplex LP, buying the quoted families at their crew-kept extra\n     cost): +40%, Finishing binds (shadow price about 6.01 an hour), buy about 151 BNH, extra cost about 391; +50%, Assembly binds (about 49.98), buy all 2,182 BNH and about 2,311 NGT, extra cost about 86,177. -->",
    "failed": []
   },
   "ch18.r8": {
@@ -19576,7 +19922,7 @@
     "mat_c": 225180.56,
     "opening_fg": 4111795.76
    },
-   "text": "<!-- Instructor notes, Requirement 9: proposed rate per standard hour on the Part III plan (68,912.79 standard hours, 1.18 hours per\n     standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47;\n     supervision 263,191.24 x 1.1414 / 68,912.79 = 4.36; depreciation 293,499.96 / 68,912.79 = 4.26; total 63.46 (58.00 at 1.0 hours).\n     Current 47.40; time-driven 61.81; 2026 actual 78.77, which includes idle capacity and the hours beyond the work (Part III), abnormal\n     under Topic 330. Revised standard costs (time-driven beside): BNH 398.17 (399.01), NGT 306.99 (308.67), SDB 337.91 (338.07), TBL 358.19 (357.64), SCN 189.74 (188.24), PIL 180.97 (180.09). Manufactured finished goods made since the opening and on hand (completions less\n     shipments plus returns, by item; FUR-SDB-0006 at 2024 and FUR-DSK-0044 at 2026 are negative, proof of opening stock, and left out):\n     2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.2, 23,116.1, 1,097,455.36; 2026 21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117; at 1.0 hours\n     (58.00): +167,288 / +243,171 / +309,655; time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle\n     capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at 1 January 2025 +257,435, 2025 income +112,161, 2026 income\n     +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the materiality of tbl-18-02 (256,717.74 and 225,180.56), while\n     the income effects are below it; at 1.0 hours the 2025 balance (243,171) falls below materiality and 2026's (309,655) stays above.\n     The rates are 2027's plan applied to 2024-2026 stock, an approximation a strong answer names. A strong answer judges the balance\n     sheet effect material on the plan's definition of normal capacity, recommends revised statements for the shareholders\n     (inventories, retained earnings, and income corrected, with the correction disclosed), or, if the CFO judges it immaterial on a\n     narrower definition, a correction in the next statements with disclosure; the decision is the CFO's. The opening\n     4,111,795.76 of finished goods has no item detail and is left out. -->",
+   "text": "<!-- Instructor notes, Requirement 9: proposed rate per standard hour on the Part III plan (68,912.79 standard hours, 1.18 hours per\n     standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47;\n     supervision 263,191.24 x 1.1414 / 68,912.79 = 4.36; depreciation 293,499.96 / 68,912.79 = 4.26; total 63.46 (58.00 at 1.0 hours).\n     Current 47.40; time-driven 61.81; 2026 actual 78.77, which includes idle capacity and the hours beyond the work (Part III), abnormal\n     under Topic 330. Revised standard costs (time-driven beside): BNH 398.17 (399.01), NGT 306.99 (308.67), SDB 337.91 (338.07), TBL 358.19 (357.64), SCN 189.74 (188.24), PIL 180.97 (180.09). Manufactured finished goods made since the opening and on hand (completions less\n     shipments plus returns, by item; FUR-SDB-0006 at 2024 and FUR-DSK-0044 at 2026 are negative, proof of opening stock, and left out):\n     2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.3, 23,116.1, 1,097,455.36; 2026 21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117; at 1.0 hours\n     (58.00): +167,288 / +243,171 / +309,655; time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle\n     capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at 1 January 2025 +257,435, 2025 income +112,161, 2026 income\n     +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the materiality of tbl-18-02 (256,717.74 and 225,180.56), while\n     the income effects are below it; at 1.0 hours the 2025 balance (243,171) falls below materiality and 2026's (309,655) stays above.\n     The rates are 2027's plan applied to 2024-2026 stock, an approximation a strong answer names. A strong answer judges the balance\n     sheet effect material on the plan's definition of normal capacity, recommends revised statements for the shareholders\n     (inventories, retained earnings, and income corrected, with the correction disclosed), or, if the CFO judges it immaterial on a\n     narrower definition, a correction in the next statements with disclosure; the decision is the CFO's. The opening\n     4,111,795.76 of finished goods has no item detail and is left out. -->",
    "failed": []
   },
   "ch18.r10": {
@@ -19976,25 +20322,25 @@
      "SalesCommissionAdjustment": "1-167, 168-405, 406-637"
     },
     "post": {
-     "Dr 2050": [
-      38587.8,
-      612
+     "Cr 1020": [
+      412114.03,
+      415
      ],
      "Cr 2060": [
       220131.88,
       225
      ],
-     "Dr 4060": [
-      589524.29,
-      637
+     "Dr 2050": [
+      38587.8,
+      612
      ],
      "Dr 4050": [
       4133.82,
       99
      ],
-     "Cr 1020": [
-      412114.03,
-      415
+     "Dr 4060": [
+      589524.29,
+      637
      ]
     },
     "both": 28,

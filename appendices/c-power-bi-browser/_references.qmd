@@ -1,0 +1,21 @@
+{{< pagebreak >}}
+
+## References
+
+Microsoft. (2025a). *DAX query view*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view>
+
+Microsoft. (2025b). *Tour the Power BI report editor*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/service-the-report-editor-take-a-tour>
+
+Microsoft. (2025c). *Upload a file in Power Query Online*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/upload-file>
+
+Microsoft. (2025d). *Use semantic model version history*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/service-semantic-model-version-history>
+
+Microsoft. (2025e). *Using the data profiling tools*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/data-profiling-tools>
+
+Microsoft. (2026a). *Data types in Power Query*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-query/data-types>
+
+Microsoft. (2026b). *Edit semantic models in the Power BI service*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/service-edit-data-models>
+
+Microsoft. (2026c). *Power BI features available to free users*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/fundamentals/end-user-features>
+
+Microsoft. (2026d). *Tenant settings for semantic models*. Microsoft Learn. <https://learn.microsoft.com/en-us/fabric/admin/service-admin-portal-data-model>

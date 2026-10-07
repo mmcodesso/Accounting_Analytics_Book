@@ -1,5 +1,5 @@
 """Charles River Reports.pbip: the reporting package Tutorials 13.1 to 15.3 build, and the appendix's Guided Tutorial
-A.1 secures.
+B.1 secures.
 
 Each function applies one tutorial's steps to the project as the previous tutorial left it: the same queries (with
 the Power Query Editor's step names and the type corrections the text asks for), relationships, column settings,
@@ -31,7 +31,7 @@ from xlbuild.expected import Expected
 
 sys.path.insert(0, str(REPO / "facts"))
 from db import Data  # noqa: E402
-from notes import appendix_a, ch14, ch15  # noqa: E402
+from notes import appendix_b, ch14, ch15  # noqa: E402
 
 FILE = "Charles River Reports"
 MONEY = "#,0.00"
@@ -40,7 +40,7 @@ PCT = "0.00%"
 CH13 = REPO / "chapters" / "13-power-bi-essentials"
 CH14 = REPO / "chapters" / "14-data-models-and-dax"
 CH15 = REPO / "chapters" / "15-management-reports"
-APPX = REPO / "appendices" / "a-publishing-security"
+APPX = REPO / "appendices" / "b-publishing-security"
 TOP = 56                                   # visuals start below a band the page navigator of Tutorial 15.3 takes
 
 
@@ -1132,7 +1132,7 @@ def md_table(path: Path, label: str) -> list[list[str]]:
 
 def ta_1(b: Build) -> None:
     m, y, path = b.model, b.year, APPX / "_tutorial-01.qmd"
-    ctx = appendix_a.t1(b.data, claim)
+    ctx = appendix_b.t1(b.data, claim)
     # Step 1 builds the access review in Audit Monitoring.pbix (the chapter 16 chain), not in this file.
     # Step 2: each employee's cost center
     employee = m.tables["Employee"]
@@ -1163,7 +1163,7 @@ def ta_1(b: Build) -> None:
         b.report.page(page).expect.append(shown)
     b.report.page("about").expect.append("Who Am I")
 
-    t, cy, ox = "Guided Tutorial A.1", f"'Date'[Year] = {y}", "Account[AccountSubType] = \"Operating Expense\""
+    t, cy, ox = "Guided Tutorial B.1", f"'Date'[Year] = {y}", "Account[AccountSubType] = \"Operating Expense\""
     blank = lambda expr: f"IF ( ISBLANK ( {expr} ), \"blank\", \"not blank\" )"
     b.check(t, "employees with a cost center",
             one("SELECT COUNT(*) FROM Employee WHERE CostCenterID IS NOT NULL"),
@@ -1220,7 +1220,7 @@ def ta_1(b: Build) -> None:
 
     # The real roles, run by the engine on a connection that applies them: with the Windows sign-in, which the
     # security table does not list, Cost Center Managers shows nothing (deny by default); Finance shows everything.
-    deny = [("Guided Tutorial A.1", c) for c in [
+    deny = [("Guided Tutorial B.1", c) for c in [
         Check("cost centers visible", 0, "COUNTROWS ( CostCenter )", 0),
         Check("items visible", 0, "COUNTROWS ( 'Item' )", 0),
         Check("employees visible", 0, "COUNTROWS ( Employee )", 0),
@@ -1229,7 +1229,7 @@ def ta_1(b: Build) -> None:
         Check("Cost Centers Shown", "blank", blank("[Cost Centers Shown]")),
         Check("customers visible (Customer has no rule)", ctx["customers"], "COUNTROWS ( Customer )", 0),
         Check("Who Am I (the sign-in the rules compare)", "not blank", blank("[Who Am I]"))]]
-    full = [("Guided Tutorial A.1", c) for c in [
+    full = [("Guided Tutorial B.1", c) for c in [
         Check("cost centers visible", len(names), "COUNTROWS ( CostCenter )", 0),
         Check(f"{y} Revenue", round(ctx["revenue"], 2), f"CALCULATE ( [Revenue], {cy} )"),
         Check(f"{y} Net Income", round(ctx["company"], 2), f"CALCULATE ( [Net Income], {cy} )", 0.01),
@@ -1239,4 +1239,4 @@ def ta_1(b: Build) -> None:
 
 
 TUTORIALS = [("13.1", t13_1), ("13.2", t13_2), ("13.3", t13_3), ("14.1", t14_1), ("14.2", t14_2), ("14.3", t14_3),
-             ("15.1", t15_1), ("15.2", t15_2), ("15.3", t15_3), ("A.1", ta_1)]
+             ("15.1", t15_1), ("15.2", t15_2), ("15.3", t15_3), ("B.1", ta_1)]

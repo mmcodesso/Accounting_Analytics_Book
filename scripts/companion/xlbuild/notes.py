@@ -28,7 +28,7 @@ class Check:
 
 def tutorial_file(tutorial: str) -> Path:
     chapter, k = tutorial.split(".")
-    if not chapter.isdigit():                         # an appendix's Guided Tutorial A.1
+    if not chapter.isdigit():                         # an appendix's Guided Tutorial B.1
         return next((REPO / "appendices").glob(f"{chapter.lower()}-*")) / f"_tutorial-{int(k):02d}.qmd"
     return next((REPO / "chapters").glob(f"{int(chapter):02d}-*")) / f"_tutorial-{int(k):02d}.qmd"
 

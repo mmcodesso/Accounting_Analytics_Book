@@ -1,0 +1,117 @@
+## Guided Tutorial C.1: Building the Chapter 13 Model in the Browser
+
+**Context and objective.** In this tutorial, you will do the work of Tutorial 13.1 in the Power BI service. You will upload CharlesRiver.xlsx, shape four of its Tables with Power Query Online, create the semantic model, relate its tables in the model editor, and reconcile it on a Validation page. Read Tutorial 13.1 first: it explains why each step matters, and this tutorial gives the browser's commands and stops where the browser behaves differently.
+
+**Prerequisites.** You need a browser, your school account, and CharlesRiver.xlsx on your computer, as the section above explains.
+
+**Step-by-step instructions.**
+
+**Step 1. Upload the workbook.** Power Query Online reads the workbook from your OneDrive for work or school, so it starts by uploading a copy there (Microsoft, 2025c).
+
+a. Sign in at app.powerbi.com with your school account.
+b. Select **Create** in the navigation pane on the left, and then the **Get Data** tile.
+c. Choose **Excel workbook**.
+d. Under **Connection settings**, select **Upload file**, click **Browse...**, and choose CharlesRiver.xlsx.
+e. When the box reads **Upload successful**, click **Next**.
+
+Selecting **Upload file** sets **Authentication kind** to **Organizational account** and signs you in with your school account, so there is nothing to choose under **Connection credentials**. The copy you uploaded is the one the model reads from now on; if your OneDrive already holds a file of the same name, the copy gets a number, such as CharlesRiver 1.xlsx. @fig-c-01 shows the two pages of Get data.
+
+![Uploading the Workbook and Choosing Its Tables.](/visuals/svg/fig-c-01-upload-and-choose.svg){#fig-c-01 fig-alt="A mock of two pages of Power Query Online's Get data in the Power BI service. On the left, Connect to data source for an Excel workbook, with Upload file selected, the uploaded CharlesRiver.xlsx marked Upload successful, and the connection credentials reduced to an organizational account. On the right, Choose data lists the workbook's Tables and worksheets in text order, with four Tables checked, and Transform data as the only way on."}
+
+**Step 2. Choose the Tables.**
+
+a. On the **Choose data** page, which takes the place of Desktop's Navigator, select the check boxes of four Tables: **T4_Customer**, **T16_SalesInvoice**, **T17_SalesInvoiceLine**, and **T44_Item**. Scroll to find each one: the list is in text order (T1, T10, T11, and so on), not in the order of the numbers.
+b. Click **Transform data**.
+
+**Choose data** offers **Transform data** only; there is no button that loads the Tables without opening Power Query. Power Query Online opens with one query for each Table, in the layout of Desktop's Power Query Editor: the **Queries** pane on the left, the preview in the middle, and **Query settings**, with **Applied steps**, on the right.
+
+**Step 3. Rename the queries, correct two types, and keep the columns the report needs.**
+
+a. Rename the queries `Customer`, `SalesInvoice`, `SalesInvoiceLine`, and `Item` by double-clicking each name in the **Queries** pane.
+b. Select **SalesInvoiceLine**. If the icon on the Discount header shows a whole number, click it, choose **Decimal number**, and click **Replace current** in the **Change column type** dialog.
+c. Set PromotionID to **Whole number** in the same way; it has no type yet, so no dialog opens.
+d. In each query, choose **Home > Choose columns**, clear **(Select all)**, select the columns that Tutorial 13.1 lists in its Step 3, and click **OK**.
+
+Power Query Online also types each column from its first 200 rows, so Discount, whose first rows are all zero, comes in as a whole number, the trap Tutorial 13.1 explains (Microsoft, 2026a). The step that keeps the columns is named Choose columns here, where Desktop names it Removed Other Columns.
+
+**Step 4. Keep the items Charles River sells, and set the date type.**
+
+a. In the **Item** query, click the arrow on the ListPrice header, clear **(null)**, and click **OK**.
+b. In the **SalesInvoice** query, look at InvoiceDate: it shows five-digit numbers, not dates.
+c. Click the icon on its header, and choose **Date**.
+
+The workbook stores InvoiceDate as an Excel date, a count of days that Excel displays as a date. Desktop reads it as a date, but Power Query Online reads the bare number, and the custom columns of Step 5 cannot take a year or a quarter from a number. After the change, the column shows dates again, and the query ends with a step named Changed column type 1. @fig-c-02 shows the column before the change.
+
+![InvoiceDate as Power Query Online Reads It.](/visuals/svg/fig-c-02-dates-as-numbers.svg){#fig-c-02 fig-alt="A mock of Power Query Online with the SalesInvoice query selected. The InvoiceDate column carries the whole number icon and shows five-digit numbers. The Applied steps list Source, Navigation 1, Changed column type, and Choose columns. A note beside the grid shows the same rows after the type is set to Date, when the numbers read as dates."}
+
+**Step 5. Add the custom columns.**
+
+a. Select the query named in the first row of @tbl-13-02, and choose **Add column > Custom column**.
+b. Type the name in **New column name**, choose the type in **Data type**, type the formula in **Custom column formula**, and click **OK**: **Whole number** for FiscalYear and FiscalQuarter, **Text** for Period, Month, and ProductType, and **Decimal number** for ListAmount and DiscountAmount.
+c. Repeat the two actions for each of the other rows of the table.
+
+The formulas are Tutorial 13.1's, and Power Query Online runs them unchanged. Because the dialog sets the type as it adds the column, there is no separate step to type the new columns, and each query ends with steps named Added custom, Added custom 1, and so on.
+
+**Step 6. Profile the invoice lines over the entire data set.**
+
+a. Select the **SalesInvoiceLine** query.
+b. On the **View** tab, open the arrow of **Data view**, and select **Enable column profile**.
+c. Open the arrow again, and select **Show column quality details** and **Show column value distribution**, which stay unavailable until the profile is on.
+d. Click **Column profiling based on top 1,000 rows** in the status bar, and choose **Column profiling based on entire data set**.
+e. Record the share of PromotionID that is empty and the number of distinct values of Discount, on both bases.
+
+The two profiles differ exactly as they do in Tutorial 13.1, and the entire data set takes only a few seconds to profile (Microsoft, 2025e).
+
+**Step 7. Create the semantic model.**
+
+a. At the bottom right of Power Query, click the arrow beside **Create a report**, and choose **Create a semantic model only**.
+b. In **Create new semantic model**, keep **My workspace** selected, type `Charles River Reports` in **Semantic model name**, and click **Create**.
+
+The service loads the four Tables and opens the model editor, which shows the tables in a diagram, a **Properties** pane, and a **Data** pane, with **Model view**, **DAX query view**, and **TMDL View (Preview)** at the bottom. A model you have just created opens in Editing mode. If you return to it later and its commands are unavailable, open the menu at the top right that reads **Viewing**, and choose **Editing**.
+
+**Step 8. Turn off two defaults.**
+
+a. In the model editor, choose **File > Options**.
+b. Under **Current File > Data Load**, clear **Autodetect new relationships after data is loaded** and **Auto date/time**, and click **OK**.
+c. Choose **Manage relationships** on the ribbon, and check that it reads "There are no relationships defined yet."
+
+Tutorial 13.1 turns these settings off before loading. The browser offers them only once the model exists, so Step 8 checks that the defaults created no relationships; if some are listed, select each one and click **Delete**.
+
+**Step 9. Relate the tables.**
+
+a. In **Manage relationships**, click **New relationship**.
+b. Choose **SalesInvoiceLine** in **From table**, and click the SalesInvoiceID column in the preview below it.
+c. Choose **SalesInvoice** in **To table**, and click its SalesInvoiceID column.
+d. Check that **Cardinality** reads **Many to one (\*:1)**, **Cross-filter direction** reads **Single**, and **Make this relationship active** is selected, and click **Save**.
+e. Create two more relationships in the same way: ItemID from **SalesInvoiceLine** to **Item**, and CustomerID from **SalesInvoice** to **Customer**. Then click **Close**.
+
+**Manage relationships** lists the three relationships as active, and the diagram shows them, each with 1 at the table that holds the key and an asterisk at the table that refers to it, as in @fig-13-04. The keys the relationships use, such as ItemID, lose their summation sign: the service sets them not to summarize.
+
+**Step 10. Set how the year and the amounts are shown.**
+
+a. Select FiscalYear in the SalesInvoice table, in the diagram or the **Data** pane.
+b. In the **Properties** pane, under **Advanced**, set **Summarize by** to **None**.
+c. Do the same for FiscalQuarter.
+d. Select LineTotal, ListAmount, and DiscountAmount together, holding Ctrl, and under **Formatting** turn on **Thousands separator**.
+
+**Properties** takes the place of Desktop's Column tools tab: **Summarize by** with **None** is Desktop's Summarization with Don't summarize. Turning on the separator sets the format to **Decimal number** with two decimal places, for all three columns at once. @fig-c-03 shows the model at this point.
+
+![The Model Editor After Steps 9 and 10.](/visuals/svg/fig-c-03-model-editor.svg){#fig-c-03 fig-alt="A mock of the model editor of the Power BI service in Editing mode. The diagram shows SalesInvoiceLine related many to one to SalesInvoice, Item, and Customer. FiscalYear is selected, and the Properties pane shows its Advanced settings, with Summarize by set to None. Model view, DAX query view, and TMDL View (Preview) are the tabs at the bottom."}
+
+**Step 11. Build the Validation page.**
+
+a. Choose **New report** on the model editor's ribbon. The report editor opens in a new browser tab.
+b. Double-click the tab **Page 1**, and rename it `Validation`.
+c. Select **Table** in the **Visualizations** pane, and select the check boxes of FiscalYear, SalesInvoiceLineID, LineTotal, ListAmount, and DiscountAmount in the **Data** pane.
+d. Click an empty part of the page, add a second **Table**, and select ItemGroup and LineTotal.
+e. Click the **Save this report** button at the top right, type `Charles River Reports` as the name, keep **My workspace**, and click **Save**.
+
+SalesInvoiceLineID comes in as Count of SalesInvoiceLineID, because the service set the key not to summarize; Tutorial 13.1 chooses **Count** by hand. Saving puts the report in My workspace, beside the semantic model of the same name, and reopens it in Reading view.
+
+**Checkpoint.** Before you build on the model, confirm the following:
+
+- The model holds four tables joined by three one-to-many relationships whose filters flow toward the invoice lines.
+- InvoiceDate is a date, and FiscalYear, Period, and Month read like Tutorial 13.1's.
+- The fiscal 2026 row of the Validation page matches the invoice line count and line total of Chapter 6, and the item group table has no (Blank) row.
+
+A model built in the browser that reproduces Chapter 6's totals is the same model as Tutorial 13.1's, and the rest of Part IV builds on it.

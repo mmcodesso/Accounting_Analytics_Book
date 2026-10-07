@@ -1,0 +1,53 @@
+{{< pagebreak >}}
+
+## Applied Exercises
+
+Work on both exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish Guided Tutorial B.1, such as `Security Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex B.1`). Do not change the queries, relationships, measures, roles, or pages the tutorials created, except where an exercise asks you to extend the role. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives. Neither exercise needs a license.
+
+### Managerial Accounting Exercises
+
+**Exercise B.1: Securing Pay Data**
+
+**Table group:** Payroll and Time
+
+**Scenario.** After Guided Tutorial B.1, the controller asks whether department managers could see what individual employees are paid. LaborTimeEntry carries the cost of each line of labor time, and the production manager, who does see the plant's employees, should see their hours but not their pay.
+
+**Requirements.**
+
+(1) Add a measure `Labor Cost`, the sum of LaborTimeEntry[ExtendedLaborCost], and a page `Ex B.1` with a table visual of Manufacturing Hours and Labor Cost by JobTitle for 2026.
+
+(2) In **TMDL view**, script the Cost Center Managers role by dragging it from the **Model** tab of the Data pane into a new script tab. Add a column permission that sets the metadata permission of ExtendedLaborCost to none, keep the role's existing rules, and choose **Preview** and then **Apply**.
+
+(3) View the report as the Production Manager with **View as**, and record what happens to the page of requirement (1) and to the Plant page. View it with the Finance role and compare.
+
+(4) On the Optimize tab, open **Performance analyzer**, record the visuals of the Budget page without a role and then with View as, and compare the durations.
+
+(5) Explain why object-level security, not row-level security, is the right tool for this requirement, and what the controller should do about visuals that fail for the role.
+
+**Deliverable.** The role's script, the comparison, and a short note answering requirement (5).
+
+
+
+### Auditing Exercises
+
+**Exercise B.2: Reviewing Access with a Query**
+
+**Table group:** Organizational Planning, with the Employee table from Master Data
+
+**Scenario.** Guided Tutorial B.1 checked the security table by eye. Internal audit wants the review as a query it can run every quarter, so that the security table is tested against the employee records each time it changes.
+
+**Requirements.**
+
+(1) Import T74_Employee as `AccessEmployees`, keeping EmployeeID, EmployeeName, Email, JobTitle, CostCenterID, EmploymentStatus, and TerminationDate. Leave it unrelated to the other tables.
+
+(2) In DAX query view, in a query tab named `Ex B.2`, write a query that lists the cost centers with no row in the security table, by name.
+
+(3) Add a query that lists the users mapped to more than one cost center.
+
+(4) Add a query that returns one row per user in the security table, with the employee whose Email matches the user's name, that employee's job title, status, termination date, and own cost center, and a column that flags users who match no employee, who are terminated, or who are mapped to a cost center other than their own.
+
+(5) The role of Guided Tutorial B.1 has no rule on AccessEmployees. View the report as the Sales Manager, and find out what a manager in the role could see of the new table.
+
+(6) Explain what the queries found, how often internal audit should run them, and what to do about AccessEmployees before the file is published.
+
+**Deliverable.** The query tab and a short note answering requirements (5) and (6).

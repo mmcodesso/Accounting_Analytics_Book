@@ -22,10 +22,10 @@
       ],
       "reviewed_source_hashes": {
         "chapters/01-role-of-analytics/_key-terms.qmd": "41517c74b7e2aad9e77f30d70ef38c140f33ba912cdd16310204e525bcd4de22",
-        "chapters/01-role-of-analytics/_references.qmd": "67175a9c9879b1b73d4ded4340f3fe584e467de276a4cef3b81ee628cb107413",
-        "chapters/01-role-of-analytics/_summary.qmd": "fda4c40a51aef40de02257cb51be430b788cfbbcc24707098b2b9d55bb5027c8",
+        "chapters/01-role-of-analytics/_references.qmd": "aecdef83370ca14c62d80ddf8ee3bbfd7ab1d67fdfc7c3188dae0c68a6baa6b2",
+        "chapters/01-role-of-analytics/_summary.qmd": "0f4c94cbe2437803963b1beae794e6260a11cb0db8156fc288b4db898c0a011b",
         "chapters/01-role-of-analytics/_tutorial-01.qmd": "3789d3b88f6c5892daa35493510b5bd76481c54553947346ee981e765fd6066d",
-        "chapters/01-role-of-analytics/chapter.qmd": "008d50d583cc500954fb2fdbdd0cf8b39399244f27679e5a83caf43eb4a4e366"
+        "chapters/01-role-of-analytics/chapter.qmd": "a3b19414fd04c41b114eefac42b8b9fd26871f9de1917d100d27ed62f59f68b5"
       },
       "approval_note": "Author approved the finished 47-slide storytelling revision, including cover, surname-only attribution, and architecture alignment, on 2026-10-05: \"Great. I aprove this version\".",
       "artifact_checks": {
@@ -178,7 +178,7 @@
         "chapters/06-descriptive-analytics/_tutorial-01.qmd": "922b21814dc3b4a6c72936097177794f02cdac769721a1cb1aaefde6972a725c",
         "chapters/06-descriptive-analytics/_tutorial-02.qmd": "75248485cacea34a3df01b129c8598d2d938b70415d0a64118b1049f10005586",
         "chapters/06-descriptive-analytics/_tutorial-03.qmd": "ee698e281b669feef930cd0d64013ea0077db7514e979719bc695b6d38f4342c",
-        "chapters/06-descriptive-analytics/_references.qmd": "5394aca5733a8b4078305951290b0d1bd740bb846dd929a3ef1d840039bdbf9c"
+        "chapters/06-descriptive-analytics/_references.qmd": "824fdc2974a3562ee85b8f00dd7a61c68769fb227e4c1cbed57160e3a36ae90e"
       },
       "artifact_checks": {
         "native_table": true,
@@ -382,7 +382,7 @@
         "chapters/13-power-bi-essentials/_references.qmd"
       ],
       "reviewed_source_hashes": {
-        "chapters/13-power-bi-essentials/chapter.qmd": "ac621d4b5278fe5d83d1b5632dcbaae046ae91876c18c22b0c7fc66f081ad76c",
+        "chapters/13-power-bi-essentials/chapter.qmd": "ee4bcf819e408f5a5c4ba21ffc2a8014e8f87b4711d622b0ea70c07e40c0aeac",
         "chapters/13-power-bi-essentials/_key-terms.qmd": "98a37d5dcbff9387c321397d8f5ebd83646ebf31ee26b6caed4b553def32e68b",
         "chapters/13-power-bi-essentials/_summary.qmd": "ca6bae6cec3f4dc72cf30faca4e6ca3c477fc6a5739e0ff29608a17340ad5b4d",
         "chapters/13-power-bi-essentials/_tutorial-01.qmd": "3c2f3a90024671f2722565a5ed0548a0e63aeccc2b5f07db6b58bee1f3c68006",

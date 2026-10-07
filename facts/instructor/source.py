@@ -8,7 +8,7 @@ chapter) is looked up in this order:
 2. the note rendered from its template through the registry in facts/notes (the key is found from the registry's own
    keys and `file` fields: the file and the name `ex1`, `r3`, `m1`, `t2`, `mcq`; nothing maps a label by hand);
 3. the literal comment archived from commit 4feb03f (facts/instructor/baseline-4feb03f.json), for the few notes that
-   never had a template (Exercise A.1, Requirement 1 of the Part I case, the Guided Tutorial A.2 notes, and eleven
+   never had a template (Exercise B.1, Requirement 1 of the Part I case, the Guided Tutorial B.2 notes, and eleven
    answer keys).
 
 A label that none of the three can supply raises KeyError: nothing is guessed.  The rendered text is the whole

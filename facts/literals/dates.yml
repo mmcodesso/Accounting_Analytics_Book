@@ -68,14 +68,16 @@ files:
     - {rx: 'paid on {Y}', key: date.payroll.last_pay}
   chapters/18-make-buy-or-reprice/chapter.qmd:
     - {rx: '*', class: constant, why: "the story's calendar (a quote that expires on 15 September), with no year"}
-  appendices/a-publishing-security/_tutorial-02.qmd:
+  appendices/b-publishing-security/_tutorial-02.qmd:
     - {rx: '*', class: real, why: "Microsoft Learn page dates"}
-  appendices/a-publishing-security/_exercises.qmd:
+  appendices/b-publishing-security/_exercises.qmd:
     - {rx: '*', class: real, why: "Microsoft Learn page dates"}
   # --- the slides --------------------------------------------------------------------------------
   slides/chapter-02/index.qmd:
     - {rx: 'earliest shipment {Y}', key: date.invoice_before_shipment.first_ship}
   # --- code that mirrors the text ----------------------------------------------------------------
+  scripts/slides/verify.py:
+    - {rx: "author's decision, {Y}", class: real, why: "the date of the author's decision, in a comment"}
   scripts/companion/pbibuild/ex15.py:
     - {rx: 'drew it on {Y}', class: real, why: "the day the chart was read in Desktop"}
   facts/notes/*.py:

@@ -276,7 +276,7 @@ def story_of(figure: str) -> str:
     m = re.match(r"fig-(\d\d)-", figure)
     if m:
         return CHAPTER_STORY.get(int(m.group(1)), "")
-    return "Appendix: publishing and security" if figure.startswith("fig-a-") else ""
+    return "Appendix: publishing and security" if figure.startswith("fig-b-") else ""
 
 
 # --- the rehearsal ---------------------------------------------------------------------------------------------

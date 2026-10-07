@@ -331,7 +331,7 @@ Review changes to rules, measures, and report behavior.
 Keep local caches and settings out of the shared history.
 
 ::: {.notes}
-Purpose: introduce version control for report definitions. Allow 60-90 seconds. A project representation makes text-based differences reviewable. Microsoft documents localSettings.json and cache.abf as default Git exclusions for PBIP. Inspect the generated ignore rules and the files being shared; a project format does not itself approve a change or protect every sensitive source setting. Publishing and access controls are covered in Appendix A. Misconception to address: saving as a project automatically creates a governed approval process. Pause and ask: Which change would require rerunning the exception-count controls? Transition: complete the assurance activity.
+Purpose: introduce version control for report definitions. Allow 60-90 seconds. A project representation makes text-based differences reviewable. Microsoft documents localSettings.json and cache.abf as default Git exclusions for PBIP. Inspect the generated ignore rules and the files being shared; a project format does not itself approve a change or protect every sensitive source setting. Publishing and access controls are covered in the appendix on publishing, securing, and sharing reports. Misconception to address: saving as a project automatically creates a governed approval process. Pause and ask: Which change would require rerunning the exception-count controls? Transition: complete the assurance activity.
 :::
 
 ## Tutorial 16.3 and chapter handoff {#ch16-31 .balanced .stepwise}
