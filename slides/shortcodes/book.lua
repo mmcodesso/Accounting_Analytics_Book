@@ -199,11 +199,18 @@ local function book_terms(_, _, meta)
 end
 
 local function book_steps(args, _, meta)
-  local steps = {}
-  for _, step in ipairs(tutorial(meta, pandoc.utils.stringify(args[1] or '')).steps) do
-    table.insert(steps, step.title)
+  -- An optional range, such as 1-6 and 7-11, splits a long tutorial over two slides; each step keeps its number.
+  local steps = tutorial(meta, pandoc.utils.stringify(args[1] or '')).steps
+  local first, last = pandoc.utils.stringify(args[2] or ''):match('^(%d+)%-(%d+)$')
+  first, last = tonumber(first) or 1, tonumber(last) or #steps
+  local lines = {}
+  for _, step in ipairs(steps) do
+    if step.number >= first and step.number <= last then
+      table.insert(lines, math.tointeger(step.number) .. '. ' .. step.title)
+    end
   end
-  return blocks(bullets(steps, 'number'))
+  if #lines == 0 then error('No steps ' .. first .. '-' .. last .. ' in this tutorial') end
+  return blocks(table.concat(lines, '\n'))
 end
 
 local function book_checkpoint(args, kwargs, meta)

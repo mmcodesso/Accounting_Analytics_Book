@@ -5,7 +5,8 @@ drawn), and Pandoc gives every table the built-in "Medium Style 2 - Accent 1". S
 book's table look into each cell instead: a blue header row with white bold text, light banded rows
 and thin horizontal rules. The tables stay native and editable. Figure captions, which Pandoc writes
 at the body size, get the smaller gray type of the Reveal captions; a caption too long for one line
-gets the room for its lines from the picture above it.
+gets the room for its lines from the picture above it. Numbered lists get numbers in the body font
+and room for two digits.
 """
 from __future__ import annotations
 
@@ -22,6 +23,7 @@ RULE_WIDTH = '9525'  # 0.75 pt
 EMU_PER_POINT = 12700
 CHARACTER_WIDTH = 0.47  # the average width of Arial text, as a share of its size
 BOX_INSET = 7.2         # PowerPoint's default left and right text insets, in points
+NUMBER_GAP = 6          # the least space between a list number and its text, in points
 
 
 def _line(tag: str, color: str | None) -> ET.Element:
@@ -114,18 +116,47 @@ def format_captions(slide: ET.Element, tokens: dict) -> None:
             make_room(pictures[0], shape, caption_lines(text, int(ext.get('cx')), size), size)
 
 
+def format_lists(slide: ET.Element, tokens: dict) -> None:
+    """Pandoc's hanging indent leaves a list number no room for two digits, and PowerPoint draws the
+    number of an item that opens with code in the wider code font (it ignores the bullet font for
+    that), so the number runs into the text. A list gets the indent its widest number needs, and its
+    numbers the body font where PowerPoint honors it."""
+    size = tokens['sizes']['body']
+    for body in slide.iter(q('p', 'txBody')):
+        numbered = [pr for pr in body.findall('a:p/a:pPr', NS) if pr.find('a:buAutoNum', NS) is not None]
+        if not numbered:
+            continue
+        highest = max(int(pr.find('a:buAutoNum', NS).get('startAt', '1')) for pr in numbered) + len(numbered) - 1
+        code_first = any(
+            (paragraph.find('a:r/a:rPr/a:latin', NS) is not None
+             and paragraph.find('a:r/a:rPr/a:latin', NS).get('typeface') == tokens.get('code_font'))
+            for paragraph in body.findall('a:p', NS) if paragraph.find('a:pPr/a:buAutoNum', NS) is not None)
+        # Arial digits are 0.556 em and the period 0.278 em; every character of a code font is 0.55 em.
+        width = (len(str(highest)) + 1) * 0.55 if code_first else len(str(highest)) * 0.556 + 0.278
+        needed = round((width * size + NUMBER_GAP) * EMU_PER_POINT)
+        for pr in numbered:
+            if pr.find('a:buFont', NS) is None:
+                auto = pr.find('a:buAutoNum', NS)
+                pr.insert(list(pr).index(auto), ET.Element(q('a', 'buFont'), typeface=tokens['font']))
+            if needed > int(pr.get('marL', '0')):
+                pr.set('marL', str(needed))
+                pr.set('indent', str(-needed))
+
+
 def finish(path: Path, tokens: dict) -> None:
-    """Rewrite the deck in place; only slides with a table or a figure change."""
+    """Rewrite the deck in place; only slides with a table, a figure or a numbered list change."""
     colors = tokens['colors']
     temporary = path.with_name(f'.{path.name}.tmp')
     with zipfile.ZipFile(path) as source, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as target:
         for item in source.infolist():
             data = source.read(item.filename)
-            if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data):
+            if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data
+                                                   or b'buAutoNum' in data):
                 xml = ET.fromstring(data)
                 for table in xml.iter(q('a', 'tbl')):
                     format_table(table, colors)
                 format_captions(xml, tokens)
+                format_lists(xml, tokens)
                 data = ET.tostring(xml, encoding='utf-8', xml_declaration=True)
             target.writestr(item, data)
     shutil.move(temporary, path)

@@ -1,0 +1,507 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter opens Part II and builds the workbook in which the rest of Part II answers the controller's question. Each module follows a section of the chapter, and the three guided tutorials build the workbook step by step.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover why structure matters and the building blocks: Tables, Power Query, structured references, and cell references and names.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover exploring the data, making exceptions visible, protecting the inputs, and documenting the workbook for a reviewer.
+:::
+
+## Build it to hand to someone else
+
+- The controller has read your data readiness memo from Part I and wants the diagnostic answer
+- Why did Furniture gross margin fall from the third quarter to the fourth?
+- The finance team, and possibly the auditors, will review the analysis
+- So the workbook must refresh, never alter the company's data, and lead a reviewer from any number to its source
+
+::: {.notes}
+"Build it as if you were going to hand it to someone else," she says, "because you are." In Part I you filtered worksheets and wrote one-off test formulas in CharlesRiver.xlsx; this chapter builds a sturdier foundation. Ask students what would make them trust a workbook someone else built.
+:::
+
+# Why Workbook Structure Matters
+
+## Spreadsheet errors are common; checks are informal
+
+- Panko: errors occur in a few percent of all cells, so a large workbook almost surely holds some
+- Powell et al.: error rates vary widely, and most errors change nothing, but one was worth $100 million
+- Caulkins et al.: managers call errors common, and quality control is mostly informal
+- Church et al.: smaller companies still do their leading accounting tasks in Excel
+
+::: {.notes}
+For a large spreadsheet the question is not whether an error exists but how many there are. In one field audit, nine of the twenty-five spreadsheets had no errors at all, so a workbook's appearance says little about its accuracy. Because accountants keep working in Excel, a spreadsheet behind a cost analysis or an audit procedure must be both accurate and reviewable.
+:::
+
+## Structure is a control, not a guarantee
+
+- Little is known about which design practices prevent which errors (Powell et al.)
+- A structured design approach cut errors in the links between parts of a workbook (Janvrin and Morrison)
+- Tables, named parameters, validation and documentation remove common chances for error
+- They also leave the logic visible to the person who checks it
+
+::: {.notes}
+These practices are controls in the accounting sense: procedures that reduce the risk of a misstatement and leave evidence that the work was done properly. They do not replace careful review; they make it possible.
+:::
+
+# Excel Tables and Structured References
+
+## An Excel Table manages its data as one named object
+
+- It knows where its data begins and ends, and which row holds the headers
+- It adds filter buttons and banding, and grows when you add rows
+- Every worksheet of CharlesRiver.xlsx already stores its data as a Table
+- So Data > Filter turns their filter buttons off rather than on
+
+::: {.notes}
+Each Charles River Table is named with a number and the database table it holds, shown in the Table Name box on the Table Design tab. Data that arrives as a plain range becomes a Table with Ctrl+T, and it deserves a descriptive name, because Table1 tells a reviewer nothing.
+:::
+
+## A plain range depends on cell addresses
+
+{{< book-figure fig-04-01 crop="0,0,1,0.462" >}}
+
+::: {.notes}
+The total names fixed cells, so rows added below the data are left out and nothing warns you: a number that looks reasonable, which is what makes a range error dangerous. The column formula was copied down by hand, so every row holds its own copy and new rows get none.
+:::
+
+## A Table knows its extent and names its columns
+
+{{< book-figure fig-04-01 crop="0,0.462,1,0.538" >}}
+
+::: {.notes}
+The same cells as a Table: one calculated-column formula fills every row, including rows added later, and the total refers to the column by name. The chapter's comparison table adds that slicers work only on Tables, and that charts and PivotTables follow a Table as it grows, although a PivotTable still needs a refresh.
+:::
+
+## Structured references state their own logic
+
+- `SalesInvoiceLine[LineTotal]` is the whole column, however many rows it holds
+- `[@Quantity]` is the value in the current row
+- Click a Table cell while writing a formula, and Excel inserts the reference
+- A formula typed in an empty column becomes a calculated column for every row
+
+::: {.notes}
+A reviewer who reads an average of SalesInvoiceLine[LineTotal] knows what is averaged; one who reads a cell range must check the column and the last row. If one row of a calculated column holds a different formula, Excel marks it with a small triangle, a useful warning when you review someone else's workbook.
+:::
+
+## Watch out: a Table grows when you type next to it {.watch-out}
+
+- A value typed in the row below a Table becomes a new row
+- One typed in the column to its right becomes a new column
+- So a summary typed beside a Table ends up inside it
+- Keep summaries, parameters and notes on their own worksheets
+
+::: {.notes}
+A summary formula that lands inside a Table may be copied to thousands of rows or refer to itself. Leave the data worksheets to the Tables alone.
+:::
+
+# Bringing Data into the Workbook with Power Query
+
+## Power Query brings data in without changing it
+
+- Working in the company workbook alters its data, carries far more than needed, and records no steps
+- Power Query connects to the source, and its editor shapes the data
+- Each filter, removed column or type change is recorded under Applied Steps
+- The result loads as a Table, and Data > Refresh All repeats every step
+
+::: {.notes}
+A copy of the data leaves the source alone but goes stale, which Power Query also solves. In the Navigator, choose the Table objects rather than the worksheets, because a Table already defines its headers and its extent. The tutorials need desktop Excel: on a Mac the Power Query Editor needs Excel for Microsoft 365, and the workbook is too large for Excel for the web.
+:::
+
+## Check the types Power Query chose
+
+- Power Query types each column from its first 200 rows, in a step named Changed Type
+- The first invoice lines carry no promotion, so Discount can arrive as a whole number
+- A whole-number Discount rounds every rate to zero
+- Fix it with Replace current, which corrects Changed Type before any rounding
+
+::: {.notes}
+Add new step would correct the type only after the rates were lost. Check the type icon of every column you will calculate with before you load a query, as Tutorial 4.1 does.
+:::
+
+# Guided Tutorial 4.1: Building the Furniture Analysis Workbook with Power Query
+
+## Steps 1 to 6: connect and shape the queries
+
+{{< book-steps 4.1 1-6 >}}
+
+::: {.notes}
+Students create Charles River Furniture Analysis.xlsx beside CharlesRiver.xlsx and import four Tables: the invoices, the invoice lines, the items and the promotion programs. They click Transform Data, not Load, so they can shape the data before it reaches the workbook.
+:::
+
+## Choose the Tables, then Transform Data
+
+{{< book-figure fig-04-02 >}}
+
+::: {.notes}
+The Navigator lists each worksheet and each Table, with a different icon for each. Select multiple items, check the four Tables, and preview one before you continue.
+:::
+
+## Applied Steps record how the data was prepared
+
+{{< book-figure fig-04-03 >}}
+
+::: {.notes}
+The Item query keeps only the items Charles River sells, those with a list price, and only the columns the analysis needs. Clicking any step shows the data as it was at that point, which is the evidence a reviewer looks for.
+:::
+
+## Steps 7 to 11: load, extend and prove the import
+
+{{< book-steps 4.1 7-11 >}}
+
+::: {.notes}
+Close & Load puts each query in its own worksheet as a Table named after the query. The control totals compare the invoice lines with the invoices they belong to, and the refresh test shows that the calculated columns survive a reload.
+:::
+
+## Two calculated columns extend the invoice lines
+
+{{< book-figure fig-04-04 >}}
+
+::: {.notes}
+ListAmount is what each line would have been billed at the item's list price, and DiscountAmount is the promotional discount taken on it. Discount holds a rate and is zero on lines without a promotion, so DiscountAmount is zero there too.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 4.1 lead="true" >}}
+
+::: {.notes}
+The zero difference shows that every invoice line was imported and that the lines add up to their invoices. The list amount is higher because most lines are billed at price-list prices below list, and some also carry a promotion; Tutorial 4.3 finds out which.
+:::
+
+# Cell References and Named Cells
+
+## References change differently when copied
+
+{{< book-figure fig-04-05 >}}
+
+::: {.notes}
+Relative references suit row-by-row calculations, absolute references point every copy at one cell such as a total or a threshold, and mixed references let one formula fill a two-way grid. While you edit a formula, F4 (Cmd+T on a Mac) cycles a reference through the four forms.
+:::
+
+## Check your understanding {.check}
+
+Copy each reference one row down and one column right. What does it become?
+
+1. `A2`
+2. `$A$2`
+3. `$A2`
+4. `A$2`
+
+::: {.notes}
+Give students a moment to work out each one before showing the answers. The hint: a dollar sign locks whatever follows it.
+:::
+
+## A dollar sign locks what follows it {.answer}
+
+1. `B3`: both parts adjust
+2. `$A$2`: nothing changes
+3. `$A3`: the column stays, the row adjusts
+4. `B$2`: the row stays, the column adjusts
+
+::: {.notes}
+Mixed references are what let Tutorial 4.2 fill its grid from a single formula: the pricing methods sit in a locked column, the discount rates in a locked row.
+:::
+
+## Watch out: filling across shifts structured references {.watch-out}
+
+- Filling down leaves a structured reference unchanged
+- Filling across moves it to the next column of the Table, with no error
+- Copy and paste instead, or lock the column: `[[PricingMethod]:[PricingMethod]]`
+- Then read the formula bar of a cell in the middle of the result
+
+::: {.notes}
+A COUNTIFS that refers to the PricingMethod column, filled one column to the right, can silently count a different column. Tutorial 4.2 copies and pastes its grid formula for this reason.
+:::
+
+## Named cells hold the parameters of an analysis
+
+- Name a cell in the Name Box, such as LargeLineThreshold
+- A name behaves like an absolute reference, and the formula states its logic
+- Keep every parameter on one worksheet, with a name and a description
+- The Name Manager lists every name, and every Table, with its value and cell
+
+::: {.notes}
+A formula that counts the lines above LargeLineThreshold says what it does. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed. When a parameter changes, every formula that uses it updates, and a reviewer sees in one place which values drove the results.
+:::
+
+# Guided Tutorial 4.2: Parameters, Named Cells, and a Summary Grid
+
+## Build the parameters and the grid in seven steps
+
+{{< book-steps 4.2 >}}
+
+::: {.notes}
+The large-line threshold comes from the data itself, with PERCENTILE.INC on the line totals, rather than from a typed amount. About a tenth of the lines are large by this definition, yet they hold close to a third of the value billed.
+:::
+
+## The Analysis worksheet after Tutorial 4.2
+
+{{< book-figure fig-04-06 >}}
+
+::: {.notes}
+The control totals from Tutorial 4.1 sit above the large-line measures and the grid. The selected cell's formula, in the formula bar, reads its pricing method from a locked column and its discount rate from a locked row.
+:::
+
+## A promotion is a discount on top of a price
+
+{{< book-figure fig-04-06 crop="0,0.466,1,0.534" >}}
+
+::: {.notes}
+Most lines are billed at a segment price list with no discount. Discounts at the promotions' rates appear with every pricing method except Base List, which Charles River uses only for its hourly design services. So a promotion is not a way of pricing a line, and a slicer on PromotionID, in Tutorial 4.3, is the way to see which promotions were used.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 4.2 lead="true" >}}
+
+::: {.notes}
+If the grand total does not equal the number of invoice lines, a label in the grid does not match the data exactly. The share block should add up to one hundred percent.
+:::
+
+# Sorting, Filtering, and Slicers
+
+## Sort on several levels and filter on conditions
+
+- Data > Sort adds levels: the first sets the order, later ones break ties
+- Number, text and date filters select by condition, not only by value
+- Filters on different columns combine, and the status bar counts the rows in view
+- Relative date filters count from today, so filter historical data by explicit dates
+
+::: {.notes}
+For example, sort the invoice lines by PromotionID and then by LineTotal from largest to smallest. A historical extract such as the Charles River data ends on a fixed date, so This Quarter or Last Year returns the wrong period or nothing at all.
+:::
+
+## SUBTOTAL and slicers work on the rows in view
+
+- A filter hides rows, but SUM still totals every row of the Table
+- `SUBTOTAL(109, …)` sums the visible rows, and `SUBTOTAL(103, …)` counts them
+- A slicer is a panel of buttons, one per value, that filters a Table
+- It shows which filter is active, and Clear Filter brings every row back
+
+::: {.notes}
+Function numbers in the hundreds also exclude rows hidden by hand, while those below, such as 9 for a sum, include them; rows removed by a filter are always excluded. A SUM beside a SUBTOTAL shows both the whole population and the part in view. Slicers return on PivotTables later in Part II and on Power BI report pages in Part IV.
+:::
+
+## Check your understanding {.check}
+
+A slicer shows one promotion's lines. What does each formula return?
+
+1. `=SUM(SalesInvoiceLine[DiscountAmount])`
+2. `=SUBTOTAL(109,SalesInvoiceLine[DiscountAmount])`
+3. `=SUBTOTAL(103,SalesInvoiceLine[SalesInvoiceLineID])`
+4. `=SUBTOTAL(9,SalesInvoiceLine[DiscountAmount])`, after you hide some of those lines by hand
+
+::: {.notes}
+Ask students whether each result changes when they click a different slicer button.
+:::
+
+## SUM sees every row; SUBTOTAL sees the view {.answer}
+
+1. The discount on every line, in view or not
+2. The discount on the promotion's lines in view
+3. The number of the promotion's lines in view
+4. The promotion's discount, still counting the lines hidden by hand
+
+::: {.notes}
+Only the function numbers in the hundreds leave out rows hidden by hand; every SUBTOTAL leaves out rows removed by a filter or a slicer.
+:::
+
+# Conditional Formatting
+
+## Conditional formatting directs attention
+
+{{< book-table tbl-04-03 rows="Highlight Cells Rules,Top/Bottom Rules,Data Bars" >}}
+
+::: {.notes}
+Conditional formatting changes how cells look, never the data, so instead of reading thousands of rows you see where the large amounts and the exceptions are. Every rule type is on the Home tab under Conditional Formatting.
+:::
+
+## Scales, icons and formula rules show patterns
+
+{{< book-table tbl-04-03 rows="Color Scales,Icon Sets,Formula-based rules" >}}
+
+::: {.notes}
+Color scales and icon sets show the spread of values at a glance. The formula-based rule is the most flexible, because it can format a whole row from the value in one of its columns, as the next slide shows.
+:::
+
+## A formula rule can shade a whole row
+
+- Select the Table's data rows, with the first data cell active
+- Enter a rule such as `=$J2>0`, where column J holds Discount
+- The dollar sign fixes the column; the row adjusts for every cell
+- Rules use cell references, not structured references
+
+::: {.notes}
+When two rules set the same property, the rule higher in the Manage Rules list wins, and a new rule goes to the top; Stop If True keeps lower rules from applying. Check the column letter of the field before writing the rule.
+:::
+
+## Watch out: color alone is a weak way to report {.watch-out}
+
+- Color-blind readers may miss it, and a printout may lose it
+- A highlighted cell cannot be counted or totaled
+- Use formatting to find the exceptions, then record them in a lasting form
+- A flag column, a COUNTIFS total or a filtered list all survive
+
+::: {.notes}
+Filter by Color, on the filter button of a formatted column, is a quick way to go from the highlighted cells to such a list.
+:::
+
+# Data Validation
+
+## Validation guards the inputs against typing mistakes
+
+- Data > Data Validation allows a list, a number or date range, a text length or a custom rule
+- The Input Message explains the parameter; a Stop alert refuses an invalid entry
+- Pasting over the cell replaces the rule, and formula results are never checked
+- Values already in the cells are not checked either, but Circle Invalid Data marks them
+
+::: {.notes}
+A mistyped parameter flows silently into every formula that depends on it, which is why validation belongs on parameter cells. Audit and finance workbooks often gather every parameter on one worksheet, named, validated and described, so a reviewer can confirm each assumption in one place.
+:::
+
+# Organizing and Documenting the Workbook
+
+## Four layers keep data, inputs, logic and notes apart
+
+{{< book-figure fig-04-07 >}}
+
+::: {.notes}
+Data worksheets hold only the Tables the queries load, so a refresh can replace them safely. A questioned number leads to its formula, the formula to its Table and parameter, and the query to its source and steps: the source-to-ledger traceability of Chapters 1 and 3, applied to your own work.
+:::
+
+## A documentation worksheet comes first
+
+- Purpose, source, Tables and query filters, and the date of the last refresh
+- The parameters and what each controls; the worksheets and their contents
+- The preparer and the reviewer, and any open questions or limitations
+- A formatting convention, such as blue inputs and black formulas
+
+::: {.notes}
+The aim is the one auditing standards set: the PCAOB requires documentation that lets an experienced auditor with no previous connection to the engagement understand the work, and that shows who performed and who reviewed it. The same practices underlie the audit workpapers at the end of Part II.
+:::
+
+## Check your understanding {.check}
+
+Which tool does each job?
+
+1. Shade every invoice line that carries a discount
+2. Refuse an impossible threshold percentile
+3. Let a reviewer see every assumption in one place
+4. Record the source, the steps, the preparer and the reviewer
+
+::: {.notes}
+Several tools could help with some of these; ask students for the one the chapter recommends.
+:::
+
+## Each job has its tool {.answer}
+
+1. A formula-based conditional formatting rule
+2. Data validation with a Stop alert
+3. Named, validated cells on a parameters worksheet
+4. The documentation worksheet, placed first
+
+::: {.notes}
+Together these are the workbook's controls: they reduce the risk of an error and leave evidence that the work was done properly.
+:::
+
+# Guided Tutorial 4.3: Surfacing Promotions and Documenting the Workbook
+
+## Finish the workbook in nine steps
+
+{{< book-steps 4.3 >}}
+
+::: {.notes}
+Students protect the threshold with validation, shade the promotion lines, sort and slice them, and measure the lines in view. They then look up the promotion that stands out and record what they found on a documentation worksheet.
+:::
+
+## One promotion stands out in lines and discount
+
+{{< book-figure fig-04-08 >}}
+
+::: {.notes}
+The SUBTOTAL formulas follow the slicer while the SUM stays fixed, so clicking each button compares the promotions. The Furniture Seasonal Promotion has more lines than any other and far more discount dollars.
+:::
+
+## The documentation records the clue and the gaps
+
+{{< book-figure fig-04-09 >}}
+
+::: {.notes}
+The open question names the promotion: ten percent off the whole Furniture group, effective across the end of the third quarter and the start of the fourth. Its effect in each quarter cannot yet be measured, because the invoice lines carry no invoice date or item group.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 4.3 lead="true" >}}
+
+::: {.notes}
+Students have not yet shown that this promotion explains the fall in the Furniture margin. To measure its effect in each quarter, the invoice lines must first be combined with the invoice dates and item groups held in other Tables.
+:::
+
+# Looking Ahead
+
+## Back to the controller's question
+
+- The Furniture Seasonal Promotion has the most promotion lines and discount dollars
+- Its dates straddle the end of the third quarter and the start of the fourth
+- A clue, not an answer: the invoice lines carry no invoice date or item group
+- Chapter 5 combines them with the invoices, items and customers into one table
+
+::: {.notes}
+The later chapters of Part II summarize that table and measure the effects that explain the change in margin. They extend the workbook built here, with its queries, parameters and documentation.
+:::
+
+## Summary
+
+- Workbook structure is a control: it removes chances for error and shows the logic
+- Tables stay correct as data grows; Power Query never changes the source
+- Relative, absolute and mixed references decide what a copied formula does
+- Sorts, filters, slicers and SUBTOTAL explore; formatting and validation guard
+- Layers and a documentation worksheet lead a reviewer to every source
+
+::: {.notes}
+Ask students which practice they would most want to see in a workbook someone handed them. The documentation worksheet keeps growing through Part II.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Control total and parameter cell are ideas the rest of Part II relies on.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 4.5 builds a refreshable exception report, an auditing use of the same techniques. Chapter 5 prepares and combines the data the analysis needs.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::

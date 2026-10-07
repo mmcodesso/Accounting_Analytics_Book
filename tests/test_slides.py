@@ -247,6 +247,16 @@ class SourceCheckTests(unittest.TestCase):
             for missing in ("no figure fig-01-09", "no table tbl-09-01", "no Guided Tutorial 1.4"):
                 self.assertTrue(any(missing in error for error in errors), missing)
 
+    def test_a_step_range_must_lie_inside_its_tutorial(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            slide = "\n## Steps\n\n{{{{< book-steps 1.1 {} >}}}}\n\n::: {{.notes}}\nThe tutorial's steps, in part.\n:::\n"
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-2"))
+            self.assertEqual([], self.check(root)[0])
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-5"))
+            self.assertTrue(any("has no steps 2-5" in error for error in self.check(root)[0]))
+
     def test_a_divider_that_names_no_section_is_a_warning(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -382,6 +392,25 @@ class PowerPointTests(unittest.TestCase):
         center = 2 * int(picture.find('a:off', NS).get("x")) + int(picture.find('a:ext', NS).get("cx"))
         self.assertAlmostEqual(2 * 3000000 + 5000000, center, delta=1)
         self.assertEqual("2000", long.find('.//a:rPr', NS).get("sz"))
+
+    def test_list_numbers_take_the_body_font_and_room_for_two_digits(self) -> None:
+        def slide(start: int, first_run: str) -> ET.Element:
+            item = ('<a:p><a:pPr marL="342900" indent="-342900"><a:buAutoNum type="arabicPeriod"'
+                    f' startAt="{start}"/></a:pPr>{first_run}</a:p>')
+            return ET.fromstring(f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree><p:sp>'
+                                 f'<p:txBody>{item * 3}</p:txBody></p:sp></p:spTree></p:cSld></p:sld>')
+        tokens = {"font": "Arial", "code_font": "Consolas", "sizes": {"body": 24}}
+        code = '<a:r><a:rPr><a:latin typeface="Consolas"/></a:rPr><a:t>A2</a:t></a:r>'
+        text = '<a:r><a:rPr/><a:t>Step</a:t></a:r>'
+        plain, coded, long = slide(1, text), slide(1, code), slide(9, text)
+        for xml in (plain, coded, long):
+            pptx_finish.format_lists(xml, tokens)
+        first = plain.find('.//a:pPr', NS)
+        self.assertEqual("Arial", first.find('a:buFont', NS).get("typeface"))
+        self.assertEqual(["buFont", "buAutoNum"], [child.tag.split("}")[1] for child in first])
+        self.assertEqual("342900", first.get("marL"))   # one Arial digit fits the indent Pandoc gives
+        self.assertLess(342900, int(coded.find('.//a:pPr', NS).get("marL")))   # a code-font number is wider
+        self.assertLess(342900, int(long.find('.//a:pPr', NS).get("marL")))    # and so are 10 and 11
 
     @unittest.skipUnless(shutil.which("quarto"), "needs Quarto for Pandoc's default template")
     def test_the_template_carries_footer_backgrounds_and_no_name(self) -> None:

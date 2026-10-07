@@ -162,6 +162,7 @@ NOTES = re.compile(r"^:{3,}\s*\{?\.notes\}?\s*$", re.M)
 SLIDE_HEADING = re.compile(r"^(#{1,2})\s+(.+?)\s*(?:\{[^}]*\})?\s*$", re.M)
 AUTHOR_NAME = re.compile(r"\b(?:Codesso|Mauricio)\b", re.I)
 CITATION = re.compile(r"\{\{<\s*book-(figure|table|steps|checkpoint)\s+([\w.-]+)")
+STEP_RANGE = re.compile(r"\{\{<\s*book-steps\s+([\w.]+)\s+(\d+)-(\d+)\s*>\}\}")
 FIGURE_CITE = re.compile(r"\{\{<\s*book-figure\s+([\w-]+)([^>]*)>\}\}")
 CROP = re.compile(r'crop\s*=\s*"([^"]*)"')
 
@@ -236,6 +237,11 @@ def verify_sources(root: Path, decks: list[str], index: dict) -> tuple[list[str]
             elif kind in {"steps", "checkpoint"} and not any(
                     tutorial["id"] == identifier for tutorial in chapter["tutorials"]):
                 errors.append(f"{label}: no Guided Tutorial {identifier} in {deck}")
+        for identifier, first, last in STEP_RANGE.findall(text):
+            numbers = next(({step["number"] for step in tutorial["steps"]}
+                            for tutorial in chapter["tutorials"] if tutorial["id"] == identifier), set())
+            if numbers and not (int(first) <= int(last) and {int(first), int(last)} <= numbers):
+                errors.append(f"{label}: Guided Tutorial {identifier} has no steps {first}-{last}")
         body = deck_text(text)
         # Every ## slide has notes for the speaker. # module dividers and the title slide are exempt.
         for section in re.split(r"(?m)^##\s+", body)[1:]:

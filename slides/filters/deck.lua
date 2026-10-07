@@ -33,21 +33,31 @@ local function roadmap(index, chapter, modules)
     if math.tointeger(number) == math.tointeger(chapter.number) then position = i end
   end
   local numeral, name = (chapter.part or ''):match('^Part (%u+): (.+)$')
-  local lead = numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name ..
-    '** · Chapter ' .. position .. ' of ' .. #chapter.part_chapters) or ''
+  local part = numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name .. '**') or ''
+  -- The chapter's place within its Part, which differs from its number after Part I.
+  local place = 'Chapter ' .. position .. ' of ' .. #chapter.part_chapters .. ' in this Part'
   local items = {}
   for _, module in ipairs(modules) do
     -- A tutorial is listed by its number; its divider carries the full title.
     table.insert(items, '- ' .. (module:match('^(Guided Tutorial [%w.]+):') or module))
   end
   if #items <= 8 then
-    return quarto.utils.string_to_blocks(lead .. '\n\n' .. table.concat(items, '\n'))
+    return quarto.utils.string_to_blocks(part .. ' · ' .. place .. '\n\n' .. table.concat(items, '\n'))
   end
-  -- A long chapter's modules take two columns, the Part and the chapter's place in it atop the first.
-  local half = math.ceil(#items / 2)
-  local left, right = {numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name ..
-    '**\n\nChapter ' .. position .. ' of ' .. #chapter.part_chapters) or '', ''}, {}
-  for i, item in ipairs(items) do table.insert(i <= half and left or right, item) end
+  -- A long chapter's modules take two columns, the Part and the chapter's place in it atop the first. The
+  -- split balances the columns' estimated lines (about 30 characters fit a line of a column), because
+  -- section titles differ in length and a column of long ones runs off a PowerPoint slide.
+  local function lines(text) return math.max(1, math.ceil(#text / 30)) end
+  local split, best = math.ceil(#items / 2), math.huge
+  for k = 1, #items - 1 do
+    local left_lines, right_lines = lines(part) + lines(place), 0
+    for i, item in ipairs(items) do
+      if i <= k then left_lines = left_lines + lines(item) else right_lines = right_lines + lines(item) end
+    end
+    if math.max(left_lines, right_lines) < best then split, best = k, math.max(left_lines, right_lines) end
+  end
+  local left, right = {part .. '\n\n' .. place, ''}, {}
+  for i, item in ipairs(items) do table.insert(i <= split and left or right, item) end
   return quarto.utils.string_to_blocks(':::: {.columns}\n::: {.column width="50%"}\n' ..
     table.concat(left, '\n') .. '\n:::\n\n::: {.column width="50%"}\n' .. table.concat(right, '\n') ..
     '\n:::\n::::')

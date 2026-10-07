@@ -102,7 +102,7 @@ notes or its answer slide give the answer.
 | Shortcode | Shows |
 |---|---|
 | `{{< book-objectives >}}`, `{{< book-objectives 4-6 >}}` | the chapter's learning objectives, verbatim, all or a range |
-| `{{< book-steps 1.1 >}}` | the step titles of Guided Tutorial 1.1 |
+| `{{< book-steps 1.1 >}}`, `{{< book-steps 4.1 7-11 >}}` | the step titles of a Guided Tutorial, all or a range (a tutorial of more than about eight steps goes on two slides) |
 | `{{< book-checkpoint 1.1 answers="hide" >}}` | the tutorial's checkpoint, without the answers in parentheses |
 | `{{< book-terms >}}` | the chapter's key terms, in one paragraph |
 | `{{< book-exercises >}}` | the exercise titles, by perspective |

@@ -452,6 +452,8 @@ files:
     constants: ["50", "500,000"]    # the chapter's generic audit-sampling illustration
   slides/chapter-02/index.qmd:
     constants: ["4100"]             # the chapter's generic packed-column example, "4100-Sales-Domestic"
+  slides/chapter-04/index.qmd:
+    constants: ["$100 million"]     # Powell et al.'s largest confirmed spreadsheet error, as the chapter cites it
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

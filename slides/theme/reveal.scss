@@ -54,6 +54,9 @@ $presentation-heading-line-height: 1.15;
 .reveal #title-slide {
   text-align: left; display: flex !important; flex-direction: column; justify-content: center;
   height: 100%; padding: 0 80px !important;
+  // Quarto's title section is not a .slide, so it misses the border-box rule above; without it the
+  // padding widens the section past the canvas and a long chapter title runs off the right edge.
+  box-sizing: border-box;
 }
 .reveal #title-slide h1.title { color: #fff; font-size: $aa-size-opening * 1.15; margin: 0; }
 .reveal #title-slide .subtitle {
