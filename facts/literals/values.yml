@@ -450,6 +450,8 @@ files:
   # ---- the slide decks (slides/chapter-NN/index.qmd); their figures and tables come from the book ---------
   slides/chapter-01/index.qmd:
     constants: ["50", "500,000"]    # the chapter's generic audit-sampling illustration
+  slides/chapter-02/index.qmd:
+    constants: ["4100"]             # the chapter's generic packed-column example, "4100-Sales-Domestic"
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

@@ -35,9 +35,22 @@ local function roadmap(index, chapter, modules)
   local numeral, name = (chapter.part or ''):match('^Part (%u+): (.+)$')
   local lead = numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name ..
     '** · Chapter ' .. position .. ' of ' .. #chapter.part_chapters) or ''
-  local lines = {lead, ''}
-  for _, module in ipairs(modules) do table.insert(lines, '- ' .. module) end
-  return quarto.utils.string_to_blocks(table.concat(lines, '\n'))
+  local items = {}
+  for _, module in ipairs(modules) do
+    -- A tutorial is listed by its number; its divider carries the full title.
+    table.insert(items, '- ' .. (module:match('^(Guided Tutorial [%w.]+):') or module))
+  end
+  if #items <= 8 then
+    return quarto.utils.string_to_blocks(lead .. '\n\n' .. table.concat(items, '\n'))
+  end
+  -- A long chapter's modules take two columns, the Part and the chapter's place in it atop the first.
+  local half = math.ceil(#items / 2)
+  local left, right = {numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name ..
+    '**\n\nChapter ' .. position .. ' of ' .. #chapter.part_chapters) or '', ''}, {}
+  for i, item in ipairs(items) do table.insert(i <= half and left or right, item) end
+  return quarto.utils.string_to_blocks(':::: {.columns}\n::: {.column width="50%"}\n' ..
+    table.concat(left, '\n') .. '\n:::\n\n::: {.column width="50%"}\n' .. table.concat(right, '\n') ..
+    '\n:::\n::::')
 end
 
 function Pandoc(doc)

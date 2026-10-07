@@ -14,15 +14,15 @@ Every deck follows the same sequence, so students always know where they are.
 | Part | Slides | How |
 |---|---|---|
 | Opening | Title: "Chapter N: Title" with the book's title | generated; the deck has no YAML |
-| | In this chapter: the Part, the chapter's place in it, and the deck's modules | `::: {.roadmap}` |
-| | Learning objectives | `{{< book-objectives >}}` |
+| | In this chapter: the Part, the chapter's place in it, and the deck's modules (two columns past eight modules; tutorials by number) | `::: {.roadmap}` |
+| | Learning objectives, on a second slide "Learning objectives (continued)" when they do not fit one (about 650 characters) | `{{< book-objectives >}}`, or `1-3` and `4-6` |
 | | Opening scenario: who, the business question, why it matters | written |
 | Modules | one per numbered section of the chapter: a divider `# <section title>`, then 2–6 slides | dividers get the book's section number |
 | Tutorials | `# Guided Tutorial N.k: Title`, the step titles, one key figure, the checkpoint | `{{< book-steps N.k >}}`, `{{< book-checkpoint N.k >}}` |
 | Closing | `# Looking Ahead`: summary, key terms, practice and next chapter, About these slides | `{{< book-terms >}}`, `{{< book-exercises >}}`, `{{< book-next >}}` |
 
-A full deck has about 30–35 teaching slides and 3–4 check-and-answer pairs. `slides/chapter-01/index.qmd`
-is the reference deck.
+A deck has about 30–40 teaching slides, depending on how many sections the chapter has, and 3–4
+check-and-answer pairs. `slides/chapter-01/index.qmd` and `slides/chapter-02/index.qmd` are the reference decks.
 
 ## Slide patterns
 
@@ -39,13 +39,16 @@ Use only these patterns. Each slide's title states its point.
 ```
 
 **Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it. `columns` and
-`rows` narrow it, each a comma-separated list of headers or first-column values:
+`rows` narrow it, each a comma-separated list of headers or first-column values; `rows` keeps every row
+whose first cell matches, so `rows="Quantitative"` takes all of a group. Column widths follow the content,
+so no column is narrower than its longest word:
 
 ```markdown
 {{< book-table tbl-01-03 columns="Table Group,Primary Accounting Use" rows="Accounting Core,Master Data" >}}
 ```
 
-A long table goes on two slides, each with its own rows.
+A long table goes on two slides, each with its own rows. Leave out a column the slide does not need rather
+than let the table run off the slide (the PowerPoint check cannot flag that, so look at the images).
 
 **Comparison.** Two columns (`:::: {.columns}` with two `::: {.column}`); PowerPoint takes at most two.
 
@@ -82,7 +85,7 @@ notes or its answer slide give the answer.
 
 | Shortcode | Shows |
 |---|---|
-| `{{< book-objectives >}}` | the chapter's learning objectives, verbatim |
+| `{{< book-objectives >}}`, `{{< book-objectives 4-6 >}}` | the chapter's learning objectives, verbatim, all or a range |
 | `{{< book-steps 1.1 >}}` | the step titles of Guided Tutorial 1.1 |
 | `{{< book-checkpoint 1.1 answers="hide" >}}` | the tutorial's checkpoint, without the answers in parentheses |
 | `{{< book-terms >}}` | the chapter's key terms, in one paragraph |

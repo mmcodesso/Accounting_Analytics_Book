@@ -4,7 +4,7 @@
 --
 --   {{< book-figure fig-01-02 >}}                 the figure, with "Figure 1.2 · <caption>" under it
 --   {{< book-table tbl-01-02 columns="Tool,Main Workflow Stages" rows="SQL,Microsoft Excel" >}}
---   {{< book-objectives >}}  {{< book-terms >}}  {{< book-exercises >}}
+--   {{< book-objectives >}} or {{< book-objectives 1-3 >}}  {{< book-terms >}}  {{< book-exercises >}}
 --   {{< book-steps 1.1 >}}  {{< book-checkpoint 1.1 answers="hide" >}}
 --   {{< book-next >}}  {{< book-title >}}  {{< book-link >}}   (inline)
 
@@ -104,12 +104,15 @@ local function book_table(args, kwargs)
   if wanted_rows then
     rows = {}
     for _, name in ipairs(names(wanted_rows)) do
-      local row
+      -- Every row whose first cell matches, in the book's order (several rows may share it).
+      local matched = false
       for _, candidate in ipairs(found.rows) do
-        if plain(candidate[1]) == name:lower() then row = candidate end
+        if plain(candidate[1]) == name:lower() then
+          table.insert(rows, candidate)
+          matched = true
+        end
       end
-      if not row then error(id .. ' has no row "' .. name .. '"') end
-      table.insert(rows, row)
+      if not matched then error(id .. ' has no row "' .. name .. '"') end
     end
   end
   local function line(cells)
@@ -117,18 +120,37 @@ local function book_table(args, kwargs)
     for _, i in ipairs(keep) do table.insert(out, cells[i] or '') end
     return '| ' .. table.concat(out, ' | ') .. ' |'
   end
-  -- Column widths follow the longest cell of each column. Pandoc reads them from the dashes of the
-  -- separator, which only count when a line is longer than 72 characters; this one always is.
-  local longest, total = {}, 0
+  -- Column widths, in percent of the table: each column in proportion to its longest cell (capped at
+  -- 60 characters, so long prose shares the room), but never below what its longest word needs at the
+  -- table text size (about 1.1% of the width per character, with the cell margins). Pandoc reads the
+  -- widths from the dashes of the separator, which count only when a line exceeds 72 characters.
+  local weights, floors, total = {}, {}, 0
   for position, i in ipairs(keep) do
-    local width = #plain(found.header[i] or '')
-    for _, row in ipairs(rows) do width = math.max(width, #plain(row[i] or '')) end
-    longest[position] = math.max(width, 8)
-    total = total + longest[position]
+    local width, word = 0, 0
+    for _, cells in ipairs({found.header, table.unpack(rows)}) do
+      local text = plain(cells[i] or '')
+      width = math.max(width, #text)
+      for token in text:gmatch('%S+') do word = math.max(word, #token) end
+    end
+    weights[position] = math.max(math.min(width, 60), 1)
+    floors[position] = (word + 3) * 1.1
+    total = total + weights[position]
+  end
+  local shares, raised, floor_total, rest = {}, {}, 0, 0
+  for position, weight in ipairs(weights) do
+    if 100 * weight / total < floors[position] then
+      shares[position], raised[position] = floors[position], true
+      floor_total = floor_total + floors[position]
+    else
+      rest = rest + weight
+    end
+  end
+  for position, weight in ipairs(weights) do
+    if not raised[position] then shares[position] = (100 - floor_total) * weight / rest end
   end
   local dashes = {}
   for position in ipairs(keep) do
-    table.insert(dashes, string.rep('-', math.max(3, math.floor(100 * longest[position] / total + 0.5))))
+    table.insert(dashes, string.rep('-', math.max(3, math.floor(shares[position] + 0.5))))
   end
   -- The source line goes above the table, as the book places table captions; in PowerPoint, text
   -- after a table would start a new slide, and a table caption is drawn at a fixed place over long rows.
@@ -138,8 +160,17 @@ local function book_table(args, kwargs)
   return blocks(table.concat(lines, '\n'))
 end
 
-local function book_objectives(_, _, meta)
-  return blocks(bullets(chapter(meta).objectives, 'number'))
+local function book_objectives(args, _, meta)
+  -- An optional range, such as 1-3 and 4-6, splits a long set over two slides.
+  local objectives = chapter(meta).objectives
+  local first, last = pandoc.utils.stringify(args[1] or ''):match('^(%d+)%-(%d+)$')
+  first, last = tonumber(first) or 1, tonumber(last) or #objectives
+  local lines = {}
+  for i = first, math.min(last, #objectives) do
+    table.insert(lines, i .. '. ' .. objectives[i])
+  end
+  if #lines == 0 then error('No learning objectives ' .. first .. '-' .. last .. ' in this chapter') end
+  return blocks(table.concat(lines, '\n'))
 end
 
 local function book_terms(_, _, meta)

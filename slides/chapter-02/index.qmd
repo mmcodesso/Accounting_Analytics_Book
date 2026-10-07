@@ -1,0 +1,400 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter asks whether accounting data is fit for analysis before any analysis begins. The modules follow the chapter's sections, with two guided tutorials that test real Charles River tables in Excel.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives give the vocabulary: types of data, where accounting data comes from, and the four quality dimensions.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three objectives put the vocabulary to work: finding problems in the data, organizing it tidily, and using traceability to test the ledger.
+:::
+
+## Is the data reliable enough to analyze?
+
+- You are a newly hired internal auditor at Charles River
+- Before the year-end audit, your supervisor asks for an assessment of the accounting data
+- Two customers share a name; hundreds of shipments have no tracking number; old shipments still read "In Transit"
+- Some ledger entries carry no amount, and the extract runs into a new fiscal year
+
+::: {.notes}
+None of these observations proves an error yet, and that is the point of the chapter. Ask students which of them worries them most, and why, before any test is run.
+:::
+
+# Why Data Quality Comes First
+
+## Every result is only as good as its data
+
+- A PivotTable on revenue with missing dates understates period totals
+- A SQL test for duplicate payments misses duplicates if vendor names differ
+- A budget dashboard misleads when budget and actual use different accounts
+- Auditors must evaluate the reliability of the data they use as evidence
+
+::: {.notes}
+No technique, however sophisticated, can repair the data it runs on. For accountants, data quality is a professional responsibility: auditing standards require it for audit evidence, and anyone presenting numbers is vouching for them. Wang and Strong showed that data quality can be measured along defined dimensions.
+:::
+
+# Data Types in Accounting
+
+## Quantitative data measures and counts
+
+{{< book-table tbl-02-01 columns="Subtype,Accounting Example,Charles River Source" rows="Quantitative" >}}
+
+::: {.notes}
+Quantitative values support arithmetic. Continuous values can take any amount, such as a line total; discrete values are counts, such as entries posted in a period. An amount stored as text, because of a currency symbol or a comma, cannot be added until it is converted.
+:::
+
+## Qualitative data names, classifies and orders
+
+{{< book-table tbl-02-01 columns="Subtype,Accounting Example,Charles River Source" rows="Qualitative" >}}
+
+::: {.notes}
+Qualitative values are categories and labels. Nominal categories have no order, such as account names; ordinal categories do, such as a supplier risk rating or a sales order's status. You can count them, but you cannot average them.
+:::
+
+## Most accounting data is structured
+
+{{< book-figure fig-02-01 >}}
+
+::: {.notes}
+Structured data sits in rows and columns with defined types, like every Charles River table. Semi-structured data, such as an XBRL filing, has tags but no table; unstructured data, such as contracts or scanned invoices, needs other tools. Unstructured data is growing in accounting work, but structured skills are the foundation.
+:::
+
+## Check your understanding {.check}
+
+What type of data is each value?
+
+1. The total of a sales invoice line
+2. An item's group, such as Furniture
+3. A sales order's status, from Open to Closed
+4. The number of ledger entries posted in a month
+
+::: {.notes}
+Ask for two labels per value: quantitative or qualitative, then the subtype.
+:::
+
+## Each value has its type {.answer}
+
+1. Quantitative, continuous: an amount
+2. Qualitative, nominal: a category with no order
+3. Qualitative, ordinal: categories in a meaningful sequence
+4. Quantitative, discrete: a count
+
+::: {.notes}
+The type decides which analysis makes sense: you can total line amounts and count statuses, but an average status or a sum of item groups means nothing.
+:::
+
+# Sources of Accounting Data
+
+## Accounting data comes from five kinds of source
+
+{{< book-figure fig-02-02 >}}
+
+::: {.notes}
+Knowing where data comes from tells you what to expect of it. Each source has its own strengths and its own typical problems, which shape the quality checks you run.
+:::
+
+## Sub-ledgers must agree with the ledger
+
+- The general ledger records every debit and credit; at Charles River, the GLEntry table
+- Sub-ledgers hold the detail: the O2C tables for receivables, the P2P tables for payables
+- A trial balance is a report that sums the ledger by account
+- ERP data is integrated but not immune to entry, setup and validation errors; external data gives you less control
+
+::: {.notes}
+When a sub-ledger and the ledger disagree, the difference is an audit finding. In one field study, analyzing a bank's procurement event logs revealed unapproved payments and segregation-of-duties violations that conventional procedures had missed.
+:::
+
+# Data Quality Dimensions
+
+## Accuracy and completeness at Charles River
+
+{{< book-table tbl-02-02 rows="Accuracy,Completeness" >}}
+
+::: {.notes}
+Accuracy asks whether a value is true; completeness asks whether every record and value is there. Auditors test completeness closely, because missing data can understate liabilities or overstate assets, by design or by accident.
+:::
+
+## Consistency and timeliness at Charles River
+
+{{< book-table tbl-02-02 rows="Consistency,Timeliness" >}}
+
+::: {.notes}
+Consistency problems make results silently wrong rather than obviously wrong, as when one customer appears under three names. Timeliness depends on the question: data current enough for a monthly report may not be for a daily cash position.
+:::
+
+## Watch out: one dimension can pass while another fails {.watch-out}
+
+- A ledger can be accurate and consistent yet incomplete, if a subsidiary was not consolidated
+- Test all four dimensions, not only the easiest one to check
+
+::: {.notes}
+A clean result on one dimension says nothing about the others. The checklist later in this module assigns tests to each dimension so none is skipped.
+:::
+
+# Common Data Quality Problems in Accounting Datasets
+
+## Four problems recur in accounting data
+
+{{< book-figure fig-02-03 >}}
+
+::: {.notes}
+Each panel uses real Charles River records: blank tracking numbers, a supplier invoice number used twice, shipments still in transit after delivery, and an unusually large freight cost. The tutorial that follows finds each of them.
+:::
+
+## Blanks and outliers call for judgment
+
+- Some tools skip missing values and others treat them as zero; both distort totals
+- Not every blank is an error: items that are never sold have no list price by design
+- A blank tracking number, by contrast, is information that should exist
+- An outlier is a question to investigate, not a value to delete
+
+::: {.notes}
+Deciding whether a value is missing by design or missing by error is part of every assessment. The highest Charles River freight costs are several times the average, yet nothing in the data marks them as errors.
+:::
+
+## Matching across records and tables
+
+- **Duplicates**: a supplier invoice number used twice; customers with identical names
+- **Inconsistent formats**: dates, names and amounts written differently break lookups and joins
+- **Referential integrity**: every reference must point to a record that exists
+- A record whose parent is missing is an **orphaned record**
+
+::: {.notes}
+Whether a same-name pair is one customer or two can only be decided by comparing the rest of each record, such as the city and segment. Charles River stores every date in one format, but data combined from other systems often does not.
+:::
+
+## Check your understanding {.check}
+
+Name the problem and the quality dimension of each finding:
+
+1. Shipments with no tracking number
+2. Shipments still "In Transit" after their delivery date
+3. One supplier's invoice number appearing on two invoices
+4. Raw materials with no list price
+
+::: {.notes}
+Give students a minute; ask them to note which finding might not be an error at all.
+:::
+
+## Problems, dimensions and judgment {.answer}
+
+1. Missing values: completeness
+2. Fields that contradict each other: consistency, and timeliness
+3. A possible duplicate: an accuracy test, and a duplicate-payment risk
+4. Missing by design: not an error, because raw materials are not sold
+
+::: {.notes}
+The last finding is the trap: a blank is a problem only when the information should exist. Recording why a finding is not an error is as useful as recording an error.
+:::
+
+## Tests for accuracy and completeness
+
+{{< book-table tbl-02-03 rows="Accuracy,Completeness" >}}
+
+::: {.notes}
+The chapter's checklist assigns tests to each dimension, with the Excel technique for each. A test that finds no problem is also a finding, because it tells you which data you can rely on.
+:::
+
+## Tests for consistency and timeliness
+
+{{< book-table tbl-02-03 rows="Consistency,Timeliness" >}}
+
+::: {.notes}
+Consistency tests compare fields and tables with each other; the referential integrity test checks every reference against its parent table. Timeliness tests read the date range of the extract and its partial periods.
+:::
+
+# Guided Tutorial 2.1: Inspecting Charles River O2C and Item Data for Data Quality Problems
+
+## Inspect the O2C and Item tables in eight steps
+
+{{< book-steps 2.1 >}}
+
+::: {.notes}
+Students first copy CharlesRiver.xlsx to CharlesRiver_Work.xlsx and work in the copy for the rest of Part I, so the download stays as provided. Each step applies one test from the checklist; the book has every click.
+:::
+
+## MINIFS finds each invoice's first shipment
+
+{{< book-figure fig-02-05 >}}
+
+::: {.notes}
+Because an order can ship in parts, each invoice is compared with the earliest shipment on its order. A handful of invoices are dated before any shipment, an accuracy problem that also matters for revenue cutoff; the No shipment rows are design services, which never ship.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 2.1 >}}
+
+::: {.notes}
+The first three findings are genuine problems; the last three need judgment, and one of them turns out to be expected. Students should list the table, column, problem type, count and conclusion for each.
+:::
+
+# The Concept of Tidy Data
+
+## Tidy data has one fact in one place
+
+- Each variable in its own column
+- Each observation in its own row
+- Each type of observational unit in its own table
+- Common violations: several values packed into one column; months as column headers
+
+::: {.notes}
+Wickham formalized these principles. A column such as "4100-Sales-Domestic" hides three variables, and a budget with months across the top stores a variable in its headers.
+:::
+
+## Wide reports reshape into long tables
+
+{{< book-figure fig-02-06 >}}
+
+::: {.notes}
+The wide layout is easy to read but hard to analyze; PivotTables, SQL grouping and Power BI models need the long layout. Charles River's budget tables are already long; the reports managers read are usually wide, and Power Query in Part II moves between the two.
+:::
+
+## Watch out: tidy is not clean {.watch-out}
+
+- Tidy describes structure; clean describes quality
+- Data can be tidy but dirty, or clean but messy
+- Both must be fixed before analysis can proceed
+
+::: {.notes}
+Relational tables like Charles River's are tidy by design, which is why the next chapter's database concepts will feel familiar. Tidiness says nothing about errors inside the values.
+:::
+
+# Source-to-Ledger Traceability
+
+## Traceability tests completeness and accuracy at once
+
+- **Completeness**: every sales invoice produced its ledger postings
+- **Accuracy**: the amounts posted for each invoice agree with its total
+- At Charles River, every sales invoice reconciles to its postings
+- Reconciling a sub-ledger to the ledger is one of the most common audit tests
+
+::: {.notes}
+{{< include /_shared/fragments/_source-to-ledger-traceability.qmd >}}
+
+In the audit chapters, the same source column separates the accounting team's journal entries from postings generated by invoices and payroll.
+:::
+
+# Guided Tutorial 2.2: Examining the Charles River Accounting Core for Completeness and Consistency
+
+## Test the Accounting Core in eight steps
+
+{{< book-steps 2.2 >}}
+
+::: {.notes}
+Students continue in their working copy. The ledger fills most of an Excel worksheet, so formulas copied down every row slow Excel down; summarizing first with a PivotTable keeps it responsive, and Part III turns to SQL when data outgrows Excel.
+:::
+
+## Debits equal credits across the whole ledger
+
+{{< book-figure fig-02-07 >}}
+
+::: {.notes}
+Totals at the bottom of the GLEntry worksheet test consistency at the aggregate level. The difference is zero, a clean result worth recording, just like the referential integrity test of the next step.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 2.2 >}}
+
+::: {.notes}
+The small periods sit at the edges of the extract, and the latest fiscal year holds only supplier payments that settle prior-year invoices, so they do not belong in an analysis of the years under review. The zero-amount rows all come from one source document type.
+:::
+
+# Data Quality Across the Charles River Table Groups
+
+## The business cycles carry the transaction problems
+
+{{< book-table tbl-02-04 columns="Table Group,Issues to Watch For" rows="Order-to-Cash (O2C),Procure-to-Pay (P2P),Manufacturing,Payroll and Time,Fixed Assets and Financing" >}}
+
+::: {.notes}
+Transaction tables accumulate records every day, so most quality problems appear here, along with control problems such as the same person creating and approving a document. The book's table also names the real-world system each group stands for.
+:::
+
+## The ledger, reference data and plans
+
+{{< book-table tbl-02-04 columns="Table Group,Issues to Watch For" rows="Accounting Core,Master Data,Organizational Planning,Demand Planning and MRP" >}}
+
+::: {.notes}
+Reference and planning tables change rarely, so their problems are gaps and duplicates. The stakes are highest in the Accounting Core, because errors in the ledger flow directly into the financial statements.
+:::
+
+## Check your understanding {.check}
+
+Which table group would you test for each risk?
+
+1. A supplier paid twice for one invoice
+2. An employee paid without time records
+3. A budget line with no cost center
+4. A journal entry created and approved by the same person
+
+::: {.notes}
+Students can use the two previous slides. Ask them to name the test they would run as well as the group.
+:::
+
+## Each risk has its table group {.answer}
+
+1. Procure-to-Pay: duplicate supplier invoice numbers and payment references
+2. Payroll and Time: employees paid without time records
+3. Organizational Planning: budget lines with no cost center
+4. Accounting Core: entries created and approved by the same person
+
+::: {.notes}
+Many of these issues go beyond data quality into internal control, and the audit chapters of Parts II and III test them across whole populations.
+:::
+
+# Looking Ahead
+
+## Summary
+
+- Data types decide which analysis makes sense; structured data is what the tools expect
+- Ledgers, sub-ledgers, ERP systems and external feeds each bring their own risks
+- Accuracy, completeness, consistency and timeliness are tested one by one
+- Missing values, duplicates, inconsistencies and outliers call for tests and judgment
+- Tidy structure and traceability make the data ready to analyze and to trust
+
+::: {.notes}
+Return to the opening scenario: each observation there now has a dimension, a test and a conclusion. Ask students which objective they feel least sure about before the exercises.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Referential integrity and orphaned record return in Chapter 3, where keys make them precise.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 2.6 tests for duplicate payments. The next chapter examines the tables, keys and relationships that connect the Charles River data.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
