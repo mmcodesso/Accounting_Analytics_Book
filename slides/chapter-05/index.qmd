@@ -1,0 +1,502 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter prepares the invoice lines for the analysis the rest of Part II performs. Each module follows a section of the chapter, and the three guided tutorials build the prepared table step by step.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover why preparation comes first and the functions that work on single fields: text, logical and date functions.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-5 >}}
+
+::: {.notes}
+The last two combine tables, first with lookup formulas and then with a refreshable Power Query workflow.
+:::
+
+## The invoice lines do not say when, what or who
+
+- The Furniture Seasonal Promotion carries the most promotion lines and discount dollars
+- The controller asks how many of those lines fell in the fourth quarter, and how much revenue
+- The lines record what was sold and at what price, but not when it was invoiced
+- Nor the item's product group, nor the customer: those live in other Tables
+
+::: {.notes}
+Before any analysis can begin, the attributes have to be brought together, checked, and made easy to refresh. Ask students which Tables hold the invoice date, the product group and the customer, using the map from Chapter 3.
+:::
+
+# Why Data Preparation Comes First
+
+## Preparation turns recorded data into analyzable data
+
+- Discover, clean, integrate and restructure data for one analysis (Fernandes et al.)
+- The workflow's third stage: after the question and the data, before the analysis
+- Client data often arrives incomplete and in an unusable form (Lee et al.)
+- Teaching cases rarely cover this step, though practice depends on it (Raschke and Charron)
+
+::: {.notes}
+Transaction systems store data in the form that suits recording it, spread across related tables, as Chapter 3 showed. An analysis needs one table in which every row carries all the attributes the question depends on.
+:::
+
+## Every preparation step needs a check
+
+- A lookup that silently fails, a date in the wrong quarter, a join that duplicates rows
+- None of these errors announces itself
+- So pair each step with a check: unmatched rows counted, totals agreed, forms tested
+- And document each decision, so someone else can repeat it
+
+::: {.notes}
+The checks apply the quality dimensions of Chapter 2: accuracy, completeness, consistency and timeliness. The documentation worksheet from Chapter 4 is where the decisions are recorded.
+:::
+
+## The destination: one table, every attribute
+
+{{< book-figure fig-05-01 >}}
+
+::: {.notes}
+By the end of Tutorial 5.3, every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. The rest of Part II analyzes that table. The next two slides enlarge each half.
+:::
+
+## Each line gains its invoice's date and customer
+
+{{< book-figure fig-05-01 crop="0,0,1,0.498" >}}
+
+::: {.notes}
+The invoice lines are the starting query, one row per line. Merged on SalesInvoiceID, each line gains its invoice's date and its order and customer keys, and because each key refers to exactly one invoice, no line is duplicated.
+:::
+
+## Items, customers and new columns complete each row
+
+{{< book-figure fig-05-01 crop="0,0.498,1,0.502" >}}
+
+::: {.notes}
+Merged on ItemID, each line gains its item's code, group and standard cost; the customer's segment and region arrive through the invoice's customer key. Custom columns then add the fiscal year and quarter, the period label, the product type and a whole-quantity check.
+:::
+
+# Text Functions
+
+## Text functions pull attributes out of codes
+
+{{< book-table tbl-05-01 1-5 >}}
+
+::: {.notes}
+Every item Charles River sells has a code made of a group, a product type and a number, and the product type is stored nowhere else, so MID with a start of five and a length of three extracts it. An invoice number carries a year too, which in a well-controlled system agrees with the invoice date: a validity test the exercises apply.
+:::
+
+## Text functions standardize and convert
+
+{{< book-table tbl-05-01 6-10 >}}
+
+::: {.notes}
+Values that mean the same thing should look the same, or lookups, filters and counts treat them as different. Standardize deliberately, though: PROPER turns a correct LLC into Llc and a correct "and" in a company name into "And".
+:::
+
+## Test before you clean
+
+- `=LEN([@CustomerName])=LEN(TRIM([@CustomerName]))` is TRUE for a name with no stray spaces
+- A COUNTIFS on the result counts the values that fail
+- Charles River's names, codes and addresses pass: the fields are clean
+- That is a finding to record, and evidence the field can be trusted
+
+::: {.notes}
+A workflow that cleans data it has not tested can introduce errors. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
+:::
+
+## Watch out: some text problems are invisible {.watch-out}
+
+- A non-breaking space looks like a space, but TRIM leaves it in place
+- SUBSTITUTE can replace it with an ordinary space before TRIM runs
+- A number stored as text looks like a number, but does not add up or match
+- VALUE converts it to a real number
+
+::: {.notes}
+Text copied from a web page is the usual source of non-breaking spaces. If a value that looks clean still fails to match, test for these two problems first.
+:::
+
+# Date Functions
+
+## Dates assign each transaction to its period
+
+- YEAR, MONTH and DAY return the parts of a date; EOMONTH returns a month's last day
+- With a calendar fiscal year, the quarter is `ROUNDUP(MONTH([@InvoiceDate])/3,0)`
+- One period label, joining year and quarter, groups and sorts better than two numbers
+- A fiscal year that starts in another month needs a shifted formula
+
+::: {.notes}
+Excel stores a date as a number of days, which is why dates subtract and compare. EOMONTH supports month-end cutoff tests, the checks that each transaction is recorded in the period in which it occurred.
+:::
+
+## Measure time from a fixed as-of date, not TODAY
+
+- Subtracting dates returns days: due date less invoice date gives the terms
+- DATEDIF returns whole months or years between two dates
+- TODAY changes every day, so an age based on it cannot be reproduced
+- Store the as-of date in a named parameter cell and subtract from that
+
+::: {.notes}
+A historical extract such as the Charles River data ends on a fixed date. The as-of date works like the threshold parameter of Chapter 4: named, validated and recorded on the documentation worksheet.
+:::
+
+## Watch out: a date stored as text is not a date {.watch-out}
+
+- It sorts alphabetically, does not subtract, and fails to match a real date
+- It is common in exports that use a different date order
+- DATEVALUE converts one value; Power Query's data type converts a column
+- Check the type of every date column before you rely on it
+
+::: {.notes}
+The Charles River workbook stores its dates as real dates, but data from other systems often does not.
+:::
+
+# Conditional Logic
+
+## Logical functions classify and check
+
+{{< book-table tbl-05-02 >}}
+
+::: {.notes}
+A logical test is TRUE or FALSE, and a column of such results can be counted, filtered and formatted. Comparisons are exact: text comparisons ignore case, but an extra space or a number stored as text makes two look-alike values unequal.
+:::
+
+## IFS needs a final TRUE; IFERROR a countable value
+
+- IFS returns the value of the first true test, so test bands in order
+- End with TRUE to catch every other value; without it, a miss returns #N/A
+- IFERROR hides every error, including a mistyped reference
+- So substitute a value you can count, such as "No match", never zero or a blank
+
+::: {.notes}
+The payment-term bands of Tutorial 5.1 are built with IFS. XLOOKUP's own not-found argument, in the next module, is narrower than IFERROR because it applies only when the key is missing.
+:::
+
+## Check your understanding {.check}
+
+Which function does each task?
+
+1. Take the product type out of an item code
+2. Group invoices into payment-term bands
+3. Age a receivable so the result can be reproduced
+4. Find names with stray spaces
+
+::: {.notes}
+Some tasks combine several functions; ask students for the main one and why it fits.
+:::
+
+## Each task has its function {.answer}
+
+1. MID, because the parts of the code have fixed lengths
+2. IFS, ending with TRUE to catch every other value
+3. Subtraction from a named as-of date, never TODAY
+4. LEN compared with LEN of TRIM
+
+::: {.notes}
+When the parts of a code vary in length, FIND locates the separators, and Microsoft 365's TEXTBEFORE and TEXTAFTER return the parts directly.
+:::
+
+# Guided Tutorial 5.1: Adding Text, Date, and Logical Columns
+
+## Prepare the items and invoices in seven steps
+
+{{< book-steps 5.1 >}}
+
+::: {.notes}
+Students add the product type and a code-form check to the Item Table, and the fiscal period, payment terms, term bands and a standard-terms test to the SalesInvoice Table. The product type and the period are the two attributes the invoice lines lack.
+:::
+
+## Every item gains its product type
+
+{{< book-figure fig-05-02 >}}
+
+::: {.notes}
+The product type is the middle part of the code; the Furniture group has eight product types, such as desks and sideboards, listed in the chapter's table of codes. The code check is TRUE for every item, so the extraction can be trusted.
+:::
+
+## Every invoice gains a period and its payment terms
+
+{{< book-figure fig-05-03 >}}
+
+::: {.notes}
+The period label comes from the invoice date, and the terms from the due date less the invoice date. Every invoice's terms are one of the four standard values, so no invoice fails the standard-terms test.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 5.1 lead="true" >}}
+
+::: {.notes}
+The product type and the period are the two attributes the controller's question needs that the invoice lines do not carry. The next tutorial brings them onto the lines.
+:::
+
+# Lookup Functions
+
+## XLOOKUP follows a key to the matching row
+
+{{< book-figure fig-05-04 >}}
+
+::: {.notes}
+A lookup is the spreadsheet version of following a foreign key, as you did by hand in Tutorial 3.2. Give XLOOKUP a fourth argument such as "No match", and counting that value becomes the first check on any lookup.
+:::
+
+## XLOOKUP is the better choice for new work
+
+{{< book-table tbl-05-04 >}}
+
+::: {.notes}
+INDEX and MATCH work in every version of Excel, so use them, wrapped in IFERROR, with a colleague whose Excel is older. VLOOKUP cannot look to the left and returns a column by number, so an inserted column can make it return the wrong one.
+:::
+
+## Some attributes are two keys away
+
+- An invoice line carries no order key, but its invoice does
+- One lookup brings the invoice's SalesOrderID onto the line
+- A second uses it to look up the order date
+- With no shared key at all, build a match key from fields the tables share
+
+::: {.notes}
+Keeping each step in its own column makes the chain easy to check. Exercise 5.5 builds a match key from standardized addresses to compare suppliers with employees.
+:::
+
+## Watch out: a lookup returns only the first match {.watch-out}
+
+- Right toward the "one" side: a line to its invoice, an invoice to its customer
+- Wrong toward the "many" side: an order can have several shipments
+- There, summarize instead: MINIFS for the earliest shipment date
+- SUMIFS and COUNTIFS for totals and counts
+
+::: {.notes}
+Chapter 3's cardinality tells you which side of a relationship you are on. Following a key is a join in SQL and a relationship in Power BI, so this question carries into Parts III and IV.
+:::
+
+## Check your understanding {.check}
+
+Look up or summarize?
+
+1. Bring the invoice date onto each invoice line
+2. Find an order's earliest shipment date
+3. Find the date on which each line was ordered
+4. Count the lines on each invoice
+
+::: {.notes}
+Ask students to name, for each one, which side of the relationship they start from.
+:::
+
+## Look up toward one; summarize toward many {.answer}
+
+1. XLOOKUP: each line has exactly one invoice
+2. MINIFS: an order can have several shipments
+3. Two lookups: line to invoice, then invoice to order
+4. COUNTIFS: an invoice can have many lines
+
+::: {.notes}
+A lookup toward the many side would return whichever row comes first in the Table, which is a silent error, not a missing value.
+:::
+
+# Guided Tutorial 5.2: Bringing Dates and Groups onto the Invoice Lines
+
+## Bring the attributes onto the lines in eight steps
+
+{{< book-steps 5.2 >}}
+
+::: {.notes}
+Students import the sales orders, then add six lookup columns to the invoice lines: the invoice date and period, the order key and order date, and the item group and product type. Every lookup is checked by counting "No match", and the Furniture revenue by quarter is reconciled to the Part I case.
+:::
+
+## Promotion lines were invoiced after it ended
+
+{{< book-figure fig-05-05 >}}
+
+::: {.notes}
+More than a hundred lines of the Furniture Seasonal Promotion were invoiced in November and December, and every one comes from an order placed while the promotion ran. The price was set when the order was placed, but the revenue was recorded when it was invoiced.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 5.2 lead="true" >}}
+
+::: {.notes}
+The Furniture revenue for the third and fourth quarters agrees to the cent with the Part I case, so the lookups put every line in the right group and quarter. A quarter-by-quarter analysis must use the invoice date for revenue and keep the order date in view to explain it.
+:::
+
+# Missing, Meaningful, and Invalid Values
+
+## A blank is not always missing
+
+- A blank PromotionID means the line carried no promotion
+- A blank ShipmentLineID on a design service means nothing was shipped
+- A blank TrackingNumber is different: the information should exist
+- Decide which kind a blank is, then record the decision
+
+::: {.notes}
+Replacing a meaningful blank, or treating it as an error, would be wrong. ISBLANK is FALSE for a formula that returns empty text, so count the value a failed lookup returns, such as "No match", rather than testing for blanks.
+:::
+
+## A value can be present and still invalid
+
+- Items sold by the unit should have whole quantities
+- Most of their invoice lines carry fractional quantities
+- Ask the source system's owners, and check whether it changes the answer
+- Revenue, list amounts and discounts are consistent, so record a limitation
+
+::: {.notes}
+The cause could be a partial-unit shipping practice, a unit-of-measure setting or a recording error, so avoid conclusions that depend on whole units. Remove Duplicates deletes without asking which row to keep: count and examine suspected duplicates first, and remove them only in a query or a copy.
+:::
+
+## Check your understanding {.check}
+
+Missing, meaningful or invalid?
+
+1. A blank PromotionID on an invoice line
+2. A blank TrackingNumber on a shipment
+3. A fractional quantity for an item sold by the unit
+4. A lookup that returns "No match"
+
+::: {.notes}
+Ask students what they would do next in each case, not only how they would classify it.
+:::
+
+## Decide what a value means before you fix it {.answer}
+
+1. Meaningful: the line had no promotion, so leave it blank
+2. Missing: the shipment should have one, so report it
+3. Present but invalid: a validity finding to record
+4. A failed match: find out why the key has no row
+
+::: {.notes}
+Only the second and fourth call for correction at the source; the first is a fact, and the third is a limitation the analysis works around.
+:::
+
+# Power Query for Repeatable Preparation
+
+## A merge is Power Query's lookup
+
+- Lookup columns recalculate on every refresh and spread the logic across columns
+- Merge Queries matches a key column and adds the second query's rows
+- Expand only the columns you need, without the name prefix
+- The whole preparation becomes one recorded procedure
+
+::: {.notes}
+The tutorials clear "Use original column name as prefix", so each column keeps its own name and later formulas can refer to it directly.
+:::
+
+## The join kind decides which rows a merge keeps
+
+{{< book-table tbl-05-05 >}}
+
+::: {.notes}
+Left outer is right for enriching the invoice lines, because every line must stay; a left anti merge on the same keys returns the lines that failed to match, which should be none. An unchanged row count is the first test of any merge.
+:::
+
+## Custom columns calculate inside the query
+
+- Written in M: `Date.Year([InvoiceDate])`, `Date.QuarterOfYear([InvoiceDate])`
+- `Text.Middle` counts from zero, so the product type starts at 4, not 5
+- Conditional Column builds an if, then, else through a dialog
+- Reference starts a new query from another, which stays unchanged
+
+::: {.notes}
+Every custom column appears in Applied Steps, so the query records how each value was calculated, and a refresh reruns the source queries and then every step. Hunter et al. describe cleaning client data as a task routinely given to the most junior auditor, paired with checks that the result is complete and accurate.
+:::
+
+# Guided Tutorial 5.3: Building InvoiceLines in Power Query
+
+## Build InvoiceLines in seven steps
+
+{{< book-steps 5.3 >}}
+
+::: {.notes}
+Students import the customers, start InvoiceLines as a reference to the invoice lines, merge in the invoice, item and customer details with left outer joins, add five custom columns, and load and check the result.
+:::
+
+## Merge on the key, with a left outer join
+
+{{< book-figure fig-05-06 >}}
+
+::: {.notes}
+The upper table is the query being built and the lower one the Table merged into it, with the key column selected in each. The dialog reports that every invoice line found a match, the merge's first check.
+:::
+
+## Five custom columns finish InvoiceLines
+
+{{< book-table tbl-05-06 >}}
+
+::: {.notes}
+These are Tutorial 5.1's worksheet formulas written in M, so they are rebuilt on every refresh. WholeQuantity is the validity check of the previous module.
+:::
+
+## InvoiceLines agrees with the lines it came from
+
+{{< book-figure fig-05-08 >}}
+
+::: {.notes}
+InvoiceLines has as many rows as SalesInvoiceLine and the same line total, and its Furniture revenue by quarter repeats the lookups to the cent. The two methods agree, which is the evidence that the preparation is correct.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 5.3 lead="true" >}}
+
+::: {.notes}
+From here on the analysis uses InvoiceLines, one recorded procedure that repeats itself on every refresh. The lookup columns on SalesInvoiceLine stay in the workbook as the check that confirmed it.
+:::
+
+# Looking Ahead
+
+## Back to the controller's question
+
+- The Furniture Seasonal Promotion priced orders placed in September and October
+- Many were invoiced after it ended, so its effect reaches further into the fourth quarter
+- InvoiceLines now carries the period, the product group and type, and the customer segment
+- Chapter 6 summarizes it to explain the change in the Furniture margin
+
+::: {.notes}
+The preparation has sharpened the question: revenue follows the invoice date, while the promotion's price follows the order date. The rest of Part II builds on InvoiceLines.
+:::
+
+## Summary
+
+- Preparation brings the attributes together, with a check at every step
+- Text, date and logical functions extract, assign and classify values
+- Lookups follow keys toward the one side; summaries handle the many side
+- Blanks can be meaningful, and present values can still be invalid
+- Power Query repeats the preparation as one recorded, refreshable query
+
+::: {.notes}
+Ask students which check they would want to see first in someone else's prepared table. The row count and the reconciled total are the usual answers.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Meaningful blank and validity check are the ideas students most often confuse with missing data.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 5.2 applies the invoice-number test from the text functions module, and Exercise 5.5 builds a match key to compare suppliers with employees. Chapter 6 summarizes InvoiceLines.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::

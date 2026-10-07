@@ -257,6 +257,16 @@ class SourceCheckTests(unittest.TestCase):
             write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-5"))
             self.assertTrue(any("has no steps 2-5" in error for error in self.check(root)[0]))
 
+    def test_a_table_row_range_must_lie_inside_its_table(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            slide = "\n## Rows\n\n{{{{< book-table tbl-01-01 {} >}}}}\n\n::: {{.notes}}\nPart of the table, by position.\n:::\n"
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("1-2"))
+            self.assertEqual([], self.check(root)[0])
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-3"))
+            self.assertTrue(any("tbl-01-01 has no rows 2-3" in error for error in self.check(root)[0]))
+
     def test_a_divider_that_names_no_section_is_a_warning(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

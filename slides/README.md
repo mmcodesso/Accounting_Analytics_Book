@@ -64,7 +64,13 @@ so no column is narrower than its longest word:
 ```
 
 A long table goes on two slides, each with its own rows. Leave out a column the slide does not need rather
-than let the table run off the slide (the PowerPoint check cannot flag that, so look at the images).
+than let the table run off the slide (the PowerPoint check cannot flag that, so look at the images). A
+range takes rows by position, which also works when the first cells hold commas, such as function
+signatures, that `rows` cannot name:
+
+```markdown
+{{< book-table tbl-05-01 1-5 >}}
+```
 
 **Comparison.** Two columns (`:::: {.columns}` with two `::: {.column}`); PowerPoint takes at most two.
 

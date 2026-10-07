@@ -121,7 +121,14 @@ local function book_table(args, kwargs)
   end
   local rows = found.rows
   local wanted_rows = value(kwargs, 'rows')
-  if wanted_rows then
+  -- An optional range, such as 1-5 and 6-10, splits a long table over two slides by position; rows=
+  -- names rows by their first cell, which cannot work when those cells hold commas.
+  local first, last = pandoc.utils.stringify(args[2] or ''):match('^(%d+)%-(%d+)$')
+  if first then
+    rows = {}
+    for i = tonumber(first), math.min(tonumber(last), #found.rows) do table.insert(rows, found.rows[i]) end
+    if #rows == 0 then error(id .. ' has no rows ' .. first .. '-' .. last) end
+  elseif wanted_rows then
     rows = {}
     for _, name in ipairs(names(wanted_rows)) do
       -- Every row whose first cell matches, in the book's order (several rows may share it).
