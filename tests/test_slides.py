@@ -257,6 +257,16 @@ class SourceCheckTests(unittest.TestCase):
             write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-5"))
             self.assertTrue(any("has no steps 2-5" in error for error in self.check(root)[0]))
 
+    def test_a_checkpoint_range_must_lie_inside_its_items(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            slide = "\n## Checkpoint\n\n{{{{< book-checkpoint 1.1 {} >}}}}\n\n::: {{.notes}}\nThe checkpoint, in part.\n:::\n"
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-2"))
+            self.assertEqual([], self.check(root)[0])
+            write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-3"))
+            self.assertTrue(any("no checkpoint items 2-3" in error for error in self.check(root)[0]))
+
     def test_a_table_row_range_must_lie_inside_its_table(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -432,6 +442,18 @@ class PowerPointTests(unittest.TestCase):
         self.assertEqual("342900", first.get("marL"))   # one Arial digit fits the indent Pandoc gives
         self.assertLess(342900, int(coded.find('.//a:pPr', NS).get("marL")))   # a code-font number is wider
         self.assertLess(342900, int(long.find('.//a:pPr', NS).get("marL")))    # and so are 10 and 11
+
+    def test_code_blocks_take_the_evidence_size(self) -> None:
+        code = '<a:r><a:rPr><a:latin typeface="Consolas"/></a:rPr><a:t>{}</a:t></a:r>'
+        xml = ET.fromstring(
+            f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree><p:sp><p:txBody>'
+            f'<a:p><a:pPr><a:buNone/></a:pPr>{code.format("SELECT")}{code.format(" x FROM t;")}</a:p>'
+            f'<a:p><a:pPr/><a:r><a:rPr/><a:t>Aliases such as </a:t></a:r>{code.format("woc")}</a:p>'
+            '</p:txBody></p:sp></p:spTree></p:cSld></p:sld>')
+        pptx_finish.format_code(xml, {"code_font": "Consolas", "sizes": {"evidence": 20}})
+        block, bullet = xml.findall('.//a:p', NS)
+        self.assertEqual({"2000"}, {rpr.get("sz") for rpr in block.iter(f'{{{NS["a"]}}}rPr')})
+        self.assertEqual({None}, {rpr.get("sz") for rpr in bullet.iter(f'{{{NS["a"]}}}rPr')})   # inline code stays
 
     def test_a_long_roadmap_takes_the_evidence_size(self) -> None:
         def slide(entries: int) -> ET.Element:

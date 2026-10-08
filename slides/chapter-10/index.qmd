@@ -1,0 +1,568 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter combines tables and summarizes their rows to answer the controller's three follow-up questions. Each module follows a section of the chapter, and the three guided tutorials extend one saved script, Chapter10.sql.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover joins, left joins and anti-joins, and aggregates with GROUP BY and HAVING, including profiling a table.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover fan-out, subqueries, and the accounting work they make possible: a trial balance from the ledger and the plant measured against its standards.
+:::
+
+## Which products, which years, volume or cost?
+
+- Chapter 9 found the variance recorded at each work order's close, mostly overhead
+- Which products carry it? How much arose in each year?
+- Is it volume, fewer units to spread costs over, or the cost itself?
+- No single table answers: the product, the hours, the output and the amounts live apart
+
+::: {.notes}
+The product is recorded on the work order, the hours in the labor time and the payroll, the output in the completions, and the amounts in a ledger that identifies accounts only by their AccountID. Answering means joining tables on the keys of Chapter 3 and summarizing thousands of rows into a few totals.
+:::
+
+# Why Join Tables
+
+## A join follows the links between tables
+
+- A database stores each fact once and links the tables through keys
+- A close names its work order; the work order names its item; the item its group
+- No foreign keys are declared, so nothing guarantees that the keys match
+- A join on mismatched keys returns fewer or more rows, never an error: test the count
+
+::: {.notes}
+A join is the SQL version of Power Query's Merge from Chapter 5: Inner keeps the matched rows, Left Outer keeps every row of the first query, and Left Anti keeps the rows with no match. XLOOKUP behaves like a left join that brings back one column.
+:::
+
+# Inner Joins
+
+## An inner join keeps the matched pairs
+
+```sql
+SELECT woc.WorkOrderCloseID, i.ItemGroup,
+    woc.TotalVarianceAmount
+FROM WorkOrderClose AS woc
+    INNER JOIN WorkOrder AS wo
+        ON wo.WorkOrderID = woc.WorkOrderID
+    INNER JOIN Item AS i ON i.ItemID = wo.ItemID;
+```
+
+- Aliases such as `woc` keep a query short; qualify every column in a join
+- Every close has one work order and every work order one item, so the rows must equal the closes
+
+::: {.notes}
+A column whose name appears in both tables must be qualified, or the query stops with "ambiguous column name". If the join returns fewer rows than the WorkOrderClose table holds, some closes point to a work order or item that does not exist, and the inner join has dropped them without a word.
+:::
+
+## Only the work orders that have a close
+
+{{< book-figure fig-10-01 crop="0,0,1,0.52" >}}
+
+::: {.notes}
+Four work orders, three of them closed: the inner join on WorkOrderID returns the three that have a close. The released work order has no match and does not appear, which is the behavior the next modules build on.
+:::
+
+# Following the Keys
+
+## Join paths through purchasing
+
+{{< book-table tbl-10-01 1-10 >}}
+
+::: {.notes}
+Each row names two tables and the key that links them, from the table that holds the foreign key to the table whose primary key it refers to. These paths reach beyond the sales and ledger tables of Part II, into the Procure-to-Pay group.
+:::
+
+## Join paths through manufacturing
+
+{{< book-table tbl-10-01 11-17 >}}
+
+::: {.notes}
+These are the paths of this chapter's tutorials: closes to work orders to items, operations to work centers, and completion lines to the items they made. Chapter 3's manufacturing figure traced the same tables.
+:::
+
+## Join paths through payroll and the ledger
+
+{{< book-table tbl-10-01 18-24 >}}
+
+::: {.notes}
+The payroll tables link through the register to its period, employee and cost center. The last row is different from the others: the ledger reaches its documents through two columns, not one key.
+:::
+
+## A join to the ledger names the document type too
+
+- SourceDocumentType names the document table; SourceDocumentID holds its key
+- Each document table numbers its own rows, so one ID belongs to many kinds of document
+- So the join's condition includes the type, such as `gl.SourceDocumentType = 'JournalEntry'`
+- Without it, ledger rows pair with whichever document happens to share their number
+
+::: {.notes}
+The ledger rows with one SourceDocumentID come from several kinds of document, of which the traced sale of Tutorial 3.2 is only one. With the type in the condition, a join to JournalEntry finds the one journal entry posted to the variance account in the year: the closing entry of Chapter 9.
+:::
+
+# Keeping Unmatched Rows with LEFT JOIN
+
+## A left join keeps every row of the first table
+
+{{< book-figure fig-10-01 crop="0,0.523,1,0.477" >}}
+
+::: {.notes}
+The left join keeps all four work orders, with NULL in the close columns where no close exists. Keeping only the rows where the second table's key IS NULL turns it into an anti-join, which lists exactly the work orders with no close.
+:::
+
+## Anti-joins find what is missing; NOT IN can fail
+
+- An anti-join keeps the left join's rows whose matched key IS NULL
+- NOT EXISTS asks the same thing with a correlated subquery
+- NOT IN returns nothing when its list holds a NULL, because no comparison is true
+- So use NOT EXISTS or the anti-join when the column can be NULL
+
+::: {.notes}
+A few requisitions have no approver, so a NOT IN test of employees against the approvers returns zero, while NOT EXISTS and the anti-join find nearly every employee. Anti-joins are among the most useful accounting tests: existence tests start from the ledger, completeness tests from the documents, and Chapter 12 builds a library of them.
+:::
+
+## Watch out: WHERE can undo a left join {.watch-out}
+
+- A condition on the second table in WHERE removes the unmatched rows
+- A NULL Status never equals Closed, so items without work orders vanish
+- Move such a condition into the ON clause, where it limits the matches
+- The IS NULL test of an anti-join is the exception: it stays in WHERE
+
+::: {.notes}
+When a question is about every member of a population, such as every customer, item or account, start from the table that holds the whole population and left join the others to it. That is the difference Chapter 3 warned about between a list of customers built from their orders and a list of all customers.
+:::
+
+## Check your understanding {.check}
+
+Which join answers each question?
+
+1. Every manufactured item, with its work orders if it has any
+2. The work orders that have never closed
+3. Each close with its item's group
+4. The employees who never approved a requisition, when some requisitions have no approver
+
+::: {.notes}
+Ask students what the wrong choice would return in each case.
+:::
+
+## Each question has its join {.answer}
+
+1. A left join from Item
+2. An anti-join: a left join keeping rows whose close IS NULL
+3. Inner joins from the close through the work order to the item
+4. NOT EXISTS or an anti-join, never NOT IN
+
+::: {.notes}
+The fourth is the trap: with a NULL in the list, NOT IN returns no rows at all, and nothing warns you.
+:::
+
+# Summarizing with Aggregate Functions
+
+## Aggregates and how they treat missing values
+
+{{< book-table tbl-10-02 >}}
+
+::: {.notes}
+Without GROUP BY, an aggregate summarizes every row the query keeps. GROUP_CONCAT is the one aggregate that returns text, which makes a short list of exceptions easy to read.
+:::
+
+## GROUP BY returns one row per group
+
+{{< book-figure fig-10-02 >}}
+
+::: {.notes}
+Every column in the SELECT list is either named in GROUP BY or wrapped in an aggregate. SQLite accepts a bare column and fills it from one of the group's rows, which says nothing about the group, so treat it as an error. After a left join, count the second table's key rather than every row, and wrap a SUM in COALESCE to show a zero; GROUP BY does what a PivotTable's Rows area does.
+:::
+
+## Watch out: group by the key, not the name {.watch-out}
+
+- Two different Charles River customers share one name
+- Several items share their names with other items
+- Grouping by name merges them into one row, and nothing in the result says so
+- Group by the ID, and add the name to GROUP BY if you want to show it
+
+::: {.notes}
+The same rule applies to accounts, employees and suppliers: names are labels, keys are identities.
+:::
+
+# Filtering Groups with HAVING
+
+## WHERE filters rows; HAVING filters groups
+
+- WHERE runs before any group exists, so it cannot use an aggregate
+- An aggregate in WHERE stops with "misuse of aggregate"
+- HAVING runs after the aggregates, so its condition can use them
+- Filter rows in WHERE whenever you can: fewer rows reach the grouping step
+
+::: {.notes}
+The two often work together: in Tutorial 10.1, WHERE keeps the year's closes and HAVING keeps the items whose total variance passes a threshold. Listing only the accounts with a balance is another HAVING condition.
+:::
+
+## Check your understanding {.check}
+
+WHERE or HAVING?
+
+1. Keep the closes of one year
+2. Keep the items whose total variance passes a threshold
+3. Keep the accounts whose balance is not zero
+4. Keep the ledger rows of one account
+
+::: {.notes}
+Ask students whether each condition is about one row or about a group's total.
+:::
+
+## Rows in WHERE, groups in HAVING {.answer}
+
+1. WHERE: a date is a property of each row
+2. HAVING: a total exists only after grouping
+3. HAVING: a balance is a sum of rows
+4. WHERE: an account is a property of each row
+
+::: {.notes}
+A query can use both, and Tutorial 10.1 does: WHERE for the year, HAVING for the threshold.
+:::
+
+# Profiling a Table Before Using It
+
+## Data quality tests in SQL
+
+{{< book-table tbl-10-03 columns="Dimension,SQL techniques" >}}
+
+::: {.notes}
+Each row gives the SQL for the tests of one data quality dimension from Chapter 2, such as plausible ranges, blanks in required fields, matching references and the date range of the extract. The chapter's table lists those tests beside the techniques.
+:::
+
+## A profile tells you what a table holds
+
+- One query counts the rows, the distinct numbers, the filled columns and the dates
+- Work order numbers are unique, and every closed work order has a close date
+- No other work order has one, so the status and the date tell one story
+- A clean profile is a finding: record it with the script
+
+::: {.notes}
+A data profile is a short set of queries that describes one table before you rely on it. Tutorial 10.3 profiles the two tables it compares before dividing one by the other, and Chapter 12 profiles the time records before testing them.
+:::
+
+# Guided Tutorial 10.1: Joining the Variance to Its Work Orders and Products
+
+## Join the variance to its products in six steps
+
+{{< book-steps 10.1 >}}
+
+::: {.notes}
+Students join the closes to their work orders and items, testing each join by its row count, total the year's variance by item group and check it against the ledger, compare the three years, keep the items above a threshold with HAVING, and list every manufactured item with a left join.
+:::
+
+## Furniture's variance rose as its closes fell
+
+{{< book-figure fig-10-03 crop="0,0,1,0.797" >}}
+
+::: {.notes}
+Furniture carries most of the variance, and its variance rose in each year while its number of closes fell. HAVING then keeps only a handful of items above the threshold, spread across several product types.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 10.1 1-3 lead="true" >}}
+
+::: {.notes}
+The joins keep every close only because every key matches, and the totals by group add up to the ledger. Furniture's rising variance with falling closes is the pattern to explain.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 10.1 4-6 >}}
+
+::: {.notes}
+The variance is not a product problem. It rises in the groups the plant makes most while the number of work orders falls, which turns the question toward the cost of production itself.
+:::
+
+# Fan-Out and Double Counting
+
+## A header amount repeats on every line
+
+{{< book-figure fig-10-04 >}}
+
+::: {.notes}
+An invoice with three lines appears three times in a join of SalesInvoice and SalesInvoiceLine, and so does its GrandTotal. Summed over the year, the join nearly doubles the invoice total: the double counting Chapter 3 warned about.
+:::
+
+## Add up each amount at its own level
+
+- Sum GrandTotal over SalesInvoice alone, and LineTotal over its lines
+- Closes joined to their operations repeat each variance three or four times
+- A count of a join's rows counts lines, not headers: COUNT(DISTINCT) counts headers
+- Summarize the many side first, then join one row per header
+
+::: {.notes}
+The derived tables of the next module show how to summarize first. The rule is the same in Power BI's data models later in the book: an amount belongs to the table it is recorded in.
+:::
+
+## Check your understanding {.check}
+
+What is wrong with each result?
+
+1. GrandTotal summed over invoices joined to their lines
+2. The rows of that join reported as the number of invoices
+3. The variance summed over closes joined to their operations
+4. Revenue totals grouped by customer name
+
+::: {.notes}
+Ask students how they would have noticed each one with a control total.
+:::
+
+## Each one counts something twice {.answer}
+
+1. Fan-out: each invoice's total repeats once per line
+2. It counts lines: use COUNT(DISTINCT) on the invoice key
+3. Fan-out: each variance repeats once per operation
+4. Two customers with one name are merged: group by the key
+
+::: {.notes}
+A control total from the header table, such as the sum of GrandTotal over SalesInvoice alone, exposes the first three at once.
+:::
+
+# Subqueries
+
+## Subqueries answer two-step questions in one
+
+- A scalar subquery returns one value, such as the year's average variance
+- It can stand wherever a value can, including the SELECT list, side by side
+- A subquery after IN supplies a list, such as the work orders of Furniture items
+- SQLite uses the first row of a scalar subquery that returns several; most systems stop
+
+::: {.notes}
+Tutorial 10.2 puts two scalar subqueries side by side to tie the closes to the ledger. A subquery is written inside another query, in parentheses.
+:::
+
+## A correlated subquery runs once per outer row
+
+- It refers to a column of the outer query, such as each account's ID
+- NOT EXISTS is one; a count of each account's postings is another
+- With an index on the searched column, it is quick
+- Without one, over thousands of rows, it can take minutes: use a join instead
+
+::: {.notes}
+GLEntry has an index on AccountID and FiscalYear, so counting each account's postings is fast. A derived table or a join is the faster way to ask the same question of a large table without an index.
+:::
+
+## Derived tables summarize before they join
+
+- A subquery in FROM is a table of its own: give it an alias
+- Sum each invoice's lines in a derived table, one row per invoice
+- Join that to the invoices, and nothing repeats
+- The same pattern combines output by year with hours by year
+
+::: {.notes}
+With the lines summed first, the sum of the invoices' SubTotals equals the sum of their lines. Tutorial 10.3 joins two derived tables on the year to compare the hours recorded with the standard hours of output.
+:::
+
+# The Order in Which a Query Runs
+
+## Written in one order, evaluated in another
+
+{{< book-figure fig-10-05 >}}
+
+::: {.notes}
+The database assembles the rows from FROM and its joins, keeps those that meet WHERE, forms the groups, keeps those that meet HAVING, calculates the SELECT list, and finally sorts and limits. It may take faster shortcuts, but the result is always the one this logical order describes.
+:::
+
+## The order explains the rules
+
+- WHERE runs before grouping, so it cannot use an aggregate; HAVING can
+- ORDER BY runs after SELECT, so it can sort by an alias
+- By the same logic, GROUP BY should not use an alias, but SQLite allows it
+- PostgreSQL and MySQL also allow it; SQL Server does not
+
+::: {.notes}
+The book writes `GROUP BY CloseYear` because it is easier to read than repeating the expression; in SQL Server you would repeat the SUBSTR expression instead. SQLite also tolerates an alias in WHERE, a habit to avoid.
+:::
+
+# Guided Tutorial 10.2: Building the Trial Balance and Following the Conversion Cost
+
+## Follow the cost through the ledger in six steps
+
+{{< book-steps 10.2 >}}
+
+::: {.notes}
+Students tie the closes to the ledger, rebuild the pre-closing trial balance, prove that debits equal credits, follow the clearing account by year and source, split the conversion variance into labor and overhead, and identify the journal entries.
+:::
+
+## The ledger rebuilds the pre-closing trial balance
+
+{{< book-figure fig-10-06 crop="0,0,1,0.792" >}}
+
+::: {.notes}
+The query keeps the postings through the year-end without the year's two closing entries and groups them by account. It returns the same accounts and balances as Chapter 6's trial balance, and the net of all its balances is zero.
+:::
+
+## Conversion cost flows through the clearing account
+
+{{< book-figure fig-10-07 crop="0,0,1,0.592" >}}
+
+::: {.notes}
+The clearing account receives the actual cost of conversion, mostly manufacturing payroll plus factory overhead and depreciation entries. It releases the standard conversion cost of the units completed to finished goods, and the work order closes clear what is left to the variance account.
+:::
+
+## The overhead part grew while the labor part shrank
+
+{{< book-figure fig-10-07 crop="0,0.595,1,0.405" >}}
+
+::: {.notes}
+The payroll charged to production rose in each year, while the standard cost released stayed nearly flat. The labor part of the variance was favorable and shrank; the overhead part grew.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 10.2 1-3 lead="true" >}}
+
+::: {.notes}
+The two scalar subqueries tie the closes to the ledger, and the trial balance matches Chapter 6's account for account. The clearing account's sources and releases are the flow the next items measure.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 10.2 4-6 >}}
+
+::: {.notes}
+The ledger locates the variance precisely: it is the part of the actual conversion cost, mostly payroll, that the standard cost of what the plant produced did not absorb, and it arises mostly in overhead.
+:::
+
+# Measuring the Plant Against Its Standards
+
+## Standard hours allowed measure direct labor
+
+- Compare the inputs used with the inputs the standards allow for the output achieved
+- Standard hours allowed: units completed times each unit's standard labor hours
+- Compare them with the direct labor time recorded against the work
+- It is Chapter 7's flexible budget applied to hours
+
+::: {.notes}
+A standard cost system recalculates the standard at the output actually achieved before comparing it with the actual (Datar and Rajan). The ratio of hours recorded to standard hours allowed measures the efficiency of direct labor.
+:::
+
+## Indirect time is overhead
+
+- Indirect labor is time no single work order carries
+- It reaches the variance through overhead, not the labor part
+- Fixed overhead is absorbed only by units made: lower output leaves some unabsorbed
+- LaborType separates direct, indirect and non-manufacturing time
+
+::: {.notes}
+The unabsorbed fixed overhead is the production-volume variance (Datar and Rajan). A payroll period belongs to the fiscal year of its pay date, so the period that ends in late December is counted in the next year, which is why Tutorial 10.3 measures hours with the labor time entries and uses the payroll for what they cost.
+:::
+
+## The Payroll and Time tables
+
+{{< book-figure fig-10-08 >}}
+
+::: {.notes}
+Time clock entries record each employee's day; labor time entries split it by labor type and, for direct labor, link to a work order operation. Payroll registers group by period and hold their lines and payments; Employee, CostCenter and WorkOrderOperation come from other table groups.
+:::
+
+# Guided Tutorial 10.3: Comparing Output with the Hours It Took
+
+## Compare output with the hours in eight steps
+
+{{< book-steps 10.3 >}}
+
+::: {.notes}
+Students measure the output and its standard hours, the payroll's hours and pay, and the number of people, then profile the two tables, find why the time records end early, and compare the hours recorded with the standard hours by kind of labor.
+:::
+
+## Two derived tables meet on the year
+
+{{< book-figure fig-10-09 crop="0,0,1,0.607" >}}
+
+::: {.notes}
+The first derived table sums the hours by year and labor type; the second sums the standard hours of output by year, counting completions only up to the last day with time records. Each holds one row per year, so the join cannot fan out.
+:::
+
+## Direct time stayed within the standard
+
+{{< book-figure fig-10-09 crop="0,0.61,1,0.39" >}}
+
+::: {.notes}
+Direct labor stayed below the standard hours in every year, while indirect time per standard hour grew. The profiles had shown that the time records end before the year does, so the output is counted only up to that day.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 10.3 1-4 lead="true" >}}
+
+::: {.notes}
+Output and its standard hours moved together, while the payroll paid the same number of people with far more overtime. The profiles explain why the output is cut off at the last day with time records.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 10.3 5-7 >}}
+
+::: {.notes}
+COUNT of rows counts registers, and COUNT DISTINCT of employees counts people. A few direct labor entries have no valid operation, a small finding to record.
+:::
+
+# Looking Ahead
+
+## Back to the controller's questions
+
+- Products: the variance rises where the plant makes most, while closes fall
+- Where: conversion cost the standard did not absorb, mostly overhead
+- Volume: mostly no; output was flat and direct labor within the standards
+- But indirect time grew by about two-thirds and overtime more than doubled
+
+::: {.notes}
+Indirect labor is overhead, so its growth reached the variance through the overhead part, while the favorable labor part shrank as direct hours moved toward the standard. Next, the controller needs a measure she can follow month by month, which Chapter 11 builds.
+:::
+
+## Summary
+
+- Joins follow logical keys, and each is tested by its row count
+- Left joins keep whole populations; anti-joins and NOT EXISTS find what is missing
+- Aggregates with GROUP BY and HAVING summarize by key, after profiling the table
+- Fan-out repeats header amounts: sum each amount at its own level
+- Subqueries and derived tables answer questions that take more than one step
+
+::: {.notes}
+Most of this chapter's queries were diagnostic analytics: they explained why the variance grew by breaking it down by product, year and part, and by comparing hours with the standards.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Fan-out, anti-join and standard hours allowed are the ideas the rest of Part III relies on most.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 10.5 tests referential integrity with anti-joins, and Exercise 10.1 reconciles the invoice lines to the ledger. Chapter 11 builds the monthly measure.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::

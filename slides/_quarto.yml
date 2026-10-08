@@ -52,6 +52,8 @@ format:
     history: true
     embed-resources: false
     code-copy: false
+    # PowerPoint shows no line numbers, and a slide's short query needs none.
+    code-line-numbers: false
     auto-stretch: true
     html-math-method: mathml
     title-slide-attributes:

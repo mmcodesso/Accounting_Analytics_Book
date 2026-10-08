@@ -146,6 +146,20 @@ def format_lists(slide: ET.Element, tokens: dict) -> None:
                 pr.set('indent', str(-needed))
 
 
+def format_code(slide: ET.Element, tokens: dict) -> None:
+    """A code block reaches PowerPoint as a paragraph whose runs are all in the code font, at the body
+    size; it gets the evidence size, as Reveal's code blocks do, so a query's lines do not wrap."""
+    size = str(tokens['sizes']['evidence'] * 100)
+    for paragraph in slide.iter(q('a', 'p')):
+        runs = paragraph.findall('a:r', NS)
+        if not runs or paragraph.find('a:pPr/a:buNone', NS) is None:
+            continue
+        fonts = [run.find('a:rPr/a:latin', NS) for run in runs]
+        if all(font is not None and font.get('typeface') == tokens.get('code_font') for font in fonts):
+            for run in runs:
+                run.find('a:rPr', NS).set('sz', size)
+
+
 def roadmap_lines(text: str) -> int:
     """Lines a roadmap entry takes in a column, as slides/filters/deck.lua estimates them."""
     return max(1, -(-len(text) // ROADMAP_CHARACTERS))
@@ -183,13 +197,15 @@ def finish(path: Path, tokens: dict) -> None:
         for item in source.infolist():
             data = source.read(item.filename)
             if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data
-                                                   or b'buAutoNum' in data or ROADMAP_TITLE.encode() in data):
+                                                   or b'buAutoNum' in data or ROADMAP_TITLE.encode() in data
+                                                   or tokens.get('code_font', '\0').encode() in data):
                 xml = ET.fromstring(data)
                 for table in xml.iter(q('a', 'tbl')):
                     format_table(table, colors)
                 format_captions(xml, tokens)
                 format_lists(xml, tokens)
                 format_roadmap(xml, tokens)
+                format_code(xml, tokens)
                 data = ET.tostring(xml, encoding='utf-8', xml_declaration=True)
             target.writestr(item, data)
     shutil.move(temporary, path)

@@ -51,6 +51,9 @@ $presentation-heading-line-height: 1.15;
 .reveal .slides .roadmap-compact { font-size: $aa-size-evidence; }
 .reveal .slides a { color: $aa-blue; text-decoration: underline; text-underline-offset: 0.12em; }
 .reveal .slides pre { box-shadow: none; padding: 0.45em; background: $aa-tint; }
+// A slide's query is shown at the evidence size, as pptx_finish.format_code sets it in PowerPoint;
+// Reveal's default is about half the body size.
+.reveal .slides pre code { font-size: $aa-size-evidence; line-height: 1.3; max-height: none; }
 
 // The title slide: the chapter on the book's blue, with the book's title above it.
 .reveal #title-slide {

@@ -225,12 +225,18 @@ end
 
 local function book_checkpoint(args, kwargs, meta)
   local found = tutorial(meta, pandoc.utils.stringify(args[1] or '')).checkpoint
+  -- An optional range, such as 1-3 and 4-6, splits a long checkpoint over two slides.
+  local first, last = pandoc.utils.stringify(args[2] or ''):match('^(%d+)%-(%d+)$')
+  first, last = tonumber(first) or 1, tonumber(last) or #found.items
   local items = {}
-  for _, item in ipairs(found.items) do
-    -- answers="hide" drops a question's trailing parenthetical answer, which the notes can give instead.
-    if value(kwargs, 'answers') == 'hide' and item:match('%?') then item = item:gsub('%s*%b()%s*$', '') end
-    table.insert(items, item)
+  for i, item in ipairs(found.items) do
+    if i >= first and i <= last then
+      -- answers="hide" drops a question's trailing parenthetical answer, which the notes can give instead.
+      if value(kwargs, 'answers') == 'hide' and item:match('%?') then item = item:gsub('%s*%b()%s*$', '') end
+      table.insert(items, item)
+    end
   end
+  if #items == 0 then error('No checkpoint items ' .. first .. '-' .. last .. ' in this tutorial') end
   local markdown = bullets(items)
   if value(kwargs, 'lead') == 'true' then markdown = found.lead .. '\n\n' .. markdown end
   return blocks(markdown)

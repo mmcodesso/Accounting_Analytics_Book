@@ -74,8 +74,8 @@ signatures, that `rows` cannot name:
 {{< book-table tbl-05-01 1-5 >}}
 ```
 
-**Code.** A short query (about six lines, no data values) goes in a ```` ```sql ```` block, which both formats
-show in the code font. Longer queries, and their results, come from the book's DB Browser mocks.
+**Code.** A short query (about six lines of at most about 50 characters, no data values) goes in a
+```` ```sql ```` block, which both formats show in the code font at the evidence size, without line numbers. Longer queries, and their results, come from the book's DB Browser mocks.
 
 **Comparison.** Two columns (`:::: {.columns}` with two `::: {.column}`); PowerPoint takes at most two.
 
@@ -114,7 +114,7 @@ notes or its answer slide give the answer.
 |---|---|
 | `{{< book-objectives >}}`, `{{< book-objectives 4-6 >}}` | the chapter's learning objectives, verbatim, all or a range |
 | `{{< book-steps 1.1 >}}`, `{{< book-steps 4.1 7-11 >}}` | the step titles of a Guided Tutorial, all or a range (a tutorial of more than about eight steps goes on two slides) |
-| `{{< book-checkpoint 1.1 answers="hide" >}}` | the tutorial's checkpoint, without the answers in parentheses |
+| `{{< book-checkpoint 1.1 answers="hide" >}}`, `{{< book-checkpoint 10.3 1-4 lead="true" >}}` | the tutorial's checkpoint, all or a range of items (a checkpoint of more than five items goes on two slides, the second titled "Checkpoint (continued)"), without the answers in parentheses |
 | `{{< book-terms >}}` | the chapter's key terms, in one paragraph |
 | `{{< book-exercises >}}` | the exercise titles, by perspective |
 | `{{< book-next >}}`, `{{< book-title >}}`, `{{< book-link >}}` | the next chapter, the book's title, and the chapter's web address (inline) |
