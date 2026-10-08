@@ -149,18 +149,22 @@ local function book_table(args, kwargs)
   end
   -- Column widths, in percent of the table: each column in proportion to its longest cell (capped at
   -- 60 characters, so long prose shares the room), but never below what its longest word needs at the
-  -- table text size (about 1.1% of the width per character, with the cell margins). Pandoc reads the
+  -- table text size (about 1.1% of the width per character, with the cell margins; a word in code
+  -- needs two characters more of margin, so a name such as USERELATIONSHIP does not break). Pandoc reads the
   -- widths from the dashes of the separator, which count only when a line exceeds 72 characters.
   local weights, floors, total = {}, {}, 0
   for position, i in ipairs(keep) do
-    local width, word = 0, 0
+    local width, word, code = 0, 0, 0
     for _, cells in ipairs({found.header, table.unpack(rows)}) do
       local text = plain(cells[i] or '')
       width = math.max(width, #text)
       for token in text:gmatch('%S+') do word = math.max(word, #token) end
+      for span in (cells[i] or ''):gmatch('`([^`]+)`') do
+        for token in span:gmatch('%S+') do code = math.max(code, #token) end
+      end
     end
     weights[position] = math.max(math.min(width, 60), 1)
-    floors[position] = (word + 3) * 1.1
+    floors[position] = math.max(word + 3, code > 0 and code + 5 or 0) * 1.1
     total = total + weights[position]
   end
   local shares, raised, floor_total, rest = {}, {}, 0, 0

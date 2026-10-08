@@ -47,6 +47,14 @@ jobs:
           version: "1.9.36"
           tinytex: true
 
+      - name: Install required LaTeX packages
+        # The PDF header uses fvextra for wrapping code blocks. Install it by
+        # package name before rendering, bypassing automatic .sty-file lookup.
+        run: |
+          tlmgr update --self
+          tlmgr install fvextra
+          kpsewhich fvextra.sty
+
       - name: Install render dependencies
         # fonts-liberation is metric-compatible with Helvetica and Arial, so
         # figure labels wrap the same way as in the local Draw.io exports.

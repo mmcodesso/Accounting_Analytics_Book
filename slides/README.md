@@ -59,7 +59,8 @@ the detail slides again after the figure changes.
 sentence, when it goes on to define the table's symbols; put the definitions in the notes). `columns` and
 `rows` narrow it, each a comma-separated list of headers or first-column values; `rows` keeps every row
 whose first cell matches, so `rows="Quantitative"` takes all of a group. Column widths follow the content,
-so no column is narrower than its longest word:
+so no column is narrower than its longest word (a word in code, such as `USERELATIONSHIP`, gets the extra
+room its wider font needs):
 
 ```markdown
 {{< book-table tbl-01-03 columns="Table Group,Primary Accounting Use" rows="Accounting Core,Master Data" >}}

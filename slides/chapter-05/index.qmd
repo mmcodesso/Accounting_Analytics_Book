@@ -161,10 +161,18 @@ The Charles River workbook stores its dates as real dates, but data from other s
 
 ## Logical functions classify and check
 
-{{< book-table tbl-05-02 >}}
+{{< book-table tbl-05-02 1-3 >}}
 
 ::: {.notes}
 A logical test is TRUE or FALSE, and a column of such results can be counted, filtered and formatted. Comparisons are exact: text comparisons ignore case, but an extra space or a number stored as text makes two look-alike values unequal.
+:::
+
+## Logical functions classify and check (continued)
+
+{{< book-table tbl-05-02 4-6 >}}
+
+::: {.notes}
+OR, NOT and IFERROR complete the set. IFERROR returns a substitute you choose when a formula's value is an error, such as "No match" when a lookup fails.
 :::
 
 ## IFS needs a final TRUE; IFERROR a countable value
