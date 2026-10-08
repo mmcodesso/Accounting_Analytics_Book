@@ -63,6 +63,11 @@ local function roadmap(index, chapter, modules)
     '\n:::\n::::')
 end
 
+local function title_key(text)
+  -- Pandoc curls the apostrophes and quotes of a deck's headings, while the book index keeps them straight.
+  return (text:gsub('\u{2019}', "'"):gsub('\u{2018}', "'"):gsub('\u{201C}', '"'):gsub('\u{201D}', '"')):lower()
+end
+
 function Pandoc(doc)
   local deck = doc.meta['book-chapter'] and pandoc.utils.stringify(doc.meta['book-chapter'])
   if not deck then return doc end
@@ -70,12 +75,12 @@ function Pandoc(doc)
   local chapter = index.chapters[deck]
   if not chapter then error('No chapter ' .. deck .. ' in the book') end
   local numbers = {}
-  for _, section in ipairs(chapter.sections) do numbers[section.title:lower()] = section.number end
+  for _, section in ipairs(chapter.sections) do numbers[title_key(section.title)] = section.number end
   local modules = {}
   for _, block in ipairs(doc.blocks) do
     if block.t == 'Header' and block.level == 1 then
       local title = pandoc.utils.stringify(block.content)
-      local number = not title:match('^Guided Tutorial') and numbers[title:lower()]
+      local number = not title:match('^Guided Tutorial') and numbers[title_key(title)]
       if number then
         block.content:insert(1, pandoc.Space())
         block.content:insert(1, pandoc.Span(pandoc.Str(number), pandoc.Attr('', {'section-number'})))

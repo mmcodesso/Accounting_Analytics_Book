@@ -456,6 +456,8 @@ files:
     constants: ["$100 million"]     # Powell et al.'s largest confirmed spreadsheet error, as the chapter cites it
   slides/chapter-07/index.qmd:
     constants: ["−1", "+1"]         # the range of a correlation coefficient, as the chapter states it
+  slides/chapter-08/index.qmd:
+    constants: ["99"]               # prices ending in 99, the chapter's example of amounts set by people
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

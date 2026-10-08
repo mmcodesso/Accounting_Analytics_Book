@@ -1,0 +1,532 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter looks at the Charles River data as an auditor does. Each module follows a section of the chapter, and the three guided tutorials review the supplier payments, the receivables and the journal entries.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover testing whole populations: reconciling them, stratifying them, and testing their first digits.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover receivables, journal entries, and the duplicate, gap and threshold tests, with the workpaper that documents them.
+:::
+
+## Can the numbers be relied on?
+
+- The audit committee has asked internal audit for a data-driven review
+- You review the supplier payments, the receivables and the journal entries
+- The question is not what the numbers mean, but whether they can be trusted
+- Is each population complete, does anything look unusual, does the ledger agree?
+
+::: {.notes}
+The earlier chapters followed a staff accountant and turned up conditions an auditor would want to examine, from reused supplier invoice numbers to invoices dated before their orders. This chapter takes the auditor's view, before the external auditors begin their work.
+:::
+
+# Audit Analytics and the Internal Auditor
+
+## Analytics lets auditors test whole populations
+
+- Internal auditors work for the organization and report to its audit committee
+- External auditors are independent and give an opinion on the statements
+- Both need complete, valid transactions and controls that worked
+- A test of every record returns exceptions, and judgment explains them
+
+::: {.notes}
+Traditional procedures examine a sample and infer the rest; analytics examines every payment, invoice or entry. Most exceptions turn out to have an ordinary explanation, so the auditor's judgment goes into designing the test, investigating each exception and deciding what it means. The AICPA's Guide to Audit Data Analytics covers how auditors can use such analyses.
+:::
+
+## An audit analytics workflow
+
+{{< book-figure fig-08-01 >}}
+
+::: {.notes}
+Every test follows these steps, from the objective to the workpaper. The dashed loop back from the exceptions is how a test whose exceptions are mostly false positives gets refined and rerun.
+:::
+
+## Watch out: closing entries cut both ways {.watch-out}
+
+- Year-end closes move each year's revenue and expenses to retained earnings
+- Leave them out of any analysis of revenue or expenses by period
+- Keep them in a journal entry test: a close is a journal entry like any other
+- Entries at the end of a period are the ones auditing standards single out
+
+::: {.notes}
+Chapter 7 left the closes out when it compared operating expenses with the budget. Tutorial 8.3 keeps them in, and explains why they exceed every approver's limit.
+:::
+
+# Reconciling the Population
+
+## Agree the population to the ledger before testing
+
+- A population is every record a test's conclusion covers
+- A test on an incomplete extract can find nothing because records are missing
+- Agree its count and total to the ledger, such as the cash credits of payments
+- Use the same cutoff on both sides, so they describe the same population
+
+::: {.notes}
+The ledger already holds supplier payments dated early in the next fiscal year, so a review of the three years filters them out on both sides. Fay and Negangard begin their journal entry testing case with the same step: validate that the file is complete before testing it.
+:::
+
+# Stratification
+
+## Stratify to see where the dollars are
+
+- Strata group a population by value, with a count and a total for each
+- Many small items and a few large ones: the few can carry much of the value
+- The largest items are examined one by one, the richest strata most carefully
+- Keep the strata bounds in cells, counted with COUNTIFS and summed with SUMIFS
+
+::: {.notes}
+The PCAOB's sampling standard uses strata to reduce a sample and directs the auditor to examine in full the items that could equal or exceed tolerable misstatement, often called individually significant items. In analytics, where every item is tested, the table still directs attention.
+:::
+
+# Benford's Law
+
+## First digits follow Benford's Law
+
+- In many data sets, about three in ten numbers start with 1, and under one in twenty with 9
+- The expected share of first digit d is `LOG10(1+1/d)`
+- It holds for amounts that combine many quantities and span several magnitudes
+- Departures can point to invented or altered amounts (Nigrini and Mittermaier)
+
+::: {.notes}
+Newcomb noticed that the early pages of logarithm tables wore out first, and Benford tested the pattern on many kinds of data. Nigrini and Mittermaier introduced digit tests as analytical procedures for audit planning.
+:::
+
+## Not every population should conform
+
+- Assigned numbers, such as invoice or check numbers, carry no magnitude
+- Amounts with a minimum or maximum cannot spread across the digits
+- Nor can a subset selected by its size
+- Amounts set by people, such as prices ending in 99, follow their preferences
+
+::: {.notes}
+Nigrini reviews which kinds of audit data suit a Benford analysis, a question to answer before running the test.
+:::
+
+## Judge conformity with the mean absolute deviation
+
+{{< book-table tbl-08-01 >}}
+
+::: {.notes}
+With tens of thousands of amounts, chi-square and z tests find a significant difference in almost any population, however small. Nigrini recommends the mean absolute deviation, the average of the nine absolute differences between actual and expected shares, judged against these ranges.
+:::
+
+## A nonconformity shows where to look
+
+- It does not show that anything is wrong
+- The digits that differ most lead to the subsets that need an explanation
+- The explanation is often a feature of the business, such as a way of paying
+- Use the test to point to subsets, not to pick a sample by what it removes
+
+::: {.notes}
+Nigrini examined a method that samples the transactions whose removal would make a population conform, and found it can produce large samples of questionable accuracy. Tutorial 8.1 uses the test to find a subset instead.
+:::
+
+## Check your understanding {.check}
+
+Should each set of numbers follow Benford's Law?
+
+1. Supplier payment amounts over three years
+2. Check numbers
+3. Only the payments above an approval threshold
+4. Retail prices that end in 99
+
+::: {.notes}
+Ask students which property of the data decides each answer.
+:::
+
+## Only measured, unbounded amounts should conform {.answer}
+
+1. Yes: measured amounts that span several magnitudes
+2. No: assigned numbers carry no magnitude
+3. No: a subset selected by its size
+4. No: amounts set by people's preferences
+
+::: {.notes}
+Even for the first, a nonconformity is a reason to look, not a finding; Tutorial 8.1 shows how.
+:::
+
+# Guided Tutorial 8.1: Stratifying and Testing Supplier Payments
+
+## Test the payments in nine steps
+
+{{< book-steps 8.1 >}}
+
+::: {.notes}
+Students start the audit workbook, reconcile the payments to the ledger, stratify them, examine the top strata, and run a first-digit test on the whole population and then on two subsets.
+:::
+
+## Four payments make up the top strata
+
+{{< book-figure fig-08-02 >}}
+
+::: {.notes}
+Most payments are small, but the top strata hold a large share of the value. The four largest payments went to two suppliers, each paying one invoice in full, so their disposition is to vouch them to the purchase order, the receiving record and the invoice approval.
+:::
+
+## Count the first digits and measure the MAD
+
+{{< book-figure fig-08-03 crop="0,0,1,0.503" >}}
+
+::: {.notes}
+COUNTIF counts the payments by first digit, and each share is compared with the expected share. The MAD of all payments falls in the marginally acceptable range.
+:::
+
+## Fewer ones, and more high digits, than expected
+
+{{< book-figure fig-08-03 crop="0,0.503,1,0.497" >}}
+
+::: {.notes}
+The columns are the actual shares and the line Benford's expected shares. The pattern points to a subset worth splitting out.
+:::
+
+## Partial payments explain the nonconformity
+
+{{< book-figure fig-08-04 >}}
+
+::: {.notes}
+Full payments conform acceptably; partial payments do not. Charles River pays in parts only larger invoices, most of them just above a thousand dollars, so their parts are amounts in the hundreds that start with the higher digits. The cause is the payment process, not invented amounts.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 8.1 lead="true" >}}
+
+::: {.notes}
+The first test found no exception that points to an error, and that is a result worth documenting. The payments reconcile, the largest are identified for vouching, and the one departure from expectations has an explanation the data supports.
+:::
+
+# Aging and Reconciling Receivables
+
+## An aging sorts open balances by days past due
+
+- Buckets such as current, 1 to 30, 31 to 60, 61 to 90 and over 90 days
+- It serves the credit department and the estimate of uncollectible amounts
+- The FASB's credit-loss standard requires an allowance, often estimated from an aging
+- The as-of date matters: later payments must not reduce the balance
+
+::: {.notes}
+The standard requires the estimate to reflect the risk of loss even when it is remote, and illustrates it with loss rates by bucket. Charles River's chart calls the valuation account the Allowance for Doubtful Accounts, the older name.
+:::
+
+## Reconcile the aging to the ledger
+
+- The open invoices are the detail behind the receivables account
+- A reconciliation lists the ledger balance, the detail and every reconciling item
+- Expected items, such as an unmatched receipt, clear in a later period
+- An item no one can explain is a finding in itself
+
+::: {.notes}
+Either the ledger holds an amount no invoice supports, or the detail misses invoices the ledger recorded. Either way, the aging does not describe the whole balance, and an allowance estimated from it would not cover it either.
+:::
+
+## Confirm the largest balances; sample the rest
+
+- A confirmation asks the customer to state its balance directly to the auditor
+- The largest balances are confirmed in full, as individually significant items
+- The rest are sampled at random, so every balance can be chosen
+- RANDARRAY and SORTBY shuffle the list; freeze it with Paste Values
+
+::: {.notes}
+The PCAOB's confirmation standard requires confirming receivables from sales, or obtaining the evidence directly from a knowledgeable external source. A selection that cannot be reproduced cannot be reviewed, so record its date and parameters.
+:::
+
+## Check your understanding {.check}
+
+How does each item enter the receivables work?
+
+1. A payment applied after the as-of date
+2. A difference from the ledger that no one can explain
+3. The customers with the largest balances
+4. All the other customers
+
+::: {.notes}
+Ask students what would go wrong if each item were treated differently.
+:::
+
+## Each item has its place {.answer}
+
+1. Left out: the balance is aged as of the reporting date
+2. A finding: the aging does not describe the whole balance
+3. Confirmed in full, as key items
+4. Sampled at random, and the selection frozen as values
+
+::: {.notes}
+Tutorial 8.2 applies all four, and the second turns out to be the most important.
+:::
+
+# Guided Tutorial 8.2: Aging Receivables and Reconciling Them to the Ledger
+
+## Age and reconcile in eight steps
+
+{{< book-steps 8.2 >}}
+
+::: {.notes}
+Students calculate each invoice's open balance at the year-end from its receipts and credit memos, age it into five buckets with a lookup table, reconcile the total to the ledger, investigate the difference, and select balances for confirmation.
+:::
+
+## The ledger holds a balance no invoice supports
+
+{{< book-figure fig-08-05 >}}
+
+::: {.notes}
+The aging shows that customers pay mostly on time. The receivables account exceeds the open invoices by a round amount, a difference that needs an explanation.
+:::
+
+## The difference traces to one journal entry line
+
+{{< book-figure fig-08-06 >}}
+
+::: {.notes}
+Grouped by source document, the receivables postings are invoices, receipts and credit memos, plus a single journal entry line: the opening balance. The allowance and bad-debt accounts have no postings at all.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 8.2 lead="true" >}}
+
+::: {.notes}
+Part of the receivables balance is supported by no invoice, and no allowance has been recorded against any of it. Both findings affect the amount at which receivables would be reported, and both go to the audit committee with their evidence.
+:::
+
+# Journal Entry Testing
+
+## Journal entries are where controls can be overridden
+
+- Managers can bypass controls that work for everyone else: management override
+- Fraud often involves unauthorized entries during the year or at period end (AS 2401)
+- Warning signs: unusual accounts, unusual creators, period-end or post-closing timing
+- Round numbers or a consistent ending number are another
+
+::: {.notes}
+The PCAOB's fraud standard requires the auditor to identify and test journal entries, ordinarily focusing on the end of the period. Fay and Negangard build their case around the same questions: who recorded an entry, when, and whether it was posted to an earlier date than it was made.
+:::
+
+## Six characteristics become six tests
+
+{{< book-table tbl-08-03 >}}
+
+::: {.notes}
+A backdated entry is created on a later day than the date it posts to, the journal entry counterpart of a post-closing entry. An entry approved by its creator defeats segregation of duties.
+:::
+
+## A risk score ranks entries for review
+
+- Each flag is TRUE or FALSE, and their sum is a risk score
+- A score ranks entries; it is not a probability of fraud
+- One flag often has an ordinary cause; several together rarely do
+- Equal weights are a judgment too
+
+::: {.notes}
+Digit tests apply to journal entries with care: Debreceny and Gray found that journal entry amounts departed from Benford's Law in every organization they examined, so a nonconforming test there suggests nothing by itself.
+:::
+
+## Every exception gets a disposition
+
+- Most flagged entries are false positives: they meet the criteria but are legitimate
+- Expected: record the evidence that explains it
+- Follow up: record the question to ask and the document to request
+- A misstatement or control deficiency: report it
+
+::: {.notes}
+Nigrini emphasizes refining and rerunning tests, and grouping and filtering results, to deal with false positives. A test whose exceptions are mostly expected is refined, for example by excluding a recurring entry type examined once, and rerun.
+:::
+
+## Check your understanding {.check}
+
+What disposition does each flagged entry get?
+
+1. Depreciation entries created on month-ends that fell on a weekend
+2. Year-end closes above every approver's limit
+3. An entry created days after its posting date, with no explanation
+4. An entry approved by the person who created it
+
+::: {.notes}
+Ask students what evidence would support each disposition.
+:::
+
+## Expected, or follow up {.answer}
+
+1. Expected: they post on the month-end date itself
+2. Expected: a close carries a whole year's amounts
+3. Follow up: ask why, and request the support
+4. Follow up, as a possible control deficiency: segregation of duties
+
+::: {.notes}
+Tutorial 8.3 explains the first two once with a PivotTable, so that the entries left to follow up stand out.
+:::
+
+# Guided Tutorial 8.3: Testing Journal Entries for Management Override
+
+## Test the journal entries in seven steps
+
+{{< book-steps 8.3 >}}
+
+::: {.notes}
+Students import the entries with their creators, approvers and approval limits, add five flag columns, each a short formula listed in the chapter's table of flags, sum them into a risk score, separate the expected patterns, and trace the highest score to the ledger.
+:::
+
+## One entry carries four flags
+
+{{< book-figure fig-08-07 >}}
+
+::: {.notes}
+The opening balance entry was created by the chief financial officer on a Saturday, days after the date it posts to, approved under the same employee ID, and far above that approver's limit. The entries scoring two include backdated entries keyed on the first Saturday of January and two large debt reclassifications.
+:::
+
+## The highest score is the opening balance entry
+
+{{< book-figure fig-08-08 >}}
+
+::: {.notes}
+A FILTER formula spills the entry's eighteen ledger lines from its number. The entry sets up the opening balances of every balance sheet account.
+:::
+
+## Its receivables line has no invoice behind it
+
+{{< book-figure fig-08-08 crop="0,0,1,0.414" >}}
+
+::: {.notes}
+The outlined line is the receivables difference found in Tutorial 8.2. The journal entry test and the receivables reconciliation have led to the same entry from two directions.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 8.3 lead="true" >}}
+
+::: {.notes}
+The tests found no sign of a concealed misstatement in the recurring entries, but they found weaknesses in how entries are approved. The opening balance entry, created after its date, approved by its own creator, and carrying balances the detail does not support, is the first item for the audit committee.
+:::
+
+# Duplicate, Gap, and Threshold Tests
+
+## Near-duplicates catch what exact duplicates miss
+
+- A duplicate payment need not repeat a reference number
+- Look for the same supplier and amount on different dates
+- Add the invoice as a criterion to tell a second payment from a second invoice
+- About a hundred such pairs each pay two different invoices: false positives
+
+::: {.notes}
+The test is still worth running, because a near-duplicate that pays the same invoice twice is exactly the error an exact-duplicate test misses. Exercise 8.5 runs it.
+:::
+
+## Gap tests need a series meant to be continuous
+
+- Compare the count with the range of the numbers: largest less smallest, plus one
+- Charles River's invoice, entry, order and receipt numbers run without gaps
+- A clean result is recorded as carefully as an exception
+- Check numbers follow all payments, so every gap is a payment of another kind
+
+::: {.notes}
+Matched against the payment numbers, every check gap is explained, except the numbers of the two checks that reused an earlier number, the pairs of Exercise 2.6.
+:::
+
+## Threshold tests look just below the line
+
+- People avoiding a control keep amounts just under its threshold
+- Count the items in narrow bands just below and just above each limit
+- Look for consecutive documents with the same requester and amount
+- They may be one purchase split to stay under a limit
+
+::: {.notes}
+Amounts just above or below control thresholds are one of the patterns Nigrini found in fraud schemes. Exercise 8.5 applies the test to Charles River's purchase requisitions and the approval limits in the Employee table.
+:::
+
+## Earlier tests join the audit program
+
+- Requisitions converted to orders without an approver (Exercise 2.5)
+- Invoice numbers whose year differs from their date (Exercise 5.2)
+- Suppliers sharing an employee's address (Exercise 5.5)
+- Unapproved suppliers and items sold outside their life (Exercise 5.6)
+
+::: {.notes}
+Each is a test of a control and belongs in the workpapers with its population, its results and a disposition for every exception. Pricing is another control area: promotion and price-list dates and override approvals can be compared with the orders, as Exercise 8.6 does.
+:::
+
+# Documenting Audit Analytics
+
+## A workpaper another auditor can follow
+
+{{< book-figure fig-08-09 >}}
+
+::: {.notes}
+The PCAOB requires documentation that lets an experienced auditor with no previous connection understand the work, the evidence and the conclusions, and shows who performed and reviewed it. The workpaper adds the objective, the reconciliation of the population, the exceptions with their dispositions, and a conclusion.
+:::
+
+## Analytics adds reproducibility and dispositions
+
+- Record the extract, its as-of date and every test's parameters
+- Then the workbook can be refreshed and the tests rerun
+- A test is complete only when every exception has a disposition and evidence
+- A test that flags nothing is a result to record, not a test to omit
+
+::: {.notes}
+The parameters include the strata bounds, the aging buckets and the approval limits. These tests also reach the limits of a workbook: comparing every payment with every other one is slow in a worksheet, and the later Parts return to them in SQL and in interactive reports.
+:::
+
+# Looking Ahead
+
+## What the review found
+
+- Payments: complete, the largest identified, and the one nonconformity explained
+- Receivables: part of the balance has no invoice behind it, and no allowance
+- Journal entries: approval weaknesses, led by the opening balance entry
+- Next: the Part II case, then Part III and the database
+
+::: {.notes}
+The Part II Comprehensive Case brings the five Excel chapters together on a decision: whether to run the promotion calendar again. Part III then asks the same questions of whole tables at once.
+:::
+
+## Summary
+
+- Reconcile a population to the ledger before testing it
+- Stratification shows where the dollars are; Benford's Law where to look
+- An aging reconciled to the ledger shows what the detail cannot support
+- Journal entry flags rank entries by risk; every exception gets a disposition
+- Duplicate, gap and threshold tests, documented so another auditor can follow
+
+::: {.notes}
+Ask students which finding they would put first for the audit committee, and why: the opening balance entry is the usual answer.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Population, disposition and management override are the ideas Part III's audit chapter returns to.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 8.1 estimates the allowance the receivables lack, and Exercise 8.5 runs the near-duplicate and threshold tests. The Part II case follows.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
