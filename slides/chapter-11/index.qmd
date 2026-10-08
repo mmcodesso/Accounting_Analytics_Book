@@ -1,0 +1,526 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter builds the monthly measure the controller needs before she takes Chapter 10's finding to the plant manager. Each module follows a section of the chapter, and the three guided tutorials extend one script, Chapter11.sql, ending with a saved view.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover CASE and conditional aggregation, the date functions, and window functions.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover common table expressions, views, and the monthly measure that combines them.
+:::
+
+## When did it start, and is it still growing?
+
+- Output was flat, but the plant recorded far more hours than its standards allow
+- Direct labor stayed within the standard; indirect time and overtime grew
+- The plant manager will ask: when did it start, and is it still getting worse?
+- How much is overtime, and is it spread across the plant or concentrated?
+
+::: {.notes}
+Annual totals cannot answer those questions. The controller needs a measure she can follow month by month, one that makes sense in months when production is lumpy, saved in the database so it runs again next month.
+:::
+
+# Beyond Grouping
+
+## Four features answer what grouping cannot
+
+- CASE places a row in a category that no column records
+- Date functions turn dates into periods and measure the time between them
+- Window functions calculate across rows without collapsing them
+- Common table expressions and views break a long analysis into named, saved steps
+
+::: {.notes}
+Grouping summarizes rows, but some questions need categories as columns, comparisons with other rows such as the same month last year, totals that accumulate while every month stays visible, or so many steps that nested subqueries become hard to check.
+:::
+
+# Classifying Rows with CASE
+
+## CASE classifies rows that no column records
+
+- The searched form tests conditions in order; the first true one wins
+- Without an ELSE, a row that meets no condition gets NULL, so write one
+- The simple form compares one column with values, so `WHEN NULL` never matches
+- `ORDER BY CASE` sorts in an order no column holds, such as statement order
+
+::: {.notes}
+CASE works like Excel's IFS from Chapter 5, and it can appear anywhere a value can: in SELECT, WHERE, GROUP BY and ORDER BY. The chapter's example classifies each payroll line as hourly pay, salaries, employer taxes and benefits, or employee deductions; a broad condition placed first would hide the narrower ones below it.
+:::
+
+# Working with Dates
+
+## SQLite's date functions
+
+{{< book-table tbl-11-01 >}}
+
+::: {.notes}
+The dates are text in year-month-day form, and the functions read, calculate with and return text, except julianday, which returns a number. Modifiers such as 'start of month' and '+1 month' are applied in order, from left to right.
+:::
+
+## Month ends and the days between dates
+
+- `date(d, 'start of month', '+1 month', '-1 day')` is the month's last day
+- So a posting date equal to it is a month-end entry, mostly accruals and depreciation
+- The difference of two julianday values is the number of days between them
+- Here the fiscal year is the calendar year, so strftime and FiscalPeriod agree
+
+::: {.notes}
+The julianday difference is the SQL counterpart of subtracting one date from another in Excel. A company whose fiscal year starts in another month needs a mapping from calendar months to fiscal periods.
+:::
+
+## Watch out: date logic is easy to get subtly wrong {.watch-out}
+
+- Modifier order matters: adding a month to the 31st can land in the month after next
+- Apply 'start of month' first whenever you step from month to month
+- Date functions return text, so compare their result with text, not a number
+- Other systems name these functions differently, so date logic travels least well
+
+::: {.notes}
+A function's result is not a column, so SQLite converts nothing: a year from strftime compared with a bare number finds no rows. SQL Server, for example, uses YEAR, DATEADD and DATEDIFF.
+:::
+
+# Turning Rows into Columns with Conditional Aggregation
+
+## Conditional aggregation turns rows into columns
+
+{{< book-figure fig-11-01 >}}
+
+::: {.notes}
+Each CASE passes the amount of one source's rows and zero for the others, so each SUM collects one source into its own column. Rows that meet no condition, here the work order closes, add zero to every column.
+:::
+
+## A CASE inside SUM is the SQL form of SUMIFS
+
+- The query names its columns, so it suits categories you know in advance
+- `COUNT(CASE WHEN … THEN 1 END)` counts rows, because COUNT skips the NULLs
+- `SUM(CASE WHEN … THEN 1 ELSE 0 END)` gives the same count as a 1-or-0 flag
+- A PivotTable, by contrast, makes a column for every value it finds
+
+::: {.notes}
+CASE is the SQL form of IFS, and a CASE inside SUM the SQL form of SUMIFS. The difference from Excel is where the result lives: one piece of text produces every row and column at once, and it runs unchanged on next year's data.
+:::
+
+## Check your understanding {.check}
+
+Which tool does each task?
+
+1. Label each payroll line as pay, salary, employer cost or deduction
+2. Group transactions by month
+3. Find the last day of each month
+4. Count the days from a work order's release to its completion
+
+::: {.notes}
+Ask students which of the four would need care with the order of its parts.
+:::
+
+## Each task has its tool {.answer}
+
+1. A searched CASE, with an ELSE
+2. `strftime('%Y-%m', d)` in GROUP BY
+3. `date` with 'start of month', '+1 month' and '-1 day', in that order
+4. The difference of two julianday values
+
+::: {.notes}
+The third is the one where order matters: start of month comes first, or a 31st can carry into the month after next.
+:::
+
+# Guided Tutorial 11.1: Classifying the Payroll and Measuring the Hours by Month
+
+## Classify and measure in five steps
+
+{{< book-steps 11.1 >}}
+
+::: {.notes}
+Students classify the manufacturing payroll and tie it to the ledger, pivot the labor time by month with conditional aggregation, find where the time records stop, compare overtime shares, and measure how long work orders take.
+:::
+
+## Indirect time almost vanishes for four months
+
+{{< book-figure fig-11-02 crop="0,0.464,1,0.329" >}}
+
+::: {.notes}
+The start-up month has more indirect than direct hours, and then indirect time almost disappears from February to May of the first year before becoming a large part of every month from the summer. The query groups the labor time by month and puts direct, indirect and overtime hours in columns of their own.
+:::
+
+## Direct overtime rose; indirect overtime stayed flat
+
+{{< book-figure fig-11-03 crop="0,0.4357,1,0.3917" >}}
+
+::: {.notes}
+The overtime share of direct labor is a quarter or more in most months of the latest year, up from about a tenth in the first half of the first year. The share of indirect labor stays at about a twelfth throughout.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 11.1 1-3 lead="true" >}}
+
+::: {.notes}
+The payroll categories other than deductions tie to the ledger's charge to the clearing account. The time records stop nearly three weeks before the year ends, which the measure in Tutorial 11.3 must allow for.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 11.1 4-6 >}}
+
+::: {.notes}
+CASE, conditional aggregation and the date functions have given three views of the same change: indirect time that appears in the middle of the first year, more overtime on direct labor, and work orders that take longer to finish.
+:::
+
+# Window Functions
+
+## A window calculates across rows and keeps them
+
+- An aggregate with GROUP BY collapses rows; a window function keeps every row
+- `OVER ()` looks at every row; PARTITION BY at the rows that share its columns
+- GROUP BY decides the rows of the result; PARTITION BY what each calculation sees
+- ORDER BY inside OVER turns a SUM into a running total
+
+::: {.notes}
+`SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)` is a year-to-date total that restarts each fiscal year. SQLite has had window functions since version 3.25, and DB Browser 3.13.1 includes a much later version.
+:::
+
+## Watch out: the default window includes ties {.watch-out}
+
+- With ORDER BY, the default window runs through the current row's peers
+- Peers are the rows tied with it on the ORDER BY columns
+- Tied rows all show the total through the last of them
+- Stop the window at the current row with `ROWS UNBOUNDED PRECEDING`
+
+::: {.notes}
+Each fiscal period appears once in each year, so a year-to-date total by period has no ties. A running total of postings ordered by their date would have many.
+:::
+
+## Ranking functions number the rows
+
+- ROW_NUMBER gives every row its own number, even when rows tie
+- RANK gives ties one number and skips the numbers after them
+- DENSE_RANK gives ties one number without skipping
+- For a stable numbering, add a unique column to the window's ORDER BY
+
+::: {.notes}
+Ranking the Furniture items by standard labor hours per unit shows the first ties in the seventh to tenth rows. ROW_NUMBER numbers tied items in whatever order it meets them, which need not be the order of the result.
+:::
+
+## A partition groups the rows; a frame slides
+
+{{< book-figure fig-11-04 crop="0,0.385,1,0.615" >}}
+
+::: {.notes}
+The year-to-date total restarts in January because each fiscal year is its own partition. The outlined frame, the current month and the two before it, slides down the column to give a moving three-month total.
+:::
+
+## Frames, named windows and offsets
+
+- `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` is a trailing twelve months
+- A ROWS frame counts rows: a missing month reaches one month further
+- `WINDOW w AS (...)` names a window that several functions share
+- `LAG(x)` partitioned by month compares each month with a year earlier
+
+::: {.notes}
+Check that a query relying on a frame has one row for every month. COUNT over the window shows where it holds fewer than twelve months. An alias of the SELECT list cannot be used inside OVER, so the window repeats the expression; SQLite answers "no such column".
+:::
+
+## The window functions of this chapter
+
+{{< book-table tbl-11-02 >}}
+
+::: {.notes}
+The aggregates you know, SUM, AVG, COUNT, MIN and MAX, all work over a window. LAG and LEAD reach back or forward a given number of rows, and their second argument can be left out when it is one.
+:::
+
+## The clauses that define a window
+
+{{< book-table tbl-11-03 >}}
+
+::: {.notes}
+These clauses combine: a partition, an order within it, and a frame of the ordered rows. The named window keeps a long query from repeating the same definition.
+:::
+
+## Windows are calculated with SELECT
+
+- After WHERE, GROUP BY and HAVING; before DISTINCT, ORDER BY and LIMIT
+- So a window can work on grouped totals: a running total of monthly sums
+- But WHERE and HAVING cannot filter on its result: "misuse of window function"
+- To keep the top-ranked rows, filter the window's result in an outer query
+
+::: {.notes}
+Trailing twelve-month figures and year-over-year comparisons are standard in management reporting because they separate a trend from one month's swings; the price is delay, so the monthly and trailing figures are read together. Window functions are the SQL form of Chapter 6's Show Values As.
+:::
+
+## Check your understanding {.check}
+
+Which window does each question need?
+
+1. A year-to-date total that restarts each year
+2. A trailing twelve-month total
+3. Each month against the same month a year earlier
+4. The three largest months of each year
+
+::: {.notes}
+Ask students to name the partition, the order and the frame for each.
+:::
+
+## Each question has its window {.answer}
+
+1. SUM partitioned by year, ordered by month
+2. SUM with `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`
+3. LAG partitioned by month, ordered by year
+4. RANK partitioned by year, filtered in an outer query
+
+::: {.notes}
+The fourth needs two levels because WHERE runs before the window is calculated.
+:::
+
+# Guided Tutorial 11.2: Tracking the Gap Month by Month
+
+## Track the gap in seven steps
+
+{{< book-steps 11.2 >}}
+
+::: {.notes}
+Students calculate the monthly gap in the clearing account with a year-to-date total, compare each month with the same month a year earlier, rank the months, count their pay dates, and rank the work centers by hours recorded against their plan.
+:::
+
+## The year-to-date gap grew in each year
+
+{{< book-figure fig-11-05 crop="0,0.3662,1,0.4578" >}}
+
+::: {.notes}
+The gap is the actual cost charged to the clearing account less the standard cost released by completions, without the work order closes. The year-to-date total restarts each January, and its December figure grew in each year.
+:::
+
+## The largest months have three pay dates
+
+{{< book-figure fig-11-06 crop="0,0.4897,1,0.3411" >}}
+
+::: {.notes}
+The largest month of each year has three pay dates, because payroll is recorded on the pay date with no month-end accrual. The first year also has two pay dates fewer than the later years, part of why its gap was smaller.
+:::
+
+## Packing and QA record far more than planned
+
+{{< book-figure fig-11-07 >}}
+
+::: {.notes}
+Packing and Quality Assurance recorded several times their planned hours, while Assembly, Cutting and Finishing recorded well under theirs. The plant as a whole recorded fewer direct hours than planned, so the totals hide the concentration.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 11.2 1-3 lead="true" >}}
+
+::: {.notes}
+The same-month comparison is NULL in the first year, because it has no earlier year. The ranking query filters its ranks in an outer query, as the window module required.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 11.2 4-6 >}}
+
+::: {.notes}
+The gap grew from year to year, and its largest months come from the pay calendar, not from a few bad months. The pattern in the time records by work center is one the controller cannot explain from the numbers alone.
+:::
+
+# Common Table Expressions
+
+## A CTE names each step of a long query
+
+- `WITH name AS (…)` defines a named subquery at the start of a query
+- Several CTEs, separated by commas, can each use the ones before them
+- The query reads from top to bottom, not from the inside out
+- Check each step by selecting from it on its own
+
+::: {.notes}
+The chapter's example totals the monthly gap in one CTE, and the outer query adds the year-to-date total. Each step's name says what it produces, which makes a long analysis reviewable.
+:::
+
+## Parameters, and CTE or derived table
+
+- A one-row CTE can hold a parameter, such as an as-of date
+- A scalar subquery reads it wherever it is needed, so one change updates the query
+- SQLite may calculate a CTE once or treat it as a derived table
+- So the choice is about readability: for more than one step, use CTEs
+
+::: {.notes}
+The SQLite documentation describes a CTE as working like a view that exists for the length of one statement. Tutorial 11.3 chains four CTEs into the monthly measure.
+:::
+
+# Saving an Analysis as a View
+
+## A view saves the query, not the rows
+
+```sql
+DROP VIEW IF EXISTS MonthlyLaborEfficiency;
+CREATE VIEW MonthlyLaborEfficiency AS
+WITH ...
+SELECT ...;
+```
+
+- Every query of the view runs the saved query on the current data
+- Leave ORDER BY out: the query that uses the view sorts it
+
+::: {.notes}
+A view cannot be changed in place, so a script drops it first and can be run again. Every user gets the same logic, which makes a view a control as well as a convenience, and its result can go to Excel or Power BI with Copy with Headers or Export to CSV.
+:::
+
+## The view lives in the working copy
+
+- It is the one thing in this Part you write into the database
+- CREATE VIEW takes effect at once, but only Write Changes saves it to the file
+- Closing first and clicking Discard removes it
+- `CREATE TEMP VIEW` lasts one session and works even read-only
+
+::: {.notes}
+That is why Chapter 9 made a working copy: the view lives in CharlesRiver_Work.sqlite, and the downloaded file is never changed. A chain of CTEs is the SQL form of Power Query's Applied Steps, and a view the counterpart of a refreshable query.
+:::
+
+## Watch out: a view breaks when its columns change {.watch-out}
+
+- A view depends on the names of the tables and columns it uses
+- Rename or remove one, and the view stops working
+- The error appears only when someone queries the view
+- Document every view: purpose, source tables, and the checks its results pass
+
+::: {.notes}
+Document a view in its script just as you document any other query.
+:::
+
+## Check your understanding {.check}
+
+What happens in each case?
+
+1. You close the database without clicking Write Changes
+2. A column the view uses is renamed
+3. You put ORDER BY inside the view
+4. You need the view only for this session
+
+::: {.notes}
+Ask students which of the four would surprise someone else who uses the view.
+:::
+
+## Each case has its consequence {.answer}
+
+1. DB Browser asks; Discard removes the view
+2. The view fails, but only when it is queried
+3. Leave it out: the query using the view sorts
+4. Use CREATE TEMP VIEW
+
+::: {.notes}
+The second is the reason for documenting a view's source tables and checks.
+:::
+
+# Guided Tutorial 11.3: Building the Monthly Measure and Saving It as a View
+
+## Build and save the measure in nine steps
+
+{{< book-steps 11.3 >}}
+
+::: {.notes}
+Students build the output step and the hours step, join them, add the trailing twelve months with a named window, look at the months before the window is full, save the chain as a view, write it to the file, and query it.
+:::
+
+## The chain of CTEs in the monthly measure
+
+{{< book-figure fig-11-08 >}}
+
+::: {.notes}
+Output counts standard hours only up to the last day with time records, so the two steps cover the same days. The Trailing step calculates the trailing ratios over the named window, and the final SELECT keeps the months whose window holds twelve months.
+:::
+
+## The saved view in the database
+
+{{< book-figure fig-11-09 >}}
+
+::: {.notes}
+After Write Changes, the view appears under Views on the Database Structure tab of the working copy, with its six columns.
+:::
+
+## The measure for the year, queried from the view
+
+{{< book-figure fig-11-10 crop="0,0,1,0.7876" >}}
+
+::: {.notes}
+The monthly ratio swings from month to month, while the trailing figures change slowly. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 11.3 1-4 lead="true" >}}
+
+::: {.notes}
+The partial windows before the twelfth month, led by the start-up month, are why the final step keeps only full windows. Each December's trailing figures equal the annual ratios of Tutorial 10.3.
+:::
+
+## Checkpoint (continued)
+
+{{< book-checkpoint 11.3 5-7 >}}
+
+::: {.notes}
+The controller now has a measure smoothed enough to show a trend, split into the kinds of labor that explain it, and saved so that it runs again every month.
+:::
+
+# Looking Ahead
+
+## Back to the plant manager's questions
+
+- When: in the middle of the first year, when indirect time appears and overtime climbs
+- Still worse? Indirect time has been flat since mid-way through the second year; direct time crept up
+- Overtime: about a fifth of all hours, and more than a quarter of direct hours
+- Where: Packing and QA record several times their plan; other centers record less
+
+::: {.notes}
+The trailing measure reached its highest point late in the latest year. The audit committee will ask whether the records behind the explanation are reliable, including why indirect time almost vanishes for four months, which the internal auditors take up in Chapter 12.
+:::
+
+## Summary
+
+- CASE classifies rows; a CASE inside an aggregate turns categories into columns
+- Date functions group by period, find period ends and count days, in text
+- Window functions rank, accumulate and compare rows while keeping them
+- CTEs name the steps of a long query; a view saves it for every month's run
+- The monthly measure combines them, matched over the same days
+
+::: {.notes}
+This was diagnostic analytics, tracing when and where the extra hours arose. The trailing measure is also a predictive baseline: each new month can be judged against it, and Chapter 7's forecasting methods could project it.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Partition, frame and trailing twelve months are the ideas management reports rely on most.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 11.5 repeats Chapter 8's journal entry tests in SQL, and Exercise 11.1 builds the financial statements from the ledger. Chapter 12 turns to audit analytics in SQL.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
