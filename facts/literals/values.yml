@@ -458,6 +458,8 @@ files:
     constants: ["−1", "+1"]         # the range of a correlation coefficient, as the chapter states it
   slides/chapter-08/index.qmd:
     constants: ["99"]               # prices ending in 99, the chapter's example of amounts set by people
+  slides/chapter-09/index.qmd:
+    constants: ["1.0", "2.0", "3.5", "1234.567", "-2", "1235.0", "1200"]   # the chapter's examples of SQLite arithmetic and ROUND
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

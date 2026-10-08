@@ -19,6 +19,7 @@ local function background(name)
 end
 
 local ROMAN = {'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'}
+local ROADMAP_LINES = 12   -- the estimated lines a roadmap column holds at the body size
 
 local function roadmap(index, chapter, modules)
   -- Where the chapter sits in the book ("Part I of V ... Chapter 1 of 3"), then the deck's modules.
@@ -58,7 +59,10 @@ local function roadmap(index, chapter, modules)
   end
   local left, right = {part .. '\n\n' .. place, ''}, {}
   for i, item in ipairs(items) do table.insert(i <= split and left or right, item) end
-  return quarto.utils.string_to_blocks(':::: {.columns}\n::: {.column width="50%"}\n' ..
+  -- Past ROADMAP_LINES lines a column runs into the footer at the body size, so the roadmap takes the
+  -- evidence size; scripts/slides/pptx_finish.py applies the same estimate to the PowerPoint slide.
+  local compact = best > ROADMAP_LINES and ' .roadmap-compact' or ''
+  return quarto.utils.string_to_blocks(':::: {.columns' .. compact .. '}\n::: {.column width="50%"}\n' ..
     table.concat(left, '\n') .. '\n:::\n\n::: {.column width="50%"}\n' .. table.concat(right, '\n') ..
     '\n:::\n::::')
 end

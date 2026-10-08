@@ -47,6 +47,8 @@ $presentation-heading-line-height: 1.15;
 .reveal .slides .columns { display: flex; gap: 1.2em; }
 .reveal .slides .column { min-width: 0; }
 .reveal .slides .column > p:first-child { margin-top: 0; }
+// A long chapter's roadmap (slides/filters/deck.lua) drops to the evidence size so both columns fit.
+.reveal .slides .roadmap-compact { font-size: $aa-size-evidence; }
 .reveal .slides a { color: $aa-blue; text-decoration: underline; text-underline-offset: 0.12em; }
 .reveal .slides pre { box-shadow: none; padding: 0.45em; background: $aa-tint; }
 

@@ -24,6 +24,9 @@ EMU_PER_POINT = 12700
 CHARACTER_WIDTH = 0.47  # the average width of Arial text, as a share of its size
 BOX_INSET = 7.2         # PowerPoint's default left and right text insets, in points
 NUMBER_GAP = 6          # the least space between a list number and its text, in points
+ROADMAP_TITLE = 'In this chapter'
+ROADMAP_CHARACTERS = 30  # characters that fit a line of a roadmap column (slides/filters/deck.lua)
+ROADMAP_LINES = 12       # lines a roadmap column holds at the body size (slides/filters/deck.lua)
 
 
 def _line(tag: str, color: str | None) -> ET.Element:
@@ -143,20 +146,50 @@ def format_lists(slide: ET.Element, tokens: dict) -> None:
                 pr.set('indent', str(-needed))
 
 
+def roadmap_lines(text: str) -> int:
+    """Lines a roadmap entry takes in a column, as slides/filters/deck.lua estimates them."""
+    return max(1, -(-len(text) // ROADMAP_CHARACTERS))
+
+
+def format_roadmap(slide: ET.Element, tokens: dict) -> None:
+    """A long chapter's two-column roadmap gets the evidence size, as Reveal's roadmap-compact class does:
+    the layout's half placeholders hold about ROADMAP_LINES lines at the body size."""
+    shapes = list(slide.iter(q('p', 'sp')))
+    title = next((shape for shape in shapes if shape.find('.//p:ph[@type="title"]', NS) is not None), None)
+    if title is None or ''.join(t.text or '' for t in title.iter(q('a', 't'))).strip() != ROADMAP_TITLE:
+        return
+    columns = [shape for shape in shapes if shape.find('.//p:ph[@sz="half"]', NS) is not None]
+    def markdown(paragraph: ET.Element) -> str:
+        # deck.lua counts the Markdown it writes: "- " before each module and "**" around the Part's name.
+        text = ''.join(t.text or '' for t in paragraph.iter(q('a', 't')))
+        if paragraph.find('a:pPr/a:buNone', NS) is None:
+            return '- ' + text
+        run = paragraph.find('a:r/a:rPr', NS)
+        return f'**{text}**' if run is not None and run.get('b') == '1' else text
+    def column_lines(shape: ET.Element) -> int:
+        return sum(roadmap_lines(markdown(paragraph)) for paragraph in shape.iter(q('a', 'p')))
+    if len(columns) != 2 or max(column_lines(shape) for shape in columns) <= ROADMAP_LINES:
+        return
+    for shape in columns:
+        for run in shape.iter(q('a', 'rPr')):
+            run.set('sz', str(tokens['sizes']['evidence'] * 100))
+
+
 def finish(path: Path, tokens: dict) -> None:
-    """Rewrite the deck in place; only slides with a table, a figure or a numbered list change."""
+    """Rewrite the deck in place; only slides with a table, a figure, a numbered list or the roadmap change."""
     colors = tokens['colors']
     temporary = path.with_name(f'.{path.name}.tmp')
     with zipfile.ZipFile(path) as source, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as target:
         for item in source.infolist():
             data = source.read(item.filename)
             if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data
-                                                   or b'buAutoNum' in data):
+                                                   or b'buAutoNum' in data or ROADMAP_TITLE.encode() in data):
                 xml = ET.fromstring(data)
                 for table in xml.iter(q('a', 'tbl')):
                     format_table(table, colors)
                 format_captions(xml, tokens)
                 format_lists(xml, tokens)
+                format_roadmap(xml, tokens)
                 data = ET.tostring(xml, encoding='utf-8', xml_declaration=True)
             target.writestr(item, data)
     shutil.move(temporary, path)

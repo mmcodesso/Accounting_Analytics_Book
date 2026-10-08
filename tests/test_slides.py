@@ -350,6 +350,17 @@ class PrepareTests(unittest.TestCase):
             # A label box keeps the whole figure's size, so labels low in the figure are still drawn.
             self.assertEqual(("800", "600"), (root[1].get("width"), root[1].get("height")))
 
+    def test_a_png_crop_lands_where_the_svg_crop_does(self) -> None:
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as temp:
+            # An export of a 100 x 50 drawing at scale 2 with a border of 8: the drawing spans pixels 16 to 216.
+            source = Path(temp) / "export.png"
+            Image.new("RGB", (232, 132), "white").save(source)
+            target = Path(temp) / "crop.png"
+            prep.crop_png(source, target, (0, 0.5, 1, 0.5), drawing=(100, 50))
+            with Image.open(target) as crop:
+                self.assertEqual((200, 50), crop.size)   # from x 16 to 216, y 66 to 116
+
     def test_background_images_are_valid_pngs(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "bg.png"
@@ -421,6 +432,26 @@ class PowerPointTests(unittest.TestCase):
         self.assertEqual("342900", first.get("marL"))   # one Arial digit fits the indent Pandoc gives
         self.assertLess(342900, int(coded.find('.//a:pPr', NS).get("marL")))   # a code-font number is wider
         self.assertLess(342900, int(long.find('.//a:pPr', NS).get("marL")))    # and so are 10 and 11
+
+    def test_a_long_roadmap_takes_the_evidence_size(self) -> None:
+        def slide(entries: int) -> ET.Element:
+            column = ''.join(f'<a:p><a:r><a:rPr/><a:t>9.{i} A section title of some length</a:t></a:r></a:p>'
+                             for i in range(entries))
+            return ET.fromstring(
+                f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree>'
+                '<p:sp><p:nvSpPr><p:nvPr><p:ph type="title"/></p:nvPr></p:nvSpPr>'
+                '<p:txBody><a:p><a:r><a:rPr/><a:t>In this chapter</a:t></a:r></a:p></p:txBody></p:sp>'
+                + ''.join(f'<p:sp><p:nvSpPr><p:nvPr><p:ph idx="{i}" sz="half"/></p:nvPr></p:nvSpPr>'
+                          f'<p:txBody>{column}</p:txBody></p:sp>' for i in (1, 2))
+                + '</p:spTree></p:cSld></p:sld>')
+        tokens = {"sizes": {"evidence": 20}}
+        short, long = slide(5), slide(8)   # 10 and 16 estimated lines a column
+        for xml in (short, long):
+            pptx_finish.format_roadmap(xml, tokens)
+        self.assertIsNone(short.find('.//p:sp[2]//a:rPr', NS).get("sz"))
+        sizes = {run.get("sz") for shape in long.findall('.//p:sp', NS)[1:] for run in shape.iter(f'{{{NS["a"]}}}rPr')}
+        self.assertEqual({"2000"}, sizes)
+        self.assertIsNone(long.find('.//p:sp//a:rPr', NS).get("sz"))   # the title keeps its size
 
     @unittest.skipUnless(shutil.which("quarto"), "needs Quarto for Pandoc's default template")
     def test_the_template_carries_footer_backgrounds_and_no_name(self) -> None:

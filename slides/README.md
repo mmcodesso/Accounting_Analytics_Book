@@ -14,7 +14,7 @@ Every deck follows the same sequence, so students always know where they are.
 | Part | Slides | How |
 |---|---|---|
 | Opening | Title: "Chapter N: Title" with the book's title | generated; the deck has no YAML |
-| | In this chapter: the Part, the chapter's place in it, and the deck's modules (two columns past eight modules; tutorials by number) | `::: {.roadmap}` |
+| | In this chapter: the Part, the chapter's place in it, and the deck's modules (two columns past eight modules, at the evidence size when a column would pass about twelve lines; tutorials by number) | `::: {.roadmap}` |
 | | Learning objectives, on a second slide "Learning objectives (continued)" when they do not fit one (about 650 characters) | `{{< book-objectives >}}`, or `1-3` and `4-6` |
 | | Opening scenario: who, the business question, why it matters | written |
 | Modules | one per numbered section of the chapter: a divider `# <section title>`, then 2–6 slides | dividers get the book's section number |
@@ -47,9 +47,10 @@ the left edge, top edge, width and height as fractions of the figure, and the ca
 {{< book-figure fig-03-07 crop="0,0,1,0.572" >}}
 ```
 
-Set the fractions by looking at the exported figure (`slides/_shared/visuals/`), and cut only through
-blank space at least a few pixels deep: the PNG that PowerPoint shows has a margin the SVG does not, so the
-same fractions land up to a few pixels apart in the two formats. Two details may overlap, so that a table
+The fractions are of the figure's drawing (its SVG viewBox), and the PowerPoint PNG is cut through the same
+geometry, so both formats cut in the same place. Set them from the drawing's coordinates in its `.drawio`
+source (a fraction is the y of the cut over the drawing's height), and cut through blank space or along a
+row boundary of a mocked grid. Two details may overlap, so that a table
 or relationship needed by both appears whole in each. The crop is cut from the book's figure at every build,
 so a change to the figure flows into it, but a change to its layout can move what the crop shows: look at
 the detail slides again after the figure changes.
@@ -72,6 +73,9 @@ signatures, that `rows` cannot name:
 ```markdown
 {{< book-table tbl-05-01 1-5 >}}
 ```
+
+**Code.** A short query (about six lines, no data values) goes in a ```` ```sql ```` block, which both formats
+show in the code font. Longer queries, and their results, come from the book's DB Browser mocks.
 
 **Comparison.** Two columns (`:::: {.columns}` with two `::: {.column}`); PowerPoint takes at most two.
 

@@ -20,6 +20,7 @@ from .pptx_theme import theme_reference
 from .verify import crop_key, cited_figures_in, load_manifest
 
 PNG_SCALE = 2
+PNG_BORDER = 8    # the export's margin, in drawing units, around the figure
 # Slide classes that get a background in both formats: (fill, bar) token names.
 BACKGROUNDS = {'divider': ('blue', 'amber'), 'in-practice': ('paper', 'teal'), 'watch-out': ('paper', 'coral'),
                'connecting-dots': ('paper', 'amber'), 'check': ('tint', 'blue'),
@@ -123,12 +124,30 @@ def crop_svg(source: Path, target: Path, crop: tuple) -> None:
     target.write_text(text[:tag.start()] + root + body, encoding='utf-8')
 
 
-def crop_png(source: Path, target: Path, crop: tuple) -> None:
+def svg_size(source: Path) -> tuple[float, float]:
+    """The width and height of an SVG's viewBox, the space that crop fractions are measured in."""
+    tag = re.search(r'<svg\b[^>]*>', source.read_text(encoding='utf-8'))
+    box = tag and re.search(r'\sviewBox=(["\'])([^"\']+)\1', tag.group(0))
+    if not box:
+        raise ValueError(f'{source}: the <svg> element needs a viewBox to be cropped')
+    _, _, width, height = (float(value) for value in box.group(2).replace(',', ' ').split())
+    return width, height
+
+
+def crop_png(source: Path, target: Path, crop: tuple, drawing: tuple[float, float] | None = None) -> None:
+    """Cut a crop out of a PNG. For a Draw.io export, `drawing` is the SVG's viewBox size: the export
+    draws the figure at PNG_SCALE inside a border of PNG_BORDER, so the fractions are mapped through
+    that geometry, and the PNG is cut exactly where the SVG crop is."""
     from PIL import Image
     left, top, width, height = crop
     with Image.open(source) as image:
-        box = (round(left * image.width), round(top * image.height),
-               round((left + width) * image.width), round((top + height) * image.height))
+        if drawing:
+            margin, (w, h) = PNG_BORDER * PNG_SCALE, drawing
+            box = (margin + PNG_SCALE * left * w, margin + PNG_SCALE * top * h,
+                   margin + PNG_SCALE * (left + width) * w, margin + PNG_SCALE * (top + height) * h)
+        else:
+            box = (left * image.width, top * image.height, (left + width) * image.width, (top + height) * image.height)
+        box = (max(0, round(box[0])), max(0, round(box[1])), min(image.width, round(box[2])), min(image.height, round(box[3])))
         image.crop(box).save(target, optimize=True)
 
 
@@ -140,7 +159,8 @@ def figure_png(root: Path, source: Path, drawio_bin: Path | None) -> Path:
     if not target.is_file():
         for stale in cache.glob(f'{source.stem}-*.png'):
             stale.unlink()
-        exporter.export_png(drawio_bin or exporter.find_drawio_executable(None), source, target, scale=PNG_SCALE)
+        exporter.export_png(drawio_bin or exporter.find_drawio_executable(None), source, target, scale=PNG_SCALE,
+                            border=PNG_BORDER)
     return target
 
 
@@ -167,7 +187,7 @@ def stage_figures(root: Path, index: dict, decks: list[str], stage: Path, *, png
                 raise ValueError(f'{identifier}: no Draw.io source to export for PowerPoint ({drawio})')
             exported = figure_png(root, drawio, drawio_bin)
             if crop:
-                crop_png(exported, target / f'{stem}.png', crop)
+                crop_png(exported, target / f'{stem}.png', crop, svg_size(source))
             else:
                 shutil.copy2(exported, target / f'{stem}.png')
 

@@ -1,0 +1,550 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter opens Part III and introduces SQL through the Charles River database. Each module follows a section of the chapter, and the three guided tutorials build one saved script that finds and ranks the manufacturing variance.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover why to query a database, how to set up the tool, and the SELECT statement with its calculated columns.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover filtering, sorting and limiting, and saving, documenting and correcting queries.
+:::
+
+## This one is a database question
+
+- The controller turns to cost of goods sold, and one line in it: manufacturing variance
+- It has grown every year, by about three-quarters, while sales grew less than a tenth
+- Is production less efficient, or do the standards no longer describe the plant?
+- The detail sits in tables the Part II workbook never imported
+
+::: {.notes}
+Those tables hold the work orders and their closes, the time employees recorded, the payroll, and a ledger of hundreds of thousands of rows. "This one is a database question," she says. "Start with the database." This chapter sets up the tool and writes the first queries.
+:::
+
+# Standard Costs in Brief
+
+## Standard costing moves the leftover to a variance
+
+- Materials go to work in process; conversion cost to a clearing account as incurred
+- Completed units go to finished goods at standard, relieving both
+- At a work order's close, actual less standard moves to the manufacturing variance account
+- Reported with cost of goods sold, its overhead part is underapplied overhead
+
+::: {.notes}
+A standard cost system values each item at what one unit should require, at standard prices and rates (Datar and Rajan). The close record splits the conversion part into direct labor and overhead, and the year-end closing entry clears the variance account with the other income statement accounts. Chapter 10 follows the whole flow through the ledger.
+:::
+
+# Why Query the Database Directly
+
+## A query asks the database for only what you need
+
+- Importing copies rows, and a ledger-sized table slows a workbook
+- A spreadsheet analysis grows hard to implement and to audit (Borthick et al.)
+- A query is a written request: nothing is copied until you ask, and it can be rerun
+- SQL is declarative: you state what you want, and the database finds it
+
+::: {.notes}
+SQL was developed at IBM soon after Codd proposed the relational model of Chapter 3, and it became the standard language of relational databases (Chamberlin). One query describes a whole result, whether it holds ten rows or a million, unlike an Excel formula that calculates one cell at a time.
+:::
+
+## Import or query: two paths to an analysis
+
+{{< book-figure fig-09-01 >}}
+
+::: {.notes}
+Neither replaces the other: Excel is strongest for ad hoc analysis, modeling and traceable workpapers, and SQL for large data, related tables and repeated procedures. The database holds the same data as the workbook, table for table; only the tool changes.
+:::
+
+# SQLite and DB Browser for SQLite
+
+## One database file, one tool, one working copy
+
+- SQLite keeps a whole database in a single file, with no server to install
+- Core SQL works the same in every major system; each adds its own dialect
+- DB Browser's four tabs: Database Structure, Browse Data, Edit Pragmas, Execute SQL
+- Query a copy, CharlesRiver_Work.sqlite, so the download is never changed
+
+::: {.notes}
+DB Browser can change a database as well as read it, which is why the tutorials work in a copy. Open Database Read Only, from the arrow beside Open Database, refuses any change; the working copy is still needed because Chapter 11 saves queries in it.
+:::
+
+## Database Structure lists every column and its type
+
+{{< book-figure fig-09-02 crop="0,0.3092,1,0.4819" >}}
+
+::: {.notes}
+Look here first when you plan a query: it gives the exact name of every table and column and the type each holds. As Chapter 3 explained, SQLite stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in year-month-day form.
+:::
+
+## Watch out: do not type in Browse Data {.watch-out}
+
+- A value typed into a cell there edits the table
+- Write Changes and Revert Changes, normally grayed out, become available
+- Write Changes saves the edit into the file; Revert Changes undoes it
+- If asked on closing whether to save changes you did not intend, click Discard
+
+::: {.notes}
+On a Mac the button reads Don't Save. Working in a copy means no mistake can reach the file you downloaded.
+:::
+
+# The SELECT Statement
+
+## SELECT names the columns; FROM names the table
+
+```sql
+SELECT AccountNumber, AccountName, AccountType
+FROM Account;
+```
+
+- `SELECT *` returns every column; a list returns only those, in that order
+- The result set is a new answer each time: the table never changes
+- With several queries in the editor, select one and run the selection
+
+::: {.notes}
+A statement is a complete instruction ending with a semicolon, built from clauses that each begin with a keyword. The book writes keywords in capitals and each clause on its own line, a convention for readers; SQLite ignores case in keywords and names.
+:::
+
+# When a Query Fails
+
+## SQLite names the problem
+
+{{< book-table tbl-09-01 >}}
+
+::: {.notes}
+A syntax error stops the query, turns the message pane red, and gives the line where the statement starts. A misspelled name is the most common cause, and the Database Structure tab is where to check the spelling.
+:::
+
+## Watch out: when a query misbehaves, check these first {.watch-out}
+
+- Was the whole query selected before you ran it?
+- Does the title bar show CharlesRiver_Work.sqlite?
+- Are the names spelled as on the Database Structure tab?
+- Save SQL file saves the script; Ctrl+S is Write Changes, which saves the database
+
+::: {.notes}
+Running with nothing selected runs the whole script and shows only the last result. Also check that you undid any change a step asked you to make only for a moment.
+:::
+
+# Calculated Columns and Functions
+
+## Aliases and arithmetic make new columns
+
+- AS gives a result column a new heading; the table keeps its names
+- A calculated column applies `+`, `-`, `*` and `/` to each row
+- ROUND to two places removes the binary fractions of a cent
+- Two whole numbers divide as whole numbers: multiply one by 1.0 for decimals
+
+::: {.notes}
+A calculated column exists only in the result, not in the table. The percent operator returns a remainder, but it drops decimals first, which makes it unsuitable for amounts.
+:::
+
+## Functions that round, convert and clean text
+
+{{< book-table tbl-09-02 1-5 >}}
+
+::: {.notes}
+ROUND to two places is the right precision for money, and CAST converts text to a number when a calculation needs one. UPPER of TRIM puts inconsistently entered text into one form before it is compared.
+:::
+
+## Functions that take text apart and fill gaps
+
+{{< book-table tbl-09-02 6-10 >}}
+
+::: {.notes}
+Document numbers carry a year in a fixed place, which SUBSTR extracts as text, counting from one. COALESCE returns its second value when the first is missing, and the double bar joins text into a label.
+:::
+
+## DISTINCT shows the values a column holds
+
+- `SELECT DISTINCT SourceDocumentType FROM GLEntry` lists each kind of source once
+- Use it before filtering: a filter on a value no row holds returns nothing, silently
+- SQLite's ROUND treats negative places as zero, unlike Excel's
+- A SELECT without FROM is a quick way to test an expression
+
+::: {.notes}
+An empty result from a mistyped value is easy to mistake for a finding, which is why DISTINCT comes first. The SQLite documentation describes every function.
+:::
+
+## Check your understanding {.check}
+
+What does each expression return in SQLite?
+
+1. `7 / 2`
+2. `7 / 2.0`
+3. `ROUND(1234.567, -2)`
+4. `UPPER(TRIM(' llc '))`
+
+::: {.notes}
+Ask students to predict each answer before revealing it, then to name the Excel result that would differ.
+:::
+
+## SQLite has its own rules {.answer}
+
+1. 3: two whole numbers divide as whole numbers
+2. 3.5: one decimal keeps the decimals
+3. 1235.0: negative places count as zero, unlike Excel's 1200
+4. LLC: spaces trimmed, then capitals
+
+::: {.notes}
+A SELECT without a table tests all four at once, which is how to check an expression before using it in a query.
+:::
+
+# Guided Tutorial 9.1: Opening the Database and Writing Your First Queries
+
+## Open the database and query it in seven steps
+
+{{< book-steps 9.1 >}}
+
+::: {.notes}
+Students make the working copy, read the ledger's structure, start Chapter09.sql with a header comment, and write their first queries, including one deliberate error and a check on the variance records.
+:::
+
+## Choose the columns you need
+
+{{< book-figure fig-09-03 crop="0,0.092,1,0.6163" >}}
+
+::: {.notes}
+The window's parts: the editor tab named after the saved script; Open SQL file(s) and Save SQL file, icons on the real toolbar; Execute all/selected SQL; the selected query; the result grid; and the message pane below it. The outlined rows show the clearing and variance accounts, whose AccountIDs differ from their account numbers.
+:::
+
+## A misspelled column turns the pane red
+
+{{< book-figure fig-09-04 >}}
+
+::: {.notes}
+The message names the column SQLite could not find and the line where the statement starts. Correcting the spelling and running the query again clears the error.
+:::
+
+## Every close adds up
+
+{{< book-figure fig-09-05 crop="0,0.1876,1,0.6118" >}}
+
+::: {.notes}
+The query adds the material and conversion parts of each close and subtracts the recorded total. The CheckDifference column is zero in every row shown, so the variance records add up.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 9.1 lead="true" >}}
+
+::: {.notes}
+Students now know where the variance is recorded: in the WorkOrderClose table, one row per closed work order, and in the ledger, under an AccountID that differs from its account number.
+:::
+
+# Filtering Rows with WHERE
+
+## WHERE keeps the rows that meet a condition
+
+- Numbers go without quotes; text goes in single quotes and must match exactly
+- `UPPER(TRIM(x))` compares text whose case or spaces cannot be trusted
+- A column compared with a value converts the value to the column's type
+- Text compared with a number finds nothing: a year cut from text needs quotes or CAST
+
+::: {.notes}
+SQLite converts a value only when one side of the comparison is a column, so a year taken from a document number with SUBSTR, compared with a bare number, returns no rows and no error.
+:::
+
+## Comparison and logical operators
+
+{{< book-table tbl-09-03 >}}
+
+::: {.notes}
+IN shortens several conditions joined by OR, and NOT reverses BETWEEN, IN or LIKE. Each operator returns only the rows for which its condition is true.
+:::
+
+## AND is evaluated before OR
+
+- AND binds first, the way multiplication comes before addition
+- One account's rows in two years, written without parentheses, returns every row of the second year
+- That is hundreds of thousands of rows from every account
+- Whenever AND meets OR, add parentheses
+
+::: {.notes}
+The parentheses make the logic clear to a reviewer as well as to the database. Comparing the row counts of the two versions shows the difference at once.
+:::
+
+## Dates are text in year-month-day form
+
+- Compare a date column with a quoted date written the same way
+- Any other form, such as month/day/year, compares wrongly without a warning
+- BETWEEN includes both ends, but a date with a time sorts after the end date
+- LIKE matches patterns: `%` for any run of characters, `_` for one
+
+::: {.notes}
+For a column that stores a time, such as a journal entry's CreatedDate, end the range with less than the next day. In SQLite, LIKE ignores the difference between capital and small letters, unlike the equals sign.
+:::
+
+# Missing Values and NULL
+
+## NULL is unknown, so = NULL is never true
+
+- NULL is not zero or empty text: the value is unknown or does not exist
+- Find missing values with IS NULL; exclude them with IS NOT NULL
+- NULL spreads through calculations: a NULL in a sum makes the sum NULL
+- COALESCE replaces a NULL, which is a decision, not a correction
+
+::: {.notes}
+A missing value is often the most important one in an audit test: a shipment with no tracking number, an entry with no approver, a time record with no clock-out. Writing them as IS NULL conditions makes the test explicit and repeatable.
+:::
+
+## IS NULL finds what = NULL cannot
+
+{{< book-figure fig-09-06 >}}
+
+::: {.notes}
+The equals comparison is NULL for every row, so a WHERE clause that uses it keeps none. IS NULL keeps the open work orders, and COALESCE shows the word open in place of their missing dates.
+:::
+
+## Check your understanding {.check}
+
+How many work orders or ledger rows does each condition keep?
+
+1. `ClosedDate = NULL`
+2. `ClosedDate IS NULL`
+3. `SourceDocumentType = 'workorderclose'`
+4. `SourceDocumentType LIKE 'workorderclose'`
+
+::: {.notes}
+Ask students which of the four would fail silently in a real analysis.
+:::
+
+## Three of four look fine and are wrong {.answer}
+
+1. None: a comparison with NULL is never true
+2. Every work order not yet closed
+3. None: = is case-sensitive, and the data says WorkOrderClose
+4. Every variance posting: LIKE ignores case in SQLite
+
+::: {.notes}
+Only the second and fourth answer the question, and the fourth only in SQLite, which is why the book writes text values exactly as the data spells them.
+:::
+
+# Guided Tutorial 9.2: Filtering the Ledger to the Variance Postings
+
+## Filter the ledger in eight steps
+
+{{< book-steps 9.2 >}}
+
+::: {.notes}
+Students find the variance and clearing accounts by their numbers, filter the ledger to the variance account for the year, list its source document types, exclude the closing entry, check every close, and find the work orders not yet closed.
+:::
+
+## Two kinds of source post to the variance account
+
+{{< book-figure fig-09-07 >}}
+
+::: {.notes}
+Work order closes post the variance through the year, and one journal entry, the year-end close, clears the account. Excluding the close leaves the variance postings ready to analyze.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 9.2 lead="true" >}}
+
+::: {.notes}
+The open work orders, all released during the year, show that the year's variance is complete only for the work orders that closed during it.
+:::
+
+# Sorting and Limiting Results
+
+## ORDER BY sorts; LIMIT keeps the first rows
+
+- ASC is the default; DESC sorts from largest to smallest
+- Later columns break ties; you can sort by an expression, such as ABS of the variance
+- In an ascending sort, SQLite places NULLs first
+- LIMIT with ORDER BY ranks; LIMIT alone returns whichever rows come first
+
+::: {.notes}
+ORDER BY works like the levels of Excel's Sort dialog, and WHERE like a filter written where a reviewer can read it. Never use LIMIT without ORDER BY to select rows for an analysis.
+:::
+
+## Watch out: LIMIT is a dialect difference {.watch-out}
+
+- SQLite, PostgreSQL and MySQL use LIMIT
+- Microsoft SQL Server uses SELECT TOP
+- The SQL standard and Oracle use FETCH FIRST … ROWS ONLY
+- If a book query fails elsewhere, look for a dialect difference first
+
+::: {.notes}
+The core of SQL taught in this Part works in every major system; LIMIT is one of the few places where the wording changes.
+:::
+
+# Saving, Documenting, and Sharing Queries
+
+## A commented script is evidence
+
+- Save SQL file saves the script; reopen it, send it, run it again
+- `--` starts a one-line comment; `/*` and `*/` enclose several lines
+- A header records the purpose, the database, the preparer and date, and the checks
+- A comment above each query says what it answers
+
+::: {.notes}
+The header is the SQL counterpart of the Documentation worksheet of Chapter 4. Audit teams and finance departments keep libraries of saved queries, so a one-off extraction becomes a procedure the next engagement can rerun.
+:::
+
+## Copy with Headers takes a result to Excel
+
+- Select the result's cells, or click one and press Ctrl+A
+- Right-click and choose Copy with Headers, then paste into Excel
+- DB Browser loads a large result in blocks, so it may ask to load the rest
+- For a large result or a file to keep, Export to CSV
+
+::: {.notes}
+The query stays in the script, so the extraction can be repeated when the data changes. Export to CSV is under the Save the results view button on the Execute SQL toolbar.
+:::
+
+# Reading and Correcting Queries
+
+## Clauses come in a fixed order
+
+{{< book-figure fig-09-08 >}}
+
+::: {.notes}
+SELECT, FROM, WHERE, ORDER BY and LIMIT: only SELECT is always needed, and a clause out of order stops the query with a syntax error.
+:::
+
+## A logical error runs and answers another question
+
+- A syntax error stops and names the problem; a logical error does neither
+- Errors recur in similar ways from student to student (Taipalus et al.)
+- `SELECT AccountNumber AccountName` runs: the second name becomes an alias
+- Know what the result should look like: row count, first rows, a control total
+
+::: {.notes}
+Missing parentheses, a comparison with NULL, text in the wrong case and text compared with a number are all logical errors. The defense is the same as in a workbook: check the result against what it should be.
+:::
+
+## Watch out: SQLite's tolerance can hide mistakes {.watch-out}
+
+- It accepts a double-quoted value as text when no column has that name
+- It treats a column's declared type as a preference, not a rule
+- It converts values in some comparisons and not in others
+- Single quotes for text and like-for-like comparisons make queries travel
+
+::: {.notes}
+A query that relies on any of these habits may run in SQLite and fail, or return a different result, in another system.
+:::
+
+## Check your understanding {.check}
+
+Name the logical error in each case.
+
+1. A query meant to show two columns shows one
+2. One account's rows in two years returns rows from every account
+3. A year cut from a document number matches nothing
+4. A filter on a status returns no rows
+
+::: {.notes}
+Each runs without an error message, which is what makes them dangerous.
+:::
+
+## Each one ran without complaint {.answer}
+
+1. A missing comma: the second column became an alias
+2. AND and OR without parentheses
+3. Text compared with a number: quote the year or CAST it
+4. A value no row holds: check it with DISTINCT first
+
+::: {.notes}
+All four are caught by knowing what the result should look like before running the query.
+:::
+
+# Guided Tutorial 9.3: Ranking the Largest Work-Order Variances
+
+## Rank the variances in six steps
+
+{{< book-steps 9.3 >}}
+
+::: {.notes}
+Students rank the year's closes by total variance, measure the share of overhead, look at the favorable end, list the closes above a review threshold, copy a result into Excel, and complete the script.
+:::
+
+## Overhead makes up most of each large variance
+
+{{< book-figure fig-09-09 crop="0,0.1704,1,0.671" >}}
+
+::: {.notes}
+The ten largest variances of the year are each a few thousand dollars, and overhead is most of each one. Sorted the other way, the ranking starts with favorable variances, and a review threshold finds several hundred closes, only a small share of them favorable.
+:::
+
+## The script documents itself
+
+{{< book-figure fig-09-10 crop="0,0.1979,1,0.4444" >}}
+
+::: {.notes}
+The header records the purpose, the database, the preparer and the checks, and a comment above each query says what it answers. Saved beside the working copy, the script can be reviewed and rerun.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 9.3 lead="true" >}}
+
+::: {.notes}
+The ranking points the controller toward overhead, which carries most of the conversion variance. It does not yet say which products those work orders made or how the variance changed from year to year.
+:::
+
+# Looking Ahead
+
+## Back to the controller's question
+
+- The variance is recorded when a work order closes, in material and conversion parts
+- In the largest closes of the year, most of it is overhead
+- The ledger holds the same amounts, plus a year-end close to leave out
+- Which products, which years, what drives the overhead: Chapter 10 joins the tables
+
+::: {.notes}
+Most of this chapter's work was descriptive analytics: finding, listing and ranking what the records hold. A single table cannot say more; the next questions span the work orders, the items, the payroll and the ledger.
+:::
+
+## Summary
+
+- A saved query extracts only what it asks for, and documents how
+- SELECT, FROM, aliases, calculated columns, functions and DISTINCT build a result
+- WHERE filters with exact types, parentheses, quoted dates and IS NULL
+- ORDER BY and LIMIT rank; scripts with comments make the work reviewable
+- Syntax errors name themselves; logical errors need a check of the result
+
+::: {.notes}
+Ask students which logical error they think they are most likely to make. The AND and OR precedence and the comparison with NULL are the usual answers.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Result set, NULL and logical error are the ideas the rest of Part III relies on most.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 9.6 looks for missing values in the time and labor records, an IS NULL test with audit consequences. Chapter 10 joins and summarizes the tables.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
