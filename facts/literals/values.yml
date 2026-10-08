@@ -462,6 +462,8 @@ files:
     constants: ["1.0", "2.0", "3.5", "1234.567", "-2", "1235.0", "1200"]   # the chapter's examples of SQLite arithmetic and ROUND
   slides/chapter-12/index.qmd:
     constants: ["1.0"]              # the Benford expectation LOG10(1 + 1.0 / Digit), as the chapter writes it
+  slides/chapter-13/index.qmd:
+    constants: ["4.5"]              # the WCAG contrast ratio for ordinary text, 4.5 to 1
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:

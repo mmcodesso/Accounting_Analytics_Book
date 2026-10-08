@@ -1,0 +1,584 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter builds the report the controller asked for in Microsoft Power BI. Each module follows a section of the chapter, and the three guided tutorials build one file, Charles River Reports.pbix, which the later Power BI chapters extend.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover what a reporting tool adds, loading and relating the tables, and how visuals summarize and filter.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover reconciling a report, honest visuals, and pages that every reader can use.
+:::
+
+## One report the managers can explore themselves
+
+- Every month the managers' requests each produce another workbook
+- Two of them reached one meeting with different discount totals
+- The controller wants one report that the managers explore themselves
+- It must tie to the reported numbers, and it must not mislead
+
+::: {.notes}
+The report covers revenue, list prices and promotional discounts, by item group, product type, customer segment, region and period. In the controller's words, a chart that makes a flat year look like a crisis is worse than no chart at all. It has to tie to the numbers in the Chapter 6 workbook before anyone sees it.
+:::
+
+# Why a Reporting Tool
+
+## A report lets the reader ask the next question
+
+- A workbook holds an analysis and its evidence together
+- A saved query extracts exactly the rows an analysis needs
+- Neither is built for a reader who wants to explore further
+- A business intelligence tool puts interactive visuals on a model
+
+::: {.notes}
+The sales manager who sees the Furniture discounts wants them by region, then by month, then for one segment, and each question would come back as a new request. In a business intelligence tool, the reader changes what the visuals show by clicking. Power BI is not where accounting judgments are made or documented in detail; that stays in the workbook and the query. It is where agreed results are shown to the people who use them.
+:::
+
+## Desktop builds the report; the service shares it
+
+- Power BI Desktop is a free Windows application for building reports
+- In it you load the data, relate the tables, calculate and lay out visuals
+- The Power BI service is the website where reports are published and shared
+- Every tutorial in this Part works in Desktop alone
+
+::: {.notes}
+Readers open a published report in a browser, without Desktop or a copy of the data. Publishing and sharing need a Power BI license, and the appendix on publishing and security covers them.
+:::
+
+## A report is pages; a dashboard is pinned tiles
+
+- A report: pages of interactive visuals built on one semantic model
+- The semantic model: the tables, relationships and calculations it reads
+- A dashboard: one service page of tiles pinned from one or more reports
+- Dashboards exist only in the service; everything here starts as a report
+
+::: {.notes}
+Chapter 1 called the semantic model a data model. In everyday speech many people call any page of charts a dashboard, as Chapter 1 does; this Part uses the word only in Power BI's sense.
+:::
+
+## From the data to a published report
+
+{{< book-figure fig-13-01 >}}
+
+::: {.notes}
+Much of the path is familiar: Power BI uses the same Power Query as Part II, with the same editor, applied steps and M formulas. You related tables through their keys in Chapter 3, and the questions a report answers are the descriptive and diagnostic questions of Chapter 6.
+:::
+
+## Part II's Excel features carry over
+
+{{< book-table tbl-13-01 columns="In Excel (Part II),In Power BI (Part IV)" >}}
+
+::: {.notes}
+The main change is where the ideas live. In a workbook you merged tables into one wide table and summarized it with a PivotTable. In Power BI the tables stay separate, the relationships do the work of the merge, and every visual on a page summarizes the same model. Measures come in Chapter 14, and publishing in the appendix.
+:::
+
+## Check your understanding {.check}
+
+Desktop, service, report or dashboard?
+
+1. The free Windows application where you build the model
+2. One page of tiles pinned from several reports
+3. Pages of interactive visuals on one semantic model
+4. The website where reports are published and shared
+
+::: {.notes}
+Ask students which of the four exist only online.
+:::
+
+## Each one has its name {.answer}
+
+1. Power BI Desktop
+2. A dashboard, in Power BI's sense
+3. A report
+4. The Power BI service
+
+::: {.notes}
+Dashboards exist only in the service, so everything in this Part starts as a report.
+:::
+
+# The Power BI Desktop Window
+
+## The window: ribbon, views, canvas and panes
+
+{{< book-figure fig-13-02 crop="0,0,1,0.8019" >}}
+
+::: {.notes}
+The numbered markers are the ribbon (1), the bar of views down the left (2), the canvas with its page tabs (3), and the Filters (4), Visualizations (5) and Data (6) panes. The real bar of views and the pane tabs show icons; the mock writes their names.
+:::
+
+## What each numbered part of the window does
+
+- 1 The ribbon: the commands, on tabs as in Excel
+- 2 The views: Report, Table, Model, DAX query and TMDL
+- 3 The canvas: the report page, with its page tabs below
+- 4 Filters: filters on one visual, one page or every page
+- 5 Visualizations and 6 Data: visual types and wells; tables and columns
+
+::: {.notes}
+Report view builds the pages, Table view shows the rows of each table, and Model view draws the relationships. DAX query view comes in Chapter 14, and TMDL view, the model's definition as text, appears in only one exercise. If the window shows separate Build and Format panes, the on-object interaction preview is on; the tutorials describe the default panes. Desktop runs only on Windows: a Mac user can work in a campus lab, a virtual machine, or the Power BI service in a browser, which the appendix on Power BI in the browser covers, depending on the license and the institution's settings.
+:::
+
+# Getting the Data
+
+## Load with Power Query; Refresh reruns it
+
+- Get data opens the Navigator; choose the Tables, then Transform Data
+- Shape the queries in the same Power Query Editor as Part II
+- Close & Apply loads the results into the model, not onto worksheets
+- Refresh runs the queries again; the workbook is never changed
+
+::: {.notes}
+The tutorials read the same CharlesRiver.xlsx as Part II, whose worksheets each hold one Excel Table. Power BI stores the rows inside the report file in a compressed form built for summarizing columns quickly, so a large model stays responsive, and a report built today can show next month's data without being rebuilt.
+:::
+
+## Watch out: a CSV's numbers depend on your region {.watch-out}
+
+- The CSV package loads faster than the large workbook
+- A text file stores numbers as characters
+- Power Query reads them by your computer's language and region
+- Where decimals take a comma, an amount can be misread or rejected
+
+::: {.notes}
+Check the numbers after loading a text file; the locale is set in the regional settings of Power BI's Options. The workbook avoids the problem, because Excel stores numbers as numbers. Get data > Text/CSV also loads a result exported from DB Browser in Part III, such as Chapter 11's monthly measure.
+:::
+
+## A profile of the first rows describes only them
+
+{{< book-figure fig-13-03 crop="0,0,1,0.8743" >}}
+
+::: {.notes}
+The View tab's Column quality, Column distribution and Column profile summarize every column, but by default only over the first 1,000 rows, as the status bar says; clicking that message switches to the entire data set. The invoice lines are stored in billing order, so the first rows come before any promotion: PromotionID is empty and Discount holds one value. Over the whole table, part of PromotionID is filled and Discount holds four rates. Know what a result describes before you rely on it.
+:::
+
+## Watch out: two defaults hide what the model contains {.watch-out}
+
+- Auto date/time adds a hidden date table behind every date column
+- Autodetect guesses relationships from column names after loading
+- A wrong guess gives wrong totals, without any warning
+- Tutorial 13.1 turns both off in the Options, under Data Load
+
+::: {.notes}
+The settings are under File > Options and settings > Options > Current File > Data Load. With both off, you create the relationships yourself and, in Chapter 14, a single date table that every visual shares.
+:::
+
+# Relationships in Brief
+
+## Relationships replace the merge
+
+- The tables stay as they are; a relationship records which columns match
+- SalesInvoiceLine.ItemID refers to Item.ItemID, the item table's key
+- So the lines' revenue can be shown by ItemGroup, never copied to them
+- Most relationships in an accounting model are one-to-many
+
+::: {.notes}
+In Chapter 5 you merged the invoice, item and customer details into the invoice lines and analyzed one wide table. Power BI works the other way, with the keys that Chapter 3 described.
+:::
+
+## Filters flow from the one side to the many
+
+{{< book-figure fig-13-04 crop="0,0,1,0.876" >}}
+
+::: {.notes}
+Power BI marks the one side of each relationship with 1 and the many side with an asterisk, and the arrow shows the direction of the filter. Selecting Furniture in Item keeps only the Furniture lines, because each line looks up its item; the filter does not flow back from the lines to the items, which matters in Tutorial 13.2.
+:::
+
+## No declared keys, so define and test them
+
+- The database declares no foreign keys, so you define each relationship
+- Then test it, as Chapter 3 recommended for any logical key
+- A line whose key finds no match appears under (Blank)
+- A blank category is a signal to investigate, not to explain away
+
+::: {.notes}
+Some blanks are meaningful, in Chapter 5's term, such as the empty PromotionID of a line sold without a promotion; others are keys that found no match. Chapter 14 covers relationships in depth, including the settings this chapter leaves at their defaults.
+:::
+
+# Guided Tutorial 13.1: Loading, Relating, and Reconciling the Sales Tables
+
+## Steps 1 to 6: load, shape and profile
+
+{{< book-steps 13.1 1-6 >}}
+
+::: {.notes}
+Students turn off the two defaults, choose four Tables in the Navigator, correct the types of Discount and PromotionID with Replace current, and keep the columns the report needs. Step 5 adds the custom columns FiscalYear, FiscalQuarter, Period, Month, ListAmount, DiscountAmount and ProductType, the same columns as Chapters 5 and 6, and Step 6 profiles the invoice lines on both bases.
+:::
+
+## Steps 7 to 11: relate, format and reconcile
+
+{{< book-steps 13.1 7-11 >}}
+
+::: {.notes}
+After Close & Apply, students relate the three pairs of tables in Model view, set the year columns to Don't summarize, format the amounts, and build the Validation page.
+:::
+
+## The model ties to Chapter 6 before anyone reads it
+
+{{< book-figure fig-13-05 crop="0,0,0.915,0.771" >}}
+
+::: {.notes}
+The latest year's row matches the invoice line count and line total of Chapter 6 to the cent, and its list amount and discounts match the Part II case. The item group table has five rows and no (Blank) row, so every invoice line found its item.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 13.1 lead="true" >}}
+
+::: {.notes}
+A model that reproduces the totals you already trust is ready for its first page. The Validation page stays in the file, so anyone who opens the report later can see that it was reconciled, and to what.
+:::
+
+# Visuals and How They Summarize
+
+## Whatever goes in a value well is summarized
+
+- Drag columns from the Data pane into a visual's wells
+- A numeric column is summed: LineTotal becomes Sum of LineTotal
+- The arrow beside the field changes it to an average, a count, and more
+- Power BI creates the calculation for you: an implicit measure
+
+::: {.notes}
+Each column also has a default summarization, set once for the model on the Column tools tab. Implicit measures are the problem you met with PivotTables in Chapter 6: the average of ratios is not the ratio of totals, so check which summary produced a number, and over which rows, before you read it.
+:::
+
+## Six defaults that can mislead
+
+{{< book-table tbl-13-03 >}}
+
+::: {.notes}
+In the latest year, Count on SalesInvoiceID in the invoice lines is about a third larger than the distinct count of invoices, and the average of the discount rate understates the share of the price given up to discounts by more than a quarter.
+:::
+
+## Choose the visual for the question
+
+- A card shows one number, such as the year's revenue
+- Column and bar charts compare categories; line charts show change
+- A table or a matrix gives exact values; a matrix is Power BI's PivotTable
+- A slicer is a filter the reader can see and change
+
+::: {.notes}
+The choice follows the question, as Chapter 6 set out, and stacked charts show composition. Matrices and tables suit readers who need exact values, and charts suit readers who need a pattern. A slicer can be a list, a drop-down or a row of buttons, and a slicer on a date can show a range.
+:::
+
+## Visuals on a page filter one another
+
+- Click a bar, and every other visual on the page shows that category
+- Charts highlight the selected part; cards and lines show the filtered value
+- Edit interactions sets, for each pair, filter, highlight or nothing
+- Filters pane entries are invisible on the canvas, so state them
+
+::: {.notes}
+This is cross-filtering and cross-highlighting. A year slicer should filter every visual, while a chart that compares the years should be left alone by it. The Filters pane suits restrictions that belong to the report, such as keeping only the sellable items; a filter that changes the meaning of a number belongs in a slicer the reader can see, or in the title.
+:::
+
+## Check your understanding {.check}
+
+What does each visual really show?
+
+1. Sum of FiscalYear in a table
+2. Count of SalesInvoiceID taken from the invoice lines
+3. Average of Discount as the discount rate
+4. A total with Services removed in the Filters pane
+
+::: {.notes}
+Ask students how they would correct each one.
+:::
+
+## Each one has its correction {.answer}
+
+1. A meaningless sum: set the year to Don't summarize
+2. Invoice lines, not invoices: use Count (Distinct)
+3. An average of rates: divide the totals with a measure
+4. A hidden exclusion: use a visible slicer, or say so in the title
+
+::: {.notes}
+The third needs a measure, which Chapter 14 teaches, as Chapter 6's margins needed calculated fields.
+:::
+
+# Guided Tutorial 13.2: Building the Sales and Discounts Page
+
+## Build the page in nine steps
+
+{{< book-steps 13.2 >}}
+
+::: {.notes}
+Students add a year slicer first, because every other visual depends on it, then four cards, a line chart and a bar chart of the discounts, a matrix of revenue by item group and quarter, and slicers for segment and region. The cards count invoices with Count (Distinct) on the invoice lines' SalesInvoiceID.
+:::
+
+## The cards match the Validation page
+
+{{< book-figure fig-13-06 crop="0,0,1,0.2012" >}}
+
+::: {.notes}
+With the latest year selected in the tile slicer, the revenue and invoice cards match the Validation page, and the gap between the list amount and revenue is the price reduction that Chapter 6 analyzed. Display units set to None shows the amounts in full rather than as millions.
+:::
+
+## Discounts peak in the autumn, almost all on Furniture
+
+{{< book-figure fig-13-06 crop="0,0.2036,1,0.2885" >}}
+
+::: {.notes}
+The discount line rises sharply in September and October, the months of the Furniture Seasonal Promotion. Selecting Design Trade moves the peak to November, its own promotion's month.
+:::
+
+## The matrix expands Furniture into its product types
+
+{{< book-figure fig-13-06 crop="0,0.497,1,0.4485" >}}
+
+::: {.notes}
+The matrix shows each item group's revenue by quarter, with totals, and the Furniture rows expand into the eight product types of Chapter 5.
+:::
+
+## A filter stops where the relationship ends
+
+- Select Furniture, and count invoices two ways
+- The count from the invoice lines falls to the invoices with Furniture
+- The count from SalesInvoice does not change at all
+- The filter flows from Item to the lines, not back to the invoices
+
+::: {.notes}
+This is Step 8. A count that ignores a filter on the page looks plausible and is wrong, which is why the card counts invoices from the lines. Chapter 14 explains the direction of filters in full.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 13.2 lead="true" >}}
+
+::: {.notes}
+The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. It cannot show what the discounts cost in margin, because margin is a ratio of totals and the report has no measure for it yet.
+:::
+
+# Honest Visuals
+
+## Position on a common scale is read most accurately
+
+{{< book-figure fig-13-07 crop="0,0,1,0.4547" >}}
+
+::: {.notes}
+Cleveland and McGill asked readers to judge the relative size of values encoded in different ways. Readers judged position along a common scale most accurately, as in bars that share a baseline, and length without a common baseline less accurately. The bars make the order and the gaps between the item groups easy to read; in the stacked bar, the smaller groups are hard to compare.
+:::
+
+## Angles and areas are hard to compare
+
+{{< book-figure fig-13-07 crop="0,0.4666,1,0.4606" >}}
+
+::: {.notes}
+Readers judged angles, as in a pie, and areas, as in circles, less accurately still, and color shading least of all. The same values that bars make easy to compare become a matter of guessing as slices or circles, which is why a bar chart is usually better than a pie.
+:::
+
+## Fit the visual to the reader's task
+
+- Graphs show spatial information: trends and relationships
+- Tables show symbolic information: the exact values
+- A reader does best when the form fits the task
+- Accountants often need both, for the same number
+
+::: {.notes}
+This is Vessey's theory of cognitive fit: a graph to see whether revenue is trending down, a table to find the discount on one invoice. Tooltips and table and matrix visuals let a report give both. Dilla and colleagues reviewed the research on interactive visualization of accounting information around the fit between the visualization, the task and the reader.
+:::
+
+## Three ways a correct chart misleads
+
+- A line chart's value axis fits the data, so small changes look large
+- A second axis makes a small series look as large as a big one
+- The starting period can carry the message
+- So check the axis, the scales and the period of every chart
+
+::: {.notes}
+Few concluded that two scales on one chart invite readers to compare magnitudes that mean nothing, and recommended two charts placed close together, or each series as a percentage of a common starting point. Compare whole years with whole years, or the same months, and say why a chart starts where it does. Beattie and Jones found that nearly a third of the graphs in large UK companies' annual reports distorted the figures, a form of impression management, and that readers with less financial knowledge were the most at risk.
+:::
+
+## Check your understanding {.check}
+
+What is wrong with each chart, and what fixes it?
+
+1. Monthly revenue on an axis that starts just below the weakest month
+2. A pie of the five item groups' revenue
+3. Discounts on a second axis beside the revenue columns
+4. Growth measured from the start-up month
+
+::: {.notes}
+Ask students which of the four contains a wrong number. None does.
+:::
+
+## Each chart has its correction {.answer}
+
+1. Small changes look large: start the axis at zero, or say it does not
+2. Angles are hard to compare: use bars on a common baseline
+3. Two scales suggest a relationship: use one axis, or two charts
+4. An unusual start: compare whole years, or the same months
+
+::: {.notes}
+Each of these charts misleads through a choice made by default or by habit, which is what a reviewer checks first.
+:::
+
+# Accessible Report Design
+
+## Four practices make a page usable by every reader
+
+- Contrast: text at least 4.5 to 1 against its background
+- A second cue: never let a meaning rest on color alone
+- Alternative text: say what the visual shows and what it means
+- A theme: one set of colors and fonts across the report
+
+::: {.notes}
+Some readers cannot tell certain colors apart, some use a screen reader or a keyboard, and projectors wash out pale colors. The Web Content Accessibility Guidelines of the W3C set the standards, and Power BI has the settings to meet them: alt text under General in each visual's format settings, and the Themes gallery on the Design tab. These practices make a report clearer for every reader, and the book's figures follow the same rules.
+:::
+
+## Check your understanding {.check}
+
+Which practice fixes each problem?
+
+1. Pale gray labels on a white background
+2. Unfavorable variances shown only in red
+3. A screen reader announces only "line chart"
+4. Each page uses its own colors for the same item groups
+
+::: {.notes}
+Ask students which of the four also helps a reader who sees perfectly.
+:::
+
+## Each problem has its practice {.answer}
+
+1. Contrast that meets the guideline for ordinary text
+2. A second cue: a label, a sign or a marker
+3. Alternative text that states what the chart shows and means
+4. One report theme, with each color used for one purpose
+
+::: {.notes}
+All four help every reader, not only those who need them.
+:::
+
+# Guided Tutorial 13.3: Correcting Three Misleading Charts
+
+## Correct three draft charts in eight steps
+
+{{< book-steps 13.3 >}}
+
+::: {.notes}
+Students rebuild a colleague's three draft charts on a Review page and correct each. The second draft claims that revenue grew by almost four-fifths from the start-up month, which is arithmetically true; measured from the first ordinary month the increase is a small fraction of that, and the whole years show almost no change into the latest year.
+:::
+
+## The default axis makes a steady year look volatile
+
+{{< book-figure fig-13-08 crop="0,0,1,0.4493" >}}
+
+::: {.notes}
+The axis begins just below the weakest month, so the chart's whole height covers the gap between the weakest and the strongest month, a small fraction of a month's revenue: the narrow band of Chapter 7.
+:::
+
+## From zero, monthly revenue runs almost level
+
+{{< book-figure fig-13-08 crop="0,0.4611,1,0.4581" >}}
+
+::: {.notes}
+Step 2 types 0 in Format visual > Y-axis > Range > Minimum. The same line now runs almost level across the year, a faithful picture of a year in which no month was far from the average.
+:::
+
+## The draft gives the discounts an axis of their own
+
+{{< book-figure fig-13-09 crop="0,0,1,0.3256" >}}
+
+::: {.notes}
+When the ranges of the line and the columns barely overlap, Power BI gives the line a second axis on the right. The discount line then rises to the height of the revenue columns in the autumn, as if discounts rivaled revenue.
+:::
+
+## On one axis, the discounts are small
+
+{{< book-figure fig-13-09 crop="0,0.33,1,0.3212" >}}
+
+::: {.notes}
+Step 6 turns the chart into a line chart with both series in the Y-axis well. The discounts appear at their true size: a line close to the bottom, rising a little in the autumn, and a small fraction of revenue even in the month of the largest discounts.
+:::
+
+## On their own labeled scale, the autumn peak shows
+
+{{< book-figure fig-13-09 crop="0,0.6535,1,0.2882" >}}
+
+::: {.notes}
+A copy of the chart without revenue, placed directly below at the same width and with its axis titled, shows the pattern of the discounts on their own scale.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 13.3 lead="true" >}}
+
+::: {.notes}
+None of the draft charts contained a wrong number. Each misled through a choice its author made by default or by habit: an axis, a starting point, a second scale. Step 8 adds alternative text to every chart.
+:::
+
+# Looking Ahead
+
+## The report ties to Chapter 6 and does not mislead
+
+- Loaded with Power Query, profiled on the entire data set
+- Related by hand, and reconciled to Chapter 6 before anything else
+- Pages that managers explore by clicking, with honest defaults
+- Charts whose axes, scales and periods tell the truth
+
+::: {.notes}
+Most of this was descriptive analytics, with the first step toward diagnosis that interaction allows: a reader who clicks Furniture sees where the discounts went.
+:::
+
+## What the report still cannot answer
+
+- Margin is a ratio of totals, which no implicit measure gives
+- The discount share needs a division that Average of Discount misstates
+- Periods are columns of the invoice table, so changes cannot be calculated
+- Chapter 14 adds a shared date table and DAX measures
+
+::: {.notes}
+The report can show a month beside the same month of the year before, but not the change between them. Answering those questions needs calculations written for the purpose and a model designed around them, which Chapter 14 builds.
+:::
+
+## Summary
+
+- A report puts interactive visuals on a semantic model of related tables
+- Profile the columns on the entire data set, not the first rows
+- Define and test the relationships, then reconcile to known totals
+- Check each visual's summary, and how the page's visuals filter
+- Match the visual to the task, and check the axes, scales and period
+
+::: {.notes}
+Accessible design, with contrast, a second cue, alternative text and a theme, makes the report clearer for every reader.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Report, dashboard and semantic model are the words the rest of Part IV relies on.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 13.1 builds revenue control totals, Exercise 13.5 profiles the sales tables on the entire data set, and Exercise 13.6 reviews a draft page. Chapter 14 turns to data models and DAX measures.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
