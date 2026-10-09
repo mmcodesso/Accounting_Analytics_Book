@@ -1,0 +1,599 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter turns the model of Chapter 14 into the company's monthly reporting package, with a page for each of three readers. Each module follows a section of the chapter, and the three guided tutorials build the Promotions, Budget and Plant pages of Charles River Reports.pbix.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover designing a page for its reader, drill-through and tooltips, and the budget against the ledger.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover visual calculations, assembling the package, and what-if parameters and forecasts.
+:::
+
+## Three readers will open the package first
+
+- The sales manager: what the promotions cost, and which cost most
+- The department managers: their spending against the approved budget
+- The production manager: whether the plant's hours are under control
+- One department spent far less than budget, another far more
+
+::: {.notes}
+It is April, and the controller wants Charles River Reports to become the monthly package. Neither of the two budget results means what it seems. The task is to design a page for each reader, connect the pages so a reader can move from a summary to the rows behind it, and explain each number before it reaches someone who will act on it.
+:::
+
+# Designing Reports for Their Readers
+
+## Start with the reader's decision
+
+- A page serves a reader with a question and a decision to make
+- Its readers did not build the model, and give a page a few seconds
+- A KPI is a measure chosen to track progress toward an objective
+- It is shown with the comparison that gives it meaning
+
+::: {.notes}
+Operating expense of several million dollars is neither good nor bad until the reader knows the budget, the same period last year, or a target. Few argues that a display meant for monitoring should fit on one screen and show each measure in the context that lets the reader judge it at a glance. Few calls such displays dashboards; Power BI reserves that word for the service, so the chapter says report page.
+:::
+
+## How a page is shown shapes the judgment
+
+- Readers rely on measures that all units share: give each the same KPIs
+- Markers change how heavily readers weigh a measure: state each threshold
+- Put the KPI and its comparison top left, the breakdown next
+- The five-second test: can someone say what the page shows?
+
+::: {.notes}
+Lipe and Salterio found that superiors evaluating two units relied on the measures common to both and ignored those unique to each. Cardinaels and van Veen-Dirks found that markers for above, below and on target changed how evaluators weighted the measures, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
+:::
+
+## Each reader gets a page and a KPI
+
+{{< book-table tbl-15-01 >}}
+
+::: {.notes}
+The controller's Validation page carries the control totals of the earlier chapters, so every other page can be trusted.
+:::
+
+## Four pages for four readers, and an About page
+
+{{< book-figure fig-15-01 crop="0,0,1,0.4743" >}}
+
+::: {.notes}
+The About page opens the package and states its purpose, readers, source and period, and where each KPI is defined and tested. It holds the page navigator, as every visible page does, with one button for each visible page.
+:::
+
+## Three hidden pages hold the detail
+
+{{< book-figure fig-15-01 crop="0.1921,0.3894,0.4097,0.5062" >}}
+
+::: {.notes}
+Promotion Detail and Cost Center Detail are reached by drill-through from the Promotions and Budget pages, and Promotion Tooltip by pointing at a promotion. They are hidden from the page tabs and the navigator, and left by the back button or by moving the pointer away.
+:::
+
+# Drill-Through and Report-Page Tooltips
+
+## Drill-through and tooltips reach the detail
+
+- Drill-down stays inside one visual; drill-through opens another page
+- Drill-through filters that page to the item the reader right-clicked
+- A report-page tooltip is a small page shown while the reader points
+- Tooltips are not interactive, and screen readers cannot read them
+
+::: {.notes}
+The drill-through field sits in a well of its own on the detail page, and Power BI adds a back button to it. The field must also appear in the visual the reader right-clicks, or the option does not appear. A tooltip page is set to the tooltip canvas size and switched on as a tooltip in its page settings. Nothing the reader must know should appear only in a tooltip.
+:::
+
+## Three ways from a summary to its detail
+
+{{< book-table tbl-15-02 >}}
+
+::: {.notes}
+Drill-through is how a report lets managers explore causes on their own, as Chapter 1 promised, without placing every detail on the summary page.
+:::
+
+## Drill-down stays put; drill-through opens a page
+
+{{< book-figure fig-15-02 crop="0,0,1,0.8909" >}}
+
+::: {.notes}
+On the left, expanding Furniture shows its product types in the same matrix, as in Chapter 13. On the right, right-clicking a promotion's bar and choosing Drillthrough opens a separate page filtered to that promotion, with a back button.
+:::
+
+## Check your understanding {.check}
+
+Drill-down, drill-through or tooltip?
+
+1. Move from an item group to its product types
+2. Study one promotion's invoice lines in detail
+3. Glance at one promotion's months while pointing at it
+4. A fact that a screen-reader user must be able to find
+
+::: {.notes}
+Ask students which of the four should never rely on a tooltip.
+:::
+
+## Each need has its tool {.answer}
+
+1. Drill-down, in the same visual
+2. Drill-through, to a detail page
+3. A report-page tooltip
+4. Never only a tooltip: put it on the page
+
+::: {.notes}
+Drill-down and drill-through are accessible to screen readers; a tooltip is not.
+:::
+
+# Guided Tutorial 15.1: The Promotions Page
+
+## Build the promotions page in nine steps
+
+{{< book-steps 15.1 >}}
+
+::: {.notes}
+Students import the promotions and relate them to the invoice lines, where lines sold without a promotion appear under (Blank), a meaningful blank. They build a disconnected table of steps, chart the steps from list price to net as a waterfall, show the discounts by promotion, and add a drill-through page and a tooltip page.
+:::
+
+## A disconnected table and SWITCH make the steps
+
+```
+Gross to Net =
+SWITCH (
+    SELECTEDVALUE ( Steps[Step] ),
+    "At list price", [List Amount],
+    "Price lists and overrides",
+        [Price Before Discount] - [List Amount],
+    "Promotions",
+        [Revenue] - [Price Before Discount],
+    [Revenue]
+)
+```
+
+- Steps relates to nothing: its rows only give the waterfall its categories
+
+::: {.notes}
+SELECTEDVALUE returns the step of the current bar, or a blank when the context holds more than one step, as it does for a total, and the last argument returns revenue itself. The promotions step is the price before discount less revenue, rather than the Discounts measure, so that the steps add up to the cent.
+:::
+
+## Everyday prices take more than the promotions
+
+{{< book-figure fig-15-03 crop="0,0.1094,1,0.4241" >}}
+
+::: {.notes}
+The waterfall starts at the list amount, steps down twice, and ends with the total that Power BI adds, equal to the latest year's revenue of Chapter 6. The price lists and approved overrides take far more off the list amount than the promotions do, as the Part II case found.
+:::
+
+## One promotion gave away several times any other
+
+{{< book-figure fig-15-03 crop="0,0.5363,1,0.3365" >}}
+
+::: {.notes}
+The Furniture Seasonal Promotion leads by far. Two promotions of the year before still appear, because their last orders were invoiced early in the latest year.
+:::
+
+## Drill-through: one promotion, month by month
+
+{{< book-figure fig-15-04 crop="0,0,1,0.8371" >}}
+
+::: {.notes}
+The Furniture Seasonal Promotion ran in September and October, but its discounts continue into November and December: Chapter 5 found those lines were ordered within the promotion's dates and invoiced later. Drilling through on the Harbor Collection Promotion shows an end date before its start date, the master-data error the Part II case found in every collection promotion.
+:::
+
+## The tooltip shows the months while pointing
+
+{{< book-figure fig-15-05 crop="0,0,1,0.8519" >}}
+
+::: {.notes}
+The pointer rests on the promotion's bar, and the Promotion Tooltip page appears beside it, filtered to that promotion. A summary page could not have shown either finding of the detail pages; they appear in two clicks.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 15.1 lead="true" >}}
+
+::: {.notes}
+The sales manager's question now has a one-page answer and two levels of detail. The page also shows something the question did not ask: the promotions are the smaller of the two reductions from list price.
+:::
+
+# Budget Versus Actual
+
+## The budget is a second fact table beside the ledger
+
+- Each line is one account, month and cost center, approved in advance
+- It shares Account, CostCenter and Date with the ledger
+- A line has a month but no day: relate the month's first day to Date
+- Variance is actual less budget, and the report must say so
+
+::: {.notes}
+Microsoft's guidance for facts at a higher grain than the date table is to store the first day of each period. The budget then adds up correctly by month, quarter and year, so budget measures are read by month or above. For an expense, a positive variance means spending above the budget, which is unfavorable; for revenue the signs mean the opposite. Variance percent divides the variance by the budget.
+:::
+
+## A variance measures a difference; causes explain it
+
+{{< book-table tbl-15-03 >}}
+
+::: {.notes}
+Charles River's operating expense shows four of the causes at once. Sales spent far less than its budget, mostly from volume. The Warehouse spent more and Administration less, offsetting each other, a classification difference that Chapter 2 warned about. What remains is a few percent under budget almost everywhere, the payroll burden rate, and the months with three pay dates are unfavorable against a budget that spreads salaries evenly.
+:::
+
+## Watch out: a static sales budget misleads {.watch-out}
+
+- The sales budget plans several times the volume actually sold
+- Revenue and cost of sales fall far short of it every month
+- The huge variances say nothing about how the year went
+- Flex the budget to actual volume first, or leave revenue off
+
+::: {.notes}
+Against the static budget, the page would show enormous unfavorable revenue variances and favorable cost variances. Flex the budget as Chapter 7 did, or leave revenue off the page and say why.
+:::
+
+## Mark the variances, never with color alone
+
+- Conditional formatting places an icon beside a value, by rules
+- An arrow up for spending more than five percent above budget
+- A circle within five percent, an arrow down below
+- Different shapes, beside the signed percentage, work in grayscale
+
+::: {.notes}
+This is the rule Chapters 4 and 6 set and Chapter 13 applied to every visual: meaning never rests on color alone. A marker appears only where it signals something the reader should act on, and its threshold is stated.
+:::
+
+## Check your understanding {.check}
+
+Which cause explains each variance?
+
+1. Commission budgeted on the budget's sales volume
+2. Depreciation budgeted in one cost center, recorded in another
+3. Salaries paid in a month with three pay dates
+4. Payroll burden below the budgeted rate
+
+::: {.notes}
+Ask students which of the four nets to zero across the cost centers.
+:::
+
+## Each variance has its cause {.answer}
+
+1. Volume
+2. Classification
+3. Timing
+4. Rate
+
+::: {.notes}
+The classification difference nets to zero: it moves cost from one cost center to another without changing the total. Spending is what remains after the other causes.
+:::
+
+# Visual Calculations
+
+## A visual calculation works on its visual's rows
+
+- A DAX calculation defined on one visual and stored with it
+- Home > New visual calculation opens an editor with the visual matrix
+- Functions: RUNNINGSUM, MOVINGAVERAGE, PREVIOUS and FIRST
+- Each takes one short formula, and templates write the common ones
+
+::: {.notes}
+Optional arguments name the direction the calculation moves through the visual, down the rows or across the columns, and restart it at each change of a higher level, such as each year in a visual of months.
+:::
+
+## Visual calculations and their SQL counterparts
+
+{{< book-table tbl-15-04 >}}
+
+::: {.notes}
+The order of the rows in the visual plays the part of ORDER BY, restarting at a higher level plays the part of PARTITION BY, and the number of rows in a moving average plays the part of the frame, as in Chapter 11.
+:::
+
+## It sees only what its visual shows
+
+- On a chart starting mid-way, a moving average has fewer months
+- It cannot be reused in another visual, exported or pinned
+- One visual's shape, such as a year-to-date line: a visual calculation
+- A number readers rely on, compare or export: a measure with a test
+
+::: {.notes}
+A measure written with the time intelligence of Chapter 14 reaches into the model and finds the months before the chart starts; a visual calculation sees only the visual's rows. Tutorial 15.3 shows the difference on the plant page.
+:::
+
+## Where a calculation can live
+
+{{< book-table tbl-15-05 >}}
+
+::: {.notes}
+The calculated column of Chapter 14 completes the comparison: it sees its own row and related rows, is stored at refresh, and can be used to filter, group or sort.
+:::
+
+## Check your understanding {.check}
+
+Measure, visual calculation or calculated column?
+
+1. A year-to-date line on one chart
+2. The trailing ratio the production manager relies on
+3. A figure readers export and compare across pages
+4. A value that belongs to each row, to slice by
+
+::: {.notes}
+Ask students what would go wrong if the second were a visual calculation on a filtered chart.
+:::
+
+## Each calculation has its place {.answer}
+
+1. A visual calculation
+2. A measure, whose window reaches into the model
+3. A measure, with a description and a test
+4. A calculated column
+
+::: {.notes}
+The second is the lesson of Tutorial 15.3: on a chart that starts mid-way, the visual calculation's window holds fewer months than it should.
+:::
+
+# Guided Tutorial 15.2: The Cost-Center Budget Page
+
+## Steps 1 to 6: import, relate, measure and flex
+
+{{< book-steps 15.2 1-6 >}}
+
+::: {.notes}
+Budget sums the budget lines, Actual is Chapter 14's GL Amount, and Variance is actual less budget. The Flexed Budget measure replaces the commission budget with the budget's commission rate times actual product revenue, without design services, and leaves every other budget line as it was; it reproduces the flexed commission of Chapter 7.
+:::
+
+## Steps 7 to 11: compare, explain and test
+
+{{< book-steps 15.2 7-11 >}}
+
+::: {.notes}
+Drilling through to the accounts finds a depreciation account with expense and no budget in the Warehouse, and a depreciation budget well above the actual in Administration. Test 4 checks the budget, flexed budget and actual against Chapter 7 and Tutorial 14.3.
+:::
+
+## BudgetLine shares three dimensions with the ledger
+
+{{< book-figure fig-15-07 crop="0,0,1,0.8266" >}}
+
+::: {.notes}
+BudgetLine and GLEntry are two fact tables sharing Account, CostCenter and Date, so a visual grouped by cost center or month can place the budget beside the ledger. BudgetDate, the first day of each budget month, is added in Step 1. Budget lines and postings without a cost center meet in the (Blank) row.
+:::
+
+## Three cost centers stand out against the budget
+
+{{< book-figure fig-15-08 crop="0.0093,0.1684,0.9177,0.6863" >}}
+
+::: {.notes}
+Sales spent far less than its budget, the Warehouse far more, and Administration less; every other cost center is a few percent under. The (Blank) row holds the expenses without a cost center, such as rent, utilities and insurance, which Chapter 7's Budget Table left out; here the budget and actual agree closely.
+:::
+
+## Volume and classification explain the big variances
+
+{{< book-figure fig-15-09 crop="0.0139,0.0304,0.9687,0.719" >}}
+
+::: {.notes}
+Each cost center's variance is the volume in the commission budget, plus the classification of depreciation, plus what remains. The classification column totals zero, the signature of a classification difference. What remains is a few percent below budget nearly everywhere, the payroll burden rate; Sales remains further below, because the actual commission rate on merchandise was also below the budgeted rate.
+:::
+
+## RUNNINGSUM shows how the variance built up
+
+{{< book-figure fig-15-06 crop="0,0.2771,0.6389,0.6359" >}}
+
+::: {.notes}
+The year-to-date variance climbs in January, falls through June, climbs again in July, and falls for the rest of the year. January and July are the months with three pay dates: against a budget that spreads salaries evenly, they look unfavorable and every other month favorable. A manager who read the report in July would have seen a cost center on budget for the year.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 15.2 lead="true" >}}
+
+::: {.notes}
+Without the flex and the reconciliation, the page would have rewarded Sales for a budget inflated by volume and blamed the Warehouse for a cost it was never budgeted.
+:::
+
+# Assembling the Reporting Package
+
+## Navigation that keeps itself up to date
+
+- A page navigator's buttons follow the pages as they change
+- Detail and tooltip pages are hidden from the tabs and the navigator
+- A bookmark saves a page's state: good for a view, poor for navigation
+- A field parameter lets the reader choose the measure a chart shows
+
+::: {.notes}
+In Desktop, a button responds to a click only while Ctrl is held, so you can still select it to edit it; in the service it responds to a click. A bookmark captures a page as it was, so every change to the page means updating it. A field parameter is a small table listing fields with NAMEOF, and it cannot serve as the field of a drill-through or tooltip page.
+:::
+
+## The About page documents the package
+
+{{< book-figure fig-15-12 crop="0,0.016,1,0.4032" >}}
+
+::: {.notes}
+The About page states the report's purpose, its readers, its source and period, and where each KPI is defined and tested, the counterpart of Chapter 4's Documentation worksheet. Below the text sits the page navigator, one button for each visible page. Every measure carries a description, the Validation page keeps reproducing the sales totals, and the Tests tab grows with each new page. Every Part of the book has ended its tool's work this way, because an error in a monthly report is repeated every month until someone finds it.
+:::
+
+## Check your understanding {.check}
+
+Which tool does each need?
+
+1. Buttons that follow pages as they are added or renamed
+2. A saved view of a page prepared for a meeting
+3. One chart that switches between two measures
+4. The report's purpose, source and KPI definitions
+
+::: {.notes}
+Ask students which of the four would go stale when the page changes.
+:::
+
+## Each need has its tool {.answer}
+
+1. A page navigator
+2. A bookmark
+3. A field parameter
+4. The About page, with a description on every measure
+
+::: {.notes}
+The bookmark is the one that goes stale: it captures the page as it was.
+:::
+
+# Guided Tutorial 15.3: The Plant Page and the Package
+
+## Steps 1 to 7: model the plant and its hours
+
+{{< book-steps 15.3 1-7 >}}
+
+::: {.notes}
+Labor time and completions join the model as two more fact tables, with Employee, WorkCenter, Item and Date as dimensions. A labor line takes the work center of its operation, so indirect time has none and appears under (Blank). Standard hours are cut off at the last day with time records, so that hours and output cover the same days, as in Chapters 10 and 11.
+:::
+
+## Steps 8 to 13: compare, chart and finish the package
+
+{{< book-steps 15.3 8-13 >}}
+
+::: {.notes}
+The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Test 5 returns the yearly ratios of Chapter 11's view.
+:::
+
+## KEEPFILTERS lets the two filters combine
+
+```
+Manufacturing Hours =
+CALCULATE (
+    SUM ( LaborTimeEntry[RegularHours] )
+        + SUM ( LaborTimeEntry[OvertimeHours] ),
+    KEEPFILTERS (
+        LaborTimeEntry[LaborType] <> "NonManufacturing" )
+)
+
+Direct Hours =
+CALCULATE ( [Manufacturing Hours],
+    LaborTimeEntry[LaborType] = "Direct Manufacturing" )
+```
+
+::: {.notes}
+Without KEEPFILTERS, Direct Hours would return every manufacturing hour. A filter argument replaces any filter on the same column, as Chapter 14 explained, so the filter inside Manufacturing Hours would override Direct Hours' filter on LaborType. With KEEPFILTERS, the two filters combine and Direct Hours returns direct time only.
+:::
+
+## On a filtered axis, the visual calculation drifts
+
+{{< book-figure fig-15-10 crop="0,0,1,0.8723" >}}
+
+::: {.notes}
+On a table that starts at the beginning of the data, the visual calculation of two twelve-month moving averages agrees with the measure. On one that starts a year later, it averages one month in the first month, two in the second, and agrees with the measure again only in the twelfth. The measure, whose DATESINPERIOD window reaches into the model, is the figure the production manager relies on.
+:::
+
+## The trailing ratio rose in every year
+
+{{< book-figure fig-15-11 crop="0,0,1,0.4284" >}}
+
+::: {.notes}
+The plant used more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation.
+:::
+
+## Overtime rose alike for every job title
+
+{{< book-figure fig-15-11 crop="0,0.434,1,0.4681" >}}
+
+::: {.notes}
+The overtime share rose by two-thirds or more from the first year to the latest for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 15.3 lead="true" >}}
+
+::: {.notes}
+The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Every number on it ties to a test, which is what makes it fit to be sent every month.
+:::
+
+# What-If Parameters and Forecasts
+
+## A what-if parameter turns an assumption into a slider
+
+- Modeling > New parameter > Numeric range creates a slider and a value
+- Measures that use the value recalculate with every move
+- The Part II case's break-even lift becomes a page to try discounts on
+- The evidence of no lift is what the required lift must be weighed against
+
+::: {.notes}
+The parameter is a one-column table of the allowed values and a measure that returns the value the reader selected. The Part II case used Goal Seek to find the discount at which a promotion pays for itself; Exercise 15.4 builds the same calculation as a what-if page for the Design Trade promotion.
+:::
+
+## The forecast uses exponential smoothing
+
+- The Analytics pane adds it to a line chart, with a length and an interval
+- Exponential smoothing weights recent observations more heavily
+- It can detect a seasonal pattern, and be run as a hindcast
+- Judge it, as Chapter 7 did, against the same period last year
+
+::: {.notes}
+A hindcast runs the forecast on older data to see how it would have predicted the recent past. Chapter 7's advice applies unchanged: a forecast is judged by how well it would have predicted periods you already know, against simple benchmarks.
+:::
+
+## Watch out: a forecast learns from any history it gets {.watch-out}
+
+- The revenue history begins with a start-up month at half the usual level
+- Expense months with three pay dates may or may not read as seasonal
+- Fit the forecast on data that ends before a quarter you know
+- Compare it with that quarter and the benchmarks, and say so on the page
+
+::: {.notes}
+Exercise 15.5 tests the forecast in this way before anyone trusts it.
+:::
+
+# Looking Ahead
+
+## The package is ready for its readers
+
+- Pages designed around each reader's question, with KPIs and comparisons
+- Drill-through pages and tooltips that reach the detail behind a number
+- Budget variances explained by volume, classification, rate and timing
+- Navigation, an About page, and a test for every page
+
+::: {.notes}
+Most of this work was descriptive and diagnostic analytics; the what-if parameter and the forecast are its first predictive and prescriptive tools, each to be judged before it is trusted. Chapter 16 turns to the internal auditor of Chapters 8 and 12, who will monitor the same data for exceptions and test whether the package itself can be relied on. How the package reaches its readers, and how each manager sees only their own cost center, is the subject of the appendix on publishing and security.
+:::
+
+## Summary
+
+- A report page serves a named reader, with each KPI against its comparison
+- Drill-through and tooltip pages put the detail on demand
+- A budget beside the ledger needs its variances explained, not just shown
+- Visual calculations shape one visual; numbers readers rely on are measures
+- A package needs navigation, documentation and tests
+
+::: {.notes}
+What-if parameters and forecasts bring prescriptive and predictive questions into the report; each should be tested against what is already known before a manager relies on it.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. KPI, drill-through and visual calculation are the ideas the package rests on.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 15.1 drills through from the income statement to the entry, Exercise 15.4 builds a what-if page for a promotion, and Exercise 15.5 tests the forecast before trusting it. Chapter 16 turns to audit monitoring and report assurance.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
