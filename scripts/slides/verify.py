@@ -167,6 +167,9 @@ CHECKPOINT_RANGE = re.compile(r"\{\{<\s*book-checkpoint\s+([\w.]+)\s+(\d+)-(\d+)
 TABLE_RANGE = re.compile(r"\{\{<\s*book-table\s+([\w-]+)\s+(\d+)-(\d+)[\s>]")
 FIGURE_CITE = re.compile(r"\{\{<\s*book-figure\s+([\w-]+)([^>]*)>\}\}")
 CROP = re.compile(r'crop\s*=\s*"([^"]*)"')
+# A case deck cites its requirements, milestones, deliverables and criteria from the book.
+REQUIREMENT_CITE = re.compile(r"\{\{<\s*book-requirement\s+(\d+)\s*>\}\}")
+CASE_LIST = re.compile(r"\{\{<\s*book-(requirements|milestones|deliverables|criteria)(?:\s+(\d+)-(\d+))?\s*>\}\}")
 
 
 def parse_crop(text: str) -> tuple[float, float, float, float]:
@@ -253,6 +256,18 @@ def verify_sources(root: Path, decks: list[str], index: dict) -> tuple[list[str]
             table = index["tables"].get(identifier)
             if table and not 1 <= int(first) <= int(last) <= len(table["rows"]):
                 errors.append(f"{label}: {identifier} has no rows {first}-{last}")
+        numbers = {requirement["number"] for requirement in chapter.get("requirements", [])}
+        for number in REQUIREMENT_CITE.findall(text):
+            if int(number) not in numbers:
+                errors.append(f"{label}: no Requirement {number} in {deck}")
+        for kind, first, last in CASE_LIST.findall(text):
+            items = chapter.get(kind, [])
+            if not items:
+                errors.append(f"{label}: {deck} has no {kind}")
+            elif first:
+                allowed = numbers if kind == "requirements" else set(range(1, len(items) + 1))
+                if not (int(first) <= int(last) and {int(first), int(last)} <= allowed):
+                    errors.append(f"{label}: {deck} has no {kind} {first}-{last}")
         body = deck_text(text)
         # Every ## slide has notes for the speaker. # module dividers and the title slide are exempt.
         for section in re.split(r"(?m)^##\s+", body)[1:]:

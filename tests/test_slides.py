@@ -141,6 +141,70 @@ Each row of the table names one part and its code.
 """
 
 
+CASE = """---
+title: "The Second Chapter"
+---
+
+## The Situation
+
+A request.
+
+## Getting Started
+
+1. **The first phase** (Requirements 1 and 2): the balances and a table.
+2. **The second phase** (Requirement 3): the memo.
+
+## Requirements
+
+### Phase 1: The Ledger
+
+**Requirement 1: Build the balances (Chapters 1 and 2).**
+
+- A task.
+
+**Requirement 2: Review them (Chapter 1).** Review the balances.
+
+### Phase 2: The Memo
+
+**Requirement 3: Write the memo.** Write it.
+
+## Deliverables and Checklist
+
+1. A script.
+2. A workbook.
+
+## What a Strong Submission Includes
+
+- Balances that agree.
+- A memo that recommends.
+"""
+
+CASE_DECK = """# Phase 1: The Ledger
+
+## Two requirements, one milestone
+
+{{{{< book-requirement {requirement} >}}}}
+
+{{{{< book-requirements 1-2 >}}}}
+
+{{{{< book-milestones {milestones} >}}}}
+
+::: {{.notes}}
+The first phase's requirements and milestone, from the book.
+:::
+
+## What you hand in, and how it is judged
+
+{{{{< book-deliverables >}}}}
+
+{{{{< book-criteria 1-2 >}}}}
+
+::: {{.notes}}
+The deliverables and the criteria of a strong submission, from the book.
+:::
+"""
+
+
 def book_fixture(root: Path) -> None:
     write(root, "_quarto.yml", BOOK)
     write(root, "index.qmd", "# Home\n")
@@ -192,6 +256,24 @@ class BookIndexTests(unittest.TestCase):
             self.assertEqual(["Analytics", "Part"], chapter["key_terms"])
             self.assertEqual("Chapter 2: The Second Chapter", chapter["next"])
             self.assertEqual([1, 2], chapter["part_chapters"])
+
+
+    def test_a_case_indexes_its_requirements_milestones_deliverables_and_criteria(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            write(root, "chapters/02-second/chapter.qmd", CASE)
+            chapter = book_index.build(root)["chapters"]["chapter-02"]
+            self.assertEqual([(1, "Build the balances", "Chapters 1 and 2", "Phase 1: The Ledger"),
+                              (2, "Review them", "Chapter 1", "Phase 1: The Ledger"),
+                              (3, "Write the memo", "", "Phase 2: The Memo")],
+                             [(r["number"], r["title"], r["chapters"], r["phase"]) for r in chapter["requirements"]])
+            self.assertEqual([(1, "The first phase", "Requirements 1 and 2", "the balances and a table."),
+                              (2, "The second phase", "Requirement 3", "the memo.")],
+                             [(m["number"], m["name"], m["requirements"], m["text"]) for m in chapter["milestones"]])
+            self.assertEqual(["A script.", "A workbook."], chapter["deliverables"])
+            self.assertEqual(["Balances that agree.", "A memo that recommends."], chapter["criteria"])
+            self.assertIn(("2.3.1", "Phase 1: The Ledger"), [(s["number"], s["title"]) for s in chapter["sections"]])
 
 
 class SourceCheckTests(unittest.TestCase):
@@ -276,6 +358,21 @@ class SourceCheckTests(unittest.TestCase):
             self.assertEqual([], self.check(root)[0])
             write(root, "slides/chapter-01/index.qmd", DECK + slide.format("2-3"))
             self.assertTrue(any("tbl-01-01 has no rows 2-3" in error for error in self.check(root)[0]))
+
+    def test_case_shortcodes_must_cite_what_the_case_has(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book_fixture(root)
+            write(root, "chapters/02-second/chapter.qmd", CASE)
+            write(root, "slides/chapter-02/index.qmd", CASE_DECK.format(requirement=2, milestones="1-2"))
+            self.assertEqual(([], []), self.check(root))
+            write(root, "slides/chapter-02/index.qmd", CASE_DECK.format(requirement=5, milestones="1-3"))
+            errors = self.check(root)[0]
+            self.assertTrue(any("no Requirement 5" in error for error in errors))
+            self.assertTrue(any("has no milestones 1-3" in error for error in errors))
+            write(root, "slides/chapter-01/index.qmd", DECK + "\n## Criteria\n\n{{< book-criteria >}}\n\n"
+                  "::: {.notes}\nA chapter with no case criteria.\n:::\n")
+            self.assertTrue(any("chapter-01 has no criteria" in error for error in self.check(root)[0]))
 
     def test_a_divider_that_names_no_section_is_a_warning(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -454,6 +551,19 @@ class PowerPointTests(unittest.TestCase):
         block, bullet = xml.findall('.//a:p', NS)
         self.assertEqual({"2000"}, {rpr.get("sz") for rpr in block.iter(f'{{{NS["a"]}}}rPr')})
         self.assertEqual({None}, {rpr.get("sz") for rpr in bullet.iter(f'{{{NS["a"]}}}rPr')})   # inline code stays
+
+    def test_a_requirement_source_line_takes_the_gray_evidence_size(self) -> None:
+        xml = ET.fromstring(
+            f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree><p:sp><p:txBody>'
+            '<a:p><a:r><a:rPr/><a:t>Requirement 3 · Rebuild the balance (Chapter 3)</a:t></a:r></a:p>'
+            '<a:p><a:r><a:rPr b="1"/><a:t>Produce:</a:t></a:r><a:r><a:rPr/><a:t> the parts</a:t></a:r></a:p>'
+            '</p:txBody></p:sp></p:spTree></p:cSld></p:sld>')
+        pptx_finish.format_sources(xml, {"sizes": {"evidence": 20}, "colors": {"gray": "5D6D7E"}})
+        source, bullet = xml.findall('.//a:p', NS)
+        run = source.find('a:r/a:rPr', NS)
+        self.assertEqual("2000", run.get("sz"))
+        self.assertEqual("5D6D7E", run.find('a:solidFill/a:srgbClr', NS).get("val"))
+        self.assertEqual({None}, {rpr.get("sz") for rpr in bullet.iter(f'{{{NS["a"]}}}rPr')})
 
     def test_a_long_roadmap_takes_the_evidence_size(self) -> None:
         def slide(entries: int) -> ET.Element:

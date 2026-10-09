@@ -1,0 +1,575 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is a case, not a chapter of tutorials. The deck opens with a kickoff (the situation, what you hand in, how it is judged, the data and the setup) and then follows the four phases of the requirements, each ending with a milestone check-in. Present the kickoff first, and each phase when its milestone begins.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover the statements from successive trial balances, rebuilding a liability from its documents, and judging the adjustments.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover the notes, what the records cannot settle, and choosing and documenting the tools.
+:::
+
+## A lender needs statements it can rely on
+
+- The CFO has asked the bank for a line of credit for working capital
+- The bank's credit committee wants full GAAP statements, with comparatives
+- The company has never given statements to a lender
+- You, the staff accountant, prepare the package and a memo to the CFO
+
+::: {.notes}
+Earlier, the controller showed the audit committee where the year's cash had gone: into inventories, with growing payables and unremitted sales tax holding the balance up. The shareholders received statements prepared straight from the ledger, and no adjustment has been recorded since. The case has no tutorials: each requirement says what the controller needs and which chapters it draws on, and you decide how to produce it.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+These are the five deliverables, as the chapter's checklist lists them. The workbook is the center of the package; the script feeds it, the Review file tests it, and the memo explains what the package required and what remains open.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission is one a reviewer can rerun and trace. Read these criteria now and again before each milestone.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-6 >}}
+
+::: {.notes}
+The memo is judged as much on its tone as on its numbers: it measures only what the ledger supports, describes rather than accuses, and ends with a recommendation the CFO can act on.
+:::
+
+# The Situation
+
+## What the bank asks for
+
+- Balance sheets, income, changes in equity and cash flows, for two years
+- Full notes, under U.S. generally accepted accounting principles
+- Management's own statements, but the bank may ask for a review or audit
+- So every number must trace to the records that support it
+
+::: {.notes}
+The controller wants to know what the ledger says as it stands and what it takes to turn it into GAAP statements, which adjustments the records support and whether they matter, what the notes must say, and what the data cannot settle.
+:::
+
+## The controller's four conditions
+
+- Nothing is posted: each adjustment is a numbered entry with its evidence
+- Materiality is a set share of each year's income before income taxes
+- Findings are worded as what the records show, not what anyone did
+- The package states the date through which its data run
+
+::: {.notes}
+The adjustments live in the workbook, with the query and the document numbers behind each, so that the CFO can approve them before anyone posts them. Every adjustment is listed, however small. The chapter states the materiality rate; use it as written.
+:::
+
+## The package: four statements and the policies
+
+{{< book-table tbl-17-01 1-5 >}}
+
+::: {.notes}
+The outline covers what the ledger records, with the topic of the Accounting Standards Codification that governs each component. Part of Requirement 2 is to find what the ledger leaves out.
+:::
+
+## The notes that support the statements
+
+{{< book-table tbl-17-01 6-11 >}}
+
+::: {.notes}
+The last column says which requirements produce each component. Lenders use statements to monitor borrowers as well as to decide whether to lend: Minnis and Sutherland found banks requesting statements to monitor about half of small commercial loans, and Minnis found that audited statements lower the cost of private firms' debt.
+:::
+
+# The Data You Will Use
+
+## What carries over from the chapters
+
+- Chapter 6's mapping from accounts to statement lines
+- Exercise 11.1's statements in SQL, and Chapter 12's Audit.sql
+- Tutorial 14.3's ledger model, and Chapter 15's drill-through
+- The Part III and Part IV case files, if you have them, as a head start
+
+::: {.notes}
+Few of the case's techniques are new. The case does not require the earlier case files: they help with the payroll accrual and a ledger model, but every method the case needs is stated in its requirements.
+:::
+
+## Tables you have not used yet: profile them first
+
+- Notes payable: DebtAgreement and DebtScheduleLine
+- Property and equipment: FixedAsset and FixedAssetEvent
+- Accruals: the references of PurchaseInvoiceLine and JournalEntry
+- Services, returns and credits: their engagement, return and credit tables
+
+::: {.notes}
+The accrual references are AccrualJournalEntryID on PurchaseInvoiceLine and ReversesJournalEntryID on JournalEntry. The services tables are ServiceEngagement, ServiceTimeEntry and ServiceBillingLine; the returns tables are SalesReturn, SalesReturnLine, CreditMemo and CustomerRefund. Profile each before relying on it, as Chapter 10 profiled WorkOrder.
+:::
+
+## Three files, three tools
+
+{{< book-table tbl-17-02 >}}
+
+::: {.notes}
+Each tool hands its results to the next in the ways the book has taught: Copy with Headers or Export to CSV from DB Browser, and Power Query in both Excel and Power BI.
+:::
+
+## Watch out: every balance is as of a date {.watch-out}
+
+- A trial balance leaves out only the closes dated on its own as-of date
+- The opening entry belongs to the first fiscal year
+- Postings after the last year-end are supplier payments only
+- Revenue belongs to the year of delivery; invoices post when received
+
+::: {.notes}
+The closes of earlier years have already moved their income into retained earnings, so they stay in. A balance taken at the ledger's last date is not a year-end balance. Supplier invoices post on the day they were received and approved, not on their invoice date.
+:::
+
+## Watch out: the ledger and its documents differ {.watch-out}
+
+- An invoice clears an accrual only up to the amount accrued
+- So measure what cleared each accrual from the ledger's postings
+- Several of the new tables fan out when joined to their headers
+- An opening balance is a question about the opening entry, not this year
+
+::: {.notes}
+Any excess of an invoice over its accrual goes to expense, and a residual can be cleared later by a separate entry. Chapter 10 warned about fan-out. Do not net an opening balance against a new estimate: a balance that has sat unchanged since the opening entry belongs in the memo.
+:::
+
+# Getting Started
+
+## Set up before you begin
+
+- Work in a capstone copy of the database; the download never changes
+- Head LenderPackage.sql, and put two comment lines above every query
+- Give the workbook a Documentation sheet, with the data-through date
+- Create the Review file in Power BI Desktop, which needs Windows
+
+::: {.notes}
+The working copy is CharlesRiver_Capstone.sqlite, so that the Part III working copy keeps its views. The script's header states its purpose, the database file, the preparer and the date, and its checks; the two comment lines say what a query tests and its population and expected result. On a Mac, plan a Windows computer for Requirements 2 and 6.
+:::
+
+## Four milestones, one for each phase
+
+{{< book-milestones >}}
+
+::: {.notes}
+Work through the phases in order, because each uses what the one before found. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the case.
+:::
+
+## Choose the tool for each step
+
+- A query extracts exactly the rows, and reruns with a new date
+- A workbook shows every formula, and holds the adjustments
+- A report moves from a line to its entries, and tests the package
+- Where the choice is not clear, choose, and document why
+
+::: {.notes}
+Each requirement's opening paragraph says why a tool fits where the choice is clear. Part of the task is to explain the choices that are not.
+:::
+
+## Check your understanding {.check}
+
+Which tool fits each step?
+
+1. Three trial balances that differ only in their date
+2. Prorating a pay period across a year-end
+3. Moving from a statement line to the postings behind it
+4. Rebuilding a debt schedule from its documents
+
+::: {.notes}
+Ask students to justify each choice, as the case's documentation must.
+:::
+
+## Each step has its tool {.answer}
+
+1. One SQL query, its date in a Params CTE, rerun three times
+2. A workbook formula, which a reviewer can see
+3. A Power BI ledger model with drill-through
+4. SQL, with the schedule formatted in the workbook
+
+::: {.notes}
+These are the reasons the requirements themselves give. A query repeats exactly, a workbook shows its reasoning, and a report lets a reader explore.
+:::
+
+# Phase 1: The Ledger as It Stands
+
+## Phase 1 at a glance
+
+{{< book-requirements 1-2 >}}
+
+{{< book-milestones 1-1 >}}
+
+::: {.notes}
+Phase 1 establishes what the ledger says before anything is adjusted, and raises the questions the later phases answer.
+:::
+
+## One query, three trial balances
+
+{{< book-requirement 1 >}}
+
+- **Produce:** three trial balances, the recorded statements, unused accounts
+- **Tool:** one query with its date in a Params CTE; mapping in the workbook
+- **Revisit:** Chapter 6's mapping, Chapter 11's CTEs, Chapter 10's anti-join
+- **Check:** the latest year ties to Chapter 6's trial balance and net income
+
+::: {.notes}
+Leave out only the closing entries dated on the as-of date. Map the accounts to statement lines by AccountSubType and account number. With the anti-join, list the accounts never posted, and ask what a company like this one must report that no account could record.
+:::
+
+## Review the statements before adjusting them
+
+{{< book-requirement 2 >}}
+
+- **Produce:** a Review file of balances and changes, and a Questions table
+- **Tool:** Power BI: a ledger model with drill-through reaches entries fastest
+- **Revisit:** Tutorial 14.3, Chapter 15's drill-through, Exercise 15.4
+- **Check:** each question names the requirement that will answer it
+
+::: {.notes}
+The Balance measure adds debits less credits up to a date and leaves out only the closing entries dated on it. A what-if parameter sets the threshold for flagging changes at the controller's materiality. Look for balances that rest on journal entries alone, and for those that have not moved since the opening entry. Keep the questions in an Enter data table, as Chapter 16 kept its dispositions.
+:::
+
+## Milestone 1: before you hand it in
+
+- One query produces all three trial balances, and each balances
+- The recorded statements agree with control totals you already trust
+- The accounts never posted are listed, with any the chart lacks
+- The Questions table links each question to a later requirement
+
+::: {.notes}
+These are self-checks, not answers. If your trial balance does not agree with Chapter 6's, look first at which closing entries the query leaves out.
+:::
+
+# Phase 2: The Adjustments
+
+## Phase 2 at a glance
+
+{{< book-requirements 3-5 >}}
+
+{{< book-milestones 2-2 >}}
+
+::: {.notes}
+Phase 2 is the heart of the case: it finds what the ledger left out at each year-end, measures it, and decides what to record. Expect it to take the longest.
+:::
+
+## Rebuild accrued expenses from their documents
+
+{{< book-requirement 3 >}}
+
+- **Produce:** the balance split into its parts at three year-ends
+- **Tool:** SQL: four tables joined under conditions on dates
+- **Revisit:** Chapter 3's trace, Chapter 10's joins, Chapter 12's tests
+- **Check:** the parts add up to the ledger's balance at every year-end
+
+::: {.notes}
+Split the balance into the opening line, the freight accrued and not yet settled, and the service accruals not yet cleared. For each accrual, subtract what had cleared it by each date: the invoice postings that refer to it and the adjustment entries that reverse it. Measure how long invoices took to clear accruals, age the open ones against the longest wait, and decide which are still liabilities and which should have been reversed, and when.
+:::
+
+## Six kinds of posting reach accrued expenses
+
+{{< book-figure fig-17-01 crop="0,0.7621,1,0.2379" >}}
+
+::: {.notes}
+Accrual entries credit the account for services received and not yet billed; a supplier invoice debits it up to the amount accrued, and an adjustment entry clears what remains. Shipments credit it for freight, and a monthly settlement pays the carriers. The opening entry has no document behind it.
+:::
+
+## Each accrual is cleared through its references
+
+{{< book-figure fig-17-01 crop="0,0,1,0.2702" >}}
+
+::: {.notes}
+An invoice line refers to the accrual it clears through AccrualJournalEntryID, and an adjustment entry refers to the accrual it reverses through ReversesJournalEntryID. An accrual is cleared by at most one invoice line. Every one of these documents posts to the ledger through the source-document trace of Chapter 3.
+:::
+
+## Test cutoff at every year-end, by one method
+
+{{< book-requirement 4 >}}
+
+- **Produce:** revenue, payroll and interest cutoff entries, each year-end
+- **Tool:** queries find the populations; prorating goes in the workbook
+- **Revisit:** Chapter 12's cutoff tests in Audit.sql, and Exercise 12.1
+- **Check:** an error at one year-end reverses in the next, and you show both
+
+::: {.notes}
+Measure each year-end the statements present, and the one before, because an error at the earlier year-end reverses in the next year. Recognize revenue in the year of delivery and value unbilled shipments at their order price less discount. Use one working-day method for payroll, split manufacturing from the other cost centers, and say where each part ends up. For interest, state your day-count convention.
+:::
+
+## Classify, measure and judge each adjustment
+
+{{< book-requirement 5 >}}
+
+- **Produce:** a numbered schedule, adjusted trial balances and decisions
+- **Tool:** the workbook: a working trial balance keeps the evidence in view
+- **Revisit:** Chapter 4's documentation, Chapter 6, Exercise 8.1's aging
+- **Check:** every adjusted trial balance balances; no adjustment moves cash
+
+::: {.notes}
+Write each adjustment's entries for both year-ends, with its accounts and evidence, and keep the entry lines in an Excel Table so the Review file can load them. Classify each, assign it to a period, and decide what to record and what to pass, individually and in aggregate. Consider also an allowance for credit losses, the returns expected after the year-end, and the condition of returned goods put back into stock.
+:::
+
+## The schedule of adjustments, column by column
+
+{{< book-table tbl-17-03 >}}
+
+::: {.notes}
+The schedule shows each adjustment's effect on opening equity, on each year's income before income taxes, and on each year-end balance sheet, with its type and the decision to record or pass it.
+:::
+
+## A missed item reverses in the next year
+
+{{< book-figure fig-17-02 crop="0,0,1,0.6565" >}}
+
+::: {.notes}
+An item missed at the end of one year enters that year's income and balance sheet and reverses in the next year's income. An item missed before the comparative year enters opening retained earnings. An error that recurs every year can leave income nearly right while the balance sheet stays wrong.
+:::
+
+## Error or estimate decides the period
+
+{{< book-figure fig-17-02 crop="0,0.6915,1,0.3085" >}}
+
+::: {.notes}
+A correction of an error goes to the period in which the facts existed, and the prior year is restated. A change in estimate goes to the period in which it becomes known, and nothing is restated. The guidance on accounting changes and error corrections, ASC Topic 250, governs both.
+:::
+
+## Watch out: a wrong estimate is not an error {.watch-out}
+
+- If the facts supported the estimate, it is a change in estimate
+- If the facts were there and were missed, it is an error
+- Materiality is not only a number: qualitative factors count too
+- Adjustments never move cash, so cash flow totals must not change
+
+::: {.notes}
+Acito and colleagues found that companies correcting the same lease error decided how on qualitative grounds and on what other companies had done, as well as on size. Choudhary and colleagues found that errors judged immaterial were followed by more errors and weaker controls. An error that recurs every year deserves attention even when each year's effect is small.
+:::
+
+## Check your understanding {.check}
+
+Error, change in estimate, or reclassification?
+
+1. An estimate that proved too low, on facts unknown at the year-end
+2. Wages earned in December, recorded only when paid in January
+3. The part of a note due next year, shown as long-term
+4. Revenue recorded in the year after the goods were delivered
+
+::: {.notes}
+Ask students what period each correction belongs to, and whether the prior year would be restated.
+:::
+
+## Each item has its type {.answer}
+
+1. A change in estimate: the period in which it becomes known
+2. An error: the year in which the work was done
+3. A reclassification: no effect on income
+4. An error: the year of delivery
+
+::: {.notes}
+The test is what the facts were at the year-end. Classifying each of the case's own adjustments, with the evidence, is the work of Requirement 5.
+:::
+
+## Milestone 2: before you hand it in
+
+- The parts of accrued expenses reconcile to the ledger at every year-end
+- Each cutoff measure uses one method at every year-end presented
+- Every adjustment is numbered, evidenced, classified and dated
+- Materiality is judged for each year, alone and in aggregate
+
+::: {.notes}
+These are self-checks, not answers. A reviewer should be able to start from any line of the schedule and reach the query or document behind it.
+:::
+
+# Phase 3: The Statements and Notes
+
+## Phase 3 at a glance
+
+{{< book-requirements 6-7 >}}
+
+{{< book-milestones 3-3 >}}
+
+::: {.notes}
+Phase 3 turns the adjusted trial balances into the statements and builds the notes that support them, each tested against the ledger.
+:::
+
+## Prepare the four statements
+
+{{< book-requirement 6 >}}
+
+- **Produce:** classified balance sheets and the three other statements
+- **Tool:** the workbook builds them; the Review file tests them
+- **Revisit:** Chapter 6's statements, Tutorial 14.3's ledger model
+- **Check:** adjustments change only reconciliation lines, never totals
+
+::: {.notes}
+The statements of income go by function, with a line for income before income taxes. The statement of changes in equity starts from the opening of the comparative year and shows the correction of the opening balance, with the earlier columns labeled as restated. The Review file's Tests tab checks that each entry balances, that no entry touches cash, and that adjusted net income and recorded total assets agree.
+:::
+
+## Cash flows by the indirect method
+
+- Start from net income, and add back depreciation and disposal losses
+- Adjust for the change in each working-capital balance
+- Classify the rest as investing or financing
+- Disclose entries that moved no cash rather than report them
+
+::: {.notes}
+Equipment financed by a note and a disposal with no proceeds moved no cash, so they are disclosed, not reported as cash flows. Add the supplemental information: interest paid, income taxes paid, and noncash investing and financing activities.
+:::
+
+## Build each note from the records
+
+{{< book-requirement 7 >}}
+
+- **Produce:** the notes on assets, debt, revenue and accrued liabilities
+- **Tool:** SQL rebuilds the schedules; the workbook formats them
+- **Revisit:** Chapters 10 and 11's queries, Chapter 14's sales model
+- **Check:** each note agrees with a line of the statements
+
+::: {.notes}
+Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any service work was done and not billed at a year-end. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why.
+:::
+
+## Milestone 3: before you hand it in
+
+- The statements agree with one another and with the adjusted balances
+- Cash and the cash flow totals are unchanged by the adjustments
+- Each required note is built from records and tied to the statements
+- The Review file's tests pass
+
+::: {.notes}
+These are self-checks, not answers. A note that cannot be traced to its records, or that does not agree with its statement line, is not finished.
+:::
+
+# Phase 4: What the Data Cannot Settle
+
+## Phase 4 at a glance
+
+{{< book-requirements 8-9 >}}
+
+{{< book-milestones 4-4 >}}
+
+::: {.notes}
+Phase 4 separates what the records can settle from what needs evidence from outside the database, and puts the open matters before the CFO.
+:::
+
+## Look past the year-end, and at the year ahead
+
+{{< book-requirement 8 >}}
+
+- **Produce:** a profile of later records, and a search for missed liabilities
+- **Tool:** SQL profiles and searches; the evaluations need more than data
+- **Revisit:** Chapter 12's unrecorded liabilities, and Chapter 8
+- **Check:** you say what the later records contain, and what they cannot
+
+::: {.notes}
+Compare the records after the year-end with the same weeks of the year before. Search the later payments for goods or services received before the year-end and not recorded as payables. List the events the CFO must evaluate up to the date the statements are available to be issued, and measure the going-concern conditions and mitigating factors from the adjusted statements.
+:::
+
+## Assemble the package, and write the memo
+
+{{< book-requirement 9 >}}
+
+- For each open matter: what the records show, and the evidence needed
+- Its possible effect where the ledger measures it, and the treatment
+- Cover tax status, leases, sales tax collected and unsupported balances
+- End with the passed items, close changes, and a recommendation
+
+::: {.notes}
+The package is a PDF produced from the workbook. The memo is at most two pages, with an appendix of exhibits of at most three. It may raise other matters the records point to, such as whether standard costs unchanged for years still measure the finished goods at cost, and it ends with your recommendation on whether the package should go to the bank as it stands.
+:::
+
+## Check your understanding {.check}
+
+Can the records settle it?
+
+1. Whether the company owes income tax
+2. Payments after the year-end for goods received before it
+3. Whether the company leases the space it occupies
+4. The date through which the data run
+
+::: {.notes}
+Ask students what evidence would settle each one the records cannot.
+:::
+
+## Each matter has its evidence {.answer}
+
+1. No: its tax status needs evidence outside the database
+2. Yes: the search for unrecorded liabilities
+3. No: the lease terms are not in the records
+4. Yes: the last date of each population
+
+::: {.notes}
+For each matter the records cannot settle, the memo states what the records do show, the evidence that would settle it, and its possible effect where the ledger allows a measure.
+:::
+
+## Milestone 4: before you hand it in
+
+- The later-events review says what the records can and cannot show
+- Each open matter has its evidence, possible effect and treatment
+- The memo keeps to its page limits and ends with a recommendation
+- The passed adjustments are listed for the CFO's approval
+
+::: {.notes}
+These are self-checks, not answers. The memo describes rather than accuses: it says what the records show, not what anyone did.
+:::
+
+# Deliverables and Checklist
+
+## Before you submit
+
+- Every query runs top to bottom, under its two comment lines
+- The Documentation sheet states the date through which the data run
+- Every number in the package traces to a query, document or entry
+- Each file opens and refreshes on another computer
+
+::: {.notes}
+Few of the case's techniques were new. What was new was deciding which tool each step needed and keeping the evidence of every step where the next reader could find it: the trial balance and mapping of Chapter 6, the anti-join of Chapter 10, the Params CTE of Chapter 11, the cutoff tests of Chapter 12, and the ledger model and drill-through of Chapters 14 and 15.
+:::
+
+# Looking Ahead
+
+## What the case practiced
+
+- Descriptive: the statements and notes describe the company
+- Diagnostic: the accruals, cutoff and opening balances show gaps
+- Predictive: the estimates of payroll owed, accruals and returns
+- Prescriptive: what to record, what to pass, and what to settle
+
+::: {.notes}
+These are the four types of analytics of Chapter 1. The estimates were small predictive models; the recommendations to the CFO are prescriptive.
+:::
+
+## After the package leaves
+
+- A lender reads the statements and the notes, and asks questions
+- It comes back each quarter to test the terms of the loan
+- An outside accountant would start from the same balances and entries
+- Your reconciliations and documentation make those conversations short
+
+::: {.notes}
+The matters you raised for the CFO are the ones that will decide whether the package can be relied on.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online chapter.
+:::

@@ -160,6 +160,26 @@ def format_code(slide: ET.Element, tokens: dict) -> None:
                 run.find('a:rPr', NS).set('sz', size)
 
 
+SOURCE_LINE = re.compile(r'^Requirement \d+ · ')
+
+
+def format_sources(slide: ET.Element, tokens: dict) -> None:
+    """A case requirement's source line ("Requirement 3 · Title (Chapters ...)", book-requirement) reaches
+    PowerPoint at the body size; it gets the gray evidence size of Reveal's .source line."""
+    size = str(tokens['sizes']['evidence'] * 100)
+    for paragraph in slide.iter(q('a', 'p')):
+        text = ''.join(t.text or '' for t in paragraph.iter(q('a', 't')))
+        if not SOURCE_LINE.match(text):
+            continue
+        for run in paragraph.findall('a:r/a:rPr', NS):
+            run.set('sz', size)
+            for old in run.findall('a:solidFill', NS):
+                run.remove(old)
+            fill = ET.Element(q('a', 'solidFill'))
+            ET.SubElement(fill, q('a', 'srgbClr'), val=tokens['colors']['gray'])
+            run.insert(0, fill)
+
+
 def roadmap_lines(text: str) -> int:
     """Lines a roadmap entry takes in a column, as slides/filters/deck.lua estimates them."""
     return max(1, -(-len(text) // ROADMAP_CHARACTERS))
@@ -198,7 +218,8 @@ def finish(path: Path, tokens: dict) -> None:
             data = source.read(item.filename)
             if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data
                                                    or b'buAutoNum' in data or ROADMAP_TITLE.encode() in data
-                                                   or tokens.get('code_font', '\0').encode() in data):
+                                                   or tokens.get('code_font', '\0').encode() in data
+                                                   or b'Requirement ' in data):
                 xml = ET.fromstring(data)
                 for table in xml.iter(q('a', 'tbl')):
                     format_table(table, colors)
@@ -206,6 +227,7 @@ def finish(path: Path, tokens: dict) -> None:
                 format_lists(xml, tokens)
                 format_roadmap(xml, tokens)
                 format_code(xml, tokens)
+                format_sources(xml, tokens)
                 data = ET.tostring(xml, encoding='utf-8', xml_declaration=True)
             target.writestr(item, data)
     shutil.move(temporary, path)

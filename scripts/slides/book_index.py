@@ -26,6 +26,12 @@ STEP = re.compile(r"^\*\*Step (\d+)\.\s+(.+?)\.?\*\*")
 LABELED = re.compile(r"^\*\*(Context and objective|Prerequisites|Checkpoint)\.\*\*\s*(.*)$")
 EXERCISE = re.compile(r"^\*\*Exercise ([0-9A-Z]+\.\d+):\s*(.+?)\.?\*\*\s*$")
 TUTORIAL = re.compile(r"^Guided Tutorial ([0-9A-Z]+\.\d+):\s*(.+)$")
+# The parts of a case: its requirements, the milestones of Getting Started, the numbered deliverables of
+# Deliverables and Checklist, and the bullets of What a Strong Submission Includes.
+REQUIREMENT = re.compile(r"^\*\*Requirement (\d+):\s*(.+?)\.\*\*")
+CHAPTERS = re.compile(r"^(.*?)\s*\(([^()]*)\)$")
+MILESTONE = re.compile(r"^(\d+)\.\s+\*\*(.+?)\*\*\s*(?:\(([^()]*)\))?:?\s*(.*)$")
+NUMBERED = re.compile(r"^(\d+)\.\s+(.+)$")
 BOOK_URL = "https://aa.accountinganalyticshub.com/"
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
@@ -129,11 +135,14 @@ def page_title(path: Path, root: Path) -> str:
 def index_chapter(path: Path, root: Path, label: str) -> dict:
     meta, lines = split_front_matter(read_lines(path, root))
     chapter: dict = {"title": str(meta.get("title", "")), "objectives": [], "sections": [],
-                     "figures": [], "tables": [], "key_terms": [], "tutorials": [], "exercises": []}
+                     "figures": [], "tables": [], "key_terms": [], "tutorials": [], "exercises": [],
+                     "requirements": [], "milestones": [], "deliverables": [], "criteria": []}
     divs: list[str] = []
     fence = None
     counters = [0, 0, 0]
     heading = ""
+    section = ""      # the current ## heading
+    phase = ""        # the current ### heading of a case's Requirements, when it names a phase
     perspective = ""
     tutorial = None
     checkpoint = None
@@ -164,6 +173,10 @@ def index_chapter(path: Path, root: Path, label: str) -> dict:
                     counters[deeper] = 0
                 section_number = ".".join([label] + [str(n) for n in counters[:level + 1]])
                 chapter["sections"].append({"number": section_number, "title": title, "level": level + 2})
+            if level == 0:
+                section, phase = title, ""
+            else:
+                phase = title if title.startswith("Phase") else ""
             if level == 0:
                 found = TUTORIAL.match(title)
                 tutorial = None
@@ -206,6 +219,30 @@ def index_chapter(path: Path, root: Path, label: str) -> dict:
         found = EXERCISE.match(line)
         if found:
             chapter["exercises"].append({"id": found[1], "title": found[2], "perspective": perspective})
+            continue
+        found = REQUIREMENT.match(line)
+        if found:
+            # "Rebuild Accrued Expenses at each year-end (Chapters 3, 10, and 12)": the chapters, when given,
+            # close the title in parentheses; a memo requirement names none.
+            parts = CHAPTERS.match(found[2])
+            title, chapters = (parts[1], parts[2]) if parts else (found[2], "")
+            chapter["requirements"].append({"number": int(found[1]), "title": title.strip(),
+                                            "chapters": chapters.strip(), "phase": phase})
+            continue
+        if section == "Getting Started":
+            found = MILESTONE.match(line)
+            if found:
+                chapter["milestones"].append({"number": int(found[1]), "name": found[2].strip(),
+                                              "requirements": (found[3] or "").strip(), "text": found[4].strip()})
+            continue
+        if section == "Deliverables and Checklist":
+            found = NUMBERED.match(line)
+            if found:
+                chapter["deliverables"].append(found[2].strip())
+            continue
+        if section == "What a Strong Submission Includes":
+            if line.startswith("- "):
+                chapter["criteria"].append(line[2:].strip())
             continue
         if tutorial is None:
             continue

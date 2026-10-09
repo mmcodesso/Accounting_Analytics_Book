@@ -25,6 +25,47 @@ A deck has about 30–45 teaching slides, depending on how many sections the cha
 check-and-answer pairs. `slides/chapter-01/index.qmd` and `slides/chapter-02/index.qmd` are the reference decks;
 `slides/chapter-03/index.qmd` shows a figure in detail.
 
+## Case decks
+
+The capstone cases of Part V (and, later, the comprehensive cases that close Parts I–IV) have no tutorials,
+key terms or exercises. Their decks follow a case standard instead, so that one deck can open the case and
+then guide students through it phase by phase (the author's decision: a kickoff plus a phase guide, with
+method guidance and no answers). `slides/chapter-17/index.qmd` is the reference deck.
+
+| Part | Slides | How |
+|---|---|---|
+| Opening (the kickoff) | Title · In this chapter · Learning objectives · Opening scenario · What you will hand in · How your work will be judged (two slides when long) | `{{< book-deliverables >}}`, `{{< book-criteria 1-3 >}}` |
+| The case's own sections | a `#` module for each section before the requirements (The Situation, The Data You Will Use, …): the request and its conditions, the exhibit tables, the tools and files, the Watch outs as slides, In Practice in the notes | book tables by ID |
+| Getting Started | Set up before you begin · the milestones · Choose the tool for each step · a check on the choice of tool | `{{< book-milestones >}}` |
+| One module per phase | divider: the book's `###` phase title, which gets its number (17.4.1). Phase N at a glance · a requirement card per requirement, with its figures and tables · a Watch out or check where the book has one · Milestone N: before you hand it in | `{{< book-requirements 3-5 >}}`, `{{< book-milestones 2-2 >}}`, `{{< book-requirement 3 >}}` |
+| Closing | `# Deliverables and Checklist`: Before you submit · `# Looking Ahead`: what the case practiced (the four analytics types), what comes after, About these slides | written |
+
+A capstone deck has about 50–55 teaching slides; a comprehensive case about 25–30.
+
+**Requirement card.** The title states the point. Under it, the requirement's gray source line from the book,
+then four bullets that open with a bold label:
+
+```markdown
+## Rebuild accrued expenses from their documents
+
+{{< book-requirement 3 >}}
+
+- **Produce:** the balance split into its parts at three year-ends
+- **Tool:** SQL: four tables joined under conditions on dates
+- **Revisit:** Chapter 3's trace, Chapter 10's joins, Chapter 12's tests
+- **Check:** the parts add up to the ledger's balance at every year-end
+```
+
+The notes give the requirement's tasks and pitfalls. **Phase at a glance** lists the phase's requirements and
+its milestone (`book-milestones` with a range of one gives "Milestone 2: …" as a paragraph). **Milestone
+check-in** is four qualitative self-checks ("every adjusted trial balance balances"); its notes may say that
+the instructor can release checkpoint values, the book's own words. Checks test the method judgments the
+book teaches (which tool, error or estimate, what the records can settle), never the case's results.
+
+Rules for case decks, in addition to those below: no values, expected results or answers anywhere, the notes
+included (they live in the released solution files), and never the words "instructor notes" or "answer key",
+which the site check rejects.
+
 ## Slide patterns
 
 Use only these patterns. Each slide's title states its point.
@@ -119,6 +160,10 @@ notes or its answer slide give the answer.
 | `{{< book-terms >}}` | the chapter's key terms, in one paragraph |
 | `{{< book-exercises >}}` | the exercise titles, by perspective |
 | `{{< book-next >}}`, `{{< book-title >}}`, `{{< book-link >}}` | the next chapter, the book's title, and the chapter's web address (inline) |
+| `{{< book-requirement 3 >}}` | a case requirement's source line, "Requirement 3 · Title (Chapters …)", gray at the evidence size in both formats |
+| `{{< book-requirements >}}`, `{{< book-requirements 3-5 >}}` | the case's requirement titles with their chapters, all or a range by number |
+| `{{< book-milestones >}}`, `{{< book-milestones 2-2 >}}` | the milestones of Getting Started, numbered, or one of them as a paragraph |
+| `{{< book-deliverables >}}`, `{{< book-criteria 1-3 >}}` | the numbered items of Deliverables and Checklist, and the bullets of What a Strong Submission Includes, all or a range |
 
 Shared definitions can be included as in the book: `{{< include /_shared/fragments/_accounting-analytics.qmd >}}`.
 
@@ -164,7 +209,7 @@ on their own once the deck exists.
 
 | File | Role |
 |---|---|
-| `scripts/slides/book_index.py` | reads the book (`_quarto.yml` and each chapter, includes expanded) into `_shared/book.json`: titles, Parts, sections, objectives, figures, tables, key terms, tutorials, exercises |
+| `scripts/slides/book_index.py` | reads the book (`_quarto.yml` and each chapter, includes expanded) into `_shared/book.json`: titles, Parts, sections, objectives, figures, tables, key terms, tutorials, exercises, and a case's requirements, milestones, deliverables and criteria |
 | `scripts/slides/prepare.py` | writes each deck's `_metadata.yml` (title, subtitle, footer, output names), stages the cited figures with a PNG for PowerPoint (exported by Draw.io from the same source, cached in `outputs/slide-png/`) and each crop under its own name, the fragments, the backgrounds and the themed templates |
 | `shortcodes/book.lua` | the `book-*` shortcodes, which read `_shared/book.json` |
 | `filters/deck.lua` | numbers the dividers, fills the roadmap, gives dividers, callouts and checks their backgrounds |

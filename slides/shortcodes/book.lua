@@ -8,6 +8,9 @@
 --   {{< book-objectives >}} or {{< book-objectives 1-3 >}}  {{< book-terms >}}  {{< book-exercises >}}
 --   {{< book-steps 1.1 >}}  {{< book-checkpoint 1.1 answers="hide" >}}
 --   {{< book-next >}}  {{< book-title >}}  {{< book-link >}}   (inline)
+--   A case's parts, each list with an optional range:
+--   {{< book-requirement 3 >}}  {{< book-requirements 3-5 >}}  {{< book-milestones >}}
+--   {{< book-deliverables >}}  {{< book-criteria 1-3 >}}
 
 local index
 
@@ -259,6 +262,89 @@ local function book_exercises(_, _, meta)
   return blocks(table.concat(lines, '\n'))
 end
 
+local function range(args, position, count)
+  -- An optional range such as 1-3; without one, the whole list.
+  local first, last = pandoc.utils.stringify(args[position] or ''):match('^(%d+)%-(%d+)$')
+  return tonumber(first) or 1, math.min(tonumber(last) or count, count)
+end
+
+local function case_list(meta, name, label)
+  local list = chapter(meta)[name] or {}
+  if #list == 0 then error('This chapter has no ' .. label) end
+  return list
+end
+
+local function requirement_line(found)
+  local chapters = found.chapters ~= '' and (' (' .. found.chapters .. ')') or ''
+  return found.title .. chapters
+end
+
+local function book_requirement(args, _, meta)
+  -- The requirement's source line, as a table's: "Requirement 3 · Title (Chapters ...)".
+  local number = tonumber(pandoc.utils.stringify(args[1] or ''))
+  for _, found in ipairs(case_list(meta, 'requirements', 'requirements')) do
+    if math.tointeger(found.number) == number then
+      return blocks('[Requirement ' .. number .. ' · ' .. requirement_line(found) .. ']{.source}')
+    end
+  end
+  error('No Requirement ' .. tostring(number) .. ' in this chapter')
+end
+
+local function book_requirements(args, _, meta)
+  local list = case_list(meta, 'requirements', 'requirements')
+  local first, last = range(args, 1, math.tointeger(list[#list].number))
+  local items = {}
+  for _, found in ipairs(list) do
+    local number = math.tointeger(found.number)
+    if number >= first and number <= last then
+      table.insert(items, 'Requirement ' .. number .. ': ' .. requirement_line(found))
+    end
+  end
+  if #items == 0 then error('No requirements ' .. first .. '-' .. last .. ' in this chapter') end
+  return blocks(bullets(items))
+end
+
+local function book_milestones(args, _, meta)
+  -- Numbered as the book numbers them, with the requirements each milestone covers.
+  local list = case_list(meta, 'milestones', 'milestones')
+  local first, last = range(args, 1, #list)
+  if first == last and list[first] then
+    -- One milestone, as a phase's slide shows it: "Milestone 2: The adjustments (Requirements 3 to 5): ...".
+    local found = list[first]
+    local covers = found.requirements ~= '' and (' (' .. found.requirements .. ')') or ''
+    return blocks('**Milestone ' .. first .. ': ' .. found.name .. '**' .. covers ..
+      (found.text ~= '' and (': ' .. found.text) or ''))
+  end
+  local lines = {}
+  for i = first, last do
+    local found = list[i]
+    local covers = found.requirements ~= '' and (' (' .. found.requirements .. ')') or ''
+    table.insert(lines, math.tointeger(found.number) .. '. **' .. found.name .. '**' .. covers ..
+      (found.text ~= '' and (': ' .. found.text) or ''))
+  end
+  if #lines == 0 then error('No milestones ' .. first .. '-' .. last .. ' in this chapter') end
+  return blocks(table.concat(lines, '\n'))
+end
+
+local function book_deliverables(args, _, meta)
+  local list = case_list(meta, 'deliverables', 'deliverables')
+  local first, last = range(args, 1, #list)
+  local lines = {}
+  for i = first, last do table.insert(lines, i .. '. ' .. list[i]) end
+  if #lines == 0 then error('No deliverables ' .. first .. '-' .. last .. ' in this chapter') end
+  return blocks(table.concat(lines, '\n'))
+end
+
+local function book_criteria(args, _, meta)
+  -- What a Strong Submission Includes.
+  local list = case_list(meta, 'criteria', 'criteria of a strong submission')
+  local first, last = range(args, 1, #list)
+  local items = {}
+  for i = first, last do table.insert(items, list[i]) end
+  if #items == 0 then error('No criteria ' .. first .. '-' .. last .. ' in this chapter') end
+  return blocks(bullets(items))
+end
+
 local function inline(text)
   return quarto.utils.string_to_inlines(text)
 end
@@ -287,4 +373,9 @@ return {
   ['book-next'] = book_next,
   ['book-title'] = book_title,
   ['book-link'] = book_link,
+  ['book-requirement'] = book_requirement,
+  ['book-requirements'] = book_requirements,
+  ['book-milestones'] = book_milestones,
+  ['book-deliverables'] = book_deliverables,
+  ['book-criteria'] = book_criteria,
 }
