@@ -233,7 +233,8 @@ committed Draw.io exports are current (`export_drawio_svgs.py --verify`), so
 export changed figures locally and commit them. Everything readers download is
 built locally and published by `scripts/release.py` as the assets of the GitHub
 release of the book's revision (`book` in `_variables.yml`):
-`Accounting-Analytics.pdf`, `.epub` and `.docx`, `chapter-NN.pptx` for each deck,
+the PDF, EPUB and DOCX named from the edition and revision (for the first edition,
+revision 2027.1, `Accounting_Analytics_First_Edition_Rev_2027_1.pdf`), `chapter-NN.pptx` for each deck,
 and the companion and solution files, which live untracked in `supplementary/`.
 The text keeps linking them by root path (`/downloads/book-latest.pdf`,
 `/supplementary/...`), and `filters/slide-links.lua` points those links at the

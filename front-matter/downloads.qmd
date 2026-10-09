@@ -14,7 +14,7 @@ This page provides access to the book, its slides and companion files, and the r
 
 ## Latest Book Version
 
-This is revision {{< var book.revision >}} of the book. Its PDF, EPUB, and DOCX files, the PowerPoint slides, and the companion and solution files in the table below are published together on the [release page of the revision]({{< var book.release >}}), and each new revision of the book gets a release of its own.
+This is revision {{< var book.revision >}} of the {{< var book.edition >}} edition of the book. Its PDF, EPUB, and DOCX files, the PowerPoint slides, and the companion and solution files in the table below are published together on the [release page of the revision]({{< var book.release >}}), and each new revision of the book gets a release of its own.
 
 - [Download PDF](/downloads/book-latest.pdf)
 - [Download EPUB](/downloads/book-latest.epub)

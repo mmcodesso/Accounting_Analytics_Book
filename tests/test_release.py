@@ -18,10 +18,9 @@ from scripts import release
 HAS_GIT = shutil.which('git') is not None
 REPO = 'https://github.com/owner/book'
 VARIABLES = f'''# Values the book reads.
-edition: "2000"
-
 book:
-  # The revision.
+  # The edition and the revision.
+  edition: "first"
   revision: "2001.1"
   tag: "book-v2001.1"
   release: "{REPO}/releases/tag/book-v2001.1"
@@ -91,7 +90,17 @@ class RevisionTests(unittest.TestCase):
             write(root, '_variables.yml', VARIABLES)
             revision = release.read_revision(root)
             self.assertEqual(('2001.1', 'book-v2001.1', 'owner/book'), (revision.revision, revision.tag, revision.repo))
-            self.assertEqual(f'{DOWNLOAD}/Accounting-Analytics.pdf', revision.url('Accounting-Analytics.pdf'))
+            self.assertEqual(f'{DOWNLOAD}/Accounting_Analytics_First_Edition_Rev_2001_1.pdf', revision.url('Accounting_Analytics_First_Edition_Rev_2001_1.pdf'))
+            self.assertEqual('First edition, revision 2001.1', revision.title)
+
+    def test_the_book_files_are_named_from_the_edition_and_the_revision(self) -> None:
+        def name(edition, number):
+            tag = f'book-v{number}'
+            return release.Revision(number, tag, f'{REPO}/releases/tag/{tag}', f'{REPO}/releases/download/{tag}',
+                                    edition).book_name
+        self.assertEqual('Accounting_Analytics_First_Edition_Rev_2027_1', name('first', '2027.1'))
+        self.assertEqual('Accounting_Analytics_Second_Edition_Rev_2028_12', name('second', '2028.12'))
+        self.assertEqual('Accounting_Analytics_First_Revised_Edition_Rev_2027_2', name('first revised', '2027.2'))
 
     def test_a_url_of_another_tag_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -109,9 +118,11 @@ class RevisionTests(unittest.TestCase):
             self.assertEqual(('2001.2', 'book-v2001.2'), (revision.revision, revision.tag))
             text = path.read_bytes().decode('utf-8')
             self.assertEqual(text.count('\n'), text.count('\r\n'))
-            self.assertIn('  # The revision.', text)
+            self.assertIn('  # The edition and the revision.', text)
+            self.assertIn('edition: "first"', text)
             self.assertIn('version: "v2000.1"', text)
             self.assertIn(f'download: "{REPO}/releases/download/book-v2001.2"', text)
+            self.assertIn('Accounting_Analytics_First_Edition_Rev_2001_2.pdf', release.expected_assets(root))
             with self.assertRaisesRegex(ValueError, 'year and a number'):
                 release.bump(root, 'next')
 
@@ -122,7 +133,7 @@ class AssetTests(unittest.TestCase):
             root = Path(temp)
             book(root)
             assets = release.expected_assets(root)
-            self.assertEqual({'Accounting-Analytics.pdf', 'Accounting-Analytics.epub', 'Accounting-Analytics.docx',
+            self.assertEqual({'Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'Accounting_Analytics_First_Edition_Rev_2001_1.epub', 'Accounting_Analytics_First_Edition_Rev_2001_1.docx',
                               'chapter-01.pptx', 'Chapter01-companion.zip', 'Chapter01-exercises.zip'}, set(assets))
             self.assertEqual(root / 'supplementary/solutions/Chapter01-exercises.zip',
                              assets['Chapter01-exercises.zip'].path)
@@ -144,35 +155,35 @@ class AssetTests(unittest.TestCase):
             root = Path(temp)
             write(root, '_variables.yml', VARIABLES)
             write(root, '_book/front-matter/downloads.html',
-                  f'<a href="{DOWNLOAD}/Accounting-Analytics.pdf">PDF</a> <a href="/slides/x.html">x</a>')
+                  f'<a href="{DOWNLOAD}/Accounting_Analytics_First_Edition_Rev_2001_1.pdf">PDF</a> <a href="/slides/x.html">x</a>')
             write(root, '_book/chapters/01/chapter.html', f'<a href="{DOWNLOAD}/Notes%20A&amp;B.zip">N</a>')
             names = release.site_links(root / '_book', release.read_revision(root))
-            self.assertEqual({'Accounting-Analytics.pdf', 'Notes A&B.zip'}, names)
+            self.assertEqual({'Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'Notes A&B.zip'}, names)
 
 
 class PlanTests(unittest.TestCase):
     ENTRIES = {
-        'Accounting-Analytics.pdf': {'kind': 'book', 'sha256': 'new-bytes', 'inputs': {'chapters': 'a'}},
+        'Accounting_Analytics_First_Edition_Rev_2001_1.pdf': {'kind': 'book', 'sha256': 'new-bytes', 'inputs': {'chapters': 'a'}},
         'chapter-01.pptx': {'kind': 'deck', 'deck': 'chapter-01', 'sha256': 'x', 'inputs': {'slides/chapter-01': 'b2'}},
         'Chapter01-companion.zip': {'kind': 'companion', 'sha256': 'same'},
         'Chapter01-exercises.zip': {'kind': 'companion', 'sha256': 'changed'},
         'chapter-02.pptx': {'kind': 'deck', 'deck': 'chapter-02', 'sha256': 'y', 'inputs': {'slides/chapter-02': 'c'}},
     }
     REMOTE = {'assets': {
-        'Accounting-Analytics.pdf': {'kind': 'book', 'sha256': 'old-bytes', 'inputs': {'chapters': 'a'}},
+        'Accounting_Analytics_First_Edition_Rev_2001_1.pdf': {'kind': 'book', 'sha256': 'old-bytes', 'inputs': {'chapters': 'a'}},
         'chapter-01.pptx': {'kind': 'deck', 'deck': 'chapter-01', 'sha256': 'x', 'inputs': {'slides/chapter-01': 'b1'}},
         'Chapter01-companion.zip': {'kind': 'companion', 'sha256': 'same'},
         'Chapter01-exercises.zip': {'kind': 'companion', 'sha256': 'before'},
     }}
-    NAMES = {'Accounting-Analytics.pdf', 'chapter-01.pptx', 'Chapter01-companion.zip', 'Chapter01-exercises.zip',
+    NAMES = {'Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'chapter-01.pptx', 'Chapter01-companion.zip', 'Chapter01-exercises.zip',
              'Retired.zip', 'manifest.json'}
 
     def test_only_what_changed_is_uploaded(self) -> None:
         uploads, deletes, kept = release.plan_uploads(self.ENTRIES, self.NAMES, self.REMOTE)
         # The PDF was rebuilt from the same inputs (new bytes, same content): the release keeps its copy.
         self.assertEqual(['chapter-01.pptx', 'Chapter01-exercises.zip', 'chapter-02.pptx'], uploads)
-        self.assertEqual({'Accounting-Analytics.pdf', 'Chapter01-companion.zip'}, set(kept))
-        self.assertEqual('old-bytes', kept['Accounting-Analytics.pdf']['sha256'])
+        self.assertEqual({'Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'Chapter01-companion.zip'}, set(kept))
+        self.assertEqual('old-bytes', kept['Accounting_Analytics_First_Edition_Rev_2001_1.pdf']['sha256'])
         self.assertEqual(['Retired.zip'], deletes)
 
     def test_force_and_a_release_without_a_manifest_upload_everything(self) -> None:
@@ -225,12 +236,12 @@ class FingerprintTests(unittest.TestCase):
             commit_all(root)
             tree = release.head_tree(root)
             write(root, '_book/front-matter/downloads.html', ''.join(
-                f'<a href="{DOWNLOAD}/{name}">x</a>' for name in ('Accounting-Analytics.pdf', 'chapter-01.pptx')))
+                f'<a href="{DOWNLOAD}/{name}">x</a>' for name in ('Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'chapter-01.pptx')))
             built = {'kind': 'deck', 'deck': 'chapter-01',
                      'inputs': release.fingerprint(root, tree, release.inputs_of(root, tree, 'chapter-01'))}
-            manifest = {'assets': {'chapter-01.pptx': built, 'Accounting-Analytics.pdf': {
+            manifest = {'assets': {'chapter-01.pptx': built, 'Accounting_Analytics_First_Edition_Rev_2001_1.pdf': {
                 'kind': 'book', 'inputs': release.fingerprint(root, tree, release.inputs_of(root, tree))}}}
-            names = ['Accounting-Analytics.pdf', 'chapter-01.pptx', 'manifest.json']
+            names = ['Accounting_Analytics_First_Edition_Rev_2001_1.pdf', 'chapter-01.pptx', 'manifest.json']
             summary = root / 'summary.md'
             self.assertEqual(0, release.check(root, root / '_book', FakeGitHub(names, manifest), summary))
             self.assertIn('Every file the site links is on the release', summary.read_text(encoding='utf-8'))

@@ -164,7 +164,7 @@ def build_sql_chain(chain: dict, variables: dict, out: Path) -> tuple[Path, list
     if folder.exists():
         shutil.rmtree(folder)
     written = []
-    readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition)",
+    readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition)",
               f"Companion files for Chapter {chain['chapter']}: {chain['file']}", "",
               f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
               f"CharlesRiver.sqlite SHA-256 {variables['dataset']['sha256']['sqlite']}", ""]
@@ -304,7 +304,7 @@ def build_excel_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
     con.close()
     release, sha = variables["dataset"]["version"], variables["dataset"]["sha256"]["xlsx"]
     stamp = dict(
-        book=f"Accounting Analytics: An Integrated Approach, {variables['edition']} edition",
+        book=f"Accounting Analytics: An Integrated Approach, {variables['book']['edition']} edition",
         dataset=f"Charles River dataset release {release} ({variables['dataset']['window']}); "
                 f"CharlesRiver.xlsx SHA-256 {sha}",
         source=f"Power Query reads {NEUTRAL}. Put your copy of CharlesRiver.xlsx in that folder, or point the "
@@ -361,7 +361,7 @@ def distribute_excel(chain: dict, variables: dict, out: Path, ends: dict[str, Pa
             shutil.copyfile(path, target)
     for ch, folder in folders.items():
         files = sorted(p.relative_to(folder).as_posix() for p in folder.rglob("*.xlsx"))
-        readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition)",
+        readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition)",
                   f"Companion files for Chapter {ch}: {chain['file']}", "",
                   f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
                   f"CharlesRiver.xlsx SHA-256 {sha}", ""] + files + [
@@ -418,7 +418,7 @@ def build_pbi_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
     con.close()
     release, sha = variables["dataset"]["version"], variables["dataset"]["sha256"]["xlsx"]
     stamp = dict(
-        book=f"Accounting Analytics: An Integrated Approach, {variables['edition']} edition",
+        book=f"Accounting Analytics: An Integrated Approach, {variables['book']['edition']} edition",
         dataset=f"Charles River dataset release {release} ({variables['dataset']['window']}); "
                 f"CharlesRiver.xlsx SHA-256 {sha}",
         source=f"Power Query reads {NEUTRAL}. Put your copy of CharlesRiver.xlsx in that folder, or point the "
@@ -513,7 +513,7 @@ def distribute_pbi(chain: dict, variables: dict, out: Path, ends: dict[str, Path
     also = also_copies(chain, out)
     for ch, folder in folders.items():
         roles = sorted(p.name for p in folder.iterdir() if p.is_dir())
-        readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition)",
+        readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition)",
                   f"Companion files for {part_name(ch)}: {name} (a Power BI project)", "",
                   f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
                   f"CharlesRiver.xlsx SHA-256 {sha}", ""] + [f"{r}/{name}/{name}.pbip" for r in roles] + (
@@ -555,7 +555,7 @@ def build_excel_solution(entry: dict, variables: dict, out_root: Path, start_fol
     con.close()
     release, sha = variables["dataset"]["version"], variables["dataset"]["sha256"]["xlsx"]
     stamp = dict(
-        book=f"Accounting Analytics: An Integrated Approach, {variables['edition']} edition (instructor solutions)",
+        book=f"Accounting Analytics: An Integrated Approach, {variables['book']['edition']} edition (instructor solutions)",
         dataset=f"Charles River dataset release {release} ({variables['dataset']['window']}); "
                 f"CharlesRiver.xlsx SHA-256 {sha}",
         source=f"Power Query reads {NEUTRAL}. Put CharlesRiver.xlsx in that folder, or point the queries at your copy "
@@ -614,7 +614,7 @@ def build_excel_solution(entry: dict, variables: dict, out_root: Path, start_fol
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
     shutil.copyfile(target, folder / entry["file"])
-    readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition), instructor files",
+    readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition), instructor files",
               (f"Solutions to the exercises of Chapter {chapter}: {entry['file']}" if kind == "exercises"
                else f"{role[0].upper() + role[1:]}: {entry['file']}"), "",
               f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
@@ -645,7 +645,7 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, start_folde
     con.close()
     release, sha = variables["dataset"]["version"], variables["dataset"]["sha256"]["xlsx"]
     stamp = dict(
-        book=f"Accounting Analytics: An Integrated Approach, {variables['edition']} edition (instructor solutions)",
+        book=f"Accounting Analytics: An Integrated Approach, {variables['book']['edition']} edition (instructor solutions)",
         dataset=f"Charles River dataset release {release} ({variables['dataset']['window']}); "
                 f"CharlesRiver.xlsx SHA-256 {sha}",
         source=f"Power Query reads {NEUTRAL}. Put CharlesRiver.xlsx in that folder, or point the queries at your copy "
@@ -722,7 +722,7 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, start_folde
     shutil.copytree(ship, folder / name)
     for n, data in kept.items():
         (folder / n).write_bytes(data)
-    readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition), instructor files",
+    readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition), instructor files",
               (f"Solutions to the Power BI exercises of {part_name(chapter)}: {name} (a Power BI project)"
                if kind == "exercises" else f"{role[0].upper() + role[1:]}: {name} (a Power BI project)"), "",
               f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
@@ -808,7 +808,7 @@ def build_sql_solution(entry: dict, variables: dict, out_root: Path, start_folde
         total += len(checks)
         print(f"  wrote {s.file}: {len(s.queries)} queries, {len(checks)} checks agree")
     files = sorted(p.name for p in folder.glob("*.sql"))
-    readme = [f"Accounting Analytics: An Integrated Approach ({variables['edition']} edition), instructor files",
+    readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition), instructor files",
               (f"SQL solutions to the exercises of {part_name(chapter)}" if kind == "exercises"
                else f"{entry['role'][0].upper() + entry['role'][1:]}"), "",
               f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",

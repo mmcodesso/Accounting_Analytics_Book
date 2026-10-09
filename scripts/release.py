@@ -39,7 +39,6 @@ FINGERPRINTS = 'outputs/build/fingerprints.json'
 STAGE = 'outputs/release'                  # the files to upload, under their names on the release
 MANIFEST = 'manifest.json'
 WORKFLOW = 'publish.yml'
-BOOK_NAME = 'Accounting-Analytics'         # the PDF, EPUB and DOCX on the release
 BOOK_FORMATS = ('pdf', 'epub', 'docx')
 BUILT = ('book', 'deck')                   # the kinds compared by fingerprint
 # What the built files are made from. A fingerprint holds the git object of each input path, so a file is out of
@@ -56,10 +55,11 @@ HREF = re.compile(r'href="([^"]*)"')
 # --- The revision ---------------------------------------------------------------------------------------------------
 
 class Revision:
-    """The book block of _variables.yml: the revision, its tag, and the URLs of its release."""
+    """The book block of _variables.yml: the edition, the revision, its tag, and the URLs of its release."""
 
-    def __init__(self, revision: str, tag: str, release: str, download: str):
+    def __init__(self, revision: str, tag: str, release: str, download: str, edition: str = 'first'):
         self.revision, self.tag, self.release, self.download = revision, tag, release, download.rstrip('/')
+        self.edition = edition
         match = re.fullmatch(r'https://github\.com/([\w.-]+/[\w.-]+)/releases/tag/(.+)', release)
         if not match or match.group(2) != tag:
             raise ValueError(f'_variables.yml: book.release must be the release page of book.tag ({tag}): {release}')
@@ -71,15 +71,28 @@ class Revision:
     def url(self, name: str) -> str:
         return f'{self.download}/{urllib.parse.quote(name)}'
 
+    @property
+    def title(self) -> str:
+        """The release's title, such as "First edition, revision 2027.1"."""
+        return f'{self.edition[:1].upper()}{self.edition[1:]} edition, revision {self.revision}'
+
+    @property
+    def book_name(self) -> str:
+        """The name of the PDF, EPUB and DOCX on the release, without the extension, from the edition and the
+        revision: Accounting_Analytics_First_Edition_Rev_2027_1. filters/slide-links.lua builds the same name."""
+        words = ''.join(f'{word[:1].upper()}{word[1:]}_' for word in re.split(r'[\s_-]+', self.edition) if word)
+        return f'Accounting_Analytics_{words}Edition_Rev_{re.sub(r"[^0-9A-Za-z]+", "_", self.revision)}'
+
 
 def read_revision(root: Path) -> Revision:
     import yaml
     data = yaml.safe_load((root / '_variables.yml').read_text(encoding='utf-8')) or {}
     book = data.get('book') or {}
-    for key in ('revision', 'tag', 'release', 'download'):
+    for key in ('edition', 'revision', 'tag', 'release', 'download'):
         if not book.get(key):
             raise ValueError(f'_variables.yml: book.{key} is missing')
-    return Revision(str(book['revision']), str(book['tag']), str(book['release']), str(book['download']))
+    return Revision(str(book['revision']), str(book['tag']), str(book['release']), str(book['download']),
+                    str(book['edition']))
 
 
 def bump(root: Path, revision: str) -> Revision:
@@ -201,11 +214,11 @@ def deck_ids(root: Path) -> list[str]:
     return sorted(path.parent.name for path in (root / 'slides').glob('chapter-[0-9][0-9]/index.qmd'))
 
 
-def asset_name(target: str) -> str:
+def asset_name(target: str, revision: Revision) -> str:
     """The release name of a file the book links by root path; filters/slide-links.lua maps links the same way."""
     match = re.fullmatch(r'/downloads/book-latest\.(\w+)', target)
     if match and match.group(1) in BOOK_FORMATS:
-        return f'{BOOK_NAME}.{match.group(1)}'
+        return f'{revision.book_name}.{match.group(1)}'
     if target.startswith('/supplementary/') and not target.endswith('/'):
         return target.rsplit('/', 1)[-1]
     raise ValueError(f'The book links {target}, which is not a release file '
@@ -221,14 +234,16 @@ def source_links(root: Path) -> list[str]:
     return links
 
 
-def expected_assets(root: Path) -> dict[str, Asset]:
+def expected_assets(root: Path, revision: Revision | None = None) -> dict[str, Asset]:
     """Every file the revision's release must hold: the book, one PowerPoint file per deck, the companion files."""
-    assets = {f'{BOOK_NAME}.{ext}': Asset(f'{BOOK_NAME}.{ext}', 'book', root / DOWNLOADS / f'book-latest.{ext}')
+    revision = revision or read_revision(root)
+    book = revision.book_name
+    assets = {f'{book}.{ext}': Asset(f'{book}.{ext}', 'book', root / DOWNLOADS / f'book-latest.{ext}')
               for ext in BOOK_FORMATS}
     for deck in deck_ids(root):
         assets[f'{deck}.pptx'] = Asset(f'{deck}.pptx', 'deck', root / PPTX / deck / f'{deck}.pptx', deck)
     for target in source_links(root):
-        name = asset_name(target)
+        name = asset_name(target, revision)
         if not target.startswith('/supplementary/'):
             continue
         path = root / SUPPLEMENTARY / target[len('/supplementary/'):]
@@ -393,9 +408,10 @@ def release_notes(revision: Revision, commit: str, manifest: dict) -> str:
     decks = sorted(name for name, entry in assets.items() if entry['kind'] == 'deck')
     companion = sum(1 for entry in assets.values() if entry['kind'] == 'companion')
     return '\n'.join([
-        f'Revision {revision.revision} of *Accounting Analytics: An Integrated Approach*.',
+        f'Revision {revision.revision} of the {revision.edition} edition of *Accounting Analytics: An Integrated '
+        'Approach*.',
         '',
-        f'- The book: {", ".join(f"`{BOOK_NAME}.{ext}`" for ext in BOOK_FORMATS)}.',
+        f'- The book: {", ".join(f"`{revision.book_name}.{ext}`" for ext in BOOK_FORMATS)}.',
         f'- The slides: {len(decks)} PowerPoint decks (`chapter-NN.pptx`).',
         f'- The companion and solution files: {companion} files, listed on the book\'s Downloads page.',
         '',
@@ -435,7 +451,7 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
         raise ValueError('origin/main has commits that this branch lacks: pull them first.')
     tree = head_tree(root)
 
-    assets = expected_assets(root)
+    assets = expected_assets(root, revision)
     refresh(root, tree, assets, build=build)
     missing = [asset for asset in assets.values() if not asset.path.is_file()]
     if missing:
@@ -474,9 +490,9 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
         if not git(root, 'ls-remote', '--tags', 'origin', f'refs/tags/{revision.tag}'):
             if subprocess.run(['git', 'rev-parse', '--verify', '--quiet', f'refs/tags/{revision.tag}'], cwd=root,
                               capture_output=True, check=False).returncode:
-                git(root, 'tag', '-a', revision.tag, '-m', f'Revision {revision.revision}', 'HEAD')
+                git(root, 'tag', '-a', revision.tag, '-m', revision.title, 'HEAD')
             subprocess.run(['git', 'push', 'origin', f'refs/tags/{revision.tag}'], cwd=root, check=True)
-        github.create(revision.tag, f'Revision {revision.revision}', notes)
+        github.create(revision.tag, revision.title, notes)
     for number, name in enumerate(uploads, 1):
         print(f'[{number}/{len(uploads)}] {name} ({megabytes(entries[name]["size"])})', flush=True)
         github.upload(revision.tag, folder / name)
@@ -490,7 +506,7 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
         print('main was already pushed, so the deploy workflow was started.')
     else:
         subprocess.run(['git', 'push', 'origin', 'HEAD:refs/heads/main'], cwd=root, check=True)
-    print(f'Published revision {revision.revision}: {revision.release}')
+    print(f'Published the {revision.edition} edition, revision {revision.revision}: {revision.release}')
     print('GitHub Actions now renders and deploys the site.')
 
 
@@ -499,7 +515,7 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
 def status(root: Path, github: GitHub | None = None) -> None:
     revision = read_revision(root)
     tree = working_tree(root)
-    assets = expected_assets(root)
+    assets = expected_assets(root, revision)
     recorded = load_fingerprints(root)
     release = manifest = None
     try:
@@ -510,7 +526,7 @@ def status(root: Path, github: GitHub | None = None) -> None:
     except RuntimeError as exc:
         names = set()
         print(f'(The release cannot be read: {exc})')
-    print(f'Revision {revision.revision}, release {revision.tag}: '
+    print(f'{revision.title}, release {revision.tag}: '
           f'{"published" if release else "not created yet"} ({revision.release})')
     remote = (manifest or {}).get('assets') or {}
     print(f'{"file":<42} {"local":<8} {"build":<8} release')

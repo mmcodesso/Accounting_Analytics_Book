@@ -1,6 +1,6 @@
 # The yearly roll
 
-Each summer the book moves to a new three-year window: the 2026 edition is fiscal 2024–2026 (dataset release v2026.1), the 2027 edition would be fiscal 2025–2027 (v2027.1). The generator is seeded, so almost every value changes. A roll is a scripted pipeline plus a review of what the scripts could not decide. This runbook is the order of work; the tools are all in the repository.
+Each summer the book moves to a new three-year window: the 2026 edition is fiscal 2024–2026 (dataset release v2026.1), the 2027 edition would be fiscal 2025–2027 (v2027.1). (In this runbook an edition is a data window; the book's own edition and revision, such as the first edition, revision 2027.1, are `book.edition` and `book.revision` in `_variables.yml`; step 10 publishes a roll under a new revision, `python scripts/release.py bump`, and a new edition of the book is set by hand in `book.edition`.) The generator is seeded, so almost every value changes. A roll is a scripted pipeline plus a review of what the scripts could not decide. This runbook is the order of work; the tools are all in the repository.
 
 Everything is public. The chapters stay clean: no hidden comments, notes or markers in the text.
 
@@ -42,7 +42,7 @@ It runs the data contract (every storyline and quirk the chapters rely on; 41 ch
 
 ### 3. Pin the new dataset
 
-Create the dataset release with a new tag (v2027.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (edition, `dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values). The companion files carry no edition in their names, so `scripts/companion/manifest.yml` needs no change. Put the files in `datasets/` and run:
+Create the dataset release with a new tag (v2027.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (`dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values). The companion files carry no edition in their names, so `scripts/companion/manifest.yml` needs no change. Put the files in `datasets/` and run:
 
     python scripts/verify/pinned_dataset.py --verify datasets/CharlesRiver.sqlite
 
@@ -107,7 +107,7 @@ A build that stops names the failing check: a value that no longer agrees is a s
 
 ### 10. Publish
 
-Release the dataset (step 3), copy the rebuilt companion and solution files into `supplementary/` with `python scripts/companion/build.py --publish` (see `supplementary/README.md`), start the edition's first revision with `python scripts/release.py bump <revision>`, commit, and run `python scripts/release.py publish`: it builds the PDF, EPUB, DOCX and decks, creates the revision's release with every file, and pushes `main`, so `publish.yml` deploys the site and `verify-data.yml` runs. The previous edition's revisions keep their own releases.
+Release the dataset (step 3), copy the rebuilt companion and solution files into `supplementary/` with `python scripts/companion/build.py --publish` (see `supplementary/README.md`), start a new revision of the book with `python scripts/release.py bump <revision>`, commit, and run `python scripts/release.py publish`: it builds the PDF, EPUB, DOCX and decks, creates the revision's release with every file, and pushes `main`, so `publish.yml` deploys the site and `verify-data.yml` runs. The previous edition's revisions keep their own releases.
 
 ## Rehearsal
 

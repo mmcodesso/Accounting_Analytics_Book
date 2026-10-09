@@ -194,7 +194,7 @@ class Result:
 
 def stamp_lines(v: dict) -> list[str]:
     d = v["dataset"]
-    return [f"Accounting Analytics: An Integrated Approach, {v['edition']} edition. Dataset release {d['version']} "
+    return [f"Accounting Analytics: An Integrated Approach, {v['book']['edition']} edition. Dataset release {d['version']} "
             f"({d['window']}).", "Public, like the rest of the book: try an exercise first, then compare your work."]
 
 
@@ -324,8 +324,8 @@ def readme(units: list[Unit], results: list[Result], v: dict, docx: bool) -> str
     rows = [f"| {u.slug}.md | {('Chapter ' + u.number) if u.kind == 'chapter' else ('Part ' + u.number.split()[1] + ' case') if u.kind == 'case' else 'Appendix'}: "
             f"{u.title} | {res.notes} of {res.items} |" for u, res in zip(units, results)]
     return "\n".join([
-        f"# Instructor Notes, {v['edition']} edition", "",
-        f"*Accounting Analytics: An Integrated Approach*, {v['edition']} edition, built on the Charles River dataset "
+        f"# Instructor Notes, {v['book']['edition']} edition", "",
+        f"*Accounting Analytics: An Integrated Approach*, {v['book']['edition']} edition, built on the Charles River dataset "
         f"release {d['version']} ({d['window']}).", "",
         "These files are public, like the rest of the book. Try an exercise first, then compare your work with the solution.", "",
         "## What these files hold", "",
@@ -337,7 +337,7 @@ def readme(units: list[Unit], results: list[Result], v: dict, docx: bool) -> str
         "The values were computed from the dataset release named above. On a different release or build of the "
         "dataset, expect different values; the instructor notes of that release replace these.", "",
         "## Dataset release", "",
-        f"- Edition: {v['edition']}", f"- Dataset release: {d['version']} ({d['window']})",
+        f"- Edition: {v['book']['edition'].capitalize()}", f"- Dataset release: {d['version']} ({d['window']})",
         f"- CharlesRiver.sqlite SHA-256: {d['sha256']['sqlite']}",
         f"- CharlesRiver.xlsx SHA-256: {d['sha256']['xlsx']}",
         f"- CharlesRiver_csv (zip) SHA-256: {d['sha256']['csv']}", "",

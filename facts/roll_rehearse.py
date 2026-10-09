@@ -7,7 +7,7 @@ The rehearsal never touches the book. It copies the tree to DIR/tree (the book's
 not outputs/, datasets/, _book/, .quarto/, .git/, node_modules/, drafts/, slides/_build, __pycache__), puts the new
 dataset in DIR/data, and then, as a roll would:
 
- 1. rolls the pins of the copy (_variables.yml: edition, window, version, SHA-256; the companion tags of
+ 1. rolls the pins of the copy (_variables.yml: window, version, SHA-256; the companion tags of
     scripts/companion/manifest.yml);
  2. checks the new build: the data contract (facts/contract.py), the selection rules of the registry
     (facts/contract_phase7.py), and the claims of the generated notes (facts/notes);
@@ -215,16 +215,14 @@ def roll_pins(tree: Path, window: tuple[int, int], sqlite_sha: str, xlsx_sha: st
     changed = []
     vp = tree / "_variables.yml"
     text = vp.read_text(encoding="utf-8")
-    old_edition = re.search(r'^edition:\s*"?(\d{4})"?', text, re.M).group(1)
     old_version = re.search(r'^\s*version:\s*"(v[\d.]+)"', text, re.M).group(1)
-    new_edition, new_version = str(C), f"v{C}.1"
-    text = re.sub(r'^(edition:\s*)"?\d{4}"?', rf'\g<1>"{new_edition}"', text, flags=re.M)
+    new_version = f"v{C}.1"
     text = re.sub(r'(window:\s*")fiscal \d{4}–\d{4}(")', rf"\g<1>fiscal {F}–{C}\g<2>", text)
     text = text.replace(old_version, new_version)
     text = re.sub(r'(sqlite:\s*")[0-9a-f]{64}(")', rf"\g<1>{sqlite_sha}\g<2>", text)
     text = re.sub(r'(xlsx:\s*")[0-9a-f]{64}(")', rf"\g<1>{xlsx_sha}\g<2>", text)
     vp.write_text(text, encoding="utf-8")
-    changed.append(f"_variables.yml: edition {old_edition} to {new_edition}, {old_version} to {new_version}, window fiscal {F}-{C}, SHA-256 of the SQLite file")
+    changed.append(f"_variables.yml: {old_version} to {new_version}, window fiscal {F}-{C}, SHA-256 of the SQLite file")
     return changed
 
 

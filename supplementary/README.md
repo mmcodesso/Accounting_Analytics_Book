@@ -1,6 +1,6 @@
 # Supplementary files
 
-Start files for the guided tutorials (`start-files/`) and solutions to the exercises, the comprehensive cases, and the capstone cases (`solutions/`) of *Accounting Analytics: An Integrated Approach* (2026 edition), built from Charles River dataset release v2026.1 (fiscal 2024–2026). Everything is public, like the rest of the book. The files are published as the assets of the GitHub release of the book's revision (`book` in `_variables.yml`), not tracked in git (only this README is), and the book's [Downloads](https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files) page links them there, lists them by chapter, and explains how to use them.
+Start files for the guided tutorials (`start-files/`) and solutions to the exercises, the comprehensive cases, and the capstone cases (`solutions/`) of *Accounting Analytics: An Integrated Approach* (first edition), built from Charles River dataset release v2026.1 (fiscal 2024–2026). Everything is public, like the rest of the book. The files are published as the assets of the GitHub release of the book's revision (`book` in `_variables.yml`), not tracked in git (only this README is), and the book's [Downloads](https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files) page links them there, lists them by chapter, and explains how to use them.
 
 ## Start and end files of the tutorials (`start-files/`)
 

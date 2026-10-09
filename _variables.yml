@@ -1,10 +1,9 @@
 # Values the book reads with {{< var key >}} shortcodes. Quarto loads this file for every page.
-# The facts registry (Phase 3 of the companion-files and yearly-roll plan) will generate most keys;
-# for now it holds the edition and the dataset release it is verified against.
-
-edition: "2026"
+# It holds the book's edition and revision and the dataset release the text is verified against.
 
 book:
+  # The book's edition, written as it reads in "the first edition" (a new edition is a major rewrite).
+  edition: "first"
   # The book's revision. Each revision is a GitHub release of this repository that holds the PDF, EPUB
   # and DOCX, the PowerPoint decks, and the companion and solution files; the site links them there
   # (filters/slide-links.lua). Start a new revision with `python scripts/release.py bump <revision>`;
