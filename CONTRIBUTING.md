@@ -249,8 +249,12 @@ python scripts/release.py bump 2027.2       # start a new revision, then commit 
 
 `publish` needs a clean `main` and the GitHub CLI, signed in. A local build
 records what its files were built from (`outputs/build/fingerprints.json`), so
-`publish` rebuilds only what is out of date: the whole book when any book source
-changed, otherwise only the decks whose sources changed. It uploads a book or
+`publish` rebuilds only what is out of date: the PDF, EPUB, DOCX and every deck
+when any book source changed (`build_all.py --release`), otherwise only the decks
+whose sources changed (`--release --slides-only --chapter chapter-NN`). It never
+renders the HTML or the Reveal decks, which GitHub Actions renders with the site;
+the full local build (`build_all.py`) still does, for a preview, and records its
+files as current too. It uploads a book or
 deck file when it was built from other sources than the copy on the release (a
 rebuild changes the bytes, not the content), a companion file when its SHA-256
 changed, and any file the release lacks, then uploads `manifest.json`, which

@@ -8,7 +8,9 @@ the decks without the book; --preview CHAPTER serves one deck in the browser.
 The full build (local) renders the PDF, EPUB and DOCX into outputs/build/downloads/, both deck
 formats, and the site; the PDF, EPUB, DOCX and PowerPoint files are published as the assets of the
 revision's release by scripts/release.py, not with the site. --site (GitHub Actions) renders only
-the site: the book's HTML and the Reveal decks, with no Draw.io, TeX, or PowerPoint step.
+the site: the book's HTML and the Reveal decks, with no Draw.io, TeX, or PowerPoint step. --release
+renders only the release's files (PDF, EPUB, DOCX, and the PowerPoint decks; with --slides-only, the
+PowerPoint decks alone), with no HTML or Reveal step: scripts/release.py publish builds this way.
 """
 from __future__ import annotations
 
@@ -133,11 +135,14 @@ def preview(root: Path, quarto: str, chapter_id: str) -> None:
         thread.join(timeout=3)
 
 
-def build(root: Path, quarto: str, *, slides_only=False, chapter_id: str | None = None, site=False) -> None:
+def build(root: Path, quarto: str, *, slides_only=False, chapter_id: str | None = None, site=False,
+          release=False) -> None:
     if chapter_id and not slides_only:
         raise ValueError('--chapter requires --slides-only; the full build renders every deck')
     if site and slides_only:
         raise ValueError('--site renders the whole site; it does not combine with --slides-only')
+    if site and release:
+        raise ValueError('--site renders the website and --release the files of the release; choose one')
     decks = selected_decks(root, chapter_id)
     require_clean(source_checks(root, chapter_id))
     actual = subprocess.check_output([quarto, '--version'], text=True).strip()
@@ -155,7 +160,8 @@ def build(root: Path, quarto: str, *, slides_only=False, chapter_id: str | None 
     tree = None if site else source_tree(root)
     # The site needs no PowerPoint inputs (figure PNGs, templates): it renders only the Reveal decks.
     prepare(root, png=not site, quarto=quarto)
-    formats = ('revealjs',) if site else ('revealjs', 'pptx')
+    # The release needs no Reveal decks (GitHub Actions renders them with the site).
+    formats = ('revealjs',) if site else ('pptx',) if release else ('revealjs', 'pptx')
     if not (slides_only or site):
         downloads = root / 'outputs/build/downloads'
         reset_owned(root, downloads)
@@ -183,18 +189,19 @@ def build(root: Path, quarto: str, *, slides_only=False, chapter_id: str | None 
                 finish_pptx(pptx_root / deck / f'{deck}.pptx', tokens)
         if chapter_id:
             focused = root / 'slides/_build/focused' / chapter_id
-            require_clean(verify_outputs(root, decks, build_root=focused, book_url=BOOK_URL))
-            for fmt in ('revealjs', 'pptx'):
+            require_clean(verify_outputs(root, decks, build_root=focused, book_url=BOOK_URL, reveal=not release))
+            for fmt in formats:
                 destination = root / 'slides/_build' / fmt
                 reset_owned(root, destination / chapter_id)
                 shutil.copytree(focused / fmt, destination, dirs_exist_ok=True)
         else:
-            require_clean(verify_outputs(root, decks, book_url=BOOK_URL, pptx=not site))
-    if not slides_only:
+            require_clean(verify_outputs(root, decks, book_url=BOOK_URL, pptx=not site, reveal=not release))
+    if not (slides_only or release):
         run(root, [quarto, 'render', '--to', 'html'], env)
         assemble(root, decks)
         require_clean(verify_outputs(root, decks, site=root / '_book', book_url=BOOK_URL))
-    mode = 'site' if site else 'slides' if slides_only else 'book-and-slides'
+    mode = ('site' if site else 'release-slides' if release and slides_only else 'release' if release
+            else 'slides' if slides_only else 'book-and-slides')
     report = {'quarto': actual, 'mode': mode, 'chapters': decks, 'automated_artifact_checks': 'passed'}
     report_path = root / ('outputs/build/' + chapter_id + '/build-report.json' if chapter_id
                           else 'outputs/build/build-report.json')
@@ -213,6 +220,8 @@ def main() -> int:
     parser.add_argument('--slides-only', action='store_true')
     parser.add_argument('--site', action='store_true',
                         help='Render only the site (book HTML and Reveal decks), as GitHub Actions does')
+    parser.add_argument('--release', action='store_true',
+                        help='Render only the release files (PDF, EPUB, DOCX, PowerPoint), as release.py publish does')
     parser.add_argument('--chapter', metavar='CHAPTER', help='Limit --check or --slides-only to one deck, e.g. chapter-01')
     parser.add_argument('--preview', metavar='CHAPTER')
     parser.add_argument('--quarto', help='Explicit Quarto executable, or set QUARTO_BIN')
@@ -222,8 +231,10 @@ def main() -> int:
             raise ValueError('--chapter is only supported with --check, --slides-only, or --preview')
         if args.chapter and args.preview and args.chapter != args.preview:
             raise ValueError('--chapter must match the --preview chapter')
-        if args.site and (args.check or args.preview or args.slides_only or args.chapter):
+        if args.site and (args.check or args.preview or args.slides_only or args.chapter or args.release):
             raise ValueError('--site renders the whole site and takes no other mode')
+        if args.release and (args.check or args.preview):
+            raise ValueError('--release builds files; it does not combine with --check or --preview')
         chapter_id = args.chapter or args.preview
         if args.check:
             require_clean(source_checks(ROOT, chapter_id))
@@ -232,7 +243,7 @@ def main() -> int:
             preview(ROOT, args.quarto or find_quarto(), args.preview)
         else:
             build(ROOT, args.quarto or find_quarto(), slides_only=args.slides_only, chapter_id=chapter_id,
-                  site=args.site)
+                  site=args.site, release=args.release)
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f'ERROR: {exc}', file=sys.stderr)

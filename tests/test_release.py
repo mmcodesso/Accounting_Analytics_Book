@@ -229,6 +229,21 @@ class FingerprintTests(unittest.TestCase):
             release.record_build(root, tree, book=True, decks=['chapter-01'])
             self.assertFalse((root / release.FINGERPRINTS).exists())
 
+    def test_an_edit_outside_a_files_inputs_does_not_hold_it_back(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book(root)
+            write(root, 'README.md', 'About the book\n')
+            commit_all(root)
+            tree = release.working_tree(root)
+            # The README is no input; chapter 2 is an input of the book but not of chapter 1's deck.
+            write(root, 'README.md', 'About the book, revised during the build\n')
+            write(root, 'chapters/02-next/chapter.qmd', '# Next, revised during the build\n')
+            release.record_build(root, tree, book=True, decks=['chapter-01'])
+            recorded = release.load_fingerprints(root)
+            self.assertIsNone(recorded['book'])
+            self.assertIn('chapter-01', recorded['decks'])
+
     def test_the_check_fails_on_a_missing_file_and_only_warns_on_a_stale_one(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

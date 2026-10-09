@@ -189,18 +189,28 @@ def record_build(root: Path, tree: str | None, *, book: bool, decks: list[str]) 
     if tree is None:
         return
     after = source_tree(root)
-    if after != tree:
-        print('WARNING: the sources changed during the build, so its files are not recorded as current; '
-              'build again before publishing.', flush=True)
+    if after is None:
         return
-    data = load_fingerprints(root)
-    if book:
-        data['book'] = fingerprint(root, tree, inputs_of(root, tree))
-    for deck in decks:
-        data['decks'][deck] = fingerprint(root, tree, inputs_of(root, tree, deck))
-    path = root / FINGERPRINTS
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    # A file is recorded only if its own inputs did not change while it was being built; an edit elsewhere
+    # (a README, a test) does not make the build's files out of date.
+    data, recorded, changed = load_fingerprints(root), 0, []
+    for deck in ([None] if book else []) + list(decks):
+        built = fingerprint(root, tree, inputs_of(root, tree, deck))
+        if fingerprint(root, after, inputs_of(root, after, deck)) != built:
+            changed.append(deck or 'the book (PDF, EPUB, DOCX)')
+            continue
+        if deck is None:
+            data['book'] = built
+        else:
+            data['decks'][deck] = built
+        recorded += 1
+    if changed:
+        print(f'WARNING: the sources of {", ".join(changed)} changed during the build, so those files are not '
+              'recorded as current; build them again before publishing.', flush=True)
+    if recorded:
+        path = root / FINGERPRINTS
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2, sort_keys=True) + '\n', encoding='utf-8')
 
 
 # --- The files of a revision ----------------------------------------------------------------------------------------
@@ -358,8 +368,10 @@ def refresh(root: Path, tree: str, assets: dict[str, Asset], *, build: bool) -> 
         raise ValueError(f'Not built from this commit: {", ".join(names)}. Publish without --no-build, '
                          'or build with python scripts/build_all.py first.')
     print(f'Building: {", ".join(names)}', flush=True)
-    commands = ([[sys.executable, 'scripts/build_all.py']] if book else
-                [[sys.executable, 'scripts/build_all.py', '--slides-only', '--chapter', deck] for deck in decks])
+    # Only the release's files: no HTML or Reveal decks, which GitHub Actions renders with the site.
+    commands = ([[sys.executable, 'scripts/build_all.py', '--release']] if book else
+                [[sys.executable, 'scripts/build_all.py', '--release', '--slides-only', '--chapter', deck]
+                 for deck in decks])
     for command in commands:
         print('+ ' + ' '.join(command), flush=True)
         subprocess.run(command, cwd=root, check=True)

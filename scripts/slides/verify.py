@@ -382,11 +382,13 @@ def verify_pptx(path: Path, *, expected_notes: int = 1, expected_slides: int | N
 
 
 def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
-                   build_root: Path | None = None, book_url: str = "", pptx: bool = True) -> list[str]:
+                   build_root: Path | None = None, book_url: str = "", pptx: bool = True,
+                   reveal: bool = True) -> list[str]:
     """Check the rendered decks (staged, or in the assembled site) and the site's pages.
 
     The PowerPoint files are checked where they are built; they are assets of the revision's release, not part of
-    the site, so a site is checked without them, as is a build that renders no PowerPoint (pptx=False)."""
+    the site, so a site is checked without them, as is a build that renders no PowerPoint (pptx=False). A build of
+    the release's files renders no Reveal decks (reveal=False)."""
     errors: list[str] = []
     staging = build_root or root / "slides/_build"
     html_root = Path(site) if site else staging / "revealjs"
@@ -399,9 +401,9 @@ def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
         source = (root / "slides" / deck / "index.qmd").read_text(encoding="utf-8-sig")
         body = deck_text(source)
         expected_notes = len(NOTES.findall(body))
-        if not html_path.is_file():
+        if reveal and not html_path.is_file():
             errors.append(f"Missing Reveal deck: {html_path}")
-        else:
+        elif reveal:
             text = html_path.read_text(encoding="utf-8-sig")
             errors.extend(audit_text(text, str(html_path), comments=False))
             parser = ResourceParser()
@@ -415,7 +417,7 @@ def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
                                       expected_slides=1 + len(slide_headings(source)),
                                       require_table=bool(re.search(r"book-table|^\|", body, re.M)),
                                       require_media=bool(re.search(r"book-figure|!\[", body))))
-    if html_root.exists():
+    if reveal and html_root.exists():
         errors.extend(verify_local_links(html_root, book_url=book_url))
     if site:
         if deck_root.exists():

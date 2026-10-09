@@ -78,9 +78,14 @@ Then, for every change:
 
 1. Commit your changes on `main`.
 2. Run `python scripts/release.py publish`. It builds what is out of date (the
-   whole book, or only the decks whose sources changed), uploads only the files
-   that changed to the release of the current revision, and pushes `main`, which
-   deploys the website. Add `--dry-run` to see the plan without changing anything.
+   PDF, EPUB, and DOCX, or only the decks whose sources changed; never the website,
+   which GitHub Actions renders), uploads only the files that changed to the
+   release of the current revision, and pushes `main`, which deploys the website.
+   Add `--dry-run` to see the plan without changing anything.
+
+To preview the website locally as well, run the full build,
+`python scripts/build_all.py`; `publish` then reuses its files if nothing changed
+since.
 
 `python scripts/release.py status` lists every file: whether it is built, whether
 it was built from the current text, and whether the release has the same copy. A

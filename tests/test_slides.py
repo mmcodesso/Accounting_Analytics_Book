@@ -680,6 +680,43 @@ class BuildTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "--site"):
                 build_all.build(root, "fake-quarto", slides_only=True, site=True)
 
+    def test_release_build_renders_only_the_release_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            write(root, "slides/chapter-01/index.qmd", "## Slide\n")
+            calls = []
+
+            def fake_render(workdir, command, env):
+                if "--to" not in command:
+                    return
+                fmt = command[command.index("--to") + 1]
+                calls.append(fmt)
+                if "--output-dir" in command:
+                    output = command[command.index("--output-dir") + 1]
+                    write(root, f"slides/{output}/chapter-01/chapter-01.pptx")
+                else:
+                    write(root, f"_book/Accounting-Analytics.{fmt}", fmt)
+            patches = self.patches(root, fake_render)
+            for p in patches: p.start()
+            try:
+                build_all.build(root, "fake-quarto", release=True)
+                # No HTML and no Reveal decks: GitHub Actions renders the site.
+                self.assertEqual(["pdf", "epub", "docx", "pptx"], calls)
+                build_all.record_build.assert_called_once_with(root, "tree", book=True, decks=["chapter-01"])
+                self.assertEqual([False], [c.kwargs.get("reveal") for c in build_all.verify_outputs.call_args_list])
+                calls.clear()
+                build_all.record_build.reset_mock()
+                build_all.build(root, "fake-quarto", release=True, slides_only=True, chapter_id="chapter-01")
+                self.assertEqual(["pptx"], calls)
+                build_all.record_build.assert_called_once_with(root, "tree", book=False, decks=["chapter-01"])
+            finally:
+                for p in patches: p.stop()
+            self.assertEqual("pdf", (root / "outputs/build/downloads/book-latest.pdf").read_text())
+            self.assertTrue((root / "slides/_build/pptx/chapter-01/chapter-01.pptx").is_file())
+            self.assertFalse((root / "slides/_build/revealjs").exists())
+            with self.assertRaisesRegex(ValueError, "choose one"):
+                build_all.build(root, "fake-quarto", site=True, release=True)
+
     def test_slides_only_exports_figures_and_skips_the_book(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
