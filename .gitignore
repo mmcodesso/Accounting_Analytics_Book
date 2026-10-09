@@ -49,6 +49,11 @@ drafts/
 # Built companion files (uploaded to the companion release, never committed)
 outputs/
 
+# The companion and solution files: published as assets of the revision's GitHub release
+# (scripts/release.py), kept here locally by scripts/companion/build.py --publish
+supplementary/*
+!supplementary/README.md
+
 # Chapter presentation build products
 slides/_variables.yml
 slides/_shared/

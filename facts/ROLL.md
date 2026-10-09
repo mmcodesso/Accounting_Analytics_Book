@@ -107,7 +107,7 @@ A build that stops names the failing check: a value that no longer agrees is a s
 
 ### 10. Publish
 
-Release the dataset (step 3), copy the rebuilt companion and solution files into `supplementary/` with `python scripts/companion/build.py --publish` (see `supplementary/README.md`), commit them, push, and let `publish.yml` and `verify-data.yml` run. Keep the previous edition's PDF, EPUB and DOCX on its own edition release.
+Release the dataset (step 3), copy the rebuilt companion and solution files into `supplementary/` with `python scripts/companion/build.py --publish` (see `supplementary/README.md`), start the edition's first revision with `python scripts/release.py bump <revision>`, commit, and run `python scripts/release.py publish`: it builds the PDF, EPUB, DOCX and decks, creates the revision's release with every file, and pushes `main`, so `publish.yml` deploys the site and `verify-data.yml` runs. The previous edition's revisions keep their own releases.
 
 ## Rehearsal
 

@@ -577,6 +577,8 @@ class BuildTests(unittest.TestCase):
                 patch.object(build_all, "finish_pptx"),
                 patch.object(build_all, "load_manifest", return_value={"colors": {}}),
                 patch.object(build_all, "verify_outputs", return_value=[]),
+                patch.object(build_all, "source_tree", return_value="tree"),
+                patch.object(build_all, "record_build"),
                 patch.object(build_all, "run", side_effect=run)]
 
     def test_full_build_exports_figures_first_and_renders_html_last(self) -> None:
@@ -610,10 +612,73 @@ class BuildTests(unittest.TestCase):
             finally:
                 for p in patches: p.stop()
             self.assertEqual(["figures", "pdf", "epub", "docx", "revealjs", "pptx", "html"], calls)
+            # The PDF, EPUB, DOCX and PowerPoint files are staged for the release, not copied into the site.
             for ext in ("pdf", "epub", "docx"):
-                self.assertEqual(ext, (root / f"_book/downloads/book-latest.{ext}").read_text())
-            self.assertTrue((root / "_book/slides/chapter-02/chapter-02.pptx").is_file())
+                self.assertEqual(ext, (root / f"outputs/build/downloads/book-latest.{ext}").read_text())
+            self.assertFalse((root / "_book/downloads").exists())
+            self.assertFalse((root / "_book/slides/chapter-02/chapter-02.pptx").exists())
+            self.assertTrue((root / "slides/_build/pptx/chapter-02/chapter-02.pptx").is_file())
             self.assertTrue((root / "_book/slides/site_libs/notes.js").is_file())
+
+    def test_full_build_records_what_its_files_were_built_from(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            write(root, "slides/chapter-01/index.qmd", "## Slide\n")
+
+            def fake_render(workdir, command, env):
+                if "--to" not in command:
+                    return
+                fmt = command[command.index("--to") + 1]
+                if "--output-dir" in command:
+                    output = command[command.index("--output-dir") + 1]
+                    write(root, f"slides/{output}/chapter-01/" + ("index.html" if fmt == "revealjs" else "chapter-01.pptx"))
+                else:
+                    write(root, "_book/index.html" if fmt == "html" else f"_book/Accounting-Analytics.{fmt}", fmt)
+            patches = self.patches(root, fake_render)
+            for p in patches: p.start()
+            try:
+                build_all.build(root, "fake-quarto")
+                build_all.record_build.assert_called_once_with(root, "tree", book=True, decks=["chapter-01"])
+                build_all.record_build.reset_mock()
+                build_all.build(root, "fake-quarto", slides_only=True, chapter_id="chapter-01")
+                build_all.record_build.assert_called_once_with(root, "tree", book=False, decks=["chapter-01"])
+            finally:
+                for p in patches: p.stop()
+
+    def test_site_build_renders_only_the_html_and_the_reveal_decks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for deck in ("chapter-01", "chapter-02"):
+                write(root, f"slides/{deck}/index.qmd", "## Slide\n")
+            calls = []
+
+            def fake_render(workdir, command, env):
+                if "scripts/export_drawio_svgs.py" in command:
+                    calls.append("figures --verify" if "--verify" in command else "figures")
+                    return
+                fmt = command[command.index("--to") + 1]
+                calls.append(fmt)
+                if "slides" in command:
+                    for deck in ("chapter-01", "chapter-02"):
+                        write(root, f"slides/_build/{fmt}/{deck}/index.html")
+                    return
+                write(root, "_book/index.html", fmt)
+            patches = self.patches(root, fake_render)
+            for p in patches: p.start()
+            try:
+                build_all.build(root, "fake-quarto", site=True)
+                self.assertEqual(["figures --verify", "revealjs", "html"], calls)
+                self.assertFalse(build_all.prepare.call_args.kwargs["png"])
+                build_all.finish_pptx.assert_not_called()
+                build_all.record_build.assert_not_called()
+                self.assertIn(False, [c.kwargs.get("pptx") for c in build_all.verify_outputs.call_args_list])
+            finally:
+                for p in patches: p.stop()
+            self.assertTrue((root / "_book/slides/chapter-01/index.html").is_file())
+            report = json.loads((root / "outputs/build/build-report.json").read_text())
+            self.assertEqual("site", report["mode"])
+            with self.assertRaisesRegex(ValueError, "--site"):
+                build_all.build(root, "fake-quarto", slides_only=True, site=True)
 
     def test_slides_only_exports_figures_and_skips_the_book(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -712,7 +777,7 @@ class AssemblyTests(unittest.TestCase):
             build_all.assemble(root, ["chapter-01"])
             self.assertTrue((root / "_book/slides/site_libs/revealjs/plugin/notes/speaker-view.html").is_file())
             self.assertTrue((root / "_book/slides/_shared/visuals/figure.svg").is_file())
-            self.assertTrue((root / "_book/slides/chapter-01/chapter-01.pptx").is_file())
+            self.assertFalse((root / "_book/slides/chapter-01/chapter-01.pptx").exists())
             for deck in ("chapter-02", "chapter-19"):
                 self.assertFalse((root / "_book/slides" / deck).exists(), deck)
 
@@ -724,7 +789,7 @@ class AssemblyTests(unittest.TestCase):
             write(root, "_book/slides/chapter-01/index.html", "stale")
             build_all.assemble(root, [])
             self.assertFalse((root / "_book/slides").exists())
-            self.assertTrue((root / "_book/downloads/book-latest.pdf").is_file())
+            self.assertFalse((root / "_book/downloads").exists())
 
     def test_source_files_and_nested_builds_in_the_rendered_tree_fail(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

@@ -57,11 +57,49 @@ and describe your suggestion; a proposed correction or example is helpful.
 
 To propose direct edits, see the [contributor guide](CONTRIBUTING.md).
 
+## Building and publishing the book
+
+GitHub Pages serves the website, and GitHub Actions renders it on every push to
+`main`: the chapters in HTML and the slides for the browser. Everything readers
+download is built on your own computer and published as the files of the book's
+current revision, a GitHub release of this repository: the PDF, EPUB, and DOCX,
+the PowerPoint decks, and the companion and solution files. **So after every
+change to the book, build it locally and publish it.**
+
+Install once:
+
+- [Quarto](https://quarto.org/) 1.9.36, a TeX distribution for the PDF (such as
+  MiKTeX), and the [Draw.io desktop app](https://www.drawio.com/) for the figures;
+- Python, then `python -m pip install -r scripts/slides/requirements.txt`;
+- the [GitHub CLI](https://cli.github.com/), signed in: `winget install --id GitHub.cli`,
+  then `gh auth login`.
+
+Then, for every change:
+
+1. Commit your changes on `main`.
+2. Run `python scripts/release.py publish`. It builds what is out of date (the
+   whole book, or only the decks whose sources changed), uploads only the files
+   that changed to the release of the current revision, and pushes `main`, which
+   deploys the website. Add `--dry-run` to see the plan without changing anything.
+
+`python scripts/release.py status` lists every file: whether it is built, whether
+it was built from the current text, and whether the release has the same copy. A
+plain `git push` also deploys the website but leaves the downloads as they were;
+the workflow's summary then lists the files that are older than the text.
+
+The revision is set in `_variables.yml` (`book.revision`). To start a new one, run
+`python scripts/release.py bump <revision>` (for example `2027.2`), commit, and
+publish: the new revision gets a tag and release of its own, and earlier revisions
+keep theirs. The companion and solution files are built with
+`scripts/companion/build.py` and kept, untracked, in `supplementary/` (see
+[its README](supplementary/README.md)). The [contributor guide](CONTRIBUTING.md#building-the-book)
+has the details.
+
 ## Citing the book
 
 If you use this book in your teaching or research, please cite it as:
 
-> Codesso, M. (2026). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
+> Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
 
 ## License and reuse
 

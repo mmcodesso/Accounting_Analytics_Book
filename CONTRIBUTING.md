@@ -222,8 +222,41 @@ quarto render --to docx
 The pre-render hook requires Python and the Draw.io desktop executable to export
 diagrams and the cover. Set `DRAWIO_BIN` if Draw.io is not found automatically.
 PDF output also requires a TeX installation; diagrams reach the PDF as the
-vector PDFs that the hook exports. The existing publishing workflow installs
-these build dependencies.
+vector PDFs that the hook exports.
+
+### What is built where
+
+GitHub Actions (`.github/workflows/publish.yml`) renders and deploys only the
+website: `python scripts/build_all.py --site` renders the book's HTML and the
+Reveal decks, with no TeX, Draw.io, or PowerPoint step. It checks that the
+committed Draw.io exports are current (`export_drawio_svgs.py --verify`), so
+export changed figures locally and commit them. Everything readers download is
+built locally and published by `scripts/release.py` as the assets of the GitHub
+release of the book's revision (`book` in `_variables.yml`):
+`Accounting-Analytics.pdf`, `.epub` and `.docx`, `chapter-NN.pptx` for each deck,
+and the companion and solution files, which live untracked in `supplementary/`.
+The text keeps linking them by root path (`/downloads/book-latest.pdf`,
+`/supplementary/...`), and `filters/slide-links.lua` points those links at the
+release in every format.
+
+```sh
+python scripts/release.py status            # built, current, and on the release?
+python scripts/release.py publish --dry-run # the plan: what would be built and uploaded
+python scripts/release.py publish           # build what is stale, upload what changed, push main
+python scripts/release.py bump 2027.2       # start a new revision, then commit and publish
+```
+
+`publish` needs a clean `main` and the GitHub CLI, signed in. A local build
+records what its files were built from (`outputs/build/fingerprints.json`), so
+`publish` rebuilds only what is out of date: the whole book when any book source
+changed, otherwise only the decks whose sources changed. It uploads a book or
+deck file when it was built from other sources than the copy on the release (a
+rebuild changes the bytes, not the content), a companion file when its SHA-256
+changed, and any file the release lacks, then uploads `manifest.json`, which
+records each file's size, SHA-256, and sources. A new revision is tagged at the
+commit it is first published from; later publishes of the same revision replace
+only the changed files. The workflow's check fails when the site links a file the
+release lacks, and warns when a file on the release is older than the text.
 
 ## Chapter slides
 
@@ -249,20 +282,24 @@ slide patterns, the shortcodes, and how to start a deck. `--check` needs neither
 the dataset: it fails only if a deck cites something the book lacks, a slide has no notes,
 or a deck names the author.
 
-The full build preserves PDF, EPUB, and DOCX downloads, renders both presentation
-formats separately, renders book HTML last, then assembles `_book/`. It exports
+The full build (local) stages the PDF, EPUB, and DOCX in `outputs/build/downloads/`,
+renders both presentation formats separately (the PowerPoint files stay in
+`slides/_build/pptx/`), renders book HTML last, then assembles `_book/`, which
+holds the Reveal decks but not the PowerPoint files or the book downloads: those
+are published on the revision's release (see Building the book). It exports
 Draw.io SVGs, vector PDFs, and the cover once before the book renders;
 all four book formats reuse those files, and the slides export a PNG of each figure
 they cite for PowerPoint. `visuals/export-manifest.json` records
-source/output checksums and export settings so GitHub Actions can skip unchanged
-figures despite unreliable checkout timestamps. Commit that manifest with changed
-sources and exports. Missing or changed outputs, changed sources, and changed
+source/output checksums and export settings so that a fresh checkout can tell which
+figures are current despite unreliable checkout timestamps; the site build on GitHub
+Actions has no Draw.io and fails when an export is out of date. Commit that manifest
+with changed sources and exports. Missing or changed outputs, changed sources, and changed
 settings trigger an export; `python scripts/export_drawio_svgs.py --force` rebuilds
 everything. Existing local exports without manifest entries are adopted once when
 their timestamps are current and default settings are used; CI never trusts those
 timestamps. Standalone
 `quarto render` commands continue to export through the pre-render hook.
-Pull requests build without deploying.
+Pull requests build the site and check the release without deploying.
 
 Edit the slide palette and type in `slides/theme/tokens.yml`, the Reveal design in
 `slides/theme/reveal.scss`, and the PowerPoint template in `scripts/slides/pptx_theme.py`.

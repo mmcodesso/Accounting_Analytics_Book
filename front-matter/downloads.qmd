@@ -9,17 +9,16 @@ aliases:
 
 # Downloads {#sec-downloads .unnumbered}
 
-This page provides access to the latest version of the book and to the release of the dataset that its chapters use.
-Versioned releases for major editions will be added as the project evolves.
+This page provides access to the book, its slides and companion files, and the release of the dataset that its chapters use.
 
 
 ## Latest Book Version
 
-These files are automatically updated whenever the book is rebuilt.
+This is revision {{< var book.revision >}} of the book. Its PDF, EPUB, and DOCX files, the PowerPoint slides, and the companion and solution files in the table below are published together on the [release page of the revision]({{< var book.release >}}), and each new revision of the book gets a release of its own.
 
-- [Download PDF (latest)](/downloads/book-latest.pdf)
-- [Download EPUB (latest)](/downloads/book-latest.epub)
-- [Download DOCX (latest)](/downloads/book-latest.docx)
+- [Download PDF](/downloads/book-latest.pdf)
+- [Download EPUB](/downloads/book-latest.epub)
+- [Download DOCX](/downloads/book-latest.docx)
 
 
 ## Charles River Accounting Dataset

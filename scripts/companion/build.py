@@ -46,7 +46,7 @@ HERE = Path(__file__).resolve().parent
 TUTORIAL = re.compile(r"^-- Tutorial (\d+)\.(\d+)\b")
 ZIP_DATE = (2026, 1, 1, 0, 0, 0)          # fixed, so a rebuild of unchanged files is byte-identical
 SITE = "https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files"
-SUPPLEMENTARY = REPO / "supplementary"              # tracked; the site serves it at /supplementary/
+SUPPLEMENTARY = REPO / "supplementary"              # gitignored; scripts/release.py uploads it to the release
 DOWNLOADS = REPO / "front-matter" / "downloads.qmd"
 NEUTRAL = "C:\\CharlesRiver\\CharlesRiver.xlsx"   # where the Excel and Power BI files look for the workbook
 
@@ -835,9 +835,10 @@ def zip_folder(folder: Path, extra_files: list[Path] = (), suffix: str = "-compa
 
 
 def publish(manifest: dict) -> int:
-    """Copy the built zips and scripts into supplementary/start-files/ and supplementary/solutions/, which the site
-    serves at /supplementary/. The set of files must equal the set of /supplementary/ links of the Downloads page.
-    Only files whose bytes changed are copied, so git sees only real rebuilds; files no longer built are removed."""
+    """Copy the built zips and scripts into supplementary/start-files/ and supplementary/solutions/, which
+    scripts/release.py publishes on the release of the book's revision (the site links them there). The set of files
+    must equal the set of /supplementary/ links of the Downloads page. Only files whose bytes changed are copied, so
+    only real rebuilds are uploaded again; files no longer built are removed."""
     folders = {"start-files": REPO / "outputs" / "companion" / manifest["start_folder"],
                "solutions": REPO / "outputs" / "companion" / manifest["solutions_folder"]}
     built = {f"{sub}/{f.name}": f for sub, folder in folders.items()
@@ -878,7 +879,7 @@ def main() -> int:
     parser.add_argument("--solutions", action="store_true",
                         help="build the instructor solutions (exercises, cases, capstones) instead of the chains")
     parser.add_argument("--publish", action="store_true",
-                        help="copy the built files into supplementary/, which the site serves, and check them "
+                        help="copy the built files into supplementary/, which release.py publishes, and check them "
                              "against the links of the Downloads page")
     args = parser.parse_args()
 

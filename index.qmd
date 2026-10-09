@@ -42,4 +42,4 @@ This book is a living project, and contributions from instructors, students, and
 
 If you use this book in your teaching or research, please cite it as:
 
-> Codesso, M. (2026). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
+> Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/

@@ -4,10 +4,12 @@
 # at the end of every tutorial in the chain. The start file of a tutorial is the end file of the
 # tutorial before it, and the chapter-end file is the copy the chapter's exercises start from.
 # audience: every file is public (author's decision, 2026-10-05): the start and end files and the solutions
-# (exercises, cases, and capstones) are tracked in supplementary/, which the site serves (supplementary/README.md).
+# (exercises, cases, and capstones) are kept in supplementary/ (gitignored) and published as assets of the release of
+# the book's revision (supplementary/README.md).
 #
 # Build with:  python scripts/companion/build.py [--tool sql|excel|pbi] [--chapter 10]
 # Publish with: python scripts/companion/build.py --publish   (copies the built files into supplementary/)
+#               python scripts/release.py publish             (uploads the changed files to the release)
 
 start_folder: start-files            # the build folder of the start files under outputs/companion/ (published to supplementary/start-files/)
 solutions_folder: solutions          # the build folder of the solutions under outputs/companion/ (published to supplementary/solutions/)

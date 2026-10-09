@@ -1,5 +1,10 @@
 -- A chapter has slides when its deck source exists: slides/chapter-NN/index.qmd. There is no approval step.
+-- The files the site links but does not serve (the book's PDF, EPUB and DOCX, the PowerPoint decks, the companion
+-- and solution files) are assets of the revision's release, book.download in _variables.yml (scripts/release.py
+-- publishes them). The text links them by root path, and this filter points those links at the release in every
+-- format; scripts/release.py names the assets the same way.
 local found = {}
+local download = nil
 
 local function has_deck(id)
   if id == nil or not id:match('^chapter%-%d%d$') then return false end
@@ -11,12 +16,47 @@ local function has_deck(id)
   return found[id]
 end
 
+-- book.download, read from _variables.yml (a top-level book: block with an indented download: line).
+local function release_base()
+  if download == nil then
+    local file = io.open(quarto.project.directory .. '/_variables.yml', 'r')
+    if file == nil then error('slide-links.lua: _variables.yml not found') end
+    local in_book = false
+    for line in file:lines() do
+      line = line:gsub('\r$', '')
+      if line:match('^%S') then
+        in_book = line:match('^book:%s*$') ~= nil
+      elseif in_book and download == nil then
+        download = line:match('^%s+download:%s*"([^"]+)"') or line:match("^%s+download:%s*'([^']+)'")
+                   or line:match('^%s+download:%s*([^%s#]+)')
+      end
+    end
+    file:close()
+    if download == nil then error('slide-links.lua: _variables.yml has no book.download') end
+    download = download:gsub('/+$', '')
+  end
+  return download
+end
+
+local function release_url(name)
+  return release_base() .. '/' .. name
+end
+
+-- The release name of a file linked by root path, or nil for any other link.
+local function asset(target)
+  local ext = target:match('^/downloads/book%-latest%.(%a+)$')
+  if ext == 'pdf' or ext == 'epub' or ext == 'docx' then return 'Accounting-Analytics.' .. ext end
+  if target:match('^/supplementary/') then return target:match('([^/]+)$') end
+  return nil
+end
+
+-- The deck in the browser is on the site; outside HTML that link needs the site's address.
 local function link_targets(id)
   local prefix = '/slides/' .. id .. '/'
   if FORMAT ~= 'html' and FORMAT ~= 'html5' then
     prefix = 'https://aa.accountinganalyticshub.com' .. prefix
   end
-  return prefix .. 'index.html', prefix .. id .. '.pptx'
+  return prefix .. 'index.html', release_url(id .. '.pptx')
 end
 
 -- A chapter page's slide links.
@@ -24,18 +64,17 @@ function Div(div)
   if div.classes:includes('chapter-slides') then
     local id = div.attributes['data-chapter']
     if not has_deck(id) then return {} end
-    local view, download = link_targets(id)
+    local view, download_link = link_targets(id)
     return pandoc.Para({pandoc.Link('View slides', view), pandoc.Str(' · '),
-                        pandoc.Link('Download PowerPoint', download)})
+                        pandoc.Link('Download PowerPoint', download_link)})
   end
 end
 
--- Files the site serves (the supplementary files, the book downloads) are linked by root path, like the decks;
--- outside HTML the link needs the site's address.
+-- The book downloads and the supplementary files.
 function Link(link)
-  if FORMAT ~= 'html' and FORMAT ~= 'html5' and
-     (link.target:sub(1, 15) == '/supplementary/' or link.target:sub(1, 11) == '/downloads/') then
-    link.target = 'https://aa.accountinganalyticshub.com' .. link.target
+  local name = asset(link.target)
+  if name then
+    link.target = release_url(name)
     return link
   end
 end
@@ -45,7 +84,7 @@ function Span(span)
   if span.classes:includes('slides') then
     local id = span.attributes['data-chapter']
     if not has_deck(id) then return pandoc.Str('—') end
-    local _, download = link_targets(id)
-    return pandoc.Link(span.content, download)
+    local _, download_link = link_targets(id)
+    return pandoc.Link(span.content, download_link)
   end
 end

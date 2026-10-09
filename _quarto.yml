@@ -4,8 +4,7 @@ project:
     - '!slides/**'
     - '!shared/calculations/**'
     - '!outputs/**'
-    - supplementary/**/*.zip
-    - supplementary/**/*.sql
+    - '!supplementary/**'
   pre-render:
     - python scripts/export_drawio_svgs.py --pre-render
 

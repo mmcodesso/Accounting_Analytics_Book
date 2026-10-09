@@ -1,6 +1,6 @@
 # Supplementary files
 
-Start files for the guided tutorials (`start-files/`) and solutions to the exercises, the comprehensive cases, and the capstone cases (`solutions/`) of *Accounting Analytics: An Integrated Approach* (2026 edition), built from Charles River dataset release v2026.1 (fiscal 2024–2026). Everything is public, like the rest of the book. The site serves this folder at `/supplementary/`, and the book's [Downloads](https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files) page lists the files by chapter and explains how to use them.
+Start files for the guided tutorials (`start-files/`) and solutions to the exercises, the comprehensive cases, and the capstone cases (`solutions/`) of *Accounting Analytics: An Integrated Approach* (2026 edition), built from Charles River dataset release v2026.1 (fiscal 2024–2026). Everything is public, like the rest of the book. The files are published as the assets of the GitHub release of the book's revision (`book` in `_variables.yml`), not tracked in git (only this README is), and the book's [Downloads](https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-companion-files) page links them there, lists them by chapter, and explains how to use them.
 
 ## Start and end files of the tutorials (`start-files/`)
 
@@ -63,11 +63,10 @@ Every file reads CharlesRiver.xlsx from C:\CharlesRiver (or point it at your cop
 
 ## Updating the files
 
-The files are built into `outputs/companion/` (gitignored) and copied here, so that a push publishes them with the site.
+The files are built into `outputs/companion/` and copied here; both folders are gitignored, and `python scripts/release.py publish` uploads the files to the revision's release.
 
 1. Build the files into `outputs/companion/start-files/` and `outputs/companion/solutions/`: `python scripts/companion/build.py --tool sql [--solutions]`, then the Excel files in the venv of `scripts/companion/requirements-excel.txt` (`--tool excel [--solutions]`, about an hour, one build at a time), then `--tool pbi [--solutions]` (Power BI Desktop opens and closes by itself for each file), then `python facts/instructor/package.py` for Instructor-Notes.zip.
 2. Run `python scripts/companion/build.py --publish`. It copies every built zip and script whose bytes changed into this folder, removes files that are no longer built, and stops unless the folder matches the links of the Downloads page (`front-matter/downloads.qmd`).
-3. Review `git status`. An Excel rebuild changes every workbook's bytes even when its content is the same, and every committed copy stays in the repository's history, so stage only the files you meant to change.
-4. Commit and push: `publish.yml` renders the book, and Quarto copies this folder into the site (`project.resources` in `_quarto.yml`).
+3. Commit any change to the text (a new file needs its row on the Downloads page), then run `python scripts/release.py publish` (`--dry-run` first to see the plan). It uploads only the files whose SHA-256 differs from the copy on the release, so an Excel rebuild, which changes every workbook's bytes even when its content is the same, re-uploads those workbooks; nothing here is committed.
 
-A file is replaced within an edition only to correct it. A new edition replaces the files in place; the previous edition's files stay in the history of its last commit.
+A file is replaced within a revision only to correct it. A new revision (`python scripts/release.py bump`) gets a release of its own, so earlier revisions keep their files.

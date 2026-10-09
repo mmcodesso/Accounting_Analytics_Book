@@ -382,12 +382,17 @@ def verify_pptx(path: Path, *, expected_notes: int = 1, expected_slides: int | N
 
 
 def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
-                   build_root: Path | None = None, book_url: str = "") -> list[str]:
+                   build_root: Path | None = None, book_url: str = "", pptx: bool = True) -> list[str]:
+    """Check the rendered decks (staged, or in the assembled site) and the site's pages.
+
+    The PowerPoint files are checked where they are built; they are assets of the revision's release, not part of
+    the site, so a site is checked without them, as is a build that renders no PowerPoint (pptx=False)."""
     errors: list[str] = []
     staging = build_root or root / "slides/_build"
     html_root = Path(site) if site else staging / "revealjs"
     deck_root = html_root / "slides" if site else html_root
-    pptx_root = deck_root if site else staging / "pptx"
+    pptx_root = staging / "pptx"
+    pptx = pptx and not site
     for deck in decks:
         html_path = deck_root / deck / "index.html"
         pptx_path = pptx_root / deck / f"{deck}.pptx"
@@ -403,9 +408,9 @@ def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
             parser.feed(text)
             if parser.notes < expected_notes:
                 errors.append(f"{deck}: Reveal has {parser.notes} notes; expected {expected_notes}")
-        if not pptx_path.is_file():
+        if pptx and not pptx_path.is_file():
             errors.append(f"Missing PowerPoint deck: {pptx_path}")
-        else:
+        elif pptx:
             errors.extend(verify_pptx(pptx_path, expected_notes=expected_notes,
                                       expected_slides=1 + len(slide_headings(source)),
                                       require_table=bool(re.search(r"book-table|^\|", body, re.M)),

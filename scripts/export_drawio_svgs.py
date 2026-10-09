@@ -108,6 +108,12 @@ def parse_args() -> argparse.Namespace:
         help="Export every requested output even when its recorded checksums match.",
     )
     parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Export nothing and never start Draw.io: fail if any output is missing or out of date "
+             "(the site build on GitHub Actions, which has no Draw.io).",
+    )
+    parser.add_argument(
         "--padding",
         type=float,
         default=DEFAULT_PADDING,
@@ -674,6 +680,7 @@ def run() -> int:
 
     exported = 0
     skipped = 0
+    stale: list[str] = []
     for source in sources:
         validate_single_page_drawio(source)
         targets = [out_dir / f"{source.stem}.svg"]
@@ -686,6 +693,9 @@ def run() -> int:
                 manifest.remember(source, output, settings)
                 print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
                 skipped += 1
+                continue
+            if args.verify:
+                stale.append(f"{source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
                 continue
 
             if output.suffix == ".svg":
@@ -702,6 +712,8 @@ def run() -> int:
             if not force_export and manifest.current(cover_source, output, settings):
                 print(f"skip   {cover_source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
                 skipped += 1
+            elif args.verify:
+                stale.append(f"{cover_source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
             else:
                 if output.suffix == ".pdf":
                     export_pdf(executable(), cover_source, output, crop=False)
@@ -711,6 +723,15 @@ def run() -> int:
                 exported += 1
             manifest.remember(cover_source, output, settings)
 
+    if args.verify:
+        if stale:
+            raise ExportError(
+                f"{len(stale)} Draw.io export(s) are missing or out of date:\n  " + "\n  ".join(stale)
+                + "\nExport them locally (python scripts/export_drawio_svgs.py) and commit the exports "
+                "with visuals/export-manifest.json."
+            )
+        print(f"Done: all {skipped} exports are current.")
+        return 0
     manifest.save()
     print(f"Done: {exported} exported, {skipped} skipped.")
     return 0

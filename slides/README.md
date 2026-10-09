@@ -134,7 +134,9 @@ python scripts/build_all.py                                 # the book and every
 ```
 
 Rendered decks land in `slides/_build/` (`revealjs/chapter-NN/index.html`, `pptx/chapter-NN/chapter-NN.pptx`);
-the full build assembles them into `_book/slides/`.
+the full build assembles the Reveal decks into `_book/slides/`. The PowerPoint files are built only locally and
+published as `chapter-NN.pptx` on the GitHub release of the book's revision (`python scripts/release.py publish`);
+GitHub Actions renders the Reveal decks with the site (`python scripts/build_all.py --site`).
 
 To look at a deck the way students will see it:
 

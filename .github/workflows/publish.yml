@@ -1,5 +1,9 @@
 name: Build and Publish Quarto Book
 
+# Renders and deploys the site only: the book's HTML and the Reveal decks. The PDF, EPUB, DOCX, the PowerPoint
+# decks and the companion files are built locally and published as the assets of the revision's GitHub release
+# (book in _variables.yml) by scripts/release.py, which the site links. No TeX, Draw.io or PowerPoint step runs here.
+
 on:
   push:
     branches: [ "main" ]
@@ -41,49 +45,23 @@ jobs:
           python scripts/build_all.py --check
           python -m unittest discover -s tests -p 'test_*.py' -v
 
-      - name: Set up Quarto with TinyTeX
+      - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: "1.9.36"
-          tinytex: true
+          tinytex: false
 
-      - name: Install render dependencies
-        # fonts-liberation is metric-compatible with Helvetica and Arial, so
-        # figure labels wrap the same way as in the local Draw.io exports.
-        run: sudo apt-get update && sudo apt-get install --yes librsvg2-bin xvfb fonts-liberation
+      - name: Build the site
+        # The committed Draw.io exports must be current (export_drawio_svgs.py --verify); the decks are
+        # rendered for the browser only.
+        run: python scripts/build_all.py --site
 
-      - name: Install Draw.io CLI
-        run: |
-          drawio_deb_url="https://github.com/jgraph/drawio-desktop/releases/download/v29.6.6/drawio-amd64-29.6.6.deb"
-          curl --fail --location --show-error --silent "${drawio_deb_url}" --output /tmp/drawio.deb
-          sudo apt-get install --yes /tmp/drawio.deb
-
-          drawio_path="$(command -v drawio || command -v draw.io || true)"
-          if [ -z "${drawio_path}" ]; then
-            echo "Draw.io installed, but no drawio executable was found on PATH"
-            exit 1
-          fi
-
-          cat > /tmp/drawio-xvfb <<EOF
-          #!/usr/bin/env bash
-          exec xvfb-run -a "${drawio_path}" "\$@"
-          EOF
-          chmod +x /tmp/drawio-xvfb
-          echo "DRAWIO_BIN=/tmp/drawio-xvfb" >> "${GITHUB_ENV}"
-
-          sources=(visuals/src/*.drawio)
-          smoke_source="${sources[0]}"
-          if [ ! -f "${smoke_source}" ]; then
-            echo "No Draw.io source file found for smoke test"
-            exit 1
-          fi
-          /tmp/drawio-xvfb -x -f svg -o /tmp/drawio-smoke.svg "${smoke_source}"
-          test -s /tmp/drawio-smoke.svg
-
-      - name: Build book and chapter slides
-        # Dataset-free. Every deck in slides/chapter-NN/index.qmd is rendered and published;
-        # there is no approval step. Draw.io exports each cited figure as a PNG for PowerPoint.
-        run: python scripts/build_all.py
+      - name: Check the release files
+        # Fails if the site links a file the revision's release lacks; warns (job summary) when a
+        # PDF, EPUB, DOCX or PowerPoint file on the release was built before the latest text.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/release.py check --site _book
 
       - name: Upload artifact
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

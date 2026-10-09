@@ -4,6 +4,16 @@
 
 edition: "2026"
 
+book:
+  # The book's revision. Each revision is a GitHub release of this repository that holds the PDF, EPUB
+  # and DOCX, the PowerPoint decks, and the companion and solution files; the site links them there
+  # (filters/slide-links.lua). Start a new revision with `python scripts/release.py bump <revision>`;
+  # publishing the same revision again (`python scripts/release.py publish`) replaces only changed files.
+  revision: "2027.1"
+  tag: "book-v2027.1"
+  release: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/tag/book-v2027.1"
+  download: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/download/book-v2027.1"
+
 dataset:
   # The release this edition is verified against. Tags are immutable: a new build gets a new tag.
   version: "v2026.1"
