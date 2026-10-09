@@ -1,0 +1,634 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This chapter turns the audit tests of Chapters 8 and 12 into monthly monitoring, and then audits the reports themselves. Each module follows a section of the chapter, and the three guided tutorials build internal audit's own file, Audit Monitoring.pbix.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover monitoring and its tests, the exception register, and the monitoring page.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover reviewing exceptions over time, testing a report before relying on it, and the change controls a monthly report needs.
+:::
+
+## Three requests reach internal audit
+
+- The audit committee: do the exceptions of earlier audits recur?
+- The chief audit executive: review each exception once, and keep the result
+- The controller: can internal audit rely on the reporting package too?
+- So: build a monitoring report, and test both reports before relying on them
+
+::: {.notes}
+You are back on the internal audit team of Chapters 8 and 12. Those tests found entries approved by their creators, orders approved after the approver had left, and pay approved by the employee being paid. The committee wants to know every month whether such exceptions recur, rather than wait for the next annual review. How a report is published and shared is the subject of the appendix on publishing and security.
+:::
+
+# From Audit Tests to Monitoring
+
+## Monitoring runs the same tests every period
+
+- Chapter 8 tested whole populations once, in a workbook
+- Chapter 12 saved its tests as queries to rerun every quarter
+- Monitoring runs them every period, on new data, and keeps the results
+- So the results can be compared over time
+
+::: {.notes}
+Vasarhelyi and Halper described one of the first such systems, for the internal auditors of AT&T Bell Laboratories: it measured key figures of large systems, compared them with standards, and called the auditors' attention to problems as they arose. Two decades later, Alles and colleagues found continuous auditing had moved from research into practice in many firms.
+:::
+
+## Continuous auditing and continuous monitoring
+
+- Continuous auditing: internal audit's ongoing assessment of risks and controls
+- It gives the board and management assurance throughout the year
+- Continuous monitoring: management's ongoing review of its own controls
+- Auditing relies on strong monitoring, which internal audit can help build
+
+::: {.notes}
+The IIA's guidance defines continuous auditing as internal audit's use of technology for ongoing assessment. Tronto and Killingsworth note that many auditors hold monitoring to be management's job, not internal audit's. This chapter builds the report as internal audit's tool; the same tests could be handed to management to run as its own monitoring.
+:::
+
+## Rules produce exceptions; analytical tests, anomalies
+
+- A rule holds or fails, such as approval within the approver's limit
+- A failure is an exception: a record that needs an explanation
+- An analytical test finds anomalies: records unlike what is expected
+- An anomaly is a reason to look, not yet a failure
+
+::: {.notes}
+Kogan and colleagues separate a first layer of deterministic business rules from a second layer of analytical monitoring. Two equal payments to one supplier a few days apart, or first digits that depart from Benford's Law, are anomalies. The register of this chapter holds the rule tests; the anomaly tests return in the exercises. Each test states its rule, population, expected result and frequency; Metcash, an Australian distributor, ran more than a hundred automated tests daily with a system for managing their exceptions.
+:::
+
+## Five journal entry tests from Chapter 8
+
+{{< book-table tbl-16-01 1-5 >}}
+
+::: {.notes}
+Every test in the register is a rule the book has already run once, so its results can be checked against the earlier chapters.
+:::
+
+## Six purchasing and payroll tests
+
+{{< book-table tbl-16-01 6-11 >}}
+
+::: {.notes}
+The purchase order tests come from Chapter 12 and the payroll tests from Exercise 12.5. Each test belongs to the process whose documents it tests, which decides the population its rate divides by.
+:::
+
+## The monitoring cycle
+
+{{< book-figure fig-16-01 crop="0,0,1,0.888" >}}
+
+::: {.notes}
+Gonzalez and Hoffman found that telling people promptly which of their transactions a monitoring system had flagged also told them what it could not detect, and that with a weak system, prompt notification made participants more inclined to commit fraud. So the report goes to the people who oversee the controls, not to those whose approvals it tests, which is why it lives in a file of its own rather than in the controller's package.
+:::
+
+## Check your understanding {.check}
+
+Exception or anomaly; auditing or monitoring?
+
+1. An entry approved by the person who created it
+2. Two equal payments to one supplier a few days apart
+3. Management reviews its own approvals every month
+4. Internal audit runs the tests to give the board assurance
+
+::: {.notes}
+Ask students which of the four needs an explanation before anyone calls it a problem.
+:::
+
+## Each one has its name {.answer}
+
+1. An exception: a rule failed
+2. An anomaly: a reason to look, not yet a failure
+3. Continuous monitoring
+4. Continuous auditing
+
+::: {.notes}
+The second is the anomaly: it may have a good explanation, which only a look at the payments can show.
+:::
+
+# Designing an Exception Register
+
+## One table holds every test's exceptions
+
+{{< book-table tbl-16-02 >}}
+
+::: {.notes}
+An exception register has one row for each exception of each test, with the same columns whatever the test: the test, the document, its date, its amount and the employee responsible, here the approver. Chapter 12 built the same thing in SQL with UNION ALL. In Power BI it is built in Power Query, so every refresh runs the tests again on new data.
+:::
+
+## Flag, unpivot, append
+
+- Each test becomes a flag column: one if a record fails, zero if not
+- Unpivot turns the flag columns into rows, one per record and flag
+- Keep the rows whose value is one: exactly the exceptions
+- Append stacks the processes, matching columns by name, not position
+
+::: {.notes}
+The flags of a document add up to its risk score, as Chapter 8's flag formulas did. Unpivot puts each flag's name in a column named Attribute and its value in Value. Append differs from UNION ALL in the way that matters: a column one table lacks is filled with nulls, so each exception table must rename its columns to the register's names first.
+:::
+
+## A count needs its population
+
+- A dozen exceptions in a few hundred entries is a high rate
+- The same dozen in many thousands of orders is a low one
+- So the populations stay in the model, as fact tables of their own
+- They are also what the auditor reconciles before relying on the tests
+
+::: {.notes}
+A measure divides the exceptions of each test by the documents of its process. If the journal entries in the model do not add up to the journal entry postings in the ledger, the monitoring is testing an incomplete population.
+:::
+
+## From flags to the register in Power Query
+
+{{< book-figure fig-16-02 crop="0,0,1,0.4703" >}}
+
+::: {.notes}
+Each flagged table feeds an exception query through Unpivot and a filter on the flag value, and the three exception queries, not loaded, are appended into one Exceptions table.
+:::
+
+## The register beside the populations it tests
+
+{{< book-figure fig-16-02 crop="0,0.4777,1,0.4604" >}}
+
+::: {.notes}
+Exceptions relates to Tests on TestID, to Date on EventDate, and to Employee on EmployeeID. The three flagged tables stay in the model as the populations the rates divide by, and JournalLines relates to JournalEntry.
+:::
+
+# Guided Tutorial 16.1: Journal Entry Monitoring
+
+## Steps 1 to 6: start the file and flag the entries
+
+{{< book-steps 16.1 1-6 >}}
+
+::: {.notes}
+The monitoring report is a new file of its own. The approver's limit is merged onto each entry, as in Tutorial 8.3, and the five tests become flag columns in Power Query, written once and applied by every refresh.
+:::
+
+## Steps 7 to 12: score, drill through and reconcile
+
+{{< book-steps 16.1 7-12 >}}
+
+::: {.notes}
+The ledger is filtered to the journal entry postings before anything else, so only a few thousand of its rows reach the model. JE Exceptions is not loaded, because Tutorial 16.2 appends it to the other processes. Test 1 shows the entries equal to their ledger postings.
+:::
+
+## Each rule becomes a flag column
+
+```
+// Weekend
+if Date.DayOfWeek([CreatedDate], Day.Monday) >= 5
+    then 1 else 0
+
+// SelfApproved
+if [CreatedByEmployeeID] = [ApprovedByEmployeeID]
+    then 1 else 0
+
+// RiskScore
+[Weekend] + [Backdated] + [SelfApproved]
+    + [AboveLimit] + [RoundAmount]
+```
+
+::: {.notes}
+With Monday as day 0, Saturday is 5 and Sunday 6, the same test as Chapter 8's WEEKDAY with return type 2. Backdated compares the date part of CreatedDate with the posting date, AboveLimit compares the amount with the approver's limit, and RoundAmount tests for whole thousands.
+:::
+
+## The flags and the score in Power Query
+
+{{< book-figure fig-16-03 crop="0,0,1,0.8992" >}}
+
+::: {.notes}
+Most entries carry five zeros. The first, the opening balance entry, fails four of the five tests. The Applied Steps list records each flag as a step, so the tests are documented in the query itself.
+:::
+
+## Eight entries fail two tests or more
+
+{{< book-figure fig-16-04 crop="0,0,1,0.3398" >}}
+
+::: {.notes}
+The score distribution reproduces Chapter 8's: most entries score zero, a couple of dozen score one, a handful two, none three, and one four. Five of the entries scoring two were posted on the first day of a year and keyed on the first Saturday after it, and two are the round debt reclassifications above the controller's limit. A risk score describes one entry, so it is set not to summarize before the visual's filter tests it.
+:::
+
+## Drill through to the entry's ledger lines
+
+{{< book-figure fig-16-04 crop="0,0.3603,1,0.2668" >}}
+
+::: {.notes}
+The detail shows the first lines of the Entry Lines page for the opening balance entry. The entry has many lines, and the page's total row shows its debits equal to its credits. Tutorial 16.2 uses the same move, from a test to the documents behind it, for every test of the register.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 16.1 lead="true" >}}
+
+::: {.notes}
+The tests of Chapter 8, which took an afternoon in a workbook, now run again with every refresh, on a population that has been reconciled.
+:::
+
+# The Monitoring Page
+
+## A heat map shows which tests fail, and when
+
+- A matrix of tests by month, with the number of exceptions in each cell
+- Cells shaded by rule, darker for more exceptions
+- The number stays in every cell, so shading never carries meaning alone
+- A drill-through page lists the documents behind any cell
+
+::: {.notes}
+A monitoring page answers three questions in order: which tests are failing, when, and on which documents. A dark row and a dark column mean different things. Baaske and colleagues found that participants who chose better visualizations identified anomalies more accurately.
+:::
+
+## A January cluster, and a row in every month
+
+- Most entry and order exceptions fall in January, in every year
+- A seasonal cluster points to how controls work at that time of year
+- One test recurs every month: registers approved by their own employee
+- A recurring exception points to the design of a control
+
+::: {.notes}
+January is when the first entries, orders and payrolls of a new year are processed, so the cluster tells the auditor where to look and when. The payroll test recurs because one employee approves every register, including the approver's own, and no one has the task of approving the approver's pay. It is not a lapse to explain one document at a time.
+:::
+
+## A rate sets each count beside its population
+
+- Journal entries are few, so a handful of exceptions is a high rate
+- Purchase orders run to many thousands, so theirs is a small fraction
+- Rates per thousand documents show whether a process is improving
+- A count alone hides that as volume changes
+
+::: {.notes}
+Over the three years, the journal entry rate fell and rose again, the purchase order rate fell by about two-thirds while the number of orders more than doubled, and the payroll rate barely moved, held in place by the recurring test.
+:::
+
+## Check your understanding {.check}
+
+What does each pattern suggest?
+
+1. A dark January column in every year
+2. One row shaded in every month
+3. A dark December cell for entries above the limit
+4. Many exceptions in a process of many thousands of documents
+
+::: {.notes}
+Ask students which of the four calls for a change to a control rather than a look at documents.
+:::
+
+## Each pattern has its meaning {.answer}
+
+1. How controls operate at the start of a year
+2. The design of a control: one finding, not dozens
+3. The year-end closes, expected and explained once
+4. Check the rate before the count
+
+::: {.notes}
+The December cell holds the year-end closing entries, which exceed every approver's limit, the policy gap Chapter 8 noted.
+:::
+
+# Guided Tutorial 16.2: The Exception Register and the Monitoring Page
+
+## Steps 1 to 7: flag the other processes and append
+
+{{< book-steps 16.2 1-7 >}}
+
+::: {.notes}
+A comparison with null returns null in Power Query, not false, so the termination flags check that a date exists first. The payroll test of termination compares the end of the pay period, not the pay date, so a final paycheck for work done before the employee left is not flagged. Because Append matches columns by name, the renaming of Step 6 is what puts each process's dates under EventDate.
+:::
+
+## Steps 8 to 14: measure, map and test the register
+
+{{< book-steps 16.2 8-14 >}}
+
+::: {.notes}
+The Tests table is the register's dimension, with the process each test runs on. Test 2 returns the counts of Chapters 8 and 12 for each of the eleven tests, so the register is complete.
+:::
+
+## Population counts the test's own documents
+
+```
+Population =
+SWITCH (
+    SELECTEDVALUE ( Tests[Process] ),
+    "Journal entries", COUNTROWS ( JournalEntry ),
+    "Purchase orders", COUNTROWS ( PurchaseOrder ),
+    "Payroll", COUNTROWS ( PayrollRegister )
+)
+```
+
+- With no single process selected, it is blank: rates do not mix populations
+
+::: {.notes}
+In a visual by test and year, Population is the number of entries, orders or registers of that year. The rate divides the exceptions by Population and scales it to a thousand documents.
+:::
+
+## The heat map: January, and one row every month
+
+{{< book-figure fig-16-05 crop="0.0139,0.0982,0.7184,0.4319" >}}
+
+::: {.notes}
+The matrix shows all three years by month of the year. The January column is the darkest. The December cell for entries above the limit holds the year-end closes. One row is shaded in every month, and the page's bar chart of exceptions by approver shows why: one approver far ahead of everyone else.
+:::
+
+## Rates set each count beside its population
+
+{{< book-figure fig-16-05 crop="0,0.535,0.6211,0.373" >}}
+
+::: {.notes}
+The journal entry tests have the highest rates, because the population is small. The recurring payroll test has a far higher rate than the other payroll tests.
+:::
+
+## From a cell to the documents behind it
+
+{{< book-figure fig-16-06 crop="0,0,1,0.7704" >}}
+
+::: {.notes}
+Drilling through from the January cell of orders approved after termination shows orders approved by an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows that test's exceptions of January only.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 16.2 lead="true" >}}
+
+::: {.notes}
+The page separates two kinds of problem that a once-a-year test would have reported the same way: exceptions that cluster at one time of year, and an exception that recurs every month and calls for a change to the control.
+:::
+
+# Reviewing Exceptions
+
+## Dispositions live in a table of their own
+
+- Each exception needs a disposition: expected, follow up, or report
+- Text typed beside a refreshed query can move to the wrong row
+- So keep the dispositions in a table, keyed by test and document
+- Merge them into the register; those without one are the open exceptions
+
+::: {.notes}
+Chapter 8 kept its dispositions on a worksheet of pasted values for the same reason. Every refresh attaches each conclusion to its exception, and a new exception arrives with none. The dispositions are internal audit's workpaper: only reviewers change them, each shows who reached it and when, and the register is tested to confirm that every disposition found its exception.
+:::
+
+## Order the review by score and novelty
+
+- A monthly system can raise more exceptions than reviewers can examine
+- A document that fails several tests comes before one that fails one
+- An exception new this month comes before one already explained
+- Scores can learn from what past investigations found
+
+::: {.notes}
+Li and colleagues note that the volume of exceptions can overwhelm an internal audit department, and Alles and colleagues found that preventing such alarm floods was critical at Siemens. Li and colleagues proposed suspicion scores from the rules each exception fails, updated as investigations show which were errors or fraud. Chapter 8's risk score is the simple version.
+:::
+
+## Two kinds of exception are not reviewed one by one
+
+- Expected every period, such as the year-end closes above every limit
+- Its disposition and evidence are recorded once, then checked as it recurs
+- Recurring by design, such as registers approved by their own employee
+- One finding, reported once; the response is a change to the control
+
+::: {.notes}
+Reviewing either one by one would only bury the new exceptions among the old. Counting exceptions by approver does not show how much of a process rests on one person; that needs the population, the share of each process's documents each employee approved. One employee approved every payroll register and another nearly every purchase order, which Exercise 16.6 measures.
+:::
+
+## Check your understanding {.check}
+
+How should each be reviewed?
+
+1. Year-end closing entries above every approver's limit
+2. Registers approved by the employee they pay, every month
+3. An entry that fails four tests
+4. An exception that is new this month
+
+::: {.notes}
+Ask students which two should not be reviewed document by document.
+:::
+
+## Each exception has its review {.answer}
+
+1. Explained once with evidence, then checked as it recurs
+2. One design finding, reported once
+3. First, because it fails the most tests
+4. Before the exceptions already explained
+
+::: {.notes}
+The first two are the kinds not reviewed one by one: one expected, one a design finding.
+:::
+
+# Auditing the Report Itself
+
+## The questions an auditor asks of a report
+
+{{< book-table tbl-16-03 >}}
+
+::: {.notes}
+Both reports are evidence that someone relies on, and neither is better than the data and calculations behind it. Chapter 12 began every test with a reconciliation, because a query run against an incomplete table can report a clean result that means nothing, and a report is no different. Who can see a report belongs with how it is published, in the appendix on publishing and security.
+:::
+
+## Completeness: reconcile, or test for gaps
+
+- Reconcile each population to the ledger, as Test 1 does
+- With nothing to reconcile to, test the document numbers for gaps
+- A count equal to the last order number shows none is missing
+- Rerun the tests at every review, and keep their results and date
+
+::: {.notes}
+Charles River numbers its purchase orders in one series across the years, as Exercise 8.5 found, so the gap test of Chapter 8 applies. The package's Tests tab reproduces control totals of Chapters 6, 7 and 11. A test that passed in April says nothing about a measure changed in May.
+:::
+
+## Currency: each population has its own last date
+
+- A report shows the data of its last refresh
+- Entries and orders run to the last day of the year
+- The last payroll was paid earlier, because the last periods are open
+- So a page should state the date through which every test has run
+
+::: {.notes}
+A December page that shows no payroll exceptions after the last payday has not tested those days at all. A measure that returns the earliest of the populations' last dates, shown on the page, states the date through which every test has run, as the package's About page states its period.
+:::
+
+## Change control: a project shows every change
+
+- Each change is requested, tested, approved and recorded
+- The person who approves a change is not the one who made it
+- A .pbix is one binary file; a .pbip stores text that Git can compare
+- The Tests tab, rerun before publishing, is the regression test
+
+::: {.notes}
+A report that managers act on every month is a system and deserves the change controls auditors expect of any system. Teams that keep reports as projects often review each change on a Git branch as a list of changed lines before it is merged and published; an auditor testing change control asks for that history. Sensitivity labels are not supported in projects, a tradeoff the appendix describes.
+:::
+
+## Watch out: a copy of a .pbix escapes every control {.watch-out}
+
+- A copy holds every row of every table, whatever its pages show
+- Its data stop at the date of the copy
+- Its measures can drift from the version readers use
+- Treat the controlled report as the only version; ask who holds copies
+
+::: {.notes}
+Whoever opens a copy in Power BI Desktop sees everything. Control totals are evidence only if they are rerun, tests only if the report they test is the one readers use, and documentation only if it states how current the data are.
+:::
+
+## Check your understanding {.check}
+
+Which question does each piece of evidence answer?
+
+1. Order numbers that run from one to the count of orders
+2. The package's tests, rerun and dated
+3. The Data Through card on the page
+4. The Git history of the report's project
+
+::: {.notes}
+Ask students which of the four a test that passed last month cannot answer.
+:::
+
+## Each piece of evidence has its question {.answer}
+
+1. Is every document in the model?
+2. Do the measures compute what they claim?
+3. How current are the data?
+4. Who changed the report, and was the change reviewed?
+
+::: {.notes}
+A test that passed last month cannot answer the second for a measure changed since, which is why the tests are rerun at every review.
+:::
+
+# Guided Tutorial 16.3: Reviewing Exceptions and Testing the Reports
+
+## Review and test the reports in nine steps
+
+{{< book-steps 16.3 >}}
+
+::: {.notes}
+The first review records three dispositions: the year-end closes are expected; the orders and registers of the employee who had left are deficiencies to report; and the payments made before their registers were approved need a question for payroll. Open Exceptions counts the exceptions with no disposition, and Test 3 shows that every disposition found its exception. Step 8 reruns the package's tests and closes it without saving: internal audit tests the package but does not change it.
+:::
+
+## Most open exceptions are one design finding
+
+{{< book-figure fig-16-07 crop="0.0116,0.0179,0.4565,0.6118" >}}
+
+::: {.notes}
+Most open exceptions belong to the registers approved by the employee they pay, a single design finding the memo reports once. The year-end closes have left the AboveLimit row, which now holds only the entries that still need a look.
+:::
+
+## Documents that fail two tests or more come first
+
+{{< book-figure fig-16-07 crop="0.4797,0.0215,0.4681,0.6172" >}}
+
+::: {.notes}
+At the top is the opening balance entry, which failed four tests; the other entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The orders outlined with dashes were reviewed for one of their two tests and are still open for the other: a disposition belongs to an exception, not to a document. The list continues with the remaining orders, among them the third approved after the approver had left and the two capital orders the purchasing manager approved alone.
+:::
+
+## Test 4 checks the numbers and the payments
+
+{{< book-figure fig-16-08 crop="0.0904,0.2302,0.7254,0.5065" >}}
+
+::: {.notes}
+The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment date. The query returns one row of counts, the first and last order numbers, and the registers not paid.
+:::
+
+## Test 4: no order is missing; three registers unpaid
+
+{{< book-figure fig-16-08 crop="0.0881,0.7424,0.6952,0.1525" >}}
+
+::: {.notes}
+The order numbers run from one to the number of orders, so none is missing. The three registers with no payment are the ones Chapter 12 found posted to the ledger as paid with no payment record behind them. Two already appear as pay after termination; the third, the chief executive's first register, is a finding for the memo.
+:::
+
+## Data Through states how far the tests have run
+
+```
+Data Through =
+MINX (
+    {
+        MAX ( JournalEntry[PostingDate] ),
+        MAX ( PurchaseOrder[OrderDate] ),
+        MAX ( PayrollRegister[PayDate] )
+    },
+    [Value]
+)
+```
+
+- The earliest of the three last dates: here, the last payday
+
+::: {.notes}
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December: the December column of the heat map is complete for two processes and partial for the third, and the card says so on the page the reviewer reads.
+:::
+
+## Checkpoint
+
+{{< book-checkpoint 16.3 lead="true" >}}
+
+::: {.notes}
+A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on both reports.
+:::
+
+# Looking Ahead
+
+## What monitoring and the audit of the reports found
+
+- Exceptions cluster in the first month of every year
+- One recurs every month, because a control has no one to perform it
+- Dispositions survive every refresh; open exceptions are the work
+- The reports are complete and tested, current only to a date by process
+
+::: {.notes}
+Most of this work was descriptive and diagnostic analytics, and its recommendations, on the controls and on the reports, are prescriptive. The reports' changes need controls that a single file cannot provide.
+:::
+
+## Part IV is complete
+
+- A model from the workbook, measured with DAX
+- A reporting package for the managers
+- Monitored and audited for internal audit
+- Next: the appendix, the Part IV case, and the capstone cases
+
+::: {.notes}
+How the package and the monitoring report reach their readers, and how each sees only what they should, is the subject of the appendix on publishing and security. The Part IV Comprehensive Case asks how a profitable year ended with less cash than it began. Part V offers three capstone cases that draw on every tool of the book.
+:::
+
+## Summary
+
+- Monitoring reruns rule tests every period and keeps the results
+- An exception register: flag, unpivot and append, beside its populations
+- A heat map with rates and drill-through shows tests, months and documents
+- Dispositions in their own table leave the open exceptions to review
+- A report is audited for completeness, tests, currency and change control
+
+::: {.notes}
+Rule tests produce exceptions; analytical tests produce anomalies, which return in the exercises.
+:::
+
+## Key terms
+
+{{< book-terms >}}
+
+::: {.notes}
+Every term is defined at the end of the chapter. Exception register, open exception and data currency are the ideas a monitoring report rests on.
+:::
+
+## Practice and next steps
+
+{{< book-exercises >}}
+
+Next: {{< book-next >}}
+
+::: {.notes}
+Assign one exercise from each perspective; Exercise 16.2 makes cutoff a monthly test, Exercise 16.4 follows the exception rates over time, and Exercise 16.6 measures the concentration of approval. The Part IV Comprehensive Case follows.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find each figure and table, with the full explanation, in the online chapter.
+:::
