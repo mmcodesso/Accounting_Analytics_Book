@@ -10,12 +10,30 @@
 \usepackage[table]{xcolor}
 \usepackage{eso-pic}
 
+% Code looks the same in every block and inline, as in HTML: on the gray of the highlighted SQL
+% blocks (shadecolor, in Quarto's Shaded box). Formula blocks (Excel, DAX, M: unhighlighted, so
+% verbatim) sit in the same Shaded box; inline code (\aacode, wrapped around \texttt by
+% filters/pdf-code.lua) is highlighted with lua-ul, which, unlike a box, still lets a long formula
+% break at the end of a line.
+\usepackage{framed}
+\usepackage{luacolor}
+\usepackage{lua-ul}
+\providecolor{shadecolor}{RGB}{241,243,245}
+\makeatletter
+\@ifundefined{Shaded}{\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}}{}
+\DeclareRobustCommand{\aacode}[1]{\highLight[shadecolor]{\hbox{}\nobreak\hskip1.5pt minus 1.5pt\nobreak
+  #1\nobreak\hskip1.5pt minus 1.5pt\hbox{}}}
+\AtBeginDocument{\@ifundefined{pdfstringdefDisableCommands}{}{\pdfstringdefDisableCommands{\let\aacode\@firstofone}}}
+\makeatother
+
 % Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,
 % instead of running into the margin, and long lines of highlighted SQL (Highlighting) wrap at
 % spaces. Deferred to \begin{document} because a package loaded later in Quarto's template
 % redefines the verbatim environment.
 \usepackage{fvextra}
-\AtBeginDocument{\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakafter={,*},breakaftersymbolpre={}}
+\AtBeginDocument{%
+  \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}%
+    \begin{Verbatim}[breaklines,breakafter={,*},breakaftersymbolpre={}]}{\end{Verbatim}\end{Shaded}}%
   \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},breaklines,breakaftersymbolpre={}}}
 
 \definecolor{PrimaryBlue}{HTML}{1A5276}
@@ -40,9 +58,10 @@
 % A higher tolerance lets a line with an unbreakable inline formula be set loosely
 % instead of running into the margin.
 \tolerance=3000
-% A long code block that breaks across pages can leave its page a few points too full;
-% accept that silently rather than report it as an overfull box.
-\vfuzz=3pt
+% A long code block that breaks across pages can leave its page a few points too full (the
+% Shaded box's padding: about 9pt for a long DAX block in Chapter 14); accept that silently
+% rather than report it as an overfull box.
+\vfuzz=10pt
 % Part entries in the table of contents set their page numbers in large bold type, and a
 % three-digit number is wider than KOMA's default page-number box.
 \RedeclareSectionCommand[tocpagenumberwidth=2em]{part}

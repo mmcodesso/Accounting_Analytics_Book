@@ -152,6 +152,98 @@ hr {
   margin-bottom: 0.25rem;
 }
 
+// The chapter's slide links (filters/slide-links.lua): a light bar under the learning objectives,
+// with a solid pill to view the deck and an outlined pill to download the PowerPoint file.
+.chapter-slides-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.7rem;
+  margin: 1rem 0 1.75rem;
+  padding: 0.6rem 0.75rem 0.6rem 1rem;
+  background: linear-gradient(90deg, rgba(26, 82, 118, 0.06), rgba(26, 82, 118, 0.015));
+  border: 1px solid rgba(26, 82, 118, 0.14);
+  border-radius: 999px;
+  font-family: $headings-font-family;
+}
+
+.learning-objectives + .chapter-slides-bar {
+  margin-top: -0.85rem;
+}
+
+.chapter-slides-bar__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-right: auto;
+  color: var(--aa-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chapter-slides-bar__label .bi {
+  color: var(--aa-primary);
+  font-size: 1rem;
+}
+
+.chapter-slides-bar .slides-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 1rem;
+  border: 1.5px solid var(--aa-primary);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chapter-slides-bar .slides-pill--view {
+  background: var(--aa-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(26, 82, 118, 0.18);
+}
+
+.chapter-slides-bar .slides-pill--view:hover {
+  background: #154360;
+  border-color: #154360;
+  color: #fff;
+}
+
+.chapter-slides-bar .slides-pill--download {
+  background: #fff;
+  color: var(--aa-primary);
+}
+
+.chapter-slides-bar .slides-pill--download:hover {
+  background: rgba(26, 82, 118, 0.08);
+  color: var(--aa-primary);
+}
+
+.chapter-slides-bar .slides-pill:hover {
+  text-decoration: none;
+}
+
+.chapter-slides-bar .slides-pill:focus-visible {
+  outline: 3px solid rgba(26, 82, 118, 0.35);
+  outline-offset: 2px;
+}
+
+// On a phone the bar becomes a card: the label on its own line, the pills below it.
+@media (max-width: 575.98px) {
+  .chapter-slides-bar {
+    border-radius: 1rem;
+  }
+
+  .chapter-slides-bar__label {
+    flex-basis: 100%;
+  }
+}
+
 .figure-placeholder,
 .table-placeholder {
   border: 1px solid var(--aa-border);

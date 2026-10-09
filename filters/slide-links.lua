@@ -77,15 +77,72 @@ local function link_targets(id)
   return prefix .. 'index.html', release_url(id .. '.pptx')
 end
 
--- A chapter page's slide links.
+-- An icon of the Bootstrap Icons font that Quarto's HTML pages load; decorative, so screen readers skip it.
+local function icon(name)
+  return pandoc.RawInline('html', '<i class="bi bi-' .. name .. '" aria-hidden="true"></i>')
+end
+
+local function words(text)
+  local inlines = {}
+  for word in text:gmatch('%S+') do
+    if #inlines > 0 then inlines[#inlines + 1] = pandoc.Space() end
+    inlines[#inlines + 1] = pandoc.Str(word)
+  end
+  return inlines
+end
+
+local function labeled(name, text)
+  local inlines = {icon(name), pandoc.Space()}
+  for _, inline in ipairs(words(text)) do inlines[#inlines + 1] = inline end
+  return inlines
+end
+
+-- A chapter page's slide links. The deck opens in a new tab, so the chapter stays open where the reader was.
+-- In HTML they form a bar of two pill buttons (styles/book.scss, .chapter-slides-bar); in the PDF a styled line;
+-- in EPUB and DOCX a plain line.
 function Div(div)
   if div.classes:includes('chapter-slides') then
     local id = div.attributes['data-chapter']
     if not has_deck(id) then return {} end
     local view, download_link = link_targets(id)
-    return pandoc.Para({pandoc.Link('View slides', view), pandoc.Str(' · '),
+    if FORMAT == 'html' or FORMAT == 'html5' then
+      local pill = function(kind, attributes)
+        return pandoc.Attr('', {'slides-pill', 'slides-pill--' .. kind}, attributes or {})
+      end
+      return pandoc.Div({pandoc.Plain({
+        pandoc.Span(labeled('easel2', 'Chapter slides'), pandoc.Attr('', {'chapter-slides-bar__label'})),
+        pandoc.Link(labeled('play-circle', 'View slides'), view, '',
+                    pill('view', {target = '_blank', rel = 'noopener'})),
+        pandoc.Link(labeled('download', 'Download PowerPoint'), download_link, '', pill('download')),
+      })}, pandoc.Attr('', {'chapter-slides-bar'}))
+    end
+    if FORMAT:match('latex') then
+      -- The PDF's line, in the small blue sans-serif of its headings (colors from styles/book-pdf.tex).
+      local latex = function(text) return pandoc.RawInline('latex', text) end
+      return pandoc.Para({
+        latex('{\\sffamily\\small\\textcolor{PrimaryBlue}{\\textbf{Chapter slides}}\\quad '),
+        pandoc.Link('View slides', view), latex('\\enspace{\\color{Ink!45}\\textbar}\\enspace '),
+        pandoc.Link('Download PowerPoint', download_link), latex('}')})
+    end
+    return pandoc.Para({pandoc.Link('View slides', view), pandoc.Str(' | '),
                         pandoc.Link('Download PowerPoint', download_link)})
   end
+end
+
+-- The PDF's text font (Palatino in T1 encoding, styles/book-pdf.tex) has no middle dot, so LuaLaTeX would print
+-- "ů" for every "·" (the separators of the Downloads page's table); set it as a centered dot instead.
+function Str(str)
+  if not FORMAT:match('latex') or not str.text:find('·', 1, true) then return nil end
+  local inlines, rest = {}, str.text
+  while true do
+    local first, last = rest:find('·', 1, true)
+    if not first then break end
+    if first > 1 then inlines[#inlines + 1] = pandoc.Str(rest:sub(1, first - 1)) end
+    inlines[#inlines + 1] = pandoc.RawInline('latex', '\\textperiodcentered{}')
+    rest = rest:sub(last + 1)
+  end
+  if #rest > 0 then inlines[#inlines + 1] = pandoc.Str(rest) end
+  return inlines
 end
 
 -- The book downloads and the supplementary files.

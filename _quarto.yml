@@ -12,6 +12,7 @@ filters:
   - filters/strip-comments.lua
   - filters/pdf-figures.lua
   - filters/slide-links.lua
+  - filters/pdf-code.lua
 
 book:
   title: "Accounting Analytics: An Integrated Approach"
