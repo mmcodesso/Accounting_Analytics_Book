@@ -352,6 +352,8 @@ end
 
 local function book_deliverables(args, _, meta)
   local list = case_list(meta, 'deliverables', 'deliverables')
+  -- A comprehensive case states its deliverable in one paragraph, which stays a paragraph.
+  if #list == 1 then return blocks(references(list[1])) end
   local first, last = range(args, 1, #list)
   local lines = {}
   for i = first, last do table.insert(lines, i .. '. ' .. references(list[i])) end

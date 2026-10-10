@@ -139,6 +139,21 @@ class AssetTests(unittest.TestCase):
                              assets['Chapter01-exercises.zip'].path)
             self.assertEqual('chapter-01', assets['chapter-01.pptx'].deck)
 
+    def test_a_case_deck_is_a_release_file_built_from_its_case_page(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book(root)
+            write(root, 'cases/part-1-case.qmd', '# Comprehensive Case: A Case\n')
+            write(root, 'slides/case-part-1/index.qmd', '## Slide\n')
+            write(root, f'{release.PPTX}/case-part-1/case-part-1.pptx', 'deck')
+            self.assertEqual(['case-part-1', 'chapter-01'], release.deck_ids(root))
+            assets = release.expected_assets(root)
+            self.assertEqual('case-part-1', assets['case-part-1.pptx'].deck)
+            self.assertEqual(root / release.PPTX / 'case-part-1/case-part-1.pptx', assets['case-part-1.pptx'].path)
+            # A case deck is built from its own page, not from a chapter folder (no git listing is needed).
+            self.assertEqual(['slides/case-part-1', 'cases/part-1-case.qmd'],
+                             release.inputs_of(root, 'HEAD', 'case-part-1')[-2:])
+
     def test_two_files_with_one_release_name_and_unknown_downloads_fail(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

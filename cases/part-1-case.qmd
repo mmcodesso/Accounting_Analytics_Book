@@ -6,6 +6,9 @@ format:
 
 # Comprehensive Case: Getting the Data Ready for the Furniture Margin Question {#sec-case-part-1 .unnumbered}
 
+::: {.chapter-slides data-chapter="case-part-1"}
+:::
+
 This case closes Part I. It asks you to use the three chapters together on one realistic assignment: preparing the data for an analysis before the analysis itself begins. You will frame the question with the concepts from Chapter 1, test the data with the techniques from Chapter 2, and navigate the database with the keys and relationships from Chapter 3. The analysis that answers the question comes in Part II, where you will learn the Excel techniques it requires. The work you do here decides whether that analysis can be trusted.
 
 The case uses CharlesRiver_Work.xlsx, the working copy of the Part I tutorials, and every step can be completed with the filters, lookup functions, and PivotTables you have already practiced.

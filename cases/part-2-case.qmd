@@ -6,6 +6,9 @@ format:
 
 # Comprehensive Case: Deciding on the 2027 Promotion Calendar {#sec-case-part-2 .unnumbered}
 
+::: {.chapter-slides data-chapter="case-part-2"}
+:::
+
 This case closes Part II. It asks you to use the five Excel chapters together on a decision that management has to make: whether Charles River should keep running sales promotions. You will build and document a workbook with Power Query, as in Chapters 4 and 5. You will describe the promotions' cost and reconcile it to the ledger with the techniques of Chapter 6, and test and model their effect on sales with the tools of Chapter 7. Finally, you will test the controls over them as the internal auditors did in Chapter 8. The Part I case ended with a memo on whether the data could be trusted. This one ends with a recommendation that someone will act on.
 
 The case uses a new workbook that reads from CharlesRiver.xlsx, so the analysis and audit workbooks from the chapters stay as they are. Every requirement can be completed with techniques you have already practiced.

@@ -1,7 +1,7 @@
 """Prepare the disposable slide inputs: the book index, each deck's metadata, the cited figures, the theme.
 
 Everything written here is generated and gitignored (slides/_shared/, slides/_variables.yml and each
-deck's slides/chapter-NN/_metadata.yml). Decks hold only their slides; the title, the footer, the
+deck's slides/<deck>/_metadata.yml, for chapter-NN and case-part-N). Decks hold only their slides; the title, the footer, the
 figures and the tables come from the book at every build.
 """
 from __future__ import annotations
@@ -52,26 +52,32 @@ def reset_owned(root: Path, path: Path) -> None:
 
 
 def deck_ids(root: Path) -> list[str]:
-    """Every deck that exists; a deck is published as soon as its source is there."""
-    return sorted(path.parent.name for path in (root / 'slides').glob('chapter-[0-9][0-9]/index.qmd'))
+    """Every deck that exists, a chapter's or a comprehensive case's; a deck is published as soon as its source is there."""
+    return sorted(path.parent.name for pattern in book_index.DECK_GLOBS
+                  for path in (root / 'slides').glob(f'{pattern}/index.qmd'))
+
+
+def deck_label(chapter: dict) -> str:
+    """What a deck calls itself before its title: "Chapter 19", or "Part I Case" for a comprehensive case."""
+    return chapter.get('label') or f"Chapter {chapter['number']}"
 
 
 def deck_metadata(index: dict, deck: str) -> dict:
     chapter = index['chapters'][deck]
     return {
-        'title': f"Chapter {chapter['number']}: {chapter['title']}",
+        'title': f"{deck_label(chapter)}: {chapter['title']}",
         'subtitle': index['book_title'],
         'book-chapter': deck,
         'format': {
             'revealjs': {'output-file': 'index.html',
-                         'footer': f"Chapter {chapter['number']} · {chapter['title']}"},
+                         'footer': f"{deck_label(chapter)} · {chapter['title']}"},
             'pptx': {'output-file': f'{deck}.pptx', 'reference-doc': f'../_shared/theme/{deck}.pptx'},
         },
     }
 
 
 def write_metadata(root: Path, index: dict, decks: list[str]) -> None:
-    for path in (root / 'slides').glob('chapter-*/_metadata.yml'):
+    for path in [p for pattern in ('chapter-*', 'case-part-*') for p in (root / 'slides').glob(f'{pattern}/_metadata.yml')]:
         if path.parent.name not in decks:
             path.unlink()
             if not any(path.parent.iterdir()):
@@ -239,7 +245,7 @@ def write_theme(root: Path, stage: Path, index: dict, decks: list[str], quarto: 
         for deck in decks:
             chapter = index['chapters'][deck]
             theme_reference(base, theme / f'{deck}.pptx', tokens,
-                            footer=f"Chapter {chapter['number']} · {chapter['title']}")
+                            footer=f"{deck_label(chapter)} · {chapter['title']}")
 
 
 def prepare(root: Path, *, png: bool = True, drawio_bin: Path | None = None, quarto: str | None = None) -> dict:

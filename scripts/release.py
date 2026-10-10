@@ -148,9 +148,13 @@ def head_tree(root: Path) -> str:
 
 
 def inputs_of(root: Path, tree: str, deck: str | None = None) -> list[str]:
-    """The input paths of the book's PDF, EPUB and DOCX, or of one deck (with its own chapter's folder)."""
+    """The input paths of the book's PDF, EPUB and DOCX, or of one deck (with its own chapter's folder, or a
+    comprehensive case's page)."""
     if deck is None:
         return list(BOOK_INPUTS)
+    case = re.fullmatch(r'case-part-(\d)', deck)
+    if case:
+        return [*DECK_INPUTS, f'slides/{deck}', f'cases/part-{case.group(1)}-case.qmd']
     number = deck.split('-')[1]
     chapters = [path for path in git(root, 'ls-tree', '--name-only', tree, 'chapters/').splitlines()
                 if path.rsplit('/', 1)[-1].startswith(number + '-')]
@@ -220,8 +224,12 @@ class Asset:
         self.name, self.kind, self.path, self.deck = name, kind, path, deck
 
 
+# A chapter's deck (chapter-01) or a comprehensive case's (case-part-1), as scripts/slides/book_index.DECK_GLOBS.
+DECK_GLOBS = ('chapter-[0-9][0-9]', 'case-part-[0-9]')
+
+
 def deck_ids(root: Path) -> list[str]:
-    return sorted(path.parent.name for path in (root / 'slides').glob('chapter-[0-9][0-9]/index.qmd'))
+    return sorted(path.parent.name for pattern in DECK_GLOBS for path in (root / 'slides').glob(f'{pattern}/index.qmd'))
 
 
 def asset_name(target: str, revision: Revision) -> str:
@@ -424,7 +432,7 @@ def release_notes(revision: Revision, commit: str, manifest: dict) -> str:
         'Approach*.',
         '',
         f'- The book: {", ".join(f"`{revision.book_name}.{ext}`" for ext in BOOK_FORMATS)}.',
-        f'- The slides: {len(decks)} PowerPoint decks (`chapter-NN.pptx`).',
+        f'- The slides: {len(decks)} PowerPoint decks (`chapter-NN.pptx`, and `case-part-N.pptx` for the comprehensive cases).',
         f'- The companion and solution files: {companion} files, listed on the book\'s Downloads page.',
         '',
         f'Last published from commit {commit[:7]} on {dt.date.today().isoformat()}. `manifest.json` lists each '

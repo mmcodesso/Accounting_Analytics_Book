@@ -56,7 +56,7 @@ def scope_files(root: Path = REPO, code: bool = True) -> list[Path]:
     out = [root / "index.qmd"]
     for d in BOOK_DIRS:
         out += sorted((root / d).rglob("*.qmd"))
-    out += sorted(root.glob("slides/chapter-*/index.qmd"))
+    out += sorted(root.glob("slides/chapter-*/index.qmd")) + sorted(root.glob("slides/case-part-*/index.qmd"))
     if code:
         for g in CODE_GLOBS + YEAR_ONLY_GLOBS:
             out += sorted(root.glob(g))

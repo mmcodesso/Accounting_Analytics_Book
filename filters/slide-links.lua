@@ -1,4 +1,5 @@
--- A chapter has slides when its deck source exists: slides/chapter-NN/index.qmd. There is no approval step.
+-- A chapter has slides when its deck source exists: slides/chapter-NN/index.qmd, or slides/case-part-N/index.qmd for
+-- a comprehensive case. There is no approval step.
 -- The files the site links but does not serve (the book's PDF, EPUB and DOCX, the PowerPoint decks, the companion
 -- and solution files) are assets of the revision's release, book.download in _variables.yml (scripts/release.py
 -- publishes them; the book's own files are named from book.edition and book.revision). The text links them by
@@ -8,7 +9,7 @@ local found = {}
 local book = nil
 
 local function has_deck(id)
-  if id == nil or not id:match('^chapter%-%d%d$') then return false end
+  if id == nil or not (id:match('^chapter%-%d%d$') or id:match('^case%-part%-%d$')) then return false end
   if found[id] == nil then
     local file = io.open(quarto.project.directory .. '/slides/' .. id .. '/index.qmd', 'r')
     found[id] = file ~= nil
@@ -105,12 +106,13 @@ function Div(div)
     local id = div.attributes['data-chapter']
     if not has_deck(id) then return {} end
     local view, download_link = link_targets(id)
+    local label = id:match('^case') and 'Case slides' or 'Chapter slides'
     if FORMAT == 'html' or FORMAT == 'html5' then
       local pill = function(kind, attributes)
         return pandoc.Attr('', {'slides-pill', 'slides-pill--' .. kind}, attributes or {})
       end
       return pandoc.Div({pandoc.Plain({
-        pandoc.Span(labeled('easel2', 'Chapter slides'), pandoc.Attr('', {'chapter-slides-bar__label'})),
+        pandoc.Span(labeled('easel2', label), pandoc.Attr('', {'chapter-slides-bar__label'})),
         pandoc.Link(labeled('play-circle', 'View slides'), view, '',
                     pill('view', {target = '_blank', rel = 'noopener'})),
         pandoc.Link(labeled('download', 'Download PowerPoint'), download_link, '', pill('download')),
@@ -120,7 +122,7 @@ function Div(div)
       -- The PDF's line, in the small blue sans-serif of its headings (colors from styles/book-pdf.tex).
       local latex = function(text) return pandoc.RawInline('latex', text) end
       return pandoc.Para({
-        latex('{\\sffamily\\small\\textcolor{PrimaryBlue}{\\textbf{Chapter slides}}\\quad '),
+        latex('{\\sffamily\\small\\textcolor{PrimaryBlue}{\\textbf{' .. label .. '}}\\quad '),
         pandoc.Link('View slides', view), latex('\\enspace{\\color{Ink!45}\\textbar}\\enspace '),
         pandoc.Link('Download PowerPoint', download_link), latex('}')})
     end

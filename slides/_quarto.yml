@@ -1,4 +1,4 @@
-# The chapter slide decks: one project, two formats (Reveal.js for the browser, native PowerPoint).
+# The chapter and comprehensive-case slide decks: one project, two formats (Reveal.js for the browser, native PowerPoint).
 # Build with scripts/build_all.py, which first writes the generated inputs under _shared/ and each
 # deck's _metadata.yml (title, footer, output names) from the book. See README.md.
 project:
@@ -6,6 +6,7 @@ project:
   output-dir: _build/revealjs
   render:
     - "chapter-*/index.qmd"
+    - "case-part-*/index.qmd"
   # A default project copies the files it finds to the output; publish only what the decks show,
   # and never the build tree itself (a render would otherwise copy _build into its own output).
   resources:

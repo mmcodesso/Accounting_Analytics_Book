@@ -1,6 +1,7 @@
 # Chapter slides
 
-Each chapter can have one deck, `slides/chapter-NN/index.qmd`, which Quarto renders twice: a Reveal.js
+Each chapter can have one deck, `slides/chapter-NN/index.qmd`, and each comprehensive case one,
+`slides/case-part-N/index.qmd` (see Case decks), which Quarto renders twice: a Reveal.js
 deck for the browser and a native PowerPoint file. A deck is published as soon as its source exists,
 like a chapter. There is no approval or review step, and editing a chapter never blocks a build.
 
@@ -27,7 +28,7 @@ check-and-answer pairs. `slides/chapter-01/index.qmd` and `slides/chapter-02/ind
 
 ## Case decks
 
-The capstone cases of Part V (and, later, the comprehensive cases that close Parts I–IV) have no tutorials,
+The capstone cases of Part V and the comprehensive cases that close Parts I–IV have no tutorials,
 key terms or exercises. Their decks follow a case standard instead, so that one deck can open the case and
 then guide students through it phase by phase (the author's decision: a kickoff plus a phase guide, with
 method guidance and no answers). `slides/chapter-17/index.qmd` is the reference deck.
@@ -41,6 +42,19 @@ method guidance and no answers). `slides/chapter-17/index.qmd` is the reference 
 | Closing | `# Deliverables and Checklist`: Before you submit · `# Looking Ahead`: what the case practiced (the four analytics types), what comes after, About these slides | written |
 
 A capstone deck has about 50–55 teaching slides; a comprehensive case about 25–30.
+
+**Comprehensive cases.** The case that closes each of Parts I–IV has its own deck, `slides/case-part-N/index.qmd`
+(the ID follows the page's `#sec-case-part-N`; the release file is `case-part-N.pptx`), titled "Part I Case:
+<title>" over the book title, with the footer "Part I Case · <title>" (the author's decision, 2026-10-10).
+The book index reads the case page as it reads a chapter, with these differences: the case has no learning
+objectives, Getting Started, milestones or phases, so the deck opens with the controller's question, the
+roadmap is titled "In this case" and says "The case that closes this Part", and the requirements form one
+`# Requirements` module of cards, with a check after the cards whose method it practices; the case's single
+`**Deliverable.**` paragraph is its deliverable (`{{< book-deliverables >}}` shows it as a paragraph); and its
+sections are unnumbered in the book, so its dividers stay unnumbered and a divider the case has no section for
+(`# Looking Ahead`) is not flagged. Each case page carries `::: {.chapter-slides data-chapter="case-part-N"}`
+after its heading, which shows a "Case slides" bar once the deck exists, and the Downloads table's case row
+links the PowerPoint file. `slides/case-part-1/index.qmd` is the reference deck.
 
 **Requirement card.** The title states the point. Under it, the requirement's gray source line from the book,
 then four bullets that open with a bold label:

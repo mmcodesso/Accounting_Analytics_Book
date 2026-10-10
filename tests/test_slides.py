@@ -205,6 +205,93 @@ The deliverables and the criteria of a strong submission, from the book.
 """
 
 
+CASE_PAGE = """---
+format:
+  html:
+    number-sections: false
+---
+
+# Comprehensive Case: Readying the Data {#sec-case-part-1 .unnumbered}
+
+::: {.chapter-slides data-chapter="case-part-1"}
+:::
+
+This case closes Part I.
+
+## The Situation
+
+A request.
+
+::: {.callout-warning .watch-out icon=false}
+## Watch out
+A caution, not a section.
+:::
+
+## Requirements
+
+**Requirement 1: Frame the question (Chapter 1).** Frame it.
+
+**Requirement 2: Find what could mislead (Auditing).** Find it.
+
+**Requirement 3: Write the memo.** Write it.
+
+**Deliverable.** A memo of one page, with an appendix.
+
+## What a Strong Submission Includes
+
+- A clear question.
+- A memo that recommends.
+"""
+
+CASE_PAGE_DECK = """## In this case
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+The case has three modules; this slide lists them.
+:::
+
+# The Situation
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+The deliverable, as the case states it.
+:::
+
+# Requirements
+
+## Find what could mislead
+
+{{< book-requirement 2 >}}
+
+::: {.notes}
+The second requirement's card, with its source line.
+:::
+
+# Looking Ahead
+
+## What comes next
+
+- Part II
+
+::: {.notes}
+A closing slide under a divider the case has no section for.
+:::
+"""
+
+
+def case_fixture(root: Path) -> None:
+    """The book fixture with a comprehensive case closing its Part, and the case's deck."""
+    book_fixture(root)
+    write(root, "_quarto.yml", BOOK + "        - cases/part-1-case.qmd\n")
+    write(root, "cases/part-1-case.qmd", CASE_PAGE)
+    write(root, "slides/case-part-1/index.qmd", CASE_PAGE_DECK)
+
+
 def book_fixture(root: Path) -> None:
     write(root, "_quarto.yml", BOOK)
     write(root, "index.qmd", "# Home\n")
@@ -274,6 +361,25 @@ class BookIndexTests(unittest.TestCase):
             self.assertEqual(["A script.", "A workbook."], chapter["deliverables"])
             self.assertEqual(["Balances that agree.", "A memo that recommends."], chapter["criteria"])
             self.assertIn(("2.3.1", "Phase 1: The Ledger"), [(s["number"], s["title"]) for s in chapter["sections"]])
+
+    def test_a_comprehensive_case_is_a_deck_of_its_own(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            case_fixture(root)
+            index = book_index.build(root)
+            case = index["chapters"]["case-part-1"]
+            self.assertEqual(("case", "Readying the Data", "Part I Case", "Part I: Foundations"),
+                             (case["kind"], case["title"], case["label"], case["part"]))
+            self.assertEqual([1, 2], case["part_chapters"])    # the chapters of its Part, not the case
+            self.assertEqual([("", "The Situation"), ("", "Requirements"), ("", "What a Strong Submission Includes")],
+                             [(s["number"], s["title"]) for s in case["sections"]])
+            self.assertEqual([(1, "Frame the question", "Chapter 1"), (2, "Find what could mislead", "Auditing"),
+                              (3, "Write the memo", "")],
+                             [(r["number"], r["title"], r["chapters"]) for r in case["requirements"]])
+            self.assertEqual(["A memo of one page, with an appendix."], case["deliverables"])
+            self.assertEqual(["A clear question.", "A memo that recommends."], case["criteria"])
+            self.assertEqual([1, 2], index["chapters"]["chapter-01"]["part_chapters"])
+            self.assertEqual("Comprehensive Case: Readying the Data", index["chapters"]["chapter-02"]["next"])
 
 
 class SourceCheckTests(unittest.TestCase):
@@ -383,6 +489,14 @@ class SourceCheckTests(unittest.TestCase):
             self.assertEqual([], errors)
             self.assertTrue(any("'Something Else'" in warning for warning in warnings))
 
+    def test_a_case_deck_is_checked_and_its_dividers_stay_unnumbered(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            case_fixture(root)
+            self.assertEqual(([], []), self.check(root))    # "Looking Ahead" names no section: no warning
+            write(root, "slides/case-part-1/index.qmd", CASE_PAGE_DECK.replace("requirement 2", "requirement 7"))
+            self.assertTrue(any("no Requirement 7 in case-part-1" in error for error in self.check(root)[0]))
+
     def test_a_crop_must_lie_inside_its_figure(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -414,6 +528,16 @@ class PrepareTests(unittest.TestCase):
             self.assertNotIn("author", metadata)
             self.assertEqual("chapter-01.pptx", metadata["format"]["pptx"]["output-file"])
             self.assertEqual("Chapter 1 · The First Chapter", metadata["format"]["revealjs"]["footer"])
+
+    def test_a_case_deck_names_its_part_on_the_title_slide_and_in_the_footer(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            case_fixture(root)
+            self.assertEqual(["case-part-1", "chapter-01"], prep.deck_ids(root))
+            metadata = prep.deck_metadata(book_index.build(root), "case-part-1")
+            self.assertEqual("Part I Case: Readying the Data", metadata["title"])
+            self.assertEqual("Part I Case · Readying the Data", metadata["format"]["revealjs"]["footer"])
+            self.assertEqual("case-part-1.pptx", metadata["format"]["pptx"]["output-file"])
 
     def test_metadata_follows_the_decks_that_exist(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -566,13 +690,13 @@ class PowerPointTests(unittest.TestCase):
         self.assertEqual({None}, {rpr.get("sz") for rpr in bullet.iter(f'{{{NS["a"]}}}rPr')})
 
     def test_a_long_roadmap_takes_the_evidence_size(self) -> None:
-        def slide(entries: int) -> ET.Element:
+        def slide(entries: int, title: str = "In this chapter") -> ET.Element:
             column = ''.join(f'<a:p><a:r><a:rPr/><a:t>9.{i} A section title of some length</a:t></a:r></a:p>'
                              for i in range(entries))
             return ET.fromstring(
                 f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree>'
                 '<p:sp><p:nvSpPr><p:nvPr><p:ph type="title"/></p:nvPr></p:nvSpPr>'
-                '<p:txBody><a:p><a:r><a:rPr/><a:t>In this chapter</a:t></a:r></a:p></p:txBody></p:sp>'
+                f'<p:txBody><a:p><a:r><a:rPr/><a:t>{title}</a:t></a:r></a:p></p:txBody></p:sp>'
                 + ''.join(f'<p:sp><p:nvSpPr><p:nvPr><p:ph idx="{i}" sz="half"/></p:nvPr></p:nvSpPr>'
                           f'<p:txBody>{column}</p:txBody></p:sp>' for i in (1, 2))
                 + '</p:spTree></p:cSld></p:sld>')
@@ -584,6 +708,9 @@ class PowerPointTests(unittest.TestCase):
         sizes = {run.get("sz") for shape in long.findall('.//p:sp', NS)[1:] for run in shape.iter(f'{{{NS["a"]}}}rPr')}
         self.assertEqual({"2000"}, sizes)
         self.assertIsNone(long.find('.//p:sp//a:rPr', NS).get("sz"))   # the title keeps its size
+        case = slide(8, "In this case")   # a comprehensive case's roadmap
+        pptx_finish.format_roadmap(case, tokens)
+        self.assertEqual("2000", case.find('.//p:sp[2]//a:rPr', NS).get("sz"))
 
     @unittest.skipUnless(shutil.which("quarto"), "needs Quarto for Pandoc's default template")
     def test_the_template_carries_footer_backgrounds_and_no_name(self) -> None:

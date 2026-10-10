@@ -355,7 +355,8 @@ def inspect_deck(context, url: str, chapter: str, screenshots: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
-    parser.add_argument("--chapter", action="append", help="chapter-NN, repeatable; defaults to all rendered decks")
+    parser.add_argument("--chapter", action="append",
+                        help="chapter-NN or case-part-N, repeatable; defaults to all rendered decks")
     parser.add_argument("--chrome", type=Path, help="Path to installed Chrome")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
@@ -381,7 +382,7 @@ def main() -> int:
 
         chrome = installed_chrome(args.chrome)
         decks = ([output / name / "index.html" for name in args.chapter] if args.chapter else
-                 sorted(output.glob("chapter-*/index.html")))
+                 sorted(path for pattern in ("chapter-*", "case-part-*") for path in output.glob(f"{pattern}/index.html")))
         if not decks or any(not path.is_file() for path in decks):
             raise RuntimeError("Rendered decks are missing. Render slides before running browser review.")
         with serve(output) as base_url, sync_playwright() as playwright:

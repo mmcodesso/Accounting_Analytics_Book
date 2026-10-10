@@ -6,6 +6,9 @@ format:
 
 # Comprehensive Case: Planning the Plant's Hours for 2027 {#sec-case-part-3 .unnumbered}
 
+::: {.chapter-slides data-chapter="case-part-3"}
+:::
+
 This case closes Part III. It asks you to use the four SQL chapters together on the question the controller must settle before the year's books are closed: what to do about the plant's hours. You will build a documented script and profile the records it relies on, as in Chapters 9 and 10. You will compare and summarize those records with the CASE expressions, window functions, and views of Chapter 11, and you will test them as the internal auditors did in Chapter 12. The Part II case ended with a recommendation on promotions. This one ends with a plan for the plant and the entries that close its year.
 
 The case works in CharlesRiver_Work.sqlite, and every requirement can be completed with techniques you have already practiced. Save all your queries in one script, Case.sql.

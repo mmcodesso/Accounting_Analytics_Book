@@ -1,0 +1,296 @@
+## In this case
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is the comprehensive case that closes Part I, not a chapter. The deck opens with the controller's question, what you hand in and how it is judged, then walks through the situation, the data, and the six requirements in order. Present the opening before students start, and each requirement when they reach it.
+:::
+
+## The controller's question
+
+- Why did Furniture gross margins fall in the latest quarter?
+- Before anyone analyzes it, the controller wants a data readiness memo
+- Which data answers the question, and can it be trusted?
+- The analysis itself comes in Part II, with Excel
+
+::: {.notes}
+The case asks you to use the three chapters of Part I together on one realistic assignment: preparing the data for an analysis before the analysis begins. The work you do here decides whether the Part II analysis can be trusted. Each requirement names the chapter it draws on, and you decide how to produce it.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+The memo is the deliverable, and the appendix carries the evidence behind it: the data map of Requirement 2 and the reconciliation table of Requirement 4. Requirement 6 sets out the memo's three sections.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission separates what this case settles from what Part II must analyze, and backs every statement with the data map and the reconciliations. Read these criteria now and again before you hand in the memo.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-6 >}}
+
+::: {.notes}
+The memo is written for the controller: concise, organized by the three perspectives of the book, and ending with a recommendation she can act on.
+:::
+
+# The Situation
+
+## You are the staff accountant again
+
+- The controller's margin question from Chapters 1 and 3 is still open
+- She wants to know which data answers it, and whether it can be trusted
+- And what could make an analysis of it misleading
+- The quarter in question ends on the last day of the fiscal year
+
+::: {.notes}
+You are the staff accountant from the opening scenarios of Chapters 1 and 3. Before the team spends time on a full diagnostic analysis, the controller wants a short memo on the data. She also reminds you that the quarter ends on the last day of the fiscal year, when the books are closed: keep that reminder in mind.
+:::
+
+## Three chapters, one assignment
+
+- Frame the question with the concepts of Chapter 1
+- Test the data with the techniques of Chapter 2
+- Navigate the database with the keys and relationships of Chapter 3
+- Leave the analysis that answers the question for Part II
+
+::: {.notes}
+Every step can be completed with the filters, lookup functions and PivotTables you have already practiced. The case is about readiness: which data, how it connects, whether it reconciles, and what could mislead.
+:::
+
+# The Data You Will Use
+
+## The worksheets you will work with
+
+- Item: each product's item group and the accounts it posts to
+- SalesInvoice and SalesInvoiceLine: what was billed, and when
+- Shipment and ShipmentLine: what was shipped, at standard cost
+- GLEntry, Account and JournalEntry: the postings and the entries
+
+::: {.notes}
+Item identifies each product's item group and the accounts its revenue and cost post to. GLEntry records the postings, Account the chart of accounts, and JournalEntry the manual journal entries.
+:::
+
+## Work in your Part I working copy
+
+- Use CharlesRiver_Work.xlsx, from the Part I tutorials
+- Filters, lookups and PivotTables are all the tools you need
+- GLEntry is large: summarize it rather than copy formulas down
+- Keep the master workbook as you downloaded it
+
+::: {.notes}
+Summarize GLEntry with filters and PivotTables, as you did in Tutorial 2.2, rather than copying formulas down every row. The working copy, made in Tutorial 2.1, keeps the download as provided.
+:::
+
+## Watch out: GLEntry stores AccountID, not the number {.watch-out}
+
+- AccountID is the surrogate key of the Account table
+- It is not the account number on a financial statement
+- Look up each account's AccountID before you filter GLEntry
+- As you did in Tutorial 3.2
+
+::: {.notes}
+Filtering GLEntry on an account number instead of its AccountID returns the wrong rows, or none, without any warning. Chapter 3 explained why a table's surrogate key and its business key differ.
+:::
+
+# Requirements
+
+## Six requirements, one memo
+
+{{< book-requirements >}}
+
+::: {.notes}
+The requirements build on each other: frame the question, map the data, test it, reconcile it, find what could mislead, and write the memo. Requirement 5 carries the auditing perspective and names no chapter, because it asks you to apply what the first four found.
+:::
+
+## Frame the question
+
+{{< book-requirement 1 >}}
+
+- **Produce:** a descriptive and a diagnostic question, with their types
+- **Tool:** a short written framing; no worksheet is needed
+- **Revisit:** Chapter 1's types of analytics and its workflow
+- **Check:** each workflow stage is marked done here or left for Part II
+
+::: {.notes}
+Restate the controller's request as two questions: what happened to the Furniture margin, and why. Identify the type of analytics each calls for, then list the stages of the analytics workflow and mark which ones this case completes.
+:::
+
+## Check your understanding {.check}
+
+Which type of analytics does each question call for?
+
+1. What were sales by region last year?
+2. Why did returns rise in one month?
+3. What will revenue be next quarter?
+4. Which supplier should the company use?
+
+::: {.notes}
+Ask students what in each question's wording points to its type, as Chapter 1 described.
+:::
+
+## Each question has its type {.answer}
+
+1. Descriptive: what happened
+2. Diagnostic: why it happened
+3. Predictive: what is likely to happen
+4. Prescriptive: what to do about it
+
+::: {.notes}
+These are the four types of analytics of Chapter 1. Requirement 1 asks you to apply them to the controller's own question.
+:::
+
+## Map the data
+
+{{< book-requirement 2 >}}
+
+- **Produce:** the Furniture accounts, a join-path sketch, the returns' postings
+- **Tool:** the Item and Account worksheets, with lookups
+- **Revisit:** Chapter 3's keys and cardinality, and Tutorial 3.2's trace
+- **Check:** every join names its key and cardinality, in account numbers
+
+::: {.notes}
+In Item, find the column that identifies Furniture items and the columns that record the accounts their revenue and cost post to, and look those accounts up in Account. Sketch the joins from the invoice lines, the shipment lines and the ledger. Then examine where returns are recorded, and what that means for a product-line margin.
+:::
+
+## Check your understanding {.check}
+
+One or many?
+
+1. A supplier and its purchase orders
+2. A purchase order and its lines
+3. A purchase order line and its item
+4. A work order and its close
+
+::: {.notes}
+Ask students to read each pair from both sides, as Chapter 3's crow's foot notation does, and to name the key that joins them.
+:::
+
+## Each pair has its cardinality {.answer}
+
+1. One to many: a supplier may have no orders, or many
+2. One to many: every order has at least one line
+3. Many to one: each line names exactly one item
+4. One to one: a work order has at most one close
+
+::: {.notes}
+These pairs come from tables outside this case. Naming the key and the cardinality of each join in your own data map is the work of Requirement 2.
+:::
+
+## Test the data
+
+{{< book-requirement 3 >}}
+
+- **Produce:** the latest complete quarter, and a judgment on each finding
+- **Tool:** filters and PivotTables on the extract's first and last periods
+- **Revisit:** Tutorial 2.2's edges of the extract, and Chapter 2's findings
+- **Check:** each finding has a reason it could, or could not, distort it
+
+::: {.notes}
+Look at the edges of the extract, as you did in Tutorial 2.2, and explain why the latest periods in the ledger are not the quarter to analyze. Then review the findings of the Chapter 2 tutorials, and decide for each whether it could distort a comparison of the Furniture margin between the two most recent complete quarters.
+:::
+
+## Check your understanding {.check}
+
+Which data quality dimension does each test address?
+
+1. The date range of the extract
+2. Blank values in required fields
+3. Related fields that agree with each other
+4. Dates in a logical order
+
+::: {.notes}
+Ask students which of Chapter 2's four dimensions each test belongs to, using its data quality checklist.
+:::
+
+## Each test has its dimension {.answer}
+
+1. Timeliness
+2. Completeness
+3. Consistency
+4. Accuracy
+
+::: {.notes}
+These are the tests of Chapter 2's checklist. Requirement 3 asks a further question of each finding: not only which dimension it touches, but whether it could distort this comparison.
+:::
+
+## Reconcile the sub-ledger to the ledger
+
+{{< book-requirement 4 >}}
+
+- **Produce:** Furniture revenue and cost for both quarters, on both sides
+- **Tool:** lookups for InvoiceDate and ItemGroup, then PivotTables
+- **Revisit:** Chapter 2's ledger checks, and Chapter 3's source documents
+- **Check:** you explain what agreement tells you, and what it does not
+
+::: {.notes}
+Total the Furniture revenue on the invoice lines and compare it with the credits to the Furniture revenue account that come from sales invoices. Total the standard cost on Furniture shipment lines and compare it with the Shipment debits to the Furniture cost account. Then identify the other source document types that post to that cost account.
+:::
+
+## Find what could mislead
+
+{{< book-requirement 5 >}}
+
+- **Produce:** the margin from all ledger rows, and then recomputed
+- **Tool:** a PivotTable of GLEntry by quarter and source document type
+- **Revisit:** Tutorial 2.2's ledger summaries, and Tutorial 3.2's trace
+- **Check:** you read the totals behind each percentage, not only the rate
+
+::: {.notes}
+Using GLEntry alone, calculate the Furniture gross margin percentage for each quarter from every row posted to the Furniture revenue and cost accounts. Look at the source document types behind the latest quarter's totals, find the entry responsible for what you see, and identify its EntryType in the JournalEntry worksheet. The controller's reminder about when the quarter ends is worth rereading here.
+:::
+
+## Write the data readiness memo
+
+{{< book-requirement 6 >}}
+
+- One to two pages, to the controller, in three sections
+- Financial reporting: the reconciliation and the cutoff findings
+- Managerial accounting: the margin measure you recommend
+- Auditing: the evidence for reliance, and the limitations
+
+::: {.notes}
+The managerial section states the accounts, the rows to include and exclude, the quarters to compare, what the measure shows, and the product-level data available for Part II. The auditing section covers the evidence that the data can be relied on and any limitation. Close the memo with a recommendation for the analysis the team should perform next.
+:::
+
+## Before you submit
+
+- The memo keeps to its length, and ends with a recommendation
+- The appendix holds the data map and the reconciliation table
+- Every join in the map names its key and its cardinality
+- Each total in the memo can be traced to a filter or PivotTable
+
+::: {.notes}
+These are self-checks, not answers. A reviewer should be able to start from any number in the memo and find the worksheet summary behind it.
+:::
+
+# Looking Ahead
+
+## From readiness to diagnosis
+
+- The data map and the margin measure are Part II's starting point
+- Part II splits the margin change into volume, mix, price and cost
+- That diagnostic question is the one this case prepares
+- The Excel chapters teach the techniques it needs
+
+::: {.notes}
+This case answered the descriptive question and prepared the diagnostic one. Part II uses Excel to break the margin change into its effects, which is the analysis the memo's recommendation should point toward.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every requirement shown comes from the case:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online book.
+:::

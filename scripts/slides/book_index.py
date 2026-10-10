@@ -32,12 +32,25 @@ REQUIREMENT = re.compile(r"^\*\*Requirement (\d+):\s*(.+?)\.\*\*")
 CHAPTERS = re.compile(r"^(.*?)\s*\(([^()]*)\)$")
 MILESTONE = re.compile(r"^(\d+)\.\s+\*\*(.+?)\*\*\s*(?:\(([^()]*)\))?:?\s*(.*)$")
 NUMBERED = re.compile(r"^(\d+)\.\s+(.+)$")
+# A comprehensive case states its deliverable in one paragraph, not in a numbered checklist.
+DELIVERABLE = re.compile(r"^\*\*Deliverable\.\*\*\s*(.+)$")
 BOOK_URL = "https://aa.accountinganalyticshub.com/"
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
+# A deck's folder under slides/: a chapter's (chapter-01) or a comprehensive case's (case-part-1), named
+# like the case page's ID, #sec-case-part-1. scripts/release.py and filters/slide-links.lua match the same names.
+DECK_GLOBS = ("chapter-[0-9][0-9]", "case-part-[0-9]")
+DECK_ID = re.compile(r"chapter-\d{2}|case-part-\d")
+CHAPTER_PATH = re.compile(r"chapters/(\d{2})-[^/]+/chapter\.qmd")
+CASE_PATH = re.compile(r"cases/part-(\d)-case\.qmd")
+CASE_HEADING = re.compile(r"^Comprehensive Case:\s*")
 
 
 def deck_id(number: int) -> str:
     return f"chapter-{number:02d}"
+
+
+def case_id(number: int) -> str:
+    return f"case-part-{number}"
 
 
 def read_lines(path: Path, root: Path) -> list[str]:
@@ -132,7 +145,8 @@ def page_title(path: Path, root: Path) -> str:
     return path.stem
 
 
-def index_chapter(path: Path, root: Path, label: str) -> dict:
+def index_chapter(path: Path, root: Path, label: str, *, numbered: bool = True) -> dict:
+    """A chapter's parts; numbered=False for a comprehensive case, whose sections the book leaves unnumbered."""
     meta, lines = split_front_matter(read_lines(path, root))
     chapter: dict = {"title": str(meta.get("title", "")), "objectives": [], "sections": [],
                      "figures": [], "tables": [], "key_terms": [], "tutorials": [], "exercises": [],
@@ -167,7 +181,9 @@ def index_chapter(path: Path, root: Path, label: str) -> dict:
             level, title, attrs = len(match[1]) - 2, match[2], match[3] or ""
             heading = title
             checkpoint = None
-            if ".unnumbered" not in attrs and not re.search(r"(^|\s)-(\s|$)", attrs):
+            if not numbered:
+                chapter["sections"].append({"number": "", "title": title, "level": level + 2})
+            elif ".unnumbered" not in attrs and not re.search(r"(^|\s)-(\s|$)", attrs):
                 counters[level] += 1
                 for deeper in range(level + 1, len(counters)):
                     counters[deeper] = 0
@@ -220,6 +236,10 @@ def index_chapter(path: Path, root: Path, label: str) -> dict:
         if found:
             chapter["exercises"].append({"id": found[1], "title": found[2], "perspective": perspective})
             continue
+        found = DELIVERABLE.match(line)
+        if found:
+            chapter["deliverables"].append(found[1].strip())
+            continue
         found = REQUIREMENT.match(line)
         if found:
             # "Rebuild Accrued Expenses at each year-end (Chapters 3, 10, and 12)": the chapters, when given,
@@ -270,28 +290,42 @@ def index_chapter(path: Path, root: Path, label: str) -> dict:
 
 
 def build(root: Path) -> dict:
-    """Every numbered chapter of the book, with lookups of its figures and tables by ID."""
+    """Every numbered chapter and comprehensive case of the book, with lookups of their figures and tables by ID.
+
+    A case is indexed like a chapter, with kind "case": its title is its heading without "Comprehensive Case: ",
+    its label names its Part ("Part I Case", where a chapter's is "Chapter 1"), and its sections are unnumbered."""
     title, entries = book_entries(root)
     chapters: dict[str, dict] = {}
     order = []
     for position, entry in enumerate(entries):
         path = root / entry["path"]
-        found = re.fullmatch(r"chapters/(\d{2})-[^/]+/chapter\.qmd", entry["path"])
+        found = CHAPTER_PATH.fullmatch(entry["path"])
+        case = CASE_PATH.fullmatch(entry["path"])
         if found:
             number = int(found[1])
             chapter = index_chapter(path, root, str(number))
-            chapter.update({"id": deck_id(number), "number": number, "path": entry["path"],
-                            "part": entry["part"]})
-            chapters[chapter["id"]] = chapter
-            order.append((position, chapter["id"]))
+            chapter.update({"id": deck_id(number), "kind": "chapter", "number": number,
+                            "label": f"Chapter {number}", "path": entry["path"], "part": entry["part"]})
+        elif case:
+            number = int(case[1])
+            chapter = index_chapter(path, root, "", numbered=False)
+            numeral = re.match(r"Part (\w+):", entry["part"] or "")
+            chapter.update({"id": case_id(number), "kind": "case", "number": number,
+                            "title": CASE_HEADING.sub("", page_title(path, root)),
+                            "label": f"Part {numeral[1]} Case" if numeral else "Case",
+                            "path": entry["path"], "part": entry["part"]})
+        else:
+            continue
+        chapters[chapter["id"]] = chapter
+        order.append((position, chapter["id"]))
     for position, identifier in order:
         chapter = chapters[identifier]
         same_part = [chapters[other]["number"] for _, other in order
-                     if chapters[other]["part"] == chapter["part"]]
+                     if chapters[other]["part"] == chapter["part"] and chapters[other]["kind"] == "chapter"]
         chapter["part_chapters"] = same_part
         following = entries[position + 1] if position + 1 < len(entries) else None
         if following:
-            found = re.fullmatch(r"chapters/(\d{2})-[^/]+/chapter\.qmd", following["path"])
+            found = CHAPTER_PATH.fullmatch(following["path"])
             name = page_title(root / following["path"], root)
             chapter["next"] = f"Chapter {int(found[1])}: {name}" if found else name
         else:

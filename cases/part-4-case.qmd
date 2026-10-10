@@ -6,6 +6,9 @@ format:
 
 # Comprehensive Case: Finding the Cash Behind the Profit {#sec-case-part-4 .unnumbered}
 
+::: {.chapter-slides data-chapter="case-part-4"}
+:::
+
 This case closes Part IV. It asks you to use the four Power BI chapters together on a question the audit committee has put to the controller: how a year with a profit of several million dollars ended with less cash than it began. You will build, profile, and validate a model of your own, as in Chapters 13 and 14, and measure balances, their changes, and how fast they turn with the DAX of Chapter 14. You will build pages that the committee can explore with the drill-through pages, tooltips, and parameters of Chapter 15, and you will test your own report before anyone relies on it, as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant's hours and the entries that close fiscal 2026. This one ends with a recommendation on the cash that Charles River holds in its working capital.
 
 The case works in a new file, Charles River Cash Case.pbix, built in Power BI Desktop from CharlesRiver.xlsx, so that the package of Chapters 13 to 15 and internal audit's monitoring file stay as they are. Every requirement can be completed with techniques you have already practiced.

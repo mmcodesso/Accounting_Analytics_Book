@@ -1,4 +1,4 @@
--- The structure every deck shares. Module dividers (# headings) that name a section of the chapter get
+-- The structure every deck shares. Module dividers (# headings) that name a numbered section of the chapter get
 -- its number ("1.4 The Accounting Analytics Workflow"); a ::: {.roadmap} div becomes the roadmap of the
 -- book's Parts and the deck's modules; dividers, callout slides and check slides get a background
 -- image, which Reveal.js and PowerPoint both honor, so the two formats look alike.
@@ -35,8 +35,10 @@ local function roadmap(index, chapter, modules)
   end
   local numeral, name = (chapter.part or ''):match('^Part (%u+): (.+)$')
   local part = numeral and ('**Part ' .. numeral .. ' of ' .. (ROMAN[count] or count) .. ': ' .. name .. '**') or ''
-  -- The chapter's place within its Part, which differs from its number after Part I.
-  local place = 'Chapter ' .. position .. ' of ' .. #chapter.part_chapters .. ' in this Part'
+  -- The chapter's place within its Part, which differs from its number after Part I; a comprehensive case
+  -- closes its Part.
+  local place = chapter.kind == 'case' and 'The case that closes this Part'
+    or ('Chapter ' .. position .. ' of ' .. #chapter.part_chapters .. ' in this Part')
   local items = {}
   for _, module in ipairs(modules) do
     -- A tutorial is listed by its number; its divider carries the full title.
@@ -85,6 +87,8 @@ function Pandoc(doc)
     if block.t == 'Header' and block.level == 1 then
       local title = pandoc.utils.stringify(block.content)
       local number = not title:match('^Guided Tutorial') and numbers[title_key(title)]
+      -- A comprehensive case's sections are unnumbered in the book, so its dividers stay unnumbered too.
+      if number == '' then number = nil end
       if number then
         block.content:insert(1, pandoc.Space())
         block.content:insert(1, pandoc.Span(pandoc.Str(number), pandoc.Attr('', {'section-number'})))

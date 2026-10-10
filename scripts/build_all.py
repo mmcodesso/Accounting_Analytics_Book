@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Build the book and its chapter slide decks; never deploy.
 
-A deck is published as soon as slides/chapter-NN/index.qmd exists, like a chapter: there is no
+A deck is published as soon as slides/chapter-NN/index.qmd (or slides/case-part-N/index.qmd, for a
+comprehensive case) exists, like a chapter: there is no
 approval step. --check runs the fast source checks (no Quarto, no dataset); --slides-only renders
 the decks without the book; --preview CHAPTER serves one deck in the browser.
 
@@ -79,7 +80,7 @@ def assemble(root: Path, decks: list[str]) -> None:
         if nested_build:
             raise ValueError(f'Nested build directory in Reveal resources: {nested_build}')
         shutil.copytree(reveal, target)
-        for directory in target.glob('chapter-*'):
+        for directory in [path for pattern in ('chapter-*', 'case-part-*') for path in target.glob(pattern)]:
             if directory.name not in decks and directory.is_dir():
                 shutil.rmtree(directory)
         # Only generated runtime resources are allowed in the Reveal staging tree.
@@ -93,7 +94,7 @@ def assemble(root: Path, decks: list[str]) -> None:
 def dependency_state(root: Path) -> tuple:
     """What a deck reads: the book sources, the exported figures, the slide theme, filters and shortcodes."""
     paths = [root / '_quarto.yml', root / '_variables.yml', root / 'slides/_quarto.yml']
-    for folder, pattern in (('chapters', '*.qmd'), ('shared/fragments', '*.qmd'), ('visuals/svg', '*.svg'),
+    for folder, pattern in (('chapters', '*.qmd'), ('cases', '*.qmd'), ('shared/fragments', '*.qmd'), ('visuals/svg', '*.svg'),
                             ('slides/theme', '*'), ('slides/filters', '*'), ('slides/shortcodes', '*')):
         paths += [p for p in (root / folder).rglob(pattern) if p.is_file()]
     return tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in paths if p.exists())

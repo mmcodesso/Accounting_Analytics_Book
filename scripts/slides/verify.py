@@ -26,6 +26,8 @@ PRIVATE_TEXT = re.compile(
 # Everything is public (author's decision, 2026-10-05): the solutions and the instructor notes are release files, and
 # the Downloads page lists them by name, so the wording check skips that one page of the assembled site.
 SOLUTION_PAGES = {"front-matter/downloads.html"}
+# A deck's folder: a chapter's (chapter-01) or a comprehensive case's (case-part-1), as book_index.DECK_ID.
+DECK_DIR = r"(?:chapter-\d{2}|case-part-\d)"
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
 INCLUDE =re.compile(r"\{\{<\s*include\s+[\"']?([^\s>\"']+)[\"']?\s*>\}\}")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<?[^\s)>]+>?)")
@@ -123,7 +125,7 @@ def is_reveal_runtime_metadata(path: Path, output_root: Path) -> bool:
     runtime location and complete descriptor contents are checked here.
     """
     relative = path.relative_to(output_root).as_posix()
-    match = re.fullmatch(r"chapter-\d{2}/index_files/libs/revealjs/plugin/([^/]+)/plugin\.yml", relative)
+    match = re.fullmatch(DECK_DIR + r"/index_files/libs/revealjs/plugin/([^/]+)/plugin\.yml", relative)
     if not match or match[1] not in REVEAL_PLUGIN_METADATA:
         return False
     descriptor, resources = REVEAL_PLUGIN_METADATA[match[1]]
@@ -278,9 +280,11 @@ def verify_sources(root: Path, decks: list[str], index: dict) -> tuple[list[str]
                 errors.append(f"{label}: slide '{title}' has no notes")
             elif len(" ".join(notes.group(1).split())) <= 20:
                 errors.append(f"{label}: slide '{title}' has notes too short to be useful")
+        # A comprehensive case leaves its sections unnumbered, so its dividers are never numbered either.
         sections = {section["title"].casefold() for section in chapter["sections"]}
         for level, title in slide_headings(text):
-            if level == 1 and title.casefold() not in sections and not title.startswith("Guided Tutorial"):
+            if (level == 1 and chapter.get("kind") != "case" and title.casefold() not in sections
+                    and not title.startswith("Guided Tutorial")):
                 warnings.append(f"{label}: divider '{title}' matches no section of the chapter, so it is not numbered")
     return errors, warnings
 
@@ -436,8 +440,8 @@ def verify_outputs(root: Path, decks: list[str], site: Path | None = None,
         errors.extend(verify_local_links(html_root, book_url=book_url))
     if site:
         if deck_root.exists():
-            for directory in deck_root.glob("chapter-*"):
-                if directory.is_dir() and directory.name not in decks:
+            for directory in deck_root.iterdir():
+                if directory.is_dir() and re.fullmatch(DECK_DIR, directory.name) and directory.name not in decks:
                     errors.append(f"Deck in the assembled site has no source: {directory.name}")
         for path in html_root.rglob("*.html"):
             listed = path.relative_to(html_root).as_posix() in SOLUTION_PAGES

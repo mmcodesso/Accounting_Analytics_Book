@@ -60,3 +60,4 @@ slides/_shared/
 slides/_build/
 slides/.quarto/
 slides/chapter-*/_metadata.yml
+slides/case-part-*/_metadata.yml

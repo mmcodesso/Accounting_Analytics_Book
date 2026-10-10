@@ -24,7 +24,7 @@ EMU_PER_POINT = 12700
 CHARACTER_WIDTH = 0.47  # the average width of Arial text, as a share of its size
 BOX_INSET = 7.2         # PowerPoint's default left and right text insets, in points
 NUMBER_GAP = 6          # the least space between a list number and its text, in points
-ROADMAP_TITLE = 'In this chapter'
+ROADMAP_TITLES = ('In this chapter', 'In this case')  # a chapter deck's roadmap, and a case deck's
 ROADMAP_CHARACTERS = 30  # characters that fit a line of a roadmap column (slides/filters/deck.lua)
 ROADMAP_LINES = 12       # lines a roadmap column holds at the body size (slides/filters/deck.lua)
 
@@ -190,7 +190,7 @@ def format_roadmap(slide: ET.Element, tokens: dict) -> None:
     the layout's half placeholders hold about ROADMAP_LINES lines at the body size."""
     shapes = list(slide.iter(q('p', 'sp')))
     title = next((shape for shape in shapes if shape.find('.//p:ph[@type="title"]', NS) is not None), None)
-    if title is None or ''.join(t.text or '' for t in title.iter(q('a', 't'))).strip() != ROADMAP_TITLE:
+    if title is None or ''.join(t.text or '' for t in title.iter(q('a', 't'))).strip() not in ROADMAP_TITLES:
         return
     columns = [shape for shape in shapes if shape.find('.//p:ph[@sz="half"]', NS) is not None]
     def markdown(paragraph: ET.Element) -> str:
@@ -217,7 +217,8 @@ def finish(path: Path, tokens: dict) -> None:
         for item in source.infolist():
             data = source.read(item.filename)
             if SLIDE.fullmatch(item.filename) and (b'<a:tbl>' in data or b'<p:pic>' in data
-                                                   or b'buAutoNum' in data or ROADMAP_TITLE.encode() in data
+                                                   or b'buAutoNum' in data
+                                                   or any(title.encode() in data for title in ROADMAP_TITLES)
                                                    or tokens.get('code_font', '\0').encode() in data
                                                    or b'Requirement ' in data):
                 xml = ET.fromstring(data)
