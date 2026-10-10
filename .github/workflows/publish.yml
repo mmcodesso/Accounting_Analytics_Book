@@ -48,7 +48,7 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: "1.9.36"
+          version: "1.10.19"
           tinytex: false
 
       - name: Build the site

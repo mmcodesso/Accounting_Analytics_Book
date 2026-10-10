@@ -33,7 +33,8 @@ INCLUDE =re.compile(r"\{\{<\s*include\s+[\"']?([^\s>\"']+)[\"']?\s*>\}\}")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<?[^\s)>]+>?)")
 NS = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main",
       "p": "http://schemas.openxmlformats.org/presentationml/2006/main"}
-# Exact upstream descriptors observed in the pinned Quarto 1.9.36 distribution.
+# Exact upstream descriptors of the pinned Quarto (build_all.QUARTO_VERSION): checked in 1.9.36 and again in
+# 1.10.19, where all four are unchanged.
 # Updating Quarto requires reviewing this small vendor metadata allowlist too.
 REVEAL_PLUGIN_METADATA = {
     "pdf-export": ("name: PdfExport\nscript: pdfexport.js", ("pdfexport.js",)),
@@ -118,7 +119,7 @@ def safe_path(root: Path, value: str, *, public: bool = False) -> Path:
 
 
 def is_reveal_runtime_metadata(path: Path, output_root: Path) -> bool:
-    """Allow only the known Quarto 1.9.36 Reveal plugin descriptors.
+    """Allow only the known Reveal plugin descriptors of the pinned Quarto.
 
     These vendor descriptors travel with runtime JS/CSS. A generic YAML extension
     exception would also publish arbitrary authoring metadata, so both the exact

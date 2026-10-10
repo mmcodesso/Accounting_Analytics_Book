@@ -809,7 +809,7 @@ def stage_products(root: Path, decks=("chapter-01", "chapter-02")) -> None:
 class BuildTests(unittest.TestCase):
     def patches(self, root: Path, run):
         return [patch.object(build_all, "source_checks", return_value=[]),
-                patch.object(build_all.subprocess, "check_output", return_value="1.9.36\n"),
+                patch.object(build_all.subprocess, "check_output", return_value=build_all.QUARTO_VERSION + "\n"),
                 patch.object(build_all, "prepare"),
                 patch.object(build_all, "finish_pptx"),
                 patch.object(build_all, "load_manifest", return_value={"colors": {}}),
@@ -998,7 +998,7 @@ class BuildTests(unittest.TestCase):
     def test_export_failure_stops_before_rendering(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             with patch.object(build_all, "source_checks", return_value=[]), \
-                 patch.object(build_all.subprocess, "check_output", return_value="1.9.36"), \
+                 patch.object(build_all.subprocess, "check_output", return_value=build_all.QUARTO_VERSION), \
                  patch.object(build_all, "prepare") as prepare, \
                  patch.object(build_all, "run", side_effect=subprocess.CalledProcessError(1, "export")) as run:
                 with self.assertRaises(subprocess.CalledProcessError):

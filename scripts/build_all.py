@@ -32,7 +32,7 @@ from scripts.slides.prepare import deck_ids, find_quarto, prepare, reset_owned
 from scripts.slides.verify import is_reveal_runtime_metadata, load_manifest, verify_outputs, verify_sources
 
 ROOT = Path(__file__).resolve().parents[1]
-QUARTO_VERSION = '1.9.36'
+QUARTO_VERSION = '1.10.19'
 BOOK_URL = book_index.BOOK_URL
 
 

@@ -268,7 +268,7 @@ release lacks, and warns when a file on the release is older than the text.
 `slides/` is a separate Quarto project. Each chapter's deck, `slides/chapter-NN/index.qmd`,
 renders to both Reveal.js and PowerPoint. A deck is published as soon as it exists, like a
 chapter; there is no approval step, and editing a chapter never blocks the build. Use
-Python 3.13, Quarto 1.9.36, and Draw.io 29.6.6, with the usual book dependencies above,
+Python 3.13, Quarto 1.10.19, and Draw.io 29.6.6, with the usual book dependencies above,
 then install the pinned Python package:
 
 ```sh

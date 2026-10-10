@@ -68,7 +68,7 @@ change to the book, build it locally and publish it.**
 
 Install once:
 
-- [Quarto](https://quarto.org/) 1.9.36, a TeX distribution for the PDF (such as
+- [Quarto](https://quarto.org/) 1.10.19, a TeX distribution for the PDF (such as
   MiKTeX), and the [Draw.io desktop app](https://www.drawio.com/) for the figures;
 - Python, then `python -m pip install -r scripts/slides/requirements.txt`;
 - the [GitHub CLI](https://cli.github.com/), signed in: `winget install --id GitHub.cli`,
