@@ -17,6 +17,7 @@ filters:
   - path: filters/book-pages.lua
     at: post-quarto
   - filters/pdf-code.lua
+  - filters/learning-objectives.lua
 
 book:
   title: "Accounting Analytics: An Integrated Approach"
@@ -117,6 +118,8 @@ format:
     template: styles/book-epub.template
     publisher: "Accounting Analytics Hub"
     rights: "Licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/"
+    # The book's EPUB styles (the learning objectives box), in every page's head.
+    include-in-header: styles/book-epub-head.html
   docx:
     reference-doc: styles/reference.docx
     # filters/book-pages.lua writes the table of contents after the title and copyright pages; Pandoc's

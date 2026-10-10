@@ -1,0 +1,25 @@
+<style type="text/css">
+  /* Added to every EPUB page's head (include-in-header in _quarto.yml). An EPUB css: file would replace
+     Pandoc's default stylesheet for the whole book, so the book's own EPUB rules go here.
+     A chapter's learning objectives: Pandoc makes the div the section of its heading. The website's box
+     (.learning-objectives in styles/book.scss), without the gradient and shadow e-readers draw unevenly. */
+  .learning-objectives {
+    background-color: #EAF2F8;
+    border: 1px solid #C9DCEA;
+    border-left: 0.3em solid #1A5276;
+    border-radius: 0.6em;
+    padding: 0.6em 1em 0.5em 1em;
+    margin: 1em 0 1.5em 0;
+  }
+  .learning-objectives h2 {
+    margin-top: 0.2em;
+    color: #1A5276;
+  }
+  .learning-objectives > p {
+    font-family: sans-serif;
+    font-weight: bold;
+  }
+  .learning-objectives ol {
+    margin-bottom: 0.2em;
+  }
+</style>
