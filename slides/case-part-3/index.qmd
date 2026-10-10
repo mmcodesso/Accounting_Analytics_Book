@@ -1,0 +1,319 @@
+## In this case
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is the comprehensive case that closes Part III, not a chapter. The deck opens with the question, what you hand in and how it is judged, then walks through the situation, the data, and the six requirements in order. Present the opening before students start, and each requirement when they reach it.
+:::
+
+## What should the plant plan for?
+
+- The audit found overtime the time clock alone cannot support
+- The controller must settle the plant's hours before the books close
+- She needs a plan for the new year, and the entries that close the old
+- You are the staff accountant of Chapters 9 to 11 again
+
+::: {.notes}
+The case puts the four SQL chapters to work together. You build a documented script and profile its records as in Chapters 9 and 10, compare and summarize them with the CASE expressions, window functions and views of Chapter 11, and test them as the internal auditors did in Chapter 12. The Part II case ended with a recommendation on promotions; this one ends with a plan for the plant and the entries that close its year.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+The memo carries the recommendation, the one-page appendix the five exhibits behind it, and Case.sql the evidence: a reviewer should be able to rerun every query from its header and comments.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission reconciles each population before it tests it, grades its evidence for independence as well as agreement, and builds a bridge that sums to the ledger. Read these criteria now and again before you hand in the memo.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-6 >}}
+
+::: {.notes}
+The memo is written for the controller: concise, organized by perspective, careful with the word "unsupported", and ending with a recommendation she can act on.
+:::
+
+# The Situation
+
+## The audit left one question open
+
+- The plant's records reconcile, and the pay is right for the hours
+- The growth in overtime sits on surge days
+- On a surge day, every hourly employee clocked the same hours
+- The timekeeping records alone cannot show those hours were worked
+
+::: {.notes}
+The internal auditors reported on the manufacturing variance in Chapter 12. The audit committee has asked management to respond, and the chief audit executive will review the response. Your memo is the analysis behind that response.
+:::
+
+## Four questions from the controller
+
+- Do records outside the time clock support the surge-day hours?
+- What did the extra hours produce, and what did they cost?
+- What should the plant plan for the new year, and should standards change?
+- What do the latest year's statements need before they are final?
+
+::: {.notes}
+The plan covers hours, overtime and conversion cost. The memo answers the questions in this order, which Requirement 6 follows: auditing first, then managerial accounting, then financial reporting.
+:::
+
+## Call the hours unsupported, not unworked
+
+- The records show hours that cannot be supported
+- They do not show hours that were never worked
+- Each employee was paid on their own register
+- Time entered in bulk for work really done remains possible
+
+::: {.notes}
+The controller's caution is a wording rule for the whole memo: call the hours unsupported until the evidence says more. Requirement 2 asks you to name two explanations that fit the records, and the evidence outside the database that would tell them apart.
+:::
+
+# The Data You Will Use
+
+## Work in Case.sql
+
+- Use CharlesRiver_Work.sqlite, the working copy, in a new editor tab
+- Give Case.sql a header like Audit.sql's
+- Put a two-line comment above every query
+- Reuse Tutorial 11.3's view and Audit.sql's tests L5 and L6
+
+::: {.notes}
+The two-line comment names what the query tests, then its population and the result you expect. The view is MonthlyLaborEfficiency. If you do not have it, the Downloads page's companion files offer Setup_Part3_Views.sql, which recreates it in your working copy, and Audit.sql as it stands at the end of Chapter 12.
+:::
+
+## Tables the chapters did not query
+
+- TimeClockPunch: the badge punches behind each clock entry
+- EmployeeShiftRoster and ShiftDefinition: the scheduled shifts
+- EmployeeAbsence and AttendanceException: absences and exceptions
+- WorkCenterCalendar and RoughCutCapacityPlan: days, hours and load
+- FixedAsset: the equipment, and where its depreciation is charged
+
+::: {.notes}
+The roster records who created each shift and when, and AttendanceException the type, status and reviewer of each exception. The case also uses tables you know: the time clock and overtime approvals, labor time and operations, completions, items, employees, cost centers, payroll, and the ledger. Profile each new table before relying on it, as Chapter 10 profiled WorkOrder.
+:::
+
+## Watch out: three calendars, and mixing them misleads {.watch-out}
+
+- Time records follow the date worked, and end before the year does
+- The ledger and the payroll follow the pay date
+- Output follows the completion date, and includes weekends
+- Compare hours with output on work dates; measure cost on the ledger
+
+::: {.notes}
+Count output only up to the last day with time records, as in Chapter 10. Because the ledger follows pay dates, the first fiscal year charged fewer payrolls to the clearing account than the later years, as Tutorial 11.2 showed. Never divide the cost of a pay year by the hours of a work year.
+:::
+
+## Check your understanding {.check}
+
+Which calendar does each measure follow?
+
+1. The hours an employee worked
+2. The payroll cost in the ledger
+3. The units the plant completed
+4. A comparison of hours with output
+
+::: {.notes}
+Ask students what each record is dated by, and what happens when two of them are compared on different calendars.
+:::
+
+## Each measure has its calendar {.answer}
+
+1. The work date
+2. The pay date
+3. The completion date
+4. Work dates, with output cut off at the last day with time records
+
+::: {.notes}
+Requirements 3 and 5 depend on these choices: the comparison of output with hours, the cost of the overtime, and the accrual of the year's last weeks.
+:::
+
+## Watch out: dates without days, and tables that fan out {.watch-out}
+
+- Roster times carry no date: build a timestamp with `||`
+- Compare times with `julianday`: a late clock-out may fall a day later
+- Several tables fan out when joined: summarize each side first
+- Count the plant's hourly employees, not the whole cost center
+
+::: {.notes}
+Each clock entry has three or four punches, RoughCutCapacityPlan repeats a work center's available hours on every item row, and WorkCenterCalendar has one row for each work center and date. Avoid correlated subqueries on TimeClockPunch, which has no index on TimeClockEntryID.
+:::
+
+# Requirements
+
+## Six requirements, one plan
+
+{{< book-requirements >}}
+
+::: {.notes}
+The requirements follow the controller's questions: build the script and its populations, test the surge days, measure what the hours produced and cost, plan the new year, close the latest year, and write the memo.
+:::
+
+## Build the case script and its populations
+
+{{< book-requirement 1 >}}
+
+- **Produce:** the header, profiles, link tests, and two views
+- **Tool:** Case.sql, with the views saved in the working copy
+- **Revisit:** Chapter 10's data profile, and Tutorial 12.3's test H9
+- **Check:** the SurgeDays view reconciles to what Tutorial 12.3 found
+
+::: {.notes}
+Profile the punch, roster, exception and calendar tables with Chapter 10's tests. Test every punch to its clock entry, every clock entry to its roster, and every exception to its clock entry, comparing the employee and date on each side, and give each exception a disposition. Save SurgeDays with the definition of test H9's CTE, and a second view of hourly manufacturing clock entries with a DayType of Surge or Ordinary.
+:::
+
+## Test whether other records support the surge days
+
+{{< book-requirement 2 >}}
+
+- **Produce:** surge against ordinary days, a control rerun, a plans test
+- **Tool:** conditional aggregation and a window function
+- **Revisit:** Chapter 11's CASE and windows, and Chapter 12's tests
+- **Check:** a corroboration matrix grades each test for independence
+
+::: {.notes}
+Compare surge and ordinary days on clock-in times, groups sharing one time, meal punches, and rostered against clocked hours. Reperform the attendance-exception control and decide whether it failed in design, operation, or both. Test the overtime's reasons against the calendar, the planned load and the operations the approvals cite. In the matrix, say whether each test supports, contradicts or says nothing, and whether its record is independent of the Production Manager and of the timekeeping system.
+:::
+
+## Check your understanding {.check}
+
+Is the record independent evidence?
+
+1. A customer's own confirmation of its balance
+2. A report prepared by the person whose results it measures
+3. A carrier's record of a delivery
+4. An approval signed by the person who requested it
+
+::: {.notes}
+Ask students who produced each record, and whether that person or system could have shaped what it says.
+:::
+
+## Independence depends on who made the record {.answer}
+
+1. Independent: it comes from outside the company
+2. Not independent: its author has a stake in it
+3. Independent: a third party recorded it
+4. Not independent: requester and approver are the same
+
+::: {.notes}
+Records that agree are stronger evidence when they come from different sources. Grading each of the case's own records this way is the work of Requirement 2's corroboration matrix.
+:::
+
+## What the hours produced and what they cost
+
+{{< book-requirement 3 >}}
+
+- **Produce:** output against hours, unused capacity, two costs, a bridge
+- **Tool:** SQL with a window frame, on work dates
+- **Revisit:** Chapter 10's measure of the plant, Chapter 11's frames, test H5
+- **Check:** the bridge sums to the ledger, and each measure names its calendar
+
+::: {.notes}
+Compare output with hours by year and by Monday week, grouped by surge days, with the following weeks' output in a window frame, and say what the comparison cannot show given how completions are dated. Cost the surge overtime two ways, with taxes and benefits, using the Employee base rates as test H5 did. Bridge the growth of the manufacturing variance into its ledger lines, explain the payroll line with three measures, and say why they do not add up exactly.
+:::
+
+## Plan the new year's hours and conversion cost
+
+{{< book-requirement 4 >}}
+
+- **Produce:** the plan's hours, capacity check, and conversion cost
+- **Tool:** a one-row Params CTE, and a Scenarios CTE built with UNION ALL
+- **Revisit:** Chapter 11's CTEs, and Chapter 7's documented model
+- **Check:** each assumption's value, source and effect is in the comments
+
+::: {.notes}
+The assumptions are the volume and why not the budget's, a target of hours per standard hour, the rate and burden, the working days, the run rate of the Factory Overhead entries, and the depreciation, after you reproduce the latest year's from FixedAsset. Compare the hours with regular capacity, show the expected variance of three scenarios, and explain the variance that remains at standard hours before deciding on the standards.
+:::
+
+## Close the fiscal year's statements
+
+{{< book-requirement 5 >}}
+
+- **Produce:** the year-end payroll accruals, entries, cutoff, and effect
+- **Tool:** SQL, with working days counted in WorkCenterCalendar
+- **Revisit:** Tutorial 12.1's tests L5 and L6, and Chapter 6's statements
+- **Check:** the effect on income is kept apart from the balance sheet
+
+::: {.notes}
+Estimate the cost of the work after the time records end from the cost per working day of the last eight processed pay periods, by cost center, and write the entries. Measure the prior year-end's work paid in the latest year by the same method, show why the effect on income differs from the effect on the liability, and decide what to do about the accrued payroll balance carried since the opening entry. Start from Chapter 6's net income.
+:::
+
+## Check your understanding {.check}
+
+Inventory, or the period's expense?
+
+1. Fixed production overhead at normal capacity
+2. Idle facility expense
+3. Abnormal spoilage
+4. The materials of the units completed
+
+::: {.notes}
+Ask students to apply the rule Requirement 5 quotes from the inventory standard, ASC Topic 330.
+:::
+
+## The inventory standard decides {.answer}
+
+1. Inventory: allocated on normal capacity
+2. The period: an abnormal cost
+3. The period: an abnormal cost
+4. Inventory: a cost of the product
+
+::: {.notes}
+Fixed overhead goes to inventory only at normal capacity; abnormal amounts, such as idle facility expense, are expenses of the period. Requirement 5 asks where the cost of the hours beyond the work belongs, and what raising the standards would do to finished goods.
+:::
+
+## Write the decision memo
+
+{{< book-requirement 6 >}}
+
+- At most two pages, in the order of the controller's questions
+- Auditing: the evidence, its independence, and the control
+- Managerial accounting: the hours' output and cost, and the plan
+- Financial reporting: the adjustments, and why inventory stays out
+
+::: {.notes}
+The auditing section also names the explanations that remain open and the evidence that would settle them. The managerial section includes the bridge of the variance and the overtime the plan allows. Close with your recommendation, and keep calling the hours unsupported.
+:::
+
+## Before you submit
+
+- Case.sql runs top to bottom, with its header and every comment
+- Each population reconciles before any test relies on it
+- The appendix holds the five exhibits the case lists
+- The memo keeps to its length, and ends with a recommendation
+
+::: {.notes}
+These are self-checks, not answers. A reviewer should be able to start from any number in the memo and find the query behind it.
+:::
+
+# Looking Ahead
+
+## From queries to reports
+
+- The case summarized records by day, week and year against a plan
+- The views you saved can run again next month without change
+- Part IV turns results like these into reports managers explore
+- Chapter 9's CSV exports are one way to bring them there
+
+::: {.notes}
+The script is now a monitoring tool as well as an answer: rerun it when new records arrive, and the views and tests show whether the surge days continue.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every requirement shown comes from the case:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online book.
+:::
