@@ -1,0 +1,319 @@
+## In this case
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is the comprehensive case that closes Part II, not a chapter. The deck opens with the decision, what you hand in and how it is judged, then walks through the situation, the data, and the six requirements in order. Present the opening before students start, and each requirement when they reach it.
+:::
+
+## Should Charles River keep running promotions?
+
+- The sales team proposes repeating last year's three promotions
+- The approved budget for the new year includes none
+- Chapter 7 found one promotion needed far more orders than came
+- The controller wants your decision memo before the CFO sees it
+
+::: {.notes}
+The case puts the five Excel chapters to work on one decision. You build and document a workbook with Power Query as in Chapters 4 and 5, describe the promotions' cost and reconcile it with Chapter 6, test and model their effect with Chapter 7, and test the controls as the internal auditors did in Chapter 8. The Part I case ended with a memo on whether the data could be trusted; this one ends with a recommendation someone will act on.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+The memo carries the recommendation, the one-page appendix carries the five exhibits behind it, and the workbook lets a reviewer rerun every number. Requirement 6 sets out the memo's three sections.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission can be refreshed and followed by someone else, ties its cost to the ledger, and judges every apparent increase against normal variation before calling it one. Read these criteria now and again before you hand in the memo.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-6 >}}
+
+::: {.notes}
+The memo is written for the controller to take to the chief financial officer: concise, organized by the book's three perspectives, and ending with a recommendation on the proposal.
+:::
+
+# The Situation
+
+## Three promotions a year, every year
+
+- A collection of items in the spring
+- An item group in the fall
+- A customer segment late in the year
+- The proposal repeats last year's calendar, at the same rates
+
+::: {.notes}
+The proposed promotions are the Harbor Collection Promotion on the items of the Harbor collection, the Furniture Seasonal Promotion on every Furniture item, and the Design Trade Customer Promotion on every order from Design Trade customers. The case gives their rates and months; put the rates on your Parameters sheet.
+:::
+
+## The sales team's two arguments
+
+- The Chapter 7 model looked at one promotion in one year
+- Promotions bring in new customers
+- Both are claims the data can test
+
+::: {.notes}
+Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that the orders showed no increase at all. The team's answer is that one promotion in one year is not the whole story. Requirement 3 tests both arguments across every promotion and every year in the data.
+:::
+
+## Four questions from the controller
+
+- What have three years of promotions cost, and where does it show?
+- Did any promotion bring in sales that would not otherwise be made?
+- What would the proposed calendar do to the new year's plan?
+- Are the controls over promotions good enough to run one?
+
+::: {.notes}
+The first question asks where the cost appears in the financial statements. The chief audit executive has shared the pricing-control findings of Exercise 8.6, and asks you to extend those tests to every promotion before anyone relies on them: that is the fourth question.
+:::
+
+# The Data You Will Use
+
+## A new workbook for the case
+
+- Charles River Promotion Case.xlsx, next to CharlesRiver.xlsx
+- It imports the Tables with Power Query, under the names given
+- The analysis and audit workbooks of the chapters stay as they are
+- Every requirement uses techniques you have already practiced
+
+::: {.notes}
+Import the Tables with Data > Get Data > From File > From Excel Workbook, using the query names the case gives, so that a reviewer can follow the workbook from its queries.
+:::
+
+## The queries the case builds
+
+- Promotions, with lookups of orders, invoices, items and customers
+- OrderLines: what customers ordered, and when
+- BilledLines: what was billed and recognized as revenue
+- RevenuePostings and BudgetPrices: the ledger and the plans
+- Overrides and Employees: who requested and approved prices
+
+::: {.notes}
+OrderLines is built from the order lines and merged with the lookups and Promotions. BilledLines takes the invoice date from Invoices. RevenuePostings comes from GLEntry with account numbers from Accounts, and BudgetPrices from the budget lines.
+:::
+
+## Follow the Part II Power Query conventions
+
+- Set Discount to a decimal number, as in Tutorial 4.1
+- Expand merged columns without the prefix
+- Import GLEntry with Transform Data, and filter it first
+- Clear Enable Load for queries that only feed others
+- Rename each loaded worksheet after its query
+
+::: {.notes}
+Check the data types in each Changed Type step: Discount in OrderLines and BilledLines must be a decimal number, or the rates round to zero. GLEntry is far too large to load before it is filtered.
+:::
+
+## Watch out: names that collide, and two kinds of date {.watch-out}
+
+- PromotionProgram repeats three column names of Item and Customer
+- Rename them in Promotions before you merge it into OrderLines
+- A promotion applies by order date: timing and volume use OrderLines
+- Revenue and the ledger follow the invoice date in BilledLines
+
+::: {.notes}
+The three columns are ItemGroup, CollectionName and CustomerSegment; rename them, for example to PromoItemGroup, PromoCollection and PromoSegment, because two columns in one query cannot share a name. Chapter 5 showed why the order date and the invoice date must be kept apart.
+:::
+
+## Check your understanding {.check}
+
+Order date or invoice date?
+
+1. Whether a line falls within a promotion's dates
+2. The quarter in which a discount reaches revenue
+3. The volume ordered in a promotion's months
+4. Tying billed revenue to the ledger
+
+::: {.notes}
+Ask students which query each question belongs in, OrderLines or BilledLines.
+:::
+
+## Each question has its date {.answer}
+
+1. Order date: a promotion applies when the order is placed
+2. Invoice date: revenue is recognized when billed
+3. Order date, in OrderLines
+4. Invoice date, in BilledLines
+
+::: {.notes}
+The two dates can fall in different months, and even in different years. Using the wrong one misplaces both the promotion's months and its cost.
+:::
+
+# Requirements
+
+## Six requirements, one decision
+
+{{< book-requirements >}}
+
+::: {.notes}
+The requirements follow the controller's questions: build and validate the workbook, measure the cost, test the effect on sales, model the proposal, test the controls, and write the memo. Each of the middle four takes one of the book's perspectives.
+:::
+
+## Build and validate the case workbook
+
+{{< book-requirement 1 >}}
+
+- **Produce:** the documented workbook, its queries and completeness checks
+- **Tool:** Power Query, and a Parameters sheet of named cells
+- **Revisit:** Tutorials 4.1 and 4.3, and Chapter 5's merges
+- **Check:** each control total agrees, and the checks are documented
+
+::: {.notes}
+Start with a Documentation sheet as in Tutorial 4.3, and a Parameters sheet holding the proposal's three rates and the commission rate of Tutorial 7.3 as named cells, with the inputs in blue. Build OrderLines and BilledLines with their three amounts. Then show the queries are complete: row counts against their sources, what the filters keep, the order lines against the orders, and no discount without a PromotionID.
+:::
+
+## Measure what the promotions cost
+
+{{< book-requirement 2 >}}
+
+- **Produce:** the discount by promotion and year, and a gross-to-net schedule
+- **Tool:** PivotTables and a chart on BilledLines
+- **Revisit:** Chapter 6's PivotTables, and its tie from ledger to statements
+- **Check:** the net billed ties to the ledger, with any difference explained
+
+::: {.notes}
+Express each year's discount as a share of that year's billed revenue. For the latest year, the gross-to-net schedule runs from the list amount through the price lists and approved overrides, then the promotional discounts, to the net billed. Find the account where discounts could be recorded, and explain what the income statement shows about the cost. Then show in which quarters the proposed promotions' discounts were billed.
+:::
+
+## Test whether the promotions brought in sales
+
+{{< book-requirement 3 >}}
+
+- **Produce:** each promotion's months and scope, and its volume test
+- **Tool:** PivotTables of ListAmount by scope and month, with STDEV.S
+- **Revisit:** Chapter 7's expectations, and Tutorial 7.3's look at orders
+- **Check:** each difference is judged against the scope's normal variation
+
+::: {.notes}
+Find the months each promotion actually ran from its lines' order dates, and compare them with its recorded dates. Measure volume at list amount, and say why. Compare each promotion's months with the average of the other months of its year and with the same months a year earlier. Then test the claim about new customers from each customer's first order, and say what the first months of the data cannot tell you.
+:::
+
+## Model the proposed calendar
+
+{{< book-requirement 4 >}}
+
+- **Produce:** break-even lifts, a data table, a Goal Seek discount, a cost
+- **Tool:** Tutorial 7.3's model over the Parameters sheet
+- **Revisit:** Chapter 7's contribution model, data tables and Goal Seek
+- **Check:** you state the volume basis, and why it is not the budget's
+
+::: {.notes}
+Extend the model to the three proposed promotions, one column each, from their latest-year billed lines. Build the data table of the Furniture promotion's contribution over discount rates and increases in volume, and use Goal Seek for the discount at which your largest measured increase would just pay. Show how the budgets planned promotions, and estimate the calendar's cost against a budget without them, by quarter.
+:::
+
+## Check your understanding {.check}
+
+Does it raise a promotion's break-even lift?
+
+1. A deeper discount
+2. A higher standard cost per unit
+3. A higher commission rate
+4. More units sold before the promotion
+
+::: {.notes}
+Ask students to reason from Tutorial 7.3's model: the lift is the extra volume the discounted margin needs to earn what the full margin earned.
+:::
+
+## Each change moves the lift, or not {.answer}
+
+1. Yes: each unit earns less during the promotion
+2. Yes: the margin left after the discount shrinks faster
+3. Yes, a little: commission takes a share of every price
+4. No: the lift is a share of the volume, whatever its size
+
+::: {.notes}
+The break-even lift is the margin before the discount divided by the margin after it, less one. Computing it for each proposed promotion is the work of Requirement 4.
+:::
+
+## Test the controls over promotions
+
+{{< book-requirement 5 >}}
+
+- **Produce:** four tests on every promotion line, with causes and dispositions
+- **Tool:** custom columns and PivotTables on OrderLines
+- **Revisit:** Exercise 8.6's pricing tests, and Chapter 8's dispositions
+- **Check:** each exception has evidence from outside the record it tests
+
+::: {.notes}
+Test that each promotion line was ordered within the recorded dates, falls within the scope, carries the promotion's rate, and that every line in scope during the promotion carries it. Where recorded dates fail, look for other evidence of when a promotion was meant to run. Investigate lines outside scope in the item master, review who approved promotions and overrides, and list the conditions for running any promotion.
+:::
+
+## Check your understanding {.check}
+
+A weakness in design, or a failure in operation?
+
+1. Nothing requires a second approval before a promotion starts
+2. A required approval is given after the promotion ended
+3. The order system accepts a discount typed with no promotion
+4. A monthly exception report exists, but nobody reviews it
+
+::: {.notes}
+Ask students whether the control is missing or badly designed, or whether a sound control did not work as intended, as Chapter 8 defined a control deficiency.
+:::
+
+## Design or operation decides the fix {.answer}
+
+1. Design: the control does not exist
+2. Operation: the control exists but did not work in time
+3. Design: the system allows what the control should prevent
+4. Operation: the report is sound, but it is not used
+
+::: {.notes}
+A design weakness needs a new or changed control; an operating failure needs the existing control to be performed. Requirement 5 asks you to make this call for each exception the case's own tests find.
+:::
+
+## Write the decision memo
+
+{{< book-requirement 6 >}}
+
+- At most two pages, to the controller, in three sections
+- Financial reporting: the cost, how it is recorded, when it reaches results
+- Managerial accounting: the effect on volume, break-even, and the cost
+- Auditing: the exceptions, their dispositions, and the conditions to run
+
+::: {.notes}
+The managerial section also covers new customers and any alternative worth testing. Close the memo with your recommendation on the proposal, which the controller will take to the chief financial officer.
+:::
+
+## Before you submit
+
+- The workbook refreshes, and its Documentation sheet is complete
+- Every control total agrees, and every parameter is a named cell
+- The appendix holds the five exhibits the case lists
+- The memo keeps to its length, and ends with a recommendation
+
+::: {.notes}
+These are self-checks, not answers. A reviewer should be able to start from any number in the memo and find the query or PivotTable behind it.
+:::
+
+# Looking Ahead
+
+## From workbooks to queries and reports
+
+- Much of this case brought tables together and summarized them
+- Part III asks the same kinds of questions of the database with SQL
+- A join and a grouped query do the work of a merge and a PivotTable
+- Part IV turns evidence like yours into reports management explores
+
+::: {.notes}
+The case's work by month and by scope is the kind of question SQL answers directly against the database, and the kind of evidence Power BI lets management explore for itself.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every requirement shown comes from the case:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online book.
+:::
