@@ -7,8 +7,9 @@
 --   EPUB: they fill the EPUB's title page (the book-pages variable of styles/book-epub.template) as XHTML, styled
 --         inline (an EPUB css file would replace Pandoc's default stylesheet for the whole book). Kept out of the
 --         body, where Pandoc would set the book's title as a heading above them.
---   DOCX: Pandoc's title block (Title and Author, from the metadata) starts the title page, and the table of
---         contents is written here after the copyright page (toc is off for docx in _quarto.yml).
+--   DOCX: Pandoc's title block (Title, Subtitle and Author, from the metadata) starts the title page, each page is
+--         a section, and the table of contents is written here after the copyright page (toc is off for docx in
+--         _quarto.yml), already listing the headings.
 
 local isbns = nil          -- key -> ISBN text ('' while unassigned), from the isbn block of _quarto.yml
 local title_lines = nil    -- the title page's lines: {class, content}
@@ -161,37 +162,92 @@ local function epub_copyright_page(div)
 end
 
 -- DOCX ---------------------------------------------------------------------------------------------------------------
+-- Pandoc's title block is the top of the title page: the filter gives it the page's title, subtitle and author
+-- lines (so the file's properties carry them too), styled Title, Subtitle and Author in styles/reference.docx. The
+-- rest of the page follows in that file's Book Rule, Book Edition and Book Publisher styles. Each page is a section
+-- of its own: the title page's ends the page, and the copyright page's sets its text at the foot of the page, as
+-- in the PDF. Then the table of contents, which Word fills in with page numbers when it updates the field; until
+-- then (a file opened in Protected View, or in another program) it lists the headings, each a link.
 
-local function docx_page_break()
-  return pandoc.RawBlock('openxml', '<w:p><w:r><w:br w:type="page" /></w:r></w:p>')
+local function xml_text(text)
+  return (text:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;'):gsub('"', '&quot;'))
 end
 
--- The table of contents exactly as Pandoc writes it for --toc (Word fills it in when the file is opened).
-local function docx_toc()
-  local title = toc_title:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
-  return pandoc.RawBlock('openxml', '<w:sdt><w:sdtPr><w:docPartObj><w:docPartGallery w:val="Table of Contents" />'
-    .. '<w:docPartUnique /></w:docPartObj></w:sdtPr><w:sdtContent><w:p><w:pPr><w:pStyle w:val="TOCHeading" /></w:pPr>'
-    .. '<w:r><w:t xml:space="preserve">' .. title .. '</w:t></w:r></w:p><w:p><w:r><w:fldChar w:fldCharType="begin"'
-    .. ' w:dirty="true" /><w:instrText xml:space="preserve">TOC \\o &quot;1-3&quot; \\h \\z \\u</w:instrText>'
-    .. '<w:fldChar w:fldCharType="separate" /><w:fldChar w:fldCharType="end" /></w:r></w:p></w:sdtContent></w:sdt>')
+local function docx_paragraph(style, text)
+  local run = text and ('<w:r><w:t xml:space="preserve">' .. xml_text(text) .. '</w:t></w:r>') or ''
+  return '<w:p><w:pPr><w:pStyle w:val="' .. style .. '" /></w:pPr>' .. run .. '</w:p>'
 end
 
--- Pandoc's title block prints the title and the author, so the page adds the lines after them, centered like them.
+-- An empty paragraph that ends a section (and so its page); vAlign bottom sets the section's text at the foot.
+local function docx_section_end(valign)
+  local align = valign and ('<w:vAlign w:val="' .. valign .. '" />') or ''
+  return pandoc.RawBlock('openxml', '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact" />'
+    .. '<w:rPr><w:sz w:val="2" /><w:szCs w:val="2" /></w:rPr><w:sectPr><w:footnotePr><w:numRestart w:val="eachSect" />'
+    .. '</w:footnotePr>' .. align .. '</w:sectPr></w:pPr></w:p>')
+end
+
+local DOCX_LINE_STYLE = {['book-edition'] = 'BookEdition', ['book-revision'] = 'BookEdition',
+                         ['book-publisher'] = 'BookPublisher'}
+
 local function docx_title_page()
-  local blocks = {}
+  local xml = {docx_paragraph('BookRule')}
   for _, line in ipairs(title_lines) do
-    if line.class ~= 'book-title' and line.class ~= 'book-subtitle' and line.class ~= 'book-author' then
-      blocks[#blocks + 1] = pandoc.Div({pandoc.Para(line.content)}, pandoc.Attr('', {}, {['custom-style'] = 'Author'}))
-    end
+    local style = DOCX_LINE_STYLE[line.class]
+    if style then xml[#xml + 1] = docx_paragraph(style, pandoc.utils.stringify(line.content)) end
   end
-  return blocks
+  return {pandoc.RawBlock('openxml', table.concat(xml)), docx_section_end(nil)}
 end
 
-local function author_line()
+local function docx_copyright_page(div)
+  return {pandoc.Div(div.content, pandoc.Attr('', {}, {['custom-style'] = 'Copyright Text'})),
+          docx_section_end('bottom')}
+end
+
+local function title_line(class)
   for _, line in ipairs(title_lines or {}) do
-    if line.class == 'book-author' then return line.content end
+    if line.class == class then return line.content end
   end
   return nil
+end
+
+-- The bookmark Pandoc writes for a heading's identifier (toBookmarkName in Pandoc's DOCX writer): the identifier
+-- itself when it starts with a letter and has at most 40 characters, otherwise X and the SHA-1 digest less its
+-- first digit.
+local function bookmark(id)
+  if id:match('^%a') and utf8.len(id) <= 40 then return id end
+  return 'X' .. pandoc.utils.sha1(id):sub(2)
+end
+
+-- Word's own field (TOC \o "1-3" \h \z \u, as Pandoc writes it for --toc), its result the headings of levels 1 to
+-- 3 in the toc 1 to toc 3 styles, without page numbers.
+local function docx_toc(doc)
+  local entries = {}
+  -- A Part's title page is a quarto-book-part div, which Quarto drops from every format but LaTeX after this filter.
+  doc.blocks:walk({
+    Div = function(div) if div.classes:includes('quarto-book-part') then return {} end end,
+  }):walk({
+    Header = function(header)
+      if header.level <= 3 then entries[#entries + 1] = {header.level, header.identifier,
+                                                        pandoc.utils.stringify(header.content)} end
+    end,
+  })
+  local begin = '<w:r><w:fldChar w:fldCharType="begin" w:dirty="true" /></w:r><w:r><w:instrText xml:space="preserve">'
+    .. 'TOC \\o &quot;1-3&quot; \\h \\z \\u</w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate" /></w:r>'
+  local field_end = '<w:r><w:fldChar w:fldCharType="end" /></w:r>'
+  local xml = {'<w:sdt><w:sdtPr><w:docPartObj><w:docPartGallery w:val="Table of Contents" /><w:docPartUnique />'
+    .. '</w:docPartObj></w:sdtPr><w:sdtContent>', docx_paragraph('TOCHeading', toc_title)}
+  if #entries == 0 then
+    xml[#xml + 1] = '<w:p>' .. begin .. field_end .. '</w:p>'
+  end
+  for i, entry in ipairs(entries) do
+    local level, id, text = entry[1], entry[2], entry[3]
+    local run = '<w:r><w:t xml:space="preserve">' .. xml_text(text) .. '</w:t></w:r>'
+    if id ~= '' then run = '<w:hyperlink w:anchor="' .. xml_text(bookmark(id)) .. '" w:history="1">' .. run .. '</w:hyperlink>' end
+    xml[#xml + 1] = '<w:p><w:pPr><w:pStyle w:val="TOC' .. level .. '" /></w:pPr>' .. (i == 1 and begin or '') .. run
+                    .. (i == #entries and field_end or '') .. '</w:p>'
+  end
+  xml[#xml + 1] = '</w:sdtContent></w:sdt>'
+  return pandoc.RawBlock('openxml', table.concat(xml))
 end
 
 -- The filters --------------------------------------------------------------------------------------------------------
@@ -211,13 +267,7 @@ local function pages(div)
   if div.identifier == 'book-copyright-page' then
     copyright = div.content
     if is_format('epub') then front.epub_copyright = epub_copyright_page(div) end
-    if is_format('docx') then
-      local blocks = {docx_page_break()}
-      for _, block in ipairs(div.content) do blocks[#blocks + 1] = block end
-      blocks[#blocks + 1] = docx_page_break()
-      blocks[#blocks + 1] = docx_toc()
-      front.copyright = blocks
-    end
+    if is_format('docx') then front.copyright = docx_copyright_page(div) end
     return {}
   end
 end
@@ -226,15 +276,17 @@ local function finish(doc)
   if is_format('latex') and (title_lines or copyright) then
     quarto.doc.include_text('before-body', latex_pages())
   end
-  local blocks = pandoc.Blocks({})
-  for _, part in ipairs({front.title or {}, front.copyright or {}}) do blocks:extend(part) end
-  if #blocks > 0 then
+  if is_format('docx') then
+    local blocks = pandoc.Blocks({})
+    for _, part in ipairs({front.title or {}, front.copyright or {}}) do blocks:extend(part) end
+    blocks:insert(docx_toc(doc))
     blocks:extend(doc.blocks)
     doc.blocks = blocks
-  end
-  if is_format('docx') then
-    local author = author_line()
-    if author then doc.meta.author = pandoc.MetaList({pandoc.MetaInlines(author)}) end
+    for meta, class in pairs({title = 'book-title', subtitle = 'book-subtitle', author = 'book-author'}) do
+      local line = title_line(class)
+      if line then doc.meta[meta] = meta == 'author' and pandoc.MetaList({pandoc.MetaInlines(line)})
+                                    or pandoc.MetaInlines(line) end
+    end
   end
   local epub_pages = pandoc.Blocks({})
   if front.epub_title then epub_pages:insert(front.epub_title) end
