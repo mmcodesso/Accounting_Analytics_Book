@@ -1,0 +1,635 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is a case, not a chapter of tutorials. The deck opens with a kickoff (the engagement, the cycle and its risks, what you hand in, how it is judged, the data and the setup) and then follows the three phases of the requirements, each ending with a milestone check-in. Present the kickoff first, and each phase when its milestone begins.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover planning an integrated audit from the records, assessing the cycle's risks including fraud, and deciding when a query of the whole population replaces a sample.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover sizing, selecting and evaluating an attribute sample, explaining the growth of returns and ranking refunds, and classifying and reporting control deficiencies.
+:::
+
+## Returns grow faster than sales
+
+- Returns and allowances have outgrown sales for three years
+- Furniture leads, yet returns rarely get a second look at the close
+- The audit committee wants assurance on controls and balances
+- You are back on the internal audit team of Chapters 8, 12 and 16
+
+::: {.notes}
+The controller's team nets returns against sales at every close and moves on. Chapters 8, 12 and 16 aged the receivables and set aside, as credits on paid invoices that were refunded, the invoices whose balances had turned negative; nobody has audited those credits and refunds since. A refund is cash that leaves the company on the strength of a record. The case has no tutorials: each requirement says what the audit needs and which chapters it draws on, and you decide how to produce it.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+These are the four deliverables, as the chapter's checklist lists them. The script tests the populations, the workbook holds the judgments, the reports show the patterns and keep the tests running, and the report to the committee brings them together.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-4 >}}
+
+::: {.notes}
+A strong submission reconciles before it tests, and tests whole populations wherever the evidence is in the records. Read these criteria now and again before each milestone.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 5-7 >}}
+
+::: {.notes}
+The report is judged as much on its wording as on its findings: it says what the records show, names the evidence that would settle each question, and rates deficiencies by likelihood and magnitude rather than by counts.
+:::
+
+# The Engagement
+
+## What the audit committee asked for
+
+- An audit of returns, credit memos, refunds, clawbacks and cash application
+- Assurance on both the controls and the balances, not a review
+- Analytics and tests over three fiscal years; controls as at the latest year-end
+- The owners: the controller, customer service and accounting managers
+
+::: {.notes}
+The chief audit executive sets the scope: three years, so that a pattern can be seen as it grows, with the conclusions on controls stated as at the end of the latest fiscal year. Fieldwork runs for a month, and the report goes to a later meeting of the committee. The owners of the cycle are the ones who will respond to the findings.
+:::
+
+## Five questions for the audit
+
+- Are the populations complete, and do they agree with the ledger?
+- Are credits and refunds approved by people entitled to approve them?
+- Could the cycle hide a fraud, and do the records show any sign of one?
+- Why do returns grow faster than sales, and what does that mean?
+- What should the committee hear, and what should be monitored?
+
+::: {.notes}
+The second question also asks whether incompatible duties are separated. The third names three frauds to keep in mind: a diverted refund, lapping, and a credit that covers stolen cash. The fourth asks what the growth of returns means for revenue and inventory, and the fifth how severe each finding is.
+:::
+
+## The chief audit executive's three conditions
+
+- Magnitude is judged against a set share of income before income taxes
+- Every finding is worded as what the records show, not what anyone did
+- The owners own their responses, but you draft the action plans
+
+::: {.notes}
+Income before income taxes is taken as the ledger records it, for the latest fiscal year, and the chapter states the share; use it as written. A finding reads like "a refund dated before the customer's payment was received" until evidence from outside the database settles the question.
+:::
+
+# The Credits Cycle and Its Risks
+
+## An integrated audit tests controls and balances
+
+- A test of controls asks whether a control operated
+- A substantive test asks whether an amount is right
+- One query over a whole population can be both at once
+- So the evidence on each control informs the test of its balance
+
+::: {.notes}
+The standard for audits of public companies' internal control over financial reporting, AS 2201 of the PCAOB, is built on this idea, and internal auditors apply it to a cycle. The query that finds every credit approved above its approver's authority also totals the credits, so the test of the control and the test of the balance share one population.
+:::
+
+## Five documents meet the ledger at one hub
+
+{{< book-figure fig-19-01 crop="0,0,1,0.5950" >}}
+
+::: {.notes}
+Each document is recorded by one department: the warehouse receives the goods back, customer service records and applies receipts, approves credits and approves the clawbacks, and accounting approves refunds. Solid arrows show the flow of documents, and dashed amber arrows their postings. The hub is Customer Deposits and Unapplied Cash: every receipt passes through it, a credit on a paid invoice lands in it, and every refund is paid out of it.
+:::
+
+## Nine control points a sound cycle would check
+
+{{< book-figure fig-19-01 crop="0,0.5950,1,0.3523" >}}
+
+::: {.notes}
+These are what a well-designed cycle would check at each step, not what Charles River's records show. Requirement 1 marks, for each control point, what the records can evidence and what they cannot.
+:::
+
+## Fraud schemes and the traces they leave
+
+{{< book-table tbl-19-01 1-3 >}}
+
+::: {.notes}
+Each scheme leaves traces a query can look for. Lapping hides a stolen receipt behind later payments; a false credit closes an invoice whose payment was taken; a diverted refund sends a credit balance somewhere the customer does not control.
+:::
+
+## Two more schemes, and their traces
+
+{{< book-table tbl-19-01 4-5 >}}
+
+::: {.notes}
+These traces are what the control tests of Requirement 4 and the refund score of Requirement 5 search for. Finding a trace is not proof of a scheme: the finding says what the records show.
+:::
+
+## Fraud here is more often theft than misreporting
+
+- Asset misappropriation far outnumbers financial statement fraud
+- Fraud usually needs an incentive, an opportunity and a rationalization
+- Preventive controls stop a refund going to the wrong account
+- Detective controls look for the traces in the table
+
+::: {.notes}
+The ACFE's latest study found asset misappropriation in the great majority of occupational fraud cases, and found that anti-fraud controls go with lower losses and faster detection. AS 2401 frames the brainstorming of Requirement 3 around the three conditions. COSO and the ACFE describe preventive controls in a refund process: pay refunds only to the instrument the customer used or to an account verified independently, offset any open balance first, and keep the approval of credits away from the people who handle the customer's cash.
+:::
+
+# The Data You Will Use
+
+## What carries over from the chapters
+
+- Chapter 12's Audit.sql, with its approval and trace tests
+- Chapter 8's random selection, key items and dispositions
+- Chapter 16's Audit Monitoring.pbix and its register, if you built it
+- Familiar tables: receipts, applications, invoices, shipments, the ledger
+
+::: {.notes}
+The familiar tables are CashReceipt and CashReceiptApplication, SalesInvoice, Shipment, Employee and the ledger. Audit Monitoring.pbix keeps its dispositions through every refresh; if you did not build it, Requirement 10 offers a small register of your own instead.
+:::
+
+## Tables new to your tests
+
+- SalesReturn and SalesReturnLine: the goods received back
+- CreditMemo and CreditMemoLine: the credits that reverse sales
+- CustomerRefund: the cash paid back to customers
+- The commission tables: rates, accruals, adjustments and payments
+
+::: {.notes}
+The commission tables are SalesCommissionRate, SalesCommissionAccrual, SalesCommissionAdjustment, SalesCommissionPayment and SalesCommissionPaymentLine. Profile each before relying on it, as Chapter 10 profiled WorkOrder; Requirement 1 starts there.
+:::
+
+## Three files, three tools
+
+{{< book-table tbl-19-02 widths="12,32,31,25" >}}
+
+::: {.notes}
+Requirement 4's query flags each refund, and Requirement 5's report loads those flags as a CSV file: the query decides, and the report lets the committee see and drill into what it decided.
+:::
+
+## Watch out: the ledger needs care in this cycle {.watch-out}
+
+- Leave the year-end closes out of every reconciliation
+- Reconcile each flow through the hub account, not just its balance
+- Postings follow each document's own date
+- A credit can post to receivables, to the hub account, or to both
+
+::: {.notes}
+The closes post to the returns and allowances account and to commission expense. The hub has large flows in and out and a small balance. Postings use the receipt date, not the deposit date, and the refund date, not the date the refund cleared. And the ledger's CreatedByEmployeeID is not evidence of who keyed a credit or a refund: on these documents it names the approver every time.
+:::
+
+## Watch out: time runs through every measure {.watch-out}
+
+- Returns follow shipments, credits follow returns, refunds follow credits
+- The last weeks' returns and the next year's refunds are missing
+- The first year had no earlier sales to return
+- Ask what was true on the day, using only what was dated by then
+
+::: {.notes}
+A refund can fall in a later year than its credit, and a return in a later year than its sale, so compare rates over complete windows. Whether the customer had paid or owed money on the day of a refund uses only the payments and credits dated by that day, as Chapter 8 aged receivables. And do not confuse the year's credit memos with the three years' refunds: the two populations happen to be close in size.
+:::
+
+## Watch out: some evidence is not in the database {.watch-out}
+
+- The authority limit in Employee is general, not a delegation for credits
+- No table holds a payee's name, a bank account or a refund request
+- Some patterns may reflect how the records were produced
+- So word every finding as what the records show
+
+::: {.notes}
+A delegation of authority for credits and refunds, if one exists, is a document outside the records. These gaps are why sampling still has a place in this audit, as Phase 2 explains.
+:::
+
+# Getting Started
+
+## Set up before you begin
+
+- Work in a capstone copy of the database; the download never changes
+- Head Credits.sql, and put two comment lines above every query
+- Give Credits Audit.xlsx a Documentation sheet with the data-through date
+- Create Credits Analytics.pbix in Power BI Desktop, which needs Windows
+
+::: {.notes}
+The working copy is CharlesRiver_Capstone.sqlite, so that the Part III working copy keeps its views. The script's header states its purpose, the database file, the preparer and the date, and its checks; the two comment lines say what a query tests and its population and expected result. Excel for Microsoft 365 provides RANDARRAY, SORTBY and BETA.INV. On a Mac, plan a Windows computer for Requirements 5 and 10.
+:::
+
+## Three milestones, one for each phase
+
+{{< book-milestones >}}
+
+::: {.notes}
+Work through the phases in order, because each uses what the one before established. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the audit.
+:::
+
+## Choose the tool for each step
+
+- A query tests whole populations and reconciles them to the ledger
+- A workbook holds materiality, the matrix, the sample and the evaluation
+- A report lets the committee move from a pattern to its documents
+- Where the choice is not clear, choose, and document why
+
+::: {.notes}
+Each requirement's opening paragraph says why a tool fits where the choice is clear. Part of the task is to explain the choices that are not.
+:::
+
+## Check your understanding {.check}
+
+Which tool fits each step?
+
+1. Reconciling the credits to the ledger by year
+2. The materiality figures every later test refers to
+3. Ranking refunds, and drilling through to their documents
+4. Selecting a random sample and freezing it
+
+::: {.notes}
+Ask students to justify each choice, as the case's documentation must.
+:::
+
+## Each step has its tool {.answer}
+
+1. A SQL query: two-sided totals by year, without the closes
+2. Workbook cells that every later test refers to
+3. A Power BI report with drill-through, loading the query's flags
+4. Excel's RANDARRAY and SORTBY, then Paste Values
+
+::: {.notes}
+These are the reasons the requirements themselves give. A query repeats exactly over the whole population, a workbook keeps the parameters and judgments in view, and a report lets a reader explore.
+:::
+
+# Phase 1: Plan the Audit
+
+## Phase 1 at a glance
+
+{{< book-requirements 1-3 >}}
+
+{{< book-milestones 1-1 >}}
+
+::: {.notes}
+Phase 1 establishes what the cycle is, as its records show it, that its populations are complete, and where its risks lie, before any test relies on them.
+:::
+
+## Map the cycle from its records
+
+{{< book-requirement 1 >}}
+
+- **Produce:** table profiles, link tests, a posting matrix, who records what
+- **Tool:** SQL: joins, anti-joins and counts over the cycle and the ledger
+- **Revisit:** Chapter 3's trace, Chapter 10's profiles, Chapter 12's tests
+- **Check:** each control point says what the records can and cannot show
+
+::: {.notes}
+Profile each table with the tests of Chapter 10's data profile. Test every link with anti-joins: return lines to shipment lines, credits to returns and invoices, credit lines to return lines, refunds to credits, and clawbacks to credit lines and accruals, and test the document numbers for gaps, as Chapter 8 did. Build a matrix of the ledger's postings by source document and account, and list who records each document, by job title.
+:::
+
+## Reconcile each population to the ledger
+
+{{< book-requirement 2 >}}
+
+- **Produce:** two-sided totals by year, and the hub account rolled forward
+- **Tool:** SQL: totals by fiscal year, without the closes
+- **Revisit:** Chapter 8's reconciliations, and Chapter 12's trace
+- **Check:** each population agrees to the cent, and exclusions are stated
+
+::: {.notes}
+Reconcile the credits' subtotal, freight, tax and totals to their accounts; the returns' standard cost to inventory and to cost of goods sold by account; the refunds to cash and the hub account; the clawbacks to the commission accounts; and the receipts and applications to cash and receivables. Roll the hub account forward to each year-end and name the items in each balance, and reconcile commission payable at the latest year-end.
+:::
+
+## Assess the risks and set materiality
+
+{{< book-requirement 3 >}}
+
+- **Produce:** materiality, an expectation of returns, and a risk matrix
+- **Tool:** the workbook: parameters in cells that every test refers to
+- **Revisit:** Chapter 6's expectations, Chapter 8's planning and sampling
+- **Check:** each risk names its control point, test, tool and evidence
+
+::: {.notes}
+Compute overall materiality under the chief audit executive's condition, with performance materiality and a clearly trivial threshold as the chapter's shares of it. Build an expectation of the latest year's returns from the prior year's return rate, compare it with the ledger, and explain why the first year's rate would make a poorer expectation. Brainstorm the fraud risks with the table of schemes and AS 2401's three conditions, mapped to the people and documents of the cycle.
+:::
+
+## Check your understanding {.check}
+
+A test of controls, a substantive test, or both?
+
+1. Finding every credit above its approver's authority, and totaling them
+2. Rolling the hub account forward to each year-end
+3. Whether the credit approver applied cash on the credited invoice
+4. Recomputing each credit line from its invoice line
+
+::: {.notes}
+Ask students what each test would let them rely on: a control, an amount, or both.
+:::
+
+## Each test has its type {.answer}
+
+1. Both: one population tests the control and totals the balance
+2. Substantive: it tests the balance
+3. A test of controls: separation of duties
+4. Substantive: it tests the amount credited
+
+::: {.notes}
+The risk-and-control matrix of Requirement 3 records each test's type, so that the evidence on a control and the test of its balance are planned together.
+:::
+
+## Milestone 1: before you hand it in
+
+- Every link of the cycle is tested, and every orphan is explained
+- Each population reconciles to the ledger by year, closes excluded
+- Materiality and its thresholds sit in cells the later tests use
+- Each risk in the matrix names its test and where its evidence lies
+
+::: {.notes}
+These are self-checks, not answers. If a population does not reconcile, look first at the closes and at the document dates the postings follow.
+:::
+
+# Phase 2: Test Controls and Balances
+
+## Phase 2 at a glance
+
+{{< book-requirements 4-7 >}}
+
+{{< book-milestones 2-2 >}}
+
+::: {.notes}
+Phase 2 is the heart of the audit: it tests every document's controls, explains the returns, samples only what the database cannot show, and tests the balances.
+:::
+
+## Test the controls on every document
+
+{{< book-requirement 4 >}}
+
+- **Produce:** authority, separation, timing, offset and method tests
+- **Tool:** SQL over the whole population, each test under two comments
+- **Revisit:** Chapter 10's joins, Chapter 11's as-of dates, Audit.sql
+- **Check:** each test states its definition, and the list combines them
+
+::: {.notes}
+Test authority for credits and refunds against the approver's limit, and the approvers' employment dates. Test separation of duties three ways, and try to test the preparer against the approver: explain why the records cannot answer. Test whether each refund was paid before the customer's payment arrived, and whether a past-due balance could have been offset, stating your definition. Compare refund and receipt methods, test the clawbacks and one refund per credit, combine the exceptions with UNION ALL, and export RefundFlags.csv.
+:::
+
+## Explain the returns and rank the refunds
+
+{{< book-requirement 5 >}}
+
+- **Produce:** Credits Analytics.pbix, with return rates and a refund score
+- **Tool:** Power BI: the committee moves from a pattern to its documents
+- **Revisit:** Chapters 13 to 15's models, measures and drill-through
+- **Check:** a Tests tab ties the credits to the returns account by year
+
+::: {.notes}
+Show return rates by year, item group, product family and reason, and compare rates by the month of the credit with rates by the month of the shipment; the Watch out on time says why the last months and the first year mislead. Look for concentration by carrier, warehouse and customer, as a share of each customer's sales. Score each refund one point for each flag, and let a reviewer drill through from the score to the refund, its credit and its invoice.
+:::
+
+## Sampling still has a place
+
+- Some evidence is a document: a request, a payee check, an inspection
+- Documents are examined one at a time, so they need a sample
+- You choose the confidence, the tolerable rate and the expected rate
+- The upper deviation limit decides whether the sample supports reliance
+
+::: {.notes}
+AS 2315 and the AICPA's audit sampling guide set out the judgments: the risk of overreliance you accept sets the confidence level, the tolerable deviation rate is the highest rate at which you would still rely on the control, and the expected rate is your estimate. Excel's BETA.INV gives the upper deviation limit for the deviations found; if it exceeds the tolerable rate, the sample does not support reliance.
+:::
+
+## Sample sizes for large populations
+
+{{< book-table tbl-19-03 >}}
+
+::: {.notes}
+The sizes come from the binomial distribution, and the number in parentheses is how many deviations each size allows. A lower tolerable rate, a higher confidence or a higher expected rate each make the sample larger.
+:::
+
+## Sample what the database cannot show
+
+{{< book-requirement 6 >}}
+
+- **Produce:** a sampling plan, a frozen selection, and the evaluation rule
+- **Tool:** the workbook, with Chapter 8's RANDARRAY and SORTBY
+- **Revisit:** Chapter 8's key items and random selection
+- **Check:** the rule is written before the test, and no result is invented
+
+::: {.notes}
+Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds, select the rest, and record the date and parameters. Apply the same sample to one attribute the data can test, the refund dated before the payment, and compare its conclusion with the whole population's.
+:::
+
+## Check your understanding {.check}
+
+Query the whole population, or sample?
+
+1. Refunds dated before the customer's payment
+2. A written request from the customer for each refund
+3. Credits approved above the approver's authority
+4. An inspection record for goods returned damaged
+
+::: {.notes}
+Ask students where the evidence for each one lies.
+:::
+
+## Where the evidence lies decides {.answer}
+
+1. Query: both dates are in the records
+2. Sample: the request is a document outside the database
+3. Query: the approver and the limit are in the records
+4. Sample: the inspection record is outside the database
+
+::: {.notes}
+A query of the whole population replaces a sample wherever the records hold the evidence. Requirement 6 compares the two on the one attribute both can test.
+:::
+
+## Test the balances, and follow the largest refund
+
+{{< book-requirement 7 >}}
+
+- **Produce:** recomputed credits, restocking values, lapping tests, a timeline
+- **Tool:** SQL for the tests; choose how to lay out the timeline
+- **Revisit:** Chapter 8's tests and dispositions, Chapter 12's trace
+- **Check:** the timeline names each step's role and the evidence needed
+
+::: {.notes}
+Recompute each credit line from its return, shipment and invoice lines, the tax, freight and clawbacks, and list the open items in the hub account at the latest year-end. Measure what returned goods were put back into inventory at, by reason. Test for lapping, and explain with Chapter 8's criteria why a first-digit test does not suit these populations. Build the largest refund's timeline from the shipment to the last receipt on its invoice, and record a disposition.
+:::
+
+## Milestone 2: before you hand it in
+
+- Every control test states its population, definition and result
+- The analytics allow for timing and for periods the data do not complete
+- The sample is frozen, with its rule written before any testing
+- The largest refund has a timeline, a disposition and the evidence needed
+
+::: {.notes}
+These are self-checks, not answers. Report a clean result with its population and definition, as carefully as an exception.
+:::
+
+# Phase 3: Evaluate and Report
+
+## Phase 3 at a glance
+
+{{< book-requirements 8-10 >}}
+
+{{< book-milestones 3-3 >}}
+
+::: {.notes}
+Phase 3 turns the results into judgments the committee can act on, and the tests into monitoring that keeps running after the report.
+:::
+
+## What makes a control deficient
+
+- A missing control, or one that did not operate as designed
+- Severity turns on likelihood and magnitude, not on what occurred
+- A compensating control counts only if it is precise enough
+- Deficiencies on the same account combine
+
+::: {.notes}
+A deficiency exists when a control does not allow timely prevention or detection of misstatements in the normal course of work. Its severity depends on whether a misstatement is reasonably possible and how large it could be, not on whether one actually occurred, as AS 2201 sets out. Internal auditors then rate their findings and agree on action plans with management under the IIA's Global Internal Audit Standards.
+:::
+
+## Three classifications, three audiences
+
+{{< book-table tbl-19-04 widths="17,37,27,19" >}}
+
+::: {.notes}
+The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting.
+:::
+
+## Four judgments lead to a classification
+
+{{< book-figure fig-19-02 crop="0,0.1499,1,0.6816" >}}
+
+::: {.notes}
+Once a deficiency is identified, a control that is missing or one that did not operate as designed, work down the judgments: the likelihood, the magnitude against materiality, the compensating controls, and the deficiencies that combine on the same account. Then internal audit rates each finding, agrees on action plans with management, and monitors them until they are complete.
+:::
+
+## Evaluate the deficiencies
+
+{{< book-requirement 8 >}}
+
+- **Produce:** an evaluation matrix, a classification and a disposition each
+- **Tool:** the workbook, against the materiality cells of Requirement 3
+- **Revisit:** Chapter 8's dispositions
+- **Check:** the clean results are reported with the same care
+
+::: {.notes}
+For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in the latest year and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with.
+:::
+
+## Check your understanding {.check}
+
+Does it decide a deficiency's severity?
+
+1. Whether a misstatement actually occurred
+2. How large a misstatement could be, against materiality
+3. A compensating control precise enough to catch it
+4. The number of exceptions the tests found
+
+::: {.notes}
+Ask students what the evaluation matrix should record for each one.
+:::
+
+## Likelihood and magnitude decide {.answer}
+
+1. No: what matters is whether one is reasonably possible
+2. Yes: magnitude is judged against materiality
+3. Yes: a precise compensating control reduces the severity
+4. No: classify by likelihood and magnitude, not by counts
+
+::: {.notes}
+The chapter's criteria ask for deficiencies classified by likelihood, magnitude and compensating controls rather than by counts. Classifying the case's own deficiencies, with the evidence, is the work of Requirement 8.
+:::
+
+## Report to the audit committee
+
+{{< book-requirement 9 >}}
+
+- A report of at most three pages, with an appendix of exhibits
+- An executive summary, a conclusion, the scope and the reconciliations
+- Each finding: condition, criteria, cause, effect, rating, recommendation
+- Action plans with owners by role and dates, and the responses expected
+
+::: {.notes}
+Report the clean results too, and say where you expect an owner to disagree. Cohen and colleagues found that managers often resist a finding of a weakness when no error has been detected, so prepare the evidence for each compensating control they may point to.
+:::
+
+## Keep the tests running
+
+{{< book-requirement 10 >}}
+
+- **Produce:** four rule tests and two processes added to the register
+- **Tool:** Power BI: Audit Monitoring.pbix, or a small register of your own
+- **Revisit:** Chapter 16's register, design findings and change control
+- **Check:** past exceptions get one design finding and do not flood review
+
+::: {.notes}
+The four rule tests are credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Record the historical exceptions once, as Chapter 16 treated the payroll registers' self-approval, with the date by which the design will be fixed. Recheck the date through which the data run, and record the change.
+:::
+
+## Milestone 3: before you hand it in
+
+- Each deficiency is classified with its likelihood, magnitude and controls
+- The report keeps to its page limits and reports the clean results
+- Each action plan has an owner by role, a date and an expected response
+- The register runs the new tests, with the change recorded
+
+::: {.notes}
+These are self-checks, not answers. The report describes rather than accuses: it says what the records show, and what evidence would settle each question.
+:::
+
+# Deliverables and Checklist
+
+## Before you submit
+
+- Every test runs top to bottom, under its two comment lines
+- The Documentation sheet states the date through which the data run
+- Every finding traces to a query, a document or a frozen selection
+- Each file opens and refreshes on another computer
+
+::: {.notes}
+This audit reused Chapter 8's random selection and dispositions, Chapter 12's approval and trace tests and its query library, and Chapter 16's exception register and change control. It also leaned on the rest of the book: the reconciliations of Chapter 6, the joins and anti-joins of Chapter 10, and the as-of measures of Chapter 11 decided what each test could trust.
+:::
+
+# Looking Ahead
+
+## What the case practiced
+
+- Descriptive: the map, the reconciliations and the tests
+- Diagnostic: the growth of returns and the largest refund's timeline
+- Predictive: the expectation of returns and the upper deviation limits
+- Prescriptive: the recommendations and the action plans
+
+::: {.notes}
+These are the four types of analytics of Chapter 1. Most of the work was descriptive and diagnostic; the expectation and the upper limits were small predictive models, and the recommendations prescriptive.
+:::
+
+## After the report
+
+- The owners agree on actions and dates
+- The committee asks for their status at its next meetings
+- The register's tests show every month whether the actions worked
+- Careful findings that rest on evidence are the ones that get fixed
+
+::: {.notes}
+An audit like this does not end with the report. The tests you added to the register keep watching the cycle, so the next review starts from what changed rather than from the beginning.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online chapter.
+:::
