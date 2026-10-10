@@ -12,6 +12,10 @@ filters:
   - filters/strip-comments.lua
   - filters/pdf-figures.lua
   - filters/slide-links.lua
+  # After Quarto's own filters, so the {{< var >}} values on the title and copyright pages are filled in
+  # before the filter writes them out as LaTeX, XHTML or Word XML.
+  - path: filters/book-pages.lua
+    at: post-quarto
   - filters/pdf-code.lua
 
 book:
@@ -64,6 +68,17 @@ book:
     - appendices/c-power-bi-browser/appendix.qmd
     - appendices/d-competencies/appendix.qmd
 
+# The ISBN of each version of the book, printed on the copyright page of the PDF, EPUB and DOCX
+# (front-matter/_book-pages.qmd, laid out by filters/book-pages.lua; the website has no copyright page).
+# A revision keeps its edition's ISBNs. A blank one prints "ISBN to be assigned". Type an ISBN-13 with or
+# without hyphens; a wrong check digit fails the render. They live here, not in _variables.yml, because
+# _variables.yml is an input of every slide deck (scripts/release.py), and _quarto.yml only of the book.
+isbn:
+  pdf: ""
+  epub: ""
+  paperback-bw: ""
+  paperback-color: ""
+  hardcover: ""
 
 format:
   html:
@@ -97,8 +112,16 @@ format:
     tbl-cap-location: top
   epub:
     cover-image: visuals/cover/cover.png
+    # Pandoc's EPUB template, whose title page prints the book's title and copyright pages
+    # (front-matter/_book-pages.qmd, through filters/book-pages.lua) in place of Pandoc's own.
+    template: styles/book-epub.template
+    publisher: "Accounting Analytics Hub"
+    rights: "Licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/"
   docx:
     reference-doc: styles/reference.docx
+    # filters/book-pages.lua writes the table of contents after the title and copyright pages; Pandoc's
+    # would come before them.
+    toc: false
 
 crossref:
   fig-title: Figure

@@ -1,0 +1,39 @@
+::: {#book-title-page}
+[Accounting Analytics]{.book-title}
+
+[An Integrated Approach]{.book-subtitle}
+
+[Mauricio Codesso, Ph.D.]{.book-author}
+
+[{{< var book.edition >}} edition]{.book-edition}
+
+[Revision {{< var book.revision >}}]{.book-revision}
+
+[Accounting Analytics Hub]{.book-publisher}
+:::
+
+::: {#book-copyright-page}
+*Accounting Analytics: An Integrated Approach*\
+Revision {{< var book.revision >}} of the {{< var book.edition >}} edition
+
+Copyright © 2027 Mauricio Codesso
+
+This book is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0), <https://creativecommons.org/licenses/by-sa/4.0/>. You may share and adapt it for any purpose, including commercially, provided you give appropriate credit, link to the license, indicate any changes, and distribute your adaptations under the same license.
+
+Published by Accounting Analytics Hub\
+Read the book online, and download the dataset and companion files, at <https://aa.accountinganalyticshub.com/>.
+
+[pdf]{.isbn} (PDF)\
+[epub]{.isbn} (EPUB)\
+[paperback-bw]{.isbn} (paperback, black and white)\
+[paperback-color]{.isbn} (paperback, color)\
+[hardcover]{.isbn} (hardcover)
+
+The examples are verified against release {{< var dataset.version >}} of the Charles River Accounting Dataset ({{< var dataset.window >}}). Charles River and every person, customer, supplier, and transaction in the dataset are fictional; any resemblance to real people or organizations is coincidental.
+
+Microsoft, Excel, Power BI, and Power Query are trademarks of the Microsoft group of companies. Other product names are trademarks of their owners. This book is not affiliated with or endorsed by any software vendor.
+
+The information in this book is provided as is, without warranty of any kind. To report an error, open an issue at <https://github.com/mmcodesso/Accounting_Analytics_Book/issues>.
+
+Suggested citation: Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
+:::

@@ -8,6 +8,8 @@ format:
     sidebar: true
 ---
 
+{{< include front-matter/_book-pages.qmd >}}
+
 # Accounting Analytics: An Integrated Approach {#accounting-analytics-a-practical-approach .unnumbered}
 
 This open educational resource textbook teaches accounting students to extract, prepare, analyze, and visualize financial and operational data using Microsoft Excel, SQL, and Microsoft Power BI, three tools widely adopted in professional practice. Every technique is taught through accounting questions, and every example draws on the data of a single company, so students see how analytics supports financial reporting, management decisions, and audit work.

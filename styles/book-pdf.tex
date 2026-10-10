@@ -90,3 +90,28 @@
   \clearpage
 }
 \makeatother
+
+% The title page (recto, after the cover and a blank page) and the copyright page (its verso), which
+% filters/book-pages.lua writes from front-matter/_book-pages.qmd between the cover and the table of contents.
+\newenvironment{aatitlepage}{%
+  \cleardoubleemptypage
+  \thispagestyle{empty}%
+  \pdfbookmark[0]{Title Page}{book-title-page}%
+  \begin{center}\sffamily\color{Ink}
+  \vspace*{0.14\textheight}}{%
+  \end{center}
+  \clearpage}
+\newcommand{\aabooktitle}[1]{{\fontsize{32}{38}\selectfont\bfseries\color{PrimaryBlue}#1\par}\vspace{0.7em}}
+\newcommand{\aabooksubtitle}[1]{{\LARGE #1\par}\vspace{1.6em}{\color{Amber}\rule{1.25in}{1.5pt}}\par\vspace{1.6em}}
+\newcommand{\aabookauthor}[1]{{\Large #1\par}\vfill}
+\newcommand{\aabookedition}[1]{{\large #1\par}\vspace{0.3em}}
+\newcommand{\aabookrevision}[1]{{\large #1\par}\vspace{2.5em}}
+\newcommand{\aabookpublisher}[1]{{\large\bfseries #1\par}\vspace*{0.04\textheight}}
+\newenvironment{aacopyrightpage}{%
+  \thispagestyle{empty}%
+  \pdfbookmark[0]{Copyright}{book-copyright-page}%
+  \vspace*{\fill}
+  \noindent\begin{minipage}{0.72\textwidth}\footnotesize\raggedright
+  \setlength{\parindent}{0pt}\setlength{\parskip}{0.7\baselineskip}}{%
+  \par\end{minipage}
+  \clearpage}

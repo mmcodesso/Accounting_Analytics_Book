@@ -150,6 +150,9 @@ suspect:
 files:
   index.qmd:
     - {rx: 'Codesso, M\. \({Y}\)', class: role, why: "the book's publication year (18 January 2027): the year after the last fiscal year (N), which a roll moves with the window"}
+  front-matter/_book-pages.qmd:
+    - {rx: 'Copyright © {Y}', class: role, why: "the copyright year is the book's publication year (N), as in index.qmd's citation"}
+    - {rx: 'Codesso, M\. \({Y}\)', class: role, why: "the book's publication year (N), the suggested citation of index.qmd"}
   front-matter/preface.qmd:
     - {rx: 'framework for management accountants in {Y}', class: real, why: "IMA framework published in 2025"}
     - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
