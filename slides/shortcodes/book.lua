@@ -182,6 +182,19 @@ local function book_table(args, kwargs)
   for position, weight in ipairs(weights) do
     if not raised[position] then shares[position] = (100 - floor_total) * weight / rest end
   end
+  -- widths="26,17,15,27,15" overrides the estimate, in percent, one per column shown: for a table whose
+  -- long headers would starve the short cells under them (the estimate weighs headers like any cell).
+  local wanted_widths = value(kwargs, 'widths')
+  if wanted_widths then
+    local given = names(wanted_widths)
+    if #given ~= #keep then error(id .. ': widths= needs ' .. #keep .. ' values, one per column') end
+    local sum = 0
+    for position, text in ipairs(given) do
+      shares[position] = tonumber(text) or error(id .. ': widths= takes numbers, not "' .. text .. '"')
+      sum = sum + shares[position]
+    end
+    for position in ipairs(given) do shares[position] = 100 * shares[position] / sum end
+  end
   local dashes = {}
   for position in ipairs(keep) do
     table.insert(dashes, string.rep('-', math.max(3, math.floor(shares[position] + 0.5))))
@@ -268,6 +281,16 @@ local function range(args, position, count)
   return tonumber(first) or 1, math.min(tonumber(last) or count, count)
 end
 
+local function references(text)
+  -- A case's lists are the book's text, which may cite a table or figure ("every assumption in
+  -- @tbl-18-02"); a deck cannot resolve the book's cross-references, so they become "Table 18.2".
+  return (text:gsub('@((%a+)%-[%w%-]*%w)', function(id, kind)
+    local found = (kind == 'tbl' and book().tables[id]) or (kind == 'fig' and book().figures[id]) or nil
+    if not found then error('No ' .. id .. ' in the book') end
+    return (kind == 'tbl' and 'Table ' or 'Figure ') .. found.number
+  end))
+end
+
 local function case_list(meta, name, label)
   local list = chapter(meta)[name] or {}
   if #list == 0 then error('This chapter has no ' .. label) end
@@ -275,8 +298,9 @@ local function case_list(meta, name, label)
 end
 
 local function requirement_line(found)
-  local chapters = found.chapters ~= '' and (' (' .. found.chapters .. ')') or ''
-  return found.title .. chapters
+  -- A no-break space keeps "Chapter 9" together when a long title wraps its source line.
+  local chapters = found.chapters ~= '' and (' (' .. found.chapters:gsub('(Chapters?) (%d)', '%1\u{00A0}%2') .. ')') or ''
+  return references(found.title .. chapters)
 end
 
 local function book_requirement(args, _, meta)
@@ -312,15 +336,15 @@ local function book_milestones(args, _, meta)
     -- One milestone, as a phase's slide shows it: "Milestone 2: The adjustments (Requirements 3 to 5): ...".
     local found = list[first]
     local covers = found.requirements ~= '' and (' (' .. found.requirements .. ')') or ''
-    return blocks('**Milestone ' .. first .. ': ' .. found.name .. '**' .. covers ..
-      (found.text ~= '' and (': ' .. found.text) or ''))
+    return blocks(references('**Milestone ' .. first .. ': ' .. found.name .. '**' .. covers ..
+      (found.text ~= '' and (': ' .. found.text) or '')))
   end
   local lines = {}
   for i = first, last do
     local found = list[i]
     local covers = found.requirements ~= '' and (' (' .. found.requirements .. ')') or ''
-    table.insert(lines, math.tointeger(found.number) .. '. **' .. found.name .. '**' .. covers ..
-      (found.text ~= '' and (': ' .. found.text) or ''))
+    table.insert(lines, references(math.tointeger(found.number) .. '. **' .. found.name .. '**' .. covers ..
+      (found.text ~= '' and (': ' .. found.text) or '')))
   end
   if #lines == 0 then error('No milestones ' .. first .. '-' .. last .. ' in this chapter') end
   return blocks(table.concat(lines, '\n'))
@@ -330,7 +354,7 @@ local function book_deliverables(args, _, meta)
   local list = case_list(meta, 'deliverables', 'deliverables')
   local first, last = range(args, 1, #list)
   local lines = {}
-  for i = first, last do table.insert(lines, i .. '. ' .. list[i]) end
+  for i = first, last do table.insert(lines, i .. '. ' .. references(list[i])) end
   if #lines == 0 then error('No deliverables ' .. first .. '-' .. last .. ' in this chapter') end
   return blocks(table.concat(lines, '\n'))
 end
@@ -340,7 +364,7 @@ local function book_criteria(args, _, meta)
   local list = case_list(meta, 'criteria', 'criteria of a strong submission')
   local first, last = range(args, 1, #list)
   local items = {}
-  for i = first, last do table.insert(items, list[i]) end
+  for i = first, last do table.insert(items, references(list[i])) end
   if #items == 0 then error('No criteria ' .. first .. '-' .. last .. ' in this chapter') end
   return blocks(bullets(items))
 end

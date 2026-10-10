@@ -116,6 +116,14 @@ signatures, that `rows` cannot name:
 {{< book-table tbl-05-01 1-5 >}}
 ```
 
+The width estimate weighs headers like any cell, so long headers over short cells (a quote's "One-time
+tooling and qualification" over "\$18,000") can leave the short cells wrapping. `widths=` then sets the
+columns in percent, one value per column shown:
+
+```markdown
+{{< book-table tbl-18-01 widths="26,17,15,27,15" >}}
+```
+
 **Code.** A short query (about six lines of at most about 50 characters, no data values) goes in a
 ```` ```sql ```` block, which both formats show in the code font at the evidence size, without line numbers. Longer queries, and their results, come from the book's DB Browser mocks.
 
@@ -164,6 +172,9 @@ notes or its answer slide give the answer.
 | `{{< book-requirements >}}`, `{{< book-requirements 3-5 >}}` | the case's requirement titles with their chapters, all or a range by number |
 | `{{< book-milestones >}}`, `{{< book-milestones 2-2 >}}` | the milestones of Getting Started, numbered, or one of them as a paragraph |
 | `{{< book-deliverables >}}`, `{{< book-criteria 1-3 >}}` | the numbered items of Deliverables and Checklist, and the bullets of What a Strong Submission Includes, all or a range |
+
+The case shortcodes show the book's own text, so a cross-reference in it (`@tbl-18-02`) becomes the
+book's number ("Table 18.2"), and "Chapter 9" in a source line keeps together when the line wraps.
 
 Shared definitions can be included as in the book: `{{< include /_shared/fragments/_accounting-analytics.qmd >}}`.
 

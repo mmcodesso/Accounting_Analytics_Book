@@ -1,0 +1,612 @@
+## In this chapter
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is a case, not a chapter of tutorials. The deck opens with a kickoff (the situation, what you hand in, how it is judged, the data and the setup) and then follows the four phases of the requirements, each ending with a milestone check-in. Present the kickoff first, and each phase when its milestone begins.
+:::
+
+## Learning objectives
+
+{{< book-objectives 1-3 >}}
+
+::: {.notes}
+The first three objectives cover classifying the plant's conversion costs and testing each classification, the three costing views and the question each answers, and the make-or-buy test on relevant costs.
+:::
+
+## Learning objectives (continued)
+
+{{< book-objectives 4-6 >}}
+
+::: {.notes}
+The last three cover pricing against the volume an increase can lose, standards on a stated capacity and their effect on the statements, and choosing the tools for a recommendation that two people who disagree can act on.
+:::
+
+## Is the company selling below cost?
+
+- The CFO: made furniture earns far less than its standard margin
+- The production manager: idle capacity is not the products' fault
+- A contract manufacturer has quoted six of the families the plant makes
+- You, the staff accountant, write the analysis and a decision memo
+
+::: {.notes}
+Once the manufacturing variance is charged, the furniture Charles River makes earns about ten points less than its standard margin, while the furniture it buys earns about what its standards say. The plant applies overhead at little more than a third of what it costs, and neither prices nor standards have changed in three years. The quote expires soon, the next price list must go to customers, and the two decision makers meet to decide. The case has no tutorials: each requirement says what the decision needs and which chapters it draws on, and you decide how to produce it.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+These are the four deliverables, as the chapter's checklist lists them. The workbook is the center of the analysis; the script feeds it, the explorer lets the decision makers move through it, and the memo turns it into decisions.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission is one a reviewer can rerun and trace, and one that uses a different cost for each question. Read these criteria now and again before each milestone.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-7 >}}
+
+::: {.notes}
+The memo is judged on whether two people who disagree can act on it: each recommendation states what it depends on, and the crew decision stays with the production manager.
+:::
+
+# The Situation
+
+## Five questions from two decision makers
+
+- What does each family cost, and which costs would stop?
+- Where the supplier is cheaper, should Charles River buy?
+- Where it keeps making, what prices does the next list need?
+- What happens to the plant's hours, its crew and the costs that stay?
+- Should the standards change, and to what?
+
+::: {.notes}
+The CFO asks the first three questions, and the production manager adds the last two. Each requirement answers part of one of them, and the memo answers all five.
+:::
+
+## The controller's five conditions
+
+- Everyone works from the same assumptions, listed in one table
+- Every figure reconciles to the variance and clearing accounts
+- The latest fiscal year is the base, because the records end there
+- The decision is made family by family
+- Decisions about positions belong to the production manager
+
+::: {.notes}
+The costs that flow into the clearing account are the payroll, the Factory Overhead entries and the depreciation charged to it, not the debits that favorable closes post back to it. The products Charles River buys in the same families are different products, not substitutes for the ones it makes. The memo states what a change in the crew would save and what it would cost, and leaves the decision there.
+:::
+
+## A quote for six families
+
+{{< book-table tbl-18-01 widths="26,17,15,27,15" >}}
+
+::: {.notes}
+The quote is the case's assumption, a hypothetical exhibit, not part of the dataset. Its prices are averages per unit at the base year's mix of items in each family, set to resemble what Charles River pays for the products it already buys in those families.
+:::
+
+## The quote comes with terms
+
+- Prices are fixed for two years
+- Charles River commits to buy a minimum share of each family chosen
+- It pays inbound freight, because the goods are sold at the supplier's plant
+- The supplier builds to the company's designs and credits defects
+- Quality assurance inspects samples on arrival
+
+::: {.notes}
+The purchasing manager estimates the freight as a small share of the price, and the minimum commitment applies each year. Payment is due on the supplier's terms. Requirement 6 asks you to list the terms that the numbers leave out.
+:::
+
+## The plan everyone works from
+
+{{< book-table tbl-18-02 1-7 >}}
+
+::: {.notes}
+Every figure in the case rests on these assumptions, so they go on the Assumptions sheet, one to a cell, and every formula refers to them. The plan figures are the plant's plan for the next year, which the Part III case built if you completed it.
+:::
+
+## Assumptions for the crew, prices and statements
+
+{{< book-table tbl-18-02 8-12 >}}
+
+::: {.notes}
+The materiality and the margin floor are rates the chapter states; use them as written. The demand-growth test is optional, for the Solver part of Requirement 7.
+:::
+
+# The Data You Will Use
+
+## What carries over from the chapters
+
+- Chapters 10 and 11 measured the plant's hours against standard
+- Chapter 7's regression, Goal Seek, Data Tables and Solver
+- Chapter 15's disconnected table that switches a measure
+- Exercise 8.6's price-list tests, and Chapter 7's promotion lift
+
+::: {.notes}
+Much of what you need you have already built. The scripts of Chapters 10 and 11 measured the plant's hours against standard, and the plan figures are the plant's plan for the next year. The Part III case file helps if you have it, but every method the case needs is stated in its requirements.
+:::
+
+## Tables the chapters used little or not at all
+
+- Item: the standard cost, its parts, and SupplyMode
+- Routing and RoutingOperation: setup and run hours by work center
+- WorkCenter and WorkCenterCalendar: the hours each center had
+- ProductionCompletionLine: the standard cost each completion released
+- PayrollRegisterLine, Employee.PayClass, and the price-list tables
+
+::: {.notes}
+Material is standard cost less conversion cost. PayrollRegisterLine tells regular, overtime and salary earnings apart, and Employee.PayClass tells hourly from salaried staff. PriceList and PriceListLine hold the price lists, and PurchaseOrderLine what Charles River pays for the products it buys. Profile each table before relying on it, as Chapter 10 profiled WorkOrder.
+:::
+
+## Three files, three tools
+
+{{< book-table tbl-18-03 widths="12,32,31,25" >}}
+
+::: {.notes}
+Each tool hands its results to the next in the ways the book has taught: Copy with Headers or Export to CSV from DB Browser, and Power Query in both Excel and Power BI. The workbook's Table of item costs is what the explorer loads.
+:::
+
+## Watch out: units and populations need care {.watch-out}
+
+- Group families by the first seven characters of the item code
+- Quantities are fractional: add them, never count rows as units
+- State which units you divide by, because closes include earlier work
+- Leave out design services, which carry no standard cost
+- Opening stock has no item detail: rebuild it from what was made since
+
+::: {.notes}
+The three-letter product type of Chapter 5 is not enough, because the same type can name a dining table in Furniture and a table lamp in Lighting. The variance closed in the base year includes work completed the year before, and some work orders are still open. Stock by item can be rebuilt only from what was made and shipped since the ledger opened.
+:::
+
+## Watch out: some records cannot carry the analysis {.watch-out}
+
+- Measure use with the routings' standard times, not the time recorded
+- A family's share of the overhead variance is an allocation
+- Some months carry three payrolls, because payroll posts on pay dates
+- The start-up month distorts any monthly trend it enters
+
+::: {.notes}
+Part III found that direct time recorded by work center moved toward packing and quality assurance and was often recorded after the operation had ended. The overhead variance each work order's close records moves with that work order's actual direct labor cost, so it does not measure what the family consumed. Chapter 11 found the months with three pay dates.
+:::
+
+# Getting Started
+
+## Set up before you begin
+
+- Work in a capstone copy of the database; the download never changes
+- Head MakeBuy.sql, and put two comment lines above every query
+- Give the workbook an Assumptions sheet and a Documentation sheet
+- Create Product Costs.pbix in Power BI Desktop, which needs Windows
+
+::: {.notes}
+The working copy is CharlesRiver_Capstone.sqlite, so that the Part III working copy keeps its views. The script's header states its purpose, the database file, the preparer and the date, and its checks; the two comment lines say what a query tests and its population and expected result. The Assumptions sheet holds the quote and the controller's assumptions, and the Documentation sheet states the purpose, the sources and the date through which the data run. Excel needs the Solver add-in only for the optional part of Requirement 7. On a Mac, plan a Windows computer for Requirement 5.
+:::
+
+## Four milestones, one for each phase
+
+{{< book-milestones >}}
+
+::: {.notes}
+Work through the phases in order, because each uses what the one before found. Your instructor may ask you to hand in each milestone and may then release checkpoint values, so that an early error does not carry through the rest of the case.
+:::
+
+## Choose the tool for each step
+
+- A query extracts exactly the rows, and reconciles them to the ledger
+- A workbook holds the assumptions, with every cost a formula
+- A report lets the decision makers move between views as they talk
+- Where the choice is not clear, choose, and document why
+
+::: {.notes}
+Each requirement's opening paragraph says why a tool fits where the choice is clear. Part of the task is to explain the choices that are not.
+:::
+
+## Check your understanding {.check}
+
+Which tool fits each step?
+
+1. Family margins from joins that can fan out
+2. Testing which inputs move with output
+3. Moving between families and views in the meeting
+4. Item costs the decision makers will want to change
+
+::: {.notes}
+Ask students to justify each choice, as the case's documentation must.
+:::
+
+## Each step has its tool {.answer}
+
+1. A SQL query, written once and reconciled to the ledger
+2. SQL extracts by month; the regressions go in the workbook
+3. A Power BI explorer with a measure that switches views
+4. Workbook formulas over one Assumptions sheet
+
+::: {.notes}
+These are the reasons the requirements themselves give. A query repeats exactly, a workbook shows its reasoning and lets the assumptions change, and a report lets a reader explore.
+:::
+
+# Phase 1: What the Records Show
+
+## Phase 1 at a glance
+
+{{< book-requirements 1-3 >}}
+
+{{< book-milestones 1-1 >}}
+
+::: {.notes}
+Phase 1 establishes what the records say before anything is costed: whether the CFO's numbers hold, how the overhead behaves, and what each family uses of the plant.
+:::
+
+## Test the CFO's numbers and premises
+
+{{< book-requirement 1 >}}
+
+- **Produce:** family results, and three margins for each made family
+- **Tool:** one query in MakeBuy.sql, reconciled before reading a margin
+- **Revisit:** Chapter 9's variance, Chapter 10's fan-out, Chapter 11's CASE
+- **Check:** the families' variances add up to the variance account
+
+::: {.notes}
+For each manufactured family in the base year, return the units sold, revenue, list value and standard cost; the variance of the year's closes, by material, labor and overhead, and as a share of the standard cost completed; and the variance per unit completed. Compute the margin at standard, after the variance per unit completed, and with the year's whole variance charged, as the ledger charges it, and set the purchased products of the same family beside them. Then test the CFO's second premise: whether list prices and standard costs changed at any time in the three years.
+:::
+
+## Take the overhead apart
+
+{{< book-requirement 2 >}}
+
+- **Produce:** the inputs to the clearing account, per standard hour
+- **Tool:** SQL extracts the inputs by month; regressions in the workbook
+- **Revisit:** Chapter 7's regression, Chapters 10–11 on the clearing account
+- **Check:** each input is classified in a sentence, with its evidence
+
+::: {.notes}
+Split the base year's inputs into direct and indirect labor, regular and overtime, salaries, employer taxes and benefits, the Factory Overhead entries and depreciation, and set them against the standard cost that completions released, by labor and overhead. Extract each input by month with the standard hours completed, test which inputs move with output after the start-up month, and explain what including that month and the months with three pay dates would do to the test. Classify each input as a cost that varies with output, a committed capacity cost, or neither.
+:::
+
+## What each family uses of the plant
+
+{{< book-requirement 3 >}}
+
+- **Produce:** each family's work, and each work center's capacity
+- **Tool:** SQL: joins and sums over the year's work orders and calendar
+- **Revisit:** Chapter 10's joins and aggregates, Chapter 11's work centers
+- **Check:** a sentence on why routing time measures use, and its limits
+
+::: {.notes}
+For each family's completions, return the work orders, units, average batch size, run and setup hours by work center, and material issue lines, with setup hours and issue lines per thousand units. For each work center, return the hours available, the practical capacity under the controller's assumptions, the routing time used, and its share of each. The Watch out on records says why recorded time will not do; say also what routing time leaves out.
+:::
+
+## Milestone 1: before you hand it in
+
+- The family results reconcile to the manufacturing variance account
+- Each input to the clearing account is classified, with its test
+- The months that distort the tests are named and handled
+- Each work center's routing time is set against its capacity
+
+::: {.notes}
+These are self-checks, not answers. If the families' variances do not add up to the ledger, look first for a join that fans out.
+:::
+
+# Phase 2: What a Product Costs
+
+## Phase 2 at a glance
+
+{{< book-requirements 4-5 >}}
+
+{{< book-milestones 2-2 >}}
+
+::: {.notes}
+Phase 2 builds the costs the decisions use. The workbook's item costs feed the explorer now and the decisions of Phase 3.
+:::
+
+## Three costing views charge products differently
+
+{{< book-figure fig-18-01 crop="0,0,1,0.6200" >}}
+
+::: {.notes}
+Standard costing charges each product a rate per standard hour. Actual absorption charges all of the year's cost divided by the units made. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, plus the factory overhead. Kaplan and Anderson suggest, as a rule of thumb, that practical capacity is about four-fifths of theoretical capacity, or a little more.
+:::
+
+## What each view leaves out of product cost
+
+{{< book-figure fig-18-01 crop="0,0.6200,1,0.3800" >}}
+
+::: {.notes}
+Read the columns in the same order. Standard costing sends everything else to the variance, charged to cost of goods sold; actual absorption leaves nothing out, so idle time is spread into every unit and unit cost rises whenever volume falls; time-driven costing reports unused capacity as a cost of the plant. Cooper and Kaplan argued that the resources supplied but not used should appear as that cost, visible to the managers who can act on it.
+:::
+
+## Compute three costs for each family
+
+{{< book-requirement 4 >}}
+
+- **Produce:** each item's cost under three views, and the unused capacity
+- **Tool:** the workbook: every cost a formula, every assumption a cell
+- **Revisit:** Chapter 7's Data Tables, and Chapter 9's standard costs
+- **Check:** product costs plus unused capacity reconcile to the inputs
+
+::: {.notes}
+Standard is the item's standard cost; actual absorption adds its family's variance per unit completed. Time-driven costs material, with the base year's material variance as a rate, the Factory Overhead entries per standard hour, and the committed costs of the crew, supervision and equipment per hour of practical capacity, times the item's routing time per unit, with setup spread over the family's average batch. Summarize by family at the base year's mix, with the margin under each view and the share of margin the top fifth of items earns. A Data Table varies practical capacity, and Excel takes its input cell only from the table's own worksheet. Keep the item costs as an Excel Table, so that Power BI can load them.
+:::
+
+## Build the explorer for the meeting
+
+{{< book-requirement 5 >}}
+
+- **Produce:** Product Costs.pbix, with Families and Capacity pages
+- **Tool:** Power BI: the decision makers move between views as they talk
+- **Revisit:** Tutorial 15.1's switching measure, Chapter 13's blanks
+- **Check:** a Tests tab ties each view's totals to the workbook
+
+::: {.notes}
+Load the item cost Table from the workbook and the invoice lines and invoices from CharlesRiver.xlsx, add a year column, and relate the lines to the item costs. Design services have no row in the cost table, so decide how the report treats that blank. Enter a Costing View table with Enter data, and write a Product Cost measure that switches on the view selected, with Margin and Margin % beside it. Add an About page and a Validation page that reproduces control totals from earlier chapters.
+:::
+
+## Check your understanding {.check}
+
+Which cost fits each question?
+
+1. Make or buy a quoted family
+2. The price on the next list
+3. Finished goods in inventory
+4. The year's whole cost over the units made: which decision?
+
+::: {.notes}
+Ask students why one cost cannot answer all four: each answers a different question, as Noreen, and Balakrishnan and colleagues, argue.
+:::
+
+## Each question has its cost {.answer}
+
+1. Relevant cost: the costs that stop if the family is bought
+2. Time-driven cost, on practical capacity
+3. A standard on normal capacity
+4. Neither decision: it spreads idle capacity into every unit
+
+::: {.notes}
+The chapter's criteria pair the costs and questions the same way. Computing each cost, and showing where the views disagree, is the work of Requirements 4 and 6.
+:::
+
+## Milestone 2: before you hand it in
+
+- Every item has three costs, each a formula over the Assumptions sheet
+- Product costs and unused capacity reconcile to the clearing account
+- The Data Table shows what moves with practical capacity
+- The explorer's Tests tab agrees with the workbook, view by view
+
+::: {.notes}
+These are self-checks, not answers. A cost that cannot be traced from the explorer back to the Assumptions sheet is not finished.
+:::
+
+# Phase 3: Make, Buy, or Reprice
+
+## Phase 3 at a glance
+
+{{< book-requirements 6-8 >}}
+
+{{< book-milestones 3-3 >}}
+
+::: {.notes}
+Phase 3 makes the decisions: make or buy for each quoted family, the value of the capacity buying would free, and the prices of the families still made.
+:::
+
+## Compare the quote with the costs that stop
+
+{{< book-figure fig-18-02 crop="0,0,1,0.4473" >}}
+
+::: {.notes}
+Start from the delivered quote, the price plus inbound freight. If it is below materials and the factory overhead that varies, the cost that stops even if the crew stays, buy, provided the terms, quality and minimum volume are acceptable. If not, ask whether it is below that cost plus the crew time the family uses.
+:::
+
+## The crew decides the middle case
+
+{{< book-figure fig-18-02 crop="0,0.3241,1,0.3112" >}}
+
+::: {.notes}
+If the quote is below that cost plus the crew time, buy only if the crew will be reduced in step with the hours freed, weighing tooling and severance over the quote's two years. If the quote is above both costs, the flowchart goes straight to keeping the family and testing its price.
+:::
+
+## Otherwise keep making, and test the price
+
+{{< book-figure fig-18-02 crop="0,0.6483,1,0.3517" >}}
+
+::: {.notes}
+If the crew stays, buying adds the supplier's price to costs the company keeps paying, so keep making. Every family kept is tested against the margin floor, and a family below it is repriced, weighing the volume the increase could cost.
+:::
+
+## Decide make or buy, family by family
+
+{{< book-requirement 6 >}}
+
+- **Produce:** each family's relevant cost, with the crew kept and reduced
+- **Tool:** the workbook: change the quote and the crew, watch the answer
+- **Revisit:** Chapter 7's Goal Seek and two-way Data Tables
+- **Check:** your answer stands beside the absorption view, explained
+
+::: {.notes}
+With the crew kept, the relevant cost is materials and the overhead that varies; with the crew reduced in step with the hours freed, add the crew's cost of the routing time. Compare each with the delivered quote, and compute the annual effect at the base year's volume. Add tooling and severance for the families you would buy, over the two years the prices are fixed. Use Goal Seek for each family's break-even quote under each crew case, and a two-way Data Table of the quote against the share of freed crew time removed. Then list the terms that the numbers leave out.
+:::
+
+## Watch out: absorption cost is not a relevant cost {.watch-out}
+
+- It includes supervision, depreciation and the crew's idle hours
+- Those costs do not stop when one family is bought
+- They fall on the families that remain, which then look dearer
+- Compare the quote with the costs that would stop
+
+::: {.notes}
+The remaining families' higher costs invite the next decision to buy: the spiral that cost systems built on actual volume can set off. For each cost you count as stopping, state what has to happen for it to stop.
+:::
+
+## Value the capacity that buying would free
+
+{{< book-requirement 7 >}}
+
+- **Produce:** hours freed by work center, and the plant's use afterwards
+- **Tool:** the workbook; Solver for the optional growth test
+- **Revisit:** Chapter 7's Solver and shadow prices, and Exercise 7.4
+- **Check:** the freed hours are set against capacity already unused
+
+::: {.notes}
+Compare the freed hours with the capacity the plant already leaves unused, in hours and in positions, and say what that comparison means for the decision. Show what happens to the cost of the remaining families if the crew is kept. The optional part asks Solver which families to buy if volume grew, minimizing the added cost with the crew kept and each work center's practical capacity as the limit, and which work center binds, at what shadow price.
+:::
+
+## Reprice the families below the floor
+
+{{< book-requirement 8 >}}
+
+- **Produce:** floor prices, the increases, and the volume each can lose
+- **Tool:** Goal Seek in the workbook; choose a tool for the price evidence
+- **Revisit:** Chapter 7's promotion lift, and Exercise 8.6's price lists
+- **Check:** each increase is set beside how customers respond to price
+
+::: {.notes}
+Measure contribution over the relevant cost with the crew kept, and compute the share of volume each increase could lose before the family earns less contribution than it does now. Test whether order volume rose in the months of past promotions, and check the dates and use of the price lists. Recommend increases and how the lists should be rebuilt, and show how the answer changes for any family you would buy. Marn and Rosiello found price the most powerful lever on profit: a small price gain with no loss of volume raised operating profit several times as much as the same gain in volume. Chapter 15's gross-to-net waterfall traced Charles River's price from list to net revenue.
+:::
+
+## Check your understanding {.check}
+
+What stops if a family is bought?
+
+1. The materials the family uses
+2. The factory overhead that varies with output
+3. The crew's time on the family's routings
+4. Supervision and the plant's depreciation
+
+::: {.notes}
+Ask students what would have to happen for each cost to stop.
+:::
+
+## Each cost has its answer {.answer}
+
+1. It stops at once
+2. It stops at once
+3. It stops only if the crew is reduced in step with the hours freed
+4. It stays, and falls on the families that remain
+
+::: {.notes}
+This is the test of the flowchart. Which families pass it, under each crew case, is the work of Requirement 6.
+:::
+
+## Milestone 3: before you hand it in
+
+- Each quoted family has a decision under both crew cases
+- The one-time costs and the break-even quotes are shown
+- The freed hours are compared with the capacity already unused
+- Each increase is set beside the evidence on customers' response
+
+::: {.notes}
+These are self-checks, not answers. A decision that does not say what happens to the crew is not yet a decision.
+:::
+
+# Phase 4: Standards and the Memo
+
+## Phase 4 at a glance
+
+{{< book-requirements 9-10 >}}
+
+{{< book-milestones 4-4 >}}
+
+::: {.notes}
+Phase 4 turns the cost study back to the statements, and then into the memo the two decision makers will act on.
+:::
+
+## Revise the standards for the statements
+
+{{< book-requirement 9 >}}
+
+- **Produce:** a conversion rate on normal capacity, with its comparisons
+- **Tool:** the workbook rebuilds the standard and revalues the stock
+- **Revisit:** Chapter 9's standard costs, and Chapter 6's statements
+- **Check:** the effect is measured at each year-end against materiality
+
+::: {.notes}
+The rate charges the labor rate with burden for the direct and the normal indirect hours, the overhead that varies, and the plan's supervision and depreciation spread over the plan volume. Compare it with the current rate, the time-driven rate and the base year's actual cost, and explain why a standard on actual cost would carry idle capacity into inventory. Revalue the manufactured finished goods made since the ledger opened and on hand at each year-end, and measure the effect on opening retained earnings, on each year's income and on each balance sheet. Show how the answer depends on what you treat as normal capacity.
+:::
+
+## Why the inventory standard uses normal capacity
+
+- Fixed production overhead is allocated on normal capacity
+- Abnormal costs, such as idle facility expense, go to the period
+- A standard on actual cost would carry idle time into inventory
+- Statements already issued may need correcting: say how
+
+::: {.notes}
+This is the inventory standard of U.S. generally accepted accounting principles, ASC Topic 330. The company issued its last two years' statements to its shareholders, so Requirement 9 asks whether the correction belongs in the next statements or calls for revised ones, and what the CFO should tell the shareholders.
+:::
+
+## Write the decision memo
+
+{{< book-requirement 10 >}}
+
+- A memo of at most two pages, with an appendix of exhibits
+- A decision table for each quoted family and each below the floor
+- Each row: what to do, the annual effect, the one-time cost, its condition
+- Close with the standards, the statements and the production manager's call
+
+::: {.notes}
+The memo goes to the CFO and the production manager, two people who disagree, so it gives each the evidence they need and leaves the crew decision with the production manager. The appendix of exhibits is at most three pages. Close with the standards you propose, what the base year's statements need, and the one decision that only the production manager can make.
+:::
+
+## Milestone 4: before you hand it in
+
+- The proposed standard states its capacity and its comparisons
+- The effect on the statements is measured and judged for materiality
+- The decision table covers each quoted family and each below the floor
+- The memo keeps to its page limits and leaves the crew decision open
+
+::: {.notes}
+These are self-checks, not answers. Each recommendation should say what it depends on, so that two people who disagree can act on it.
+:::
+
+# Deliverables and Checklist
+
+## Before you submit
+
+- Every query runs top to bottom, under its two comment lines
+- Every assumption lives in one cell of the Assumptions sheet
+- Every figure reconciles to the variance and clearing accounts
+- Each file opens and refreshes on another computer
+
+::: {.notes}
+This case brought back earlier answers. Chapters 10 to 12 found that the plant pays for hours beyond its work; here those hours became the unused capacity that no product should carry. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the base year's statements came back too, because a cost study can change what the statements should have said.
+:::
+
+# Looking Ahead
+
+## What the case practiced
+
+- Descriptive: what the families earned and used of the plant
+- Diagnostic: why the variance grew and where the cost really sits
+- Predictive: what freed capacity, growth and higher prices would do
+- Prescriptive: whether to make, buy or reprice, and the standards
+
+::: {.notes}
+These are the four types of analytics of Chapter 1. Requirements 1 and 3 were descriptive, 2 and 4 diagnostic, and 7 and 8 predictive; the recommendations were prescriptive, as decisions usually are.
+:::
+
+## The next round
+
+- Quotes expire, crews change, and prices move
+- The workbook and the explorer are tools for the next decision
+- Costing on practical capacity each year shows idle capacity early
+- Reviewing the standards every year keeps them from going stale
+
+::: {.notes}
+A plant that measures its costs on practical capacity every year sees idle capacity while it is still small, and a company that reviews its standards every year never has to explain years of stale ones at once.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every figure and table comes from the chapter:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online chapter.
+:::
