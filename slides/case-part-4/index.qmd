@@ -1,0 +1,331 @@
+## In this case
+
+::: {.roadmap}
+:::
+
+::: {.notes}
+This is the comprehensive case that closes Part IV, not a chapter. The deck opens with the committee's question, what you hand in and how it is judged, then walks through the situation, the data, and the six requirements in order. Present the opening before students start, and each requirement when they reach it.
+:::
+
+## Where did the cash go?
+
+- The company made a profit of several million dollars
+- Yet it ended the year with less cash than it began with
+- The controller will answer with a report the committee can explore
+- You are the staff accountant of Chapters 13 to 15 again
+
+::: {.notes}
+The case puts the four Power BI chapters to work together. You build, profile and validate a model of your own as in Chapters 13 and 14, measure balances and how fast they turn with Chapter 14's DAX, build pages the committee can explore with Chapter 15's drill-through, tooltips and parameters, and test your own report as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant; this one ends with a recommendation on the cash held in working capital.
+:::
+
+## What you will hand in
+
+{{< book-deliverables >}}
+
+::: {.notes}
+The memo carries the recommendation, the one-page appendix the five exhibits behind it, and the report the evidence: a reviewer should be able to refresh it and see its tests pass.
+:::
+
+## How your work will be judged
+
+{{< book-criteria 1-3 >}}
+
+::: {.notes}
+A strong submission can be refreshed and checked by someone else, ends its cash bridge exactly at the change in cash, and states every measure's definition. Read these criteria now and again before you hand in the memo.
+:::
+
+## How your work will be judged (continued)
+
+{{< book-criteria 4-6 >}}
+
+::: {.notes}
+The memo is written for the controller and the committee: concise, organized by perspective, careful with its words, and ending with a recommendation she can act on.
+:::
+
+# The Situation
+
+## A profit, and less cash than the year began with
+
+- The audit committee is reviewing the latest year's statements
+- The company earned a net income of several million dollars
+- The year before, its cash had grown by several million
+- The income statement cannot say where this year's cash went
+
+::: {.notes}
+The committee's question is one the income statement cannot answer, because profit and cash move on different schedules. The controller will answer it at the committee's next meeting, with a report its members can explore with her. You build the report and write the memo that goes with it.
+:::
+
+## Four questions from the controller
+
+- Where did the cash go, and how did the year differ from the last?
+- Which balances absorbed it, and how quickly do they turn back?
+- Why did materials grow, and what would a return to target release?
+- Are the balances behind the report supported?
+
+::: {.notes}
+The second question also asks how the turnover has changed since the first year of the data. The fourth asks what the statements and the committee need to know about any balances that are not supported. The memo answers in this order, which Requirement 6 follows.
+:::
+
+## The report must carry its own evidence
+
+- Internal audit will test the report, as it tested the package
+- So the file needs a Validation page and a Tests tab
+- And it shows the date through which its data run
+- Findings state what the records show, not what anyone did
+
+::: {.notes}
+Some balances will look wrong. Word each finding as what the records show, such as a balance that no document supports or a payment that the ledger does not record, until evidence from outside the database settles the question.
+:::
+
+# The Data You Will Use
+
+## A new file for the case
+
+- Charles River Cash Case.pbix, next to CharlesRiver.xlsx
+- Turn off the two loading options of Tutorial 13.1
+- The package and the monitoring file stay as they are
+- Every requirement uses techniques you have already practiced
+
+::: {.notes}
+Import the Tables with Home > Get data > Excel workbook, under the query names the case gives, so that a reviewer can follow the model from its queries.
+:::
+
+## The queries the case builds
+
+- GLEntry, Account and JournalEntry: the ledger star, with a Date table
+- Receipts: what was received, and the requisition behind it
+- Issues: what production used, by work order
+- Requisitions, and Item with each item's inventory target
+- ARInvoices, APInvoices and DebtSchedule: open items and the notes
+
+::: {.notes}
+The ledger star is Tutorial 14.3's, with its closing entries flagged, and the Date table is Tutorial 14.1's. Receipts reach their requisitions through the order lines. Requisitions carry each approver's job title, and the open balances of the invoices follow Exercise 16.1 and Exercise 8.2.
+:::
+
+## Follow the Part IV conventions
+
+- Open GLEntry with Transform Data: fewer columns, but all its rows
+- Clear Enable load on the queries that only feed others
+- Relate facts one-to-many, in a single direction, and hide the keys
+- Keep measures in Key Measures, each with a description of its definition
+
+::: {.notes}
+These are the model rules of Chapters 13 and 14. The descriptions matter here: the committee will read the measures' definitions as part of the evidence.
+:::
+
+## Watch out: rows a working-capital report treats apart {.watch-out}
+
+- Leave the year-end closes out of every flow
+- The opening entry brings in balances that no document supports
+- The ledger's last posting date is not the report's data-through date
+- Some entries move a balance without moving any cash
+- Group the inventory policies by item before you merge them
+
+::: {.notes}
+Because the first year was the ledger's first, a figure for it built on an average balance or on the change from the opening says little. Supplier payments are the only postings after the latest year. The inventory policies hold one row for each item and warehouse, so without grouping every item appears twice.
+:::
+
+## Watch out: a ratio is only as good as its definition {.watch-out}
+
+- Compare receivables with what was billed, not with revenue
+- Materials and finished goods each have their own flow and target
+- Take each balance at a quarter-end, with the twelve months before it
+- Let the Balance measure filter Date; add no columns to GLEntry
+
+::: {.notes}
+None of these ratios is standard enough to go unstated, so state each definition. Receivables include sales tax and freight, which revenue does not. GLEntry is large, so a measure that iterates it, or a calculated column on it, slows the whole report.
+:::
+
+## Check your understanding {.check}
+
+Which flow goes with each balance?
+
+1. Receivables
+2. Materials inventory
+3. Finished goods
+4. Payables
+
+::: {.notes}
+Ask students what makes each balance grow and what makes it shrink, and which of those flows the ledger records.
+:::
+
+## Each balance has its flow {.answer}
+
+1. What was billed, tax and freight included
+2. What production issued
+3. What was shipped, at cost
+4. The supplier invoices recorded
+
+::: {.notes}
+Each measure of days divides a balance by its own flow over the twelve months before the date. Requirement 3 builds them, and Requirement 4 compares the days of supply with the policy targets.
+:::
+
+# Requirements
+
+## Six requirements, one report and a memo
+
+{{< book-requirements >}}
+
+::: {.notes}
+The requirements follow the controller's questions: build and validate the file, explain where the cash went, measure how fast working capital turns, trace the materials build, test the balances, and write the memo.
+:::
+
+## Build and validate the case file
+
+{{< book-requirement 1 >}}
+
+- **Produce:** the model, profiles, link tests, a Validation page, Data Through
+- **Tool:** Power Query and the ledger star, in a new file
+- **Revisit:** Chapter 13's profiles, Exercise 14.1, and Tutorial 16.3
+- **Check:** the Validation page reproduces totals you already trust
+
+::: {.notes}
+Add a channel column to Requisitions from each justification, and carry it into Receipts. Profile the new Tables on the entire data set and test their links. The Validation page ties net income, total assets with Exercise 14.1's Balance measure, and the materials received and issued against the materials inventory account, with the queries in a Tests tab. Data Through is the earliest of the last posting dates of the documents behind the working-capital accounts, as Tutorial 16.3 found it.
+:::
+
+## Explain where the cash went
+
+{{< book-requirement 2 >}}
+
+- **Produce:** balance sheets and ratios, a bridge, a waterfall, restated sections
+- **Tool:** bridge columns on Account, and measures with KEEPFILTERS
+- **Revisit:** Tutorials 14.3, 15.1 and 15.3, and Exercise 15.1's drill-through
+- **Check:** the bridge ends exactly at the change in cash
+
+::: {.notes}
+Assign each account to a step of the bridge from net income to the change in cash, and each step to an activity. Measure each step from the year's postings without the closes, not from two balances. Chart the year as a waterfall with its steps sorted, compare the year before, and drill through to find the entries that moved no cash. The standard on cash flows, ASC Topic 230, reports only cash receipts and payments and requires noncash activities to be disclosed. Then measure cash net of uncollected sales tax, and the notes' principal due within a year.
+:::
+
+## Check your understanding {.check}
+
+Cash, or a noncash activity?
+
+1. A customer pays an invoice
+2. A building is acquired by issuing shares
+3. Equipment is sold for cash
+4. A loan's principal is repaid
+
+::: {.notes}
+Ask students which section of the statement of cash flows each belongs in, if any.
+:::
+
+## Only cash goes in the statement {.answer}
+
+1. Cash: an operating activity
+2. No cash: disclosed, not reported in the statement
+3. Cash: an investing activity
+4. Cash: a financing activity
+
+::: {.notes}
+An activity that moves no cash is disclosed beside the statement, not reported in it. Requirement 2 asks you to find the case's own entries that moved no cash, and to restate the sections as the indirect method requires.
+:::
+
+## Measure how fast working capital turns
+
+{{< book-requirement 3 >}}
+
+- **Produce:** days of sales, inventory and payables, the cycle, days of supply
+- **Tool:** twelve-month measures, a field parameter, and a tooltip page
+- **Revisit:** Tutorial 15.3's trailing measure, and Exercise 15.3
+- **Check:** blank until twelve months exist, and after Data Through
+
+::: {.notes}
+Each measure divides a balance at a quarter-end by the ledger flow of the twelve months that end on that date, converted to days. Add days of supply for materials and finished goods, to compare with each item's target. On one page, let a field parameter switch a line chart among the measures, with a tooltip page behind each point and a matrix with icons against the targets. Then recompute two measures without the opening entry and compare an average-balance version.
+:::
+
+## Trace the materials build and set a target
+
+{{< book-requirement 4 >}}
+
+- **Produce:** receipts and issues by channel, requisition groups, a target
+- **Tool:** a reference query grouped by justification, and a what-if parameter
+- **Revisit:** Tutorial 16.2's document key, and Exercise 15.4's what-if
+- **Check:** the estimate states what it assumes and what it leaves out
+
+::: {.notes}
+Chart the materials received and issued by month with receipts split by channel, and the build by item group and item. Group the work-order shortfall requisitions by their justification, build the same key for each issue line with `Text.From`, and compare what was requisitioned with what was used. A what-if parameter sets the target days of supply, with the policy target as its default; test several targets and compare the excess with the year's fall in cash.
+:::
+
+## Test the balances behind the report
+
+{{< book-requirement 5 >}}
+
+- **Produce:** roll-forwards, reconciliations, a sales tax test, findings
+- **Tool:** a matrix by SourceDocumentType, and a Findings table
+- **Revisit:** Exercise 16.1, the cutoff findings of Chapters 6 and 12
+- **Check:** in the Tests tab, each difference equals its recorded items
+
+::: {.notes}
+Roll each working-capital account forward by its sources, and identify the parts no subledger document supports. Reconcile receivables and payables to their open items, compare billing with the invoices dated in each year, and age the open payables without those already moved to notes. Test what posts to sales tax payable and what never does. Enter each finding with its account, amount and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions.
+:::
+
+## Check your understanding {.check}
+
+Expected, follow up, or report?
+
+1. A flagged entry that is a year-end close
+2. A payment with no invoice on file, and no explanation yet
+3. Revenue recorded in the wrong year, as the shipment dates confirm
+4. Payments approved by someone without the authority
+
+::: {.notes}
+Ask students which of Chapter 8's dispositions fits each exception, and what evidence would change it.
+:::
+
+## Each exception has its disposition {.answer}
+
+1. Expected: the close explains it
+2. Follow up: request the document, or ask the question
+3. Report: a misstatement
+4. Report: a control deficiency
+
+::: {.notes}
+A disposition records the auditor's conclusion and the evidence behind it. Requirement 5 asks you to record one for each of the case's own reconciling items and findings.
+:::
+
+## Write the decision memo
+
+{{< book-requirement 6 >}}
+
+- At most two pages, for the controller's meeting with the committee
+- Financial reporting: the cash, the restated sections, the balance sheet
+- Managerial accounting: the turnover, the build, and a target with its cash
+- Auditing: the reconciliations, findings, and the controls the report needs
+
+::: {.notes}
+The financial reporting section covers the sales tax, the notes due within a year, and the balances no document supports. The auditing section also covers the evidence outside the database that would settle each finding, and the controls over requisitions that the build points to. Close with your recommendation.
+:::
+
+## Before you submit
+
+- The file refreshes, and its Tests tab passes
+- The About page shows the date through which the data run
+- The appendix holds the five exhibits the case lists
+- The memo keeps to its length, and ends with a recommendation
+
+::: {.notes}
+These are self-checks, not answers. A reviewer should be able to start from any number in the memo and find the measure and page behind it.
+:::
+
+# Looking Ahead
+
+## From one tool to all of them
+
+- This case reconciled profit with cash, and the ledger with its subledgers
+- It compared purchases with their plan, and a report with its own tests
+- Each Part has done that work with one tool: workbook, query, report
+- Part V offers three capstone cases that draw on every tool
+
+::: {.notes}
+The capstone cases of Part V are independent final projects: each states the methods it needs, and each asks you to choose the tool for every step and explain the choice.
+:::
+
+## About these slides
+
+These slides accompany {{< book-title >}}, licensed under CC BY-SA 4.0. Every requirement shown comes from the case:
+
+{{< book-link >}}
+
+::: {.notes}
+Students can find the full case, with every requirement and its tasks, in the online book.
+:::
