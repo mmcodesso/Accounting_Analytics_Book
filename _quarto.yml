@@ -18,6 +18,7 @@ filters:
     at: post-quarto
   - filters/pdf-code.lua
   - filters/learning-objectives.lua
+  - filters/pdf-keep-together.lua
 
 book:
   title: "Accounting Analytics: An Integrated Approach"

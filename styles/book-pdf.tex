@@ -4,20 +4,74 @@
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{longtable}
-% Two fixes to longtable, which sets the book's tables:
-% - It resets LaTeX's room for text on the page (\@colroom) to the full page when a table starts and
-%   never sets it back. On a page whose top holds a figure, the next figure after the table then let the
-%   text run past the foot of the page (Table 15.2 and Figure 15.2 in the print interior). At the end of
-%   a table the room is set back to what the page allows (\vsize: the full page again if it broke).
+% The book's tables are longtables (Quarto and Pandoc write every table that way), which can break at any
+% row and never move. Four changes:
+% - A captioned table no taller than 85% of the text height floats like a figure: it stays where it is if
+%   it fits there, otherwise it goes to the top of the next page and the text that follows fills the
+%   space (\fps@table below). When a longtable ends, it holds the whole table, its head with the caption
+%   in \LT@firsthead, its rows in box 0 and its bottom rule in \LT@lastfoot, and calls \LT@start to set
+%   it on the page; \LT@start is wrapped to measure those boxes and, for such a table, to put them in a
+%   box of its own instead, which \endlongtable then sets as a float (\aa@LT@float). The caption,
+%   number, label and link target are the ones longtable made.
+% - A longer table breaks across pages as before, with its header repeated, but never starts in the last
+%   quarter of a page, where its caption and a row or two would sit alone (\aa@LT@long).
+% - longtable resets LaTeX's room for text on the page (\@colroom) to the full page when a table starts
+%   and never sets it back. On a page whose top holds a figure, the next figure after the table then let
+%   the text run past the foot of the page (Table 15.2 and Figure 15.2 in the print interior). At the end
+%   of a table the room is set back to what the page allows (\vsize: the full page again if it broke).
 % - A figure that follows a table which broke across pages could go at the top of the table's last page,
 %   between its two parts (Figure 1.4 inside Table 1.3). When a table breaks, no figure goes at the top
 %   of the page where it ends: the figure follows the table on that page if it fits, or moves to the next.
 \usepackage{etoolbox}
 \makeatletter
 \newif\ifaa@LTbroke
+\newif\ifaa@LTfloat
+\newbox\aa@LTbox
+\newskip\aa@LTpost
+\newdimen\aa@LTheight
+\def\aa@LTtable{table}
+\let\aa@LT@start@orig\LT@start
+\def\LT@start{%
+  \aa@LTheight\ht\z@ \advance\aa@LTheight\dp\z@
+  \advance\aa@LTheight\ht\ifvoid\LT@firsthead\LT@head\else\LT@firsthead\fi
+  \advance\aa@LTheight\dp\ifvoid\LT@firsthead\LT@head\else\LT@firsthead\fi
+  \advance\aa@LTheight\ht\ifvoid\LT@lastfoot\LT@foot\else\LT@lastfoot\fi
+  \edef\aa@LTcap{\LTcaptype}%
+  \let\aa@LTnext\aa@LT@long
+  \ifx\aa@LTcap\aa@LTtable
+    \ifdim\aa@LTheight>0.85\textheight\else \let\aa@LTnext\aa@LT@float \fi
+  \fi
+  \aa@LTnext}
+% A short table: its parts go into \aa@LTbox; the end penalty that would call longtable's output
+% routine becomes an ordinary one, and \endlongtable (below) sets the box as a float.
+\def\aa@LT@float{%
+  \global\setbox\aa@LTbox\vbox{%
+    \MakeLinkTarget{\LTcaptype}%
+    \ifvoid\LT@firsthead\copy\LT@head\else\box\LT@firsthead\fi
+    \unvbox\z@
+    \ifvoid\LT@lastfoot\copy\LT@foot\else\box\LT@lastfoot\fi}%
+  \global\setbox\LT@foot\box\voidb@x
+  \mathchardef\LT@end@pen\z@
+  \global\aa@LTpost\LTpost \global\LTpost\z@skip
+  \global\aa@LTfloattrue}
+% A long table: not in the last quarter of a page, unless it follows a heading, which must keep it.
+\def\aa@LT@long{%
+  \if@nobreak\else
+    \endgraf\penalty\z@
+    \ifdim\pagegoal<\maxdimen
+      \dimen@\pagegoal \advance\dimen@-\pagetotal
+      \ifdim\dimen@<0.25\textheight \vfil\penalty-\@M \fi
+    \fi
+  \fi
+  \aa@LT@start@orig}
 \pretocmd{\LT@output}{\ifnum\outputpenalty<-\@Mi\else\global\aa@LTbroketrue\fi}{}
   {\PackageWarning{book-pdf}{Could not patch longtable's output routine}}
-\apptocmd{\endlongtable}{\global\@colroom\vsize\ifaa@LTbroke\global\@topnum\z@\fi\global\aa@LTbrokefalse}{}
+\apptocmd{\endlongtable}{%
+  \global\@colroom\vsize\ifaa@LTbroke\global\@topnum\z@\fi\global\aa@LTbrokefalse
+  \ifaa@LTfloat
+    \global\aa@LTfloatfalse \global\LTpost\aa@LTpost
+    \begin{table}\box\aa@LTbox\end{table}%
+  \fi}{}
   {\PackageWarning{book-pdf}{Could not patch the end of longtable}}
 \makeatother
 \usepackage{array}
@@ -71,6 +125,10 @@
 % With boxes kept whole, a page can end early; leave that space at the foot of the page instead of
 % stretching the gaps between paragraphs and headings to fill it.
 \raggedbottom
+% No paragraph leaves a single line at the foot of a page or carries one over to the top of the next.
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 \definecolor{Teal}{HTML}{17A589}
 \definecolor{Coral}{HTML}{E74C3C}
 \definecolor{Amber}{HTML}{F39C12}
@@ -91,8 +149,10 @@
 % can share a page with text, and a page of figures alone is made only when they fill at least 80% of
 % it, so a large figure no longer sits alone on a page while its paragraph runs on before and after it
 % (LaTeX's defaults, 70% at the top and float pages half full, put Figure 1.4 on a page by itself).
+% Tables that float (see longtable at the top) follow the same rules.
 \makeatletter
 \renewcommand{\fps@figure}{htp}
+\renewcommand{\fps@table}{htp}
 \makeatother
 \renewcommand{\topfraction}{0.85}
 \renewcommand{\textfraction}{0.1}
