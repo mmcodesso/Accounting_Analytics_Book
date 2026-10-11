@@ -64,6 +64,12 @@
     \fi
   \fi
   \aa@LT@start@orig}
+% Every cell sits at the top left of its row. Pandoc sets each header cell of a table with column widths
+% in \begin{minipage}[b], which drops a one-line header to the last line of a header that wraps; inside
+% a longtable a minipage is set [t] instead, like the body cells.
+\let\aa@minipage\minipage
+\def\aa@minipage@t[#1]{\aa@minipage[t]}
+\AtBeginEnvironment{longtable}{\def\minipage{\@ifnextchar[\aa@minipage@t\aa@minipage}}
 \pretocmd{\LT@output}{\ifnum\outputpenalty<-\@Mi\else\global\aa@LTbroketrue\fi}{}
   {\PackageWarning{book-pdf}{Could not patch longtable's output routine}}
 \apptocmd{\endlongtable}{%
@@ -91,9 +97,31 @@
 \providecolor{shadecolor}{RGB}{241,243,245}
 \makeatletter
 \@ifundefined{Shaded}{\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}}{}
-\DeclareRobustCommand{\aacode}[1]{\highLight[shadecolor]{\hbox{}\nobreak\hskip1.5pt minus 1.5pt\nobreak
+% \leavevmode starts the paragraph first: lua-ul's \highLight in vertical mode (code at the start of a
+% table cell, as in the first column of Table 10.2) set the code a line below the other cells of its row.
+\DeclareRobustCommand{\aacode}[1]{\leavevmode\highLight[shadecolor]{\hbox{}\nobreak\hskip1.5pt minus 1.5pt\nobreak
   #1\nobreak\hskip1.5pt minus 1.5pt\hbox{}}}
 \AtBeginDocument{\@ifundefined{pdfstringdefDisableCommands}{}{\pdfstringdefDisableCommands{\let\aacode\@firstofone}}}
+% Code stays in the order of the text, unlike figures and tables. filters/pdf-keep-together.lua asks
+% for room (\aaNeedspace) before each code block and its lead-in, so a query of up to 25 lines moves
+% whole to the next page instead of splitting, and a longer one leaves at least six lines on its first
+% page. Waiting figures and tables are not placed at the top of a page that a code block starts or
+% continues on: they would take the room the block was moved there for (Figure 9.9 split the query of
+% Tutorial 9.3, Step 2), or sit between the two parts of a long block (Figure 10.8 once sat inside the
+% first query of Tutorial 10.3). They go to the next page instead. \aaNeedspace is needspace's
+% \Needspace* with that one difference.
+\newif\ifaa@incode
+\AtBeginEnvironment{Shaded}{\global\aa@incodetrue}
+\AfterEndEnvironment{Shaded}{\global\aa@incodefalse}
+\let\aa@startcolumn\@startcolumn
+\def\@startcolumn{\ifaa@incode\global\@colroom\@colht\else\expandafter\aa@startcolumn\fi}
+\newcommand{\aaNeedspace}[1]{%
+  \par\penalty-100
+  \begingroup
+    \setlength\dimen@{#1}%
+    \dimen@ii\pagegoal \advance\dimen@ii-\pagetotal
+    \ifdim\dimen@>\dimen@ii \global\aa@incodetrue \break \global\aa@incodefalse \fi
+  \endgroup}
 \makeatother
 
 % Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,
