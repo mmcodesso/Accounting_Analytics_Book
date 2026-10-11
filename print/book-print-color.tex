@@ -1,0 +1,22 @@
+% The color print interior: every color in CMYK (IngramSpark: CMYK only, at most 240% total ink, text of
+% 24pt or less in 100% black). The values are LATEX_COLORS in scripts/print/palette.py, which also gives
+% the figures their CMYK colors; tests/test_print.py checks that the two agree.
+
+% Colors used by name after this point (Quarto's callout colors, Pandoc's \textcolor[rgb] in highlighted
+% code, lua-ul's shading) are converted to CMYK by xcolor, with neutral grays in black only.
+\selectcolormodel{cmyk}
+
+% Colors defined before this point keep their RGB values when tcolorbox or pgf copy them, so each is
+% defined again in CMYK.
+\definecolor{Ink}{cmyk}{0,0,0,1}
+\definecolor{PrimaryBlue}{cmyk}{1,0.73,0.35,0.19}
+\definecolor{Teal}{cmyk}{0.82,0.11,0.62,0.01}
+\definecolor{Coral}{cmyk}{0.03,0.91,0.95,0}
+\definecolor{Amber}{cmyk}{0.03,0.46,1,0}
+\definecolor{LightGray}{cmyk}{0,0,0,0.06}
+\definecolor{BorderGray}{cmyk}{0,0,0,0.2}
+\definecolor{shadecolor}{cmyk}{0,0,0,0.06}
+\colorlet{ObjectivesTint}{PrimaryBlue!6}
+
+% Body text in 100% black, not the screen's dark slate.
+\color{Ink}

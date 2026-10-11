@@ -98,13 +98,22 @@ local function labeled(name, text)
   return inlines
 end
 
+-- The print interiors (profiles print-color and print-bw, scripts/print/build.py).
+local function is_print()
+  for _, profile in ipairs(quarto.project.profile or {}) do
+    if profile == 'print-color' or profile == 'print-bw' then return true end
+  end
+  return false
+end
+
 -- A chapter page's slide links. The deck opens in a new tab, so the chapter stays open where the reader was.
 -- In HTML they form a bar of two pill buttons (styles/book.scss, .chapter-slides-bar); in the PDF a styled line;
--- in EPUB and DOCX a plain line.
+-- in EPUB and DOCX a plain line. The print interiors leave them out, so a chapter goes from its title to its
+-- learning objectives (the Downloads page sends print readers to the website).
 function Div(div)
   if div.classes:includes('chapter-slides') then
     local id = div.attributes['data-chapter']
-    if not has_deck(id) then return {} end
+    if is_print() or not has_deck(id) then return {} end
     local view, download_link = link_targets(id)
     local label = id:match('^case') and 'Case slides' or 'Chapter slides'
     if FORMAT == 'html' or FORMAT == 'html5' then

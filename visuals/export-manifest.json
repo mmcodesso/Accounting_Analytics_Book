@@ -212,11 +212,11 @@
       "source_sha256": "d8c269bf13d0d2622b46b6ed68418d691965088a9e692fb0ec6d93d4ee4c6e63"
     },
     "visuals/pdf/fig-04-02-power-query-navigator.pdf": {
-      "output_sha256": "543ce2631c58cea07f175772f50305c0060fd4e93489df871cffadebe4717d6b",
+      "output_sha256": "6faf130bf086cf9d71a28158b742b2d5f9389919617bdd9a844ea071b706499f",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-04-02-power-query-navigator.drawio",
-      "source_sha256": "e9e74ed7b79c6c73c49c694b8a5c4e26e3b47700765e0477b5cc8a0a76c64c2b"
+      "source_sha256": "467c8b7d3f479e2cc5d04f312f5959c09ac46262834a5483f76418b88a0c511f"
     },
     "visuals/pdf/fig-04-03-power-query-editor-item.pdf": {
       "output_sha256": "43f3086d97690fc699b33ce89c7c825639528da89f89ee3458c8fbc854938ae7",
@@ -338,11 +338,11 @@
       "source_sha256": "ab088fdb4f02bb6f9f422495769293560d8d141ff5517718c2aee8e0f5a89fbb"
     },
     "visuals/pdf/fig-06-03-pivottable-areas.pdf": {
-      "output_sha256": "a0a0d41ff3f5085ebffa769e4640d4280180920caa504b2a8b5ff6ddb32666b0",
+      "output_sha256": "257ea734434eecf96050c30691f159ad0a5a77c1306e85be7aaf5ba223f88808",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-06-03-pivottable-areas.drawio",
-      "source_sha256": "a2690fe61daceb5fdb1c021b504b273efcd8e5f780f10d5031ed63b7857001f8"
+      "source_sha256": "236c69a263afa339e98ea81490fdf92c6b53b4875291a542efcb4a9a94d91b86"
     },
     "visuals/pdf/fig-06-04-show-values-as.pdf": {
       "output_sha256": "e172f640c81fda88e29e78e72fe230c6de679b04d41f0185b091113e66dfbd8c",
@@ -527,25 +527,25 @@
       "source_sha256": "382b268b12fa038d08d25b2bdd0df6922b4228e8dfdec74bb92b20e151b687ab"
     },
     "visuals/pdf/fig-09-03-account-columns.pdf": {
-      "output_sha256": "3cd96f8a75228beb88bd311dd5cd1d9d70e1295f4664ee33efc74ccce8c3449d",
+      "output_sha256": "a88ab98e7b01b5882e537ca36d3b04e9c6b597382eca287173bdff04ce805719",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-03-account-columns.drawio",
-      "source_sha256": "91762c5dd38db4d25c076b753e7441ad63c699231a318e60f93323b7e124b31d"
+      "source_sha256": "e956d424c685ae0742f11bbfc3f5febd3a5b5ad62696009868c0d08f366fa6d2"
     },
     "visuals/pdf/fig-09-04-syntax-error.pdf": {
-      "output_sha256": "89236b86acf5845626e09243e8702464275ab1489946b898b0e718e2bd96c781",
+      "output_sha256": "41d725dee44afc2d5940b3b3a4e979ad7936542dfb4bf0c9502b270f104aae0f",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-04-syntax-error.drawio",
-      "source_sha256": "112ba60807848750a4eceb037f7cca11d1ede38d9d6075560f149480cf0c9353"
+      "source_sha256": "aaf3a1235530a9ae1fea80d0de3f3cbabec4a6c69b64b62c50a659c5d867155f"
     },
     "visuals/pdf/fig-09-05-variance-check.pdf": {
-      "output_sha256": "6d9b4d10a9f5d2e0bfdf17b40d6b509ec6ca2e34c90a224529d99bd78595b033",
+      "output_sha256": "fab6e467a19663c46985738a71e0e481c047b2179325d2d3757f1a544316392a",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-05-variance-check.drawio",
-      "source_sha256": "1b3ddabfceb150b82de178da618429563a2aa0e1cf02e81d16d1a027da08699c"
+      "source_sha256": "2268f309d942b73ba4d9bcc8e47e0918a5dcf2d39733a3f20b4d486b40ffa4e6"
     },
     "visuals/pdf/fig-09-06-where-null.pdf": {
       "output_sha256": "eb2278a32c6cc63a4dd93c9c329dfd196b40ee970d2947e4331f9bd8f0053733",
@@ -555,11 +555,11 @@
       "source_sha256": "1fa768125678bc07b13f017778076ef0bc03b8e29372c33d967f01166ff9ca7c"
     },
     "visuals/pdf/fig-09-07-variance-sources.pdf": {
-      "output_sha256": "4eff444791ae84fad72f7219c08af4819ce6bfaa05807d2f1a52554975e44789",
+      "output_sha256": "df888c928f256f25dcaa35d6e30521de17ef5c6d9cd87309e5aeabc61992447b",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-07-variance-sources.drawio",
-      "source_sha256": "122796554894d82237dbf5c8d59df09e74820924c68927a49949761727970730"
+      "source_sha256": "46a631015deefc4f5606377dee96b12b57d4828212d15396149e72dcd3363f3d"
     },
     "visuals/pdf/fig-09-08-query-anatomy.pdf": {
       "output_sha256": "7e99d52530d8434cf6cc997b0fcfeb71d676b24f2be6464cc683272da1643022",
@@ -569,18 +569,18 @@
       "source_sha256": "ea388561210e0749ef55bb8ee1280e1442e449b7db12c64eeb63714cdfa18f0f"
     },
     "visuals/pdf/fig-09-09-top-variances.pdf": {
-      "output_sha256": "54153f382fbb0bf0a2dc20e1f171a3ead69f1900e35613ac44abdbe8287f842d",
+      "output_sha256": "b59b3d11b8e7653b7eb456ae1c8140dfc3865d7df3c1be2119ccb9a445047dfb",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-09-top-variances.drawio",
-      "source_sha256": "b09e5817e4cfc2d356510ccb396700290d086b51e902df82e853b725456dcb93"
+      "source_sha256": "0642d954f9b1929458f95b0b62cb9fb54ba3cb4be25677e0b4fa68a9486f7d8a"
     },
     "visuals/pdf/fig-09-10-saved-script.pdf": {
-      "output_sha256": "7a77d2a195292eb4fc41c154497a538bd36bfe972029c11bcedb04a76cf26112",
+      "output_sha256": "d044543706d435ff30c4dec70161b7a59d7e2c524dbddb4a6c97714af82a90dd",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-09-10-saved-script.drawio",
-      "source_sha256": "6581faf332b4516e0914ee0ec1b9c5fe7ad05bc53c26548d61df03dc8d872bb3"
+      "source_sha256": "35d26f58ba8b94a4a8fc4fe7b2029054fdd22613df3ea4137cb1d50e26c63fd0"
     },
     "visuals/pdf/fig-10-01-join-matching.pdf": {
       "output_sha256": "f42e39c7f426dbc86b3508e9f4e425980b0ce3b217c43b344b707e8708c18f2e",
@@ -891,11 +891,11 @@
       "source_sha256": "b9ed81cea01ecf4112f838e4fa5ab10868b234430262de4e856b37129c5eb150"
     },
     "visuals/pdf/fig-14-06-dax-query-view.pdf": {
-      "output_sha256": "99daacb8130404bf86376f19027224db0fae96807aede42e0f586e17455c36b0",
+      "output_sha256": "f261c7969f232b560314f5d09f024334866f94bceebc93d36fce62f825c82387",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-14-06-dax-query-view.drawio",
-      "source_sha256": "37ec123d2d7d3550b1716e6edc304257ab1cb91e14f8e4f4a11596fa02878dc5"
+      "source_sha256": "779c3073ce349d26c33a8bb6598707009bfdf244a30b52bf04d8afbe181d1ff6"
     },
     "visuals/pdf/fig-14-07-margin-matrix.pdf": {
       "output_sha256": "d982e6f466359f1e04a5c45ac791836362ee83fefd5384ef67eb6e4f7d9e47ce",
@@ -1066,11 +1066,11 @@
       "source_sha256": "fdd1f3958310f0c96bd75254aced24f5f78207c684b6b85218156fc85b4077ab"
     },
     "visuals/pdf/fig-16-08-population-test.pdf": {
-      "output_sha256": "871832826cbd71799599ae3b12218b5caed271e435a2209fc8243f37a21e83a9",
+      "output_sha256": "734d3de1c9b6f869b1acd08c9d133e80552e4effb96b18801fd817064629468b",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-16-08-population-test.drawio",
-      "source_sha256": "16d19549af5eba337a4fcc35d400335fe2a6089aa3ce1711fe43bc2b7cb0eeda"
+      "source_sha256": "fd249c79065c3846fd52b79cb9824a376dfa1dbaa975141c50397b43c7811c28"
     },
     "visuals/pdf/fig-17-01-accrual-trace.pdf": {
       "output_sha256": "103f71b4a8d58dc97253236c5a5d75925a3bf267e709e2dfd293e27504110dc3",
@@ -1150,11 +1150,11 @@
       "source_sha256": "b86edb6e3bd892dfe74abb526401ecd3307ebeda246b92485e8ab88b00e2d817"
     },
     "visuals/pdf/fig-c-01-upload-and-choose.pdf": {
-      "output_sha256": "d6dfae6e99a3d49a0d1e66b6b6516a95b834a8e8ed4c735bac3985de8b16a66c",
+      "output_sha256": "72e77bdfd8526b436b4712ef9523c11ca87fcb8381295689687cc6b246658dbc",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-c-01-upload-and-choose.drawio",
-      "source_sha256": "d08c41b4c76cc466701a2f1059497bd9bb2d407f74a08ac74415fa9688f211fd"
+      "source_sha256": "83921c469a0a431cdf697d36047a50d6f90810d5a468f6e04e28db16064593fc"
     },
     "visuals/pdf/fig-c-02-dates-as-numbers.pdf": {
       "output_sha256": "a84f21f1b2554d69617c779512da1c503c75bada6b4bc34404a3797f62c55083",
@@ -1178,11 +1178,11 @@
       "source_sha256": "7a7bafb4ba17b1879c68b80fea765b7acd72fc79e6b969e98ea8b00f41dfc04b"
     },
     "visuals/pdf/fig-c-05-dax-query-measure.pdf": {
-      "output_sha256": "a29fc4a99231206e9ac8da1aa2f1a2db704e65c30df040f54c84d428ebe9e50b",
+      "output_sha256": "a3939b8c1c36afe7787a740ea2a984e932d4e3395e3b5ac92acaad6204190d8b",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-c-05-dax-query-measure.drawio",
-      "source_sha256": "5d70bf5d1cc00adb27416fa12392722438a057f43458c828965c658d64653ef6"
+      "source_sha256": "44362589d58bf61ae54630a23b1bc7bbdc7330deeedd9a6fe662487da6e8e3c2"
     },
     "visuals/svg/fig-01-01-analytics-continuum.svg": {
       "output_sha256": "8b09da8acbfee03464450f7b3ad6fb61314f0c530a6e41a178b9364f8495dc4a",
@@ -1419,13 +1419,13 @@
       "source_sha256": "d8c269bf13d0d2622b46b6ed68418d691965088a9e692fb0ec6d93d4ee4c6e63"
     },
     "visuals/svg/fig-04-02-power-query-navigator.svg": {
-      "output_sha256": "eacd8bed89f5520a37f56ebf29472823c1797bc7d1218e8a688d1644b5ff849e",
+      "output_sha256": "583edd527bce0ff4ac4ae294e29d33e03e527a7288497fe844f153e1bcb0192c",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-02-power-query-navigator.drawio",
-      "source_sha256": "e9e74ed7b79c6c73c49c694b8a5c4e26e3b47700765e0477b5cc8a0a76c64c2b"
+      "source_sha256": "467c8b7d3f479e2cc5d04f312f5959c09ac46262834a5483f76418b88a0c511f"
     },
     "visuals/svg/fig-04-03-power-query-editor-item.svg": {
       "output_sha256": "bc1d7b4a3dd5f0f301390a04648e51e603a6e37d3f4df81345f6746e2ef76bc4",
@@ -1581,13 +1581,13 @@
       "source_sha256": "ab088fdb4f02bb6f9f422495769293560d8d141ff5517718c2aee8e0f5a89fbb"
     },
     "visuals/svg/fig-06-03-pivottable-areas.svg": {
-      "output_sha256": "f38f1e74a0bfe7cf8fcb449c8254ce1060056bbb0e9c3c17268e86da5ac5e7bb",
+      "output_sha256": "4b875545d1530bc08f81c9fa011c218d750782c434d5df4ede7a5493c520c065",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-03-pivottable-areas.drawio",
-      "source_sha256": "a2690fe61daceb5fdb1c021b504b273efcd8e5f780f10d5031ed63b7857001f8"
+      "source_sha256": "236c69a263afa339e98ea81490fdf92c6b53b4875291a542efcb4a9a94d91b86"
     },
     "visuals/svg/fig-06-04-show-values-as.svg": {
       "output_sha256": "e2f464d6b152e709816057b480ff8d617c88cdff946fd96042075c62d79dff71",
@@ -1824,31 +1824,31 @@
       "source_sha256": "382b268b12fa038d08d25b2bdd0df6922b4228e8dfdec74bb92b20e151b687ab"
     },
     "visuals/svg/fig-09-03-account-columns.svg": {
-      "output_sha256": "9df815511ed48fbdff649cda9e40ec3aa56a8a4789ec4f72a40a37c4fa55ad07",
+      "output_sha256": "9c7a8dbd73fa0543c8b47bf069f528888856b7b3a0c4d4a799e3702fc8cf219e",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-03-account-columns.drawio",
-      "source_sha256": "91762c5dd38db4d25c076b753e7441ad63c699231a318e60f93323b7e124b31d"
+      "source_sha256": "e956d424c685ae0742f11bbfc3f5febd3a5b5ad62696009868c0d08f366fa6d2"
     },
     "visuals/svg/fig-09-04-syntax-error.svg": {
-      "output_sha256": "49c02d5f6e7e010015e5dc38665766660e92323c3be3ce3a83217755eae3104a",
+      "output_sha256": "94e90f798ae129020870ce38eb4fa04fd8d4957cced7f8bc876bb172b9459e37",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-04-syntax-error.drawio",
-      "source_sha256": "112ba60807848750a4eceb037f7cca11d1ede38d9d6075560f149480cf0c9353"
+      "source_sha256": "aaf3a1235530a9ae1fea80d0de3f3cbabec4a6c69b64b62c50a659c5d867155f"
     },
     "visuals/svg/fig-09-05-variance-check.svg": {
-      "output_sha256": "a502ea3dededfc9d7d00b37b181bdbffcd0e3b65db8cabfa65e5863b99378f64",
+      "output_sha256": "ac47bf2d88d93264ea6a61c18b3580c6c1c6e7df3cfea3b61c6c0fe9a68c471d",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-05-variance-check.drawio",
-      "source_sha256": "1b3ddabfceb150b82de178da618429563a2aa0e1cf02e81d16d1a027da08699c"
+      "source_sha256": "2268f309d942b73ba4d9bcc8e47e0918a5dcf2d39733a3f20b4d486b40ffa4e6"
     },
     "visuals/svg/fig-09-06-where-null.svg": {
       "output_sha256": "a4fe3b785ebd4b9dc7cd6821683c0693e0b36d45e876fe6029e23fb39490e9ee",
@@ -1860,13 +1860,13 @@
       "source_sha256": "1fa768125678bc07b13f017778076ef0bc03b8e29372c33d967f01166ff9ca7c"
     },
     "visuals/svg/fig-09-07-variance-sources.svg": {
-      "output_sha256": "52063d78ebae409d6a0fb2fcba3b5bb160ab5e93d627f7ae9989a2f977c303c2",
+      "output_sha256": "0441f9b307a8c486d5c83461d298634ba2bfbc535427cc1e6ac6aa6805db09c8",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-07-variance-sources.drawio",
-      "source_sha256": "122796554894d82237dbf5c8d59df09e74820924c68927a49949761727970730"
+      "source_sha256": "46a631015deefc4f5606377dee96b12b57d4828212d15396149e72dcd3363f3d"
     },
     "visuals/svg/fig-09-08-query-anatomy.svg": {
       "output_sha256": "f640ff3f818ebfb61405e28ebd0727968dd00bb3ebe2efd38e8af72569e40d21",
@@ -1878,22 +1878,22 @@
       "source_sha256": "ea388561210e0749ef55bb8ee1280e1442e449b7db12c64eeb63714cdfa18f0f"
     },
     "visuals/svg/fig-09-09-top-variances.svg": {
-      "output_sha256": "ec70dfa71e4ad11e1da61344a56021ac9a6da376e8ca109e361b5390860bb59b",
+      "output_sha256": "97813e7351697105ed008da091e2edee2896831b20add66d0fc21c5c2d531efb",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-09-top-variances.drawio",
-      "source_sha256": "b09e5817e4cfc2d356510ccb396700290d086b51e902df82e853b725456dcb93"
+      "source_sha256": "0642d954f9b1929458f95b0b62cb9fb54ba3cb4be25677e0b4fa68a9486f7d8a"
     },
     "visuals/svg/fig-09-10-saved-script.svg": {
-      "output_sha256": "4c61d0e91bbe0a397863476065a6b65da5a245344112900fed79295e18d3e3bd",
+      "output_sha256": "a9d569a6b396a9327d48ba126b650633e1a7f9271d2ec45051cbdb3c7f5f70cf",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-10-saved-script.drawio",
-      "source_sha256": "6581faf332b4516e0914ee0ec1b9c5fe7ad05bc53c26548d61df03dc8d872bb3"
+      "source_sha256": "35d26f58ba8b94a4a8fc4fe7b2029054fdd22613df3ea4137cb1d50e26c63fd0"
     },
     "visuals/svg/fig-10-01-join-matching.svg": {
       "output_sha256": "8a4914eb41d4a3d3b9b9f4d16f0ef4acdbb0addb6b814488ad5a4c42242c96f3",
@@ -2292,13 +2292,13 @@
       "source_sha256": "b9ed81cea01ecf4112f838e4fa5ab10868b234430262de4e856b37129c5eb150"
     },
     "visuals/svg/fig-14-06-dax-query-view.svg": {
-      "output_sha256": "3f0d42a3752b40ccb7638b0dbe4bce2cdaf9903732fd5c7ca4e683773b1cb5c0",
+      "output_sha256": "becff8f8ece2971d73e2913d2ed7cfa6063cd4b6f608f8f1cfe444f4718cbe14",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-06-dax-query-view.drawio",
-      "source_sha256": "37ec123d2d7d3550b1716e6edc304257ab1cb91e14f8e4f4a11596fa02878dc5"
+      "source_sha256": "779c3073ce349d26c33a8bb6598707009bfdf244a30b52bf04d8afbe181d1ff6"
     },
     "visuals/svg/fig-14-07-margin-matrix.svg": {
       "output_sha256": "2038b0ed6005cfc2c97bb09138b67bbfeaa3af76839f15f2d3219fba2482fe5d",
@@ -2517,13 +2517,13 @@
       "source_sha256": "fdd1f3958310f0c96bd75254aced24f5f78207c684b6b85218156fc85b4077ab"
     },
     "visuals/svg/fig-16-08-population-test.svg": {
-      "output_sha256": "30d49b9d2436fcf1b783ea9a1b7bfda818a7b72365a17e660639bafe14fada6b",
+      "output_sha256": "fdccbb04311e2440d8ed2478a9828c4438921a883b81fd0149122e165321a678",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-08-population-test.drawio",
-      "source_sha256": "16d19549af5eba337a4fcc35d400335fe2a6089aa3ce1711fe43bc2b7cb0eeda"
+      "source_sha256": "fd249c79065c3846fd52b79cb9824a376dfa1dbaa975141c50397b43c7811c28"
     },
     "visuals/svg/fig-17-01-accrual-trace.svg": {
       "output_sha256": "e7b718ff20df330c2af7e3954f38d2aa25265c7df5f599602c7f1331ca2586a2",
@@ -2625,13 +2625,13 @@
       "source_sha256": "b86edb6e3bd892dfe74abb526401ecd3307ebeda246b92485e8ab88b00e2d817"
     },
     "visuals/svg/fig-c-01-upload-and-choose.svg": {
-      "output_sha256": "37d476b70753caf093c74c16bcb562dcd724966d65b656189599a37d05ad8c37",
+      "output_sha256": "17f3df33129965bbbbaffc6a8b7d366827230d3a186fff921976bad0e3cbbbc8",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-01-upload-and-choose.drawio",
-      "source_sha256": "d08c41b4c76cc466701a2f1059497bd9bb2d407f74a08ac74415fa9688f211fd"
+      "source_sha256": "83921c469a0a431cdf697d36047a50d6f90810d5a468f6e04e28db16064593fc"
     },
     "visuals/svg/fig-c-02-dates-as-numbers.svg": {
       "output_sha256": "8d3527209e9fca977c0fa427f71487d04435b75dba38ae9f207cd5fb284fb4e1",
@@ -2661,13 +2661,13 @@
       "source_sha256": "7a7bafb4ba17b1879c68b80fea765b7acd72fc79e6b969e98ea8b00f41dfc04b"
     },
     "visuals/svg/fig-c-05-dax-query-measure.svg": {
-      "output_sha256": "a3a22a8d628dc19aaf568fca20fcb9a8649bcd88acfcfbf9d6cc39d75220f0fc",
+      "output_sha256": "a3855cd1720967438cb40a06c6b3e331fadbc3b43a6c4cf7a4d65f602163c6b1",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-05-dax-query-measure.drawio",
-      "source_sha256": "5d70bf5d1cc00adb27416fa12392722438a057f43458c828965c658d64653ef6"
+      "source_sha256": "44362589d58bf61ae54630a23b1bc7bbdc7330deeedd9a6fe662487da6e8e3c2"
     }
   },
   "version": 1

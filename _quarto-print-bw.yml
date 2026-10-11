@@ -1,0 +1,19 @@
+# The black-and-white print interior of the book for IngramSpark (US Letter, no bleed). Built by
+# `python scripts/print/build.py --bw`, which renders `quarto render --profile print-bw --to pdf` and
+# then converts the PDF to PDF/X. Quarto merges this file into _quarto.yml; the header files below
+# load after styles/book-pdf.tex.
+project:
+  output-dir: outputs/print/render/bw
+
+# Print-only content: `::: {.content-visible when-meta="print"}` (front-matter/downloads.qmd).
+print: true
+
+format:
+  pdf:
+    # Links are not clickable on paper: print them in black, and print the address of a link whose
+    # text is not its address as a footnote.
+    colorlinks: false
+    links-as-notes: true
+    include-in-header:
+      - print/book-print.tex
+      - print/book-print-bw.tex

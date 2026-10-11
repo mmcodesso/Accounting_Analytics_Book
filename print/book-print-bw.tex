@@ -1,0 +1,71 @@
+% The black-and-white print interior: every color a gray (IngramSpark: grayscale, text in 100% black).
+% The values are LATEX_COLORS in scripts/print/palette.py, which also gives the figures their gray levels;
+% tests/test_print.py checks that the two agree. Tints are at least 12% black, because the screen's
+% 5-6% tints can vanish on the press.
+
+% Colors used by name after this point (Quarto's callout colors, lua-ul's shading) are converted to gray.
+\selectcolormodel{gray}
+
+% Colors defined before this point keep their RGB values when tcolorbox or pgf copy them, so each is
+% defined again as a gray. Headings, captions and rules are black.
+\definecolor{Ink}{gray}{0}
+\definecolor{PrimaryBlue}{gray}{0}
+\definecolor{Teal}{gray}{0.3}
+\definecolor{Coral}{gray}{0.3}
+\definecolor{Amber}{gray}{0.5}
+\definecolor{LightGray}{gray}{0.88}
+\definecolor{BorderGray}{gray}{0.6}
+\definecolor{shadecolor}{gray}{0.88}
+\definecolor{ObjectivesTint}{gray}{0.88}
+
+% Body text in 100% black.
+\color{Ink}
+
+% Callouts: a black left rule and outline, with a title band at 10% black (Quarto draws it as a 10% tint
+% of the callout color). Quarto defines these colors after this header, hence \AtBeginDocument.
+\AtBeginDocument{%
+  \definecolor{quarto-callout-note-color}{gray}{0}%
+  \definecolor{quarto-callout-tip-color}{gray}{0}%
+  \definecolor{quarto-callout-warning-color}{gray}{0}%
+  \definecolor{quarto-callout-important-color}{gray}{0}%
+  \definecolor{quarto-callout-caution-color}{gray}{0}%
+  \definecolor{quarto-callout-note-color-frame}{gray}{0.4}%
+  \definecolor{quarto-callout-tip-color-frame}{gray}{0.4}%
+  \definecolor{quarto-callout-warning-color-frame}{gray}{0.4}%
+  \definecolor{quarto-callout-important-color-frame}{gray}{0.4}%
+  \definecolor{quarto-callout-caution-color-frame}{gray}{0.4}%
+}
+
+% Highlighted code (the SQL blocks) in black, set apart by weight and slant instead of colors, which
+% would print as screened grays and look fuzzy at this size.
+\providecommand{\AlertTok}[1]{}\renewcommand{\AlertTok}[1]{\textbf{#1}}
+\providecommand{\AnnotationTok}[1]{}\renewcommand{\AnnotationTok}[1]{\textit{#1}}
+\providecommand{\AttributeTok}[1]{}\renewcommand{\AttributeTok}[1]{#1}
+\providecommand{\BaseNTok}[1]{}\renewcommand{\BaseNTok}[1]{#1}
+\providecommand{\BuiltInTok}[1]{}\renewcommand{\BuiltInTok}[1]{#1}
+\providecommand{\CharTok}[1]{}\renewcommand{\CharTok}[1]{#1}
+\providecommand{\CommentTok}[1]{}\renewcommand{\CommentTok}[1]{\textit{#1}}
+\providecommand{\CommentVarTok}[1]{}\renewcommand{\CommentVarTok}[1]{\textit{#1}}
+\providecommand{\ConstantTok}[1]{}\renewcommand{\ConstantTok}[1]{#1}
+\providecommand{\ControlFlowTok}[1]{}\renewcommand{\ControlFlowTok}[1]{\textbf{#1}}
+\providecommand{\DataTypeTok}[1]{}\renewcommand{\DataTypeTok}[1]{#1}
+\providecommand{\DecValTok}[1]{}\renewcommand{\DecValTok}[1]{#1}
+\providecommand{\DocumentationTok}[1]{}\renewcommand{\DocumentationTok}[1]{\textit{#1}}
+\providecommand{\ErrorTok}[1]{}\renewcommand{\ErrorTok}[1]{\textbf{#1}}
+\providecommand{\ExtensionTok}[1]{}\renewcommand{\ExtensionTok}[1]{#1}
+\providecommand{\FloatTok}[1]{}\renewcommand{\FloatTok}[1]{#1}
+\providecommand{\FunctionTok}[1]{}\renewcommand{\FunctionTok}[1]{#1}
+\providecommand{\ImportTok}[1]{}\renewcommand{\ImportTok}[1]{#1}
+\providecommand{\InformationTok}[1]{}\renewcommand{\InformationTok}[1]{\textit{#1}}
+\providecommand{\KeywordTok}[1]{}\renewcommand{\KeywordTok}[1]{\textbf{#1}}
+\providecommand{\NormalTok}[1]{}\renewcommand{\NormalTok}[1]{#1}
+\providecommand{\OperatorTok}[1]{}\renewcommand{\OperatorTok}[1]{#1}
+\providecommand{\OtherTok}[1]{}\renewcommand{\OtherTok}[1]{#1}
+\providecommand{\PreprocessorTok}[1]{}\renewcommand{\PreprocessorTok}[1]{#1}
+\providecommand{\RegionMarkerTok}[1]{}\renewcommand{\RegionMarkerTok}[1]{#1}
+\providecommand{\SpecialCharTok}[1]{}\renewcommand{\SpecialCharTok}[1]{#1}
+\providecommand{\SpecialStringTok}[1]{}\renewcommand{\SpecialStringTok}[1]{#1}
+\providecommand{\StringTok}[1]{}\renewcommand{\StringTok}[1]{#1}
+\providecommand{\VariableTok}[1]{}\renewcommand{\VariableTok}[1]{#1}
+\providecommand{\VerbatimStringTok}[1]{}\renewcommand{\VerbatimStringTok}[1]{#1}
+\providecommand{\WarningTok}[1]{}\renewcommand{\WarningTok}[1]{\textit{#1}}

@@ -109,15 +109,28 @@ def sheet_tabs(d: Diagram, x: float, y: float, names: list[str], active: str,
     return x
 
 
+# Symbol glyphs (✓, ▶, ▾) come from Segoe UI Symbol, which has no bold face: in a bold run Chrome
+# emboldens them synthetically, and Draw.io's PDF export then embeds them as a Type 3 font, which
+# print preflights reject. So they always stay outside <b>.
+SYMBOL_GLYPHS = "✓▶▾"
+
+
+def bold(label: str) -> str:
+    """A bold label whose symbol glyphs stay regular weight (see SYMBOL_GLYPHS)."""
+    parts = re.split(f"([{SYMBOL_GLYPHS}])", label)
+    return "".join(esc(part) if part and part in SYMBOL_GLYPHS else f"<b>{esc(part)}</b>" if part.strip()
+                   else esc(part) for part in parts)
+
+
 def button(d: Diagram, x: float, y: float, w: float, label: str, primary: bool = False) -> str:
-    return d.box(f"<b>{esc(label)}</b>" if primary else esc(label), x, y, w, 26,
+    return d.box(bold(label) if primary else esc(label), x, y, w, 26,
                  fill=BLUE if primary else WHITE, stroke=BLUE if primary else GRAY,
                  color=WHITE if primary else INK, size=SMALL, rounded=True)
 
 
 def checkbox(d: Diagram, x: float, y: float, checked: bool) -> None:
-    """A 14 px check box; a checked box is filled and carries a check mark."""
-    d.vertex("<b>✓</b>" if checked else "",
+    """A 14 px check box; a checked box is filled and carries a check mark (regular weight: see SYMBOL_GLYPHS)."""
+    d.vertex("✓" if checked else "",
              f"rounded=0;whiteSpace=wrap;html=1;fillColor={BLUE if checked else WHITE};"
              f"strokeColor={BLUE if checked else GRAY};fontColor={WHITE};fontSize={SMALL};"
              "fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=0;",

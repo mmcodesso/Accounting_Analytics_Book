@@ -100,6 +100,39 @@ keep theirs. The companion and solution files are built with
 [its README](supplementary/README.md)). The [contributor guide](CONTRIBUTING.md#building-the-book)
 has the details.
 
+### Print editions
+
+The printed book (IngramSpark, US Letter, 8.5 × 11 in) has two interiors, one in
+color and one in black and white. They differ from the downloadable PDF:
+
+- no cover (the printer takes the cover as a file of its own);
+- print margins;
+- black text;
+- colors converted to CMYK or gray;
+- no links: the chapters have no slide links, and the Downloads page points to the
+  website.
+
+Build them with:
+
+```sh
+python scripts/print/build.py           # both; --color or --bw for one
+python scripts/print/build.py --draft   # while the ISBNs are blank
+```
+
+The build needs [Ghostscript](https://ghostscript.com/releases/) (on Windows,
+the `gs<version>w64.exe` installer) and PyMuPDF (`python -m pip install pymupdf`).
+It writes PDF/X-1a files, checked against IngramSpark's file requirements, to
+`outputs/print/`, and they are never part of a release. Before you send them to
+the printer:
+
+1. Fill in `isbn.paperback-color` and `isbn.paperback-bw` in `_quarto.yml`.
+2. Build without `--draft`.
+3. Upload each file and read IngramSpark's error report.
+4. Order a printed proof.
+
+The cover is made separately with IngramSpark's cover template, sized from the
+final page count.
+
 ## Citing the book
 
 If you use this book in your teaching or research, please cite it as:

@@ -4,6 +4,22 @@
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{longtable}
+% Two fixes to longtable, which sets the book's tables:
+% - It resets LaTeX's room for text on the page (\@colroom) to the full page when a table starts and
+%   never sets it back. On a page whose top holds a figure, the next figure after the table then let the
+%   text run past the foot of the page (Table 15.2 and Figure 15.2 in the print interior). At the end of
+%   a table the room is set back to what the page allows (\vsize: the full page again if it broke).
+% - A figure that follows a table which broke across pages could go at the top of the table's last page,
+%   between its two parts (Figure 1.4 inside Table 1.3). When a table breaks, no figure goes at the top
+%   of the page where it ends: the figure follows the table on that page if it fits, or moves to the next.
+\usepackage{etoolbox}
+\makeatletter
+\newif\ifaa@LTbroke
+\pretocmd{\LT@output}{\ifnum\outputpenalty<-\@Mi\else\global\aa@LTbroketrue\fi}{}
+  {\PackageWarning{book-pdf}{Could not patch longtable's output routine}}
+\apptocmd{\endlongtable}{\global\@colroom\vsize\ifaa@LTbroke\global\@topnum\z@\fi\global\aa@LTbrokefalse}{}
+  {\PackageWarning{book-pdf}{Could not patch the end of longtable}}
+\makeatother
 \usepackage{array}
 \usepackage{caption}
 \usepackage{graphicx}
@@ -42,9 +58,19 @@
 % loads tcolorbox for the callouts; \tcbuselibrary works whichever loads it first.
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
-\newtcolorbox{aaobjectives}{enhanced, breakable, colback=PrimaryBlue!6, colframe=PrimaryBlue,
+% Its background is a named color so that the print interiors (print/book-print-*.tex) can redefine it.
+\colorlet{ObjectivesTint}{PrimaryBlue!6}
+\newtcolorbox{aaobjectives}{enhanced, breakable, colback=ObjectivesTint, colframe=PrimaryBlue,
   boxrule=0pt, leftrule=3pt, arc=2mm, left=4mm, right=4mm, top=1mm, bottom=2mm,
   before skip=6pt, after skip=10pt}
+% A box never splits across two pages: a callout (In Practice, Watch out, Connecting the Dots) or the
+% learning objectives that does not fit at the foot of a page moves whole to the next one. Quarto asks
+% for breakable callouts, so the breakable style is emptied for every box; the longest callout is about
+% a dozen lines, far less than a page.
+\tcbset{breakable@true/.code={}}
+% With boxes kept whole, a page can end early; leave that space at the foot of the page instead of
+% stretching the gaps between paragraphs and headings to fill it.
+\raggedbottom
 \definecolor{Teal}{HTML}{17A589}
 \definecolor{Coral}{HTML}{E74C3C}
 \definecolor{Amber}{HTML}{F39C12}
@@ -59,6 +85,20 @@
 \setkomafont{subsection}{\large\sffamily\bfseries\color{PrimaryBlue}}
 \setkomafont{captionlabel}{\sffamily\bfseries\color{PrimaryBlue}}
 \setkomafont{caption}{\small}
+
+% Figure placement: a figure goes where the text calls it if it fits there, otherwise at the top of a
+% page, with the text that follows filling the page before it. A figure up to 85% of the text height
+% can share a page with text, and a page of figures alone is made only when they fill at least 80% of
+% it, so a large figure no longer sits alone on a page while its paragraph runs on before and after it
+% (LaTeX's defaults, 70% at the top and float pages half full, put Figure 1.4 on a page by itself).
+\makeatletter
+\renewcommand{\fps@figure}{htp}
+\makeatother
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{2}
+\setcounter{totalnumber}{3}
 
 \captionsetup[figure]{position=bottom, justification=raggedright, singlelinecheck=false}
 \captionsetup[table]{position=top, justification=raggedright, singlelinecheck=false}

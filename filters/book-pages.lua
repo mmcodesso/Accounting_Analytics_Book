@@ -3,7 +3,8 @@
 -- names each version's ISBN as [key]{.isbn}, filled in here from the isbn block of _quarto.yml ("ISBN to be
 -- assigned" while it is blank). This filter lays the two pages out for each format; the website has neither.
 --   PDF: the pages go between the cover (\maketitle) and the table of contents, in the aatitlepage and
---        aacopyrightpage layouts of styles/book-pdf.tex.
+--        aacopyrightpage layouts of styles/book-pdf.tex. The print interiors (print/book-print.tex) drop the
+--        cover, so there the title page is page 1.
 --   EPUB: they fill the EPUB's title page (the book-pages variable of styles/book-epub.template) as XHTML, styled
 --         inline (an EPUB css file would replace Pandoc's default stylesheet for the whole book). Kept out of the
 --         body, where Pandoc would set the book's title as a heading above them.
