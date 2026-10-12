@@ -8,8 +8,10 @@
 
 % The printer's safe area: at least 0.5in from every trim edge, plus 0.125in of no ink at the spine.
 % The outer margin leaves room for microtype's protrusion and the code shading, which reach about 0.04in
-% past the text block, and the footskip lifts the page numbers to 0.6in above the bottom edge.
-\geometry{inner=0.75in, outer=0.625in, top=0.65in, bottom=0.9in, footskip=0.3in}
+% past the text block, and the footskip lifts the page numbers to 0.6in above the bottom edge. The running
+% head (styles/book-pdf.tex) sits 0.12in above the text, so the top margin of 0.8in keeps its ink at least
+% 0.5in from the top edge.
+\geometry{inner=0.75in, outer=0.625in, top=0.8in, bottom=0.9in, footskip=0.3in}
 
 % A paragraph that cannot be set within the tolerance (a long unbreakable inline formula) gets a loose line
 % rather than one that runs into the margin, toward the trim.

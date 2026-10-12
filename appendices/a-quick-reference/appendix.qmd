@@ -105,7 +105,7 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 : Analysis and what-if tools {#tbl-a-06}
 
 
-## Power Query
+## Power Query {.new-page}
 
 Power Query is the same editor in Excel, where Part II uses it, and in Power BI, where Part IV does. Its commands record steps that run again at every refresh, and a custom column holds a formula in M, Power Query's language. M is case-sensitive, and its text functions count characters from 0, where Excel and SQL count from 1. Microsoft's M function reference describes each function (Microsoft, 2025).
 
@@ -148,7 +148,7 @@ Power Query is the same editor in Excel, where Part II uses it, and in Power BI,
 : M functions in custom columns {#tbl-a-08}
 
 
-## SQL
+## SQL {.new-page}
 
 The SQL chapters of Part III query SQLite through DB Browser for SQLite. SQLite's documentation describes its functions and the behaviors that differ from other databases (SQLite, n.d.-a, n.d.-b, n.d.-c, n.d.-d, n.d.-e). Keywords are written in capitals, by the book's convention, and the double bar operator joins texts, so `a || ' ' || b` puts a space between a and b (Chapter 9).
 
@@ -241,7 +241,7 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 : SQLite behaviors the book relies on {#tbl-a-13}
 
 
-## DAX
+## DAX {.new-page}
 
 The Power BI chapters of Part IV write DAX in measures, calculated columns, calculated tables, and queries. The book puts a space inside each parenthesis and quotes the table names Date and Item, which are reserved words (Chapter 14). Microsoft's DAX function reference describes each function (Microsoft, 2023).
 
@@ -327,7 +327,7 @@ Visual calculations belong to a single visual and work on the rows it shows (Mic
 : Visual calculation functions {#tbl-a-18}
 
 
-## The Same Calculation in Three Tools
+## The Same Calculation in Three Tools {.new-page}
 
 The chapters return to a handful of calculations in each tool. @tbl-a-19 sets them side by side, with the chapters in parentheses, so that a technique learned in one Part can be found in the others.
 

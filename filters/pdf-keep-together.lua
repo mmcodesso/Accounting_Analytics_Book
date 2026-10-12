@@ -15,8 +15,15 @@
 -- characters, and PADDING_LINES lines are added for the shading's padding and the space around the block (the
 -- lead-in adds one for the space after it), so the estimate errs on the side of moving the block.
 --
+-- Callout boxes (never split, see styles/book-pdf.tex): a tall one needs its room as well. A figure placed at the
+-- top of a page leaves the text only a tenth of the page (\textfraction), and a box that cannot break and does not
+-- fit overflows the page's foot, so a callout of CALLOUT_MIN lines or more asks for its estimated height first, like
+-- a code block (a heading right before it moves with it): when the page cannot hold it, the break comes before
+-- it, and the figures and tables still waiting are placed after it.
+--
 -- Section breaks that place the waiting floats first: a level-2 heading with the class new-page starts a new
--- page after \clearpage, so the figures and tables still waiting for room are set before it, never after it.
+-- page after \aaClearpageTop (styles/book-pdf.tex: \clearpage, with the floats left over stacked from the top of
+-- their pages), so the figures and tables still waiting for room are set before it, never after it.
 -- Quarto's {{< pagebreak >}} is a plain \newpage, which leaves them waiting: in the quick reference appendix
 -- (almost all tables) the next group's heading and the references were printed between tables of the groups before.
 
@@ -27,6 +34,10 @@ local LEAD_CHARS = 300   -- a paragraph this short before a code block introduce
 local TEXT_LINE = 90
 local HEADER_LINES = 3
 local PADDING_LINES = 3  -- the shading's padding and the space around the block
+local CALLOUT_LINE = 96     -- characters in a line inside a callout (the box is narrower than the text)
+local CALLOUT_TITLE = 2     -- the title bar, in lines
+local CALLOUT_PADDING = 1   -- the box's padding, in lines
+local CALLOUT_MIN = 8       -- a shorter callout fits in the room a float leaves for text
 
 local function is_question(block)
   if block.t ~= 'Para' or #block.content == 0 or block.content[1].t ~= 'Strong' then return false end
@@ -49,6 +60,34 @@ local function code_lines(code)
   return lines
 end
 
+-- Quarto hands a callout to this filter as a custom node: a Div with no callout class, holding a scaffold Div for
+-- the title and another for the body
+local function is_callout(block)
+  return block.t == 'Div' and block.attributes['__quarto_custom_type'] == 'Callout'
+end
+
+-- printed lines of blocks inside a callout: a paragraph line holds CALLOUT_LINE characters, a block adds a
+-- fraction of a line of space after it, and a list adds its items
+local function text_lines(blocks)
+  local lines = 0
+  for _, inner in ipairs(blocks) do
+    if inner.t == 'Header' then
+      lines = lines + CALLOUT_TITLE
+    elseif inner.t == 'CodeBlock' then
+      lines = lines + code_lines(inner.text) + 1
+    elseif inner.t == 'BulletList' or inner.t == 'OrderedList' then
+      for _, item in ipairs(inner.content) do lines = lines + text_lines(item) end
+    elseif inner.t == 'Div' then
+      lines = lines + text_lines(inner.content)
+    elseif inner.t == 'Para' or inner.t == 'Plain' then
+      lines = lines + math.ceil(length(pandoc.utils.stringify(inner)) / CALLOUT_LINE) + 0.4
+    else
+      lines = lines + 2
+    end
+  end
+  return lines
+end
+
 local function starts_page(block)
   return block ~= nil and block.t == 'Header' and block.level == 2 and block.classes:includes('new-page')
 end
@@ -64,7 +103,7 @@ function Blocks(blocks)
   while i <= #blocks do
     local block = blocks[i]
     if starts_page(block) then
-      table.insert(result, pandoc.RawBlock('latex', '\clearpage'))
+      table.insert(result, pandoc.RawBlock('latex', '\\aaClearpageTop'))
       table.insert(result, block)
       changed, i = true, i + 1
     elseif is_question(block) and is_options(blocks[i + 1]) then
@@ -113,6 +152,18 @@ function Blocks(blocks)
                        pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
         end
         changed = true
+      elseif is_callout(block) then
+        local wanted = math.ceil(text_lines(block.content)) + CALLOUT_PADDING
+        if wanted >= CALLOUT_MIN then
+          local back = 0
+          if blocks[i - 1] ~= nil and blocks[i - 1].t == 'Header' then
+            back = 1
+            wanted = wanted + HEADER_LINES
+          end
+          table.insert(result, #result - back + 1,
+                       pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
+          changed = true
+        end
       end
       table.insert(result, block)
       i = i + 1

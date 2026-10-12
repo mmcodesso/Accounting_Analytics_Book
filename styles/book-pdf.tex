@@ -187,6 +187,55 @@
 \renewcommand{\floatpagefraction}{0.8}
 \setcounter{topnumber}{2}
 \setcounter{totalnumber}{3}
+% A section break that places the waiting floats first (the filter's new-page headings, as the groups of the
+% quick reference appendix, which is nearly all tables): the floats left over fill pages of their own, and
+% they stack from the top of each page instead of floating in its middle (LaTeX's glue on such a page is
+% 0pt plus 1fil above and below and 8pt plus 2fil between, which spreads them over it). The glue is set
+% inside the group, so every other float page keeps the default.
+\makeatletter
+\newcommand{\aaClearpageTop}{{%
+  \setlength{\@fptop}{0pt}\setlength{\@fpsep}{12pt}\setlength{\@fpbot}{0pt plus 1fil}%
+  \clearpage}}
+\makeatother
+
+% Running heads (author's request 2026-10-12): on a left-hand page the Part, flush left ("Part II  Accounting
+% Analytics with Excel"), and on a right-hand page the chapter, flush right ("Chapter 5  Data Preparation and
+% Cleaning in Excel"; "Appendix A  ..." for an appendix; the title alone for an unnumbered chapter, such as
+% the preface or a case). The first page of a chapter and a Part's title page keep the page style plain, with
+% no head, and the page numbers keep the foot they had: the new page style is plain with a head.
+%
+% The marks live in two mark classes of their own, not in \leftmark and \rightmark, because Pandoc writes
+% \markright after every unnumbered section (Learning Objectives, Opening Scenario, ...), which would put those
+% titles in the head. KOMA's \partmark and \chaptermark, called by \part and \chapter, set the marks of numbered
+% Parts and chapters, and \markboth, which Pandoc writes after each unnumbered chapter, those of the
+% unnumbered ones. A chapter outside the Parts (the preface, the closing thoughts, the appendices) must not
+% show the Part before it: Quarto writes \bookmarksetup{startatroot} before such a chapter, and \appendix
+% starts the appendices, so each sets a flag that the next chapter's mark uses to clear the Part. A left-hand
+% page outside the Parts has no head. The head sits in the top margin, \headsep above the text, so the print
+% interior (print/book-print.tex) makes the top margin 0.8in to keep it inside the printer's safe area.
+\makeatletter
+\NewMarkClass{aapart}
+\NewMarkClass{aachap}
+\newif\ifaa@outsidepart
+\AtBeginDocument{%
+  \let\aa@bookmarksetup\bookmarksetup
+  \renewcommand*{\bookmarksetup}[1]{\aa@bookmarksetup{#1}\ifstrequal{#1}{startatroot}{\aa@outsideparttrue}{}}}
+\apptocmd{\appendix}{\aa@outsideparttrue}{}{}
+\renewcommand*{\partmarkformat}{\textbf{\partname\ \thepart}\quad}
+\renewcommand*{\chaptermarkformat}{\textbf{\chapapp\ \thechapter}\quad}
+\newcommand*{\aa@leavepart}{\ifaa@outsidepart\InsertMark{aapart}{}\aa@outsidepartfalse\fi}
+\renewcommand*{\partmark}[1]{\aa@outsidepartfalse\InsertMark{aapart}{\partmarkformat #1}}
+\renewcommand*{\chaptermark}[1]{\aa@leavepart\InsertMark{aachap}{\chaptermarkformat #1}}
+\let\aa@markboth\markboth
+\renewcommand*{\markboth}[2]{\aa@markboth{#1}{#2}\aa@leavepart\InsertMark{aachap}{#2}}
+\newcommand*{\aa@headfont}{\sffamily\footnotesize\color{Ink}}
+\newcommand*{\ps@aaheadings}{%
+  \ps@plain
+  \renewcommand*{\@evenhead}{\hb@xt@\textwidth{\aa@headfont\strut\FirstMark{aapart}\hfil}}%
+  \renewcommand*{\@oddhead}{\hb@xt@\textwidth{\aa@headfont\hfil\strut\FirstMark{aachap}}}}
+\pagestyle{aaheadings}
+\geometry{headheight=12pt, headsep=0.12in}
+\makeatother
 
 \captionsetup[figure]{position=bottom, justification=raggedright, singlelinecheck=false}
 \captionsetup[table]{position=top, justification=raggedright, singlelinecheck=false}
