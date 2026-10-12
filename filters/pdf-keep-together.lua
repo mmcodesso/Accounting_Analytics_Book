@@ -14,6 +14,11 @@
 -- as printed: a code line longer than WRAP characters wraps (breaklines), a paragraph line holds about TEXT_LINE
 -- characters, and PADDING_LINES lines are added for the shading's padding and the space around the block (the
 -- lead-in adds one for the space after it), so the estimate errs on the side of moving the block.
+--
+-- Section breaks that place the waiting floats first: a level-2 heading with the class new-page starts a new
+-- page after \clearpage, so the figures and tables still waiting for room are set before it, never after it.
+-- Quarto's {{< pagebreak >}} is a plain \newpage, which leaves them waiting: in the quick reference appendix
+-- (almost all tables) the next group's heading and the references were printed between tables of the groups before.
 
 local KEEP_LINES = 25
 local MIN_LINES = 6
@@ -44,6 +49,10 @@ local function code_lines(code)
   return lines
 end
 
+local function starts_page(block)
+  return block ~= nil and block.t == 'Header' and block.level == 2 and block.classes:includes('new-page')
+end
+
 local function is_lead(block)
   return block ~= nil and (block.t == 'Para' or block.t == 'Plain')
     and length(pandoc.utils.stringify(block)) <= LEAD_CHARS
@@ -54,7 +63,11 @@ function Blocks(blocks)
   local result, changed, i = {}, false, 1
   while i <= #blocks do
     local block = blocks[i]
-    if is_question(block) and is_options(blocks[i + 1]) then
+    if starts_page(block) then
+      table.insert(result, pandoc.RawBlock('latex', '\clearpage'))
+      table.insert(result, block)
+      changed, i = true, i + 1
+    elseif is_question(block) and is_options(blocks[i + 1]) then
       -- samepage forbids breaks inside the list and at its end, so the page may break only at the
       -- explicit penalty after each question.
       for _, item in ipairs({pandoc.RawBlock('latex', '\\begin{samepage}'), block, blocks[i + 1],

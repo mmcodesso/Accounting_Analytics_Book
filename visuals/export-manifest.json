@@ -1017,11 +1017,11 @@
       "source_sha256": "2f53992a50e5131f4515c2384b71fd454afd628850860c0dac7714e4260e7f02"
     },
     "visuals/pdf/fig-16-01-monitoring-cycle.pdf": {
-      "output_sha256": "9e7c21df5148baa57a255e42dca80760a96c3ea886af27bf825f113e439952cf",
+      "output_sha256": "5e612d319ca285a8b1f27328a156a700ce30214bf8349a6a09dd425c6c229073",
       "recipe": 1,
       "settings": {},
       "source": "visuals/src/fig-16-01-monitoring-cycle.drawio",
-      "source_sha256": "a8ca9f36e34e38429b27d832f162e44f3c0c06fc1ae8f3be7106239c9a5fb3fd"
+      "source_sha256": "de7709ca66a5240dc61537bf3c80a21e20e7bc7081e066847303108de350e74a"
     },
     "visuals/pdf/fig-16-02-exception-register.pdf": {
       "output_sha256": "572bf8e2a092bd19350b1810e4df60ead2393b0498c63e58dd2918d217dd627c",
@@ -2454,13 +2454,13 @@
       "source_sha256": "2f53992a50e5131f4515c2384b71fd454afd628850860c0dac7714e4260e7f02"
     },
     "visuals/svg/fig-16-01-monitoring-cycle.svg": {
-      "output_sha256": "55fad4974b37690dd867edef5b99a51a5ede820bce4d0d89e454a2039639b27c",
+      "output_sha256": "81948e32bb69ca9e470c7c954732d814adfea4e3324ee1290762adf28128d914",
       "recipe": 1,
       "settings": {
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-01-monitoring-cycle.drawio",
-      "source_sha256": "a8ca9f36e34e38429b27d832f162e44f3c0c06fc1ae8f3be7106239c9a5fb3fd"
+      "source_sha256": "de7709ca66a5240dc61537bf3c80a21e20e7bc7081e066847303108de350e74a"
     },
     "visuals/svg/fig-16-02-exception-register.svg": {
       "output_sha256": "da9430187d1efe82094bd3e84b89f8bf9071fc90862127fa1e7c77bab46dee52",
