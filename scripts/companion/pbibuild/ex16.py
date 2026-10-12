@@ -75,8 +75,8 @@ def receivables(b: Build, name: str, keep_: str, apps: Query, credits: Query) ->
             .types({"InvoiceDate": "type date", "DueDate": "type date"})
             .merge(apps, "SalesInvoiceID", "SalesInvoiceID", ["Applied"])
             .merge(credits, "SalesInvoiceID", "OriginalSalesInvoiceID", ["Credited"])
-            .custom("OpenBalance", "Number.Round([GrandTotal] - (if [Applied] = null then 0 else [Applied]) "
-                                   "- (if [Credited] = null then 0 else [Credited]), 2)", "type number")
+            .raw("Replaced Value", f'Table.ReplaceValue({pq.PREV}, null, 0, Replacer.ReplaceValue, {{"Applied", "Credited"}})')
+            .custom("OpenBalance", "Number.Round([GrandTotal] - [Applied] - [Credited], 2)", "type number")
             .filter(f"[InvoiceDate] <= {end} and [OpenBalance] {keep_} 0"))
 
 
@@ -150,6 +150,8 @@ def ex1(b: Build) -> None:
 
     t = "Exercise 16.1"
     b.check(t, "invoices with an open balance", ctx["n"], "[Open Invoices]", 0)
+    b.check(t, "open invoices with no application or credit memo (nulls replaced)", ctx["untouched"],
+            "COUNTROWS ( FILTER ( ARInvoices, ARInvoices[Applied] = 0 && ARInvoices[Credited] = 0 ) )", 0)
     b.check(t, "open balance", round(ctx["total"], 2), "[Open Balance]", 0.01)
     b.check(t, "customers with an open balance", ctx["customers"], "DISTINCTCOUNT ( ARInvoices[CustomerID] )", 0)
     for bk, label in zip(ctx["b"], ["Current", "1-30 days", "31-60 days", "61-90 days", "Over 90 days"]):
@@ -279,10 +281,10 @@ def ex3(b: Build) -> None:
              .custom("TotalHours", "[RegularHours] + [OvertimeHours]", "type number"))
     m.add(query_table(clock, summarize={"EmployeeID": "none", "CostCenterID": "none"}, hidden={"EmployeeID", "CostCenterID"}))
     m.relate("ClockEntries.WorkDate", "Date.Date")
-    # (2) and (3) one row per day; the surge days kept. Count Distinct Rows would count distinct rows of the whole
-    # group, so the distinct values of TotalHours are counted with List.Distinct.
+    # (2) and (3) one row per day; the surge days kept. Desktop's Group By has no count of distinct values (Count
+    # Distinct Rows counts whole rows), so the distinct employees and values of TotalHours use List.Distinct.
     surge = group(Query.reference("SurgeDays", clock), ["WorkDate"], [
-        ("Employees", "Table.RowCount(_)", "Int64.Type"),
+        ("Employees", "List.Count(List.Distinct([EmployeeID]))", "Int64.Type"),
         ("HoursValues", "List.Count(List.Distinct([TotalHours]))", "Int64.Type"),
         ("OvertimeHours", "List.Sum([OvertimeHours])", "type nullable number")])
     surge.filter("[Employees] > 1 and [HoursValues] = 1")
@@ -316,8 +318,9 @@ def ex3(b: Build) -> None:
         "the prompt notification that Gonzalez and Hoffman (2018) found can encourage fraud when detection is weak, "
         "so the test stays in internal audit's file and goes to the audit committee; the Plant page's overtime share "
         "is a management measure, the surge-day test an audit test.",
-        "Group By: Count Distinct Rows counts distinct rows of the group, not values of one column, so the "
-        "aggregation is List.Count ( List.Distinct ( [TotalHours] ) )."], size=10))
+        "Group By in Desktop has no count of distinct values (Count Distinct Rows counts whole rows), so Employees "
+        "and HoursValues are List.Count ( List.Distinct ( ... ) ) of EmployeeID and TotalHours. The share divides "
+        "by all of the month's overtime in ClockEntries; divided by SurgeDays alone it would be 100%."], size=10))
     page.expect = ["Surge days by month", "Surge Share of Overtime", f"{ctx['on_surge'][-1]:,.0f}", pct(ctx["shares"][-1]),
                    "Model answer"]
 
@@ -357,8 +360,8 @@ def ex4(b: Build) -> None:
     ctx = ch16.ex4(b.d, claim)
     folder, years = "Ex 16.4", b.d.years
     measure(b, folder, "Unexplained Rate per 1,000",
-            "DIVIDE (\n    CALCULATE (\n        [Exceptions],\n        Exceptions[Disposition] <> \"Expected\",\n"
-            "        Tests[TestID] <> \"PR SelfApproved\"\n    ),\n    [Population]\n) * 1000", "0.0")
+            "DIVIDE (\n    CALCULATE (\n        [Exceptions],\n        KEEPFILTERS ( Exceptions[Disposition] <> \"Expected\" ),\n"
+            "        KEEPFILTERS ( Tests[TestID] <> \"PR SelfApproved\" )\n    ),\n    [Population]\n) * 1000", "0.0")
     process = {r[0][:2]: r[2] for r in md_table(CHAPTER / "chapter.qmd", "tbl-16-01")}
     page = b.report.add(Page("ex164", "Ex 16.4"))
     pr, yr = col("Tests", "Process"), col("Date", "Year")
@@ -375,6 +378,9 @@ def ex4(b: Build) -> None:
     page.add(answer("ex164Answer", 860, 270, 400, 440, [
         "(1) Population counts the documents of SELECTEDVALUE ( Tests[Process] ), which is blank when several "
         "processes are in context, so the total row shows no rate: a rate across processes would mix populations.",
+        "(2) The measure leaves out only the expected closes and the recurring PR SelfApproved: open exceptions, "
+        "deficiencies and follow-ups stay in, so it is not the rate of open exceptions. KEEPFILTERS keeps a selected "
+        "test or disposition intersected with the exclusions instead of replacing it.",
         f"(4) Purchase orders: the exceptions rose by {ctx['rose']} ({po[1][0]} to {po[2][0]}) while the rate "
         f"{ctx['moved']} ({po[1][2]:.2f} to {po[2][2]:.2f}), because orders grew by {pct(ctx['growth'], 0)}; from "
         f"{years[0]} the rate fell by {ctx['fell']} while orders more than doubled.",
@@ -398,6 +404,9 @@ def ex4(b: Build) -> None:
             b.check(t, f"{p} {yy} rate per 1,000", round(rate, 4), f"CALCULATE ( [Rate per 1,000], {f} )", 0.0001)
             b.check(t, f"{p} {yy} unexplained rate per 1,000", round(un, 4),
                     f"CALCULATE ( [Unexplained Rate per 1,000], {f} )", 0.0001)
+    b.check(t, "the unexplained rate with PR SelfApproved selected (blank: KEEPFILTERS intersects)", "blank",
+            f"IF ( ISBLANK ( CALCULATE ( [Unexplained Rate per 1,000], Tests[TestID] = \"PR SelfApproved\", "
+            f"'Date'[Year] = {years[-1]} ) ), \"blank\", \"not blank\" )")
     b.check(t, "the total row's rate (blank)", "blank",
             f"IF ( ISBLANK ( CALCULATE ( [Rate per 1,000], 'Date'[Year] = {years[-1]} ) ), \"blank\", \"not blank\" )")
 

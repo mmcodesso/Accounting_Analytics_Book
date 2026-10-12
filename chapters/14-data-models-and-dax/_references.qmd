@@ -18,7 +18,9 @@ Microsoft. (2024d). *Understand star schema and the importance for Power BI*. Mi
 
 Microsoft. (2025a). *DAX query view*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view>
 
-Microsoft. (2025b). *Set and use date tables in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-date-tables>
+Microsoft. (2025b). *Implement time-based calculations in Power BI*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-time-intelligence>
+
+Microsoft. (2025c). *Set and use date tables in Power BI Desktop*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-date-tables>
 
 Microsoft. (2026). *CALCULATE function (DAX)*. Microsoft Learn. <https://learn.microsoft.com/en-us/dax/calculate-function-dax>
 

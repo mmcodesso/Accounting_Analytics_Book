@@ -22,4 +22,4 @@ Microsoft. (2026). *Design Power BI reports for accessibility*. Microsoft Learn.
 
 Vessey, I. (1991). Cognitive fit: A theory-based analysis of the graphs versus tables literature. *Decision Sciences*, *22*(2), 219–240. <https://doi.org/10.1111/j.1540-5915.1991.tb00344.x>
 
-World Wide Web Consortium. (2023). *Web content accessibility guidelines (WCAG) 2.2*. <https://www.w3.org/TR/WCAG22/>
+World Wide Web Consortium. (2023). *Web content accessibility guidelines (WCAG) 2.2*. <https://www.w3.org/TR/2023/REC-WCAG22-20231005/>

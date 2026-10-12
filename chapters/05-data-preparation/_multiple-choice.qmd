@@ -78,7 +78,7 @@ B.  Inner
 C.  Left anti
 D.  Full outer
 
-**11.** After a left outer merge in Power Query, a query has more rows than it had before the merge. What is the most likely explanation?
+**11.** After a left outer merge in Power Query and the expansion of the merged column, a query has more rows than it had before the merge. What is the most likely explanation?
 
 A.  The join kind was changed to left anti after the merge.
 B.  The key appears more than once in the second table.
@@ -96,7 +96,7 @@ D.  Power Query counts the hyphens in a code differently from Excel.
 
 A.  Reference queries cannot be refreshed, so their results are fixed.
 B.  Reference queries run without needing CharlesRiver.xlsx to be available.
-C.  The original query stays unchanged, and the new one updates whenever it does.
+C.  The original query stays unchanged, and the new one is rebuilt from its result on every refresh.
 D.  A reference query copies the worksheet formulas of the original Table.
 
 **14.** A calculated column on the invoice lines uses this formula, where PromoEnd is a named cell that holds the date 2026-10-31:

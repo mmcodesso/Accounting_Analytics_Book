@@ -1,6 +1,6 @@
 # Power BI in the Browser {#sec-appendix-browser}
 
-Power BI Desktop runs only on Windows. The Power BI service, at app.powerbi.com, does most of the same work in any browser, on a Mac, a Chromebook, or a Windows computer without Desktop: it builds a semantic model from CharlesRiver.xlsx with Power Query, relates the model's tables, holds its measures and tests them with DAX queries, and builds the report's pages (Microsoft, 2026b). This appendix gives you a starting point for that path. Its three tutorials rebuild Chapter 13's model and its Sales and Discounts page in the browser and add a first measure, and its last section lists what else changes, so that you can follow the rest of Part IV on your own.
+Power BI Desktop runs only on Windows. The Power BI service, at app.powerbi.com, does most of the same work in a supported browser, on a Mac, a Chromebook, or a Windows computer without Desktop: it builds a semantic model from CharlesRiver.xlsx with Power Query, relates the model's tables, holds its measures and tests them with DAX queries, and builds the report's pages (Microsoft, 2026b). This appendix gives you a starting point for that path. Its three tutorials rebuild Chapter 13's model and its Sales and Discounts page in the browser and add a first measure, and its last section lists what else changes, so that you can follow the rest of Part IV on your own.
 
 The browser's tools do the same work as Desktop's. What changes is where a command lives, a few defaults, and how your work is saved, and the tutorials stop at each of those places. The companion start files of the Power BI chapters are Power BI projects, which only Desktop can open, so in the browser you build your own model from the workbook in Guided Tutorial C.1 and carry it through the chapters.
 
@@ -89,7 +89,7 @@ With the three tutorials done, you can follow the rest of Part IV in the browser
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-A model's version history in the service is a modest form of the change control that Chapter 16 asks of a report. Each version records the model as it stood, and restoring one undoes a change that broke a test. It is not a substitute for a Power BI project under version control, because it keeps only the last few versions and does not say who changed what, but it gives a team without Desktop a way back from a mistake.
+A model's version history in the service is a modest form of the change control that Chapter 16 asks of a report. Each version records the model as it stood, and restoring one undoes a change that broke a test. It is not a substitute for a Power BI project under version control, because it keeps only the last five versions and names only the last person to change each one, not what was changed, but it gives a team without Desktop a way back from a mistake.
 :::
 
 {{< include _key-terms.qmd >}}

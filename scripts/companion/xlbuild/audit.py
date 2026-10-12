@@ -68,11 +68,11 @@ PREPARED = "Accounting Analytics companion file: replace with your name and the 
 
 
 def conformity(value: float) -> str:
-    return next(label for limit, label in MAD_RANGES if value < limit)
+    return next(label for limit, label in MAD_RANGES if value <= limit)
 
 
-CONFORMITY = ('=IF({c}<0.006,"Close conformity",IF({c}<0.012,"Acceptable conformity",'
-              'IF({c}<0.015,"Marginally acceptable conformity","Nonconformity")))')
+CONFORMITY = ('=IF({c}<=0.006,"Close conformity",IF({c}<=0.012,"Acceptable conformity",'
+              'IF({c}<=0.015,"Marginally acceptable conformity","Nonconformity")))')
 
 
 def lead_digit(amount: float) -> int:
@@ -281,8 +281,8 @@ class Facts:
                     f"Follow up: the opening balance entry, created by the {r['creator']['title'].lower()} on {on}, "
                     f"after its posting date of {r['posted']}, approved under the same employee ID, and "
                     f"{money(total)}, far above the approver's limit of {money(r['approver']['limit'])}. Request the "
-                    "support for the opening balances; its accounts receivable line has no invoice behind it "
-                    "(Tutorial 8.2).")
+                    "support for the opening balances; its accounts receivable line has no invoice in the extract "
+                    "behind it (Tutorial 8.2).")
         first_saturday = made.weekday() == 5 and made.month == 1 and made.day <= 7
         if only("Weekend", "Backdated") and first_saturday and posted == date(made.year, 1, 1):
             return ("follow:backdated",
@@ -294,8 +294,8 @@ class Facts:
         if only("AboveLimit") and kind in carries and r["approver"]["limit"] == top_limit:
             return ("expected:close",
                     f"Expected: a year-end closing entry of {money(total)}, which carries {carries[kind]}, above the "
-                    f"approver's limit of {money(r['approver']['limit'])}, the highest limit of any employee. Report "
-                    "the gap in the approval policy for closing entries.")
+                    f"approver's limit of {money(r['approver']['limit'])}, the highest limit of any employee. Agree it "
+                    "to the year's balances, and report the gap in the approval policy for closing entries.")
         if only("AboveLimit", "RoundAmount") and kind == "Debt Reclass" and r["approver"]["title"] == "Controller":
             return ("follow:reclass",
                     f"Follow up: a round debt reclassification of {money(total)}, above the controller's limit of "
@@ -305,7 +305,8 @@ class Facts:
         if only("Weekend") and kind == "Depreciation" and made.date() == posted and month_end:
             return ("expected:depreciation",
                     f"Expected: the monthly depreciation, created by the {r['creator']['title'].lower()} on the last "
-                    f"day of the month, {on}, the date it posts to.")
+                    f"day of the month, {on}, the date it posts to. Agree the amount to the depreciation schedule, and "
+                    "check its approval, before clearing it.")
         support = {"Rent": "the lease", "Utilities": "the utility invoice"}
         if only("SelfApproved") and kind in support and r["creator"]["title"] == "Accounting Manager":
             return ("follow:self",
@@ -579,12 +580,12 @@ def t8_1(b: Build) -> None:
                                       "(dispositions on the Strata worksheet). Partial payments: Charles River pays "
                                       "in parts only invoices of $1,000 or more (the smallest is "
                                       f"{money(bn['smallest_part_invoice'])}), {bn['part_under_2000']:.0%} of them "
-                                      "under $2,000, so their parts start with the digits 3 to 9 more often than "
-                                      "Benford's Law expects; the nonconformity comes from the payment process, not "
-                                      "from invented amounts.",
-        "Conclusion": "The payments reconcile to the ledger, the largest ones are identified for vouching, and the "
-                      "one departure from Benford's Law has an explanation that the data supports. The test found no "
-                      "exception that points to an error.",
+                                      "under $2,000, so their parts start with the digits 5 to 9 more often than "
+                                      "Benford's Law expects, and with 2 and 3 less often; the nonconformity comes from "
+                                      "the payment process, not from invented amounts.",
+        "Conclusion": "The payments agree with the ledger in count and total, the largest ones are identified for "
+                      "vouching, and the one departure from Benford's Law has an explanation that the data supports. The "
+                      "tests found no exception that points to an error; the vouching of the four payments is still to do.",
         "Prepared by": PREPARED,
         "Reviewed by": ""})
 
@@ -647,7 +648,7 @@ def t8_2(b: Build) -> None:
         ("Grouped Rows", 'Table.Group({prev}, {"OriginalSalesInvoiceID"}, {{"CreditedTotal", '
                          'each List.Sum([GrandTotal]), type nullable number}})')]))
     # Step 2: the open balance of each invoice.
-    xl.add_query(wb, "OpenInvoices", nav(b, 16, "SalesInvoice", extra=[
+    xl.add_query(wb, "OpenInvoices", nav(b, 16, "SalesInvoice", {"FreightAmount": "type number"}, extra=[
         ("Filtered Rows", before_filter(b, "InvoiceDate")),
         ("Merged Queries", pq.merge("Applied", "SalesInvoiceID", "SalesInvoiceID", "Applied")),
         ("Expanded Applied", pq.expand("Applied", ["AppliedTotal"])),
@@ -800,19 +801,23 @@ def t8_2(b: Build) -> None:
                    f"and a random sample of {SAMPLE} of the other {others} customers: {selected}.",
         "Exceptions and disposition": f"Finding 1: the difference of {money(a['gl'] - a['subledger'])} is the "
                                       f"{a['je']['description'].lower()} in {a['je']['voucher']}, dated "
-                                      f"{a['je']['date']}. No invoice stands behind it, and no receipt has been "
-                                      "applied to it since. Follow-up: request the customer-level detail behind it "
-                                      "and assess whether any of it is still collectible. Finding 2: no allowance "
-                                      "for doubtful accounts: accounts 1030 and 6170 have no postings in the three "
-                                      "years. The FASB credit loss standard requires an allowance even when the risk "
-                                      "of loss is remote, and an aging schedule is one of the methods it accepts. "
+                                      f"{a['je']['date']}. No invoice in the extract stands behind it, and no "
+                                      "receipt has been applied to it since. Follow-up: request the customer-level "
+                                      "detail behind it from the records of the earlier system, and assess whether any "
+                                      "of it is still collectible. Finding 2: no allowance for doubtful accounts: "
+                                      "accounts 1030 and 6170 have no postings in the three years. The FASB credit "
+                                      "loss standard requires the estimate of expected credit losses to reflect the "
+                                      "risk of loss even when it is remote, and an aging schedule is one of the "
+                                      "methods it accepts; request management's assessment. "
                                       f"Finding 3: the {len(a['old'])} invoices more than 60 days past due hold "
                                       f"{money(sum(i['balance'] for i in a['old']))}; {len(small)} of them are "
                                       "residual balances under $10 left after the customer's payment. Write them off "
-                                      "or collect them.",
-        "Conclusion": "Customers pay mostly on time. Part of the receivables balance is not supported by any invoice, "
-                      "and no allowance has been recorded against any of it. Both findings affect the amount at which "
-                      "receivables would be reported, and both go to the audit committee with the evidence.",
+                                      "under an approved small-balance policy, or collect them.",
+        "Conclusion": "Most of the balance open at the year-end is not yet due. Part of the receivables balance has "
+                      "no invoice detail in the extract, and no allowance has been recorded against any of the balance. "
+                      "Both findings could affect the amount at which receivables are reported, and both go to the audit "
+                      "committee with the evidence. The confirmation requests are still to be sent and their replies "
+                      "evaluated.",
         "Prepared by": PREPARED,
         "Reviewed by": ""})
 
@@ -1011,8 +1016,9 @@ def t8_3(b: Build) -> None:
                    "Flags: " + ", ".join(f"{k} {v}" for k, v in j["flags"].items()) + ".",
         "Exceptions and disposition": f"Expected, with evidence: {summary(expected)}. Follow up: {summary(follow)}. "
                                       "Details on the Dispositions worksheet.",
-        "Conclusion": "The tests found no sign of a concealed misstatement in the recurring entries, but they found "
-                      "weaknesses in how entries are approved. The opening balance entry, created after its date, "
+        "Conclusion": "The flags on the recurring entries are explained by their timing, which leaves their amounts "
+                      "and approvals to be checked against their schedules. The tests found weaknesses in how entries "
+                      "are approved. The opening balance entry, created after its date, "
                       "approved by its own creator, and carrying balances that the detail does not support, is the "
                       "first item for the audit committee; the approval of opening and recurring entries needs "
                       "follow-up before a conclusion on the control can be reached.",

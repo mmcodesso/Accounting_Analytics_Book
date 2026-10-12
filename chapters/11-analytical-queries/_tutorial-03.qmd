@@ -8,7 +8,7 @@
 
 **Step-by-step instructions.**
 
-**Step 1. Build the output step and check it.** The first CTE turns the production completions into standard hours by month. Its WHERE clause counts only the output completed up to the last day with time records, as Tutorial 10.3 did, so that the last month compares hours and output over the same days.
+**Step 1. Build the output step and check it.** The first CTE turns the production completions into standard hours by month. Its WHERE clause counts only the output completed up to the last day with time records, as Tutorial 10.3 did, so that the last month compares hours and output up to the same last day.
 
 a. Type and run the query below.
 
@@ -171,7 +171,7 @@ b. Delete the last line, `SELECT COUNT(*) AS Months FROM Monthly;`, type a comma
 c. Read the TTMDirect, TTMIndirect, and TTMTotal columns from the first row to the last.
 d. Read the TTMOvertimeShare column.
 
-The WINDOW clause names the window, its order and its frame, once as w, and all nine window functions of the step use it. TTMDirect, TTMIndirect, and TTMTotal are the direct, indirect, and total hours per standard hour over the current month and the eleven before it, and MonthsInWindow counts the months in each window. The result starts in December 2024, the first month whose window holds twelve months. The monthly ratio jumps around, but the trailing figures tell a clear story. TTMIndirect climbs through the first half of fiscal 2025, as the months of 2024 with little indirect time leave the window, and then holds at a little over half an hour per standard hour. TTMDirect stays below one, but it creeps up through fiscal 2026. TTMTotal reaches its highest point in October 2026, and TTMOvertimeShare climbs in most months, from about a ninth of the hours to about a fifth. Each December's figures equal the ratios of Tutorial 10.3 for the year, because both count the labor time by the day worked and the output up to the same last day with time records.
+The WINDOW clause names the window, its order and its frame, once as w, and all nine window functions of the step use it. TTMDirect, TTMIndirect, and TTMTotal are the direct, indirect, and total hours per standard hour over the current month and the eleven before it, and MonthsInWindow counts the months in each window. Each trailing figure divides the hours of its twelve months by their standard hours, so a month with more output counts for more: it is not the average of twelve monthly ratios. The result starts in December 2024, the first month whose window holds twelve months. The monthly ratio jumps around, but the trailing figures tell a clear story. TTMIndirect climbs through the first half of fiscal 2025, as the months of 2024 with little indirect time leave the window, and then holds at a little over half an hour per standard hour. TTMDirect stays below one, but it creeps up through fiscal 2026. TTMTotal reaches its highest point in October 2026, and TTMOvertimeShare climbs in most months, from about a ninth of the hours to about a fifth. Each December's figures equal the ratios of Tutorial 10.3 for the year, because both count the labor time by the day worked and the output up to the same last day with time records. The last row, December 2026, has a full window of twelve monthly rows, but its month holds only the days to 11 December 2026, so read it as provisional.
 
 **Step 5. Look at the months before the window is full.** The final SELECT keeps only the months whose window holds twelve months, and reversing the condition shows why.
 
@@ -179,7 +179,7 @@ a. In the query of Step 4, change `WHERE MonthsInWindow = 12` to `WHERE MonthsIn
 b. Read the TTMTotal column of the first rows.
 c. Change the condition back to `WHERE MonthsInWindow = 12`.
 
-The query returns the months of 2024 before December, whose windows hold from one to eleven months. January 2024's window holds only the start-up month, when the plant recorded hours but completed almost nothing, and its figure is many times any other. The figures settle as the window fills, but they average fewer months than the rest, so keeping them would compare unlike periods. The full windows of December 2024 onward still include January 2024, which makes the first of them a little high.
+The query returns the months of 2024 before December, whose windows hold from one to eleven months. January 2024's window holds only the start-up month, when the plant recorded hours but completed almost nothing, and its figure is many times any other. The figures settle as the window fills, but they average fewer months than the rest, so keeping them would compare unlike periods. The first full window, December 2024, still includes January 2024, which makes it a little high; the start-up month leaves the window when it moves to January 2025.
 
 **Step 6. Save the measure as a view.** A view stores the query under a name, and the name can then be queried like a table. The statements drop any earlier version of the view first, so that they can be run again whenever the query changes.
 
@@ -269,15 +269,15 @@ a. On the **Execute SQL** tab, type and run the query below at the end of the sc
    -- Tutorial 11.3: the view for fiscal 2026
    SELECT *
    FROM MonthlyLaborEfficiency
-   WHERE Month >= '2026-01'
+   WHERE Month BETWEEN '2026-01' AND '2026-12'
    ORDER BY Month;
    ```
 
 b. Compare the result with the fiscal 2026 rows of Step 4.
 
-The result, shown in @fig-11-10, holds the twelve months of fiscal 2026, with the same values as Step 4. The controller, or anyone else with the working copy, can run this query each month, after the new month's data arrives, and see at once whether the measure is still rising. Because the output stops at the last day with time records, the latest month is always compared over the days that its time records cover.
+The result, shown in @fig-11-10, holds the twelve months of fiscal 2026, with the same values as Step 4. The controller, or anyone else with the working copy, can run the view each month, after the new month's data arrives, with the months of the WHERE clause moved forward, and see at once whether the measure is still rising. Because the output stops at the last day with time records, the latest month compares hours and output up to the same day, but read it as provisional until its records are complete.
 
-![The Monthly Measure for Fiscal 2026, Queried from the View.](/visuals/svg/fig-11-10-monthly-measure.svg){#fig-11-10 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, is scrolled to a query that selects every column of the view MonthlyLaborEfficiency for the months from 2026-01 onward. The result grid shows twelve months with the monthly hours per standard hour, which swings from month to month, and the trailing twelve-month direct, indirect, and total hours per standard hour and overtime share, which change slowly. The trailing twelve-month columns are outlined."}
+![The Monthly Measure for Fiscal 2026, Queried from the View.](/visuals/svg/fig-11-10-monthly-measure.svg){#fig-11-10 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, is scrolled to a query that selects every column of the view MonthlyLaborEfficiency for the months of 2026. The result grid shows twelve months with the monthly hours per standard hour, which swings from month to month, and the trailing twelve-month direct, indirect, and total hours per standard hour and overtime share, which change slowly. The trailing twelve-month columns are outlined."}
 
 **Step 9. Complete and save the script.** The header comment should record the checks that the chapter's queries passed.
 
@@ -287,7 +287,7 @@ a. Replace the last line of the header comment of Chapter11.sql, so that the hea
    /* Chapter 11: the plant's hours, month by month
       Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
       Prepared by: your name, date
-      Checks: the payroll ties to the ledger; the measure has 36 months */
+      Checks: the payroll ties to the ledger; 36 months in, 25 in the view */
    ```
 
 b. Click **Save SQL file**.
@@ -296,7 +296,7 @@ The script now holds every query of the chapter under a comment that says what i
 
 **Checkpoint.** Check that:
 
-- each step of the chain returns 36 months, including the join of the two summaries;
+- each step of the chain returns 36 months, including the join of the two summaries, and the view keeps the 25 months with full windows;
 - the months before December 2024 have partial windows, led by the start-up month of January 2024;
 - the trailing indirect hours per standard hour level off from the middle of fiscal 2025, while the trailing direct figure creeps up through fiscal 2026;
 - the trailing total reaches its highest point in October 2026, and each December's figures equal the ratios of Tutorial 10.3;

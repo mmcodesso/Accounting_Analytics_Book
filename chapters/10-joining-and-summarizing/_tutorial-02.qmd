@@ -1,6 +1,6 @@
 ## Guided Tutorial 10.2: Building the Trial Balance and Following the Conversion Cost
 
-**Context and objective.** Chapter 6 built the pre-closing trial balance of fiscal 2026 in Excel, with Power Query's Group By, and turned it into the income statement of @fig-06-07. In this tutorial, you will put two totals side by side with scalar subqueries, build the trial balance again with one query, and prove with derived tables that its debits equal its credits. You will then use the ledger to follow the cost of production through account 1090 Manufacturing Cost Clearing, the account where the manufacturing variance arises.
+**Context and objective.** Chapter 6 built the pre-closing trial balance of fiscal 2026 in Excel, with Power Query's Group By, and turned it into the income statement of @fig-06-07. In this tutorial, you will put two totals side by side with scalar subqueries, build the trial balance again with one query, and check with derived tables that its debits equal its credits. You will then use the ledger to follow the cost of production through account 1090 Manufacturing Cost Clearing, the account where the manufacturing variance arises.
 
 **Prerequisites.** Complete Tutorial 10.1, and continue at the end of Chapter10.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter10.sql as it stands at the end of Tutorial 10.1 from [Companion Files](#sec-companion-files).
 
@@ -48,7 +48,7 @@ The result, shown in @fig-10-06, has one row for each account with postings, the
 
 ![The Pre-Closing Trial Balance of Fiscal 2026.](/visuals/svg/fig-10-06-trial-balance.svg){#fig-10-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins GLEntry to Account, keeps the postings through 2026-12-31 without the two closing entries of fiscal 2026, and groups them by account. The first rows of the result show account numbers, names, types, and balances, positive for debit balances and negative for credit balances. The message pane reports the number of accounts returned."}
 
-**Step 3. Prove that debits equal credits.** The trial balance becomes a derived table, which an outer query can total.
+**Step 3. Check that debits equal credits.** The trial balance becomes a derived table, which an outer query can total.
 
 a. Type and run the query below, which wraps the grouping of Step 2 in a subquery.
 
@@ -83,7 +83,7 @@ c. Edit the copy until it reads as below: change the comment and the SELECT list
    WHERE tb.Balance > 0;
    ```
 
-The net of all the balances is zero, which means that the debit balances equal the credit balances. The total of the debit balances in item c is the control total of Chapter 6's trial balance. Two tools and two methods give the same trial balance, which is the evidence that both are right.
+The net of all the balances is zero, which means that the debit balances equal the credit balances. The total of the debit balances in item c is the control total of Chapter 6's trial balance. Two tools and two methods give the same trial balance, so the SQL and Excel reconstructions agree on the recorded balances, and the debit balances equal the credit balances. Neither check shows that the entries behind them are complete or correctly classified, as Tutorial 4.1, Step 10 showed for control totals.
 
 **Step 4. Follow account 1090 by year and source.** Account 1090 collects the actual cost of converting materials into products and releases the standard cost of what is produced.
 

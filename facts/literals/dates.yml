@@ -17,6 +17,7 @@
 dates:
   2026-12-11: date.time_records_end
   2026-12-07: date.time_records_end.monday
+  2026-12-04: date.time_records_end.indirect
   2026-12-18: date.payroll.last_pay
   2027-02-23: date.gl.end
   2024-01-06: date.je.backdated_created

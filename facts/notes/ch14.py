@@ -352,8 +352,8 @@ def ex2(d, claim):
     services = [r for r in rows if r["group"] == "Services"]
     claim({r["id"] for r in blank} == {r["id"] for r in services}, "the lines without a shipment are exactly the Services lines")
     claim({int(r["shipped"][:4]) for r in shipped} == set(d.years), "the ship dates fall in the fiscal years of the window")
-    claim(d.one("SELECT COUNT(*) FROM Shipment WHERE substr(DeliveryDate, 1, 4) <> substr(ShipmentDate, 1, 4)") == 0,
-          "every shipment is delivered in the year it ships")
+    claim(d.one("SELECT COUNT(*) FROM Shipment WHERE substr(DeliveryDate, 1, 7) <> substr(ShipmentDate, 1, 7)") == 0,
+          "every shipment is delivered in the month (and so the year) it ships")
     by_invoice = [total(pick(d, year=y), "rev") for y in d.years]
     before = [r for r in rows if r["year"] < d.F]       # dated before the Date table: (Blank) on the active relationship
     by_ship = [sum(r["rev"] for r in shipped if int(r["shipped"][:4]) == y) for y in d.years]

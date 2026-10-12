@@ -72,7 +72,7 @@ def fig_19_01() -> Diagram:
         ("SalesReturn", "Warehouse", "goods received back", ["C1"],
          "Dr 1040 Inventory<br>Cr 5010–5040 Cost of goods sold"),
         ("CreditMemo", "Customer service", "credit approved", ["C2", "C3", "C4"],
-         "Dr 4060, 4050, 2050<br>Cr 1020 or <b>2060</b>"),
+         "Dr 4060, 4050, 2050<br>Cr 1020 and/or <b>2060</b>"),
         ("SalesCommission<br>Adjustment", "Customer service", "commission clawed back", ["C5"],
          "Dr 2034 Commission payable<br>Cr 6290 Commission expense"),
         ("CustomerRefund", "Accounting", "refund approved and paid", ["C6", "C7", "C8"],

@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will set up the environment that you will use for every SQL tutorial in Part III. You will make a working copy of the Charles River database, open it in DB Browser for SQLite, and read the structure of the tables that record the manufacturing variance. You will then start the script that holds the chapter's queries and write your first queries in it. You will also make a deliberate error, read its message, and calculate a check on the variance records.
 
-**Prerequisites.** You need DB Browser for SQLite, which is free, installed on your computer. Download it from <https://sqlitebrowser.org/dl/>. The tutorials use version 3.13.1, whose built-in SQLite runs every query in Part III. The About window, under the Help menu (under DB Browser for SQLite on a Mac), shows the version you have, and packages for Linux can be older. You also need the CharlesRiver.sqlite file from the [Downloads](#sec-downloads) page. The file is large, several hundred megabytes, so allow time for the download.
+**Prerequisites.** You need DB Browser for SQLite, which is free, installed on your computer. Download it from <https://sqlitebrowser.org/dl/>. The tutorials use version 3.13.1; an older version may lack features that Part III uses. The About window, under the Help menu (under DB Browser for SQLite on a Mac), shows the version you have, and packages for Linux can be older. You also need the CharlesRiver.sqlite file from the [Downloads](#sec-downloads) page. The file is large, several hundred megabytes, so allow time for the download.
 
 **Step-by-step instructions.**
 
@@ -85,7 +85,7 @@ d. Correct the spelling, and run the query again.
 
 The message pane turns red, as in @fig-09-04. It reports that execution finished with errors, names the column it cannot find, and gives the line of the editor at which the statement starts. After the correction, the query runs as before. @tbl-09-01 lists the other messages you are likely to meet.
 
-![A Syntax Error in the Message Pane.](/visuals/svg/fig-09-04-syntax-error.svg){#fig-09-04 fig-alt="A mock of the Execute SQL tab. The editor holds the query from Step 5 with AccountNumber misspelled as AccountNumbr. The message pane below it is red with white text: Execution finished with errors, Result: no such column: AccountNumbr, and the line at which the statement starts."}
+![A Misspelled Column in the Message Pane.](/visuals/svg/fig-09-04-syntax-error.svg){#fig-09-04 fig-alt="A mock of the Execute SQL tab. The editor holds the query from Step 5 with AccountNumber misspelled as AccountNumbr. The message pane below it is red with white text: Execution finished with errors, Result: no such column: AccountNumbr, and the line at which the statement starts."}
 
 **Step 7. Calculate a check on the variance records.** A calculated column can test whether the parts of each variance add up to its total.
 

@@ -231,16 +231,17 @@ def ex1(b: Build) -> None:
     s.answer("Requirement (6), memo to the controller",
              f"The chart of accounts holds {n['n']} accounts in {len(n['types'])} types and {n_subtypes} subtypes, "
              f"organized under {ch09.word(len(n['top']))} top-level headers with two sub-headers, so it reads like the "
-             f"financial statements. {cap(n['n_opposite'])} contra accounts carry the opposite normal balance, as they "
-             f"should, and {n['n_inactive']} inactive accounts have no postings, so nothing is posted where it should "
-             f"not be. Manufacturing salaries and factory overhead are recorded through 1090 "
+             f"financial statements. {cap(n['n_opposite'])} contra accounts carry the opposite normal balance, as contra "
+             f"accounts do, and neither the header accounts nor the {n['n_inactive']} inactive accounts has a posting in "
+             f"this extract, although misclassified postings among the active accounts would need another test. "
+             f"Manufacturing salaries and factory overhead are recorded through 1090 "
              f"{n['clearing_name']} rather than the inactive {' and '.join(str(a['number']) for a in idle)}, so manufacturing cost reaches cost of goods "
              f"sold through inventory and 5080 {n['variance_name']}.\n\n"
              f"Before year-end, two points deserve review. First, {allowance['number']} {allowance['name']} has no "
-             f"postings at all, so no allowance for credit losses has ever been recorded against the receivables "
-             f"(Chapter 8 estimates one). Second, 4070 Sales Discounts is inactive, so promotion discounts are netted "
-             f"in revenue rather than shown separately (the Part II case); the presentation should be a decision, not "
-             f"a default. The inactive accounts should stay closed to posting.")
+             f"postings in the three years of the extract, so no allowance for credit losses has been recorded in that "
+             f"period (Chapter 8 estimates one). Second, 4070 Sales Discounts is inactive and has no postings; the Part II "
+             f"case found the promotion discounts netted in the invoice prices rather than shown separately, so the "
+             f"presentation should be a decision, not a default. The inactive accounts should stay closed to posting.")
 
 
 # --- Exercise 9.2 --------------------------------------------------------------------------------
@@ -338,7 +339,8 @@ def ex2(b: Build) -> None:
              f"The postings of fiscal {year} come from PurchaseInvoice and JournalEntry documents. The only "
              f"JournalEntry row is the year-end close {n['close']}, a credit of {money(n['close_amount'])} that "
              f"brings the account back to zero for the new year. Including it would net the year's activity to zero, so an "
-             f"analysis of the account excludes it, as Tutorial 9.2 excluded the close of 5080.")
+             f"analysis of the year's purchase variances excludes it, as Tutorial 9.2 set apart the close of 5080; a "
+             f"journal entry that adjusted the variance would stay in the analysis.")
     s.answer("Requirements (3) and (5)",
              f"The {num(n['pi_rows'])} PurchaseInvoice postings carry three descriptions: unfavorable variances "
              f"({num(n['unf']['n'])} debits, {money(n['unf']['amount'])}), favorable variances "
@@ -411,6 +413,19 @@ def ex3(b: Build) -> None:
             """,
             [Check("items failing the component check", 0, len)])
 
+    s.query("Requirement (3): items with a missing component, which the comparison would pass over",
+            "Population: Item, SupplyMode Manufactured; expected: no rows",
+            """
+            SELECT ItemCode, ItemName
+            FROM Item
+            WHERE SupplyMode = 'Manufactured'
+                AND (StandardDirectLaborCost IS NULL
+                    OR StandardVariableOverheadCost IS NULL
+                    OR StandardFixedOverheadCost IS NULL
+                    OR StandardConversionCost IS NULL);
+            """,
+            [Check("items with a NULL component", 0, len)])
+
     s.query("Requirement (4): the list with the labor rate per standard hour, sorted by it",
             f"Population: as (1); expected: rates from {money(n['rate_low'])} to {money(n['rate_high'])}",
             columns + """,
@@ -448,8 +463,9 @@ def ex3(b: Build) -> None:
              f"Charles River makes {n['n']} items ({groups}). Each standard cost is material plus conversion cost: "
              f"the material part, StandardCost less StandardConversionCost, runs from {money(n['material_low'])} to "
              f"{money(n['material_high'])} a unit, and the conversion part is direct labor plus variable and fixed "
-             f"overhead. The component check returns no rows, so the three parts add up to the conversion cost on "
-             f"every item. Direct labor is the standard hours times an item-specific rate: the rate per standard hour "
+             f"overhead. The component check returns no rows, and no component is NULL (a NULL would make the "
+             f"comparison unknown and pass over the item), so the three parts add up to the conversion cost on every "
+             f"item. Direct labor is the standard hours times an item-specific rate: the rate per standard hour "
              f"runs from {money(n['rate_low'])} to {money(n['rate_high'])}, with {rates} different rates, so there is "
              f"no single plant rate. The highest conversion costs are {top[0]['code']} {top[0]['name']} "
              f"({money(top[0]['cost'])}), {top[1]['code']} ({money(top[1]['cost'])}) and {top[2]['code']} "
@@ -534,7 +550,7 @@ def ex4(b: Build) -> None:
             + [Check(f"{st} among them", k, count("Status", st)) for st, k in n["due_status"]])
 
     released = dict(n["due_status"])["Released"]
-    s.query("Requirement (5): those still Released, where work has not started",
+    s.query("Requirement (5): those still Released",
             f"Population: the work orders of (4); expected: {released} work orders",
             f"""
             SELECT WorkOrderNumber, Status, ReleasedDate, DueDate,
@@ -558,14 +574,19 @@ def ex4(b: Build) -> None:
              f"{n['due']} were due on or before {end} ({due}). The oldest, {oldest['number']}, was released on "
              f"{oldest['released']} and due on {oldest['due']}, and it was still Released at the end of the data; the "
              f"next are {n['next'][0]['number']} (due {n['next'][0]['due']}) and {n['next'][1]['number']} (due "
-             f"{n['next'][1]['due']}). Of the past-due work orders, {released} have not been started, a backlog worth "
-             f"reviewing: are they still needed, or should they be cancelled? The {n['status']['Completed']} completed "
-             f"work orders should be closed.\n\n"
+             f"{n['next'][1]['due']}). Of the past-due work orders, {released} are still marked Released. The status "
+             f"alone is not proof that work has not started: material issues, production completions, and operation "
+             f"start dates in other tables record activity on {n['active']['n']} of them"
+             + (", including the three named above" if n["named_active"] else "")
+             + f", so production should reconcile their statuses (Chapter 10's joins can test the rest). For the "
+             f"others, ask whether they are still needed or should be cancelled. The {n['status']['Completed']} "
+             f"completed work orders should be closed.\n\n"
              f"A work order's variance is recorded only when it closes, when the WorkOrderClose document posts the "
-             f"difference between actual and standard cost to 5080. The cost of these work orders sits in work in "
-             f"process and 1090 until then, so their variance is not in the fiscal {year} results and will be recorded "
-             f"when they close, after the data ends. (Counting each status takes one query and the message pane; "
-             f"COUNT comes in Chapter 10.)")
+             f"difference between actual and standard cost to 5080. The costs recorded against these work orders so "
+             f"far stay in work in process and 1090 until then, so any variance on them is not in the fiscal {year} "
+             f"results; it will be recorded when they close, after the data ends, and the open status alone does not "
+             f"say how large it will be. (Counting each status takes one query and the message pane; COUNT comes in "
+             f"Chapter 10.)")
 
 
 # --- Exercise 9.5 --------------------------------------------------------------------------------
@@ -645,15 +666,17 @@ def ex5(b: Build) -> None:
              f"shows the same {num(dict(n['status'])['In Transit'])} In Transit shipments, of which {n['transit']} have "
              f"a DeliveryDate before {end}, the oldest {n['oldest']}; {n['later_word']} more has a DeliveryDate on or "
              f"after {end}. In Excel the date comparison was left to the eye; in SQL it is part of the condition. The "
-             f"SQL tests are easier to rerun because the conditions are written down: the saved script reruns them on "
-             f"next year's data in one click, and a reviewer can read exactly which rows were kept, where an Excel "
-             f"filter has to be rebuilt by hand and leaves no record of itself.")
+             f"SQL tests are easier to rerun and review because the conditions are written down in plain text: a reviewer "
+             f"can read exactly which rows were kept, and the same script runs on next year's extract once its cutoff "
+             f"date ({end} here) is changed and its results are checked again. An Excel filter is kept with its "
+             f"workbook too, but its conditions sit in each column's filter menu, where a reviewer has to look for "
+             f"them, and they apply to whichever rows the sheet holds.")
     s.answer("Requirement (5)",
-             "The missing tracking number is a completeness test: ask the shipping team why these shipments left "
-             "without a tracking number recorded, and whether the carrier's records hold one that was never "
+             "The missing tracking number is a completeness test: ask the shipping team why these shipments have "
+             "no tracking number recorded, and whether the carrier's records hold one that was never "
              "entered. The In Transit status after the delivery date is a consistency (or timeliness) test, a status "
-             "that contradicts the delivery date: ask who updates the status on delivery and why these shipments were "
-             "never marked Delivered.")
+             "that contradicts the delivery date: ask who updates the status on delivery, whether DeliveryDate records the "
+             "delivery or only the date expected, and what evidence of delivery exists for these shipments.")
 
 
 # --- Exercise 9.6 --------------------------------------------------------------------------------

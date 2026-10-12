@@ -38,7 +38,7 @@ One point from Chapter 3 matters more here than anywhere else. The Charles River
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-Power Query's Merge offered several join kinds in Chapter 5. Inner keeps only the rows that match, Left Outer keeps every row of the first query, and Left Anti keeps the rows of the first query that have no match. They are the inner join, the left outer join, and the anti-join of this chapter. XLOOKUP, which returns one matching value for each row, behaves like a left join that brings back a single column.
+Power Query's Merge offered several join kinds in Chapter 5. Inner keeps only the rows that match, Left Outer keeps every row of the first query, and Left Anti keeps the rows of the first query that have no match. They are the inner join, the left outer join, and the anti-join of this chapter. XLOOKUP, which returns one matching value for each row, behaves like a left join that brings back a single column, as long as the key it looks up is unique: where the key repeats, XLOOKUP still returns one match, while a join returns a row for each.
 :::
 
 
@@ -79,7 +79,8 @@ The questions of this Part reach beyond the sales and ledger tables of Part II, 
 | From | To | Join on |
 |---|---|---|
 | PurchaseOrder | Supplier | SupplierID |
-| PurchaseOrder | Employee | CreatedByEmployeeID, ApprovedByEmployeeID |
+| PurchaseOrder | Employee, as creator | CreatedByEmployeeID = EmployeeID |
+| PurchaseOrder | Employee, as approver | ApprovedByEmployeeID = EmployeeID |
 | PurchaseOrderLine | PurchaseOrder | PurchaseOrderID |
 | GoodsReceiptLine | PurchaseOrderLine | POLineID |
 | PurchaseInvoiceLine | PurchaseInvoice | PurchaseInvoiceID |
@@ -105,7 +106,7 @@ The questions of this Part reach beyond the sales and ledger tables of Part II, 
 
 : Join paths through the purchasing, manufacturing, payroll, and ledger tables {#tbl-10-01}
 
-The last row is different from the others. As Chapter 3 explained, the ledger links to its documents through two columns: SourceDocumentType names the document table, and SourceDocumentID holds the key of the document in that table. The ID alone is not enough, because each document table numbers its own rows. The ledger rows whose SourceDocumentID is 7947, for example, come from several kinds of document, of which sales invoice SI-2025-007947, whose revenue posting @fig-01-06 showed and Tutorial 3.2 traced, is only one. A join to a document table therefore names the document type as part of its condition:
+Where a table refers to another twice, as a purchase order names both the employee who created it and the one who approved it, each role is a join of its own, and showing both people takes two aliases of Employee. The last row is different from the others. As Chapter 3 explained, the ledger links to its documents through two columns: SourceDocumentType names the document table, and SourceDocumentID holds the key of the document in that table. The ID alone is not enough, because each document table numbers its own rows. The ledger rows whose SourceDocumentID is 7947, for example, come from several kinds of document, of which sales invoice SI-2025-007947, whose revenue posting @fig-01-06 showed and Tutorial 3.2 traced, is only one. A join to a document table therefore names the document type as part of its condition:
 
 ```sql
 SELECT gl.GLEntryID, gl.PostingDate, je.EntryNumber, je.EntryType
@@ -132,7 +133,7 @@ FROM Item AS i
 WHERE i.SupplyMode = 'Manufactured' AND wo.WorkOrderID IS NULL;
 ```
 
-The query returns a handful of manufactured items for which no work order has ever been released, all of them discontinued. The same test can be written with NOT EXISTS, which keeps a row of the first table when a subquery finds no matching row in the second:
+The query returns a handful of manufactured items for which the data hold no work order, all of them discontinued. The same test can be written with NOT EXISTS, which keeps a row of the first table when a subquery finds no matching row in the second:
 
 ```sql
 SELECT i.ItemCode, i.ItemName, i.ItemGroup
@@ -179,13 +180,13 @@ Chapter 3 warned that a list of customers built by joining to their orders can s
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Anti-joins are among the most useful tests in accounting data, because they find what is missing. An existence test starts from the ledger and asks whether every posting points to a document; a completeness test starts from the documents and asks whether every one was posted. Invoices never posted, ledger rows that point to no document, and customers who have never ordered are all anti-join results, and Chapter 12 builds a library of such tests.
+Anti-joins are among the most useful tests in accounting data, because they find what is missing. An existence test starts from the ledger and asks whether every posting points to a document; a completeness test starts from the documents and asks whether every one was posted. Invoices never posted, ledger rows that point to no document, and customers with no order in the records are all anti-join results, and Chapter 12 builds a library of such tests.
 :::
 
 
 ## Summarizing with Aggregate Functions
 
-An aggregate function calculates one value from many rows. @tbl-10-02 lists the ones you will use most. Without a GROUP BY clause, an aggregate summarizes every row the query keeps, so the query `SELECT COUNT(*) FROM WorkOrderClose` returns a single row with the number of closes. GROUP_CONCAT is the one aggregate that returns text: it lists a group's values in one cell, in no guaranteed order, which makes a short list of exceptions easy to read.
+An aggregate function calculates one value from many rows. @tbl-10-02 lists the ones you will use most. Without a GROUP BY clause, an aggregate summarizes every row the query keeps, so the query `SELECT COUNT(*) FROM WorkOrderClose` returns a single row with the number of closes. GROUP_CONCAT is the aggregate in the table that joins a group's values into one text: it lists them in one cell, in no guaranteed order, which makes a short list of exceptions easy to read.
 
 | Function | Returns | Treatment of NULL |
 |---|---|---|
@@ -287,7 +288,7 @@ Status takes four values, and every Closed work order has a ClosedDate while no 
 
 ## Fan-Out and Double Counting
 
-A join between a header table and its lines returns one row per line, and it repeats the header's columns on every one of them. That is what you want when you need the header's date or customer beside each line. It is a trap when you add up an amount that belongs to the header. An invoice with three lines appears three times in a join of SalesInvoice and SalesInvoiceLine, and so does its GrandTotal. @fig-10-04 shows this effect, which is called fan-out, the double counting that Chapter 3 warned about when joining related tables. Summed over fiscal 2026, the join nearly doubles the invoice total.
+A join between a header table and its lines returns one row per line, and it repeats the header's columns on every one of them. That is what you want when you need the header's date or customer beside each line. It is a trap when you add up an amount that belongs to the header. An invoice with three lines appears three times in a join of SalesInvoice and SalesInvoiceLine, and so does its GrandTotal. @fig-10-04 shows this effect, which is called fan-out, the double counting that Chapter 3 warned about when joining related tables. Summed over fiscal 2026, the join nearly doubles the invoice total. (The lines themselves add up to the invoice's SubTotal; its GrandTotal also includes the freight and tax recorded on the header.)
 
 ![Fan-Out: A Header Amount Repeated on Every Line.](/visuals/svg/fig-10-04-fan-out.svg){#fig-10-04 fig-alt="A Charles River sales invoice of fiscal 2026 with three lines. Joined to its lines, the invoice's GrandTotal appears on all three rows, so summing GrandTotal over the join counts it three times, while summing the LineTotal of the lines counts each line once. A note states that across fiscal 2026 the sum of GrandTotal over the joined rows is nearly twice the true total of the invoices."}
 
@@ -314,7 +315,7 @@ WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
         WHERE CloseDate BETWEEN '2026-01-01' AND '2026-12-31');
 ```
 
-A scalar subquery can also stand in the SELECT list, where two of them can put totals from different tables side by side, as Tutorial 10.2 does to tie the closes to the ledger. It must return one row. If it returns several, SQLite quietly uses the first, while most other systems stop with an error.
+A scalar subquery can also stand in the SELECT list, where two of them can put totals from different tables side by side, as Tutorial 10.2 does to tie the closes to the ledger. It should return at most one row. If it finds none, its value is NULL; if it returns several, SQLite quietly uses the first, while most other systems stop with an error.
 
 ### Subqueries in WHERE
 
@@ -374,7 +375,7 @@ A query is written in one order and evaluated, logically, in another. @fig-10-05
 
 The evaluation order explains several rules you have already met. WHERE cannot use an aggregate, because the groups do not yet exist when WHERE runs. HAVING can, because it runs after grouping. ORDER BY can sort by an alias defined in the SELECT list, because it runs after SELECT.
 
-By the same logic, neither WHERE nor GROUP BY should be able to use a column alias, because both run before SELECT defines it. For WHERE, most database systems enforce the rule, and SQLite, which does not, invites a habit to avoid. For GROUP BY, SQLite, PostgreSQL, and MySQL all look up an alias from the SELECT list, and the queries in this book use it, because `GROUP BY CloseYear` is easier to read than repeating the expression. Microsoft SQL Server does not allow it, so in that system you would write `GROUP BY SUBSTR(woc.CloseDate, 1, 4)` instead.
+By the same logic, neither WHERE nor GROUP BY should be able to use a column alias, because both run before SELECT defines it. For WHERE, most database systems enforce the rule, and SQLite, which does not, invites a habit to avoid. For GROUP BY, SQLite, PostgreSQL, and MySQL all look up an alias from the SELECT list, and the queries in this book use it, because `GROUP BY CloseYear` is easier to read than repeating the expression. Microsoft SQL Server does not allow it, so in that system you would repeat the expression, with SQL Server's own function, `SUBSTRING`, as in `GROUP BY SUBSTRING(woc.CloseDate, 1, 4)`.
 
 
 {{< include _tutorial-02.qmd >}}
@@ -384,7 +385,7 @@ By the same logic, neither WHERE nor GROUP BY should be able to use a column ali
 
 The controller's third question is about the plant, and the tables of @tbl-10-01 let you measure it the way a standard cost system does. A standard cost system compares the inputs actually used with the inputs the standards allow for the output actually achieved (Datar & Rajan, 2021). For direct labor, the input allowed is the standard hours allowed: the units completed times the standard labor hours of each unit. The input used is the direct labor time recorded against the work, and comparing the two measures the efficiency of direct labor. It is the flexible budget of Chapter 7 applied to hours: the standard is recalculated at the output actually achieved before it is compared with the actual.
 
-Not every hour of a plant is direct labor. Indirect labor, the time that no single work order carries, is part of manufacturing overhead, and a standard cost system does not compare it with the standard labor hours. It charges overhead to production at a standard amount for each unit, so more indirect time shows up in the overhead part of the variance, not the labor part. The fixed part of overhead is absorbed only by the units made, so a fall in output leaves some of it unabsorbed, an effect called the production-volume variance (Datar & Rajan, 2021).
+Not every hour of a plant is direct labor. Indirect labor, the time that no single work order carries, is part of manufacturing overhead, and a standard cost system does not compare it with the standard labor hours. It charges overhead to production at a standard amount for each unit, so more indirect time shows up in the overhead part of the variance, not the labor part. The fixed part of overhead is absorbed only by the units made, so output below the volume on which the overhead rate was set leaves some of it unabsorbed, an effect called the production-volume variance (Datar & Rajan, 2021).
 
 The Charles River records keep these kinds of time apart. LaborTimeEntry records each employee's hours, dated by the day worked, with a LaborType. Direct Manufacturing time is recorded against a work order operation. Indirect Manufacturing time is plant time with no operation, and NonManufacturing time belongs to the rest of the company. PayrollRegisterLine records the pay, with regular and overtime earnings and their hours, together with salaries, employer taxes, benefits, and deductions, which have no hours. @fig-10-08 shows these tables and the keys that link them, in the notation of Chapter 3. A payroll period belongs to the fiscal year of its pay date, so the period that ends in late December is paid, and counted, in the next year. Because the labor time entries follow the same calendar as the production completions, Tutorial 10.3 measures the hours with them, after profiling both tables to check that they cover the same days, and uses the payroll for what the hours cost.
 
@@ -398,7 +399,7 @@ The Charles River records keep these kinds of time apart. LaborTimeEntry records
 
 This chapter has taught you to combine tables and summarize their rows. You joined tables with INNER JOIN on their logical keys and tested each join by its row count. You kept unmatched rows with LEFT JOIN, listed whole populations, and found missing records with anti-joins and NOT EXISTS. You summarized with aggregate functions, grouped by key, filtered groups with HAVING, and avoided the double counting of fan-out. You wrote subqueries in SELECT, WHERE, and FROM, including correlated ones, and you learned the logical order in which a query is evaluated. Along the way, you tied the variance to the ledger, rebuilt the pre-closing trial balance of fiscal 2026, and followed the conversion cost of production through the ledger, after profiling the tables you relied on. Where Chapter 9's queries described the records, most of this chapter's were diagnostic analytics, in the terms of @tbl-01-01: they explained why the variance grew by breaking it down by product, year, and part, and by comparing the hours recorded with the hours the standards allow.
 
-The controller now has her answer to the volume question, and it is mostly no. The plant completed about as many units in fiscal 2026 as in fiscal 2024, with a dip in fiscal 2025 that left some fixed overhead unabsorbed, and those units needed about as many standard labor hours. The direct labor recorded against the work stayed within those standard hours in every year. The extra hours were elsewhere. Indirect time, which no work order carries, grew by about two-thirds, and overtime more than doubled. Indirect labor is overhead, so its growth reached the variance through the overhead part, while the favorable labor part shrank as direct hours moved toward the standard and more of them were paid as overtime. What the controller needs next is a measure she can follow month by month, one that shows whether the gap between the hours recorded and the standard hours is still widening. Building that measure requires classifying rows, calculating across months, and organizing a long query into steps, which is the work of Chapter 11.
+The controller now has her answer to the volume question, and it is mostly no. The plant completed about as many units in fiscal 2026 as in fiscal 2024, with a dip in fiscal 2025, when fewer units absorbed the fixed overhead, and those units needed about as many standard labor hours. The direct labor recorded stayed within those standard hours in every year. The extra hours were elsewhere. Indirect time, which no work order carries, grew by about two-thirds, and overtime more than doubled. Indirect labor is overhead, so its growth is consistent with the growth of the variance's overhead part, while the favorable labor part shrank as direct hours moved toward the standard and more of them were paid as overtime. The queries do not yet measure how much of the change each cause explains. What the controller needs next is a measure she can follow month by month, one that shows whether the gap between the hours recorded and the standard hours is still widening. Building that measure requires classifying rows, calculating across months, and organizing a long query into steps, which is the work of Chapter 11.
 
 
 

@@ -2,7 +2,7 @@
 
 ## Key Terms
 
-**Anomaly.** A record or period that differs from what an analytical test expects, such as a near-duplicate payment or a departure from Benford's Law. An anomaly is a reason to look more closely, while an exception is a failure of a rule.
+**Anomaly.** A record or period that differs from what an analytical test expects, such as a near-duplicate payment or a departure from Benford's Law. An anomaly is a reason to look more closely, while an exception is a record that meets a rule's criteria and needs an explanation.
 
 **Append.** A Power Query operation that stacks the rows of two or more tables into one, matching their columns by name and filling with nulls the columns a table lacks. It is the counterpart of SQL's UNION ALL, which matches columns by position.
 
@@ -12,10 +12,10 @@
 
 **Continuous monitoring.** Management's ongoing review, often automated, of whether its own controls operate as designed. Continuous auditing can rely on it when it is strong.
 
-**Data currency.** How recent the data in a report are: the last date each of its populations covers at its last refresh. A report whose populations end on different dates has been tested in full only through the earliest of them.
+**Data currency.** How recent the data in a report are: the last date each of its populations reaches at its last refresh. A report whose populations end on different dates can have been tested in full only through the earliest of them.
 
 **Exception register.** A table that holds the exceptions of several monitoring tests, one row per exception per test, with the same columns for every test: the test, the document, its date, its amount, and the employee responsible.
 
-**Open exception.** An exception with no disposition recorded. In a monitoring report, the open exceptions are the reviewers' work for the period, while the exceptions already reviewed keep their dispositions from one refresh to the next.
+**Open exception.** An exception with no disposition recorded, one that no reviewer has yet examined. In a monitoring report, the open exceptions are the reviewers' first work for the period, while the exceptions already reviewed keep their dispositions from one refresh to the next. A reviewed exception is not necessarily resolved: one marked for follow-up or reported as a deficiency stays a matter to track until it is closed.
 
 **Unpivot.** A Power Query operation that turns selected columns into rows, each column becoming a row with its name in an Attribute column and its value in a Value column. Unpivoting flag columns and keeping the rows with a value of 1 turns flags into exceptions.

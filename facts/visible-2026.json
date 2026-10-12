@@ -124,6 +124,7 @@
   "date.promo.furniture.start": "2026-09-01",
   "date.surge.first": "2024-05-31",
   "date.time_records_end": "2026-12-11",
+  "date.time_records_end.indirect": "2026-12-04",
   "date.time_records_end.monday": "2026-12-07",
   "date.trace.application": "2025-04-17",
   "date.trace.invoice": "2025-03-05",

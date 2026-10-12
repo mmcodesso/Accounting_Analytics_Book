@@ -378,7 +378,7 @@ plant_measures = [
     measure("Manufacturing Hours", """
 CALCULATE (
     SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
-    LaborTimeEntry[LaborType] <> "NonManufacturing"
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
 )
 """, "#,0"),
     measure("Direct Hours", """CALCULATE ( [Manufacturing Hours], LaborTimeEntry[LaborType] = "Direct Manufacturing" )""", "#,0"),
@@ -386,7 +386,7 @@ CALCULATE (
     measure("Overtime Hours", """
 CALCULATE (
     SUM ( LaborTimeEntry[OvertimeHours] ),
-    LaborTimeEntry[LaborType] <> "NonManufacturing"
+    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
 )
 """, "#,0"),
     measure("Standard Hours", """

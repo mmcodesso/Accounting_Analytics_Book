@@ -19,16 +19,18 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
    - Import the **T3_GLEntry** Table, clicking **Transform Data** rather than **Load**, and name the query `TrialBalance`.
    - Filter PostingDate to dates before `2027-01-01`, and filter VoucherNumber to exclude JE-2026-000296 and JE-2026-000297, the 2026 closing entries.
    - Choose **Transform > Group By**, select **Advanced**, group by AccountID, and add two aggregations: `Debit`, the sum of Debit, and `Credit`, the sum of Credit.
-   - Import the **T1_Account** Table as a second query named `ChartOfAccounts`, keep AccountID, AccountNumber, AccountName, AccountType, and AccountSubType, and clear **Enable Load**.
-   - Merge TrialBalance with ChartOfAccounts on AccountID, expand the four other columns without the prefix, and choose **Close & Load**.
+   - Import the **T1_Account** Table as a second query named `ChartOfAccounts`, and keep AccountID, AccountNumber, AccountName, AccountType, and AccountSubType.
+   - Merge TrialBalance with ChartOfAccounts on AccountID, and expand the four other columns without the prefix.
+   - ChartOfAccounts only feeds the merge, so it should load as a connection only. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection**, and click **OK**; the choice applies to both new queries.
+   - Open **Data > Queries & Connections**, right-click **TrialBalance**, choose **Load To**, and load it as a **Table** on a **New worksheet**.
 
 (2) In the TrialBalance Table, add three calculated columns: `Balance`, equal to Debit minus Credit; `DebitBalance`, equal to `=MAX(0,[@Balance])`; and `CreditBalance`, equal to `=MAX(0,-[@Balance])`. Turn on **Table Design > Total Row** and show the sums of DebitBalance and CreditBalance. Explain why the revenue and expense accounts show only the activity of fiscal 2026, although the query includes 2024 and 2025.
 
-(3) On a worksheet named `IncomeStatement`, build the income statement of @fig-06-07 with one SUMIFS formula per line on the Balance column by AccountSubType: operating revenue (the Operating Revenue subtype, with the sign reversed), sales returns and allowances (Contra Revenue), net revenue, cost of goods sold (COGS), gross margin, operating expenses (Operating Expense), operating income, other income and expense (the Other Income or Expense and Other Expense subtypes), and net income. Add a column that expresses every line as a percentage of net revenue.
+(3) On a worksheet named `IncomeStatement`, build the income statement of @fig-06-07: operating revenue (the Operating Revenue subtype), sales returns and allowances (Contra Revenue), net revenue, cost of goods sold (COGS), gross margin, operating expenses (Operating Expense), operating income, other income and expense (the Other Income or Expense and Other Expense subtypes), and net income. Calculate each line that comes from the accounts with SUMIFS on the Balance column by AccountSubType, with the sign reversed, so that revenue is positive and the deductions negative, as in @fig-06-07; calculate each subtotal as the sum of the lines above it. Add a column that expresses every line as a percentage of net revenue.
 
 (4) Check the statement in two ways. First, compare net income with the TotalAmount of JE-2026-000297, the entry that closed the income summary to retained earnings. The analysis workbook has no journal entry Table, so import the T2_JournalEntry Table as a query named `JournalEntries`, or read the entry's TotalAmount on the JournalEntry worksheet of CharlesRiver.xlsx. Second, use SUMIFS by AccountType to show that the assets equal the liabilities and equity once net income is added to equity.
 
-(5) Compare the balances of the product revenue accounts, 4010 to 4040 and 4080, with the fiscal 2026 revenue of their item groups in InvoiceLines. Three accounts differ by small amounts. Identify the invoices responsible, using what you found in Exercise 5.2 about invoices numbered in one fiscal year and dated in another, and explain which date should determine the period of their revenue.
+(5) Compare the balances of the product revenue accounts, 4010 to 4040 and 4080, with the fiscal 2026 revenue of their item groups in InvoiceLines. Three accounts differ by small amounts. Identify the invoices responsible, using what you found in Exercise 5.2 about invoices numbered in one fiscal year and dated in another, and explain which date should determine the period of their revenue and what evidence would settle it. Each invoice line's ShipmentLineID leads, through the ShipmentLine and Shipment worksheets of CharlesRiver_Work.xlsx, to the date its goods were delivered.
 
 (6) Write a memo of half a page to the controller that presents the common-size income statement, describes what it shows about Charles River's cost structure, and explains the reconciling differences.
 
@@ -42,19 +44,21 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Table group:** Order-to-Cash, with the Customer and Item tables from Master Data
 
-**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and it offers major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare the disaggregation that Charles River would disclose on that basis.
+**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and it offers major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare a first disaggregation on that basis from the invoice lines, for management, before it is reconciled to the revenue the financial statements report.
 
 **Requirements.**
 
 (1) Build a PivotTable from InvoiceLines with CustomerSegment in the Rows area, ItemGroup in the Columns area, and LineTotal in the Values area, filtered to fiscal 2026. Show the values as % of Grand Total and identify the three largest combinations of segment and product line.
 
-(2) Keep that PivotTable, and build a second one with the same fields, adding FiscalYear to the Columns area, above ItemGroup. Show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest increases and the two largest decreases among the combinations with at least $500,000 of revenue in 2025.
+(2) Keep that PivotTable, and build a second one with the same fields, adding FiscalYear to the Columns area, above ItemGroup. Show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest percentage increases and the two largest percentage decreases among the combinations with at least $500,000 of revenue in 2025.
 
 (3) Repeat the year-over-year comparison in a third PivotTable, by Region instead of by segment.
 
 (4) Write a disclosure-style paragraph of four to six sentences that presents the disaggregation you would recommend, states why you chose its categories, and summarizes the changes from the previous year.
 
-**Deliverable.** Three PivotTables, a list of the largest combinations and changes, and a disclosure paragraph.
+(5) List the differences between this invoice-based revenue and the revenue that the income statement of Exercise 6.1 reports, which would have to be reconciled before the disaggregation could support a disclosure in the financial statements.
+
+**Deliverable.** Three PivotTables, a list of the largest combinations and changes, a disclosure paragraph, and the list of differences to reconcile.
 
 
 
@@ -126,7 +130,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (2) On a separate worksheet, use each group's revenue in the same quarter of 2025 as the expectation for 2026, and calculate the difference in dollars and as a percentage of the expectation.
 
-(3) Flag the differences that exceed both 10 percent of the expectation and $50,000, and list them.
+(3) Flag the differences that exceed both 10 percent of the expectation and $50,000, the thresholds your senior chose for this exercise, in either direction: compare the absolute values, with ABS, so that decreases are flagged as well as increases. List the flagged differences.
 
 (4) Identify the largest difference in dollars that your threshold does not flag, and explain what that says about the design of the threshold.
 

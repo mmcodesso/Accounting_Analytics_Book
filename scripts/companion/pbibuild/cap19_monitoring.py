@@ -2,17 +2,19 @@
 the Chapter 19 capstone case, built on a copy of internal audit's file as Tutorial 16.3 leaves it.
 
 Requirement 10 adds four rule tests to the register (credits above the approver's authority, credits approved by
-someone who applied cash to the credited invoice, refunds above authority, and refunds dated before the customer's last
-payment on the invoice) and the processes Credit memos and Refunds to the populations, under the change control
+someone who applied cash to the credited invoice, refunds above authority, and refunds dated before the last application
+of the customer's payments to the credited invoice) and the processes Credit memos and Refunds to the populations,
+under the change control
 Chapter 16 described. The flags are computed in Power Query, as Tutorials 16.1 and 16.2 computed theirs and as the
 note describes: for BeforePayment the applications are grouped by invoice for the last ApplicationDate and merged; for
 CashAndCredit they are grouped by invoice and applier and merged on the credit's invoice and approver. The two new
 exception queries are appended to the Exceptions query's Source step, and the Tests table gains four rows.
 
 The historical exceptions of the new tests get one design-finding treatment: a Design Findings table (Enter data, one
-row per new test, naming the finding and the date by which its design is to be fixed) is merged into the register by
-TestID, an exception dated by that date is covered by the finding, and Open Exceptions leaves the covered exceptions
-out, so the review sees only the exceptions dated after the fix. The refund method and the missing offset stay anomaly
+row per new test, naming the finding, the period it covers, through the end of the audited year, and the date by which
+its design is to be fixed) is merged into the register by TestID; an exception dated within the period is covered by
+the finding and stays in the register, and Open Exceptions leaves the covered exceptions out, so the review sees every
+exception dated after the period, before the fix as well as after it, and a finding closes only on a retest. The refund method and the missing offset stay anomaly
 tests: columns of CustomerRefund, outside the register, on a page of their own. Data Through takes the last credit and
 refund dates as well (the date stays payroll's), and a Change Log table (Enter data) records the change.
 
@@ -23,6 +25,7 @@ whole register, recomputed for the larger register.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 
 from pbibuild.audit_monitoring import COUNT, MEASURES, MONEY, REGISTER, Build, exceptions, flags
@@ -37,11 +40,14 @@ M = lambda n: meas(MEASURES, n)           # noqa: E731
 NEW_TESTS = [("CM AboveLimit", "Credit above its approver's limit", "Credit memos", "Chapter 19"),
              ("CM CashAndCredit", "Credit approved by someone who applied cash to its invoice", "Credit memos", "Chapter 19"),
              ("RF AboveLimit", "Refund above its approver's limit", "Refunds", "Chapter 19"),
-             ("RF BeforePayment", "Refund dated before the customer's last payment on the credited invoice", "Refunds",
-              "Chapter 19")]
+             ("RF BeforePayment", "Refund dated before the last application of the customer's payments to the credited "
+              "invoice", "Refunds", "Chapter 19")]
 FIX_BY = "2027-12-31"           # the action plans' date (Requirement 9): the delegation of authority and the refund rule
+# the findings cover the exceptions dated through the end of the audited year (ch19.year_end(d.C)); a later exception, before
+# the fix as well as after it, stays open for review, and a finding closes on a retest, not on FIX_BY
 FINDINGS = {"CM": "Credits approved without a delegation of authority, by customer service staff who also apply the cash",
-            "RF": "Refunds approved without a delegation of authority, before the customer's payment has cleared"}
+            "RF": "Refunds approved without a delegation of authority, and dated before the customer's payments were "
+                  "applied to the credited invoice"}
 CHANGE_DATE = "2027-09-30"      # the end of the audit's fieldwork (the case is set in September 2027)
 
 POPULATION = """SWITCH (
@@ -171,15 +177,18 @@ def r10(b: Build) -> None:
     claim(all(q.columns == reg.parts[0].columns for q in (cmx, rfx)), "the new exception queries have the register's columns")
     reg.parts += [cmx, rfx]                                   # the Source step's Table.Combine, two more queries
     # the design findings (Enter data), merged by TestID: an exception dated by FixBy is covered by its finding
-    rows = [[tid, FINDINGS[tid[:2]], FIX_BY] for tid, *_ in NEW_TESTS]
+    covers = ch19.year_end(d.C)
+    rows = [[tid, FINDINGS[tid[:2]], covers, FIX_BY] for tid, *_ in NEW_TESTS]
     m.add(Table("Design Findings", [Column("TestID", "string"), Column("Finding", "string"),
+                                    Column("CoversThrough", "dateTime", fmt="Short Date"),
                                     Column("FixBy", "dateTime", fmt="Short Date")], entered=rows, hidden=True))
     m.query_order.append("Design Findings")
     dfq = Query("Design Findings")
-    dfq.columns = {"TestID": "type text", "Finding": "type text", "FixBy": "type date"}
-    reg.merge(dfq, "TestID", "TestID", ["Finding", "FixBy"])
-    reg.custom("Covered", "if [FixBy] <> null and [EventDate] <= [FixBy] then 1 else 0", "Int64.Type")
-    m.tables["Exceptions"] = query_table(reg, formats={"Amount": MONEY, "FixBy": "Short Date"},
+    dfq.columns = {"TestID": "type text", "Finding": "type text", "CoversThrough": "type date", "FixBy": "type date"}
+    reg.merge(dfq, "TestID", "TestID", ["Finding", "CoversThrough", "FixBy"])
+    reg.custom("Covered", "if [CoversThrough] <> null and [EventDate] <= [CoversThrough] then 1 else 0", "Int64.Type")
+    m.tables["Exceptions"] = query_table(reg, formats={"Amount": MONEY, "CoversThrough": "Short Date",
+                                                       "FixBy": "Short Date"},
                                          summarize={"EmployeeID": "none", "Covered": "none"})
     for q in (apps, last, appliers, receipts, methods, invoices, credits, dates, due, cmx, rfx):
         m.stage(q)
@@ -204,7 +213,8 @@ def r10(b: Build) -> None:
     set_measure(b, "Open Exceptions", OPEN)
     set_measure(b, "Data Through", DATA_THROUGH)
     add_measure(b, "Design Finding Exceptions", "CALCULATE ( [Exceptions], Exceptions[Covered] = 1 )", COUNT,
-                "Exceptions dated by the fix date of their test's design finding: reported once, as the finding.")
+                "Exceptions dated within the period their test's design finding covers: reported once, as the finding, "
+                "and kept in the register.")
     add_measure(b, "Method Mismatch Refunds", "CALCULATE ( COUNTROWS ( CustomerRefund ), CustomerRefund[MethodMismatch] = 1 )",
                 COUNT, "Anomaly test: refunds by a method no receipt on the credited invoice used.")
     add_measure(b, "Method Mismatch Amount", "CALCULATE ( SUM ( CustomerRefund[Amount] ), CustomerRefund[MethodMismatch] = 1 )",
@@ -221,8 +231,9 @@ def r10(b: Build) -> None:
             "CM Exceptions, RF Exceptions appended to Exceptions)", "Requirement 10: the credits cycle audit"],
            [CHANGE_DATE, "Population", "Added the processes Credit memos and Refunds", "Rates per 1,000 for the new tests"],
            [CHANGE_DATE, "Design Findings and Open Exceptions",
-            f"The new tests' exceptions dated by {FIX_BY} are covered by two design findings and left out of Open Exceptions",
-            "Report the historical exceptions once; review only those after the fix"],
+            f"The new tests' exceptions dated through {covers} are covered by two design findings, to be fixed by "
+            f"{FIX_BY}, and left out of Open Exceptions",
+            "Report the historical exceptions once; review every later one, and close a finding on a retest"],
            [CHANGE_DATE, "CustomerRefund anomaly columns", "MethodMismatch and OffsetMissed, outside the register",
             "Anomalies are reasons to look, not rule failures"],
            [CHANGE_DATE, "Data Through", f"Added the last credit memo and refund dates; still {ctx['through']} (payroll)",
@@ -253,7 +264,7 @@ def r10(b: Build) -> None:
     names = {r[0]: r[1] for r in d.q("SELECT EmployeeID, EmployeeName FROM Employee")}
     recompute = {("Tutorial 16.2", "Exceptions rows"), ("Tutorial 16.2", "test and document pairs (each unique)"),
                  ("Tutorial 16.2", "Tests rows"), ("Tutorial 16.3", "documents failing two tests or more"),
-                 ("Tutorial 16.3", "the documents failing two tests or more")}
+                 ("Tutorial 16.3", "the documents failing two tests or more"), ("Tutorial 16.3", "Test 3: exception keys")}
     recompute |= {("Tutorial 16.2", f"{mn[:3]} exceptions (all years)") for mn in ch16.MONTHS}
     recompute |= {("Tutorial 16.2", f"exceptions approved by {names[e]}") for e, _ in Counter(x["emp"] for x in old).most_common(5)}
     before = len(b.project.checks)
@@ -262,6 +273,8 @@ def r10(b: Build) -> None:
     s2 = "Requirement 10 (Chapter 16's checks, on the larger register)"
     b.check(s2, "Exceptions rows", len(full), "COUNTROWS ( Exceptions )", 0)
     b.check(s2, "test and document pairs (each unique)", len({(e["test"], e["doc"]) for e in full}),
+            "COUNTROWS ( SUMMARIZE ( Exceptions, Exceptions[TestID], Exceptions[DocumentNumber] ) )", 0)
+    b.check(s2, "Test 3: exception keys", len({(e["test"], e["doc"]) for e in full}),
             "COUNTROWS ( SUMMARIZE ( Exceptions, Exceptions[TestID], Exceptions[DocumentNumber] ) )", 0)
     b.check(s2, "Tests rows", len(ch16.TESTS) + len(NEW_TESTS), "COUNTROWS ( Tests )", 0)
     months = Counter(int(e["date"][5:7]) for e in full)
@@ -280,6 +293,11 @@ def r10(b: Build) -> None:
             "Exceptions[DocumentNumber], \", \", Exceptions[DocumentNumber], ASC )")
     # the page expectations of Tutorials 16.2 and 16.3 over the whole register
     mon, review = b.report.page("monitoring"), b.report.page("review")
+    claim({"source": "approvers", "target": "rates", "type": "NoFilter"} in mon.extra.get("visualInteractions", []),
+          "the approvers chart does not filter the rates table, so a rate's numerator and population share one context")
+    end = re.search(r"CALENDAR \( DATE \( \d+, 1, 1 \), DATE \( (\d+), 12, 31 \) \)", m.tables["Date"].dax or "")
+    claim(end is not None, "the Date table is Tutorial 16.1's CALENDAR")
+    date_end = f"{end.group(1)}-12-31"
     old_multi = sorted(k for k, n in Counter(e["doc"] for e in old).items() if n >= 2)
     review.expect = [w for w in review.expect if w != old_multi[-1]]   # the last of 19 rows; the list is longer now
     # the heat map gets room for the four new rows (and the approvers and rates below it move down)
@@ -303,8 +321,9 @@ def r10(b: Build) -> None:
     page.add(card("registerCards", 860, 20, 400, 200, [M("Exceptions"), M("Reviewed Exceptions"),
                                                        M("Design Finding Exceptions"), M("Open Exceptions")]))
     page.add(Visual("findings", "tableEx", 20, 235, 1240, 130, {"Values": [
-        col("Exceptions", "TestID"), col("Exceptions", "Finding"), col("Exceptions", "FixBy"),
-        M("Design Finding Exceptions"), M("Open Exceptions")]}, title="Design findings: reported once, reviewed after the fix",
+        col("Exceptions", "TestID"), col("Exceptions", "Finding"), col("Exceptions", "CoversThrough"),
+        col("Exceptions", "FixBy"), M("Design Finding Exceptions"), M("Open Exceptions")]},
+        title="Design findings: reported once; later exceptions stay open for review",
         filters=[keep("findingTests", col("Exceptions", "TestID"), new_ids)]))
     tests_ = {x_["name"]: x_ for x_ in ctx["tests"]}
     page.add(answer("cycleAnswer", 20, 380, 1240, 330, "the continuing tests", [
@@ -314,12 +333,16 @@ def r10(b: Build) -> None:
         f". Populations: credits {' / '.join(str(v) for v in ctx['pop_c'])}, refunds {' / '.join(str(v) for v in ctx['pop_r'])}. "
         f"The register grows from {ctx['old']} to {ctx['new']} rows, and each test and document pair is still unique.",
         f"Design findings: the {len(new)} historical exceptions of the new tests are reported once, as two findings about "
-        f"the design of the controls (credits and refunds approved without a delegation of authority), to be fixed by "
-        f"{FIX_BY}. Exceptions dated by then are covered by the finding and left out of Open Exceptions, which stays at "
-        f"{sum(1 for e in old if not e['disposition'])}, so the new tests do not flood the review. After the fix, the two "
-        "authority tests should fall to zero; CashAndCredit and BeforePayment are the ones that would catch the next case.",
-        f"Data Through stays {ctx['through']}, set by payroll's last pay date: the credits run to {ctx['cm_last']} and the "
-        f"refunds to {ctx['rf_last']}. The refund method and the missing offset stay anomaly tests, outside the register "
+        f"the design of the controls (credits and refunds approved without a delegation of authority), each kept in the "
+        f"register with its document. The findings cover the exceptions dated through {covers} and are to be fixed by "
+        f"{FIX_BY}; Open Exceptions leaves the covered ones out and stays at {sum(1 for e in old if not e['disposition'])}, "
+        "so the new tests do not flood the review, while any later exception, before the fix as well as after it, stays "
+        "open for review. A finding closes when a retest after the fix shows the control works, not on its planned date; "
+        "after the fix, the two authority tests should fall to zero, and CashAndCredit and BeforePayment are the ones that "
+        f"would catch the next case. The Date table ends {date_end}: extend it before exceptions after that date arrive.",
+        f"Data Through stays {ctx['through']}, set by payroll's last pay date: the earliest of the processes' last dates, "
+        "which bounds what the tests can have seen but does not show that every record through it was loaded. The "
+        f"credits run to {ctx['cm_last']} and the refunds to {ctx['rf_last']}. The refund method and the missing offset stay anomaly tests, outside the register "
         "(the Anomalies page), because they are reasons to look rather than rule failures. The Change Log page records "
         "the change, and Tests 5 and 6 in the Tests tab are rerun with Tests 1 to 4 before the file is used."]))
     cmab = tests_["CM AboveLimit"]
@@ -338,8 +361,10 @@ def r10(b: Build) -> None:
         "so it is a reason to look, not a rule.",
         f"Missing offset: {r4['pd1']['n']} refunds ({money(r4['pd1']['amt'])}) were paid while the customer had a past-due "
         f"balance, {r4['pd2']['n']} ({money(r4['pd2']['amt'])}; {r4['pd2']['cur'][0]} in {d.C}, {money(r4['pd2']['cur'][1])}) "
-        "of them a balance at least as large as the refund. No policy requires an offset yet, so these stay anomalies "
-        "until one does; then the rule joins the register."]))
+        "of them a balance at least as large as the refund. The records hold no policy that requires an offset or the "
+        "original payment method, so these stay anomalies to follow up; once a policy sets the rule, it joins the "
+        "register. The method test reads every receipt applied to the invoice, later ones included: "
+        f"{r4['late']['n']} refunds ({money(r4['late']['amt'])}) match only on receipts dated after the refund."]))
     page.expect = ["Method Mismatch Refunds", "Offset Missed Refunds", money(r4["mism"]["cur"][1]), money(r4["pd2"]["cur"][1])]
 
     # the Change Log page
@@ -379,7 +404,8 @@ def r10(b: Build) -> None:
                     f"CALCULATE ( [Rate per 1,000], {f}, 'Date'[Year] = {y} )", 0.0001)
         b.check(s, f"{x_['name']} exceptions covered by its design finding", x_["n"],
                 f"CALCULATE ( [Design Finding Exceptions], {f} )", 0)
-        b.check(s, f"{x_['name']} open exceptions (dated after {FIX_BY})", 0, f"CALCULATE ( [Open Exceptions], {f} ) + 0", 0)
+        b.check(s, f"{x_['name']} open exceptions (none is dated after {covers})", 0,
+                f"CALCULATE ( [Open Exceptions], {f} ) + 0", 0)
     b.check(s, "register rows of Chapter 16's tests", ctx["old"],
             "CALCULATE ( [Exceptions], NOT Tests[TestID] IN { " + ", ".join(f"\"{i}\"" for i in new_ids) + " } )", 0)
     b.check(s, "register rows", ctx["new"], "[Exceptions]", 0)
@@ -392,6 +418,9 @@ def r10(b: Build) -> None:
     b.check(s, "last refund date", ctx["rf_last"], 'FORMAT ( MAX ( CustomerRefund[RefundDate] ), "yyyy-mm-dd" )')
     b.check(s, "Change Log rows", len(log), "COUNTROWS ( 'Change Log' )", 0)
     b.check(s, "Design Findings rows", len(rows), "COUNTROWS ( 'Design Findings' )", 0)
+    b.check(s, "covered exceptions dated after the period their finding covers", 0,
+            "COUNTROWS ( FILTER ( Exceptions, Exceptions[Covered] = 1 && Exceptions[EventDate] > Exceptions[CoversThrough] ) ) + 0",
+            0)
     # the anomaly tests (Requirement 4's values, kept outside the register)
     for label, key, n_dax, a_dax in (("method mismatch", "mism", "[Method Mismatch Refunds]", "[Method Mismatch Amount]"),
                                      ("offset missed (past due at least the refund)", "pd2", "[Offset Missed Refunds]",
@@ -436,11 +465,13 @@ def m3(b: Build) -> None:
     for v in page.visuals:
         if v.name == "cycleAnswer":
             v.objects["general"][0]["properties"]["paragraphs"].append({"textRuns": [{"value": (
-                f"Evaluation (Milestone 3): two significant deficiencies, over credits (authority and segregation in "
-                f"customer service) and over refunds (authority, refunds before payment, no preparer recorded); the "
-                f"Accounting Manager's concentration a deficiency; no material weakness, because the {b.d.C} exposure of "
-                f"each authority finding ({money(cur(t.cm_above, 'gt'))} of credits, {money(cur(t.rf_above, 'amt'))} of "
-                f"refunds) is below materiality, {money(mat['mat'])}."), "textStyle": {"fontSize": "10pt"}}]})
+                f"Evaluation (Milestone 3), provisional: two significant deficiencies, over credits (authority and "
+                f"segregation in customer service) and over refunds (authority, refunds before payment, no preparer "
+                f"recorded); the Accounting Manager's concentration a deficiency; no material weakness identified on the "
+                f"records. The {b.d.C} exposure of each authority finding ({money(cur(t.cm_above, 'gt'))} of credits, "
+                f"{money(cur(t.rf_above, 'amt'))} of refunds) is below materiality, {money(mat['mat'])}, but the year's "
+                f"credits ({money(cur(list(ch19.cycle(b.d).cm.values()), 'gt'))}) are above it, so the rating rests on "
+                f"compensating controls whose records lie outside the database."), "textStyle": {"fontSize": "10pt"}}]})
     for test, rows, key in (("CM AboveLimit", t.cm_above, "gt"), ("RF AboveLimit", t.rf_above, "amt")):
         b.check(s, f"{test}: {b.d.C} exposure (below materiality, {money(mat['mat'])})", round(cur(rows, key), 2),
                 f"CALCULATE ( SUM ( Exceptions[Amount] ), Tests[TestID] = \"{test}\", 'Date'[Year] = {b.d.C} )")

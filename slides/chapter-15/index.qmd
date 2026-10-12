@@ -31,7 +31,7 @@ The last three cover visual calculations, assembling the package, and what-if pa
 - One department spent far less than budget, another far more
 
 ::: {.notes}
-It is April, and the controller wants Charles River Reports to become the monthly package. Neither of the two budget results means what it seems. The task is to design a page for each reader, connect the pages so a reader can move from a summary to the rows behind it, and explain each number before it reaches someone who will act on it.
+It is April, and the controller wants Charles River Reports to become the monthly package. Neither of the two budget results means what it seems. The task is to design a page for each reader, connect the pages so a reader can move from a summary to the detail behind it, and explain each number before it reaches someone who will act on it.
 :::
 
 # Designing Reports for Their Readers
@@ -49,13 +49,13 @@ Operating expense of several million dollars is neither good nor bad until the r
 
 ## How a page is shown shapes the judgment
 
-- Readers rely on measures that all units share: give each the same KPIs
+- Readers weigh shared measures and pass over unique ones
 - Markers change how heavily readers weigh a measure: state each threshold
 - Put the KPI and its comparison top left, the breakdown next
 - The five-second test: can someone say what the page shows?
 
 ::: {.notes}
-Lipe and Salterio found that superiors evaluating two units relied on the measures common to both and ignored those unique to each. Cardinaels and van Veen-Dirks found that markers for above, below and on target changed how evaluators weighted the measures, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
+Lipe and Salterio found that superiors evaluating two units relied on the measures common to both and ignored those unique to each. That is a warning, not a reason to give every department the same KPIs: define the shared measures the same way, keep each department's own measures, and make clear that they count. Cardinaels and van Veen-Dirks found that markers for above, below and on target changed how evaluators weighted the measures, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
 :::
 
 ## Each reader gets a page and a KPI
@@ -116,7 +116,7 @@ On the left, expanding Furniture shows its product types in the same matrix, as 
 Drill-down, drill-through or tooltip?
 
 1. Move from an item group to its product types
-2. Study one promotion's invoice lines in detail
+2. Study one promotion's terms and months in detail
 3. Glance at one promotion's months while pointing at it
 4. A fact that a screen-reader user must be able to find
 
@@ -163,7 +163,7 @@ SWITCH (
 - Steps relates to nothing: its rows only give the waterfall its categories
 
 ::: {.notes}
-SELECTEDVALUE returns the step of the current bar, or a blank when the context holds more than one step, as it does for a total, and the last argument returns revenue itself. The promotions step is the price before discount less revenue, rather than the Discounts measure, so that the steps add up to the cent.
+SELECTEDVALUE returns the step of the current bar, or a blank when the context holds more than one step, as it does for a total, and the last argument returns revenue itself. The promotions step is revenue less the price before discount, a negative amount, rather than the Discounts measure with its sign reversed, so that the steps add up to the cent.
 :::
 
 ## Everyday prices take more than the promotions
@@ -241,12 +241,12 @@ Against the static budget, the page would show enormous unfavorable revenue vari
 ## Mark the variances, never with color alone
 
 - Conditional formatting places an icon beside a value, by rules
-- An arrow up for spending more than five percent above budget
-- A circle within five percent, an arrow down below
+- An arrow up for spending five percent or more above budget
+- A circle in between, an arrow down five percent or more below
 - Different shapes, beside the signed percentage, work in grayscale
 
 ::: {.notes}
-This is the rule Chapters 4 and 6 set and Chapter 13 applied to every visual: meaning never rests on color alone. A marker appears only where it signals something the reader should act on, and its threshold is stated.
+This is the rule Chapters 4 and 6 set and Chapter 13 applied to every visual: meaning never rests on color alone. A marker appears only where it signals something the reader should act on, and its threshold is stated. The five percent is this package's choice, not a standard.
 :::
 
 ## Check your understanding {.check}
@@ -401,11 +401,11 @@ Without the flex and the reconciliation, the page would have rewarded Sales for 
 
 - A page navigator's buttons follow the pages as they change
 - Detail and tooltip pages are hidden from the tabs and the navigator
-- A bookmark saves a page's state: good for a view, poor for navigation
+- A bookmark saves a page's state: for views, not page navigation
 - A field parameter lets the reader choose the measure a chart shows
 
 ::: {.notes}
-In Desktop, a button responds to a click only while Ctrl is held, so you can still select it to edit it; in the service it responds to a click. A bookmark captures a page as it was, so every change to the page means updating it. A field parameter is a small table listing fields with NAMEOF, and it cannot serve as the field of a drill-through or tooltip page.
+In Desktop, and while a report is edited in the service, a button responds to a click only while Ctrl is held, so you can still select it to edit it; a reader viewing the report simply clicks it. A bookmark keeps the state it captured, its filters, slicers, sort order and visible visuals, until someone updates it, while the navigator follows the pages by itself. Hiding a page tidies the navigation; it does not decide who may see the data. A field parameter is a small table listing fields with NAMEOF, and it cannot serve as the field of a drill-through or tooltip page.
 :::
 
 ## The About page documents the package
@@ -437,7 +437,7 @@ Ask students which of the four would go stale when the page changes.
 4. The About page, with a description on every measure
 
 ::: {.notes}
-The bookmark is the one that goes stale: it captures the page as it was.
+The bookmark is the one that can go stale: it keeps the state it captured until someone updates it.
 :::
 
 # Guided Tutorial 15.3: The Plant Page and the Package
@@ -447,7 +447,7 @@ The bookmark is the one that goes stale: it captures the page as it was.
 {{< book-steps 15.3 1-7 >}}
 
 ::: {.notes}
-Labor time and completions join the model as two more fact tables, with Employee, WorkCenter, Item and Date as dimensions. A labor line takes the work center of its operation, so indirect time has none and appears under (Blank). Standard hours are cut off at the last day with time records, so that hours and output cover the same days, as in Chapters 10 and 11.
+Labor time and completions join the model as two more fact tables, with Employee, WorkCenter, Item and Date as dimensions. A labor line takes the work center of its operation, so indirect time has none and appears under (Blank). Standard hours are cut off at the last day with time records, so that hours and output cover the same days, as in Chapters 10 and 11. Item filters the sales and the output, WorkCenter and Employee only the labor time, so the ratio of hours to output is meaningful for the whole plant over a period.
 :::
 
 ## Steps 8 to 13: compare, chart and finish the package
@@ -455,7 +455,7 @@ Labor time and completions join the model as two more fact tables, with Employee
 {{< book-steps 15.3 8-13 >}}
 
 ::: {.notes}
-The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Test 5 returns the yearly ratios of Chapter 11's view.
+The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Step 11 stops the work-center and job-title charts from filtering the KPI, and the report is saved on the About page, the page it then opens on. Test 5 returns the yearly ratios of Chapter 11's view.
 :::
 
 ## KEEPFILTERS lets the two filters combine
@@ -491,7 +491,7 @@ On a table that starts at the beginning of the data, the visual calculation of t
 {{< book-figure fig-15-11 crop="0,0,1,0.4284" >}}
 
 ::: {.notes}
-The plant used more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation.
+The plant used more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation. The bar chart does not filter the card or the line: one work center's hours over the whole plant's output would describe neither.
 :::
 
 ## Overtime rose alike for every job title
@@ -507,7 +507,7 @@ The overtime share rose by two-thirds or more from the first year to the latest 
 {{< book-checkpoint 15.3 lead="true" >}}
 
 ::: {.notes}
-The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Every number on it ties to a test, which is what makes it fit to be sent every month.
+The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Its control totals are tested against the earlier Parts, which is what makes it fit to be sent every month.
 :::
 
 # What-If Parameters and Forecasts
@@ -523,7 +523,7 @@ The package now answers three readers' questions on three pages, each with its c
 The parameter is a one-column table of the allowed values and a measure that returns the value the reader selected. The Part II case used Goal Seek to find the discount at which a promotion pays for itself; Exercise 15.4 builds the same calculation as a what-if page for the Design Trade promotion.
 :::
 
-## The forecast uses exponential smoothing
+## The forecast and exponential smoothing
 
 - The Analytics pane adds it to a line chart, with a length and an interval
 - Exponential smoothing weights recent observations more heavily
@@ -531,7 +531,7 @@ The parameter is a one-column table of the allowed values and a measure that ret
 - Judge it, as Chapter 7 did, against the same period last year
 
 ::: {.notes}
-A hindcast runs the forecast on older data to see how it would have predicted the recent past. Chapter 7's advice applies unchanged: a forecast is judged by how well it would have predicted periods you already know, against simple benchmarks.
+Microsoft described the method as exponential smoothing when it introduced the forecast in Power View; the Analytics pane's documentation still points to that article as dated but still relevant. A hindcast runs the forecast on older data to see how it would have predicted the recent past. Chapter 7's advice applies unchanged: a forecast is judged by how well it would have predicted periods you already know, against simple benchmarks.
 :::
 
 ## Watch out: a forecast learns from any history it gets {.watch-out}
@@ -552,7 +552,7 @@ Exercise 15.5 tests the forecast in this way before anyone trusts it.
 - Pages designed around each reader's question, with KPIs and comparisons
 - Drill-through pages and tooltips that reach the detail behind a number
 - Budget variances explained by volume, classification, rate and timing
-- Navigation, an About page, and a test for every page
+- Navigation, an About page, and tests of each page's totals
 
 ::: {.notes}
 Most of this work was descriptive and diagnostic analytics; the what-if parameter and the forecast are its first predictive and prescriptive tools, each to be judged before it is trusted. Chapter 16 turns to the internal auditor of Chapters 8 and 12, who will monitor the same data for exceptions and test whether the package itself can be relied on. How the package reaches its readers, and how each manager sees only their own cost center, is the subject of the appendix on publishing and security.

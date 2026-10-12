@@ -25,7 +25,7 @@ b. In column D of that row, type `=SUM(`, click the first Debit value in cell D2
 c. Enter the same kind of formula for the Credit column in column E.
 d. In the row below, type `Difference` in column C and enter a formula in column D that subtracts the credit total from the debit total.
 
-The two totals should be equal, or very nearly so (small differences may arise from rounding), as they are in @fig-02-07. If there is a significant difference, that indicates a serious consistency problem in the ledger.
+The two totals should be equal, or very nearly so (small differences may arise from rounding), as they are in @fig-02-07. If there is a significant difference, that indicates a serious consistency problem in the ledger. Equal totals show only that the ledger balances as a whole: an entry left out entirely, with its debit and its credit, would leave them equal, and so would errors that offset each other.
 
 ![Debit and Credit Totals at the Bottom of the GLEntry Worksheet.](/visuals/svg/fig-02-07-glentry-debit-credit-sum.svg){#fig-02-07 fig-alt="A mock of the bottom of the Charles River GLEntry worksheet in Excel, showing the last ledger rows, year-end journal entries dated 2026-12-31. After one blank row, a Total row shows the sum of the Debit column and the sum of the Credit column, which are equal, and a Difference row shows $0.00. The formula bar shows the difference formula, and the totals and the difference are outlined."}
 
@@ -35,7 +35,7 @@ a. Insert a PivotTable from the GLEntry worksheet and place AccountID in the **R
 b. Next to the PivotTable, use XLOOKUP or COUNTIFS to check whether each listed AccountID exists in the Account worksheet's AccountID column.
 c. Record the result.
 
-Any AccountID with no match is an orphaned reference. In the Charles River data, every AccountID should match. A clean result like this is still a finding worth recording, because it tells you that the ledger's account references can be relied on.
+Any AccountID with no match is an orphaned reference. In the Charles River data, every AccountID should match. A clean result like this is still a finding worth recording, because it tells you that every account the ledger refers to exists in the chart of accounts.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -53,7 +53,7 @@ Most periods contain a similar volume of entries, but the first period and the f
 
 **Step 7. Look for entries with no amount.** Examine the Debit and Credit columns for missing or unusual values. Filter for rows where both the Debit and Credit fields are zero, and record the count and the source document type. You will find a small number of such rows, all from the same source document type. An entry with no debit and no credit amount serves no accounting purpose. It may be a system artifact or a data entry error, and either way it should be investigated and explained.
 
-**Step 8. Check that every business cycle posts to the ledger.** Use a PivotTable to count the number of GLEntry rows for each value of the SourceDocumentType column, and record the distribution. You should see types such as "SalesInvoice," "Shipment," "PurchaseInvoice," "GoodsReceipt," "MaterialIssue," "PayrollPayment," "JournalEntry," and "WorkOrderClose." If an expected source type were absent, that would indicate a completeness problem, in which an entire business cycle failed to post to the ledger.
+**Step 8. Check that every business cycle posts to the ledger.** Use a PivotTable to count the number of GLEntry rows for each value of the SourceDocumentType column, and record the distribution. You should see types such as "SalesInvoice," "Shipment," "PurchaseInvoice," "GoodsReceipt," "MaterialIssue," "PayrollPayment," "JournalEntry," and "WorkOrderClose." If an expected source type were absent from a period in which that activity took place, that would indicate a completeness problem, in which an entire business cycle failed to post to the ledger. Finding every type present is weaker evidence: it cannot show that every transaction of each type was posted.
 
 **Checkpoint.** At this point, you should have assessed the Charles River Accounting Core against the quality dimensions in @tbl-02-03:
 

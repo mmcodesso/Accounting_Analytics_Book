@@ -1,4 +1,4 @@
-## Guided Tutorial 6.1: Profiling Fiscal 2026 and Proving the Total
+## Guided Tutorial 6.1: Profiling Fiscal 2026 and Checking the Total
 
 **Context and objective.** In this tutorial, you will build the first part of the controller's request: a statistical profile of the invoice lines billed in fiscal 2026 and a summary of revenue by product line. You will store the fiscal year in a named cell, so that one change updates every number, calculate statistics with and without criteria, and compare the product lines with a control total. The comparison will find something the product-line list leaves out. Finally, you will chart the distribution of the line totals as a histogram.
 
@@ -110,7 +110,7 @@ d. In G17, the last bin, which has no upper bound, enter:
 
 e. Type `Total` in F18, and enter `=SUM(G2:G17)` in G18.
 
-G18 equals the number of lines in B2, so every line of the year falls in exactly one bin. The first bin holds the most lines, and the counts shrink as the amounts grow.
+G18 equals the number of lines in B2, so every line of the year falls in exactly one bin. The first bin holds the most lines, and the counts generally shrink as the amounts grow. The last bin is taller than the two before it because it has no upper bound: it gathers every line of $15,000 or more.
 
 **Step 9. Chart the bins as a histogram.**
 
@@ -120,7 +120,7 @@ c. Right-click a bar, choose **Format Data Series**, and set **Gap Width** to 0%
 
 The chart in @fig-06-02 rises to its highest bar at the left and trails off to the right: most lines are under a few thousand dollars, and a thin tail reaches far beyond them. That is the right skew that the average and the median described in Step 4, now visible at a glance.
 
-![The Distribution of Fiscal 2026 Line Totals.](/visuals/svg/fig-06-02-line-total-histogram.svg){#fig-06-02 fig-alt="A mock of columns F and G of the Profile worksheet and a chart beside them. The table lists the lower bound of each 1,000-dollar bin, from 0 to 15,000, with the number of fiscal 2026 invoice lines in each and a total that equals the year's line count; the formula bar shows the COUNTIFS formula of the first bin. The chart is a histogram of the counts: the first bins are the tallest, and the bars fall steadily toward the right, with a long, thin tail of large lines and a small last bin for lines of 15,000 dollars or more."}
+![The Distribution of Fiscal 2026 Line Totals.](/visuals/svg/fig-06-02-line-total-histogram.svg){#fig-06-02 fig-alt="A mock of columns F and G of the Profile worksheet and a chart beside them. The table lists the lower bound of each 1,000-dollar bin, from 0 to 15,000, with the number of fiscal 2026 invoice lines in each and a total that equals the year's line count; the formula bar shows the COUNTIFS formula of the first bin. The chart is a histogram of the counts: the first bins are the tallest, and the bars generally fall toward the right into a long, thin tail of large lines, ending in an open-ended last bin, labeled 15k+, for lines of 15,000 dollars or more."}
 
 **Step 10. Document the profile.**
 

@@ -89,7 +89,7 @@ def invoices_by_delivery(d) -> list[dict]:
     for sid, number, invoiced, shipped, delivered, posted, sub in rows:
         late = posted[:4] != delivered[:4]
         out.append(dict(id=sid, number=number, date=invoiced, shipped=shipped, delivered=delivered, posted=posted,
-                        sub=sub, late=late, before=not late and invoiced < shipped))
+                        sub=sub, late=late, early=invoiced < shipped, before=not late and invoiced < shipped))
     return out
 
 
@@ -154,12 +154,16 @@ def ex1(d, claim):
     claim(s1 > s2, f"{d.P} is overstated (received more than it moved on)")
     claim(value > s2, f"{d.C} is understated (unbilled more than received)")
     before = [i for i in invoices if i["before"]]
+    early = [i for i in invoices if i["early"]]
+    both = [i["number"] for i in early if i["late"]]
+    claim(len(both) <= 1, "at most one invoice dated before its shipment was also posted in the next year")
     ex52 = {r[0] for r in d.q("SELECT InvoiceNumber FROM SalesInvoice WHERE substr(InvoiceNumber, 4, 4) <> substr(InvoiceDate, 1, 4)")} | \
         {r[0] for r in d.q("SELECT si.InvoiceNumber FROM SalesInvoice si JOIN SalesOrder so ON so.SalesOrderID = si.SalesOrderID "
                            "WHERE si.InvoiceDate < so.OrderDate")}
-    numbers = {i["number"] for i in before}
-    only_ex52, only_before = sorted(ex52 - numbers), sorted(numbers - ex52)
-    claim(set(only_ex52) <= odd_numbers, "the Exercise 5.2 invoices missing from the list are revenue cutoff errors")
+    numbers = {i["number"] for i in early}
+    only_ex52, only_early = sorted(ex52 - numbers), sorted(numbers - ex52)
+    claim(set(both) <= odd_numbers, "the invoice dated before its shipment and posted in the next year is a cutoff error "
+                                    "dated before the year-end")
     differences = [i for i in invoices if int(i["posted"][:4]) == d.C and i["date"][:4] != i["posted"][:4]]
     cutoff_errors = [i["number"] for i in differences if i["late"]]
     late_pi = [dict(number=r[0], received=r[1], posted=r[2]) for r in d.q(
@@ -222,8 +226,9 @@ def ex1(d, claim):
     return dict(g1=dict(word=word(len(g1)).capitalize(), sub=s1, odd=odd1), g2=dict(word=word(len(g2)), sub=s2, odd=odd2),
                 n_unbilled=word(len(unbilled)).capitalize(), cost=cost, value=value,
                 eff1=s1, eff2=s1 - s2, eff3=round(value - s2, -1),
-                n_before=word(len(before)).capitalize(), before=runs([i["number"] for i in before]),
-                only_ex52=only_ex52, only_before=only_before, cutoff_errors=cutoff_errors,
+                n_early=word(len(early)).capitalize(), n_before=word(len(before)),
+                before=runs([i["number"] for i in before]), both=both,
+                only_ex52=only_ex52, only_early=only_early, cutoff_errors=cutoff_errors,
                 n_differences=word(len(differences)), late_pi=late_pi, crossing=crossing, n_crossing=word(len(crossing)),
                 hourly=[dict(work=r[0], paid=r[1], total=r[2], mfg=r[3]) for r in hourly],
                 full=[thousands(late_december_cost(d, y)) for y in (d.F, d.P)],
@@ -318,6 +323,10 @@ def ex3(d, claim):
     # first year, whose share is 0.00.
     cutoff = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry")
     claim(cutoff[:4] == str(d.C), "the time records end in the current fiscal year")
+    claim(d.one("SELECT COUNT(*) FROM LaborTimeEntry lt JOIN WorkOrderOperation op ON op.WorkOrderOperationID = "
+                "lt.WorkOrderOperationID WHERE lt.LaborType = 'Direct Manufacturing' AND (op.ActualStartDate IS NULL "
+                "OR lt.WorkDate < op.ActualStartDate)") == 0,
+          "no direct time is dated before its operation's ActualStartDate (and every operation with time has one)")
     rows = d.q("SELECT CAST(strftime('%Y', op.ActualEndDate) AS INTEGER), wc.WorkCenterName, SUM(op.PlannedLoadHours), "
                "SUM(lab.H), SUM(lab.Hin) FROM WorkOrderOperation op JOIN WorkCenter wc ON wc.WorkCenterID = op.WorkCenterID "
                "LEFT JOIN (SELECT lt.WorkOrderOperationID AS id, SUM(lt.RegularHours + lt.OvertimeHours) AS H, "
@@ -325,8 +334,8 @@ def ex3(d, claim):
                "FROM LaborTimeEntry lt JOIN WorkOrderOperation o2 ON o2.WorkOrderOperationID = lt.WorkOrderOperationID "
                "WHERE lt.LaborType = 'Direct Manufacturing' GROUP BY lt.WorkOrderOperationID) lab ON lab.id = op.WorkOrderOperationID "
                "WHERE op.ActualEndDate <= ? GROUP BY 1, 2 ORDER BY 1, 2", cutoff)
-    # all hours as Tutorial 11.2 compares them (hours rounded before dividing); the hours while open unrounded
-    ratio = {(y, c): dict(all=round(h) / round(p), open=hin / p) for y, c, p, h, hin in rows}
+    # all hours as Tutorial 11.2 compares them, and the hours while open, both unrounded
+    ratio = {(y, c): dict(all=h / p, open=hin / p) for y, c, p, h, hin in rows}
     centers = sorted({c for _, c, *_ in rows})
     short = lambda c: c.removesuffix(" Work Center")
     claim(all(ratio[(d.C, c)]["open"] < 1 for c in centers), f"every work center falls below plan in {d.C} on the time while open")
@@ -525,15 +534,17 @@ def ex6(d, claim):
                    "ON pi.PurchaseInvoiceID = p.PurchaseInvoiceID WHERE p.PaymentDate <= ?", end)
 
     def mad(amounts: list[float]) -> float:
-        digits = Counter(int(f"{a:e}"[0]) for a in amounts)
+        digits = Counter(int(f"{a:.15e}"[0]) for a in amounts)
         n = sum(digits.values())
         return sum(abs(digits[k] / n - math.log10(1 + 1 / k)) for k in range(1, 10)) / 9
 
     smallest = min(a for a, _ in payments)
     claim(smallest > 0, "every payment is positive")
+    claim(all(f"{a:e}"[0] == f"{a:.15e}"[0] for a, _ in payments),
+          "no payment's first digit changes between six and fifteen decimals")
     return dict(n_dupes=word(len(dupes)), n_checks=word(len(checks)).capitalize(), check_supplier=checks[0][0],
                 checks=[r[1] for r in checks], n_logged=word(len(logged)), n_with_check=word(len(with_check)),
                 pairs=len(pairs), within30=sum(1 for r in pairs if abs(r[0]) <= 30),
                 within14=sum(1 for r in pairs if abs(r[0]) <= 14), series=series,
                 mad_all=mad([a for a, _ in payments]), mad_full=mad([a for a, g in payments if abs(a - g) < 0.005]),
-                mad_partial=mad([a for a, g in payments if a < g - 0.005]), smallest=smallest, smallest_e=f"{smallest:e}")
+                mad_partial=mad([a for a, g in payments if a < g - 0.005]), smallest=smallest, smallest_e=f"{smallest:.15e}")

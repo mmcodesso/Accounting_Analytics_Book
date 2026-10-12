@@ -11,12 +11,13 @@
 a. Choose **Data > Get Data > From File > From Excel Workbook**, and select CharlesRiver.xlsx.
 b. In the **Navigator**, select the **T2_JournalEntry**, **T74_Employee**, and **T1_Account** Tables, and click **Transform Data**.
 c. Rename the queries `JournalEntries`, `Employees`, and `Accounts`.
-d. In Employees, keep EmployeeID, EmployeeName, JobTitle, and MaxApprovalAmount. In Accounts, keep AccountID, AccountNumber, and AccountName. Clear **Enable Load** for both.
+d. In Employees, keep EmployeeID, EmployeeName, JobTitle, and MaxApprovalAmount. In Accounts, keep AccountID, AccountNumber, and AccountName.
 e. In JournalEntries, set the type of PostingDate to **Date**, and of CreatedDate and ApprovedDate to **Date/Time**.
 f. Merge JournalEntries with **Employees**, matching ApprovedByEmployeeID with EmployeeID, with a left outer join. Expand EmployeeName, JobTitle, and MaxApprovalAmount without the prefix.
 g. Rename the three new columns `ApproverName`, `ApproverTitle`, and `ApproverLimit`.
 h. Merge JournalEntries with **Employees** again, matching CreatedByEmployeeID with EmployeeID. Expand EmployeeName and JobTitle without the prefix, and rename them `CreatorName` and `CreatorTitle`.
-i. Choose **Home > Close & Load**, and rename the new worksheet `JournalEntries`.
+i. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection**, and click **OK**. The choice applies to all three new queries.
+j. Open **Data > Queries & Connections**, right-click **JournalEntries**, choose **Load To**, and load it as a **Table** on a **New worksheet**, as in Tutorial 8.1, Step 1. Rename the new worksheet `JournalEntries`.
 
 The JournalEntries Table holds several hundred entries, each with the names of the people who created and approved it and the approver's limit.
 
@@ -35,7 +36,7 @@ b. Check a few rows by hand. For example, an entry whose CreatedByEmployeeID equ
 
 : The flag columns of the JournalEntries Table {#tbl-08-04}
 
-WEEKDAY with the second argument 2 numbers the days from Monday (1) to Sunday (7), so values above 5 are Saturdays and Sundays. INT removes the time from CreatedDate, so Backdated is TRUE for an entry created on a later day than the date it posts to. ApproverLimit is the approver's MaxApprovalAmount, and RoundAmount is TRUE for totals in exact thousands.
+WEEKDAY with the second argument 2 numbers the days from Monday (1) to Sunday (7), so values above 5 are Saturdays and Sundays. INT removes the time from CreatedDate, so Backdated is TRUE for an entry created on a later day than the date it posts to. ApproverLimit is the approver's MaxApprovalAmount, and RoundAmount is TRUE for totals in exact thousands. The Employee table holds only each employee's current limit, so AboveLimit assumes that the limit applied on the date of every entry; a history of the limits would be the evidence to request before calling an exception a breach.
 
 **Step 3. Combine the flags into a risk score.**
 
@@ -95,7 +96,7 @@ h. Type the headings `AccountNumber`, `AccountName`, `Debit`, and `Credit` in A3
 
 i. Type another entry number, such as `JE-2026-000296`, in B1 to see its lines, and then type `JE-2024-000001` again.
 
-B15 and B16 agree, so the entries' headers and their ledger lines describe the same population. The formula in A4 spills the eighteen lines of the opening balance entry, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger.
+B15 and B16 agree: the entries' headers and their ledger lines carry the same total, a control total for the population of journal entries. The formula in A4 spills the eighteen lines of the opening balance entry, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger.
 
 ![The Ledger Lines of the Opening Balance Entry.](/visuals/svg/fig-08-08-journal-entry-drilldown.svg){#fig-08-08 fig-alt="A mock of the Drilldown worksheet, with the FILTER formula of cell A4 in the formula bar and the entry number JE-2024-000001 in B1. Eighteen spilled rows list the account number, account name, debit, and credit of each ledger line of the entry: cash, accounts receivable, inventories, prepaid expenses, and equipment on the debit side; accounts payable, accruals, accumulated depreciation, common stock, and retained earnings on the credit side. The accounts receivable line is outlined."}
 
@@ -117,4 +118,4 @@ The completed workpaper records the journal entry tests in a form that another a
 - the Dispositions worksheet holds a disposition for every entry with a score of 1 or more;
 - the totals of the JournalEntries and JournalLines Tables agree, and the Drilldown worksheet shows the accounts receivable line of JE-2024-000001.
 
-The journal entry tests found no sign of a concealed misstatement in the recurring entries. They did find weaknesses in how entries are approved, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.
+The journal entry tests explained the flags on the recurring entries by their timing, which still leaves their amounts and approvals to be checked against their schedules before the entries are cleared. They did find weaknesses in how entries are approved, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.

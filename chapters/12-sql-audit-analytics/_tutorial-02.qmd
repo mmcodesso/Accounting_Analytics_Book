@@ -111,7 +111,7 @@ b. Compare the two columns.
 
 The value of the receipts not yet invoiced agrees with the balance of account 2020 to within a dollar, the rounding of the amounts by which invoice lines clear the account, so the ledger's liability is supported by the detail of the open receipts. That does not prove it complete: a receipt never recorded would be missing from both sides, which is why auditors also search for unrecorded liabilities among the invoices received after the year-end. The test reads all the data, which ends with fiscal 2026; to rerun it at another date, bound the receipts and invoices by date, as Exercise 12.2 does.
 
-**Step 4. Test the approvals of the purchase orders.** Three tests, joined with UNION ALL in a CTE, are summarized in one result. PurchaseOrder records no approval date, so the order date stands in for it.
+**Step 4. Test the approvals of the purchase orders.** Three tests, joined with UNION ALL in a CTE, are summarized in one result. PurchaseOrder records no approval date, so the order date stands in for it, and the third test is named for what it measures: orders dated after their approver left.
 
 a. Type and run the test below.
 
@@ -129,7 +129,7 @@ a. Type and run the test below.
                ON e.EmployeeID = po.ApprovedByEmployeeID
        WHERE po.OrderTotal > e.MaxApprovalAmount
        UNION ALL
-       SELECT 'Approved after termination', po.PONumber, po.OrderTotal
+       SELECT 'Dated after approver left', po.PONumber, po.OrderTotal
        FROM PurchaseOrder AS po
            INNER JOIN Employee AS e
                ON e.EmployeeID = po.ApprovedByEmployeeID
@@ -146,7 +146,7 @@ b. Read the number of orders and their value for each test.
 
 The summary, shown in @fig-12-06, flags between three and thirteen orders for each test, the exceptions that Exercise 8.5 found in Excel. Most of their value is in a few large orders.
 
-![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-06-approval-exceptions.svg){#fig-12-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows a test whose CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and approved after the approver's termination. The summary grid shows each test with its number of orders and their total value, between three and thirteen orders for each test. The grid is outlined."}
+![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-06-approval-exceptions.svg){#fig-12-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows a test whose CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and dated after the approver's termination. The summary grid shows each test with its number of orders and their total value, between three and thirteen orders for each test. The grid is outlined."}
 
 **Step 5. List the orders behind the exceptions.** A second CTE groups the exceptions by order, with GROUP_CONCAT, the aggregate of @tbl-10-02 that joins text, listing the tests each order fails in one cell. Employee appears twice in the final query, as c for the employee who created the order and as a for the approver.
 
@@ -167,7 +167,7 @@ b. Edit the copy until it reads as below: change the comment, type a comma after
                ON e.EmployeeID = po.ApprovedByEmployeeID
        WHERE po.OrderTotal > e.MaxApprovalAmount
        UNION ALL
-       SELECT 'Approved after termination', po.PONumber, po.OrderTotal
+       SELECT 'Dated after approver left', po.PONumber, po.OrderTotal
        FROM PurchaseOrder AS po
            INNER JOIN Employee AS e
                ON e.EmployeeID = po.ApprovedByEmployeeID
@@ -191,7 +191,7 @@ b. Edit the copy until it reads as below: change the comment, type a comma after
 
 c. Read the job titles, the approval limit, and the tests of each order.
 
-Fourteen orders are flagged, and most fail two tests. The two largest are the capital-equipment orders whose note-financed invoices you met in Exercise 8.2, created and approved by the Purchasing Manager, above that manager's limit and above even the chief financial officer's. Three orders were approved by an Account Executive, a sales employee with no approval authority, after the date of that employee's termination: the employee of Tutorial 12.1. Several small orders were approved by buyers and analysts whose approval limit is zero. Each is an exception in the operation of the approval control, and each needs a disposition.
+Fourteen orders are flagged, and most fail two tests. The two largest are the capital-equipment orders whose note-financed invoices you met in Exercise 8.2, created and approved by the Purchasing Manager, above that manager's limit and above even the chief financial officer's. Three orders name as their approver an Account Executive, a sales employee with no approval authority, and are dated after that employee's termination: the employee of Tutorial 12.1. Whether they were approved after the termination, and by whom, only the approval records can show. Several small orders were approved by buyers and analysts whose approval limit is zero. Each is an exception in the operation of the approval control, and each needs a disposition.
 
 **Step 6. Measure the concentration of approvals.** An approval control also depends on how many people share it. The test groups by the approver's key, not by the job title, which several employees share.
 
@@ -216,7 +216,7 @@ The chief financial officer approved nearly every purchase order in the three ye
 - the three-way match reports no line invoiced above received or received above ordered;
 - no invoice price differs from its order price by more than three percent;
 - the receipts not yet invoiced agree with account 2020 to within a dollar;
-- the approval tests flag fourteen orders, among them two large self-approved orders and three approved after a termination, and one person approved almost all the others;
+- the approval tests flag fourteen orders, among them two large self-approved orders and three dated after their approver's termination, and one person approved almost all the others;
 - Audit.sql holds this tutorial's six tests under their comments.
 
-The purchasing chain holds together. What it received it was billed for, at prices close to the orders, and its liability for unbilled receipts agrees with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.
+The purchasing chain holds together in the records tested: no line was billed for more than was received, prices were close to the orders, and the liability for unbilled receipts agrees with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.

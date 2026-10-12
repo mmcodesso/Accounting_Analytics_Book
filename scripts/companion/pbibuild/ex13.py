@@ -103,16 +103,19 @@ def ex1(b: Build) -> None:
         "; ".join(f"{g} {money(v)}" for g, v in cur["groups"]) + f"; total {money(cur['total'])}.",
         "(2) SubTotal by fiscal year equals the line totals exactly: " +
         "; ".join(f"{x['year']} {money(x['total'])} on {x['n']:,} invoices" for x in yrs) +
-        ". No invoice is without lines.",
+        ". No invoice is without lines. Equal annual totals cannot show that every invoice agrees, since differences "
+        "between invoices could offset (Tutorial 4.1, Step 10); compared invoice by invoice, all "
+        f"{ctx['n_all']:,} invoices equal their lines within half a cent.",
         "(3) GrandTotal (" + "; ".join(money(x["grand"]) for x in yrs) + ") is SubTotal plus freight (" +
         "; ".join(money(x["freight"]) for x in yrs) + ") plus sales tax (" + "; ".join(money(x["tax"]) for x in yrs) +
         "). The lines hold only the goods and services sold, so they reconcile to SubTotal. Revenue from the sale of "
         f"goods and services is SubTotal: freight billed to the customer posts to its own revenue account ({freight}), "
         f"and sales tax is collected for the state and posts to a liability ({tax}), as Chapter 10's trace of "
         f"{ctx['traced']} showed.",
-        "(4) SalesInvoice already relates the invoices to their lines. A second table with the same key would be a "
-        "second path from the invoices to the lines, and the model keeps one table per entity; InvoiceHeaders exists "
-        "only to test the header amounts, so it stays unrelated (a filter on Item does not change its totals)."]))
+        "(4) InvoiceHeaders is a control: its totals come from the invoice table alone, so they test the model instead "
+        "of depending on its relationships (a filter on Item does not change them). Relating it would not create an "
+        "ambiguous path, but it would add a second table for the same invoices, whose FiscalYear could filter the lines "
+        "alongside SalesInvoice's."]))
     page.expect = ["FiscalYear", money(dict(cur["groups"])["Furniture"]), money(cur["total"]), "GrandTotal",
                    money(cur["grand"]), "Model answer: Exercise 13.1"]
 
@@ -252,8 +255,13 @@ def ex3(b: Build) -> None:
         "error in the end date, not discounts given outside the promotion (the Part II case).",
         f"(5) In fiscal {y} the promotions gave away {money(ctx['total'])}: " +
         "; ".join(f"{p['short']} {money(p['disc'])}" for p in sorted(ctx["promos"], key=lambda p: -p["disc"])) +
-        ". The report shows what each promotion cost and when, but not whether it paid off: that needs the margin given up "
-        "against the volume it added (Chapter 7 and the Part II case)."]))
+        ". By item group: " + ", ".join(f"{g} {money(v)}" + (f" ({pct(v / ctx['total'])})" if i == 0 else "")
+                                        for i, (g, v) in enumerate(ctx["groups"])) +
+        "".join(f"; {g} none" for g in ctx["no_disc"]) + ". The segment promotions (" +
+        " and ".join(p["short"] for p in ctx["spread"]) + ") reached " + ", ".join(ctx["spread"][0]["groups"][:-1]) +
+        f", and {ctx['spread'][0]['groups'][-1]}, while the others stayed in their own group. The report shows what each promotion cost and when, but not "
+        "whether it paid off: that needs the margin given up against the volume it added (Chapter 7 and the Part II "
+        "case)."]))
     top = cur[0]
     names = dict(rows("SELECT PromotionID, PromotionName FROM PromotionProgram"))
     # the matrix scrolls sideways (twelve months of two values), so the values checked are from its first months
@@ -283,6 +291,9 @@ def ex3(b: Build) -> None:
     b.check(t, "(Blank) row: discounts", 0, f"CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmount] ), {fy}, {blank} )", 0.005)
     b.check(t, f"discounts in fiscal {y}", round(ctx["total"], 2),
             f"CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmount] ), {fy} )", 0.01)
+    for g, v in ctx["groups"]:
+        b.check(t, f"discounts in fiscal {y} on {g}", round(v, 2),
+                f"CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmount] ), {fy}, 'Item'[ItemGroup] = \"{g}\" )", 0.01)
     b.check(t, f"promotions with fiscal {y} lines that end before they start", names[bad["id"]],
             "CALCULATE ( CONCATENATEX ( FILTER ( VALUES ( PromotionProgram[PromotionID] ), "
             "CALCULATE ( COUNTROWS ( SalesInvoiceLine ) ) > 0 && CALCULATE ( MAX ( PromotionProgram[EffectiveEndDate] ) ) "
@@ -360,28 +371,35 @@ def ex5(b: Build) -> None:
     top, n, inv = ch13.TOP_ROWS, ctx["n"], ctx["invoices"]
     share = lambda k, of: f"{k:,} ({k / of:.1%})"
     page = b.report.add(Page("ex135", "Ex 13.5", height=900))
+    # Requirements (2) and (3): every column that has empty values, on both bases, from the census of the raw Tables
     left = [
-        "Profile of the four sales Tables, CharlesRiver.xlsx, as Power Query profiles them: on the top "
-        f"{top:,} rows (the default) and on the entire data set. Empty = null in Column quality; distinct = Column "
-        "distribution.", "",
-        (f"Profile_Lines ({n:,} rows)", True),
-        f"PromotionID empty: {share(ctx['promo'], n)} on the entire data set; {ctx['top_empty']:.0%} of the top {top:,}.",
-        f"PriceOverrideApprovalID empty: {share(ctx['override'], n)}; {ctx['override_top']:,} of the top {top:,}.",
-        f"PriceListLineID and ShipmentLineID empty: {share(ctx['base'], n)} (the Base List design-service lines); "
-        f"{ctx['base_top']} of the top {top:,}.",
-        f"PricingMethod: {ctx['methods']} distinct values on both bases. Discount: {ctx['discounts']} distinct on the "
-        f"entire data set, {ctx['discounts_top']} (zero) on the top {top:,}.",
-        f"Quantity is fractional on {ctx['fractional']:,} lines (Chapter 5's validity check).", "",
-        (f"Profile_Invoices ({inv:,} rows)", True),
-        f"PaymentDate empty: {share(ctx['unpaid'], inv)} ({ctx['unpaid_open']:,} open invoices, {ctx['unpaid_settled']} "
-        f"Settled); {ctx['unpaid_top']} of the top {top:,}.",
-        f"Status: {len(ctx['statuses'])} distinct ({', '.join(ctx['statuses'])}); {len(ctx['top_statuses'])} "
-        f"({', '.join(ctx['top_statuses'])}) on the top {top:,}.", "",
-        (f"Profile_Items ({ctx['items']:,} rows; {ctx['sellable']} with a ListPrice)", True),
-        f"ListPrice empty on {ctx['unpriced']} items (bought, not sold). CollectionName empty on {ctx['blank']} of the "
-        f"sellable items (all {ctx['acc']} Accessories, {ctx['fur']} Furniture, the {ctx['svc']} services).", "",
-        (f"Profile_Customers ({ctx['customers']} rows)", True),
-        f"No empty values. CustomerName has {ctx['names']} distinct values ({' and '.join(ctx['dup'])} twice)."]
+        "Profile of the four sales Tables, CharlesRiver.xlsx, as Power Query profiles them: empty values in every "
+        f"column that has any, on the top {top:,} rows (the default) against the entire data set, each share of the "
+        "rows on its basis. Empty = null in Column quality; distinct = Column distribution. No other column has an "
+        "empty value.", ""]
+    for tbl in ctx["census"]:
+        whole = tbl["n"] <= top
+        left.append((f"{tbl['query']} ({tbl['n']:,} rows" +
+                     (f", all within the top {top:,}, so both bases agree)" if whole else ")"), True))
+        cells = [f"{c['name']} " + ("" if whole else f"{share(c['top'], tbl['top_n'])} against ") +
+                 share(c["full"], tbl["n"]) for c in tbl["columns"]]
+        left.append("; ".join(cells) + "." if cells else "No empty values.")
+        if tbl["query"] == "Profile_Lines":
+            left.append(f"PricingMethod: {ctx['methods']} distinct values on both bases. Discount: "
+                        f"{ctx['discounts_top']} (zero) on the top {top:,} against {ctx['discounts']} distinct. Quantity "
+                        f"is fractional on {ctx['fractional']:,} lines (Chapter 5's validity check, not a blank).")
+        elif tbl["query"] == "Profile_Invoices":
+            left.append(f"Status: {len(ctx['top_statuses'])} ({', '.join(ctx['top_statuses'])}) on the top {top:,} "
+                        f"against {len(ctx['statuses'])} ({', '.join(ctx['statuses'])}). The {ctx['unpaid']} empty "
+                        f"PaymentDates are {ctx['unpaid_open']:,} open invoices and {ctx['unpaid_settled']} Settled.")
+        elif tbl["query"] == "Profile_Items":
+            left.append(f"{ctx['sellable']} items have a ListPrice; the {ctx['unpriced']} without one are bought, not "
+                        f"sold. Of the {ctx['coll_raw']} empty CollectionNames, {ctx['blank']} are on sellable items "
+                        f"(all {ctx['acc']} Accessories, {ctx['fur']} Furniture, the {ctx['svc']} services).")
+        else:
+            left.append(f"CustomerName has {ctx['names']} distinct values ({' and '.join(ctx['dup'])} twice), so "
+                        "complete does not mean unique.")
+        left.append("")
     right = [
         ("Why the first rows mislead", True),
         f"The top {top:,} rows are the earliest records: lines to {ctx['first_line']} and invoices to "
@@ -389,18 +407,21 @@ def ex5(b: Build) -> None:
         "dated earlier). They predate the first promotion, and almost every invoice among them is paid, so Discount, "
         "PromotionID, PaymentDate, and Status look far cleaner and simpler than the Tables are. Overrides already occur "
         f"({(top - ctx['override_top']) / top:.1%} of the top {top:,} against {(n - ctx['override']) / n:.1%} overall).",
-        "Columns whose profile changes materially: PromotionID, Discount, PriceOverrideApprovalID, PriceListLineID, "
-        "ShipmentLineID, PaymentDate, and Status. Switch the status bar to Column profiling based on entire data set "
-        "before relying on a profile.", "",
+        "The changes that matter are PromotionID, PaymentDate, Discount, and Status; the blanks of "
+        f"{', '.join(ctx['small'][:-1])}, and {ctx['small'][-1]} move by under one percentage point. The Item and "
+        "Customer profiles cannot change, because the top 1,000 rows already hold every row. Switch the status bar to "
+        "Column profiling based on entire data set before relying on a profile.", "",
         ("Blanks", True),
-        "PromotionID: a meaningful blank (no promotion). PaymentDate: a meaningful blank (unpaid), but the Settled "
-        "invoices without one are a matter for follow-up. PriceListLineID on Base List lines: meaningful (design "
-        f"services are priced from the base list). CollectionName on the {ctx['fur_word']} Furniture items: follow-up "
-        f"(the Part II case found one of them, {ctx['item']}, ordered under the {ctx['collection']} promotion).", "",
+        "PromotionID: a meaningful blank (no promotion). PaymentDate: a meaningful blank on the open invoices, but the "
+        "Settled invoices without one are a matter for follow-up. PriceListLineID and ShipmentLineID on the Base List "
+        "lines: meaningful (design services are priced from the base list and ship nothing). CollectionName on the "
+        f"{ctx['fur_word']} Furniture items: follow-up (the Part II case found one of them, {ctx['item']}, ordered "
+        f"under the {ctx['collection']} promotion). The other Item blanks (the routing, the accounts, and the product "
+        "attributes) depend on each item's type and supply mode, so read them by those before calling them errors.", "",
         ("Conclusion for the file", True),
-        "The four Tables are complete and keyed (every line finds its invoice, item, and customer). The blanks are "
-        "explained except the ones marked for follow-up, Quantity is fractional, and two customer names belong to two "
-        "customers each, so the report groups by key."]
+        "Every line finds its invoice, item, and customer, and none of those keys is empty. The blanks are explained except "
+        "the ones marked for follow-up, Quantity is fractional, and two customer names belong to two customers each, "
+        "so the report groups by key. The profile describes the Tables; it does not show why an exception occurred."]
     page.add(answer("memo", 20, 20, 610, 860, "Exercise 13.5, profile memo", left))
     page.add(textbox("memoRight", 650, 20, 610, 860, right, size=10))
     page.expect = ["Model answer: Exercise 13.5, profile memo", "Why the first rows mislead"]
@@ -459,7 +480,10 @@ def ex6(b: Build) -> None:
                             "holds more than half of revenue; Services is the smallest group."))
     rev.add(card("discountCards", 640, 20, 620, 110, [(DA, "Promotional discounts"), (LA, "Revenue at list price")],
                  units_none=True, title=f"Promotional discounts beside revenue at list price, fiscal {y}",
-                 filters=[keep("discountCardsYear", FY, [y])]))
+                 filters=[keep("discountCardsYear", FY, [y])],
+                 alt_text=f"Two cards for fiscal {y}: the promotional discounts in dollars and the revenue at list "
+                          "price, shown side by side in place of an average of the line rates, which weights a small "
+                          "line as much as a large one."))
     rev.add(Visual("yearColumns", "clusteredColumnChart", 640, 150, 620, 130, {"Category": [FY], "Y": [LT]},
                    title=f"Revenue by fiscal year, {first} to {y}", objects=labels(),
                    alt_text=f"Revenue by whole fiscal year from {first} to {y}, with data labels. Revenue grew "
@@ -490,17 +514,19 @@ def ex6(b: Build) -> None:
         f"December {y} look {pct(ctx['growth'], 0)} higher. Whole years changed by " +
         " and ".join(spct(c) for c in ctx["changes"]) + ". Start the axis at zero and compare whole years.",
         "Line and clustered column chart: the discounts get their own axis and look comparable to revenue, although "
-        f"they were {pct(ctx['peak']['share'])} of revenue in {ctx['peak']['month']} {y}, their largest month. Use one "
-        "axis, or two charts with titles that name their scales.",
+        f"they were {pct(ctx['peak']['share'])} of revenue in {ctx['peak']['month']} {y}, their largest month "
+        f"({pct(ctx['peak_shown'])} of the revenue the draft chart shows, without Services). Use one axis, or two "
+        "charts with titles that name their scales.",
         f"Hidden filter: leaving out Services removes {money(ctx['services'])} ({pct(ctx['services_share'])}) of fiscal "
         f"{y} revenue from the chart without telling the reader. Remove it, or make it a visible slicer and say so in "
         "the title.",
         ("(3) and (4) The revised page", True),
         "Each element is replaced by an honest equivalent: a sorted bar chart with labels, the discount dollars beside "
         "revenue at list price (a discount rate needs a measure, Chapter 14), whole years and an axis from zero, "
-        "revenue and discounts on one axis, and no hidden filter. Accessibility: every visual has a title that states "
-        "what it shows and for which period, and alternative text; data labels carry the values, so no meaning rests on "
-        "color; the report keeps the default theme, whose text meets the 4.5 to 1 contrast threshold."]))
+        "revenue and discounts on one axis, and no hidden filter. Accessibility: every chart and card has a title that "
+        "states what it shows and for which period, and alternative text; data labels carry the values, so no meaning "
+        "rests on color; the report keeps the default theme, whose text should still be checked against the 4.5 to 1 "
+        "contrast threshold, as the chapter says of any theme."]))
     rev.expect = [f"Revenue by item group, fiscal {y} (all item groups, including Services)",
                   "Promotional discounts", money(ctx["services"]), "Model answer: Exercise 13.6, review notes"]
 

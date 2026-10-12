@@ -1,6 +1,6 @@
 ## Guided Tutorial 14.2: Writing and Testing the Margin Measures
 
-**Context and objective.** In this tutorial, you will write the measures that answer the managers' questions about margin and discounts, and prove them. You will collect the measures in a table of their own, build the sales measures from simple sums to a ratio with a variable, use CALCULATE to fix a filter and to remove one, and show Furniture's margin by quarter. Finally, you will write a tab of tests in DAX query view that compares the measures with the totals of Chapter 6.
+**Context and objective.** In this tutorial, you will write the measures that answer the managers' questions about margin and discounts, and test them. You will collect the measures in a table of their own, build the sales measures from simple sums to a ratio with a variable, use CALCULATE to fix a filter and to remove one, and show Furniture's margin by quarter. Finally, you will write a tab of tests in DAX query view that compares the measures with the totals of Chapter 6.
 
 **Prerequisites.** You need Charles River Reports.pbix from Tutorial 14.1, with the sales star and the marked Date table. If you start here, download Charles River Reports as it stands at the end of Tutorial 14.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
@@ -107,7 +107,7 @@ d. Read the Furniture row across the eight quarters.
 
 @fig-14-07 shows the matrix. Furniture's margin at standard cost holds steady through the first half of 2026, falls in the third quarter, and falls again in the fourth, to its lowest level in the two years, the decline the controller asked about in Part I. Each total is a margin of its own, calculated from the totals of revenue and cost, not an average of the cells beside it.
 
-![Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-14-07-margin-matrix.svg){#fig-14-07 fig-alt="A mock of a Power BI matrix with the item groups as rows, the quarters of fiscal 2025 and 2026 as columns, and the margin percentage at standard cost in each cell, with a total row and a total column. The Furniture row is outlined: its margin moves within a narrow band from the first quarter of 2025 to the third quarter of 2026, and falls clearly below that band in the fourth quarter of 2026."}
+![Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-14-07-margin-matrix.svg){#fig-14-07 fig-alt="A mock of a Power BI matrix with the item groups as rows, the quarters of fiscal 2025 and 2026 as columns, and the margin percentage at standard cost in each cell, with a total row and a total column. The Furniture row is outlined: its margin holds within a narrow band from the first quarter of 2025 to the second quarter of 2026, slips in the third quarter, and falls clearly below the band in the fourth quarter of 2026."}
 
 **Step 7. Write the first test.** Each test is a query whose result must equal a total you already trust.
 
@@ -171,4 +171,4 @@ A reader who points at a measure in the Data pane now sees what it means, and th
 - Test 1's fiscal 2026 row equals Chapter 6's control totals, and Test 2 reproduces the Furniture margins at the two ends of Chapter 6's bridge.
 - Discount Rate is higher than the Average of Discount of Chapter 13, and Share of Revenue adds up to 100% across the item groups of a year.
 
-The measures now say what the report's numbers mean, and the tests prove it. The fall in Furniture's margin is visible quarter by quarter. Comparing it with the same quarter of the year before needs time intelligence, which the next section explains and Exercise 14.3 builds.
+The measures now say what the report's numbers mean, and the tests check them against the totals of Chapter 6. The fall in Furniture's margin is visible quarter by quarter. Comparing it with the same quarter of the year before needs time intelligence, which the next section explains and Exercise 14.3 builds.

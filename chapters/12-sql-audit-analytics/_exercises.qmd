@@ -16,11 +16,11 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (1) List the sales invoices whose revenue was posted in a different fiscal year from the delivery of the goods they bill, with their SubTotal, invoice date, shipment and delivery dates, and posting date, and list separately the invoices dated before their shipment.
 
-(2) For each fiscal year, total the SubTotal of the revenue recorded in that year for goods delivered in the year before, and of the revenue for goods delivered in that year but recorded in the next one. Add the shipments of fiscal 2026 that were never invoiced, valued at their order price, and calculate the net effect of cutoff on each year's revenue. Explain why the effect on gross margin is larger than the effect on cost of goods sold.
+(2) For each fiscal year, total the SubTotal of the revenue recorded in that year for goods delivered in the year before, and of the revenue for goods delivered in that year but recorded in the next one. Add the shipments of fiscal 2026 that were never invoiced, valued at their order price, and calculate the net effect of cutoff on each year's revenue, as the revenue recorded less the revenue of the year's deliveries. Explain why the effect on gross margin is larger than the effect on cost of goods sold.
 
 (3) Repeat the test for supplier invoices, comparing InvoiceDate with the posting date of each invoice's ledger rows. Compare the posting dates with ReceivedDate, and explain which date Charles River posts supplier invoices on.
 
-(4) Total the hourly labor cost of LaborTimeEntry (ExtendedLaborCost) by the year of its WorkDate and the fiscal year of its pay period, and identify the cost of work done in December that was recorded in the next fiscal year. Estimate the full payroll cost of the work of 14 to 31 December 2026, whose pay periods have no registers, from the average cost of the last pay periods of fiscal 2026.
+(4) Total the hourly labor cost of LaborTimeEntry (ExtendedLaborCost) by the year of its WorkDate and the fiscal year of its pay period, and identify the cost of work done in December that was recorded in the next fiscal year. Estimate the full payroll cost of the work of 14 to 31 December 2026, whose pay periods have no registers, from the average cost of the last pay periods of fiscal 2026, and state the assumptions behind the estimate.
 
 (5) Write a short memo (one half page) to the controller with the effect on each year and a recommendation for the year-end close.
 
@@ -64,7 +64,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Requirements.**
 
-(1) For each direct labor time entry, flag whether it was recorded on or before the operation's ActualEndDate.
+(1) For each direct labor time entry, flag whether it was recorded on or before the operation's ActualEndDate, and count the entries dated before the operation's ActualStartDate, which would also fall outside the time the operation was open.
 
 (2) Repeat the work-center comparison of Tutorial 11.2, with the planned hours of each work center and year, and two recorded-to-planned ratios: one for all direct hours, and one for the hours recorded while the operation was open.
 
@@ -110,11 +110,11 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Table group:** Payroll and Time, Master Data
 
-**Scenario.** Tutorial 12.1 found two approved payroll registers of an Account Executive who had left, with no payment record, and Tutorial 12.2 found the same employee approving purchase orders after leaving. The chief audit executive asks you to test the pay of everyone who had left, and the approval of every payroll register and payment, and to add the tests to the query library.
+**Scenario.** Tutorial 12.1 found two approved payroll registers of an Account Executive who had left, with no payment record, and Tutorial 12.2 found the same employee named as the approver of purchase orders dated after leaving. The chief audit executive asks you to test the pay of everyone who had left, and the approval of every payroll register and payment, and to add the tests to the query library.
 
 **Requirements.**
 
-(1) List the registers whose pay date is after the employee's termination date, with the job title, the employee's own cost center and the register's, the dates of the pay period, and the gross pay. Add the employee's usual gross pay before the termination with a correlated subquery in the SELECT list, and explain which registers could be a final paycheck.
+(1) List the registers whose pay date is after the employee's termination date, with the job title, the employee's own cost center and the register's, the dates of the pay period, and the gross pay. Add the employee's usual gross pay, the average gross pay of the registers paid on or before the termination date, with a correlated subquery in the SELECT list, and explain which registers could be a final paycheck.
 
 (2) Count the registers each employee approved, grouping by the approver's key, and how many were approved on their pay date.
 
@@ -146,7 +146,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (4) For the sales invoice, purchase order, cash receipt, and journal entry numbers, extract the year and the sequence number with SUBSTR and CAST, and report the first and last number of each year. Use LAG to find any step greater than one: partitioned by year for a series that restarts each year, and ordered across the years, without a partition, for a series that continues.
 
-(5) Calculate the first significant digit of every supplier payment dated through 2026-12-31 with `printf('%e', Amount)`, and the mean absolute deviation from the expected proportions of `LOG10(1 + 1.0 / Digit)`, for all payments, for full payments (Amount equal to the invoice's GrandTotal), and for partial payments. Compare the results with Tutorial 8.1.
+(5) Calculate the first significant digit of every supplier payment dated through 2026-12-31 with `printf('%.15e', Amount)`, and the mean absolute deviation from the expected proportions of `LOG10(1 + 1.0 / Digit)`, for all payments, for full payments (Amount equal to the invoice's GrandTotal), and for partial payments. Compare the results with Tutorial 8.1.
 
 (6) For each test, record the number of exceptions and a disposition, and write a short note on why the near-duplicate test needs a self-join and on what running these tests in SQL gains over a workbook.
 

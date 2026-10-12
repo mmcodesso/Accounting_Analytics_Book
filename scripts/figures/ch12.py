@@ -74,9 +74,10 @@ def fig_12_01() -> Diagram:
             entry=(1, round((co_mid - 24) / gl.h, 4)))
     cut_y = doc_y - 18 + 30
     d.box("<b>Cutoff: when the event happened against when it was posted</b><br>Compare the PostingDate "
-          "of the ledger rows with the date of the event: the DeliveryDate of the goods a sales invoice "
-          "bills, and the work dates of the pay period a payroll pays. A posting in a different fiscal "
-          "year from the event records it in the wrong period.", 0, cut_y, 860, 86,
+          "of the ledger rows that first record a transaction with the date of the event: the DeliveryDate of "
+          "the goods a sales invoice bills, when control passes on delivery, and the work dates of the pay "
+          "period a payroll pays. A first posting in a different fiscal year from the event records it in the "
+          "wrong period; a later payment that settles an accrual does not.", 0, cut_y, 860, 86,
           fill=GRAY_TINT, stroke=GRAY, align="left", size=SMALL)
     ly = cut_y + 106
     d.line_sample(0, ly + 10, 50, color=AMBER, dashed=True, end="blockThin")
@@ -207,7 +208,7 @@ def fig_12_06() -> Diagram:
     d = Diagram("Approval Exceptions in the Purchase Orders")
     rows = db.run(sql("approval_summary"))[1]
     counts = {r[0]: r[1] for r in rows}
-    assert counts == {"Above approver limit": 13, "Self-approved": 9, "Approved after termination": 3}, counts
+    assert counts == {"Above approver limit": 13, "Self-approved": 9, "Dated after approver left": 3}, counts
     detail = db.run(sql("approval_detail"))[1]
     assert len(detail) == 14 and sum(1 for r in detail if ";" in r[7]) == 11, detail
     out = CHAPTER12.mock(d, "approval_summary", [300, 120, 160], compact=True)
@@ -222,22 +223,23 @@ def fig_12_07() -> Diagram:
     records = [("TimeClockEntry", "the hours clocked each day, regular and overtime", None),
                ("LaborTimeEntry", "the hours charged to a work order operation, or indirect time",
                 "TimeClockEntryID"),
-               ("PayrollRegister", "each employee's pay for a pay period", "EmployeeID, PayrollPeriodID"),
+               ("PayrollRegister", "each employee's pay for a pay period",
+                "PayrollRegisterLine: LaborTimeEntryID, PayrollRegisterID"),
                ("PayrollPayment", "the net pay disbursed", "PayrollRegisterID"),
                ("GLEntry", "the cost and the payment posted to the ledger", "SourceDocumentID")]
     for table, _, key in records:
-        columns = {r[1] for r in q(f"PRAGMA table_info({table})")}
-        assert columns, table
-        if key:
-            assert {k.strip() for k in key.split(",")} <= columns, (table, key)
-    assert "LaborTimeEntryID" in {r[1] for r in q("PRAGMA table_info(PayrollRegisterLine)")}
+        assert {r[1] for r in q(f"PRAGMA table_info({table})")}, table
+        if key:                                  # the key's columns, in the record itself or in the table named
+            source, _, keys = key.rpartition(": ")
+            columns = {r[1] for r in q(f"PRAGMA table_info({source or table})")}
+            assert {k.strip() for k in keys.split(",")} <= columns, (table, key)
     tests = [("Profiled; overtime above half an hour is approved; no day on which everyone clocks the "
               "same hours", "Tutorial 12.3, Steps 1, 6, and 7"),
-             ("Its hours equal the clock entry's; direct time recorded while its operation was open",
+             ("Its hours equal the clock entry's; no direct time recorded after its operation ended",
               "Tutorial 12.3, Steps 2, 8, and 9"),
-             ("Pays its own employee's approved time at the employee's rate; not approved by that employee",
-              "Tutorial 12.3, Steps 4 and 5; Exercise 12.5"),
-             ("One payment for each approved register, made after its ApprovedDate",
+             ("Its earnings lines pay its own employee's approved time at the employee's rate; not approved by "
+              "that employee", "Tutorial 12.3, Steps 4 and 5; Exercise 12.5"),
+             ("A payment for each approved register, made after its ApprovedDate",
               "Tutorial 12.1; Exercise 12.5"),
              ("Every payment posting traces to a payment; unpaid wages accrued at the year-end",
               "Tutorial 12.1, Steps 3 and 8")]
@@ -245,7 +247,9 @@ def fig_12_07() -> Diagram:
     boxes = []
     for i, (table, what, key) in enumerate(records):
         x = i * (w + gap)
-        via = f"<br><i>linked by {esc(key)}</i>" if key else ""
+        source, _, keys = (key or "").rpartition(": ")
+        via = (f"<br><i>linked through {esc(source)} ({esc(keys)})</i>" if source else
+               f"<br><i>linked by {esc(key)}</i>" if key else "")
         boxes.append(d.box(f"<b>{table}</b><br>{esc(what)}{via}", x, 24, w, 130, fill=BLUE_TINT,
                            stroke=BLUE, size=SMALL))
         test, where = tests[i]

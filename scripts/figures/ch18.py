@@ -19,7 +19,7 @@ def fig_18_01() -> Diagram:
     views = [
         ("Standard costing", BLUE,
          "Standard rate × standard hours of the output",
-         "<b>Variance</b>: everything else, charged to cost of goods sold when each work order closes",
+         "<b>Variance</b>: everything else, which Charles River charges to cost of goods sold as each work order closes",
          False, "Good for control while the rates are current"),
         ("Actual absorption", GRAY,
          "All of the year's cost divided by the units made",
@@ -56,11 +56,14 @@ def fig_18_02() -> Diagram:
                fill=WHITE, stroke=BLUE, stroke_width=1.5)
     q3 = d.box("Will the crew be <b>reduced in step</b> with the hours freed?", L, 320, qw, qh,
                fill=WHITE, stroke=BLUE, stroke_width=1.5)
-    buy1 = d.box("<b>Buy</b>, if the terms, quality, and minimum volume are acceptable", 470, 92, 390, qh,
+    buy1 = d.box("<b>Buy</b>, if the terms, quality, and minimum volume are acceptable and two years of savings cover "
+                 "the tooling", 470, 92, 390, qh,
                  fill=TEAL_TINT, stroke=TEAL)
-    buy2 = d.box("<b>Buy, with the crew plan</b>: weigh tooling and severance over the quote's two years",
+    buy2 = d.box("<b>Buy, with the crew plan</b>, if two years of savings cover the tooling and severance, on the same "
+                 "terms",
                  470, 320, 390, qh, fill=TEAL_TINT, stroke=TEAL)
-    make1 = d.box("<b>Keep making</b>: buying adds cost while the crew stays; test the price as well", 470, 434, 390, qh,
+    make1 = d.box("<b>Keep making</b>, unless the freed hours have another use: buying adds cost while the crew stays; "
+                  "test the price too", 470, 434, 390, qh,
                   fill=BLUE_TINT, stroke=BLUE)
     make2 = d.box("<b>Keep making</b>, and test the price against the margin floor", L, 434, qw, qh,
                   fill=BLUE_TINT, stroke=BLUE)

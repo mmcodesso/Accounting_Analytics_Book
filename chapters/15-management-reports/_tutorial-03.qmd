@@ -36,7 +36,7 @@ a. In **Model view**, relate LaborTimeEntry to **Employee** on EmployeeID, to **
 b. Relate ProductionCompletionLine to **Item** on ItemID and to the **Date** table on CompletionDate.
 c. Hide the keys of the two fact tables.
 
-The Date table now filters five fact tables: the invoice lines, the ledger, the budget, the labor time, and the completions. Item filters both the invoice lines and the completions, so a selection of Furniture limits the sales and the output together.
+The Date table now filters five fact tables: the invoice lines, the ledger, the budget, the labor time, and the completions. Item filters both the invoice lines and the completions, so a selection of Furniture limits the sales and the output together, but not the labor time, which records no item. WorkCenter and Employee filter the labor time and not the completions. A ratio of hours to output is therefore meaningful for the whole plant over a period, not for one item, work center, or job title, a limit that Step 11 protects.
 
 **Step 5. Write the hours measures.**
 
@@ -163,13 +163,14 @@ The card sets the latest trailing figure beside the 2024 level, the KPI with its
 
 a. Add a clustered bar chart of Direct Hours by WorkCenterName, with a visual filter on 2026.
 b. Add a clustered column chart with JobTitle on the **X-axis**, Year on **Legend**, and the Overtime Share measure below on the **Y-axis**, filtered to the years 2024 to 2026 and to the job titles Assembler, Machine Operator, and Quality Technician.
+c. Select the bar chart, choose **Format > Edit interactions**, and click the **None** icon above the card and above the line chart. Select the column chart, and do the same.
 
 
 ```
 Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 ```
 
-@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found. Editing the interactions keeps the card and the line chart plant-wide. Without it, clicking Packing in the bar chart would divide Packing's direct hours by the whole plant's output, because the work center filters the labor time and not the completions: a ratio well below the plant's that describes neither Packing nor the plant. A ratio for one work center would first need its output measured there.
 
 ![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
 
@@ -177,18 +178,19 @@ Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 
 a. Add a page named `About`, and drag its tab to the first position.
 b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period and the last date of its time records, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
-c. Choose **Insert > Buttons > Navigator > Page navigator**, and place the navigator below the text.
-d. Right-click the tabs of Promotion Detail, Promotion Tooltip, and Cost Center Detail, and choose **Hide Page**.
-e. Copy the navigator to the top of each visible page, and test it by holding Ctrl and clicking its buttons.
+c. In **Model view**, give every measure that has no description one in the **Properties** pane, as in Tutorial 14.2, Step 9, saying what it measures and any filter or cut-off it applies.
+d. Choose **Insert > Buttons > Navigator > Page navigator**, and place the navigator below the text.
+e. Right-click the tabs of Promotion Detail, Promotion Tooltip, and Cost Center Detail, and choose **Hide Page**.
+f. Copy the navigator to the top of each visible page, and test it by holding Ctrl and clicking its buttons.
 
-@fig-15-12 shows the About page. The navigator lists the visible pages in order and updates itself as pages change, and the hidden detail pages are reached only from the pages they serve.
+@fig-15-12 shows the About page. The navigator lists the visible pages in order and updates itself as pages change, and the hidden detail pages are reached only from the pages they serve. Every measure now has the description the About page promises.
 
 ![The About Page With Its Page Navigator.](/visuals/svg/fig-15-12-about-page.svg){#fig-15-12 fig-alt="A mock of a Power BI report page named About. A text box states the report's purpose, its three readers, its source, the period it covers, and where its measures are defined and tested. Below it, a page navigator shows one button for each visible page: About, Sales and Discounts, Validation, Review, Margins, Income Statement, Promotions, Budget, and Plant, with About selected. The page tabs below the canvas list the same pages; the three hidden detail pages are not among them."}
 
 **Step 13. Add the plant test.**
 
 a. In DAX query view, open the **Tests** tab, add the query below, and run it.
-b. Save the report.
+b. Select **Report view** and the About page, and save the report.
 
 
 ```
@@ -203,7 +205,7 @@ SUMMARIZECOLUMNS (
 )
 ```
 
-The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, which shows that the model, the visuals, and the queries of Part III agree.
+The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, so the model's yearly figures agree with the queries of Part III. The test covers those totals, not what each visual shows under its filters and interactions, which Chapter 16 examines when it audits a report. A report opens on the page that was active when it was saved, which is why About is selected before saving.
 
 
 
@@ -212,6 +214,7 @@ The ratio for each year equals the trailing figure of its December and the figur
 
 - LaborTimeEntry and ProductionCompletionLine relate to their dimensions, and Test 5 returns Chapter 11's yearly ratios.
 - The trailing measure and the visual calculation agree on the full axis and differ on the filtered one, for the reason Step 9 gave.
-- The About page opens the report, the navigator reaches every visible page, and the detail pages are hidden.
+- The report opens on the About page, the navigator reaches every visible page, and the detail pages are hidden.
+- Clicking a work center in the bar chart leaves the card and the line chart unchanged.
 
-The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Every number on it ties to a test, which is what makes it fit to be sent every month.
+The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Its control totals are tested against the earlier Parts, which is what makes it fit to be sent every month.

@@ -270,18 +270,21 @@ def data_dates(d: Data) -> dict:
     """Dates the text states about the data's extent:
     - date.time_records_end: the last WorkDate of the time records (2026-12-11), before year-end because the
       last two pay periods are Open; date.time_records_end.monday: the Monday of that week (the last Monday
-      week of the Part III case);
+      week of the Part III case); date.time_records_end.indirect: the last WorkDate of indirect manufacturing
+      time (2026-12-04), a week earlier (Tutorial 10.3, Step 4);
     - date.payroll.last_pay: the last pay date with registers (Chapter 16's Data Through, 2026-12-18);
     - date.gl.end: the last posting date of the ledger (2027-02-23, supplier payments of N);
     - date.je.backdated_created: the day the first backdated journal entry was keyed (the first Saturday of F,
       shown as 2024-01-06 10:00:00)."""
     end = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry")
     monday = (dt.date.fromisoformat(end) - dt.timedelta(days=dt.date.fromisoformat(end).weekday())).isoformat()
+    indirect = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing'")
     pay = d.one("SELECT MAX(pp.PayDate) FROM PayrollRegister r JOIN PayrollPeriod pp ON pp.PayrollPeriodID = r.PayrollPeriodID")
     gl = d.one("SELECT MAX(PostingDate) FROM GLEntry")
     created = first(d, "SELECT CreatedDate FROM JournalEntry WHERE date(CreatedDate) > PostingDate "
                        "ORDER BY CreatedDate, EntryNumber", what="backdated journal entry")[0]
-    return {"date.time_records_end": end, "date.time_records_end.monday": monday, "date.payroll.last_pay": pay,
+    return {"date.time_records_end": end, "date.time_records_end.monday": monday,
+            "date.time_records_end.indirect": indirect, "date.payroll.last_pay": pay,
             "date.gl.end": gl, "date.je.backdated_created": created[:10], "time.je.backdated_created": created[11:]}
 
 

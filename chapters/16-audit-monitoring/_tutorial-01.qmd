@@ -135,7 +135,7 @@ c. On the Journal Entries page, right-click the opening balance entry in the tab
 
 @fig-16-04 shows the result. The opening balance entry has many lines, and its debits equal its credits. Tutorial 16.2 uses the same move, from a test to the documents behind it, for every test of the register.
 
-![The Risk Scores and an Entry's Ledger Lines.](/visuals/svg/fig-16-04-entry-lines.svg){#fig-16-04 fig-alt="Two mocks of Power BI report pages. On the left, the Journal Entries page: a matrix of risk scores with the number of entries and their amount for each score, most entries at zero and one entry at four, and a table of the entries that failed two tests or more, with the opening balance entry at the top. On the right, the Entry Lines page reached by drill-through, with a back button, listing that entry's ledger lines by account with their debits and credits, which total the same amount."}
+![The Risk Scores and an Entry's Ledger Lines.](/visuals/svg/fig-16-04-entry-lines.svg){#fig-16-04 fig-alt="Two mocks of Power BI report pages, one above the other. Above, the Journal Entries page: a matrix of risk scores with the number of entries and their amount for each score, most entries at zero and one entry at four, and a table of the entries that failed two tests or more, with the opening balance entry at the top. Below, the Entry Lines page reached by drill-through, with a back button, listing that entry's ledger lines by account with their debits and credits, which total the same amount."}
 
 **Step 11. Turn the flags into exceptions.**
 
@@ -166,7 +166,7 @@ ROW (
 )
 ```
 
-The entries' totals equal the debits and the credits of their postings, the reconciliation Chapter 8 performed before its tests and Chapter 12 performed in SQL. The population the tests run on is complete, so an entry that escapes them does so because of the rules, not because it is missing.
+The entries' total equals the debits and the credits of their postings, the reconciliation Chapter 8 performed before its tests and Chapter 12 performed in SQL. That is good evidence that the tests run on the entries the ledger holds, though agreeing totals alone could hide an entry missing from both, as Tutorial 4.1, Step 10 showed.
 
 
 
@@ -176,6 +176,6 @@ The entries' totals equal the debits and the credits of their postings, the reco
 - The five flags and the risk score reproduce Chapter 8's counts and distribution.
 - The opening balance entry drills through to its ledger lines, and they balance.
 - JE Exceptions has one row per failed test, with the register's column names, and is not loaded.
-- Test 1 shows the entries equal to their ledger postings.
+- Test 1 shows the entries' total equal to the debits and the credits of their ledger postings.
 
 The tests of Chapter 8, which took an afternoon in a workbook, now run again with every refresh, on a population that has been reconciled.

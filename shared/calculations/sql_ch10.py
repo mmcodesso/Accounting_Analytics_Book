@@ -66,11 +66,11 @@ QUERIES = [
      "GROUP BY i.ItemGroup, CloseYear\n"
      "ORDER BY i.ItemGroup, CloseYear;"),
     ("items_above_threshold", "-- Tutorial 10.1: items with more than $50,000 of variance in 2026",
-     "SELECT i.ItemID, i.ItemCode, i.ItemName, COUNT(*) AS Closes,\n"
+     "SELECT i.ItemCode, i.ItemName, i.ItemGroup, COUNT(*) AS Closes,\n"
      "    ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance\n"
      + _JOIN_ITEMS +
      "WHERE woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'\n"
-     "GROUP BY i.ItemID, i.ItemCode, i.ItemName\n"
+     "GROUP BY i.ItemID, i.ItemCode, i.ItemName, i.ItemGroup\n"
      "HAVING SUM(woc.TotalVarianceAmount) > 50000\n"
      "ORDER BY TotalVariance DESC;"),
     ("every_item", "-- Tutorial 10.1: every manufactured item with its closes of 2026",

@@ -153,6 +153,8 @@ files:
   front-matter/_book-pages.qmd:
     - {rx: 'Copyright © {Y}', class: role, why: "the copyright year is the book's publication year (N), as in index.qmd's citation"}
     - {rx: 'Codesso, M\. \({Y}\)', class: role, why: "the book's publication year (N), the suggested citation of index.qmd"}
+  front-matter/downloads.qmd:
+    - {rx: 'Microsoft 365 or Excel {Y}', class: real, why: "a software release: Excel 2024 adds the functions the Excel solutions use"}
   front-matter/preface.qmd:
     - {rx: 'framework for management accountants in {Y}', class: real, why: "IMA framework published in 2025"}
     - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
@@ -170,6 +172,8 @@ files:
     - {rx: 'In {Y}, the Public Company Accounting Oversight Board', class: real, why: "PCAOB amendments of 2024"}
   chapters/12-sql-audit-analytics/chapter.qmd:
     - {rx: 'amended its standards in {Y}', class: real, why: "PCAOB amendments of 2024"}
+  chapters/14-data-models-and-dax/chapter.qmd:
+    - {rx: 'still a preview feature in September {Y}', class: real, why: "the status of calendar-based time intelligence when the book was written (Power BI's September 2026 release)"}
   chapters/14-data-models-and-dax/_multiple-choice.qmd:
     - {rx: 'into February {Y}', class: role, why: "the ledger's last month (N); Microsoft is the date-table guidance"}
   appendices/b-publishing-security/_exercises.qmd:

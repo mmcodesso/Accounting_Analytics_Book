@@ -8,7 +8,7 @@ HEADER = (
     "/* Chapter 11: the plant's hours, month by month\n"
     "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
     "   Prepared by: your name, date\n"
-    "   Checks: the payroll ties to the ledger; the measure has 36 months */"
+    "   Checks: the payroll ties to the ledger; 36 months in, 25 in the view */"
 )
 
 _PAYROLL = ("FROM PayrollRegisterLine AS prl\n"
@@ -37,8 +37,8 @@ _CENTERS = (
     "FROM (\n"
     "    SELECT strftime('%Y', op.ActualEndDate) AS EndYear,\n"
     "        wc.WorkCenterName,\n"
-    "        ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,\n"
-    "        ROUND(SUM(lab.Hours), 0) AS RecordedHours\n"
+    "        SUM(op.PlannedLoadHours) AS PlannedHours,\n"
+    "        SUM(lab.Hours) AS RecordedHours\n"
     "    FROM WorkOrderOperation AS op\n"
     "        INNER JOIN WorkCenter AS wc ON wc.WorkCenterID = op.WorkCenterID\n"
     "        LEFT JOIN (\n"
@@ -233,19 +233,19 @@ QUERIES = [
      "ORDER BY FiscalPeriod;"),
     ("work_centers", "-- Tutorial 11.2: work centers ranked by hours recorded against plan",
      "SELECT EndYear, WorkCenterName,\n"
-     "    RecordedHours - PlannedHours AS ExcessHours,\n"
+     "    ROUND(RecordedHours - PlannedHours, 0) AS ExcessHours,\n"
      "    ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,\n"
      "    RANK() OVER (PARTITION BY EndYear\n"
      "        ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank\n"
      + _CENTERS),
     ("work_centers_plant", "-- Tutorial 11.2: the ranking with the plant's excess hours",
      "SELECT EndYear, WorkCenterName,\n"
-     "    RecordedHours - PlannedHours AS ExcessHours,\n"
+     "    ROUND(RecordedHours - PlannedHours, 0) AS ExcessHours,\n"
      "    ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,\n"
      "    RANK() OVER (PARTITION BY EndYear\n"
      "        ORDER BY RecordedHours / PlannedHours DESC) AS CenterRank,\n"
-     "    SUM(RecordedHours - PlannedHours) OVER (PARTITION BY EndYear)\n"
-     "        AS PlantExcessHours\n"
+     "    ROUND(SUM(RecordedHours - PlannedHours)\n"
+     "        OVER (PARTITION BY EndYear), 0) AS PlantExcessHours\n"
      + _CENTERS),
     ("measure_output", "-- Tutorial 11.3: step 1, the standard hours of output by month",
      f"WITH {_OUTPUT_CTE}\n"
@@ -265,6 +265,6 @@ QUERIES = [
     ("query_view", "-- Tutorial 11.3: the view for fiscal 2026",
      "SELECT *\n"
      "FROM MonthlyLaborEfficiency\n"
-     "WHERE Month >= '2026-01'\n"
+     "WHERE Month BETWEEN '2026-01' AND '2026-12'\n"
      "ORDER BY Month;"),
 ]

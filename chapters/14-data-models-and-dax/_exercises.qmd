@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on these exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch14 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 14.1`), and put the measures it asks for in a display folder of the Key Measures table with the same name. Do not change the queries, relationships, measures, or pages the tutorials created, except where an exercise tells you to change something temporarily and undo it. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
+Work on these exercises in a copy of Charles River Reports.pbix, saved with **File > Save as** after you finish this chapter's tutorials, such as `Ch14 Exercises.pbix`. Build each exercise on its own report page, or in its own query tab in DAX query view, named after it (such as `Ex 14.1`), and put the measures it asks for in a display folder of the Key Measures table with the same name (in **Model view**, select a measure and type the folder's name in **Display folder** in the **Properties** pane). Do not change the queries, relationships, measures, or pages the tutorials created, except where an exercise tells you to change something temporarily and undo it. When an exercise needs a Table the tutorials did not load, import it under the query name the exercise gives.
 
 ### Financial Accounting Exercises
 
@@ -186,7 +186,7 @@ SUMMARIZECOLUMNS (
 
 **Table group:** Order-to-Cash and Accounting Core
 
-**Scenario.** The auditor wants one query that proves the model agrees with the control totals established in Parts II and III, can be run again after every change to the model, and reports a pass or a fail for each test.
+**Scenario.** The auditor wants one query that tests whether the model agrees with the control totals established in Parts II and III, can be run again after every change to the model, and reports a pass or a fail for each test.
 
 **Requirements.**
 

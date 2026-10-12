@@ -349,8 +349,11 @@ def ex7_1(b: ExerciseBuild) -> None:
         + f"With the mean for every group the sum would be {means_wo:,.0f} "
         f"({(means_wo - e['company']) / e['company']:+.1%}); the rest of the gap is that the company forecast leaves out "
         f"only January {d.F}, not the whole first quarter. Each range is the chosen method's backtest error without the "
-        f"start-up quarter, so {widest} carries the widest. The bank should receive the item-group forecasts with their "
-        "ranges and a note that they need not add up to the company forecast, because the methods differ.",
+        f"start-up quarter, so {widest} carries the widest. A range shows what a miss as large as the backtest's would "
+        "mean; it is not a confidence interval, and the sums of the low and high ends (H56 and H57) would hold only if "
+        "every group missed by its full backtest error in the same direction at once. The bank should receive the "
+        "item-group forecasts, labeled as billed revenue by invoice date, with their ranges and a note that they need "
+        "not add up to the company forecast, because the methods differ.",
     ]
     model_answer(ws, 70, paras)
 
@@ -502,10 +505,11 @@ def ex7_2(b: ExerciseBuild) -> None:
         f"difference, {gaps[d.C]:,.2f}, is exactly the {rows_blank} operating-expense lines that have no cost center. The "
         "Budget Table summarizes the budget by cost center, so lines without one never reach it, and the accounts budgeted "
         f"only that way ({len(blank)} accounts, listed above) are missing from it altogether. The same gap appears in "
-        f"every year: {gaps[d.F]:,.2f} in {d.F} and {gaps[d.P]:,.2f} in {d.P}, so the summaries sent to the bank "
-        "understated budgeted operating expenses, and overstated budgeted profit, by "
+        f"every year: {gaps[d.F]:,.2f} in {d.F} and {gaps[d.P]:,.2f} in {d.P}, so a summary prepared from the Budget "
+        "Table, as last year's for the bank was, understates budgeted operating expenses, and overstates budgeted "
+        "profit, by "
         f"{min(gaps.values()) / 1e6:.1f} to {max(gaps.values()) / 1e6:.1f} million dollars a year.",
-        "The budget sent to the bank should be prepared from the BudgetLine Table, which is complete, or from the Budget "
+        "The budget sent to the bank should be prepared from the BudgetLine Table, which holds every budget line, or from the Budget "
         "Table only after the unassigned lines have been assigned to cost centers and the two agree.",
         "Recommended control: whenever the budget is approved or revised, reconcile the summary to the detail by year and "
         "account, with a check that the difference is zero, and have the reconciliation reviewed and signed off before any "
@@ -545,16 +549,18 @@ def ex7_3_expected(d: Data) -> dict:
     opex = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND BudgetCategory = 'Operating Expense'", d.C)
     budget_commission = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?",
                               d.C, d.account(6290))
+    # Interest (7030) is budgeted under Operating Expense but is a financing cost, below operating income (Requirement 2)
+    interest = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?", d.C, d.account(7030))
     added = {n: d.one("SELECT SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? "
                       "AND SourceDocumentType <> 'JournalEntry'", d.account(n), d.C) for n in (5050, 5060, 5080)}
     variance = {y: d.one(f"SELECT SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND {d.no_closes()}",
                          d.account(5080), y) for y in d.years}
     cm = revenue - cost - commissions
     ratio = cm / revenue
-    fixed = opex - budget_commission
+    fixed = opex - budget_commission - interest
     fixed2 = fixed + sum(added.values())
     return dict(revenue=revenue, cost=cost, commissions=commissions, cm=cm, ratio=ratio, opex=opex,
-                budget_commission=budget_commission, fixed=fixed, be=fixed / ratio, added=added, fixed2=fixed2,
+                budget_commission=budget_commission, interest=interest, fixed=fixed, be=fixed / ratio, added=added, fixed2=fixed2,
                 be2=fixed2 / ratio, goal=(4_000_000 + fixed2) / ratio, goal_without=(4_000_000 + fixed) / ratio,
                 variance=variance)
 
@@ -575,8 +581,9 @@ def ex7_3(b: ExerciseBuild) -> None:
                 "A7": "Sales commission expense (GLOpex, account 6290)", "A8": "Contribution margin",
                 "A9": "Contribution margin ratio",
                 "A11": "Operating-expense budget (BudgetLine)", "A12": "Less: sales commission budget (account 6290)",
-                "A13": "Fixed costs (requirement 2)", "A14": "Break-even revenue", "A15": "Margin of safety",
-                "A16": "Margin of safety, % of revenue",
+                "A13": "Less: interest expense budget (account 7030, below operating income)",
+                "A14": "Fixed costs (requirement 2)", "A15": "Break-even revenue", "A16": "Margin of safety",
+                "A17": "Margin of safety, % of revenue",
                 "A18": "Requirement 4: items GLOpex does not contain (GLCostVariances)",
                 "A19": f"5050 {names[5050]}", "A20": f"5060 {names[5060]}", "A21": f"5080 {names[5080]}",
                 "A22": "Added items", "A23": "Fixed costs with the added items", "A24": "Break-even revenue",
@@ -594,16 +601,17 @@ def ex7_3(b: ExerciseBuild) -> None:
         "B8": "=B5-B6-B7", "B9": "=B8/B5",
         "B11": '=SUMIFS(BudgetLine[BudgetAmount],BudgetLine[BudgetCategory],"Operating Expense")',
         "B12": "=SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],6290)",
-        "B13": "=B11-B12", "B14": "=B13/B9", "B15": "=B5-B14", "B16": "=B15/B5",
-        "B22": "=SUM(B19:B21)", "B23": "=B13+B22", "B24": "=B23/B9", "B25": "=B5-B24", "B26": "=B25/B5",
-        "B30": "=B29*B9-B23", "B31": "=(B28+B23)/B9", "B32": "=(B28+B13)/B9"})
+        "B13": "=SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],7030)",
+        "B14": "=B11-B12-B13", "B15": "=B14/B9", "B16": "=B5-B15", "B17": "=B16/B5",
+        "B22": "=SUM(B19:B21)", "B23": "=B14+B22", "B24": "=B23/B9", "B25": "=B5-B24", "B26": "=B25/B5",
+        "B30": "=B29*B9-B23", "B31": "=(B28+B23)/B9", "B32": "=(B28+B14)/B9"})
     for r, n in zip((19, 20, 21), (5050, 5060, 5080)):
         ws.Range(f"B{r}").Formula = (f"=SUMIFS(GLCostVariances[Debit],GLCostVariances[AccountID],{ids[n]})-"
                                      f"SUMIFS(GLCostVariances[Credit],GLCostVariances[AccountID],{ids[n]})")
     ws.Range("B5:B8").NumberFormat = MONEY
     ws.Range("B9").NumberFormat = PCT
-    ws.Range("B11:B15").NumberFormat = MONEY
-    ws.Range("B16").NumberFormat = PCT
+    ws.Range("B11:B16").NumberFormat = MONEY
+    ws.Range("B17").NumberFormat = PCT
     ws.Range("B19:B25").NumberFormat = MONEY
     ws.Range("B26").NumberFormat = PCT
     ws.Range("B28:B32").NumberFormat = MONEY
@@ -644,10 +652,12 @@ def ex7_3(b: ExerciseBuild) -> None:
         "operating expenses are salaries, rent, depreciation, insurance, and other recurring costs that do not move with "
         "sales volume, and Tutorial 7.2 showed that every budgeted account except the payroll burden and the commissions "
         "came within a few percent of actual. The commission budget is taken out because commissions vary with revenue "
-        "and are already in the contribution margin.",
+        "and are already in the contribution margin. The interest budget is taken out too: the budget files it under "
+        "Operating Expense, but interest is a financing cost, which the income statement shows below operating income, "
+        "so leaving it in would measure profit after interest rather than the operating profit the question asks about.",
         f"Memo (requirement 6). With {d.C} as the base, the contribution margin ratio is {e['ratio']:.1%} (revenue less the "
-        "standard cost of the products sold and sales commissions). With the operating-expense budget less commissions as "
-        f"the fixed costs ({e['fixed']:,.0f}), revenue could fall to {e['be']:,.0f} before the operating profit disappeared, "
+        "standard cost of the products sold and sales commissions). With the operating-expense budget less commissions and "
+        f"interest as the fixed costs ({e['fixed']:,.0f}), revenue could fall to {e['be']:,.0f} before the operating profit disappeared, "
         f"a margin of safety of {e['revenue'] - e['be']:,.0f}, or {1 - e['be'] / e['revenue']:.1%} of {d.C} revenue. That "
         f"estimate is too optimistic, because it leaves out freight-out and the purchase price and manufacturing variances, "
         f"{sum(e['added'].values()):,.0f} in {d.C}, which the ledger reports with cost of goods sold but the standard costs "
@@ -673,12 +683,13 @@ def ex7_3(b: ExerciseBuild) -> None:
     rows = [("B5", "revenue", e["revenue"]), ("B6", "standard cost of the products sold", e["cost"]),
             ("B7", "sales commission expense (6290, without the close)", e["commissions"]),
             ("B8", "contribution margin", e["cm"]), ("B11", "operating-expense budget", e["opex"]),
-            ("B12", "commission budget", e["budget_commission"]), ("B13", "fixed costs", e["fixed"]),
-            ("B14", "break-even revenue", e["be"]), ("B15", "margin of safety", e["revenue"] - e["be"])]
+            ("B12", "commission budget", e["budget_commission"]), ("B13", "interest expense budget", e["interest"]),
+            ("B14", "fixed costs", e["fixed"]), ("B15", "break-even revenue", e["be"]),
+            ("B16", "margin of safety", e["revenue"] - e["be"])]
     for addr, label, value in rows:
         b.check(t, f"{label} (Ex 7.3!{addr})", round(value, 2), f"='Ex 7.3'!{addr}", 0.01)
     b.check(t, "contribution margin ratio (B9)", round(e["ratio"], 9), "='Ex 7.3'!B9", 1e-9, PCT)
-    b.check(t, "margin of safety, % of revenue (B16)", round(1 - e["be"] / e["revenue"], 9), "='Ex 7.3'!B16", 1e-9, PCT)
+    b.check(t, "margin of safety, % of revenue (B17)", round(1 - e["be"] / e["revenue"], 9), "='Ex 7.3'!B17", 1e-9, PCT)
     for r, n in zip((19, 20, 21), (5050, 5060, 5080)):
         b.check(t, f"{n} {names[n]}, {d.C} without journal entries (B{r})", round(e["added"][n], 2), f"='Ex 7.3'!B{r}", 0.01)
     b.check(t, "added items (B22)", round(sum(e["added"].values()), 2), "='Ex 7.3'!B22", 0.01)
@@ -1331,7 +1342,7 @@ def ex7_5(b: ExerciseBuild) -> None:
     pairs = [(a, c) for a, c in zip(cur, cur[1:]) if a in flagged and c in flagged and a["diff"] * c["diff"] < 0]
     flag_text = ", ".join(f"{mname(c)} {c['diff']:+,.0f} ({c['pct']:+.1%})" for c in flagged)
     pair_text = (f"The {mname(pairs[0][0])} and {mname(pairs[0][1])} differences have opposite signs and nearly offset, "
-                 "the pattern of a shift between two months rather than a misstatement of the year"
+                 "a pattern that could come from a shift between the two months, which the records below test"
                  if pairs else "The differences do not offset one another")
     mix, low, yl = e["mix"], e["low"], e["year_low"]
     rate_text = ", ".join(f"{seg} {lo:.1%}" for seg, lo, _ in e["rates"])
@@ -1345,14 +1356,14 @@ def ex7_5(b: ExerciseBuild) -> None:
     if pairs:
         a_, c_ = pairs[0]
         evidence.append(
-            f"The evidence settles it. Accrual dates agree with invoice dates on all but {e['other_day']} of the "
-            f"{e['accrual_count']:,} accruals ({e['other_month']} fall in another month), so accruals are not booked in the "
-            f"wrong month. The rates differ by customer segment ({rate_text}, columns P to R), and {low} customers, at the "
+            f"The records point elsewhere. Accrual dates agree with invoice dates on all but {e['other_day']} of the "
+            f"{e['accrual_count']:,} accruals ({e['other_month']} fall in another month), so the dating of the accruals does "
+            f"not explain the pattern. The rates differ by customer segment ({rate_text}, columns P to R), and {low} customers, at the "
             f"lowest rate, made up {mix[a_['month']]['low']:.0%} of {mname(a_)}'s commission base against "
             f"{mix[c_['month']]['low']:.0%} of {mname(c_)}'s (column N; {yl:.0%} for {d.C}), so the accrual rate was "
             f"{mix[a_['month']]['rate']:.2%} in {mname(a_)} and {mix[c_['month']]['rate']:.2%} in {mname(c_)} (column M). "
-            + ("The offsetting differences come from the customer mix, which a regression on total revenue cannot see, "
-               "not from an error." if explained(a_) and explained(c_) else
+            + ("The customer mix, which a regression on total revenue cannot see, accounts for the offsetting "
+               "differences; recomputing a sample of the accruals from the rate table would confirm it." if explained(a_) and explained(c_) else
                "The customer mix explains only part of the offsetting differences, so the accruals need recomputing."))
     for c in flagged:
         if c["month"] in paired:
@@ -1591,15 +1602,15 @@ def ex7_6(b: ExerciseBuild) -> None:
         "together: their ratios range from "
         + ", ".join(f"{min(by_year[y]):.2f} to {max(by_year[y]):.2f} in {y}" for y in years)
         + ", so the bias is systematic, not a problem of one group. Services is the exception: its forecast is only "
-        f"{min(svc):.2f} to {max(svc):.2f} of the hours ordered, a sign that design services are not really forecast "
-        "with the same method.",
+        f"{min(svc):.2f} to {max(svc):.2f} of the hours ordered, an underforecast of design-service hours that needs an "
+        "explanation of its own and is kept apart from the product units.",
         f"Requirement 4: the {d.C} budget planned {budget26:,.0f} product units, more still than the forecast "
         f"({fc26:,.0f}) and {budget26 / or26:.1f} times the {or26:,.0f} units ordered ({inv26:,.0f} invoiced).",
         "Memo (requirement 6). To: the audit senior. Subject: management's demand forecast.",
         "The forecast is not consistent with Charles River's historical experience. In every product group and every year "
         f"it ran at more than twice the units customers ordered ({min(min(v) for v in by_year.values()):.2f} to "
         f"{max(max(v) for v in by_year.values()):.2f} times), and the bias grew each year, to {total[d.C]:.2f} in {d.C}. "
-        "Any plan or estimate that relies on it is overstated: purchasing and production plans would buy and build far "
+        "Any plan or estimate that relies on it would be overstated: purchasing and production plans would buy and build far "
         "more than customers order, building inventory that may need an excess and obsolescence reserve; estimates of "
         "inventory recoverability or capacity needs based on it would be too high; and the budget, whose volume is "
         "higher still, cannot be used to evaluate performance, as Tutorial 7.2 found.",
@@ -1609,8 +1620,9 @@ def ex7_6(b: ExerciseBuild) -> None:
         + f", the first forecast week of each year for {code} ({name}, {group}) at warehouse {a0[3]}, "
         f"{e['warehouse'].get(a0[3], '')}, each {multiples[0]:.1f} times its baseline, entered as {a0[4]} by {pname} "
         f"(employee {a0[7]}), a {ptitle}, with no approver. The list tests the approval of planners' adjustments. These "
-        f"are the only unapproved forecasts in the Table ({words(e['unapproved'])} in all), so the control operated for every "
-        "other adjustment but not for these. The quantities are small, but an unapproved override by a buyer who plans "
+        f"are the only unapproved forecasts in the Table ({words(e['unapproved'])} in all), so an approval is recorded for "
+        "every other adjustment but not for these; a recorded approval shows that the step was taken, not how carefully "
+        "the change was reviewed. The quantities are small, but an unapproved override by a buyer who plans "
         f"most forecasts ({e['planned']:,} of {e['current']:,}) and also creates purchase orders ({e['pos']:,} of them) "
         "is a segregation-of-duties exception worth reporting.",
         "Evidence and explanations to request: the forecasting method and its inputs, and why it runs above orders; "

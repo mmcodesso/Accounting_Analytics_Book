@@ -259,6 +259,8 @@ def t2(d, claim):
     claim(len({o["approver"] for o in po_after}) == 1, "one employee approved the orders after termination")
     claim(all(o["flags"]["AboveLimit"] for o in po_after), "the orders after termination are also above the limit")
     years = {p: per_year(d, [e["date"] for e in ex if e["process"] == p]) for p in PROCESSES}
+    diaz_orders = sum(1 for o in orders(d) if o["approver"] == po_after[0]["approver"])
+    claim(diaz_orders == len(po_after), "the departed approver approved only the orders flagged after termination")
     return dict(po=dict(n=len(pops["PO"]), years=per_year(d, pops["PO"])),
                 pr=dict(n=len(pops["PR"]), years=per_year(d, pops["PR"])), payments=payments, unpaid=unpaid,
                 n=len(ex), process_n=process_n, tests=tests,
@@ -272,7 +274,8 @@ def t2(d, claim):
                 self_cal_low=min(calendar), self_cal_high=max(calendar), approvers=named,
                 po_after=[dict(number=o["number"], when=month_year(o["date"])) for o in po_after],
                 po_after_by=po_after[0]["approver"], po_after_limit=emp[po_after[0]["approver"]]["limit"],
-                years=years, je_rates=[1000 * n / p for n, p in zip(years["JE"], per_year(d, pops["JE"]))])
+                years=years, je_rates=[1000 * n / p for n, p in zip(years["JE"], per_year(d, pops["JE"]))],
+                diaz_orders=word(diaz_orders), diaz_rate=1000 * len(po_after) / len(pops["PO"]))
 
 
 # --- Tutorial 16.3 --------------------------------------------------------------------------------
@@ -285,6 +288,8 @@ def t3(d, claim):
     open_ = [e for e in ex if not e["disposition"]]
     keys = Counter((e["test"], e["doc"]) for e in ex)
     claim(max(keys.values()) == 1, "each test and document number is unique in the register")
+    disp_keys = {(e["test"], e["doc"]) for e in reviewed}
+    claim(len(disp_keys) == len(reviewed), "each disposition's test and document number is unique")
     by_test = []
     for t in sorted({e["test"] for e in reviewed}):
         rows = [e for e in ex if e["test"] == t]
@@ -326,6 +331,7 @@ def t3(d, claim):
     # Test 4
     numbers = [int(o["number"][-6:]) for o in orders(d)]
     claim(len(set(numbers)) == len(numbers) == max(numbers) - min(numbers) + 1, "no purchase order number is missing")
+    last_paid = d.one("SELECT MAX(PaymentDate) FROM PayrollPayment")
     claim(len({o["number"][3:7] for o in orders(d)}) > 1 and min(numbers) == 1, "PO numbers continue across years")
     regs = registers(d)
     unpaid = [r for r in regs if r["paid"] is None]
@@ -364,6 +370,8 @@ def t3(d, claim):
                         "ON pc.ProductionCompletionID = pcl.ProductionCompletionID JOIN Item i ON i.ItemID = pcl.ItemID "
                         "WHERE pc.CompletionDate <= ? GROUP BY 1", cut))
     return dict(n=len(ex), n_disp=len(reviewed), reviewed=len(reviewed), open=len(open_), by_test=by_test,
+                n_keys=len(keys), n_disp_keys=len(disp_keys), follow=word(kinds["Follow up"]),
+                deficient=word(kinds["Deficiency"]), unique=len(set(numbers)), last_paid=last_paid,
                 kinds=[(k, kinds[k]) for k in ("Expected", "Deficiency", "Follow up")], open_years=open_years,
                 pr_self=pr_self, pr_self_n=sum(pr_self), n_multi=len(multi), je_top=je_top, je_top_n=multi[je_top],
                 je_rest=[k for k in je_multi if k != je_top], small=runs(small),
@@ -391,6 +399,11 @@ def ex1(d, claim):
                "LEFT JOIN Applied a ON a.SalesInvoiceID = si.SalesInvoiceID LEFT JOIN Credited c ON c.SalesInvoiceID = si.SalesInvoiceID "
                "WHERE si.InvoiceDate <= ?1", end)
     positive = [r for r in rows if r[2] > 0]
+    untouched = d.one("SELECT COUNT(*) FROM SalesInvoice si WHERE si.InvoiceDate <= ?1 AND si.GrandTotal > 0 "
+                      "AND NOT EXISTS (SELECT 1 FROM CashReceiptApplication a WHERE a.SalesInvoiceID = si.SalesInvoiceID "
+                      "AND a.ApplicationDate <= ?1) AND NOT EXISTS (SELECT 1 FROM CreditMemo c WHERE "
+                      "c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1)", end)
+    claim(0 < untouched < len(positive), "some open invoices have no application or credit memo (the nulls matter)")
     buckets = [dict(name=name, balances=[]) for _, name in BUCKETS]
     for r in positive:
         buckets[[i for i, (low, _) in enumerate(BUCKETS) if r[3] >= low][-1]]["balances"].append(r[2])
@@ -419,7 +432,8 @@ def ex1(d, claim):
     return dict(asof=end, n=len(positive), total=total, customers=len({r[1] for r in positive}),
                 b=[dict(name=b["name"], amount=sum(b["balances"])) for b in buckets], ledger=ledger,
                 difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
-                oldest=dict(n=len(oldest), largest=max((r[2] for r in oldest), default=0.0)), refunded=refunded)
+                oldest=dict(n=len(oldest), largest=max((r[2] for r in oldest), default=0.0)), refunded=refunded,
+                untouched=untouched, ar_id=d.account("1020"))
 
 
 # --- Exercise 16.2 --------------------------------------------------------------------------------
@@ -467,6 +481,17 @@ def ex3(d, claim):
                "JOIN CostCenter c ON c.CostCenterID = e.CostCenterID WHERE c.CostCenterName = 'Manufacturing' "
                "GROUP BY tc.WorkDate ORDER BY tc.WorkDate")
     surge = [r for r in days if r[1] > 1 and r[2] == 1]
+    dups = [r[0] for r in d.q("SELECT COUNT(*) FROM TimeClockEntry tc JOIN Employee e ON e.EmployeeID = tc.EmployeeID "
+                              "JOIN CostCenter c ON c.CostCenterID = e.CostCenterID WHERE c.CostCenterName = 'Manufacturing' "
+                              "GROUP BY tc.EmployeeID, tc.WorkDate HAVING COUNT(*) > 1")]
+    claim(bool(dups) and set(dups) == {2}, "the plant's employee-days with more than one clock entry have two each")
+    dup = len(dups)
+    distinct = dict(d.q("SELECT tc.WorkDate, COUNT(DISTINCT tc.EmployeeID) FROM TimeClockEntry tc JOIN Employee e "
+                        "ON e.EmployeeID = tc.EmployeeID JOIN CostCenter c ON c.CostCenterID = e.CostCenterID "
+                        "WHERE c.CostCenterName = 'Manufacturing' GROUP BY 1"))
+    claim(all(distinct[r[0]] == r[1] for r in surge), "on every surge day the entries are one per employee")
+    claim([r[0] for r in days if distinct[r[0]] > 1 and r[2] == 1] == [r[0] for r in surge],
+          "counting distinct employees finds the same surge days as counting entries")
     per_month = Counter(r[0][:7] for r in surge)
     several = next(m for m in sorted(per_month) if per_month[m] > 1)
     cut = d.one("SELECT MAX(WorkDate) FROM TimeClockEntry")
@@ -504,7 +529,8 @@ def ex3(d, claim):
                 average=sum(n for m, n in per_month.items() if m >= several) / span,
                 peak=peak, peak_month=month_year(peaks[0] + "-01"),
                 employees=surge[0][1], regular=surge[0][3], overtime=surge[0][4], on_surge=on_surge,
-                shares=[s / (s + o) for s, o in zip(on_surge, other)], other=other, entries=len(approvals))
+                shares=[s / (s + o) for s, o in zip(on_surge, other)], other=other, entries=len(approvals),
+                dup=word(dup))
 
 
 # --- Exercise 16.4 --------------------------------------------------------------------------------

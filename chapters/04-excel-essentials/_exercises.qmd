@@ -20,7 +20,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (3) On the same worksheet, use COUNTIFS and SUMIFS with the named cells to calculate, for the period, the number of invoices and the totals of SubTotal, FreightAmount, TaxAmount, and GrandTotal. Confirm that SubTotal plus FreightAmount plus TaxAmount equals GrandTotal.
 
-(4) Build a grid with the fiscal years 2024, 2025, and 2026 in a column and the four amounts across a row. Fill it with one SUMIFS formula that uses mixed references, calculating each year's start and end dates with the DATE function. Add a total row and show that it equals the totals of the entire SalesInvoice Table.
+(4) Build a grid with the fiscal years 2024, 2025, and 2026 in a column and the four amounts across a row. Fill it with one SUMIFS formula that uses mixed references, calculating each year's start and end dates with the DATE function. The four amount columns sit side by side in the SalesInvoice Table, in the order SubTotal, FreightAmount, TaxAmount, GrandTotal, so here you can fill the formula across rather than paste it, provided you lock the column that must not move, as the Watch out on structured references explains. Add a total row and show that it equals the totals of the entire SalesInvoice Table.
 
 (5) Write two or three sentences explaining why this schedule is not a revenue figure for the financial statements. Consider, for example, the CreditMemo worksheet in CharlesRiver.xlsx, sales tax, and freight.
 
@@ -46,7 +46,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (4) Identify the promotion with the largest share of the discount dollars, and describe its scope, its rate, and its effective dates from the PromotionProgram Table.
 
-(5) Write a brief memo (one half page) summarizing the promotions, the consistency test, and what the analysis cannot yet show about when each discounted line was billed.
+(5) Write a brief memo (one half page) summarizing the promotions and the consistency test, with what a matching rate does and does not show, and what the analysis cannot yet show about when each discounted line was billed. If any promotion's effective dates in the PromotionProgram Table look wrong, list them as a question to follow up rather than correcting them.
 
 **Deliverable.** A promotion summary with shares of the discount dollars, a rate consistency test, and a half-page memo.
 
@@ -70,11 +70,11 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (3) Sort the Table by ItemGroup from A to Z and then by MarginPct from largest to smallest. Apply a color scale to the MarginPct column.
 
-(4) Create a named parameter cell, MarginTarget, set to 0.45 and validated to allow decimals between 0 and 1. Add a formula-based conditional formatting rule that highlights the items whose MarginPct is below MarginTarget, and use COUNTIFS to count them.
+(4) Create a named parameter cell, MarginTarget, set to 0.45 and validated to allow decimals between 0 and 1. Add a formula-based conditional formatting rule that highlights the items whose MarginPct is below MarginTarget, and use COUNTIFS to count them. A filter hides rows from view but not from COUNTIFS, so give the formula an ItemType condition rather than relying on the filter of requirement (2).
 
-(5) Create a parameter cell with a List validation rule that offers the four product groups Accessories, Furniture, Lighting, and Textiles. Use AVERAGEIFS to calculate the average UnitMargin and MarginPct of the finished goods in the selected group, and record the results for each group.
+(5) Create a parameter cell with a List validation rule that offers the four product groups Accessories, Furniture, Lighting, and Textiles. Use AVERAGEIFS, with the same ItemType condition, to calculate the average UnitMargin and MarginPct of the finished goods in the selected group, and record the results for each group.
 
-(6) Write three to four sentences interpreting the results. Explain why a margin at list price is not the margin Charles River actually earns.
+(6) Write three to four sentences interpreting the results. Explain why a margin at list price is not the margin Charles River actually earns, and why an average of the items' margins, which counts every item once, is not the margin on a product group's sales.
 
 **Deliverable.** An Item analysis with margin columns, a validated margin target, highlighted exceptions, a group selector driving AVERAGEIFS results, and a short interpretation.
 
@@ -90,7 +90,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 **Requirements.**
 
-(1) Use Power Query to load the Shipment and SalesOrder Tables from CharlesRiver.xlsx into your copy of the workbook.
+(1) Use Power Query to load the Shipment and SalesOrder Tables from CharlesRiver.xlsx into your copy of the workbook. Load both as Tables on new worksheets, with **Load To** (or **Close & Load To**) and then **Table** and **New worksheet**, as in Tutorial 4.1, Step 7.
 
 (2) On the Shipment Table, add a calculated column FreightTerms that brings in the FreightTerms of each shipment's sales order with XLOOKUP, using SalesOrderID, as you did with lookups in Part I. Add a second calculated column, FreightMargin, equal to BillableFreightAmount minus FreightCost.
 
@@ -126,7 +126,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (4) On an Analysis worksheet, use COUNTIFS to count the shipments in each exception category, the blank tracking numbers by Status, and the shipments in both categories.
 
-(5) Add a slicer on Status and confirm your counts with SUBTOTAL. Then change ReviewDate to December 1, 2026, explain how the second count changes, and set ReviewDate back to December 31, 2026.
+(5) Add a slicer on Status and use it, with SUBTOTAL, to confirm the blank tracking numbers by Status. With the slicer on In Transit, compare the number of shipments in view with your count of In Transit shipments past their DeliveryDate, and explain any difference. Then change ReviewDate to December 1, 2026, explain how the count of shipments past their DeliveryDate changes, and set ReviewDate back to December 31, 2026.
 
 (6) Prepare a brief memo for your senior (one half page) describing each exception, its likely cause, and the evidence you would request.
 
@@ -150,9 +150,9 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (3) Apply formula-based conditional formatting rules that highlight, in different colors, requests with a blank ApprovedByEmployeeID and requests whose RequestedByEmployeeID equals the ApprovedByEmployeeID. COUNTIFS cannot compare two columns of the same row, so add a calculated column, `SelfApproved`, with the formula `=[@RequestedByEmployeeID]=[@ApprovedByEmployeeID]`. Use COUNTIFS to count each group, and use a slicer on Status to see how the groups relate to it.
 
-(4) Build a small grid with the requesting employees as rows and, as columns, the number of requests, the number approved by someone other than the requester, and the number approved by the requester. Look up the requesters' names and job titles in the Employee worksheet of CharlesRiver.xlsx.
+(4) Build a small grid with the requesting employees as rows and, as columns, the number of requests, the number approved by someone other than the requester, the number approved by the requester, and the number still Pending. Count a request as approved only when its Status is Approved: a blank ApprovedByEmployeeID differs from the requester's ID, but it is not an approval by someone else. Look up the requesters' names and job titles in the Employee worksheet of CharlesRiver.xlsx.
 
-(5) Sort the Table by DiscountFromReference from largest to smallest, and describe the range of discounts approved.
+(5) Sort the Table by DiscountFromReference from largest to smallest, and describe the range of the discounts on the Approved requests. A price recorded on a Pending request has not been approved.
 
 (6) Prepare a brief memo (one half page) that describes each exception, explains why it matters for the design of the pricing control, and lists the follow-up procedures you would propose, including how you would find out whether the pending requests were used on sales.
 

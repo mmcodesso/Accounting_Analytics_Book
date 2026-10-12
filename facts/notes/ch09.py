@@ -90,6 +90,7 @@ def ex1(d, claim):
           and by_id[variance]["subtype"] == "COGS", "work order closes post to 5080, a cost of goods sold account")
     claim(by_id[d.account("1030")]["postings"] == 0, "1030 has no postings")
     claim(not by_id[d.account("4070")]["active"], "4070 is inactive")
+    claim(by_id[d.account("4070")]["postings"] == 0, "4070 has no postings")
     return dict(n=len(accounts), types=types, n_subtypes=word(len(subtypes)).capitalize(),
                 subtypes=[(s, subtypes[s]) for s in SUBTYPES], headers=len(headers), n_top=word(len(top)),
                 top=[a["number"] for a in top], subs=subs, n_opposite=len(opposite),
@@ -165,6 +166,9 @@ def ex3(d, claim):
     for r in items:
         groups[r[2]] = groups.get(r[2], 0) + 1
     claim(all(r[4] for r in items), "the component check returns no rows")
+    claim(d.one("SELECT COUNT(*) FROM Item WHERE SupplyMode = 'Manufactured' AND (StandardDirectLaborCost IS NULL "
+                "OR StandardVariableOverheadCost IS NULL OR StandardFixedOverheadCost IS NULL "
+                "OR StandardConversionCost IS NULL)") == 0, "no component of a manufactured item is NULL")
     rates = [r[5] for r in items]
     claim(len(set(rates)) >= len(items) / 2, "labor rates are item-specific, not one plant rate")
     claim(items[2][6] > items[3][6], "the three highest conversion costs are not tied with the fourth")
@@ -197,10 +201,24 @@ def ex4(d, claim):
     claim(due[0][1] == "Released", "the oldest is still Released")
     released = sum(1 for r in due if r[1] == "Released")
     claim(200 <= released < 1000, "hundreds of released work orders are past due")
+    # The status against the other tables (C9-15 of the review): activity recorded on work orders still marked Released.
+    activity = {r[0]: r[1:] for r in d.q(
+        "SELECT w.WorkOrderNumber, "
+        "EXISTS (SELECT 1 FROM MaterialIssue m WHERE m.WorkOrderID = w.WorkOrderID), "
+        "EXISTS (SELECT 1 FROM ProductionCompletion p WHERE p.WorkOrderID = w.WorkOrderID), "
+        "EXISTS (SELECT 1 FROM WorkOrderOperation o WHERE o.WorkOrderID = w.WorkOrderID AND o.ActualStartDate IS NOT NULL), "
+        "EXISTS (SELECT 1 FROM LaborTimeEntry l WHERE l.WorkOrderID = w.WorkOrderID) "
+        "FROM WorkOrder w WHERE w.ClosedDate IS NULL AND w.Status = 'Released' AND w.DueDate <= ?", end)}
+    active = [k for k, v in activity.items() if any(v)]
+    claim(all(all(activity[k][:3]) for k in active),
+          "every past-due Released work order with activity has material issues, completions, and started operations")
+    claim(0 < len(active) < released / 2, "some, far fewer than half, of the past-due Released work orders have activity")
+    named_active = all(r[0] in active for r in due[:3])
     return dict(end=end, n=len(rows), status=status, not_completed=status["Released"] + status["In Progress"], by_year=by_year,
                 released_low=min(r[2] for r in rows), released_high=max(r[2] for r in rows),
                 due=len(due), due_status=due_status,
-                oldest=dict(number=due[0][0], released=due[0][2], due=due[0][3]),
+                active=dict(n=len(active), labor=sum(1 for k in active if activity[k][3])), named_active=named_active,
+                released=released, oldest=dict(number=due[0][0], released=due[0][2], due=due[0][3]),
                 next=[dict(number=r[0], due=r[3]) for r in due[1:3]])
 
 

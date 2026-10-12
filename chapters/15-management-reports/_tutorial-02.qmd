@@ -51,7 +51,7 @@ Actual is the GL Amount of Tutorial 14.3, debits less credits without the closin
 a. Add a page named `Budget`, with a slicer of Year set to 2026.
 b. Add a matrix with CostCenterName on **Rows** and Budget, Actual, Variance, and Variance % as **Values**.
 c. In **Filters on this visual**, add AccountSubType from Account and keep only Operating Expense.
-d. Record the cost centers whose variance is more than five percent of their budget.
+d. Record the cost centers whose variance is five percent of their budget or more, above or below.
 
 Three cost centers stand out. Sales spent far less than its budget, the Warehouse far more, and Administration less. Every other cost center is a few percent under budget. The (Blank) row holds the expenses budgeted and recorded without a cost center, such as rent, utilities, and insurance, which Chapter 7's Budget Table left out. Here both the budget and the actual amounts are present, and they agree within one percent.
 
@@ -140,7 +140,7 @@ c. Type the formula below in the formula bar, and click **Back to report**.
 YTD Variance = RUNNINGSUM ( [Variance to Flexed] )
 ```
 
-The year-to-date column climbs in January, falls through June, climbs again in July, and falls for the rest of the year to the total of Step 9. January and July are the months with three pay dates, which Chapter 11 traced to payroll recorded when it is paid: against a budget that spreads salaries evenly, they look unfavorable, and every other month looks favorable. A manager who read the report in July would have seen a cost center on budget for the year; the months between tell the truer story. @fig-15-06 showed this calculation in the editor.
+The year-to-date column climbs in January, falls through June, climbs again in July, and falls for the rest of the year to the total of Step 9, within a cent: each month is flexed at its own month's budgeted commission rate, which differs from the year's rate only in its last digits. January and July are the months with three pay dates, which Chapter 11 traced to payroll recorded when it is paid: against a budget that spreads salaries evenly, they look unfavorable, and every other month looks favorable. A manager who read the report in July would have seen a cost center on budget for the year; the months between tell the truer story. @fig-15-06 showed this calculation in the editor.
 
 **Step 11. Add the budget test.**
 

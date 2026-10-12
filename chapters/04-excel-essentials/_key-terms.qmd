@@ -6,11 +6,11 @@
 
 **Applied steps.** The list in the Power Query Editor that records each action taken on a query, such as filtering rows, removing columns, or changing a data type. Power Query repeats the steps in order every time the query is refreshed, and the list documents how the data was prepared.
 
-**Calculated column.** A column of an Excel Table whose formula Excel applies to every row automatically, including rows added later. Calculated columns are the natural place for row-level measures, such as the list amount or the discount on each invoice line.
+**Calculated column.** A column of an Excel Table whose formula Excel applies by default to every row, including rows added later. Calculated columns are the natural place for row-level measures, such as the list amount or the discount on each invoice line. A single row can still be overwritten, which Excel's error checking flags.
 
 **Conditional formatting.** An Excel feature that changes the appearance of cells that meet a rule, such as values above a threshold, the top items in a range, or rows for which a formula returns TRUE. It directs attention to patterns and exceptions without changing the data.
 
-**Control total.** A total calculated independently from a set of data, which the data must agree with, such as the sum of the invoice subtotals against the sum of the invoice lines. A difference shows that records are missing, duplicated, or wrongly included.
+**Control total.** A total calculated independently from a set of data, which the data must agree with, such as the sum of the invoice subtotals against the sum of the invoice lines. A difference calls for investigation, because records may be missing, duplicated, or wrongly included, or values may be wrong. Agreement shows only that the two sides match: records missing from both sides go unnoticed.
 
 **Data validation.** An Excel feature that restricts what can be typed into a cell, such as a list of allowed values or a number within a range, and that can display an input message and refuse invalid entries. In analytical workbooks it protects the parameter cells that drive the results.
 
@@ -20,7 +20,7 @@
 
 **Mixed reference.** A cell reference that locks either the column or the row but not both, such as $A2 or A$2. Mixed references let a single formula fill a two-way grid, with the row labels in a locked column and the column headers in a locked row.
 
-**Named cell.** A cell to which a descriptive name has been assigned, such as LargeLineThreshold, so that formulas can use the name in place of the cell address. A name always refers to the same cell, so it behaves like an absolute reference while making the formula easier to read. A name can also refer to a range of cells, and the Name Manager lists every name in a workbook.
+**Named cell.** A cell to which a descriptive name has been assigned, such as LargeLineThreshold, so that formulas can use the name in place of the cell address. A name created in the Name Box refers to its cell with an absolute reference, so it behaves like one while making the formula easier to read. A name can also refer to a range of cells, and the Name Manager lists every name in a workbook.
 
 **Parameter cell.** A cell that holds an input to an analysis, such as a threshold, a percentile, or the start date of a review period, so that the value is stated once and used by every formula that needs it. Parameter cells are usually named, validated, and gathered on one worksheet.
 

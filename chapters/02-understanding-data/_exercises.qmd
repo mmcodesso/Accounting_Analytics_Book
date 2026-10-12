@@ -8,13 +8,13 @@
 
 **Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** You are a financial reporting analyst at Charles River preparing to analyze the company's revenue for the most recent fiscal year. Before building any reports, you need to verify that the underlying sales data is reliable enough to support accurate revenue figures.
+**Scenario.** You are a financial reporting analyst at Charles River preparing to analyze the company's revenue for fiscal 2026, the most recent complete fiscal year in the extract. Before building any reports, you need to verify that the underlying sales data is reliable enough to support accurate revenue figures.
 
 **Requirements.**
 
 (1) Open your working copy, CharlesRiver_Work.xlsx, in Excel and examine the SalesOrder, SalesOrderLine, SalesInvoice, SalesInvoiceLine, Customer, and Item worksheets. For each table, identify and document any data quality problems you observe, classifying each problem by quality dimension (accuracy, completeness, consistency, or timeliness).
 
-(2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved, such as Quantity, UnitPrice, Discount, and LineTotal, and test whether LineTotal agrees with the other columns. Examine the PricingMethod column and identify the lines priced by approved override rather than by a price list, which deserve closer review.
+(2) Assess whether the SalesInvoiceLine table contains the information needed to calculate revenue for each invoice. Identify the columns involved, such as Quantity, UnitPrice, Discount, and LineTotal, and test whether LineTotal agrees with the other columns. Discount is a rate, a fraction of the price rather than an amount, and LineTotal is rounded to the cent, so treat a difference of a cent or less as rounding rather than an error. LineTotal is the amount billed for the line, before freight and tax and before any later credit memo. Examine the PricingMethod column and identify the lines priced by approved override rather than by a price list, which deserve closer review.
 
 (3) Examine whether every CustomerID in the SalesOrder table corresponds to a customer in the Customer table. Use COUNTIFS or XLOOKUP to test this relationship. Document any orphaned records where an order references a customer that does not exist, and explain what a clean result tells you.
 
@@ -27,7 +27,7 @@
 
 **Table group:** Accounting Core
 
-**Scenario.** You are a financial reporting analyst who has been asked to verify that the Charles River general ledger is complete before the team begins preparing the year-end financial statements. Your supervisor is concerned that some transactions may not have been posted.
+**Scenario.** You are a financial reporting analyst who has been asked to verify that the Charles River general ledger is complete before the team begins preparing the financial statements for the fiscal year that ended December 31, 2026. Your supervisor is concerned that some transactions may not have been posted.
 
 **Requirements.**
 
@@ -35,7 +35,7 @@
 
 (2) Identify the date range covered by the general ledger entries. Use the FiscalYear and FiscalPeriod columns to check whether entries are present for every period within each fiscal year. Note any periods that have an unusually low number of entries compared to other periods, and explain whether each reflects missing transactions or the edges of the extract.
 
-(3) Examine the SourceDocumentType column to understand what types of transactions are recorded. Determine whether the ledger includes entries from all expected source types, such as SalesInvoice, Shipment, PurchaseInvoice, JournalEntry, PayrollPayment, and WorkOrderClose. If any expected source type is absent, document this as a potential completeness concern.
+(3) Examine the SourceDocumentType column to understand what types of transactions are recorded. Determine whether the ledger includes entries from all expected source types, such as SalesInvoice, Shipment, PurchaseInvoice, JournalEntry, PayrollPayment, and WorkOrderClose. If any expected source type is absent, document this as a potential completeness concern, and explain what finding all of them present does and does not show.
 
 (4) Write a brief assessment (one page) of the general ledger's completeness, suitable for review by the financial reporting manager.
 
@@ -71,7 +71,7 @@
 
 **Requirements.**
 
-(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row), and describe what one row of each table represents.
+(1) Open your working copy, CharlesRiver_Work.xlsx, and examine the Budget and BudgetLine worksheets from the Organizational Planning group. Determine whether the budget data follows tidy data principles (each variable in its own column, each observation in its own row), describe what one row of each table represents, and explain whether the amounts of the two tables can be added together.
 
 (2) Department managers often ask for budget reports with months across the top. Sketch the layout of such a report for one cost center. Explain which tidy data principles it would violate and why the tidy form stored in the workbook is better suited to a budget-versus-actual analysis.
 
@@ -92,7 +92,7 @@
 
 **Requirements.**
 
-(1) For the Order-to-Cash group, test for missing values in critical fields of the SalesOrder table (OrderDate, CustomerID, Status), and test for sales invoices dated before the earliest shipment on the same sales order. Document the number of records affected by each problem.
+(1) Working in your copy, CharlesRiver_Work.xlsx, start with the Order-to-Cash group: test for missing values in critical fields of the SalesOrder table (OrderDate, CustomerID, Status), and test for sales invoices dated before the earliest shipment on the same sales order. Document the number of records affected by each problem.
 
 (2) For the Master Data group, check the Item table for blank ListPrice values and determine which of them are expected.
 
@@ -119,7 +119,7 @@
 
 (3) For each pair, compare the two records: their dates, their amounts, and, for the payments, the purchase invoices they paid. Decide whether each pair looks like the same obligation paid twice or a reference number reused on two different transactions, and describe the evidence you would request from the supplier or the accounts payable team to settle the question.
 
-(4) A duplicate payment does not always share a reference number, so test the risk directly. In the PurchaseInvoice worksheet, use SUMIFS to total the payments recorded against each invoice in the DisbursementPayment worksheet, matching on PurchaseInvoiceID, and compare that total with the invoice's GrandTotal. Many invoices are paid in installments, which is normal. Identify any invoice whose payments exceed its GrandTotal, and explain what a clean result does and does not prove.
+(4) A duplicate payment does not always share a reference number, so add a test at the level of each invoice. In the PurchaseInvoice worksheet, use SUMIFS to total the payments recorded against each invoice in the DisbursementPayment worksheet, matching on PurchaseInvoiceID, and compare that total with the invoice's GrandTotal. Round both to the cent with ROUND before comparing them, because a sum of many amounts can differ from the total by a tiny fraction of a cent. Many invoices are paid in installments, which is normal. Identify any invoice whose payments exceed its GrandTotal, and explain what a clean result does and does not prove.
 
 
 

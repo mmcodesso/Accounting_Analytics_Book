@@ -78,7 +78,7 @@ b. In **Filters on this visual**, keep the AccountType values Revenue and Expens
 c. Add a card with Net Income, and in **Filters on this visual** keep the year 2026 for the card.
 d. Read each year's total in the matrix, and compare the 2026 total with the card.
 
-@fig-14-10 shows the matrix. Each year's total is that year's net income, and it equals the amount the year's closing entry transferred to retained earnings. To see why the flag matters, add the temporary measure below, which adds up all the postings, and place it in the matrix. It shows zero for every year, as in @fig-14-09. Delete it afterward.
+@fig-14-10 shows the matrix. Each year's total is that year's net income, and it equals the amount the year's closing entry transferred to retained earnings. With YearMonth in place of Year on **Columns**, the same matrix is the statement month by month, because P&L Amount is calculated for whatever period a cell holds. To see why the flag matters, add the temporary measure below, which adds up all the postings, and place it in the matrix. It shows zero for every year, as in @fig-14-09. Delete it afterward.
 
 
 ```

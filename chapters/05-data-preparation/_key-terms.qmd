@@ -26,7 +26,7 @@
 
 **Merge.** A Power Query operation that combines two queries by matching a key column in each and adds the matching rows of the second query as columns of the first. It is Power Query's equivalent of a lookup or a SQL join.
 
-**Reference query.** A Power Query query created from another query with the Reference command, which starts from the other query's result and updates whenever it does. Building a combined table as a reference query leaves the source queries unchanged.
+**Reference query.** A Power Query query created from another query with the Reference command, which starts from the other query's result and is rebuilt from it on every refresh. Building a combined table as a reference query leaves the source queries unchanged.
 
 **Text function.** An Excel function that extracts, changes, or tests text, such as MID, TRIM, SUBSTITUTE, or PROPER. Text functions are used to pull attributes out of codes and to standardize values so that they match.
 

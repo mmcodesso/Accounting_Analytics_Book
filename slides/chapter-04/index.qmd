@@ -76,7 +76,7 @@ Each Charles River Table is named with a number and the database table it holds,
 {{< book-figure fig-04-01 crop="0,0,1,0.462" >}}
 
 ::: {.notes}
-The total names fixed cells, so rows added below the data are left out and nothing warns you: a number that looks reasonable, which is what makes a range error dangerous. The column formula was copied down by hand, so every row holds its own copy and new rows get none.
+The total names fixed cells, so rows added below the data are left out and nothing warns you: a number that looks reasonable, which is what makes a range error dangerous. The column formula was copied down by hand, so every row holds its own copy, and nothing ensures that new rows get one.
 :::
 
 ## A Table knows its extent and names its columns
@@ -84,7 +84,7 @@ The total names fixed cells, so rows added below the data are left out and nothi
 {{< book-figure fig-04-01 crop="0,0.462,1,0.538" >}}
 
 ::: {.notes}
-The same cells as a Table: one calculated-column formula fills every row, including rows added later, and the total refers to the column by name. The chapter's comparison table adds that slicers work only on Tables, and that charts and PivotTables follow a Table as it grows, although a PivotTable still needs a refresh.
+The same cells as a Table: one calculated-column formula fills every row by default, including rows added later, and the total refers to the column by name. The chapter's comparison table adds that slicers work only on Tables, and that charts and PivotTables follow a Table as it grows, although a PivotTable still needs a refresh.
 :::
 
 ## Structured references state their own logic
@@ -92,10 +92,10 @@ The same cells as a Table: one calculated-column formula fills every row, includ
 - `SalesInvoiceLine[LineTotal]` is the whole column, however many rows it holds
 - `[@Quantity]` is the value in the current row
 - Click a Table cell while writing a formula, and Excel inserts the reference
-- A formula typed in an empty column becomes a calculated column for every row
+- By default, a formula typed in an empty column becomes a calculated column
 
 ::: {.notes}
-A reviewer who reads an average of SalesInvoiceLine[LineTotal] knows what is averaged; one who reads a cell range must check the column and the last row. If one row of a calculated column holds a different formula, Excel marks it with a small triangle, a useful warning when you review someone else's workbook.
+A reviewer who reads an average of SalesInvoiceLine[LineTotal] knows what is averaged; one who reads a cell range must check the column and the last row. A calculated column makes one formula the default, not a guarantee: if one row holds a different formula or a typed value, Excel marks it with a small triangle, a useful warning when you review someone else's workbook.
 :::
 
 ## Watch out: a Table grows when you type next to it {.watch-out}
@@ -159,12 +159,12 @@ The Navigator lists each worksheet and each Table, with a different icon for eac
 The Item query keeps only the items Charles River sells, those with a list price, and only the columns the analysis needs. Clicking any step shows the data as it was at that point, which is the evidence a reviewer looks for.
 :::
 
-## Steps 7 to 11: load, extend and prove the import
+## Steps 7 to 11: load, extend and check the import
 
 {{< book-steps 4.1 7-11 >}}
 
 ::: {.notes}
-Close & Load puts each query in its own worksheet as a Table named after the query. The control totals compare the invoice lines with the invoices they belong to, and the refresh test shows that the calculated columns survive a reload.
+Close & Load To, with Table and New worksheet, puts each query in its own worksheet as a Table named after the query; a plain Close & Load would send several new queries at once to the Data Model, Excel's default. The control totals compare the invoice lines with the invoices they belong to, and the refresh test shows that the calculated columns survive a reload.
 :::
 
 ## Two calculated columns extend the invoice lines
@@ -180,7 +180,7 @@ ListAmount is what each line would have been billed at the item's list price, an
 {{< book-checkpoint 4.1 lead="true" >}}
 
 ::: {.notes}
-The zero difference shows that every invoice line was imported and that the lines add up to their invoices. The list amount is higher because most lines are billed at price-list prices below list, and some also carry a promotion; Tutorial 4.3 finds out which.
+The zero difference shows that the imported lines add up to the imported invoices. An invoice left out with all its lines would leave it at zero too, so only evidence from outside the import, such as a count of the source rows, shows that nothing is missing from both. The list amount is higher because most lines are billed at price-list prices below list, and some also carry a promotion; Tutorial 4.3 finds out which.
 :::
 
 # Cell References and Named Cells
@@ -231,7 +231,7 @@ A COUNTIFS that refers to the PricingMethod column, filled one column to the rig
 ## Named cells hold the parameters of an analysis
 
 - Name a cell in the Name Box, such as LargeLineThreshold
-- A name behaves like an absolute reference, and the formula states its logic
+- A name made this way is an absolute reference, and the formula states its logic
 - Keep every parameter on one worksheet, with a name and a description
 - The Name Manager lists every name, and every Table, with its value and cell
 
@@ -367,8 +367,8 @@ Filter by Color, on the filter button of a formatted column, is a quick way to g
 
 - Data > Data Validation allows a list, a number or date range, a text length or a custom rule
 - The Input Message explains the parameter; a Stop alert refuses an invalid entry
-- Pasting over the cell replaces the rule, and formula results are never checked
-- Values already in the cells are not checked either, but Circle Invalid Data marks them
+- Pasted or filled values get no alert, and an ordinary paste replaces the rule
+- Existing values and formula results raise no alert; Circle Invalid Data marks them
 
 ::: {.notes}
 A mistyped parameter flows silently into every formula that depends on it, which is why validation belongs on parameter cells. Audit and finance workbooks often gather every parameter on one worksheet, named, validated and described, so a reviewer can confirm each assumption in one place.
@@ -388,11 +388,11 @@ Data worksheets hold only the Tables the queries load, so a refresh can replace 
 
 - Purpose, source, Tables and query filters, and the date of the last refresh
 - The parameters and what each controls; the worksheets and their contents
-- The preparer and the reviewer, and any open questions or limitations
+- The preparer and the reviewer, with dates, and any open questions or limitations
 - A formatting convention, such as blue inputs and black formulas
 
 ::: {.notes}
-The aim is the one auditing standards set: the PCAOB requires documentation that lets an experienced auditor with no previous connection to the engagement understand the work, and that shows who performed and who reviewed it. The same practices underlie the audit workpapers at the end of Part II.
+The aim is the one auditing standards set: the PCAOB requires documentation that lets an experienced auditor with no previous connection to the engagement understand the work, and that shows who performed and who reviewed it, and when. The same practices underlie the audit workpapers at the end of Part II.
 :::
 
 ## Check your understanding {.check}

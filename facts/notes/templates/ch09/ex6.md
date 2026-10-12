@@ -3,4 +3,5 @@
      {{ r.employee }}, work order {{ r.work_order }}, {{ r.date }}, {{ r.hours|num(2) }} hours){{ sep(loop) }}{% endfor %}; employee{{ 's' if employees|length > 1 }} {% for e in employees %}{{ e }}{{ sep(loop) }}{% endfor %} {{ 'are' if employees|length > 1 else 'is' }} {{ title }}. They are planted anomalies (invalid direct labor operation
      link). ClockStatus values: {% for s, k in clock %}{{ s }} ({{ k|count }}){{ ' and ' if not loop.last }}{% endfor %}. {{ n_missing }} entries have no ClockOutTime, all for employee {{ clock_employee }} ({{ clock_title }}) on January 1 of {{ d.F }}, {{ d.P }}, and {{ d.C }}, with Pending status (planted missing clock-out). {{ terminated }} employees have a
      TerminationDate; all are Terminated with IsActive 0, so the three columns agree. Missing links mean labor cost that cannot be traced
-     to an operation; missing clock-outs mean paid hours without a complete time record. -->
+     to an operation; missing clock-outs mean recorded hours without a complete time record; whether they were paid is a
+     payroll question, which Chapter 12 tests. -->

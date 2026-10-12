@@ -16,7 +16,7 @@ B.  Only the measures common to both units
 C.  Only the nonfinancial measures of each unit
 D.  All of the measures, weighted equally
 
-**3.** A reader right-clicks the bar of one promotion and opens a page that shows only that promotion's terms and invoice lines. Which feature is the reader using?
+**3.** A reader right-clicks the bar of one promotion and opens a page that shows only that promotion's terms and its discounts by month. Which feature is the reader using?
 
 A.  Drill-through
 B.  Drill-down

@@ -102,7 +102,7 @@ D.  They are two spellings of one clause, and they give the same result
 
 **15.** The monthly ratio of labor hours to standard hours swings widely, while the trailing twelve-month ratio rises over two years. What should the controller conclude?
 
-A.  The rise is a trend, since the trailing measure smooths single months
+A.  The recorded measure suggests a sustained rise, if its coverage and definitions held
 B.  The monthly figures are wrong, because they differ from the trailing ones
 C.  Nothing, because a trailing twelve-month measure always rises over time
 D.  The swings show that the plant's efficiency improved in some months

@@ -96,7 +96,7 @@ a. Replace the last line of the header comment, so that the header reads as belo
    /* Chapter 9: manufacturing variance, first look
       Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)
       Prepared by: your name, date
-      Checks: every close adds up; the 2026 postings exclude JE-2026-000296 */
+      Checks: every close adds up; the closing entry is JE-2026-000296 */
    ```
 
 b. Click **Save SQL file**.

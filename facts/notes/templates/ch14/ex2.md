@@ -8,6 +8,8 @@
      posting date, not by invoice date{% endif %}{% if dropped %}{{ ',' if added }} {{ 'and' if added else 'because it' }} leaves out {{ dropped|join(', ') }}, which also {{ 'has' if dropped|length == 1 else 'have' }} lines delivered in {{ d.C }}, since it dates an invoice by its last delivery{% endif %}); {% for g in early %}{{ g.lines }} line{{ 's' if g.lines != 1 }} on {{ g.numbers }}, dated {{ g.dates }} and shipped {{ g.shipped }}
      ({{ g.amount|money }}){{ ', and ' if not loop.last }}{% endfor %}, the invoices
      dated before their shipment (Chapter 12; their numbers carry the next year's prefix, Chapter 5). (6) Revenue is recognized when
-     control passes, which for Charles River's goods is at shipment or delivery (every shipment is delivered in the year it ships);
-     invoice-date revenue misstates the years by the late invoices, and Services have no ship date, so a ship-date report needs a rule
-     for them (their invoice date). Revenue by ship date is lower in each year mainly because Services drop to (Blank). -->
+     control passes, which Chapter 12 assumes happens on delivery; every shipment is delivered in the month it ships, so the ship
+     date dates goods revenue as delivery would, while invoice-date revenue misstates the years by the late invoices. Services have no
+     ship date, so a ship-date report needs a rule for them, such as the invoice date as a documented proxy for when the service was
+     performed. Revenue by ship date is lower in each year mainly because Services drop to (Blank). Accept a reasoned
+     recommendation that names its date and discloses the other. -->

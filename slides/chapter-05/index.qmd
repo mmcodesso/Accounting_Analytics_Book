@@ -44,7 +44,7 @@ Before any analysis can begin, the attributes have to be brought together, check
 - Teaching cases rarely cover this step, though practice depends on it (Raschke and Charron)
 
 ::: {.notes}
-Transaction systems store data in the form that suits recording it, spread across related tables, as Chapter 3 showed. An analysis needs one table in which every row carries all the attributes the question depends on.
+Transaction systems store data in the form that suits recording it, spread across related tables, as Chapter 3 showed. A row-level analysis in Excel needs one table in which every row carries all the attributes the question depends on.
 :::
 
 ## Every preparation step needs a check
@@ -94,18 +94,18 @@ Every item Charles River sells has a code made of a group, a product type and a 
 
 ## Text functions standardize and convert
 
-{{< book-table tbl-05-01 6-10 >}}
+{{< book-table tbl-05-01 6-11 >}}
 
 ::: {.notes}
-Values that mean the same thing should look the same, or lookups, filters and counts treat them as different. Standardize deliberately, though: PROPER turns a correct LLC into Llc and a correct "and" in a company name into "And".
+Values that mean the same thing should look the same, or lookups, filters and counts treat them as different. Standardize deliberately, though: PROPER turns a correct LLC into Llc and a correct "and" in a company name into "And". EXACT compares two texts including their case, which an ordinary comparison ignores.
 :::
 
 ## Test before you clean
 
 - `=LEN([@CustomerName])=LEN(TRIM([@CustomerName]))` is TRUE for a name with no stray spaces
 - A COUNTIFS on the result counts the values that fail
-- Charles River's names, codes and addresses pass: the fields are clean
-- That is a finding to record, and evidence the field can be trusted
+- Charles River's names, codes and addresses pass: no stray spaces
+- That is a finding to record: the field is free of the problem tested for
 
 ::: {.notes}
 A workflow that cleans data it has not tested can introduce errors. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
@@ -148,7 +148,7 @@ A historical extract such as the Charles River data ends on a fixed date. The as
 
 ## Watch out: a date stored as text is not a date {.watch-out}
 
-- It sorts alphabetically, does not subtract, and fails to match a real date
+- It sorts alphabetically, fails to match a real date, and misleads in arithmetic
 - It is common in exports that use a different date order
 - DATEVALUE converts one value; Power Query's data type converts a column
 - Check the type of every date column before you rely on it
@@ -225,7 +225,7 @@ Students add the product type and a code-form check to the Item Table, and the f
 {{< book-figure fig-05-02 >}}
 
 ::: {.notes}
-The product type is the middle part of the code; the Furniture group has eight product types, such as desks and sideboards, listed in the chapter's table of codes. The code check is TRUE for every item, so the extraction can be trusted.
+The product type is the middle part of the code; the Furniture group has eight product types, such as desks and sideboards, listed in the chapter's table of codes. The code check is TRUE for every item, so MID takes the product type from the same position in every code; reading the extracted codes against the table of codes shows that they are real types.
 :::
 
 ## Every invoice gains a period and its payment terms
@@ -233,7 +233,7 @@ The product type is the middle part of the code; the Furniture group has eight p
 {{< book-figure fig-05-03 >}}
 
 ::: {.notes}
-The period label comes from the invoice date, and the terms from the due date less the invoice date. Every invoice's terms are one of the four standard values, so no invoice fails the standard-terms test.
+The period label comes from the invoice date, and the terms from the due date less the invoice date. Every invoice's terms are one of the four standard values, so no invoice fails the standard-terms test; the test shows that the recorded terms conform, not whether a due date was calculated or typed.
 :::
 
 ## Checkpoint
@@ -331,7 +331,7 @@ More than a hundred lines of the Furniture Seasonal Promotion were invoiced in N
 {{< book-checkpoint 5.2 lead="true" >}}
 
 ::: {.notes}
-The Furniture revenue for the third and fourth quarters agrees to the cent with the Part I case, so the lookups put every line in the right group and quarter. A quarter-by-quarter analysis must use the invoice date for revenue and keep the order date in view to explain it.
+The Furniture revenue for the third and fourth quarters agrees to the cent with the Part I case, which is evidence at the level of those totals; like the control totals of Tutorial 4.1, it cannot show that every single line has the right group and quarter. A quarter-by-quarter analysis must use the invoice date for revenue and keep the order date in view to explain it.
 :::
 
 # Missing, Meaningful, and Invalid Values
@@ -429,7 +429,7 @@ Students import the customers, start InvoiceLines as a reference to the invoice 
 {{< book-figure fig-05-06 >}}
 
 ::: {.notes}
-The upper table is the query being built and the lower one the Table merged into it, with the key column selected in each. The dialog reports that every invoice line found a match, the merge's first check.
+The upper table is the query being built and the lower one the Table merged into it, with the key column selected in each. The dialog's message estimates that every invoice line finds a match; the row count after loading is the check that confirms it.
 :::
 
 ## Five custom columns finish InvoiceLines
@@ -445,7 +445,7 @@ These are Tutorial 5.1's worksheet formulas written in M, so they are rebuilt on
 {{< book-figure fig-05-08 >}}
 
 ::: {.notes}
-InvoiceLines has as many rows as SalesInvoiceLine and the same line total, and its Furniture revenue by quarter repeats the lookups to the cent. The two methods agree, which is the evidence that the preparation is correct.
+InvoiceLines has as many rows as SalesInvoiceLine and the same line total, and its Furniture revenue by quarter repeats the lookups to the cent. The two methods agree, which shows that the query prepares the data as consistently as the lookups; both start from the same keys and dates, so the agreement cannot show that every source value is right.
 :::
 
 ## Checkpoint

@@ -1,5 +1,8 @@
-"""Read-only twins for Chapter 18 ("Make, Buy, or Reprice"). Every value the chapter's instructor notes state is
-computed here: SQL for the records, Python for the workbook's regressions, Goal Seek targets, Data Tables, and Solver."""
+"""Twins for Chapter 18 ("Make, Buy, or Reprice"). Every value the chapter's instructor notes state is computed here:
+SQL for the records, Python for the workbook's regressions, Goal Seek targets, Data Tables, and Solver. The dataset is
+read only; the script writes two files, the CR18 reference model's inputs cr18_itemcosts.csv (the item costs at six
+decimals) and cr18_sales.csv, in the reference models' folder (paths.REFERENCE_MODELS), and overwrites them on every run,
+so run it before scripts/companion/pbi/make_cr18.py."""
 import sqlite3
 import statistics as st
 from collections import defaultdict

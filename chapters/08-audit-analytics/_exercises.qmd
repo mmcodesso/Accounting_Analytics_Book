@@ -10,7 +10,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Tutorial 8.2 found that Charles River has never recorded an allowance for credit losses. The controller asks you to estimate one at the end of fiscal 2026 from the aging schedule. The credit department proposes these loss rates for the buckets, which are an assumption for this exercise and not data from Charles River:
+**Scenario.** Tutorial 8.2 found that Charles River's ledger shows no allowance for credit losses in three years. The controller asks you to estimate one at the end of fiscal 2026 from the aging schedule. The credit department proposes these loss rates for the buckets, which are an assumption for this exercise and not data from Charles River:
 
 - current: 0.5 percent;
 - 1 to 30 days past due: 2 percent;
@@ -133,7 +133,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
    Count each flag, and explain what the difference between the two counts shows.
 
-(6) Run a gap test on the purchase order numbers. Add a column with the year of each PONumber, `=--MID([@PONumber],4,4)`, and one with its sequence number, `=--RIGHT([@PONumber],6)`. For each year, compare the number of orders with the largest sequence number minus the smallest, plus one, and state whether any numbers are missing.
+(6) Run a gap test on the purchase order numbers. Add a column with the year of each PONumber, `=--MID([@PONumber],4,4)`, and one with its sequence number, `=--RIGHT([@PONumber],6)`. For each year, check that no sequence number repeats, compare the number of orders with the largest sequence number minus the smallest, plus one, and state whether any numbers are missing.
 
 (7) Write a memo of one half to one page that summarizes the exceptions, distinguishes weaknesses in the design of the approval controls from failures in their operation, records the clean results of the duplicate and gap tests, and recommends follow-up.
 

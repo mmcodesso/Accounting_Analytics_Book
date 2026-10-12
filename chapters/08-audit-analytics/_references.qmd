@@ -14,6 +14,8 @@ Fay, R. G., & Negangard, E. M. (2017). Manual journal entry testing: Data analyt
 
 Financial Accounting Standards Board. (2016). *Financial instruments—Credit losses (Topic 326): Measurement of credit losses on financial instruments* (Accounting Standards Update No. 2016-13). <https://storage.fasb.org/ASU%202016-13.pdf>
 
+Institute of Internal Auditors. (2024). *Global internal audit standards*. <https://www.theiia.org/en/standards/2024-standards/global-internal-audit-standards/>
+
 Newcomb, S. (1881). Note on the frequency of use of the different digits in natural numbers. *American Journal of Mathematics*, *4*(1), 39–40. <https://doi.org/10.2307/2369148>
 
 {{< include /shared/fragments/_reference-nigrini-2012.qmd >}}

@@ -8,7 +8,7 @@
 
 **Audit workpaper.** The documentation of an audit test: its objective, source, population check, procedure, parameters, results, exceptions and their dispositions, conclusion, preparer, and reviewer, recorded so that an experienced auditor with no connection to the engagement can understand and review the work.
 
-**Backdated entry.** A journal entry created on a later day than the date it posts to, so that it changes a period that may already have been reported.
+**Backdated entry.** A journal entry created on a later day than the date it posts to, so that it may change a period that has already been closed or reported.
 
 **Benford's Law.** The observation that in many collections of numbers the first digit d occurs with a proportion of about `LOG10(1+1/d)`, so that about 30 percent of the numbers begin with 1 and fewer than 5 percent with 9.
 

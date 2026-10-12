@@ -37,7 +37,7 @@ B.  In a HAVING clause, because it tests an aggregate of each group
 C.  In the ON clause of the join from GLEntry to the Account table
 D.  In the ORDER BY clause, after the balance of each account is calculated
 
-**6.** An auditor left joins WorkOrder to Item on ItemID and keeps only the rows where `wo.WorkOrderID IS NULL`. What does the query find?
+**6.** An auditor runs `Item AS i LEFT JOIN WorkOrder AS wo ON wo.ItemID = i.ItemID` and keeps only the rows where `wo.WorkOrderID IS NULL`. What does the query find?
 
 A.  The work orders whose ItemID matches no item
 B.  The items that have exactly one work order

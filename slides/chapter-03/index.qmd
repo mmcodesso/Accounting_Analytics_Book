@@ -62,7 +62,7 @@ Each row is one instance, here one customer; each column is one attribute. A tab
 {{< book-table tbl-03-01 columns="Data Type,How Charles River Stores It,Charles River Example" >}}
 
 ::: {.notes}
-SQLite has only a few storage classes, so dates are text in year-month-day form, which sorts in order, and true or false flags are 1 and 0. Excel and Power BI convert these on import, so check that each column arrives with the type you expect.
+SQLite has no date or Boolean type, so dates are text in year-month-day form, which sorts in order, and true or false flags are 1 and 0. A declared type is a preference SQLite does not enforce, so the data's conventions, not the file, keep each column to one type. Excel and Power BI convert these on import, so check that each column arrives with the type you expect.
 :::
 
 ## Watch out: not every number is a quantity {.watch-out}
@@ -82,7 +82,7 @@ Before calculating with a numeric column, ask whether its values are quantities 
 - A **primary key** identifies each row: unique and never blank; every Charles River table uses one integer surrogate key
 - Unique indexes protect document numbers, but not the number on a supplier's own invoice, which is how Chapter 2's duplicates got in
 - A **foreign key** refers to the primary key of another table
-- Charles River's foreign keys are logical, not declared, so referential integrity is tested, and Power BI relationships are defined by hand
+- Charles River's foreign keys are logical, not declared, so referential integrity is tested, and Power BI relationships are defined and checked rather than imported
 
 ::: {.notes}
 A primary key plays the role an invoice or check number plays in accounting. Because the file declares no foreign keys, nothing stops an orphaned record from being added; the Chapter 2 tests found none in the ledger's account references.
@@ -135,7 +135,7 @@ One-to-many is the most common in accounting data, such as one customer and many
 - **Optionality**: must a row take part? Every order has a customer, but some customers have no orders
 - A join that allows no match can silently drop the customers who never ordered
 - Joining customers to orders to lines repeats a customer once per line
-- Summing revenue by line is right; counting customers by line overstates them
+- Summing order-line amounts by line is right; counting customers by line overstates them
 
 ::: {.notes}
 Double counting is the most common mistake with related tables. Consider the cardinality of every join before you aggregate, a habit Part III's SQL chapters return to.
@@ -299,7 +299,7 @@ The answers: two foreign keys, SalesOrderID and ItemID; SalesOrderLine and CashR
 - JournalEntry holds the manual entries, such as accruals and adjustments
 
 ::: {.notes}
-The Accounting Core has only a few tables but every group flows into it, which makes GLEntry the single source of truth for the financial position. Every balance on the statements can be traced back to the documents behind it.
+The Accounting Core has only a few tables but every group flows into it, which makes GLEntry the central record of posted financial activity. The balances on the statements can be traced back through it to the documents behind them.
 :::
 
 ## The Accounting Core and its connections

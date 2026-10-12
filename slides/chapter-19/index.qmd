@@ -99,11 +99,11 @@ Income before income taxes is taken as the ledger records it, for the latest fis
 
 - A test of controls asks whether a control operated
 - A substantive test asks whether an amount is right
-- One query over a whole population can be both at once
+- One procedure can serve both, if each purpose is designed and judged
 - So the evidence on each control informs the test of its balance
 
 ::: {.notes}
-The standard for audits of public companies' internal control over financial reporting, AS 2201 of the PCAOB, is built on this idea, and internal auditors apply it to a cycle. The query that finds every credit approved above its approver's authority also totals the credits, so the test of the control and the test of the balance share one population.
+The standard for audits of public companies' internal control over financial reporting, AS 2201 of the PCAOB, is built on this idea, and internal auditors apply it to a cycle. The query that finds every credit approved above its approver's authority tests the control, and recomputing each credit from its return and invoice tests the amount: a shared population does not make one result evidence for the other, and the PCAOB's evidence standard says a procedure used for more than one purpose should achieve each objective. Testing every record removes sampling risk, not the risk that the records or the test are wrong.
 :::
 
 ## Five documents meet the ledger at one hub
@@ -378,7 +378,7 @@ Phase 2 is the heart of the audit: it tests every document's controls, explains 
 - **Check:** each test states its definition, and the list combines them
 
 ::: {.notes}
-Test authority for credits and refunds against the approver's limit, and the approvers' employment dates. Test separation of duties three ways, and try to test the preparer against the approver: explain why the records cannot answer. Test whether each refund was paid before the customer's payment arrived, and whether a past-due balance could have been offset, stating your definition. Compare refund and receipt methods, test the clawbacks and one refund per credit, combine the exceptions with UNION ALL, and export RefundFlags.csv.
+Test authority for credits and refunds against the approver's recorded limit, and the approvers' employment dates. Test separation of duties three ways, and try to test the preparer against the approver: explain why the records cannot answer. Test whether each refund was paid before the customer's payments had arrived, choosing and stating whether a payment counts from its receipt or its application to the invoice: the records hold dates, not times, and no bank clearance. Then test whether a past-due balance could have been offset. Compare refund and receipt methods, test the clawbacks and one refund per credit, combine the exceptions with UNION ALL, and export RefundFlags.csv.
 :::
 
 ## Explain the returns and rank the refunds
@@ -402,7 +402,7 @@ Show return rates by year, item group, product family and reason, and compare ra
 - The upper deviation limit decides whether the sample supports reliance
 
 ::: {.notes}
-AS 2315 and the AICPA's audit sampling guide set out the judgments: the risk of overreliance you accept sets the confidence level, the tolerable deviation rate is the highest rate at which you would still rely on the control, and the expected rate is your estimate. Excel's BETA.INV gives the upper deviation limit for the deviations found; if it exceeds the tolerable rate, the sample does not support reliance.
+AS 2315 and the AICPA's audit sampling guide set out the judgments: the risk of overreliance you accept sets the confidence level, the tolerable deviation rate is the highest rate at which you would still rely on the control, and the expected rate is your estimate. Excel's BETA.INV gives the upper deviation limit for the deviations found, while they are fewer than the items (if every item deviates, the limit is 100%); if it exceeds the tolerable rate, the sample does not support reliance.
 :::
 
 ## Sample sizes for large populations
@@ -423,7 +423,7 @@ The sizes come from the binomial distribution, and the number in parentheses is 
 - **Check:** the rule is written before the test, and no result is invented
 
 ::: {.notes}
-Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds, select the rest, and record the date and parameters. Apply the same sample to one attribute the data can test, the refund dated before the payment, and compare its conclusion with the whole population's.
+Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. The inspection applies only to those refunds, so size it on their own population, or examine them all: another refund is not a passed inspection. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds, select the rest, and record the date and parameters. Write the rule for zero to three deviations, or up to one more than the plan allows. Apply the same sample to one attribute the data can test, the refund dated before the payment as Requirement 4 defined it, and compare its conclusion with the whole population's.
 :::
 
 ## Check your understanding {.check}
@@ -497,12 +497,12 @@ Phase 3 turns the results into judgments the committee can act on, and the tests
 A deficiency exists when a control does not allow timely prevention or detection of misstatements in the normal course of work. Its severity depends on whether a misstatement is reasonably possible and how large it could be, not on whether one actually occurred, as AS 2201 sets out. Internal auditors then rate their findings and agree on action plans with management under the IIA's Global Internal Audit Standards.
 :::
 
-## Three classifications, three audiences
+## Three classifications, and who hears of each
 
 {{< book-table tbl-19-04 widths="17,37,27,19" >}}
 
 ::: {.notes}
-The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting.
+The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting. Management hears of every deficiency; the audit committee hears of the significant deficiencies and material weaknesses.
 :::
 
 ## Four judgments lead to a classification
@@ -523,7 +523,7 @@ Once a deficiency is identified, a control that is missing or one that did not o
 - **Check:** the clean results are reported with the same care
 
 ::: {.notes}
-For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in the latest year and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with.
+For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in the latest year and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with. Say what evidence each classification rests on and what could change it.
 :::
 
 ## Check your understanding {.check}
@@ -560,7 +560,7 @@ The chapter's criteria ask for deficiencies classified by likelihood, magnitude 
 - Action plans with owners by role and dates, and the responses expected
 
 ::: {.notes}
-Report the clean results too, and say where you expect an owner to disagree. Cohen and colleagues found that managers often resist a finding of a weakness when no error has been detected, so prepare the evidence for each compensating control they may point to.
+The conclusion says what the tests covered and what they could not reach, such as the documents outside the database. Report the clean results too, and say where you expect an owner to disagree. The audit partners Cohen and colleagues interviewed describe managers who resist a finding of a weakness when no error has been detected, so prepare the evidence for each compensating control they may point to.
 :::
 
 ## Keep the tests running
@@ -573,7 +573,7 @@ Report the clean results too, and say where you expect an owner to disagree. Coh
 - **Check:** past exceptions get one design finding and do not flood review
 
 ::: {.notes}
-The four rule tests are credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Record the historical exceptions once, as Chapter 16 treated the payroll registers' self-approval, with the date by which the design will be fixed. Recheck the date through which the data run, and record the change.
+The four rule tests are credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Record the historical exceptions once, as Chapter 16 treated the payroll registers' self-approval, with the date by which the design will be fixed, and keep each exception in the register. Keep reviewing the exceptions that arrive after the period the finding covers, and close it only when a retest shows the fix works. Recheck the date through which the data run, and record the change.
 :::
 
 ## Milestone 3: before you hand it in
@@ -606,11 +606,11 @@ This audit reused Chapter 8's random selection and dispositions, Chapter 12's ap
 
 - Descriptive: the map, the reconciliations and the tests
 - Diagnostic: the growth of returns and the largest refund's timeline
-- Predictive: the expectation of returns and the upper deviation limits
+- Predictive: the expectation of returns, if the return rate holds
 - Prescriptive: the recommendations and the action plans
 
 ::: {.notes}
-These are the four types of analytics of Chapter 1. Most of the work was descriptive and diagnostic; the expectation and the upper limits were small predictive models, and the recommendations prescriptive.
+These are the four types of analytics of Chapter 1. Most of the work was descriptive and diagnostic; the expectation of returns was a small predictive model, resting on the assumption that the prior year's return rate still holds, and the recommendations prescriptive. The upper deviation limits are statistical inference about the population a sample was drawn from, not forecasts.
 :::
 
 ## After the report

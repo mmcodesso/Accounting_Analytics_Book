@@ -8,6 +8,7 @@ UnitPrice * Discount, left unrounded.
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from functools import lru_cache
 
@@ -361,8 +362,9 @@ def fig_13_07() -> Diagram:
     colors = dict(zip(order, [BLUE, TEAL, AMBER, CORAL, GRAY]))
     panel_w, panel_h = 420, 300
     spots = [(0, 0), (440, 0), (0, 320), (440, 320)]
-    titles = ["1. Position on a common scale: bars", "2. Length without a common baseline: one stacked bar",
-              "3. Angle: a pie", "4. Area: circles"]
+    # The panels are not numbered: Cleveland and McGill rank length and angle together (note below).
+    titles = ["Position on a common scale: bars", "Length without a common baseline: one stacked bar",
+              "Angle: a pie", "Area: circles"]
     for (x, y), title in zip(spots, titles):
         d.box("", x, y, panel_w, panel_h, fill=WHITE, stroke=RULE, rounded=False)
         d.text(f"<b>{esc(title)}</b>", x + 8, y + 6, panel_w - 16, 22, size=SMALL)
@@ -373,30 +375,46 @@ def fig_13_07() -> Diagram:
         by = y + 44 + i * 48
         d.text(esc(g), x + 8, by + 4, 92, 22, size=SMALL, align="right")
         d.box("", x + 106, by, 280 * rev[g] / peak, 28, fill=colors[g], stroke=colors[g], rounded=False)
-    # 2. One stacked bar: each segment starts where the previous one ends.
+    # 2. One stacked bar: each segment starts where the previous one ends. Every segment is named on the
+    # chart, so no group is known by its color alone: a wide segment carries its name, and a narrow one is
+    # named below the bar, each on its own row, at the end of a leader line from the segment.
     x, y = spots[1]
-    sx = x + 20
+    sx, row = x + 20, 0
     for g in order:
         w = 380 * rev[g] / grand
-        d.box("", sx, y + 80, w, 60, fill=colors[g], stroke=WHITE, rounded=False)
+        wide = w >= 70
+        d.box(esc(g) if wide else "", sx, y + 80, w, 60, fill=colors[g], stroke=WHITE, color=WHITE, size=SMALL,
+              rounded=False)
+        if not wide:
+            mid, ly = sx + w / 2, y + 160 + row * 28
+            d.edge(d.anchor(mid, y + 140), d.anchor(mid, ly + 11))
+            d.text(esc(g), mid - 104, ly, 100, 22, size=SMALL, align="right")
+            row += 1
         sx += w
-    for i, g in enumerate(order):
-        lx = x + 20 + (i % 3) * 132
-        ly = y + 170 + (i // 3) * 28
-        d.box("", lx, ly + 4, 14, 14, fill=colors[g], stroke=colors[g], rounded=False)
-        d.text(esc(g), lx + 18, ly, 110, 22, size=SMALL)
-    # 3. A pie, its slices labeled.
+    # 3. A pie. The wide slices carry their names inside; a narrow slice is named to the left of the pie, at the
+    # end of a leader line from the middle of its arc (raised where two names would overlap).
     x, y = spots[2]
     start = 0.0
-    cx, cy, r = x + 150, y + 165, 110
+    cx, cy, r = x + 210, y + 175, 95
+    narrow = []
     for g in order:
         share = rev[g] / grand
         d.vertex("", f"shape=mxgraph.basic.pie;html=1;startAngle={start:.4f};endAngle={start + share:.4f};"
                      f"fillColor={colors[g]};strokeColor={WHITE};", cx - r, cy - r, 2 * r, 2 * r)
+        angle = 2 * math.pi * (start + share / 2)        # clockwise from twelve o'clock, as Draw.io draws it
+        if share >= 0.15:
+            d.text(esc(g), cx + 0.55 * r * math.sin(angle) - 40, cy - 0.55 * r * math.cos(angle) - 11, 80, 22,
+                   size=SMALL, color=WHITE, align="center")
+        else:
+            assert math.sin(angle) < 0, f"{g}: a narrow slice is named on the left of the pie"
+            narrow.append((g, cx + r * math.sin(angle), cy - r * math.cos(angle)))
         start += share
-    for i, g in enumerate(order):
-        d.box("", x + 290, y + 70 + i * 32, 14, 14, fill=colors[g], stroke=colors[g], rounded=False)
-        d.text(esc(g), x + 308, y + 66 + i * 32, 104, 22, size=SMALL)
+    label_y = None
+    for g, ex, ey in sorted(narrow, key=lambda n: -n[2]):        # from the lowest name up
+        label_y = ey if label_y is None else min(ey, label_y - 30)
+        end = d.anchor(cx - r - 14, label_y)
+        d.edge(d.anchor(ex, ey), end, points=[(ex, label_y)] if label_y < ey else None)
+        d.text(esc(g), cx - r - 108, label_y - 11, 90, 22, size=SMALL, align="right")
     # 4. Circles with areas proportional to revenue.
     x, y = spots[3]
     biggest = 120
@@ -407,9 +425,9 @@ def fig_13_07() -> Diagram:
                  cx, y + 170 - diameter / 2, diameter, diameter)
         d.text(esc(g), cx + diameter / 2 - 45, y + 238 + (i % 2) * 24, 90, 22, size=SMALL, align="center")
         cx += diameter + 14
-    d.text("<i>Fiscal 2026 revenue of the five item groups. Readers judge the bars most accurately, then "
-           "the stacked lengths, then the angles, and the areas least accurately (Cleveland and McGill, "
-           "1984).</i>", 0, 628, 860, 40, size=SMALL, color=GRAY)
+    d.text("<i>Fiscal 2026 revenue of the five item groups. Cleveland and McGill (1984) ranked position on a "
+           "common scale first, length and angle together below it, and area below both; their experiments "
+           "compared position with length and with angle.</i>", 0, 628, 860, 40, size=SMALL, color=GRAY)
     return d
 
 

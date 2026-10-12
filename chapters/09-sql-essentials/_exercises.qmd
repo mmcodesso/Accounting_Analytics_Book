@@ -10,7 +10,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Table group:** Accounting Core
 
-**Scenario.** Before the fiscal 2026 financial statements are finalized, the controller asks you to review the chart of accounts in the database. She wants to know how it is organized, which accounts carry a balance opposite to their type, and which accounts are no longer in use.
+**Scenario.** Before the fiscal 2026 financial statements are finalized, the controller asks you to review the chart of accounts in the database. She wants to know how it is organized, which accounts have a normal balance opposite to their type, and which accounts are no longer in use.
 
 **Requirements.**
 
@@ -26,7 +26,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (6) Write a short memo (one half page) to the controller summarizing the structure of the chart and anything that should be reviewed before year-end.
 
-**Deliverable.** A script with the six queries and a half-page memo.
+**Deliverable.** A script with the queries of requirements (1) to (5) and a half-page memo.
 
 
 
@@ -42,7 +42,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (1) Find the AccountID of account 5060.
 
-(2) List the distinct source document types of the account's postings in fiscal 2026, and identify the one that must be excluded from an analysis of the account. Explain why.
+(2) List the distinct source document types of the account's postings in fiscal 2026, and identify the posting that must be excluded from an analysis of the year's purchase variances. Explain why.
 
 (3) Use DISTINCT to list the descriptions of the remaining postings. Explain the two kinds of cost the account records.
 
@@ -88,7 +88,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Table group:** Manufacturing
 
-**Scenario.** A work order's variance is recorded only when it closes, so the work orders still open at the end of fiscal 2026 hold variance that has not yet reached the ledger. The production manager and the controller want to know how many work orders are open, in what state, and how late they are.
+**Scenario.** A work order's variance is recorded only when it closes, so any variance on the work orders still open at the end of fiscal 2026 has not yet reached the ledger. The production manager and the controller want to know how many work orders are open, in what state, and how late they are.
 
 **Requirements.**
 
@@ -100,9 +100,9 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (4) List the open work orders whose DueDate is on or before 2026-12-31, sorted by DueDate. Identify the oldest.
 
-(5) Among them, list the work orders whose Status is Released, meaning that work has not started. Describe what you find.
+(5) Among them, list the work orders whose Status is still Released, a status meant for work orders not yet started. Describe what you find.
 
-(6) Write a short memo (one half page) to the production manager on the open work orders, and explain why their variance is not yet in the fiscal 2026 results.
+(6) Write a short memo (one half page) to the production manager on the open work orders, and explain why any variance on them is not yet in the fiscal 2026 results.
 
 **Deliverable.** A script with the queries and a half-page memo.
 
@@ -144,7 +144,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Requirements.**
 
-(1) List the LaborTimeEntry rows whose LaborType is Direct Manufacturing and whose WorkOrderOperationID is missing. Show the employee, work order, work date, and hours.
+(1) List the LaborTimeEntry rows whose LaborType is Direct Manufacturing and whose WorkOrderOperationID is missing. Show the EmployeeID, WorkOrderID, work date, and hours.
 
 (2) Use DISTINCT to list the values of ClockStatus in the TimeClockEntry table, and list the time clock entries with no ClockOutTime, showing `COALESCE(ClockOutTime, 'missing')` in place of the empty value.
 

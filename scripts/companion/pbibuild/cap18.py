@@ -210,7 +210,8 @@ MEASURES = [
      MONEY, "Units sold at each item's standard cost."),
     ("Views", "Absorption Cost",
      "SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[AbsorptionCost] ) )", MONEY,
-     "Units sold at standard cost plus the family's variance per unit completed (actual absorption)."),
+     "Units sold at standard cost plus the family's variance per unit completed (the case's proxy for actual "
+     "absorption)."),
     ("Views", "Time-Driven Cost",
      "SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[TimeDrivenCost] ) )", MONEY,
      "Units sold at the time-driven cost: material at the actual rate, Factory Overhead per standard hour, and the "
@@ -227,7 +228,9 @@ MEASURES = [
      "The share of the margin of the items selected that the top N items earn, N being the rank on the axis."),
     ("Capacity", "Available Hours", "SUM ( 'Work Centers'[AvailableHours] )", "#,0.00",
      "Hours available in WorkCenterCalendar in the base year."),
-    ("Capacity", "Practical Share", "0.8", "0%", "Practical capacity as a share of the available hours (tbl-18-02)."),
+    ("Capacity", "Practical Share", "0.8", "0%", "Practical capacity as a share of the available hours, typed at the "
+     "case's 80% (tbl-18-02). The item costs come from the workbook at its own Assumptions value, so change both "
+     "together."),
     ("Capacity", "Practical Capacity", "[Available Hours] * [Practical Share]", HOURS, "Available hours at the practical share."),
     ("Capacity", "Routing Time Used", "SUM ( 'Routing Time'[Hours] )", HOURS,
      "Routing time of the base year's completions: run hours per unit times the units, plus setup per work order."),
@@ -388,8 +391,10 @@ def r5(b: Build) -> None:
         "Purpose: the explorer for the CFO and the production manager. It shows what each family and item of finished "
         "goods earns under three costing views, and what the plant had and used of its capacity, in the base year, "
         f"fiscal {y}.",
-        "Views: Standard is each item's standard cost. Absorption adds its family's variance per unit completed in the "
-        "year, so the year's whole cost is spread over the units made. Time-driven charges material at the year's "
+        "Views: Standard is each item's standard cost. Absorption is the case's proxy for actual absorption: the "
+        "standard cost plus the family's variance per unit completed in the year (the year's close variance over the "
+        "year's completions), which spreads the plant's idle time over the units made. Time-driven charges material at "
+        "the year's "
         "actual rate, the Factory Overhead entries per standard hour, and the committed cost of the crew, supervision, "
         "and equipment per hour of practical capacity times the item's routing time; the capacity left unused is a "
         "cost of the plant, shown on the Capacity page. Purchased finished goods carry their standard cost in every "

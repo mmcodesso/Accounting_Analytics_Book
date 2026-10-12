@@ -10,7 +10,7 @@
 
 a. Click the plus sign beside the page tabs at the bottom of Report view to add a page.
 b. Double-click its tab and rename it `Sales and Discounts`.
-c. Drag the tab to the left of **Validation**, so that the report opens on it.
+c. Drag the tab to the left of **Validation**, so that it is the first page.
 
 The report now has two pages, and the new one is empty.
 
@@ -29,7 +29,7 @@ b. Drag SalesInvoiceID from the SalesInvoiceLine table, not from SalesInvoice, i
 c. Double-click each field in the well and rename it for this visual: `Revenue`, `At list price`, `Discounts`, and `Invoices`.
 d. In **Format visual**, expand **Callout values** and set **Display units** to **None**.
 
-The four cards show fiscal 2026 in full, rather than abbreviated as millions. Revenue and invoices match the Validation page, and the gap between the list amount and revenue is the price reduction that Chapter 6 analyzed.
+The four cards show fiscal 2026 in full, rather than abbreviated as millions. Revenue, the list amount, and the discounts match the fiscal 2026 row of the Validation page. The invoice card counts invoices, not lines, so it is lower than the page's count of invoice lines, because an invoice can have several lines. The gap between the list amount and revenue is the price reduction that Chapter 6 analyzed.
 
 **Step 4. Chart the discounts by month and by item group.**
 
@@ -80,7 +80,7 @@ The count taken from SalesInvoiceLine falls to the invoices that contain a Furni
 
 **Checkpoint.** Before you move on, confirm that your page does the following:
 
-- With 2026 selected, the cards match the Validation page: revenue, list amount, discounts, and the number of invoices.
+- With 2026 selected, the revenue, list amount, and discount cards match the Validation page, and the invoice card shows fewer invoices than the page shows invoice lines.
 - The discount line rises sharply in September and October, and the bar chart shows Furniture far ahead of the other groups.
 - Selecting Furniture changes the invoice count taken from the invoice lines but not one taken from the SalesInvoice table.
 

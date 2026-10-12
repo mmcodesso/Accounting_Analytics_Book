@@ -830,10 +830,13 @@ def r3(b: Build) -> None:
         {n['lag_low']} to {n['lag_high']} days (median {n['median']}), and {n['at_window']} cleared at exactly
         {n['window']} days, so "older than {n['window']} days" is the rule.
 
-        An accrual past the invoicing window at a year-end should have been reversed then, because the facts existed:
-        the old items are corrections of errors at each year-end (retained earnings at 1 January {d.P}
-        {a3['re']:+,.2f}; {d.P} expense {-a3['P']:+,.2f}; {d.C} expense {-a3['C']:+,.2f}). An accrual within the window
-        is an estimate, and one that later proves unneeded is a change in estimate in the year it goes stale. Keep the
+        Age and the missing invoice show that an old accrual has gone unbilled, not that nothing is owed. A3 reverses
+        the old items at each year-end on the assumption that they will never be billed, which the suppliers'
+        statements or confirmations, the service contracts, and the absence of any later invoice or settlement must
+        support; if they do, the facts existed at each year-end and A3 corrects errors (retained earnings at 1 January
+        {d.P} {a3['re']:+,.2f}; {d.P} expense {-a3['P']:+,.2f}; {d.C} expense {-a3['C']:+,.2f}). Until that evidence is in
+        hand, keeping them as liabilities is equally sound. An accrual within the window is an estimate, and one
+        that later proves unneeded is a change in estimate in the year it goes stale. Keep the
         {money(n['young_c'])} of young {d.C} accruals, and leave the {money(n['opening'])} to Requirement 9.""")
 
 
@@ -1219,7 +1222,9 @@ def r4(b: Build) -> None:
 
         Payroll, by working day: {money(pf['total'])} at {ye(d.F)}, {money(pp['total'])} at {ye(d.P)}, and
         {money(pc['total'])} at {ye(d.C)} from the last eight processed periods' cost per working day. The
-        manufacturing part goes to 1090 and, with no completion to absorb it, ends in 5080 and cost of goods sold; the
+        manufacturing part goes to 1090 and, under the case's standard-cost close (standard cost leaves 1090 only
+        through completions, and the rest clears to 5080 at each work order's close), ends in 5080 and cost of goods
+        sold; assigning part of it to inventory would need those days' production traced to their work orders. The
         rest goes to the cost centers' salary accounts and 6060. Interest (2080 has never been used): each payment's
         interest covers the days since the one before; the day count includes the year-end: {', '.join(
             f"{money(x['total'])} at {ye(x['year'])}" for x in ints)}. Prorating a pay period or a payment is a
@@ -2357,17 +2362,19 @@ def r9(b: Build) -> None:
     s.answer("Requirement 9", f"""
         The matters the records cannot settle, with what this script measures (the memo itself is in the package
         workbook). Tax status: no tax account and no tax recorded in {n['years']} years; if the company is a C
-        corporation, 21% federal on adjusted {d.C} income of {money(n['adj_ni'])} alone is about {num(n['provision'])},
-        several times materiality, so state it and record no number. Leases: rent of
-        {', '.join(money(v) for v in n['rent'])} is paid from cash each month while 2120 and 1140 are unused; the
-        agreements decide the right-of-use assets and lease liabilities. Sales tax: {money(n['stax'])} collected with
-        no remittance recorded (2050 credits only from invoices, debits only from credit memos,
-        {money(n['memo_debits'])}). Opening balances: assets {money(n['assets'])} and liabilities
+        corporation, 21% federal on adjusted {d.C} income of {money(n['adj_ni'])}, a magnitude screen that measures
+        neither taxable income nor state or deferred taxes, is about {num(n['provision'])}, several times
+        materiality, so state it and record no number. Leases: rent of {', '.join(money(v) for v in n['rent'])} is
+        paid from cash each month while 2120 Lease Liability is unused (1140 Leasehold Improvements is not a
+        right-of-use account); the agreements decide the right-of-use assets and lease liabilities. Sales tax:
+        {money(n['stax'])} recorded as payable on invoicing, with no remittance recorded (2050 credits only from
+        invoices, debits only from credit memos, {money(n['memo_debits'])}). Opening balances: assets {money(n['assets'])} and liabilities
         {money(n['liabilities'])} that no document supports; if none is real, equity rises by {money(n['equity'])}.
         Standards unchanged since {d.F}: at a standard rebuilt on normal capacity the manufactured finished goods would
         be about {num(n['reval_c'])} higher at the end of {d.C} and {num(n['reval_p'])} at the end of {d.P}, so a strong
-        memo recommends a cost study. Recommendation: record A1-A4 and R1-R2, and do not release the package until the
-        tax status, the leases, the sales tax, and the opening balances are settled.""")
+        memo recommends a cost study. Recommendation: record A1, A2, A4, and R1-R2, and A3 once the suppliers'
+        evidence supports it, and do not release the package until the tax status, the leases, the sales tax, and
+        the opening balances are settled.""")
 
 
 def m4(b: Build) -> None:

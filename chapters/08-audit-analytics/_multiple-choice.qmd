@@ -23,7 +23,7 @@ B.  About 11 percent, one-ninth of the amounts
 C.  About 50 percent
 D.  About 30 percent
 
-**4.** Which formula returns the first significant digit of every positive amount in A2, including amounts below $1?
+**4.** Which formula returns the first significant digit of a positive amount in dollars and cents in A2, including amounts below $1?
 
 A.  `=LEFT(A2,1)`
 B.  `=--LEFT(TEXT(A2,"0.00000000E+00"),1)`
@@ -58,7 +58,7 @@ B.  Include it as current, because it was paid within 90 days.
 C.  Exclude it, because it has been paid in full.
 D.  Include it in the over 90 days bucket, because the payment was late.
 
-**9.** The accounts receivable balance in the general ledger exceeds the total of the open invoices, and the difference is not a timing difference. What does this mean?
+**9.** The accounts receivable balance in the general ledger exceeds the total of the open invoices, and no reconciling item, such as a receipt not yet applied, explains the difference. What does this mean?
 
 A.  The ledger is always right, so the difference can safely be ignored.
 B.  The aging schedule has been calculated incorrectly and should be discarded.

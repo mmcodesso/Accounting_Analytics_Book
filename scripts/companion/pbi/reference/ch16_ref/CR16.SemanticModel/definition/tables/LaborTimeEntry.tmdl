@@ -3,7 +3,7 @@ table LaborTimeEntry
 	measure 'Manufacturing Hours' =
 			CALCULATE (
 			    SUM ( LaborTimeEntry[RegularHours] ) + SUM ( LaborTimeEntry[OvertimeHours] ),
-			    LaborTimeEntry[LaborType] <> "NonManufacturing"
+			    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
 			)
 		formatString: #,0
 
@@ -16,7 +16,7 @@ table LaborTimeEntry
 	measure 'Overtime Hours' =
 			CALCULATE (
 			    SUM ( LaborTimeEntry[OvertimeHours] ),
-			    LaborTimeEntry[LaborType] <> "NonManufacturing"
+			    KEEPFILTERS ( LaborTimeEntry[LaborType] <> "NonManufacturing" )
 			)
 		formatString: #,0
 

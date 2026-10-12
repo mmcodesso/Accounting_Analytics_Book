@@ -384,7 +384,7 @@ ORDER BY Family;""",
                    lambda r, k=k: round(next(c / lv for f, c, lv in zip(r.col("Family"), r.col("OrderCost"),
                                                                       r.col("ListValue")) if f[4:] == k), 3), 0.0006)
              for k, x in ratio.items()])
-    s.query("Requirement 1, Q9: the CFO's second premise: did list prices or standard costs ever change?",
+    s.query("Requirement 1, Q9: the CFO's second premise: do the records show a change in list prices or standards?",
             "Population: every invoice, shipment, and completion line; expected: no change beyond rounding",
             f"""\
 SELECT
@@ -440,11 +440,17 @@ products of its family (Q4); the variance runs from {pct(min(x['share'] for x in
 The second premise holds as arithmetic (Q9): the base list price equals the item's list price on all {v['lines']:,}
 invoice lines, every shipment line's standard cost is its quantity times the item's standard cost, completion lines
 differ by at most {v['max_diff']:.2f} (component rounding), and {v['all_years']} items were sold in each of the
-{v['n_years']} years, so neither list prices nor standards changed. It fails as a diagnosis: whether the products are
-under-costed depends on what the variance is made of, which Requirement 2 takes apart.""")
+{v['n_years']} years, so the records show no change in list prices or standards. Agreement with today's master data
+cannot show that nothing was changed and changed back, or changed for an item no line used: the dataset keeps no history
+of its master data, so dated price and standard records, or a change log, are the evidence the stronger claim needs. The
+premise fails as a diagnosis: whether the products are under-costed depends on what the variance is made of, which
+Requirement 2 takes apart.""")
 
 
 # --- Requirement 2 -----------------------------------------------------------------------------------------------
+
+PARTS = ("DirectRegular", "DirectOvertime", "IndirectRegular", "IndirectOvertime", "Salaries", "EmployerTax", "Benefits")
+
 
 def r2(b):
     d, m = b.data, model(b)
@@ -509,7 +515,7 @@ ORDER BY Source;""",
                  Check("payroll", round(v["payroll"], 2), lambda r: r.where(Source="PayrollSummary")["Debits"])])
     remember(b, "debits", q)
     q = s.query("Requirement 2, Q12: what the base year's completions released at standard, and 1090's credits",
-                f"Population: the completion lines of {d.C}; expected: conversion equal to the credits within rounding",
+                f"Population: the completion lines of {d.C}; expected: conversion equal to the credits for them",
                 f"""\
 SELECT ROUND(SUM(pcl.QuantityCompleted
         * i.StandardLaborHoursPerUnit), 2) AS StandardHours,
@@ -525,7 +531,17 @@ SELECT ROUND(SUM(pcl.QuantityCompleted
         INNER JOIN Account AS a ON a.AccountID = gl.AccountID
      WHERE a.AccountNumber = 1090 AND gl.FiscalYear = {d.C}
         AND gl.SourceDocumentType = 'ProductionCompletion')
-        AS CreditsTo1090
+        AS CreditsTo1090,
+    COALESCE((SELECT ROUND(SUM(gl.Credit) - SUM(gl.Debit), 2)
+     FROM GLEntry AS gl
+        INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+        INNER JOIN ProductionCompletion AS x
+            ON x.ProductionCompletionID = gl.SourceDocumentID
+     WHERE a.AccountNumber = 1090 AND gl.FiscalYear = {d.C}
+        AND gl.SourceDocumentType = 'ProductionCompletion'
+        AND x.CompletionDate
+            NOT BETWEEN {first} AND {last}), 0)
+        AS CreditsDatedOtherYears
 FROM ProductionCompletionLine AS pcl
     INNER JOIN ProductionCompletion AS pc
         ON pc.ProductionCompletionID = pcl.ProductionCompletionID
@@ -538,7 +554,12 @@ WHERE pc.CompletionDate BETWEEN {first} AND {last};""",
                  Check("fixed overhead released", round(v["fixed_oh"], 2), lambda r: r.value("FixedOverhead")),
                  Check("conversion on the lines", round(v["conversion"], 2), lambda r: r.value("Conversion")),
                  Check("ProductionCompletion credits to 1090", round(v["released_gl"], 2),
-                       lambda r: r.value("CreditsTo1090"))])
+                       lambda r: r.value("CreditsTo1090")),
+                 Check("credits for completions dated in another year", round(v["off"]["amount"], 2),
+                       lambda r: r.value("CreditsDatedOtherYears")),
+                 Check("credits for the year's completions less the lines", 0.0,
+                       lambda r: round(r.value("CreditsTo1090") - r.value("CreditsDatedOtherYears")
+                                       - r.value("Conversion"), 2))])
     remember(b, "released", q)
     s.query("Requirement 2, Q13: the inputs to 1090 and the standard cost released, per standard hour",
             "Population: the totals of Q10 to Q12; expected: actual cost well above standard, mostly overhead",
@@ -623,7 +644,7 @@ FROM Totals;""",
                     d.account("1090"), d.F, d.C)
     three = sorted(mo for mo, n in pay_dates if n == 3)
     s.query("Requirement 2, Q14: each input to 1090 by month, with the standard hours completed",
-            f"Population: completions and 1090 debits, {d.F}-01 to {d.C}-12; expected: some months with 3 pay dates",
+            f"Population: completions, 1090 debits, payroll, {d.F}-01 to {d.C}-12; expected: some 3-pay-date months",
             f"""\
 WITH Made AS (
     SELECT strftime('%Y-%m', pc.CompletionDate) AS Month,
@@ -654,15 +675,54 @@ Posted AS (
             AND gl.SourceDocumentType = 'JournalEntry'
     WHERE a.AccountNumber = 1090
     GROUP BY Month
+),
+Paid AS (
+    SELECT strftime('%Y-%m', pp.PayDate) AS Month,
+        SUM(CASE WHEN prl.LineType = 'Regular Earnings'
+                AND lte.LaborType = 'Direct Manufacturing'
+            THEN prl.Amount ELSE 0 END) AS DirectRegular,
+        SUM(CASE WHEN prl.LineType = 'Overtime Earnings'
+                AND lte.LaborType = 'Direct Manufacturing'
+            THEN prl.Amount ELSE 0 END) AS DirectOvertime,
+        SUM(CASE WHEN prl.LineType = 'Regular Earnings'
+                AND lte.LaborType = 'Indirect Manufacturing'
+            THEN prl.Amount ELSE 0 END) AS IndirectRegular,
+        SUM(CASE WHEN prl.LineType = 'Overtime Earnings'
+                AND lte.LaborType = 'Indirect Manufacturing'
+            THEN prl.Amount ELSE 0 END) AS IndirectOvertime,
+        SUM(CASE WHEN prl.LineType = 'Salary Earnings'
+            THEN prl.Amount ELSE 0 END) AS Salaries,
+        SUM(CASE WHEN prl.LineType = 'Employer Payroll Tax'
+            THEN prl.Amount ELSE 0 END) AS EmployerTax,
+        SUM(CASE WHEN prl.LineType = 'Employer Benefits'
+            THEN prl.Amount ELSE 0 END) AS Benefits
+    FROM PayrollRegisterLine AS prl
+        INNER JOIN PayrollRegister AS pr
+            ON pr.PayrollRegisterID = prl.PayrollRegisterID
+        INNER JOIN PayrollPeriod AS pp
+            ON pp.PayrollPeriodID = pr.PayrollPeriodID
+        INNER JOIN CostCenter AS cc ON cc.CostCenterID = pr.CostCenterID
+        LEFT JOIN LaborTimeEntry AS lte
+            ON lte.LaborTimeEntryID = prl.LaborTimeEntryID
+    WHERE cc.CostCenterName = 'Manufacturing'
+    GROUP BY Month
 )
 SELECT mo.Month, ROUND(mo.StandardHours, 2) AS StandardHours,
     ROUND(mo.AppliedOverhead, 2) AS AppliedOverhead,
     ROUND(COALESCE(p.FactoryOverhead, 0), 2) AS FactoryOverhead,
     ROUND(COALESCE(p.Payroll, 0), 2) AS Payroll,
     ROUND(COALESCE(p.Depreciation, 0), 2) AS Depreciation,
-    COALESCE(p.PayDates, 0) AS PayDates
+    COALESCE(p.PayDates, 0) AS PayDates,
+    ROUND(COALESCE(w.DirectRegular, 0), 2) AS DirectRegular,
+    ROUND(COALESCE(w.DirectOvertime, 0), 2) AS DirectOvertime,
+    ROUND(COALESCE(w.IndirectRegular, 0), 2) AS IndirectRegular,
+    ROUND(COALESCE(w.IndirectOvertime, 0), 2) AS IndirectOvertime,
+    ROUND(COALESCE(w.Salaries, 0), 2) AS Salaries,
+    ROUND(COALESCE(w.EmployerTax, 0), 2) AS EmployerTax,
+    ROUND(COALESCE(w.Benefits, 0), 2) AS Benefits
 FROM Made AS mo
     LEFT JOIN Posted AS p ON p.Month = mo.Month
+    LEFT JOIN Paid AS w ON w.Month = mo.Month
 WHERE mo.Month BETWEEN '{d.F}-01' AND '{d.C}-12'
 ORDER BY mo.Month;""",
             [same_as_workbook(b, "monthly"),
@@ -686,16 +746,28 @@ ORDER BY mo.Month;""",
              Check("months with three pay dates", three,
                    lambda r: [mo for mo, n in zip(r.col("Month"), r.col("PayDates")) if n == 3]),
              Check(f"{d.C} depreciation by month (its schedule)", [round(x, 2) for x in m["dep_months"]],
-                   lambda r: [x for mo, x in zip(r.col("Month"), r.col("Depreciation")) if mo.startswith(str(d.C))])])
+                   lambda r: [x for mo, x in zip(r.col("Month"), r.col("Depreciation")) if mo.startswith(str(d.C))]),
+             Check("by pay date, the payroll's parts equal the payroll posted to 1090 after the start-up month", 0.0,
+                   lambda r: round(max(abs(sum(r.rows[k][r.columns.index(c)] for c in PARTS)
+                                           - r.rows[k][r.columns.index("Payroll")]) for k in range(1, len(r.rows))), 2),
+                   0.011),
+             Check("the start-up month's payroll by pay date (posted to 5080)", round(v["startup"]["to_5080"], 2),
+                   lambda r: round(sum(r.rows[0][r.columns.index(c)] for c in PARTS), 2)),
+             Check("the start-up month's payroll posted to 1090", 0.0, lambda r: r.rows[0][r.columns.index("Payroll")])])
     s.answer("Requirement 2", f"""\
 In {d.C}, 1090 received {money(v['inputs'])} (Q11): payroll {money(v['payroll'])}, the Factory Overhead entries
 {money(v['foh'])}, and depreciation {money(v['dep'])}; the completions released {money(v['released_gl'])} at standard
 (Q12), {v['conv_rate']:.2f} per standard hour (labor {v['labor_rate']:.2f}, overhead {v['oh_rate']:.2f}) against
 {v['actual_rate']:.2f} of actual cost (Q13). Overhead, the inputs less the direct earnings of {money(v['direct'])}, is
 {money(v['actual_oh'])}, {v['times']:.2f} times what the standards applied: the standards apply {v['third']:.2f} of it, the
-CFO's "a third". Q14 is the monthly extract the workbook's regressions read, from {v['first_month']} on, and from
-{v['start_month']} to show what the start-up month does to them; it carries the pay dates of each month, so the months
-with three payrolls ({', '.join(three)}) can be marked before anyone reads a slope from them.""")
+CFO's "a third", a comparison of totals that does not say what the overhead that varies costs. The completion lines and
+the credits differ by {money(v['off']['amount'])}: {v['off']['number']}, dated {v['off']['date']}, posted its credit on
+{v['off']['posted']}, a date exception (Q12), not rounding. Q14 is the monthly extract the workbook's regressions read,
+from {v['first_month']} on, and from {v['start_month']} to show what the start-up month does to them: that month posted
+no payroll and no Factory Overhead entry to 1090 (its one payroll, {money(v['startup']['to_5080'])}, went to 5080), only
+{money(v['startup']['dep'])} of depreciation, on {v['startup']['stdh']:,.0f} standard hours. Q14 also carries the
+payroll's parts by pay date, so each input can be tested on its own, and the pay dates of each month, so the months with
+three payrolls ({', '.join(three)}) can be marked before anyone reads a slope from them.""")
 
 
 # --- Requirement 3 -----------------------------------------------------------------------------------------------
@@ -1385,9 +1457,12 @@ Q28 and Q29 rebuild the manufactured finished goods made since the ledger opened
 units ({one(v['s_f']['stdh'])} standard hours) at the end of {d.F}, {one(v['s_p']['units'])} at the end of {d.P}, and
 {one(s3['units'])} ({one(s3['stdh'])} standard hours, {money(s3['std'])} at standard) at the end of {d.C}, carried at
 about {s3['per_hour']:.2f} of conversion per standard hour. {' and '.join(f"{c} at {y}" for c, y in negatives)} come
-out negative, which proves stock that predates the ledger's item detail; they are left out, as is the opening
-{money(v['opening_fg'])} of finished goods (Q31). The workbook revalues this stock at the proposed standard; Q30 gives
-the materiality it is measured against ({money(v['mat_p'])} for {d.P} and {money(v['mat_c'])} for {d.C}).""")
+out negative, so they drew on stock that predates the ledger's item detail; they are left out, as is the opening
+{money(v['opening_fg'])} of finished goods (Q31). The rebuild counts the stock as made since the opening only if
+shipments drew on new production first, and the negative items show that the opening stock was drawn on, so item-level
+opening balances would be needed to know which layers remain. The workbook revalues this stock at the proposed
+standard, a sensitivity on next year's plan rather than an established error; Q30 gives the 5% screen it is measured
+against ({money(v['mat_p'])} for {d.P} and {money(v['mat_c'])} for {d.C}), a first, quantitative screen.""")
 
 
 # --- Milestones ----------------------------------------------------------------------------------------------------

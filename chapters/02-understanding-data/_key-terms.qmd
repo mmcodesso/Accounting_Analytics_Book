@@ -16,7 +16,7 @@
 
 **General ledger.** The complete record of an organization's financial transactions, organized by account. It holds the debit and credit entries that feed the financial statements, and in the Charles River dataset it is stored in the GLEntry table within the Accounting Core group.
 
-**Messy data.** A dataset whose layout violates one or more tidy data principles, for example by storing values such as month names in column headers. Messy data is often easy for people to read but must be reshaped before analysis.
+**Messy data.** A dataset whose layout violates one or more tidy data principles, for example by storing values such as month names in column headers. Messy data is often easy for people to read but usually needs reshaping before analysis.
 
 **Missing value.** A field within a record that is blank, null, or contains a placeholder rather than a substantive value. Missing values represent a completeness problem when the data should exist, and they can distort calculations if not handled properly.
 
@@ -28,7 +28,7 @@
 
 **Quantitative data.** Data consisting of numerical values that represent measurements or counts and that can be subjected to arithmetic operations. Transaction amounts, unit quantities, and financial ratios are examples of quantitative data in accounting.
 
-**Referential integrity.** The requirement that every foreign key value corresponds to an existing primary key value in the referenced table. In the Charles River database, for example, every AccountID in GLEntry should exist in the Account table.
+**Referential integrity.** The requirement that every foreign key value that is not blank corresponds to an existing primary key value in the referenced table. Whether a blank is allowed depends on the relationship. In the Charles River database, for example, every AccountID in GLEntry should exist in the Account table.
 
 **Semi-structured data.** Data that has some organizational elements but does not fit neatly into rows and columns. XBRL filings and PDF bank statements are examples relevant to accounting.
 
@@ -36,7 +36,7 @@
 
 **Sub-ledger.** A detailed record for a specific category of accounts that feeds summary totals to the general ledger. The accounts receivable sub-ledger and accounts payable sub-ledger are common examples. In the Charles River dataset, tables such as SalesInvoice and CashReceiptApplication (accounts receivable) and PurchaseInvoice and DisbursementPayment (accounts payable) function as sub-ledgers.
 
-**Tidy data.** A dataset organized so that each variable occupies its own column, each observation occupies its own row, and each type of observational unit forms its own table. Tidy data aligns with the input requirements of analytical tools such as PivotTables, SQL, and Power BI.
+**Tidy data.** A dataset organized so that each variable occupies its own column, each observation occupies its own row, and each type of observational unit forms its own table. Tidy data is the layout that analytical tools such as PivotTables, SQL, and Power BI handle most easily.
 
 **Timeliness.** A data quality dimension indicating that the data reflects the current state of the business as of the relevant reporting date. Data that is not current enough for the intended analysis has a timeliness problem.
 

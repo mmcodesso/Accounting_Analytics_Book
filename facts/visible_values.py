@@ -106,7 +106,7 @@ def rel_path(path: Path | str) -> str:
 # The body: "$" (a dollar sign after any sign: −$3.5), "," or "_" (thousands separators, "_" as Python
 # writes 380_000), ".N" (N decimals; required), then the unit: "%" (a fraction shown as a percentage,
 # 0.4749 -> 47.49%), "M" or "K" (millions or thousands, 29.8M), "x" (a trailing ×, 2.33×), or "e" (C's
-# %e, 6.884200e+02), "p" (a fraction shown as a percentage number without the sign: 8 in "8, 10, and 12 percent"). A unit in words follows the body after a space: " percent", " million",
+# %e, 6.884200e+02, or %.15e), "p" (a fraction shown as a percentage number without the sign: 8 in "8, 10, and 12 percent"). A unit in words follows the body after a space: " percent", " million",
 # " billion" (31 percent, $100 million).
 #
 # The flags: "abs" (the absolute value; the text states the direction in words), "()" (a negative
@@ -313,7 +313,7 @@ MASKS = [
     re.compile(r"\b(?:BY-SA|ShareAlike|BY) \d\.\d\b"),                         # the license
     re.compile(r"\*\d+\*(?:\(\d+\))?|\b\d+\(\d+\),? ?\d+[–-]\d+|, \d+[–-]\d+\.|\bArticle \d+|\bpp?\. \d+(?:[–-]\d+)?"),  # citations
     re.compile(r"\bDATE ?\( ?(?:19|20)\d{2}, ?\d{1,2}, ?\d{1,2} ?\)"),        # DAX and Excel DATE(y, m, d)
-    re.compile(r"\b\d\.\d{6}e[+-]\d{2}\b"),                                    # scientific notation (found as CODE)
+    re.compile(r"\b\d\.(?:\d{15}|\d{6})e[+-]\d{2}\b"),                         # scientific notation (found as CODE)
 ]
 
 # A single digit counts data, and must be classified, when an ID word precedes it (Register 2,
@@ -525,7 +525,7 @@ def find_qmd(path: str, text: str) -> list[Occurrence]:
 # Codes without a year (agent A's registry takes the document numbers that carry one): item codes,
 # check numbers, and fixed-asset tags. A roll keeps the catalog, but a code chosen by its role (the
 # traced item, the largest line) is a key.
-CODE = re.compile(r"(?<![\w-])(?:[A-Z]{3}-[A-Z]{3}-\d{4}|CHK\d{7}|MFG-\d{4}|\d\.\d{6}e[+-]\d{2})(?![\w-])")
+CODE = re.compile(r"(?<![\w-])(?:[A-Z]{3}-[A-Z]{3}-\d{4}|CHK\d{7}|MFG-\d{4}|\d\.(?:\d{15}|\d{6})e[+-]\d{2})(?![\w-])")
 
 
 VALUE_IN_STRING = re.compile(r"""(?<![\w.,$])(?P<lit>[−+-]?\$?[−-]?(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+|\d+)

@@ -91,8 +91,9 @@ def fig_16_01() -> Diagram:
           "when it is strong", x0 + 10, 140, 268, 76, fill=WHITE, stroke=TEAL, size=SMALL, align="left")
     d.text("<b>Who sees the results</b>", x0 + 10, 232, 268, 20, size=SMALL)
     d.text("The people who oversee the controls, such as the audit committee and the chief audit executive. "
-           "Not the people whose transactions are tested: telling them what was flagged also tells them what "
-           "was not.", x0 + 10, 256, 268, 140, size=SMALL)
+           "The people whose transactions are tested hear of the exceptions they must explain, not the whole "
+           "report: telling them what was flagged also tells them what was not.", x0 + 10, 256, 268, 140,
+           size=SMALL)
     note(d, "Rule tests produce exceptions, failures of a stated rule; analytical tests produce anomalies, "
             "departures from an expectation that call for a closer look.", 420)
     return d
@@ -139,9 +140,10 @@ def fig_16_02() -> Diagram:
     emp = pbi.model_table(d, "Employee", 230, top + 176, ["EmployeeID", "EmployeeName", "JobTitle"], w=160)
     date = pbi.model_table(d, "Date", 470, top + 60, ["Date", "Year", "YearMonth", "MonthName"], w=130)
     jl = pbi.model_table(d, "JournalLines", 690, top - 10, ["SourceDocumentID", "Debit", "Credit"], w=170)
-    je = pbi.model_table(d, "JournalEntry", 690, top + 104, ["JournalEntryID", "PostingDate", "RiskScore"], w=170)
-    po = pbi.model_table(d, "PurchaseOrder", 690, top + 218, ["OrderDate"], w=170)
-    pr = pbi.model_table(d, "PayrollRegister", 690, top + 284, ["PayDate"], w=170)
+    je = pbi.model_table(d, "JournalEntry", 690, top + 104, ["JournalEntryID", "PostingDate", "ApprovedByEmployeeID",
+                                                             "RiskScore"], w=170)
+    po = pbi.model_table(d, "PurchaseOrder", 690, top + 242, ["OrderDate"], w=170)
+    pr = pbi.model_table(d, "PayrollRegister", 690, top + 308, ["PayDate"], w=170)
     pbi.relationship(d, tests.right("TestID"), exc.left("TestID"))
     pbi.relationship(d, emp.left("EmployeeID"), exc.left("EmployeeID"),
                      [(205, emp.rows["EmployeeID"]), (205, exc.rows["EmployeeID"])])
@@ -151,10 +153,14 @@ def fig_16_02() -> Diagram:
         pbi.relationship(d, date.right("Date"), t.left(col), [(640, date.rows["Date"]), (640, t.rows[col])])
     pbi.relationship(d, je.left("JournalEntryID"), jl.left("SourceDocumentID"),
                      [(668, je.rows["JournalEntryID"]), (668, jl.rows["SourceDocumentID"])])
+    # the approver: Employee filters the journal entries, and no other population
+    pbi.relationship(d, emp.right("EmployeeID"), je.left("ApprovedByEmployeeID"),
+                     [(676, emp.rows["EmployeeID"]), (676, je.rows["ApprovedByEmployeeID"])], jump=True)
     bottom = max(t.y + t.h for t in [tests, exc, emp, date, je, po, pr, jl]) + 12
-    note(d, "The three flagged tables stay in the model as the populations the rates divide by. "
-            "<b>1</b> marks the table that holds the key and <b>*</b> the table that refers to it; "
-            "the arrow shows the direction of the filter.", bottom)
+    note(d, "The three flagged tables stay in the model as the populations the rates divide by. Employee reaches "
+            "JournalEntry through its approver, but not PurchaseOrder or PayrollRegister. <b>1</b> marks the table "
+            "that holds the key and <b>*</b> the table that refers to it; the arrow shows the direction of the "
+            "filter.", bottom)
     return d
 
 
@@ -396,22 +402,23 @@ def fig_16_07() -> Diagram:
 
 # -- fig-16-08 --------------------------------------------------------------------------------
 
-TEST_4 = """// Test 4: the purchase orders have no gaps, and three registers were never paid
+TEST_4 = """// Test 4: the order numbers have no gap; three registers have no payment record
 EVALUATE
 VAR Numbers =
     SELECTCOLUMNS (
         PurchaseOrder,
         "Number", VALUE ( RIGHT ( PurchaseOrder[PONumber], 6 ) )
     )
-VAR Unpaid =
+VAR NoPayment =
     FILTER ( PayrollRegister, ISBLANK ( PayrollRegister[PaymentDate] ) )
 RETURN
     ROW (
         "Orders", COUNTROWS ( PurchaseOrder ),
-        "First number", MINX ( Numbers, [Number] ),
-        "Last number", MAXX ( Numbers, [Number] ),
+        "Unique numbers", COUNTROWS ( DISTINCT ( Numbers ) ),
+        "First", MINX ( Numbers, [Number] ),
+        "Last", MAXX ( Numbers, [Number] ),
         "Registers", COUNTROWS ( PayrollRegister ),
-        "Registers not paid", COUNTROWS ( Unpaid )
+        "No payment record", COUNTROWS ( NoPayment )
     )"""
 
 
@@ -419,28 +426,31 @@ def fig_16_08() -> Diagram:
     d = Diagram("Test 4 in DAX Query View")
     tutorial = (REPO_ROOT / "chapters" / "16-audit-monitoring" / "_tutorial-03.qmd").read_text(encoding="utf-8")
     assert TEST_4 in tutorial, "Test 4 differs from Tutorial 16.3"
-    orders, first, last = one("SELECT COUNT(*), MIN(CAST(substr(PONumber, -6) AS INTEGER)), "
-                              "MAX(CAST(substr(PONumber, -6) AS INTEGER)) FROM PurchaseOrder")
+    orders, unique, first, last = one("SELECT COUNT(*), COUNT(DISTINCT CAST(substr(PONumber, -6) AS INTEGER)), "
+                                      "MIN(CAST(substr(PONumber, -6) AS INTEGER)), "
+                                      "MAX(CAST(substr(PONumber, -6) AS INTEGER)) FROM PurchaseOrder")
     regs, unpaid = one("SELECT COUNT(*), SUM(pp.PayrollRegisterID IS NULL) FROM PayrollRegister r "
                        "LEFT JOIN PayrollPayment pp ON pp.PayrollRegisterID = r.PayrollRegisterID")
-    assert (orders, first, last, regs, unpaid) == (18832, 1, 18832, 8197, 3)
+    assert (orders, unique, first, last, regs, unpaid) == (18832, 18832, 1, 18832, 8197, 3)
     pane_w = 150
     win = pbi.window(d, 640, view="DAX query", tab="Home", tabs=pbi.QUERY_TABS, panes=["Data"], pane_w=pane_w,
                      buttons=["Format", "Comment", "Uncomment", "Find", "Replace", "Command palette"],
                      file="Audit Monitoring")
     x, w = win.canvas_x + 8, win.canvas_w - 16
     bottom = pbi.dax_query_editor(d, x, win.top + 10, w, TEST_4, ["Tests"], "Tests")
-    res = pbi.dax_results(d, x, bottom + 12, ["[Orders]", "[First number]", "[Last number]", "[Registers]",
-                                              "[Registers not paid]"], [90, 120, 120, 100, 160],
-                          [[str(orders), str(first), str(last), str(regs), str(unpaid)]])
+    widths = [78, 132, 66, 70, 94, 160]
+    assert sum(widths) <= w, (sum(widths), w)
+    res = pbi.dax_results(d, x, bottom + 12, ["[Orders]", "[Unique numbers]", "[First]", "[Last]", "[Registers]",
+                                              "[No payment record]"], widths,
+                          [[str(orders), str(unique), str(first), str(last), str(regs), str(unpaid)]])
     assert res["bottom"] <= win.bottom, res["bottom"]
-    xl.emphasis(d, *res["geometry"][(0, 4)])
+    xl.emphasis(d, *res["geometry"][(0, 5)])
     for i, name in enumerate(["Key Measures", "Date", "Employee", "Exceptions", "JournalEntry", "JournalLines",
                               "PayrollRegister", "PurchaseOrder", "Tests"]):
         d.text(esc(name), win.panes_x + 8, win.top + 34 + i * 26, pane_w - 12, 22, size=SMALL)
-    d.text("<i>The Tests tab of Audit Monitoring.pbix after Run. The order numbers run from 1 to the number of "
-           "orders, so none is missing. Outlined: the three registers with no payment record. The editor shows Test 4 "
-           "alone; in your Tests tab it follows Tests 1 to 3.</i>",
+    d.text("<i>The Tests tab of Audit Monitoring.pbix after Run. The order numbers are unique and run from 1 to the "
+           "number of orders, so none is missing between them. Outlined: the three registers with no payment record. "
+           "The editor shows Test 4 alone; in your Tests tab it follows Tests 1 to 3.</i>",
            0, win.bottom + 10, 860, 40, size=SMALL, color=GRAY)
     return d
 

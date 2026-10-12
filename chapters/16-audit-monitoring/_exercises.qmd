@@ -16,24 +16,24 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (1) Import T16_SalesInvoice as `ARInvoices`, keeping SalesInvoiceID, InvoiceNumber, CustomerID, InvoiceDate, DueDate, and GrandTotal; T20_CashReceiptApplication as `ARApplications`, keeping SalesInvoiceID, ApplicationDate, and AppliedAmount; and T23_CreditMemo as `ARCredits`, keeping OriginalSalesInvoiceID, CreditMemoDate, and GrandTotal.
 
-(2) In Power Query, keep the applications and credit memos dated on or before 2026-12-31, group each by invoice with **Group By**, and merge the totals into ARInvoices. Add `OpenBalance` as GrandTotal less the applications and credits, rounded to two decimals, and keep the invoices dated on or before 2026-12-31 with an open balance above zero.
+(2) In Power Query, keep the applications and credit memos dated on or before 2026-12-31, group each by invoice with **Group By**, and merge the totals into ARInvoices. Replace the nulls of the two merged totals with 0, as in Tutorial 8.2, Step 2e: an invoice with no application or credit memo finds no match, and a subtraction with a null returns null. Add `OpenBalance` as GrandTotal less the applications and credits, rounded to two decimals, and keep the invoices dated on or before 2026-12-31 with an open balance above zero.
 
 (3) Add an aging column with the days past due at 2026-12-31, in Chapter 8's buckets: Current, 1–30, 31–60, 61–90, and over 90 days. Show the open balance and the number of invoices by bucket.
 
-(4) Import T3_GLEntry as `ARLedger` with **Transform Data**, keep the postings to account 1020 dated on or before 2026-12-31, and compare their balance with the open balances. Explain the difference with Chapter 8's finding.
+(4) Import T3_GLEntry as `ARLedger` with **Transform Data**, merge AccountNumber from the Account query, because the ledger records each account's AccountID, and keep the postings to account 1020 dated on or before 2026-12-31, and compare their balance with the open balances. Explain the difference with Chapter 8's finding.
 
-(5) The open balances leave out invoices whose credits and applications exceed their total. Count them, total them, and explain where Chapter 8 found that they belong.
+(5) The open balances leave out invoices whose credits and applications exceed their total. Duplicate ARInvoices as `ARCreditBalances` with the filter reversed to keep them, count them, total them, and explain where Chapter 8 found that they belong.
 
 **Deliverable.** The aging page, the reconciliation, and a short note answering requirements (4) and (5).
 
 
 
 
-**Exercise 16.2: Cutoff as a Monthly Test**
+**Exercise 16.2: Year-End Cutoff on the Monitoring Report**
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Chapter 12 found sales invoices for December deliveries recorded in January, and December shipments never invoiced at all. A test of revenue cutoff run every month would show these exceptions in the month they arise, not a year later.
+**Scenario.** Chapter 12 found sales invoices for December deliveries recorded in January, and December shipments never invoiced at all. Added to the monitoring report, the same tests would show these exceptions at the first refresh after each year-end, not at the next annual review. They compare the year of delivery with the year of the invoice, so they test the cutoff at a year-end, not between the months of a year.
 
 **Requirements.**
 
@@ -43,7 +43,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (3) Build two exception queries with the register's columns: `SI DeliveredPriorYear`, one row per invoice whose lines were all delivered in a year before the year of the invoice, dated by the invoice, with its SubTotal as the amount; and `SL NotInvoiced`, one row per shipment line with no invoice line, dated by its delivery, with its standard cost as the amount.
 
-(4) Append them to a copy of the register named `Exceptions 16.2`, add the two tests to a copy of the Tests table, and show the new tests by month.
+(4) Append them to a copy of the register named `Exceptions 16.2`, and add the two tests to a copy of the Tests table named `Tests 16.2`. Relate Exceptions 16.2 to Tests 16.2 on TestID and to the Date table on EventDate, add a measure that counts the rows of Exceptions 16.2, and show the new tests by month.
 
 (5) Chapter 12 counted the invoices for December deliveries by the date they were posted in the ledger, and found one more in January 2026 than your test finds. Find that invoice in the ledger and explain the difference.
 
@@ -64,11 +64,16 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (1) Import T66_TimeClockEntry as `ClockEntries`, keeping EmployeeID, WorkDate, RegularHours, and OvertimeHours, and merge the employee's CostCenterID from the Employee query. Keep the entries of cost center 4, Manufacturing.
 
-(2) Add a column of total hours, regular plus overtime. Group the entries by WorkDate with **Group By** in its advanced mode, counting the employees and the distinct values of total hours, and summing the overtime hours.
+(2) Add a column of total hours, regular plus overtime. Reference ClockEntries as `SurgeDays`, and group it by WorkDate with **Group By** in its advanced mode, with three aggregations: `Employees` and `HoursValues`, each with any operation for now, and `OvertimeHours`, the sum of the overtime hours. Group By in Power BI Desktop cannot count the distinct values of a column (its **Count Distinct Rows** counts whole rows), so in the formula bar change the first two aggregations to the ones below, which count the distinct employees and the distinct values of total hours.
 
-(3) Keep the days with more than one employee and a single distinct value of total hours, Chapter 12's test H8, as `SurgeDays`, and load it.
+```
+{"Employees", each List.Count(List.Distinct([EmployeeID])), Int64.Type},
+{"HoursValues", each List.Count(List.Distinct([TotalHours])), Int64.Type},
+```
 
-(4) Show the surge days and their overtime hours by month, with a line of the share of the plant's overtime they account for.
+(3) In SurgeDays, keep the days with more than one employee and a single distinct value of total hours, Chapter 12's test H8, and load both queries.
+
+(4) Show the surge days and their overtime hours by month, with a line of the share of the plant's overtime they account for, the overtime of all of the month's entries in ClockEntries.
 
 (5) Describe when surge days began, how often they occur, and how their share of overtime has changed. Explain why the test belongs in internal audit's monitoring report rather than on the Plant page of the package, which the production manager reads.
 
@@ -133,7 +138,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Requirements.**
 
-(1) In Power Query, reference the Payments query of Exercise 16.5 as `PaymentPairs`, and merge it with itself on SupplierID and Amount. Keep the pairs of two different payments on different dates, each pair once.
+(1) In Power Query, reference the Payments query of Exercise 16.5 as `PaymentPairs`, and merge it with itself on SupplierID and Amount. Keep the pairs of two different payments on different dates, each pair once, by keeping the rows whose DisbursementID is less than the other payment's: the merge pairs every payment with itself, and every pair in both orders.
 
 (2) Add the number of days between the two payments, and show the pairs by that number. Count the pairs within 30 days, and check whether any pair pays the same invoice.
 

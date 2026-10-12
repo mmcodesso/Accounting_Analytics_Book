@@ -31,7 +31,7 @@ The last three cover filtering, sorting and limiting, and saving, documenting an
 - The detail sits in tables the Part II workbook never imported
 
 ::: {.notes}
-Those tables hold the work orders and their closes, the time employees recorded, the payroll, and a ledger of hundreds of thousands of rows. "This one is a database question," she says. "Start with the database." This chapter sets up the tool and writes the first queries.
+Those tables hold the work orders and their closes, the time employees recorded, the payroll, and a ledger of hundreds of thousands of rows. "This one is a database question," she says. "Start with the database." Volume, prices and the timing of the records can move the variance too, so the two explanations are hypotheses to test. This chapter sets up the tool and writes the first queries.
 :::
 
 # Standard Costs in Brief
@@ -41,17 +41,17 @@ Those tables hold the work orders and their closes, the time employees recorded,
 - Materials go to work in process; conversion cost to a clearing account as incurred
 - Completed units go to finished goods at standard, relieving both
 - At a work order's close, actual less standard moves to the manufacturing variance account
-- Reported with cost of goods sold, its overhead part is underapplied overhead
+- Reported with cost of goods sold; a positive overhead part is underapplied overhead
 
 ::: {.notes}
-A standard cost system values each item at what one unit should require, at standard prices and rates (Datar and Rajan). The close record splits the conversion part into direct labor and overhead, and the year-end closing entry clears the variance account with the other income statement accounts. Chapter 10 follows the whole flow through the ledger.
+A standard cost system values each item at what one unit should require, at standard prices and rates (Datar and Rajan). A positive variance, actual above standard, is unfavorable and lowers the margin; a negative one is favorable, and a negative overhead part is overapplied. The close record splits the conversion part into direct labor and overhead, and the year-end closing entry clears the variance account with the other income statement accounts. Chapter 10 follows the whole flow through the ledger.
 :::
 
 # Why Query the Database Directly
 
 ## A query asks the database for only what you need
 
-- Importing copies rows, and a ledger-sized table slows a workbook
+- Part II's imports copy rows, and a ledger-sized table slows a workbook
 - A spreadsheet analysis grows hard to implement and to audit (Borthick et al.)
 - A query is a written request: nothing is copied until you ask, and it can be rerun
 - SQL is declarative: you state what you want, and the database finds it
@@ -78,7 +78,7 @@ Neither replaces the other: Excel is strongest for ad hoc analysis, modeling and
 - Query a copy, CharlesRiver_Work.sqlite, so the download is never changed
 
 ::: {.notes}
-DB Browser can change a database as well as read it, which is why the tutorials work in a copy. Open Database Read Only, from the arrow beside Open Database, refuses any change; the working copy is still needed because Chapter 11 saves queries in it.
+DB Browser can change a database as well as read it, which is why the tutorials work in a copy. Open Database Read Only, from the arrow beside Open Database, prevents changes to the database; the working copy is still needed because Chapter 11 saves queries in it.
 :::
 
 ## Database Structure lists every column and its type
@@ -124,7 +124,7 @@ A statement is a complete instruction ending with a semicolon, built from clause
 {{< book-table tbl-09-01 >}}
 
 ::: {.notes}
-A syntax error stops the query, turns the message pane red, and gives the line where the statement starts. A misspelled name is the most common cause, and the Database Structure tab is where to check the spelling.
+An error like these stops the query, turns the message pane red, and gives the line where the statement starts; the message can point near the mistake rather than at it. A misspelled name, which SQLite finds before it runs anything, is the most common cause, and the Database Structure tab is where to check the spelling.
 :::
 
 ## Watch out: when a query misbehaves, check these first {.watch-out}
@@ -233,7 +233,7 @@ The message names the column SQLite could not find and the line where the statem
 {{< book-figure fig-09-05 crop="0,0.1876,1,0.6118" >}}
 
 ::: {.notes}
-The query adds the material and conversion parts of each close and subtracts the recorded total. The CheckDifference column is zero in every row shown, so the variance records add up.
+The query adds the material and conversion parts of each close and subtracts the recorded total. The CheckDifference column is zero in every row shown; Tutorial 9.2 tests every close at once.
 :::
 
 ## Checkpoint
@@ -250,11 +250,11 @@ Students now know where the variance is recorded: in the WorkOrderClose table, o
 
 - Numbers go without quotes; text goes in single quotes and must match exactly
 - `UPPER(TRIM(x))` compares text whose case or spaces cannot be trusted
-- A column compared with a value converts the value to the column's type
+- A value compared with a column takes the column's type where it can
 - Text compared with a number finds nothing: a year cut from text needs quotes or CAST
 
 ::: {.notes}
-SQLite converts a value only when one side of the comparison is a column, so a year taken from a document number with SUBSTR, compared with a bare number, returns no rows and no error.
+The conversion comes from the column's affinity, or from a CAST; a function's result and a typed value have none, so a year taken from a document number with SUBSTR, compared with a bare number, returns no rows and no error.
 :::
 
 ## Comparison and logical operators
@@ -284,7 +284,7 @@ The parentheses make the logic clear to a reviewer as well as to the database. C
 - LIKE matches patterns: `%` for any run of characters, `_` for one
 
 ::: {.notes}
-For a column that stores a time, such as a journal entry's CreatedDate, end the range with less than the next day. In SQLite, LIKE ignores the difference between capital and small letters, unlike the equals sign.
+For a column that stores a time, such as a journal entry's CreatedDate, end the range with less than the next day. In SQLite, LIKE ignores the difference between capital and small letters of the English alphabet, unlike the equals sign.
 :::
 
 # Missing Values and NULL
@@ -323,7 +323,7 @@ Ask students which of the four would fail silently in a real analysis.
 
 ## Three of four look fine and are wrong {.answer}
 
-1. None: a comparison with NULL is never true
+1. None: an ordinary comparison with NULL is never true
 2. Every work order not yet closed
 3. None: = is case-sensitive, and the data says WorkOrderClose
 4. Every variance posting: LIKE ignores case in SQLite
@@ -339,7 +339,7 @@ Only the second and fourth answer the question, and the fourth only in SQLite, w
 {{< book-steps 9.2 >}}
 
 ::: {.notes}
-Students find the variance and clearing accounts by their numbers, filter the ledger to the variance account for the year, list its source document types, exclude the closing entry, check every close, and find the work orders not yet closed.
+Students find the variance and clearing accounts by their numbers, filter the ledger to the variance account for the year, list its source document types, set the closing entry apart, check every close, and find the work orders not yet closed.
 :::
 
 ## Two kinds of source post to the variance account
@@ -347,7 +347,7 @@ Students find the variance and clearing accounts by their numbers, filter the le
 {{< book-figure fig-09-07 >}}
 
 ::: {.notes}
-Work order closes post the variance through the year, and one journal entry, the year-end close, clears the account. Excluding the close leaves the variance postings ready to analyze.
+Work order closes post the variance through the year, and one journal entry, the year-end close, clears the account. Setting the close apart leaves the variance postings of the year; in another year, read each journal entry first, because one that adjusts the variance belongs in it.
 :::
 
 ## Checkpoint
@@ -355,7 +355,7 @@ Work order closes post the variance through the year, and one journal entry, the
 {{< book-checkpoint 9.2 lead="true" >}}
 
 ::: {.notes}
-The open work orders, all released during the year, show that the year's variance is complete only for the work orders that closed during it.
+The open work orders, all released during the year, show that the year's variance covers only the work orders that closed during it.
 :::
 
 # Sorting and Limiting Results
@@ -418,7 +418,7 @@ SELECT, FROM, WHERE, ORDER BY and LIMIT: only SELECT is always needed, and a cla
 
 ## A logical error runs and answers another question
 
-- A syntax error stops and names the problem; a logical error does neither
+- An error that stops a query names the problem; a logical error does neither
 - Errors recur in similar ways from student to student (Taipalus et al.)
 - `SELECT AccountNumber AccountName` runs: the second name becomes an alias
 - Know what the result should look like: row count, first rows, a control total
@@ -502,7 +502,7 @@ The ranking points the controller toward overhead, which carries most of the con
 
 - The variance is recorded when a work order closes, in material and conversion parts
 - In the largest closes of the year, most of it is overhead
-- The ledger holds the same amounts, plus a year-end close to leave out
+- The ledger holds the same amounts, plus a year-end close to set apart
 - Which products, which years, what drives the overhead: Chapter 10 joins the tables
 
 ::: {.notes}
@@ -515,7 +515,7 @@ Most of this chapter's work was descriptive analytics: finding, listing and rank
 - SELECT, FROM, aliases, calculated columns, functions and DISTINCT build a result
 - WHERE filters with exact types, parentheses, quoted dates and IS NULL
 - ORDER BY and LIMIT rank; scripts with comments make the work reviewable
-- Syntax errors name themselves; logical errors need a check of the result
+- Errors that stop a query name themselves; logical errors need a check
 
 ::: {.notes}
 Ask students which logical error they think they are most likely to make. The AND and OR precedence and the comparison with NULL are the usual answers.

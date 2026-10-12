@@ -162,7 +162,7 @@ def fig_09_03() -> Diagram:
 
 
 def fig_09_04() -> Diagram:
-    d = Diagram("A Syntax Error in the Message Pane")
+    d = Diagram("A Misspelled Column in the Message Pane")
     comment, sql, line = CHAPTER09.location("account_columns")
     wrong = sql.replace("AccountNumber", "AccountNumbr", 1)
     assert wrong != sql
@@ -282,8 +282,10 @@ def fig_09_09() -> Diagram:
     rows = db.run(step1)[1]
     assert len(rows) == 10 and all(r[5] > r[3] + r[4] for r in rows), \
         "overhead is larger than material and labor together in each of the ten"
-    shares = [r[6] for r in db.run(saved)[1]]
-    assert sum(s > 0.8 for s in shares) >= 6, shares     # "most of them more than four-fifths"
+    shares = [r[7] for r in db.run(saved)[1]]            # OverheadShare, rounded as the result shows it
+    most, four_fifths, half = 0.5, 0.8, len(shares) / 2
+    assert all(s > most for s in shares) and sum(s > four_fifths for s in shares) > half, shares
+    # "Overhead makes up most of each of the ten largest variances, in most of them more than four-fifths."
     out = CHAPTER09.mock(d, "top_ten", [150, 110, 110, 100, 100, 110, 100], sql=step1)
     db.emphasize_cells(d, out["geometry"], [(-1, 5), (9, 5)])
     note(d, "Outlined: the Overhead column, which holds most of each total.", out["bottom"] + 8, 22)

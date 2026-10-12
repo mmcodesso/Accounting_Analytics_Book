@@ -85,7 +85,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Requirements.**
 
-(1) Choose **Modeling > New parameter > Numeric range**, name it `Discount`, with a minimum of 0, a maximum of 0.2, an increment of 0.01, and a default of 0.12, and add its slider to the page.
+(1) Choose **Modeling > New parameter > Numeric range**, name it `Discount`, set **Data type** to **Whole number**, with a minimum of 0, a maximum of 20, an increment of 1, and a default of 12, and add its slider to the page. The slider reads in whole percents, so divide its value by 100 wherever a measure uses it. A decimal range from 0 to 0.2 in steps of 0.01 would stop at 0.19, because 0.01 is not stored exactly.
 
 (2) Write measures, filtered to the Design Trade Customer Promotion's 2026 lines, for the units, the price before discount per unit, and the standard cost per unit.
 
@@ -114,7 +114,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (2) Add a line chart with MonthStart on the **X-axis** and Revenue on the **Y-axis**, filtered to the months from January 2024 to September 2026. In the **Analytics** pane, add a forecast of three months with a 95 percent confidence interval.
 
-(3) Record the forecast for October, November, and December 2026 and its interval, and add the three months to a quarter total.
+(3) Record the forecast for October, November, and December 2026 and each month's interval, and add the three monthly forecasts to a quarter total. The monthly intervals cannot simply be added into an interval for the quarter.
 
 (4) Compare the forecast with the actual revenue of fiscal 2026's fourth quarter and with the three benchmarks of Chapter 7: the trend, the mean, and the same quarter of the previous year.
 
@@ -135,15 +135,15 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Requirements.**
 
-(1) Import T52_WorkOrderOperation again as `OperationPaths`, keeping WorkOrderOperationID, WorkCenterID, and ActualEndDate, and T66_TimeClockEntry as `ClockPaths`, keeping TimeClockEntryID and WorkCenterID. Clear **Enable load** on both.
+(1) Import T52_WorkOrderOperation again as `OperationPaths`, keeping WorkOrderOperationID, WorkCenterID, and ActualEndDate, with ActualEndDate typed as **Date**, and T66_TimeClockEntry as `ClockPaths`, keeping TimeClockEntryID and WorkCenterID. Clear **Enable load** on both.
 
-(2) Import T60_LaborTimeEntry again as `LaborPaths`, keeping LaborTimeEntryID, TimeClockEntryID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, and OvertimeHours. Merge it with OperationPaths and with ClockPaths, and bring each path's work-center name from the WorkCenter query, as OperationWorkCenter and ClockWorkCenter.
+(2) Import T60_LaborTimeEntry again as `LaborPaths`, keeping LaborTimeEntryID, TimeClockEntryID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, and OvertimeHours, with WorkDate typed as **Date**. Merge it with OperationPaths with a left outer join, which keeps the lines that have no operation, expand WorkCenterID and ActualEndDate, and rename WorkCenterID to `OperationWorkCenterID`. Merge it with ClockPaths the same way, expand WorkCenterID, and rename it `ClockWorkCenterID`. Then merge each of the two keys with the WorkCenter query to bring its work-center name, as OperationWorkCenter and ClockWorkCenter.
 
-(3) Add custom columns that test whether the two work centers agree and whether the work date falls after the operation's actual end date.
+(3) Add custom columns that test whether the two work centers agree and whether the work date falls after the operation's actual end date, each left blank (null) when a line has nothing to compare, such as a line without an operation.
 
 (4) For direct manufacturing time, count the lines on which the two paths disagree in each year, and build a matrix of 2026 hours with OperationWorkCenter on the rows and ClockWorkCenter on the columns.
 
-(5) Compare the share of lines recorded after their operation ended among the lines that disagree and among all direct lines of 2026, and relate the result to Chapter 12's finding about direct time recorded after operations ended.
+(5) Compare the share of lines recorded after their operation ended among the lines that disagree and among all direct lines of 2026, say how many direct lines could not be tested, and relate the result to Chapter 12's finding about direct time recorded after operations ended.
 
 (6) Show where the time clock places the indirect manufacturing hours of 2026, which the operation path leaves in (Blank), and conclude which path should feed which question on the plant page.
 

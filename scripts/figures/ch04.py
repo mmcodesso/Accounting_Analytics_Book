@@ -102,8 +102,8 @@ def fig_04_01() -> Diagram:
     traced_row = traced + 1
     d.box(f"<b>Column formula, copied by hand:</b><br>{new_l}{traced_row} holds "
           f"=ROUND({qty_l}{traced_row}*{price_l}{traced_row},2). The formula was typed in "
-          f"{new_l}2 and copied down, so every row has its own copy. Rows added below the data "
-          "get no formula until you copy it again.", 0, y, box_w, box_h, fill=GRAY_TINT,
+          f"{new_l}2 and copied down, so every row has its own copy, and nothing ensures that rows "
+          "added below the data get one.", 0, y, box_w, box_h, fill=GRAY_TINT,
           stroke=GRAY, stroke_width=1.5, align="left", valign="top")
     d.box(f"<b>Total:</b> =SUM({total_l}2:{total_l}{count + 1})<br>The formula names fixed cells. "
           f"Rows added below row {count + 1} are left out of the total, and nothing warns you.",
@@ -173,8 +173,8 @@ def fig_04_05() -> Diagram:
         ("Relative: A2", BLUE,
          [["", "B", "C", "D"], ["2", "4", "25.00", "=B2*C2"], ["3", "6", "30.00", "=B3*C3"]],
          [30, 60, 70, 112], {(1, 3), (2, 3)},
-         "Copied down one row, <b>=B2*C2</b> becomes <b>=B3*C3</b>. Both the row and the "
-         "column adjust, so each row uses its own data."),
+         "Copied down one row, <b>=B2*C2</b> becomes <b>=B3*C3</b>: the row adjusts, so each "
+         "row uses its own data. Copied across, the column would adjust too."),
         ("Absolute: $A$2", TEAL,
          [["", "B", "C"], ["2", "100.00", "=B2/<b>$B$6</b>"], ["3", "250.00", "=B3/<b>$B$6</b>"],
           ["6", "1,000.00", "Total"]],
@@ -507,9 +507,9 @@ def fig_04_06() -> Diagram:
     gx, gy, _, _ = geo[(numbers.index("16"), 1)]
     xl.emphasis(d, gx, gy, sum(widths[2:]), 22 * 5)
     bottom = 40 + 22 + 22 * len(rows)
-    right = xl.sheet_tabs(d, 0, bottom + 6, ["Documentation", "SalesInvoice", "SalesInvoiceLine",
-                                            "Item", "PromotionProgram", "Parameters", "Analysis"],
-                          "Analysis")
+    # Tutorial 4.3 adds the Documentation worksheet, so the tabs are those at the end of Tutorial 4.2.
+    right = xl.sheet_tabs(d, 0, bottom + 6, ["SalesInvoice", "SalesInvoiceLine", "Item",
+                                            "PromotionProgram", "Parameters", "Analysis"], "Analysis")
     assert right <= 860, right
     d.text("<i>Rows the tutorial leaves empty are not shown. Outlined: the grid of counts. Cell "
            "E19 is selected, so the formula bar shows its formula.</i>", 0, bottom + 38, 860, 20,
@@ -589,14 +589,14 @@ def fig_04_09() -> Diagram:
     assert group == "Furniture", group
     tables = excel_tables()
     entries = [
-        ("Workbook documentation", ""),
         ("Purpose", "Diagnose the decline in Furniture gross margin from the third to the fourth "
                     "quarter of fiscal 2026, as requested by the controller."),
-        ("Source", f"{XLSX.name}: Tables {', '.join(tables[t] for t in QUERIES)}, imported with "
-                   "Power Query."),
+        ("Source", rf"C:\CharlesRiver\{XLSX.name}: Tables {', '.join(tables[t] for t in QUERIES)}, "
+                   "imported with Power Query."),
         ("Query steps", "Item keeps only items with a list price, and eleven columns. SalesInvoice "
-                        "has its date columns set to the Date type. The other queries keep every "
-                        "row and column."),
+                        "has its date columns set to the Date type. FreightAmount and Discount "
+                        "have the decimal number type in their Changed Type steps. The other "
+                        "queries keep every row and column."),
         ("Last refreshed", "Date of the last Refresh All"),
         ("Parameters", "ThresholdPercentile (Parameters!B3, an input validated between 0.5 and "
                        "0.99); LargeLineThreshold (Parameters!B4, a formula)."),
@@ -624,7 +624,7 @@ def fig_04_09() -> Diagram:
         d.box(str(i + 1), 0, y, 36, h, fill=GRAY_TINT, stroke=RULE, color=GRAY, size=SMALL,
               rounded=False)
         d.box(f"<b>{esc(label)}</b>", 36, y, 190, h, fill=WHITE, stroke=RULE,
-              size=HEAD if i == 0 else SMALL, align="left", valign="top", rounded=False)
+              size=SMALL, align="left", valign="top", rounded=False)
         d.box(esc(entry), 226, y, 630, h, fill=WHITE, stroke=RULE, size=SMALL, align="left",
               valign="top", rounded=False)
         if label == "Open questions":

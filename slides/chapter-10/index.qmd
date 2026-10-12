@@ -44,7 +44,7 @@ The product is recorded on the work order, the hours in the labor time and the p
 - A join on mismatched keys returns fewer or more rows, never an error: test the count
 
 ::: {.notes}
-A join is the SQL version of Power Query's Merge from Chapter 5: Inner keeps the matched rows, Left Outer keeps every row of the first query, and Left Anti keeps the rows with no match. XLOOKUP behaves like a left join that brings back one column.
+A join is the SQL version of Power Query's Merge from Chapter 5: Inner keeps the matched rows, Left Outer keeps every row of the first query, and Left Anti keeps the rows with no match. XLOOKUP behaves like a left join that brings back one column, as long as its key is unique: where the key repeats, XLOOKUP still returns one match, while a join returns a row for each.
 :::
 
 # Inner Joins
@@ -79,15 +79,15 @@ Four work orders, three of them closed: the inner join on WorkOrderID returns th
 
 ## Join paths through purchasing
 
-{{< book-table tbl-10-01 1-10 >}}
+{{< book-table tbl-10-01 1-11 >}}
 
 ::: {.notes}
-Each row names two tables and the key that links them, from the table that holds the foreign key to the table whose primary key it refers to. These paths reach beyond the sales and ledger tables of Part II, into the Procure-to-Pay group.
+Each row names two tables and the key that links them, from the table that holds the foreign key to the table whose primary key it refers to. These paths reach beyond the sales and ledger tables of Part II, into the Procure-to-Pay group. A purchase order names two employees, its creator and its approver, so each role is a join of its own, with two aliases of Employee.
 :::
 
 ## Join paths through manufacturing
 
-{{< book-table tbl-10-01 11-17 >}}
+{{< book-table tbl-10-01 12-18 >}}
 
 ::: {.notes}
 These are the paths of this chapter's tutorials: closes to work orders to items, operations to work centers, and completion lines to the items they made. Chapter 3's manufacturing figure traced the same tables.
@@ -95,7 +95,7 @@ These are the paths of this chapter's tutorials: closes to work orders to items,
 
 ## Join paths through payroll and the ledger
 
-{{< book-table tbl-10-01 18-24 >}}
+{{< book-table tbl-10-01 19-25 >}}
 
 ::: {.notes}
 The payroll tables link through the register to its period, employee and cost center. The last row is different from the others: the ledger reaches its documents through two columns, not one key.
@@ -175,7 +175,7 @@ The fourth is the trap: with a NULL in the list, NOT IN returns no rows at all, 
 {{< book-table tbl-10-02 >}}
 
 ::: {.notes}
-Without GROUP BY, an aggregate summarizes every row the query keeps. GROUP_CONCAT is the one aggregate that returns text, which makes a short list of exceptions easy to read.
+Without GROUP BY, an aggregate summarizes every row the query keeps. GROUP_CONCAT joins a group's values into one text, which makes a short list of exceptions easy to read.
 :::
 
 ## GROUP BY returns one row per group
@@ -286,7 +286,7 @@ The joins keep every close only because every key matches, and the totals by gro
 {{< book-checkpoint 10.1 4-6 >}}
 
 ::: {.notes}
-The variance is not a product problem. It rises in the groups the plant makes most while the number of work orders falls, which turns the question toward the cost of production itself.
+The variance is not concentrated in a few products: a ranking by total dollars shows where the amounts accumulate, not which items are made inefficiently. It rises in the groups the plant makes most while the number of work orders falls, which turns the question toward the cost of production itself.
 :::
 
 # Fan-Out and Double Counting
@@ -296,7 +296,7 @@ The variance is not a product problem. It rises in the groups the plant makes mo
 {{< book-figure fig-10-04 >}}
 
 ::: {.notes}
-An invoice with three lines appears three times in a join of SalesInvoice and SalesInvoiceLine, and so does its GrandTotal. Summed over the year, the join nearly doubles the invoice total: the double counting Chapter 3 warned about.
+An invoice with three lines appears three times in a join of SalesInvoice and SalesInvoiceLine, and so does its GrandTotal. Summed over the year, the join nearly doubles the invoice total: the double counting Chapter 3 warned about. The lines add up to the SubTotal; the GrandTotal also holds the header's freight and tax.
 :::
 
 ## Add up each amount at its own level
@@ -341,7 +341,7 @@ A control total from the header table, such as the sum of GrandTotal over SalesI
 - A scalar subquery returns one value, such as the year's average variance
 - It can stand wherever a value can, including the SELECT list, side by side
 - A subquery after IN supplies a list, such as the work orders of Furniture items
-- SQLite uses the first row of a scalar subquery that returns several; most systems stop
+- No row: NULL. Several rows: SQLite takes the first; most systems stop
 
 ::: {.notes}
 Tutorial 10.2 puts two scalar subqueries side by side to tie the closes to the ledger. A subquery is written inside another query, in parentheses.
@@ -387,7 +387,7 @@ The database assembles the rows from FROM and its joins, keeps those that meet W
 - PostgreSQL and MySQL also allow it; SQL Server does not
 
 ::: {.notes}
-The book writes `GROUP BY CloseYear` because it is easier to read than repeating the expression; in SQL Server you would repeat the SUBSTR expression instead. SQLite also tolerates an alias in WHERE, a habit to avoid.
+The book writes `GROUP BY CloseYear` because it is easier to read than repeating the expression; in SQL Server you would repeat the expression with its own function, SUBSTRING. SQLite also tolerates an alias in WHERE, a habit to avoid.
 :::
 
 # Guided Tutorial 10.2: Building the Trial Balance and Following the Conversion Cost
@@ -397,7 +397,7 @@ The book writes `GROUP BY CloseYear` because it is easier to read than repeating
 {{< book-steps 10.2 >}}
 
 ::: {.notes}
-Students tie the closes to the ledger, rebuild the pre-closing trial balance, prove that debits equal credits, follow the clearing account by year and source, split the conversion variance into labor and overhead, and identify the journal entries.
+Students tie the closes to the ledger, rebuild the pre-closing trial balance, check that debits equal credits, follow the clearing account by year and source, split the conversion variance into labor and overhead, and identify the journal entries.
 :::
 
 ## The ledger rebuilds the pre-closing trial balance
@@ -405,7 +405,7 @@ Students tie the closes to the ledger, rebuild the pre-closing trial balance, pr
 {{< book-figure fig-10-06 crop="0,0,1,0.792" >}}
 
 ::: {.notes}
-The query keeps the postings through the year-end without the year's two closing entries and groups them by account. It returns the same accounts and balances as Chapter 6's trial balance, and the net of all its balances is zero.
+The query keeps the postings through the year-end without the year's two closing entries and groups them by account. It returns the same accounts and balances as Chapter 6's trial balance, and the net of all its balances is zero: the two reconstructions agree, which does not show that the entries behind them are complete or correctly classified.
 :::
 
 ## Conversion cost flows through the clearing account
@@ -446,7 +446,7 @@ The ledger locates the variance precisely: it is the part of the actual conversi
 
 - Compare the inputs used with the inputs the standards allow for the output achieved
 - Standard hours allowed: units completed times each unit's standard labor hours
-- Compare them with the direct labor time recorded against the work
+- Compare them with the direct labor time recorded
 - It is Chapter 7's flexible budget applied to hours
 
 ::: {.notes}
@@ -457,7 +457,7 @@ A standard cost system recalculates the standard at the output actually achieved
 
 - Indirect labor is time no single work order carries
 - It reaches the variance through overhead, not the labor part
-- Fixed overhead is absorbed only by units made: lower output leaves some unabsorbed
+- Fixed overhead is absorbed only by units made: output below plan leaves some unabsorbed
 - LaborType separates direct, indirect and non-manufacturing time
 
 ::: {.notes}
@@ -495,7 +495,7 @@ The first derived table sums the hours by year and labor type; the second sums t
 {{< book-figure fig-10-09 crop="0,0.61,1,0.39" >}}
 
 ::: {.notes}
-Direct labor stayed below the standard hours in every year, while indirect time per standard hour grew. The profiles had shown that the time records end before the year does, so the output is counted only up to that day.
+The direct hours recorded stayed below the standard hours in every year, while indirect time per standard hour grew. The profiles had shown that the time records end before the year does, so the output is counted only up to that day; indirect time ends a week earlier still, on 4 December 2026.
 :::
 
 ## Checkpoint
@@ -503,7 +503,7 @@ Direct labor stayed below the standard hours in every year, while indirect time 
 {{< book-checkpoint 10.3 1-4 lead="true" >}}
 
 ::: {.notes}
-Output and its standard hours moved together, while the payroll paid the same number of people with far more overtime. The profiles explain why the output is cut off at the last day with time records.
+Output and its standard hours moved together, while the payroll paid the same number of people, so not a larger workforce, with far more overtime. The profiles explain why the output is cut off at the last day with time records.
 :::
 
 ## Checkpoint (continued)
@@ -524,7 +524,7 @@ COUNT of rows counts registers, and COUNT DISTINCT of employees counts people. A
 - But indirect time grew by about two-thirds and overtime more than doubled
 
 ::: {.notes}
-Indirect labor is overhead, so its growth reached the variance through the overhead part, while the favorable labor part shrank as direct hours moved toward the standard. Next, the controller needs a measure she can follow month by month, which Chapter 11 builds.
+Indirect labor is overhead, so its growth is consistent with the growth of the overhead part, while the favorable labor part shrank as direct hours moved toward the standard; the queries do not yet measure how much each cause explains. Next, the controller needs a measure she can follow month by month, which Chapter 11 builds.
 :::
 
 ## Summary

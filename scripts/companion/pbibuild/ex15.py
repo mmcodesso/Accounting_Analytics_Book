@@ -273,12 +273,13 @@ def ex4(b: Build) -> None:
     y, folder = b.year, "Ex 15.4"
     name = one("SELECT PromotionName FROM PromotionProgram WHERE PromotionID = ?", ctx["id"])
     claim(one("SELECT COUNT(*) FROM PromotionProgram WHERE PromotionName = ?", name) == 1, "the promotion's name is unique")
-    # (1) Modeling > New parameter > Numeric range: the GENERATESERIES table and its Value measure, as Desktop writes them
-    default = 0.12
-    b.model.add(Table("Discount", [Column("Discount", "double", "[Value]", fmt="0%", summarize="none",
+    # (1) Modeling > New parameter > Numeric range, Data type Whole number: the GENERATESERIES table and its Value
+    # measure, as Desktop writes them; the slider reads whole percents, and Break-even Lift divides by 100
+    default = 12
+    b.model.add(Table("Discount", [Column("Discount", "int64", "[Value]", fmt="0", summarize="none",
                                           extra=('extendedProperty ParameterMetadata = {"version":0}',))],
-                      measures=[Measure("Discount Value", f"SELECTEDVALUE ( 'Discount'[Discount], {default} )", "0%")],
-                      dax="GENERATESERIES ( 0, 0.2, 0.01 )"))
+                      measures=[Measure("Discount Value", f"SELECTEDVALUE ( 'Discount'[Discount], {default} )", "0")],
+                      dax="GENERATESERIES ( 0, 20, 1 )"))
     # (2) and (3) the measures
     scope = f"PromotionProgram[PromotionName] = \"{name}\", 'Date'[Year] = {y}"
     measure(b, folder, "Design Trade Units", f"CALCULATE ( SUM ( SalesInvoiceLine[Quantity] ), {scope} )", "#,0.00")
@@ -288,7 +289,7 @@ def ex4(b: Build) -> None:
             f"DIVIDE ( CALCULATE ( [Standard Cost], {scope} ), [Design Trade Units] )", MONEY)
     measure(b, folder, "Break-even Lift",
             "VAR Price = [Design Trade Price per Unit]\nVAR Cost = [Design Trade Cost per Unit]\n"
-            f"VAR Commission = {ch15.CASE_RATE}\nVAR Disc = [Discount Value]\nRETURN\n"
+            f"VAR Commission = {ch15.CASE_RATE}\nVAR Disc = [Discount Value] / 100\nRETURN\n"
             "    DIVIDE (\n        Price * ( 1 - Commission ) - Cost,\n"
             "        Price * ( 1 - Disc ) * ( 1 - Commission ) - Cost\n    ) - 1", "0.0%")
     # the page: the slider (Single value, set to the default), the cards, and the lift at every discount
@@ -304,13 +305,11 @@ def ex4(b: Build) -> None:
     page.extra = {"visualInteractions": [{"source": "discountSlider", "target": "liftByDiscount", "type": "NoFilter"}]}
     lifts = dict(ctx["lifts"])
     case_lift = lifts[0.12]
-    v_last = 0.0
-    while v_last + 0.01 <= 0.2:
-        v_last += 0.01
     page.add(answer("ex154Answer", 400, 150, 860, 560, [
-        f"(1) The slider runs from 0% to {pct(v_last, 0)}: GENERATESERIES adds the increment step by step, and twenty "
-        "steps of 0.01 land just above 0.2, so the last value is left out (a maximum of 0.21 would include 20%). Until "
-        "the slider is moved, Discount Value returns its default, 12%.",
+        f"(1) A whole-number parameter: GENERATESERIES ( 0, 20, 1 ) gives the {ctx['steps']} values from 0 to 20, read as "
+        "whole percents and divided by 100 in Break-even Lift. A decimal range from 0 to 0.2 in steps of 0.01 would stop "
+        f"at 0.19, because 0.01 is not stored exactly. Until the slider is moved, Discount Value returns its default, "
+        f"{default}.",
         f"(2) {name}, fiscal {y}: {ctx['units']:,.2f} units, price before discount {ctx['price']:.2f} per unit, standard "
         f"cost {ctx['cost']:.2f} per unit (the Part II case's inputs).",
         "(4) Break-even lift: " + "; ".join(f"{pct(k, 0)} discount {pct(v)}" for k, v in ctx["lifts"]) +
@@ -324,21 +323,17 @@ def ex4(b: Build) -> None:
     page.expect = ["Break-even Lift", "Discount Value", f"{ctx['units']:,.2f}", pct(case_lift), pct(lifts[0.05])]
 
     t = "Exercise 15.4"
-    # GENERATESERIES adds the increment step by step, so 0.01 twenty times lands just above 0.2 and the last value is
-    # 0.19 (what Modeling > New parameter writes for these settings); the exercise needs only 5 to 15 percent
-    n, v = 0, 0.0
-    while v <= 0.2:
-        n, v = n + 1, v + 0.01
-    b.check(t, "Discount rows (GENERATESERIES from 0 by 0.01 while at most 0.2)", n, "COUNTROWS ( 'Discount' )", 0)
-    b.check(t, "the largest Discount value", round(v - 0.01, 6), "MAX ( 'Discount'[Discount] )", 0.000001)
+    # whole numbers are exact, so the range reaches 20 (a decimal range to 0.2 by 0.01 stopped at 0.19 in Desktop)
+    b.check(t, "Discount rows (GENERATESERIES ( 0, 20, 1 ))", ctx["steps"], "COUNTROWS ( 'Discount' )", 0)
+    b.check(t, "the smallest Discount value", 0, "MIN ( 'Discount'[Discount] )", 0)
+    b.check(t, "the largest Discount value", 20, "MAX ( 'Discount'[Discount] )", 0)
     b.check(t, "Design Trade Units", round(ctx["units"], 4), "[Design Trade Units]", 0.0001)
     b.check(t, "Design Trade Price per Unit", round(ctx["price"], 6), "[Design Trade Price per Unit]", 0.000005)
     b.check(t, "Design Trade Cost per Unit", round(ctx["cost"], 6), "[Design Trade Cost per Unit]", 0.000005)
     b.check(t, "Break-even Lift at the default (12%)", round(case_lift, 6), "[Break-even Lift]", 0.000005)
     for k, v in ctx["lifts"]:
         b.check(t, f"Break-even Lift at {pct(k, 0)}", round(v, 6),
-                f"CALCULATE ( [Break-even Lift], FILTER ( ALL ( 'Discount'[Discount] ), ABS ( 'Discount'[Discount] - {k} ) "
-                "< 0.0001 ) )", 0.000005)
+                f"CALCULATE ( [Break-even Lift], 'Discount'[Discount] = {round(100 * k)} )", 0.000005)
     b.check(t, "promotion lines in the scope", one(
         "SELECT COUNT(*) FROM SalesInvoiceLine l JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID "
         "WHERE l.PromotionID = ? AND substr(si.InvoiceDate, 1, 4) = ?", ctx["id"], str(y)),
@@ -398,9 +393,10 @@ def ex5(b: Build) -> None:
     errs = [abs(sum(x for x, _, _ in v) / ctx["actual"] - 1) for v in FORECAST.values()] +         [abs(e[k]["quarter"]) for k in ("trend", "last")]
     claim(abs(e["mean"]["quarter"]) < min(errs), "the mean benchmark has the smallest quarter error (the audit note)")
     page.add(answer("ex155Answer", 800, 20, 460, 690, [
-        "(3) The forecast is computed in the visual (exponential smoothing), not in the model, so no measure can return "
-        "it; the tooltip and the visual's data points give the months and the 95% interval. As Power BI Desktop 2.158 "
-        f"drew them, {fc('January')}.",
+        "(3) The forecast is computed in the visual (exponential smoothing, as Microsoft described it when the forecast "
+        "was introduced), not in the model, so no measure can return it; the tooltip and the visual's data points give "
+        "the months and each month's 95% interval, and the quarter adds only the three forecasts (the monthly intervals "
+        f"do not add up to an interval for the quarter). As Power BI Desktop 2.158 drew them, {fc('January')}.",
         f"(4) Actual revenue of fiscal {y}'s fourth quarter: {money(ctx['actual'])}. Chapter 7's benchmarks for the same "
         f"quarter, fitted from February {first} to September {y}: trend {pct(e['trend']['quarter'], 2)} quarter error "
         f"(monthly {pct(e['trend']['monthly'], 2)}); mean {pct(e['mean']['quarter'], 2)} ({pct(e['mean']['monthly'], 2)}); "
@@ -494,9 +490,8 @@ def ex6(b: Build) -> None:
                              keep("pmBlank", ow, [None], exclude=True)]))
     page.add(Visual("lateShare", "tableEx", 640, 20, 620, 150, {"Values": [
         col("LaborPaths", "SameWorkCenter"), M("Path Lines"), M("Share After Operation End")]},
-        title=f"Direct lines of {y} on both paths, recorded after the operation ended",
-        filters=[keep("lsType", lt, [DIRECT]), keep("lsYear", col("Date", "Year"), [y]),
-                 keep("lsBlank", col("LaborPaths", "SameWorkCenter"), [None], exclude=True)]))
+        title=f"Direct lines of {y} by whether the paths agree, and the share recorded after the operation ended",
+        filters=[keep("lsType", lt, [DIRECT]), keep("lsYear", col("Date", "Year"), [y])]))
     page.add(Visual("indirectByClock", "clusteredBarChart", 20, 440, 600, 270, {"Category": [cw], "Y": [M("Path Hours")]},
                     title=f"Indirect manufacturing hours of {y} by the time clock's work center",
                     filters=[keep("ibcType", lt, [INDIRECT]), keep("ibcYear", col("Date", "Year"), [y])],
@@ -507,9 +502,10 @@ def ex6(b: Build) -> None:
             f"{v['year']} {v['differ']:,} / {v['lines']:,} / {v['hours']:,.1f}" for v in yrs) +
         f"; {ctx['total']:,} in all. Packing operations were often clocked at another work center.",
         f"(5) After the operation's end: {ctx['late_differ']:,} of the {ctx['differ']:,} disagreeing lines "
-        f"({pct(ctx['late_differ'] / ctx['differ'], 0)}) against {ctx['late_all']:,} of the {ctx['now']:,} direct lines "
-        f"on both paths ({pct(ctx['late_all'] / ctx['now'], 0)}): the disagreement concentrates in the late time of "
-        "Chapter 12.",
+        f"({pct(ctx['late_differ'] / ctx['differ'])}) against {ctx['late_direct']:,} of all {ctx['direct']:,} direct lines "
+        f"of {y} ({pct(ctx['late_direct'] / ctx['direct'], 2)}); the {ctx['untested']} lines without an operation cannot "
+        f"be tested, and among the {ctx['now']:,} lines on both paths the share is {pct(ctx['late_all'] / ctx['now'], 2)}. "
+        "The disagreement concentrates in the late time of Chapter 12.",
         "(6) The clock places the indirect hours mostly at " + ", ".join(f"{n} ({h:,.1f})" for n, h in ctx["indirect"][:3]) +
         ". The operation path answers what work the time was charged to; the clock path where the employee was. "
         "Neither alone supports the Packing finding, which needs corroboration."], size=9))
@@ -552,6 +548,11 @@ def ex6(b: Build) -> None:
             round(ctx["late_all"] / ctx["now"], 6),
             f"CALCULATE ( [Share After Operation End], {d_}, {cy}, NOT ISBLANK ( LaborPaths[SameWorkCenter] ) )", 0.000005)
     b.check(t, f"{y} direct lines in all", ctx["direct"], f"CALCULATE ( [Path Lines], {d_}, {cy} )", 0)
+    b.check(t, f"{y} share after the operation's end, all direct lines (requirement 5)",
+            round(ctx["late_direct"] / ctx["direct"], 6), f"CALCULATE ( [Share After Operation End], {d_}, {cy} )",
+            0.000005)
+    b.check(t, f"{y} direct lines that cannot be tested (no operation, so no end date)", ctx["untested"],
+            f"CALCULATE ( [Path Lines], {d_}, {cy}, ISBLANK ( LaborPaths[AfterOperationEnd] ) )", 0)
     for short, h in ctx["indirect"]:
         name = center_name("Quality Assurance" if short == "QA" else short)
         b.check(t, f"{y} indirect hours clocked at {name}", round(h, 2),

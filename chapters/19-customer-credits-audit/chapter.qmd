@@ -46,7 +46,7 @@ Three conditions come with them. Magnitude is judged against 5% of fiscal 2026 i
 
 ## The Credits Cycle and Its Risks
 
-An integrated audit tests controls and balances together, so that the evidence on one informs the other. The standard for audits of public companies' internal control over financial reporting, AS 2201 of the Public Company Accounting Oversight Board (PCAOB, n.d.-a), is built on that idea, and internal auditors apply it to a cycle. A test of controls asks whether a control operated; a substantive test asks whether an amount is right. A query over a whole population can be both at once: the same query that finds every credit approved above its approver's authority also totals the credits, so the test of the control and the test of the balance share one population.
+An integrated audit tests controls and balances together, so that the evidence on one informs the other. The standard for audits of public companies' internal control over financial reporting, AS 2201 of the Public Company Accounting Oversight Board (PCAOB, n.d.-a), is built on that idea, and internal auditors apply it to a cycle. A test of controls asks whether a control operated; a substantive test asks whether an amount is right. One procedure can serve both, but each purpose needs its own design and its own evaluation: the query that finds every credit approved above its approver's authority tests the control, recomputing each credit from its return and its invoice tests the amount, and sharing a population does not make one result evidence for the other. The PCAOB's standard on audit evidence now says so directly: an auditor who uses a procedure for more than one purpose should achieve each of its objectives (PCAOB, 2024). Testing every record removes the risk of sampling, not the risk that the records, or the test, are wrong.
 
 @fig-19-01 maps the cycle as its records show it. Each document is recorded by one department: the warehouse receives the goods back, customer service records receipts, applies cash, approves credits, and approves the commission clawbacks, and accounting approves refunds. The control points C1 to C9 are what a well-designed cycle would check at each step. The ledger meets the cycle at account 2060 Customer Deposits and Unapplied Cash: every receipt passes through it on the way to the receivable, a credit on an invoice that has been paid lands in it, and every refund is paid out of it.
 
@@ -167,9 +167,9 @@ A planning workbook keeps its parameters in cells that every later test refers t
 
 Each test joins a document to the people who handled it and to the cash on the invoice behind it, across the whole population. Write each test under a two-line comment, as in Audit.sql, stating its population and its expected result.
 
-- Test authority for credits and for refunds against the approver's limit, and the approvers' employment dates.
+- Test authority for credits and for refunds against the approver's recorded limit, and the approvers' employment dates.
 - Test separation of duties: the credit approver against the people who recorded or applied cash on the credited invoice, the refund approver against the credit approver, and the person who received the return against the credit approver. Try to test the preparer against the approver, and explain why the records cannot answer.
-- Test whether each refund was paid before the customer's payment on the credited invoice arrived, and whether the customer had a past-due balance on the refund date that could have been offset. State the definition you use.
+- Test whether each refund was paid before the customer's payments on the credited invoice had arrived. Decide whether a payment counts from its receipt (ReceiptDate) or from its application to the invoice (ApplicationDate), and state the definition you use: the records hold dates, not times, and nothing in them shows when a payment cleared the bank. Then test whether the customer had a past-due balance on the refund date that could have been offset.
 - Compare each refund's method with the methods of the receipts on the credited invoice, and test the clawbacks for completeness and accuracy and the refunds for one per credit.
 - Combine the exceptions in one list by year with UNION ALL, and export the refund flags as RefundFlags.csv.
 
@@ -188,7 +188,7 @@ The committee will want to see where returns grow and which refunds deserve a se
 
 
 
-Sampling still has a place when the evidence lies outside the database. The records cannot show whether a customer asked in writing for a refund, whether someone independent checked the payee, or whether anyone inspected the goods that came back damaged; those need documents, and documents are examined one at a time. AS 2315 (PCAOB, n.d.-b) and the American Institute of Certified Public Accountants' audit sampling guide (AICPA, 2025) set out the judgments involved: the risk of overreliance you accept, which sets the confidence level; the tolerable deviation rate, the highest rate at which you would still rely on the control; and the expected deviation rate. @tbl-19-03 gives the sample sizes the binomial distribution implies for large populations, with the number of deviations each size allows. After testing, the upper deviation limit for k deviations in a sample of n is `BETA.INV(confidence, k + 1, n - k)` in Excel; if it exceeds the tolerable rate, the sample does not support reliance.
+Sampling still has a place when the evidence lies outside the database. The records cannot show whether a customer asked in writing for a refund, whether someone independent checked the payee, or whether anyone inspected the goods that came back damaged; those need documents, and documents are examined one at a time. AS 2315 (PCAOB, n.d.-b) and the American Institute of Certified Public Accountants' audit sampling guide (AICPA, 2025) set out the judgments involved: the risk of overreliance you accept, which sets the confidence level; the tolerable deviation rate, the highest rate at which you would still rely on the control; and the expected deviation rate. @tbl-19-03 gives the sample sizes the binomial distribution implies for large populations, with the number of deviations each size allows. After testing, the upper deviation limit for k deviations in a sample of n is `BETA.INV(confidence, k + 1, n - k)` in Excel while k is less than n (if every item deviates, it is 100%); if it exceeds the tolerable rate, the sample does not support reliance.
 
 | Expected deviation rate | 95% confidence, 5% tolerable | 95% confidence, 10% tolerable | 90% confidence, 5% tolerable | 90% confidence, 10% tolerable |
 |-------------|-------------|-------------|-------------|-------------|
@@ -202,11 +202,11 @@ Sampling still has a place when the evidence lies outside the database. The reco
 
 The selection and its evaluation are worksheet work, with the random selection Chapter 8 taught.
 
-- Define three attributes that need evidence outside the database: a written request from the customer, a payee checked against the customer master by someone independent, and, for refunds of returns coded Damaged, an inspection record of the goods.
+- Define three attributes that need evidence outside the database: a written request from the customer, a payee checked against the customer master by someone independent, and, for refunds of returns coded Damaged, an inspection record of the goods. The third applies only to the refunds of Damaged returns, so define its population and size its sample, or test it in full, on its own: a refund of another return is not a successful test of an inspection.
 - Choose the confidence level, tolerable deviation rate, and expected deviation rate, and take the sample size from @tbl-19-03.
 - From the refunds of fiscal 2024 to 2026, take the key items in full: every refund of $5,000 or more, and every refund to a customer whose refunds over the three years exceed $10,000. Select the rest with RANDARRAY and SORTBY, freeze the selection with Paste Values, and record the date and parameters.
-- Write the evaluation rule before you test: the upper deviation limit for zero to three deviations.
-- Apply the same sample to one attribute the data can test, the refund dated before the customer's payment, and compare the sample's conclusion with Requirement 4's result for the whole population.
+- Write the evaluation rule before you test: the upper deviation limit for zero to three deviations, or up to one more than your plan allows if that is more.
+- Apply the same sample to one attribute the data can test, the refund dated before the customer's payment as you defined it in Requirement 4, and compare the sample's conclusion with Requirement 4's result for the whole population.
 - The database holds no documents, so you cannot complete the three attributes here. Deliver the sampling plan, the frozen selection, and the rule for evaluating it, and do not invent results.
 
 
@@ -228,9 +228,9 @@ A control deficiency exists when the design or operation of a control does not a
 
 | Classification | Definition, abridged | What tips the severity | Who hears about it |
 |---------------|---------------------------------|-------------------------|---------------------|
-| Deficiency | A control's design or operation does not allow timely prevention or detection of misstatements | Low likelihood or small potential magnitude | Management |
-| Significant deficiency | Less severe than a material weakness, but important enough to merit the attention of those who oversee financial reporting | Likelihood or magnitude that matters, short of a material misstatement | The audit committee |
-| Material weakness | A reasonable possibility that a material misstatement will not be prevented or detected on a timely basis | Potential magnitude at or above materiality, with no compensating control precise enough | The audit committee, and the public for registrants |
+| Deficiency | A control's design or operation does not allow timely prevention or detection of misstatements | Low likelihood or small potential magnitude | Management, with notice to the audit committee |
+| Significant deficiency | Less severe than a material weakness, but important enough to merit the attention of those who oversee financial reporting | Likelihood or magnitude that matters, short of a material misstatement | Management and the audit committee |
+| Material weakness | A reasonable possibility that a material misstatement will not be prevented or detected on a timely basis | Potential magnitude at or above materiality, with no compensating control precise enough | Management and the audit committee, and the public for registrants |
 
 : Classifying control deficiencies {#tbl-19-04}
 
@@ -241,13 +241,13 @@ A control deficiency exists when the design or operation of a control does not a
 An evaluation matrix computes each deficiency's exposure against the materiality cells of Requirement 3, which keeps the judgment and its arithmetic together in the workbook.
 
 - For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in fiscal 2026 and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with.
-- Classify each, and give it a disposition in Chapter 8's terms.
+- Classify each, say what evidence your classification rests on and what evidence could change it, and give it a disposition in Chapter 8's terms.
 - Report the clean results with the same care as the exceptions.
 
 
 
 
-**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. Managers often resist a finding of a weakness when no error has been detected (Cohen et al., 2020), so prepare the evidence for each compensating control they may point to.
+**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion that says what the tests covered and what they could not. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. The audit partners Cohen et al. (2020) interviewed describe managers who resist a finding of a weakness when no error has been detected and who argue that a review control would have caught the problem, so prepare the evidence for each compensating control they may point to.
 
 
 
@@ -256,9 +256,9 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 
 The register in Audit Monitoring.pbix already runs the rule tests of Chapters 8 and 12 with every refresh. Adding this cycle's rules there, under the change control Chapter 16 described, turns the audit into monitoring.
 
-- Add four rule tests to the Tests table: credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment. Add the processes Credit memos and Refunds to the populations.
+- Add four rule tests to the Tests table: credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it. Add the processes Credit memos and Refunds to the populations.
 - Keep the refund method and the missing offset as anomaly tests, outside the register of rules.
-- Give the historical exceptions of the new tests one design-finding treatment, as Chapter 16 treated the payroll registers' self-approval: record them once, as a single finding about the control's design with the date by which it will be fixed, and review only the exceptions dated after that date, so that they do not flood the review.
+- Give the historical exceptions of the new tests one design-finding treatment, as Chapter 16 treated the payroll registers' self-approval: record them once, as a single finding about the control's design with the date by which it will be fixed, so that they do not flood the review, while each exception stays in the register. Keep reviewing the exceptions dated after the period the finding covers as they arrive, and close the finding only when a retest shows that the fixed control works, not on the date planned for the fix.
 - If you did not build Audit Monitoring.pbix in Chapter 16, build a small register in Credits Analytics.pbix instead: a Tests table entered with Enter data, and an exceptions table that appends the documents each of the four tests flags.
 - Recheck the date through which the register's data run, and record the change.
 
@@ -294,7 +294,7 @@ This audit reused Chapter 8's random selection and dispositions, Chapter 12's ap
 
 ## Looking Ahead
 
-This audit tested a cycle's controls and balances on whole populations, and kept sampling for the evidence the records cannot hold. Most of the work was descriptive and diagnostic analytics, in the terms of @tbl-01-01: the map, the reconciliations, and the tests describe what the records show, and the analytics of returns and the timeline of the largest refund diagnose where the risks sit. The expectation of returns and the upper deviation limits are small predictive models, and the recommendations and action plans are prescriptive.
+This audit tested a cycle's controls and balances on whole populations, and kept sampling for the evidence the records cannot hold. Most of the work was descriptive and diagnostic analytics, in the terms of @tbl-01-01: the map, the reconciliations, and the tests describe what the records show, and the analytics of returns and the timeline of the largest refund diagnose where the risks sit. The expectation of returns is a small predictive model, resting on the assumption that the prior year's return rate still holds; the upper deviation limits are statistical inference about the population a sample was drawn from, not forecasts; and the recommendations and action plans are prescriptive.
 
 An audit like this does not end with the report. The owners agree on actions and dates, the committee asks for their status at its next meetings, and the tests you added to the register show, every month, whether the actions worked. Findings that are worded carefully and rest on evidence are the ones management accepts and fixes.
 

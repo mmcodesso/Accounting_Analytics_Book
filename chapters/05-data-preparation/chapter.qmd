@@ -11,7 +11,7 @@ After completing this chapter, you will be able to:
 1. Explain why accounting data must be prepared before it is analyzed, and document the preparation so that a reviewer can repeat it.
 2. Use text and logical functions to extract, standardize, classify, and validate fields, such as the product type encoded in an item code or the payment terms of an invoice.
 3. Use date functions to assign transactions to fiscal periods and to measure the time between business events.
-4. Combine data from related tables with XLOOKUP, INDEX and MATCH, and VLOOKUP, and recognize when a one-to-many relationship calls for a different approach.
+4. Combine data from related tables with XLOOKUP and with INDEX and MATCH, read the VLOOKUP formulas of older workbooks, and recognize when a one-to-many relationship calls for a different approach.
 5. Build a repeatable preparation workflow in Power Query that merges tables, adds calculated columns, and can be refreshed when the source data changes.
 :::
 
@@ -29,7 +29,7 @@ The analysis workbook you built in Chapter 4 ended with a clue and an open quest
 
 Data preparation is the work of transforming data from the form in which it was recorded into a form that suits a particular analysis. A review of the field describes it as the process of discovering, cleaning, integrating, and restructuring data, and it names the activities involved: profiling the data, matching records across sources, mapping one structure onto another, transforming formats, and repairing values that are wrong (Fernandes et al., 2023). In the analytics workflow you met in Chapter 1, it is the third stage, after the question has been defined and the data has been obtained, and before any analysis begins.
 
-For accountants, preparation is rarely optional. Transaction systems store data in the form that suits recording it, spread across related tables, as you saw in Chapter 3. An analysis needs a different form: one table in which every row carries all the attributes the question depends on. Auditors face the same problem with data they receive from clients. Lee et al. (2021) note that client data often arrives incomplete and in an unusable format, so that considerable time must be spent cleansing, transforming, standardizing, and validating it before it can be analyzed. The same concern runs through accounting education. In a review of published data analytics teaching cases, Raschke and Charron (2021) found that most cases focus on analysis and communication, and that few cover the steps that come before analysis, such as extraction and data preparation.
+For accountants, preparation is rarely optional. Transaction systems store data in the form that suits recording it, spread across related tables, as you saw in Chapter 3. A row-level analysis in Excel needs a different form: one table in which every row carries all the attributes the question depends on. Auditors face the same problem with data they receive from clients. Lee et al. (2021) note that client data often arrives incomplete and in an unusable format, so that considerable time must be spent cleansing, transforming, standardizing, and validating it before it can be analyzed. The same concern runs through accounting education. In a review of published data analytics teaching cases, Raschke and Charron (2021) found that most cases focus on analysis and communication, and that few cover the steps that come before analysis, such as extraction and data preparation.
 
 Preparation is also where many analytical errors begin. A lookup that silently fails, a date assigned to the wrong quarter, or a join that duplicates rows can change every number that follows, and none of these errors announces itself. That is why this chapter pairs every preparation technique with a check: a count of the rows that failed to match, a total that must agree with its source, or a test that a field has the form it should. The quality dimensions you studied in Chapter 2, accuracy, completeness, consistency, and timeliness, are the standard the checks apply. And because preparation involves many small decisions, it has to be documented, as you learned in Chapter 4, so that someone else can repeat it and reach the same result.
 
@@ -50,9 +50,10 @@ Text fields carry more information than their appearance suggests. An item code,
 | `LEN(text)` | The number of characters | `LEN("FUR-DSK-0075")` returns 12 |
 | `FIND(find, text)` | The position of one text inside another | `FIND("-","FUR-DSK-0075")` returns 4 |
 | `TRIM(text)` | The text without leading, trailing, or repeated spaces | Removes stray spaces from an imported name |
-| `CLEAN(text)` | The text without non-printing characters | Removes line breaks copied in from another system |
+| `CLEAN(text)` | The text without the basic non-printing control characters | Removes line breaks copied in from another system |
 | `SUBSTITUTE(text, old, new)` | The text with one string replaced by another | Replaces "Street" with "St" to standardize addresses |
 | `UPPER`, `LOWER`, `PROPER` | The text in capitals, lower case, or with each word capitalized | `UPPER("Smith Ltd")` returns `SMITH LTD` |
+| `EXACT(text1, text2)` | TRUE if the two texts are identical, including their case | `EXACT("LLC","Llc")` returns FALSE |
 | `VALUE(text)` | The number that a text value represents | Converts `"007947"` to 7947 |
 
 : Text functions used for data preparation {#tbl-05-01}
@@ -65,7 +66,7 @@ Invoice numbers encode information too. SI-2025-007947 contains a document prefi
 
 ### Standardizing Text
 
-Values that mean the same thing should look the same, or lookups, filters, and counts will treat them as different. TRIM removes spaces at the start and end of a value and reduces repeated spaces to one. CLEAN removes non-printing characters, such as line breaks, that are often copied in from other systems. SUBSTITUTE replaces one string with another, which is useful for standardizing abbreviations. UPPER, LOWER, and PROPER change the case of the letters.
+Values that mean the same thing should look the same, or lookups, filters, and counts will treat them as different. TRIM removes spaces at the start and end of a value and reduces repeated spaces to one. CLEAN removes the basic non-printing control characters, such as line breaks, that are often copied in from other systems, although it leaves some invisible characters in place, as the Watch out below explains. SUBSTITUTE replaces one string with another, which is useful for standardizing abbreviations. UPPER, LOWER, and PROPER change the case of the letters.
 
 Standardizing should be deliberate, because it can damage values that were already correct. PROPER capitalizes the first letter of every word and lowers the rest, so it turns a supplier named Donaldson LLC into Donaldson Llc and the connecting word in Watson, Mitchell and Chen into And. It also changes item names such as a sideboard "48 in" wide into "48 In". When a field is already consistent, the right preparation step is to leave it alone and record that you checked it.
 
@@ -77,7 +78,7 @@ Before you clean a field, test whether it needs cleaning. This formula returns T
 =LEN([@CustomerName])=LEN(TRIM([@CustomerName]))
 ```
 
-A COUNTIFS on the result tells you how many values fail. Applied to the Charles River names, codes, and addresses, tests like this find nothing to remove: the text fields are clean. That is a finding worth recording, not a wasted step. A preparation workflow that cleans data it has not tested can introduce errors, and one that tests and finds nothing has evidence that the field can be trusted. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
+A COUNTIFS on the result tells you how many values fail. Applied to the Charles River names, codes, and addresses, tests like this find nothing to remove: the text fields have no stray spaces. That is a finding worth recording, not a wasted step. A preparation workflow that cleans data it has not tested can introduce errors, and one that tests and finds nothing has evidence that the field is free of the problem it tested for, although not of every other problem. You can also test the form of a value, for example that every item code has twelve characters with hyphens in the fourth and eighth positions.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -99,11 +100,11 @@ Many organizations use a fiscal year that does not follow the calendar. For a fi
 
 Subtracting one date from another returns the number of days between them. The formula `=[@DueDate]-[@InvoiceDate]` returns the payment terms of each invoice in days, and the difference between an invoice date and its order date measures how long an order took to be billed. For whole months or years between two dates, DATEDIF returns the difference in a chosen unit, as in `=DATEDIF(start, end, "m")`, although Excel does not suggest it as you type.
 
-Measuring the age of a balance requires an as-of date. It is tempting to write `=TODAY()-[@InvoiceDate]`, but TODAY returns the date on which the workbook is opened, so the result changes every day and cannot be reproduced. A historical extract such as the Charles River data ends on a fixed date. Store the as-of date in a named parameter cell, as you did with the threshold in Chapter 4, and subtract from it instead.
+Measuring the age of a balance requires an as-of date. It is tempting to write `=TODAY()-[@InvoiceDate]`, but TODAY returns the current date each time the workbook recalculates, so the result changes from one day to the next and cannot be reproduced. A historical extract such as the Charles River data ends on a fixed date. Store the as-of date in a named parameter cell, as you did with the threshold in Chapter 4, and subtract from it instead.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-A date that is stored as text looks like a date but behaves like text: it sorts alphabetically, it does not subtract, and it fails to match a real date. Text dates are common in data exported from other systems, especially when the export uses a different date order from your computer's settings. `DATEVALUE` converts a text date that Excel can recognize, and Power Query's data type setting, which you used in Chapter 4, converts a whole column. The Charles River workbook stores its dates as real dates, but always check the data type of a date column before you rely on it.
+A date that is stored as text looks like a date but behaves like text: it sorts alphabetically, it fails to match a real date, and arithmetic on it either fails or depends on Excel guessing the date it represents. Text dates are common in data exported from other systems, especially when the export uses a different date order from your computer's settings. `DATEVALUE` converts a text date that Excel can recognize, and Power Query's data type setting, which you used in Chapter 4, converts a whole column. The Charles River workbook stores its dates as real dates, but always check the data type of a date column before you rely on it.
 :::
 
 
@@ -177,7 +178,7 @@ Before XLOOKUP was added to Excel, the same retrieval was written by combining t
 =INDEX(SalesInvoice[InvoiceDate],MATCH([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],0))
 ```
 
-The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
+The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. Leave it out, and MATCH looks for an approximate match in a column it assumes is sorted, which can return the wrong row without an error. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
 
 VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-04 compares the three.
 
@@ -185,9 +186,9 @@ VLOOKUP is the oldest of the three and the most limited. It searches only the fi
 |---|---|---|---|
 | Where the key can be | Only in the first column of the range | In any column | In any column |
 | How the return column is chosen | By its number in the range | By reference to the column | By reference to the column |
-| Effect of inserting or deleting columns | Can return the wrong column | None | None |
-| Default match | Approximate, unless the last argument is FALSE | Exact when the last argument is 0 | Exact |
-| When the key is not found | #N/A | #N/A | #N/A, or a value you supply |
+| Effect of inserting or deleting columns | Can return the wrong column | Adjusts, unless a referenced column is deleted | Adjusts, unless a referenced column is deleted |
+| Match when the last argument is left out | Approximate; FALSE asks for an exact match | Approximate; 0 asks for an exact match | Exact |
+| When the key is not found, in an exact match | #N/A | #N/A | #N/A, or a value you supply |
 | Availability | All versions of Excel | All versions of Excel | Microsoft 365 and Excel 2021 or later |
 
 : Lookup functions compared {#tbl-05-04}
@@ -203,7 +204,7 @@ A lookup returns one value, the first match it finds. That is correct when the l
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-Every lookup in this chapter follows a foreign key to a primary key, the relationship you studied in Chapter 3. The same operation is called a join in SQL, where it is written in a query rather than in a column formula, and it is called a relationship in Power BI's data model. The skill of asking which key connects two tables, and on which side of the relationship each table sits, carries over to both of the tools you will learn in Parts III and IV.
+The lookups of the tutorials follow a foreign key to a primary key, the relationship you studied in Chapter 3; the match key of Exercise 5.5 is the kind you build when no such relationship exists. The same operation is called a join in SQL, where it is written in a query rather than in a column formula, and it is called a relationship in Power BI's data model. The skill of asking which key connects two tables, and on which side of the relationship each table sits, carries over to both of the tools you will learn in Parts III and IV.
 :::
 
 
@@ -240,7 +241,7 @@ Power Query's equivalent of a lookup is a merge. Merge Queries, on the Home tab 
 
 : Join kinds in Power Query merges {#tbl-05-05}
 
-For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. Because every key in the Charles River invoice lines refers to a single row in the table it references, a left outer merge returns exactly as many rows as the invoice lines query started with, and checking that the row count has not changed is the first test of any merge.
+For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. A left outer merge returns exactly as many rows as it started with only when each key appears once in the second table, as the keys of the Charles River Tables do, so checking that the row count has not changed is the first test of any merge. The message at the bottom of the Merge dialog helps you choose the right columns, but Power Query calls its count of matches an estimate, so the tests use the loaded result instead.
 
 ### Custom Columns
 
@@ -248,7 +249,7 @@ A custom column, added through Add Column > Custom Column, calculates a new colu
 
 ### Reference Queries and Refresh
 
-A merge can change the query it is applied to, so it is good practice to build the combined table in a new query rather than altering the queries that load the source Tables. Right-clicking a query in the Queries pane and choosing Reference creates a new query that starts from the result of the first one. The original query is unchanged, and the new query updates whenever the original does. When the data is refreshed, Power Query runs the source queries and then every step of the combined query, so the combined table is rebuilt from the current data without any formula being copied down.
+A merge can change the query it is applied to, so it is good practice to build the combined table in a new query rather than altering the queries that load the source Tables. Right-clicking a query in the Queries pane and choosing Reference creates a new query that starts from the result of the first one. The original query is unchanged, and the new query is rebuilt from the original's result every time the workbook is refreshed. When the data is refreshed, Power Query runs the source queries and then every step of the combined query, so the combined table is rebuilt from the current data without any formula being copied down.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice

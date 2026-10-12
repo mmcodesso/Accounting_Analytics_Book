@@ -31,7 +31,7 @@ The last three cover the notes, what the records cannot settle, and choosing and
 - You, the staff accountant, prepare the package and a memo to the CFO
 
 ::: {.notes}
-Earlier, the controller showed the audit committee where the year's cash had gone: into inventories, with growing payables and unremitted sales tax holding the balance up. The shareholders received statements prepared straight from the ledger, and no adjustment has been recorded since. The case has no tutorials: each requirement says what the controller needs and which chapters it draws on, and you decide how to produce it.
+Earlier, the controller showed the audit committee where the year's cash had gone: into inventories, with growing payables and sales tax with no recorded remittance holding the balance up. The shareholders received statements prepared straight from the ledger, and no adjustment has been recorded since. The case has no tutorials: each requirement says what the controller needs and which chapters it draws on, and you decide how to produce it.
 :::
 
 ## What you will hand in
@@ -68,7 +68,7 @@ The memo is judged as much on its tone as on its numbers: it measures only what 
 - So every number must trace to the records that support it
 
 ::: {.notes}
-The controller wants to know what the ledger says as it stands and what it takes to turn it into GAAP statements, which adjustments the records support and whether they matter, what the notes must say, and what the data cannot settle.
+The controller wants to know what the ledger says as it stands and what it takes to turn it into GAAP statements, which adjustments the records support and whether they matter, what the notes must say, and what the data cannot settle. What you prepare is a draft for the CFO's review, released to the bank only once the open matters are settled.
 :::
 
 ## The controller's four conditions
@@ -87,15 +87,15 @@ The adjustments live in the workbook, with the query and the document numbers be
 {{< book-table tbl-17-01 1-5 >}}
 
 ::: {.notes}
-The outline covers what the ledger records, with the topic of the Accounting Standards Codification that governs each component. Part of Requirement 2 is to find what the ledger leaves out.
+The outline gives the topic of the Accounting Standards Codification that governs each component. Its last row holds matters the ledger does not record and the package must still address; part of Requirement 2 is to find what else the ledger leaves out.
 :::
 
 ## The notes that support the statements
 
-{{< book-table tbl-17-01 6-11 >}}
+{{< book-table tbl-17-01 6-12 >}}
 
 ::: {.notes}
-The last column says which requirements produce each component. Lenders use statements to monitor borrowers as well as to decide whether to lend: Minnis and Sutherland found banks requesting statements to monitor about half of small commercial loans, and Minnis found that audited statements lower the cost of private firms' debt.
+The last column says which requirements produce each component. Lenders use statements to monitor borrowers as well as to decide whether to lend: Minnis and Sutherland found banks requesting statements to monitor about half of small commercial loans, and Minnis found that private firms with audited statements pay less for their debt.
 :::
 
 # The Data You Will Use
@@ -279,7 +279,7 @@ Phase 2 is the heart of the case: it finds what the ledger left out at each year
 - **Check:** the parts add up to the ledger's balance at every year-end
 
 ::: {.notes}
-Split the balance into the opening line, the freight accrued and not yet settled, and the service accruals not yet cleared. For each accrual, subtract what had cleared it by each date: the invoice postings that refer to it and the adjustment entries that reverse it. Measure how long invoices took to clear accruals, age the open ones against the longest wait, and decide which are still liabilities and which should have been reversed, and when.
+Split the balance into the opening line, the freight accrued and not yet settled, and the service accruals not yet cleared. For each accrual, subtract what had cleared it by each date: the invoice postings that refer to it and the adjustment entries that reverse it. Measure how long invoices took to clear accruals, age the open ones against the longest wait, and decide which you treat as still owed and which you would reverse, and when. Age shows that an accrual has gone unbilled, not that nothing is owed, so state the assumption and the evidence that would confirm it, such as the suppliers' statements.
 :::
 
 ## Six kinds of posting reach accrued expenses
@@ -287,7 +287,7 @@ Split the balance into the opening line, the freight accrued and not yet settled
 {{< book-figure fig-17-01 crop="0,0.7621,1,0.2379" >}}
 
 ::: {.notes}
-Accrual entries credit the account for services received and not yet billed; a supplier invoice debits it up to the amount accrued, and an adjustment entry clears what remains. Shipments credit it for freight, and a monthly settlement pays the carriers. The opening entry has no document behind it.
+Accrual entries credit the account for services received and not yet billed; a supplier invoice debits it up to the amount accrued, and an adjustment entry clears all or part of what remains. Shipments credit it for freight, and a monthly settlement pays the carriers. The opening entry has no document behind it.
 :::
 
 ## Each accrual is cleared through its references
@@ -308,7 +308,7 @@ An invoice line refers to the accrual it clears through AccrualJournalEntryID, a
 - **Check:** an error at one year-end reverses in the next, and you show both
 
 ::: {.notes}
-Measure each year-end the statements present, and the one before, because an error at the earlier year-end reverses in the next year. Recognize revenue in the year of delivery and value unbilled shipments at their order price less discount. Use one working-day method for payroll, split manufacturing from the other cost centers, and say where each part ends up. For interest, state your day-count convention.
+Measure each year-end the statements present, and the one before, because an error at the earlier year-end reverses in the next year. Recognize revenue in the year of delivery, when the case assumes control passes, and value unbilled shipments at their order price less discount. Use one working-day method for payroll, split manufacturing from the other cost centers, and say where each part ends up. For interest, state your day-count convention.
 :::
 
 ## Classify, measure and judge each adjustment
@@ -332,20 +332,20 @@ Write each adjustment's entries for both year-ends, with its accounts and eviden
 The schedule shows each adjustment's effect on opening equity, on each year's income before income taxes, and on each year-end balance sheet, with its type and the decision to record or pass it.
 :::
 
-## A missed item reverses in the next year
+## A missed cutoff item reverses in the next year
 
-{{< book-figure fig-17-02 crop="0,0,1,0.6565" >}}
+{{< book-figure fig-17-02 crop="0,0,1,0.6835" >}}
 
 ::: {.notes}
-An item missed at the end of one year enters that year's income and balance sheet and reverses in the next year's income. An item missed before the comparative year enters opening retained earnings. An error that recurs every year can leave income nearly right while the balance sheet stays wrong.
+A cutoff item missed at the end of one year, and recorded in the next, enters that year's income and balance sheet and reverses in the next year's income. A balance that persists, such as one with no document behind it, does not reverse and needs an analysis of its own. An item missed before the comparative year enters opening retained earnings. An error that recurs every year can leave income nearly right while the balance sheet stays wrong.
 :::
 
 ## Error or estimate decides the period
 
-{{< book-figure fig-17-02 crop="0,0.6915,1,0.3085" >}}
+{{< book-figure fig-17-02 crop="0,0.7046,1,0.2954" >}}
 
 ::: {.notes}
-A correction of an error goes to the period in which the facts existed, and the prior year is restated. A change in estimate goes to the period in which it becomes known, and nothing is restated. The guidance on accounting changes and error corrections, ASC Topic 250, governs both.
+A correction of an error goes to the period in which the facts existed and, when the error is material, the prior year is restated. A change in estimate goes to the period in which it becomes known, and nothing is restated. The guidance on accounting changes and error corrections, ASC Topic 250, governs both.
 :::
 
 ## Watch out: a wrong estimate is not an error {.watch-out}
@@ -353,10 +353,10 @@ A correction of an error goes to the period in which the facts existed, and the 
 - If the facts supported the estimate, it is a change in estimate
 - If the facts were there and were missed, it is an error
 - Materiality is not only a number: qualitative factors count too
-- Adjustments never move cash, so cash flow totals must not change
+- No adjustment in this case moves cash or the cash flow totals
 
 ::: {.notes}
-Acito and colleagues found that companies correcting the same lease error decided how on qualitative grounds and on what other companies had done, as well as on size. Choudhary and colleagues found that errors judged immaterial were followed by more errors and weaker controls. An error that recurs every year deserves attention even when each year's effect is small.
+Acito and colleagues found that companies correcting the same lease error decided how on qualitative grounds and on what other companies had done, as well as on size; what others did describes practice, not authority. Choudhary and colleagues found that errors judged immaterial were followed by more errors and weaker controls. An error that recurs every year deserves attention even when each year's effect is small.
 :::
 
 ## Check your understanding {.check}
@@ -413,7 +413,7 @@ Phase 3 turns the adjusted trial balances into the statements and builds the not
 - **Produce:** classified balance sheets and the three other statements
 - **Tool:** the workbook builds them; the Review file tests them
 - **Revisit:** Chapter 6's statements, Tutorial 14.3's ledger model
-- **Check:** adjustments change only reconciliation lines, never totals
+- **Check:** these adjustments change reconciliation lines, not totals
 
 ::: {.notes}
 The statements of income go by function, with a line for income before income taxes. The statement of changes in equity starts from the opening of the comparative year and shows the correction of the opening balance, with the earlier columns labeled as restated. The Review file's Tests tab checks that each entry balances, that no entry touches cash, and that adjusted net income and recorded total assets agree.
@@ -434,13 +434,13 @@ Equipment financed by a note and a disposal with no proceeds moved no cash, so t
 
 {{< book-requirement 7 >}}
 
-- **Produce:** the notes on assets, debt, revenue and accrued liabilities
+- **Produce:** notes on assets, debt, revenue, accruals and inventories
 - **Tool:** SQL rebuilds the schedules; the workbook formats them
 - **Revisit:** Chapters 10 and 11's queries, Chapter 14's sales model
 - **Check:** each note agrees with a line of the statements
 
 ::: {.notes}
-Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any service work was done and not billed at a year-end. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why.
+Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any service work was done and not billed at a year-end. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why. The notes on accounting policies and on the CFO's matters, such as income taxes and leases, complete the package before it goes to the bank.
 :::
 
 ## Milestone 3: before you hand it in
@@ -485,11 +485,11 @@ Compare the records after the year-end with the same weeks of the year before. S
 
 - For each open matter: what the records show, and the evidence needed
 - Its possible effect where the ledger measures it, and the treatment
-- Cover tax status, leases, sales tax collected and unsupported balances
+- Cover tax status, leases, sales tax payable and unsupported balances
 - End with the passed items, close changes, and a recommendation
 
 ::: {.notes}
-The package is a PDF produced from the workbook. The memo is at most two pages, with an appendix of exhibits of at most three. It may raise other matters the records point to, such as whether standard costs unchanged for years still measure the finished goods at cost, and it ends with your recommendation on whether the package should go to the bank as it stands.
+The package is a PDF produced from the workbook. The memo is at most two pages, with an appendix of exhibits of at most three. It may raise other matters the records point to, such as whether standard costs unchanged for years still measure the finished goods at cost, and it ends with your recommendation on whether the package should go to the bank as it stands. Until the CFO releases it, the package is a draft.
 :::
 
 ## Check your understanding {.check}

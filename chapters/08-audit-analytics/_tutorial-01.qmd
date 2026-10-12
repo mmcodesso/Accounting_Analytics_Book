@@ -13,11 +13,11 @@ b. Choose **Data > Get Data > From File > From Excel Workbook**, and select Char
 c. In the **Navigator**, select the **T39_DisbursementPayment**, **T37_PurchaseInvoice**, and **T31_Supplier** Tables, and click **Transform Data**.
 d. Rename the queries `Payments`, `PurchaseInvoices`, and `Suppliers`.
 e. In PurchaseInvoices, use **Home > Choose Columns** to keep PurchaseInvoiceID, InvoiceNumber, and GrandTotal, and in Suppliers, keep SupplierID and SupplierName.
-f. Right-click PurchaseInvoices and then Suppliers in the **Queries** pane, and clear **Enable Load** for each.
-g. In Payments, open the filter list of PaymentDate, choose **Date/Time Filters > Before**, and enter `2027-01-01`, so that the query keeps the payments of fiscal 2024 through 2026.
-h. Merge Payments with **PurchaseInvoices** on PurchaseInvoiceID, with a left outer join, and expand InvoiceNumber and GrandTotal without the prefix.
-i. Merge Payments with **Suppliers** on SupplierID, with a left outer join, and expand SupplierName without the prefix.
-j. Choose **Home > Close & Load**, and rename the new worksheet `Payments`.
+f. In Payments, open the filter list of PaymentDate, choose **Date/Time Filters > Before**, and enter `2027-01-01`, so that the query keeps the payments of fiscal 2024 through 2026.
+g. Merge Payments with **PurchaseInvoices** on PurchaseInvoiceID, with a left outer join, and expand InvoiceNumber and GrandTotal without the prefix.
+h. Merge Payments with **Suppliers** on SupplierID, with a left outer join, and expand SupplierName without the prefix.
+i. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection**, and click **OK**. The choice applies to all three new queries, so none of them adds a worksheet yet, and PurchaseInvoices and Suppliers stay connections that only feed Payments.
+j. Open **Data > Queries & Connections**, right-click **Payments**, choose **Load To**, and load it as a **Table** on a **New worksheet**. Rename the new worksheet `Payments`.
 
 The Payments Table holds tens of thousands of payments. The date filter leaves out the few hundred payments that the ledger already records in fiscal 2027, so that the population matches the three years under review.
 
@@ -34,7 +34,7 @@ h. In A2, type `Payments Table`, and in B2 and C2, enter `=ROWS(Payments[Amount]
 i. In A3, type `Cash credits in the ledger`, and in B3 and C3, enter `=SUM(PaymentPostings[Postings])` and `=SUM(PaymentPostings[CashCredited])`.
 j. In A4, type `Difference`, and in B4 and C4, enter `=B2-B3` and `=C2-C3`.
 
-Both differences are zero: the extract contains every payment that the ledger recorded in the period, for the same total. A difference would mean that one side is missing payments, and no test on the extract could be relied on until it was explained.
+Both differences are zero: the extract and the ledger agree in count and total, as they must if the extract holds every payment the ledger recorded in the period. The agreement is in total, so it cannot show that each payment is present, as Tutorial 4.1, Step 10 showed. A difference, though, would have to be explained, by missing or extra payments, a wrong amount, or a different cutoff, before any test on the extract could be relied on.
 
 **Step 3. Stratify the payments.**
 
@@ -76,7 +76,7 @@ a. In the first empty column to the right of the Payments Table, type `LeadDigit
 
 b. On the Population worksheet, type `Payments with LeadDigit 0` in A6, and enter `=COUNTIF(Payments[LeadDigit],0)` in B6.
 
-B6 returns 0. Scientific notation always starts with the first significant digit, so this formula works for every amount. Two shorter formulas do not. `LEFT([@Amount],1)` returns 0 for the payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit, so that $0.60 becomes 1 and $9.70 becomes 10, which starts with 1. Together, the two shortcuts misclassify several hundred payments.
+B6 returns 0. Scientific notation always starts with the first significant digit, so this formula works for every amount in this population, all of them positive amounts in dollars and cents; a column with zeros, negative amounts, or more decimal places needs a rule of its own. Two shorter formulas do not. `LEFT([@Amount],1)` returns 0 for the payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit, so that $0.60 becomes 1 and $9.70 becomes 10, which starts with 1. Together, the two shortcuts misclassify several hundred payments.
 
 **Step 6. Compare the first digits with Benford's Law.**
 
@@ -118,14 +118,14 @@ c. In F14, type `Smallest invoice paid in parts`, and in I14, enter:
    =MINIFS(Payments[GrandTotal],Payments[Partial],TRUE)
    ```
 
-@fig-08-04 shows the two subsets. The full payments conform acceptably. The partial payments do not conform at all, and the reason lies in how they arise: I14 shows that Charles River pays in parts only invoices of $1,000 or more, and most of those invoices are between $1,000 and $2,000. Split into two or three payments, such an invoice produces amounts in the hundreds that start with the digits 3 to 9. The nonconformity comes from the payment process, not from invented amounts, and the invoices themselves, whose first digits you can test in the same way, conform closely.
+@fig-08-04 shows the two subsets. The full payments conform acceptably. The partial payments do not conform at all, and the reason lies in how they arise: I14 shows that Charles River pays in parts only invoices of $1,000 or more, and most of those invoices are between $1,000 and $2,000. Split into two or three payments, such an invoice produces amounts in the hundreds, so the partial payments start with the digits 5 to 9 far more often than Benford's Law expects, and with 2 and 3 far less often. The nonconformity comes from the payment process, not from invented amounts, and the invoices themselves, whose first digits you can test in the same way, conform closely.
 
 ![First Digits of Full and Partial Payments.](/visuals/svg/fig-08-04-benford-by-payment-type.svg){#fig-08-04 fig-alt="Two combo charts side by side, each with actual proportions as columns and Benford's expected proportions as a line. The left chart, for full payments, follows the expected line closely and is labeled with a mean absolute deviation in the acceptable range. The right chart, for partial payments, departs sharply: the digits 2 and 3 are far below the line and the digits 5 to 9 far above it, with a mean absolute deviation in the nonconformity range."}
 
 **Step 9. Document the tests.**
 
 a. Add a worksheet named `WP Payments`, and type the workpaper labels in A1:A10: `Objective`, `Source`, `Population check`, `Procedure`, `Parameters`, `Results`, `Exceptions and disposition`, `Conclusion`, `Prepared by`, and `Reviewed by`.
-b. In column B, describe the payment tests beside each label.
+b. In column B, describe the payment tests beside each label, and type your name and the date beside Prepared by, leaving Reviewed by for the reviewer's name and date.
 c. Record the date filter, the strata bounds, and the digit formula in the Parameters entry.
 d. Record the four largest payments to vouch and the explanation of the partial payments in the Exceptions and disposition entry.
 e. Save the workbook.

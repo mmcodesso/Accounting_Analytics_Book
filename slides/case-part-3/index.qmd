@@ -46,7 +46,7 @@ The memo is written for the controller: concise, organized by perspective, caref
 
 ## The audit left one question open
 
-- The plant's records reconcile, and the pay is right for the hours
+- The plant's records reconcile, and the pay fits the hours and rates on file
 - The growth in overtime sits on surge days
 - On a surge day, every hourly employee clocked the same hours
 - The timekeeping records alone cannot show those hours were worked

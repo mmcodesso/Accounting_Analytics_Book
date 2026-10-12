@@ -213,7 +213,7 @@ def fig_11_07() -> Diagram:
     for i in marks:
         db.emphasize_cells(d, out["geometry"], [(i, 0), (i, 4)])
     note(d, "The editor shows the start of the query, whose derived table follows. The grid is scrolled to the "
-            "operations that ended in 2026. Outlined: the two work centers ranked first.", out["bottom"] + 8, 40)
+            "operations that ended in 2026. Outlined: the top two work centers.", out["bottom"] + 8, 40)
     return d
 
 

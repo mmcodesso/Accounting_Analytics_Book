@@ -14,15 +14,15 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Requirements.**
 
-(1) Use Power Query to load the CreditMemo and CreditMemoLine Tables from CharlesRiver.xlsx into your copy of the analysis workbook, with CreditMemoDate set to the Date type.
+(1) Use Power Query to load the CreditMemo and CreditMemoLine Tables from CharlesRiver.xlsx into your copy of the analysis workbook, with CreditMemoDate set to the Date type. Load both as Tables on new worksheets, with **Close & Load To** and then **Table** and **New worksheet**, as in Tutorial 4.1, Step 7.
 
 (2) Prepare the credit memo lines for the comparison. Bring each line's CreditMemoDate from the CreditMemo Table, matching on CreditMemoID, and add a period label. Bring the ItemGroup from the Item Table, matching on ItemID. Use either lookups or Power Query merges, and count the rows that failed to match.
 
-(3) Build a grid with the four quarters of 2026 across a row and three rows below them: gross Furniture revenue from InvoiceLines, Furniture credit memo lines, and net Furniture revenue. Fill it with SUMIFS formulas.
+(3) Build a grid with the four quarters of 2026 across a row and three rows below them: Furniture revenue billed, from the LineTotal of InvoiceLines (after line discounts and before credit memos), Furniture credit memo lines, and net Furniture revenue. Fill it with SUMIFS formulas.
 
 (4) Some credit memos in 2026 reverse invoices issued in an earlier year. Use the credit memo's OriginalSalesInvoiceID to find them, and explain in two or three sentences whether a credit should be assigned to the quarter of the credit memo or to the quarter of the original invoice for this analysis.
 
-**Deliverable.** A quarterly schedule of gross and net Furniture revenue for fiscal 2026 with a short note on the timing of credits.
+**Deliverable.** A quarterly schedule of billed and net Furniture revenue for fiscal 2026 with a short note on the timing of credits.
 
 
 
@@ -62,9 +62,9 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Requirements.**
 
-(1) Using InvoiceLines, build a grid with the eight Furniture product types as rows and, for 2026-Q3 and 2026-Q4, columns for revenue and quantity. Use the product type names from Tutorial 5.1 as row labels.
+(1) Using InvoiceLines, build a grid with the eight Furniture product types as rows and, for 2026-Q3 and 2026-Q4, columns for revenue and quantity. InvoiceLines holds the product type codes, so put the codes in one column, for the SUMIFS criteria, and their names from @tbl-05-03 in another, as labels. Include ItemGroup as a criterion too, because some codes, such as TBL, also occur in other groups.
 
-(2) Add columns for each product type's share of Furniture revenue in each quarter, and for the change in share.
+(2) Add columns for each product type's share of Furniture revenue in each quarter, and for the change in share in percentage points: the fourth quarter's share less the third quarter's.
 
 (3) Apply conditional formatting that highlights the product types whose share changed by more than two percentage points.
 
@@ -86,9 +86,9 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 (1) On the SalesInvoice Table, bring each invoice's OrderDate from the SalesOrder Table, unless you already added it in Exercise 5.2, and calculate the number of days from order to invoice.
 
-(2) For each quarter of fiscal 2026, use COUNTIFS and AVERAGEIFS to calculate the number of invoices and the average lag. Use MEDIAN to calculate the median lag of all the invoices, and explain why the average is higher than the median. Describe how stable the lag is from quarter to quarter.
+(2) For each quarter of fiscal 2026, use COUNTIFS and AVERAGEIFS to calculate the number of invoices and the average lag. Use MEDIAN to calculate the median lag of all the invoices, and explain why the average is higher than the median. Describe how stable the lag is from quarter to quarter, and note any invoice with a negative lag, dated before its order.
 
-(3) For each promotion in the PromotionProgram Table, count its invoice lines and the lines invoiced after its EffectiveEndDate.
+(3) For each promotion in the PromotionProgram Table, count its invoice lines and the lines invoiced after its EffectiveEndDate. Before you read the counts as billing lag, check each promotion's dates: a promotion whose end date comes before its start date, or that runs for a single day, raises a question about the master data rather than about billing.
 
 (4) Write a brief memo (three to five sentences) recommending whether the margin analysis should assign promotional revenue by invoice date or by order date, and why.
 
@@ -108,7 +108,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Requirements.**
 
-(1) Use Power Query to load the Supplier and Employee Tables from CharlesRiver.xlsx into a new workbook, as queries named `Supplier` and `Employee`. Keep every column of Supplier, because Exercise 5.6 uses this Table too, and keep EmployeeID, EmployeeName, JobTitle, Address, and City of Employee.
+(1) Use Power Query to load the Supplier and Employee Tables from CharlesRiver.xlsx into a new workbook, as queries named `Supplier` and `Employee`, both as Tables on new worksheets (**Close & Load To**, then **Table** and **New worksheet**, as in Tutorial 4.1, Step 7). Keep every column of Supplier, because Exercise 5.6 uses this Table too, and keep EmployeeID, EmployeeName, JobTitle, Address, and City of Employee.
 
 (2) On each Table, build a match key that joins the Address and City columns. Standardize the key with TRIM and UPPER so that differences in spacing and case do not hide a match, and explain why the key includes the city.
 
@@ -132,7 +132,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 **Requirements.**
 
-(1) In the workbook of Exercise 5.5, using the Supplier Table, add a column that applies PROPER to SupplierName, and count the names that change. Examine the changed names and explain why applying PROPER to this field would be a mistake.
+(1) In the workbook of Exercise 5.5, using the Supplier Table, add a column, `ProperName`, that applies PROPER to SupplierName, and count the names that change. PROPER changes only the case of letters, which an ordinary comparison such as `<>` ignores, as the Watch out on logical tests explains, so compare the two columns with EXACT, which is case-sensitive: `=NOT(EXACT([@SupplierName],[@ProperName]))` is TRUE for a name that changes. Examine the changed names and explain why applying PROPER to this field would be a mistake.
 
 (2) Test for duplicate suppliers: count the suppliers that share a TaxID and the suppliers that share a BankAccount. The masked bank accounts begin with `****`, which COUNTIF and COUNTIFS read as wildcards, so compare the values exactly, for example with `=SUM(--(Supplier[BankAccount]=[@BankAccount]))`, which counts the suppliers with the same BankAccount as the row's. Explain what a clean result shows and what it does not.
 
@@ -143,7 +143,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 (5) In your copy of the analysis workbook, load the Item Table again as a new query named `ItemMaster`, with all its columns. Then test the item master against the invoice lines:
 
    - list the items whose LifecycleStatus is Discontinued but whose IsActive flag is 1;
-   - on ItemMaster, count each item's invoice lines with COUNTIFS on `SalesInvoiceLine[ItemID]`, and list the items with IsActive 0 that were still invoiced, with the latest InvoiceDate of each;
+   - on ItemMaster, count each item's invoice lines with COUNTIFS on `SalesInvoiceLine[ItemID]`, and list the items with IsActive 0 that were still invoiced, with the latest InvoiceDate of each (MAXIFS returns 0, which Excel shows as a meaningless date, for an item with no invoice lines, so show it only where the count is above zero);
    - on the SalesInvoiceLine Table, look up each line's LaunchDate from ItemMaster, flag the lines invoiced before their item's launch, and count them by item.
 
 (6) Prepare a brief memo (one half page) that summarizes both reviews, recommends which suppliers the purchasing tests should focus on, and explains what each item finding means for the reliability of the item master.

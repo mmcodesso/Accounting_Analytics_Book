@@ -96,6 +96,6 @@ D.  Emailing each new version of the .pbix file to the reviewer
 **14.** A department manager asks for a copy of Charles River Reports.pbix to work with offline. Why should internal audit object?
 
 A.  A copy cannot be opened without a Power BI Pro license
-B.  It holds every row and escapes change control
+B.  It holds every imported row and escapes change control
 C.  The copy's measures are recalculated by a different engine
 D.  The copy loses its Tests tab and the queries saved in it

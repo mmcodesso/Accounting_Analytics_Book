@@ -9,7 +9,7 @@ title: "Descriptive and Diagnostic Analytics in Excel"
 After completing this chapter, you will be able to:
 
 1. Describe a numeric column, or part of it, with statistical functions such as AVERAGE, MEDIAN, STDEV.S, MIN, MAX, and PERCENTILE.INC, and show the shape of its distribution with a histogram.
-2. Calculate conditional totals, counts, and averages with SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS, and prove that a summary is complete with a control total.
+2. Calculate conditional totals, counts, and averages with SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS, and MAXIFS, and test with a control total whether a summary accounts for the whole population it describes.
 3. Build PivotTables and PivotCharts from an Excel Table that summarize data across two or more dimensions, and choose a chart that fits the question.
 4. Create calculated fields for margins and ratios, and explain why a calculated field works on totals rather than on individual rows.
 5. Explain a change between two periods by drilling down, comparing, and decomposing it into price, volume, mix, and cost effects, and communicate the finding.
@@ -47,7 +47,7 @@ The gap between the two is informative. When the mean is well above the median, 
 
 ### Dispersion and Extremes
 
-The standard deviation measures how widely values are spread around their mean. `STDEV.S(range)` treats the values as a sample, a subset drawn from a larger population, and divides by the number of values minus one. `STDEV.P(range)` treats them as the complete population and divides by the number of values. The distinction matters for small samples, such as an audit sample of a few dozen items. For thousands of invoice lines, the two results differ by a fraction of a percent, and analysts commonly use STDEV.S. A standard deviation is easiest to interpret relative to the mean: two cost centers with the same average monthly spending are very different to manage if one varies by a few percent from month to month and the other by a third.
+The standard deviation measures how widely values are spread around their mean. `STDEV.S(range)` treats the values as a sample, a subset drawn from a larger population, and divides by the number of values minus one. `STDEV.P(range)` treats them as the complete population and divides by the number of values. The distinction matters for small samples, such as an audit sample of a few dozen items. A year's invoice lines are the whole population of that year, which STDEV.P describes, but for thousands of lines the two results differ by a fraction of a percent, and this chapter uses STDEV.S, as many analysts do. A standard deviation is easiest to interpret relative to the mean: two cost centers with the same average monthly spending are very different to manage if one varies by a few percent from month to month and the other by a third.
 
 `MIN(range)` and `MAX(range)` return the smallest and largest values. They are summary measures, but they are also data checks. A negative or zero amount where none should exist, or a maximum far above the rest of the data, is worth a look before any other statistic is trusted. In the fiscal 2026 invoice lines, the smallest line is under two dollars and the largest is not a piece of furniture but a design services engagement, a reminder that the lines mix very different kinds of sales. `PERCENTILE.INC(range, k)`, which you used in Chapter 4 to set the large-line threshold, returns the value below which a share k of the values falls, and the top tenth of the fiscal 2026 lines carries nearly a third of the year's revenue.
 
@@ -79,7 +79,7 @@ Criteria are easier to maintain in cells than in formulas. The formula
 
 takes the item group from column A of its own row and the fiscal year from a named cell. Copied down a column of item groups, it returns each group's revenue, and changing ReportYear updates every row. The mixed reference `$A12`, which you learned in Chapter 4, keeps the formula pointed at column A when it is copied.
 
-Conditional aggregation has one dangerous property: it fails silently. A SUMIFS whose criterion is misspelled, such as "Furnture", returns zero rather than an error, and a list of categories typed by hand can simply leave one out. The defense is a control total, an independently calculated total that the parts of a summary must add up to. You have used control totals since Chapter 4, when you compared the sum of the invoice lines with the sum of the invoice subtotals. In a summary by category, the control total is the total of the whole population for the same criteria, and the difference between it and the sum of the categories must be zero. Auditors apply the same discipline when they foot a schedule, adding its columns, and cross-foot it, adding its rows, before relying on it.
+Conditional aggregation has one dangerous property: it fails silently. A SUMIFS or COUNTIFS whose criterion is misspelled, such as "Furnture", returns zero rather than an error, and a list of categories typed by hand can simply leave one out. AVERAGEIFS is the exception, returning #DIV/0! when no row meets its criteria, which at least shows that something is wrong. The defense is a control total, an independently calculated total that the parts of a summary must add up to. You have used control totals since Chapter 4, when you compared the sum of the invoice lines with the sum of the invoice subtotals. In a summary by category, the control total is the total of the whole population for the same criteria, and the difference between it and the sum of the categories must be zero. Auditors apply the same discipline when they foot a schedule, adding its columns, and cross-foot it, adding its rows, before relying on it.
 
 
 ## Charting Descriptive Results
@@ -163,7 +163,7 @@ The same value field can be displayed in different ways without changing the num
 
 ### Refreshing and Referencing a PivotTable
 
-A PivotTable summarizes a copy of its source, called the pivot cache, so it does not change when the source changes. After a query refresh, the PivotTable must be refreshed too, and Data > Refresh All does both. A formula that refers to a PivotTable should use GETPIVOTDATA, which Excel writes for you when you type an equal sign and click a value in the PivotTable. `GETPIVOTDATA` identifies the value by its field and items, such as the Sum of LineTotal for Period 2026-Q4, rather than by its cell address, so it keeps returning the right value when the PivotTable's layout changes. Slicers, which you used on a Table in Chapter 4, filter PivotTables in the same way, and one slicer can control several PivotTables built from the same source.
+A PivotTable summarizes a copy of its source, called the pivot cache, so it does not change when the source changes. After a query refresh, the PivotTable must be refreshed too, and Data > Refresh All does both. A formula that refers to a PivotTable should use GETPIVOTDATA, which Excel writes for you when you type an equal sign and click a value in the PivotTable. `GETPIVOTDATA` identifies the value by its field and items, such as the Sum of LineTotal for Period 2026-Q4, rather than by its cell address, so it keeps returning the right value when the PivotTable's layout changes. A change to the PivotTable's filters, however, changes the value it returns, because the formula reads whatever the PivotTable shows. Slicers, which you used on a Table in Chapter 4, filter PivotTables in the same way, and one slicer can control several PivotTables built from the same source.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -205,7 +205,7 @@ A common-size statement expresses every line as a percentage of net revenue, whi
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-A trial balance built from a ledger extract is only as complete as the extract. The Charles River ledger already holds supplier payments dated in fiscal 2027, so a trial balance without a date filter would mix two years. Filter by posting date before you group, and check the result: equal debit and credit balances show that the entries balance, but only a comparison with an independent figure, such as the closing entry, shows that nothing is missing.
+A trial balance built from a ledger extract is only as complete as the extract. The Charles River ledger already holds supplier payments dated in fiscal 2027, so a trial balance without a date filter would mix two years. Filter by posting date before you group, and check the result: equal debit and credit balances show that the entries in the extract balance, and comparing net income with an independent figure, the closing entry, tests the year's result. Neither check shows that nothing is missing. An entry left out of the extract, such as the payment of a payable, would leave the debits equal to the credits and net income unchanged, and, as with the control totals of Tutorial 4.1, Step 10, only evidence from outside the extract could reveal it.
 :::
 
 

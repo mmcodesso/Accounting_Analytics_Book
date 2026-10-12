@@ -204,10 +204,20 @@ def ex4(d, claim):
     claim(max(rates) - min(rates) < 0.0005, "the variance rate is steady (within 0.05 percentage points)")
     claim(all(a["amount"] < b["amount"] and a["variance"] < b["variance"] for a, b in zip(years, years[1:])),
           "the amount invoiced and the variance grow every year")
+    # The growth of the variance from the first year to the last, split into the larger amount invoiced at the first
+    # year's rate and the change of rate on the last year's amount (a dollar-base and rate bridge, nothing more).
+    y0, y1 = years[0], years[-1]
+    increase = y1["variance"] - y0["variance"]
+    base = (y1["amount"] - y0["amount"]) * y0["rate"]
+    rate_effect = y1["amount"] * (y1["rate"] - y0["rate"])
+    claim(abs(base + rate_effect - increase) < 0.01, "the two parts of the bridge add up to the increase")
+    claim(base > rate_effect > 0, "most of the growth comes with the larger amount invoiced, the rest from a higher rate")
     others = dict(d.q(f"SELECT Description, SUM(Debit) - SUM(Credit) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? "
                       f"AND NOT {VARIANCE} AND {d.no_closes()} GROUP BY 1", ppv, d.C))
     claim(set(others) == {"Record nonrecoverable purchase tax"}, "the rest of account 5060 is nonrecoverable purchase tax")
-    return dict(gl=gl, top=[dict(id=s, name=nm, amount=a) for s, nm, a in suppliers[:5]], lines=lines, gap=abs(gap),
+    return dict(bridge=dict(first=y0["year"], last=y1["year"], increase=increase, base=base, rate=rate_effect,
+                            base_share=base / increase),
+                gl=gl, top=[dict(id=s, name=nm, amount=a) for s, nm, a in suppliers[:5]], lines=lines, gap=abs(gap),
                 supplier_gap=supplier_gap, n_lines=n, above=above, below=below, at=at, low=-low, high=high, years=years,
                 line_gap_low=min(y["line_gap"] for y in years), line_gap_high=max(y["line_gap"] for y in years),
                 tax=others.get("Record nonrecoverable purchase tax", 0.0))

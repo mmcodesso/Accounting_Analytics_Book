@@ -10,11 +10,11 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** Before the report is shared, the controller wants a second set of control totals on the Validation page: revenue by item group for each fiscal year, and proof that the invoice lines add up to the invoices they belong to.
+**Scenario.** Before the report is shared, the controller wants a second set of control totals beside the Validation page: revenue by item group for each fiscal year, and a check, year by year, that the invoice lines add up to the invoices they belong to.
 
 **Requirements.**
 
-(1) Build a matrix with FiscalYear on rows, ItemGroup on columns, and LineTotal as values, with row and column totals. Compare the fiscal 2026 column totals with the revenue by item group you calculated in Chapter 6.
+(1) Build a matrix with FiscalYear on rows, ItemGroup on columns, and LineTotal as values, with row and column totals. Compare the fiscal 2026 row, item group by item group, with the revenue by item group you calculated in Chapter 6, and its total with the fiscal 2026 line total of the Validation page.
 
 (2) Import T16_SalesInvoice again as a query named `InvoiceHeaders`, keep SalesInvoiceID, InvoiceDate, SubTotal, FreightAmount, TaxAmount, and GrandTotal, and add a FiscalYear custom column. Before you choose the columns, make sure FreightAmount has the decimal number type, as Discount does in Step 3 of Tutorial 13.1. Do not relate it to the other tables. Build a table visual of SubTotal by fiscal year from InvoiceHeaders, and compare it with the line totals by fiscal year.
 
@@ -37,13 +37,13 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Build a table visual of CustomerName and LineTotal for fiscal 2026, sorted from the largest, and filtered to the top 10 customers with the **Top N** filter type in the Filters pane.
 
-(2) Build a second table visual with CustomerID, CustomerName, and LineTotal, with the same filter. Compare the two lists and explain any difference.
+(2) Build a second table visual with CustomerID, CustomerName, and LineTotal for fiscal 2026, and set CustomerID to **Don't summarize** in the visual, as Step 9 of Tutorial 13.1 set the years. Filter it to the top 10 with the **Top N** filter on CustomerID, not on CustomerName, so that it ranks customers by key. Compare the two lists and explain any difference.
 
 (3) Find every customer name that belongs to more than one CustomerID, and state how much revenue each of those customers produced in fiscal 2026.
 
 (4) Calculate the share of fiscal 2026 revenue held by the largest customer and by the top ten, and state whether any customer reaches the policy's threshold.
 
-(5) Explain why the Top N filter belongs on the page, where the reader can see it, or in the visual's title, and write the title you would give the corrected visual.
+(5) Explain why the Top N filter should be stated on the page, where the reader can see it, or in the visual's title, and write the title you would give the corrected visual.
 
 **Deliverable.** Two table visuals and a half-page note to the controller.
 
@@ -116,9 +116,9 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (4) For three of the columns with empty values, decide whether the blanks are meaningful blanks (Chapter 5), data that should exist, or a matter for follow-up, and give your reason.
 
-(5) Write a one-page profile memo, in the form of Chapter 10's data profile, that the auditor can file with the report.
+(5) Write a one-page profile memo, in the form of Chapter 10's data profile, that the auditor can file with the report, with the figures of (2) and (3) in a table attached to it.
 
-**Deliverable.** A one-page profile memo with the two sets of figures.
+**Deliverable.** A one-page profile memo, with the two sets of figures in an attached table.
 
 
 

@@ -215,10 +215,11 @@ def ex2(b: Build) -> None:
         "; ".join(f"{g['lines']} lines on {g['numbers']}, dated {g['dates']} and shipped {g['shipped']} "
                   f"({money(g['amount'])})" for g in early) +
         " (Chapter 12; their numbers carry the next year's prefix, Chapter 5).",
-        "(6) Use the ship date for revenue: control passes at shipment or delivery, and every shipment is delivered in "
-        "the year it ships. Invoice-date revenue misstates the years by the late invoices. Services have no ship date, so "
-        "the report needs a rule for them (their invoice date) and should disclose it, with the invoice-date figures as "
-        "a reconciliation."]))
+        "(6) Use the ship date for goods revenue: Chapter 12 assumes control passes on delivery, and every shipment is "
+        "delivered in the month it ships, so the ship date dates revenue as delivery would. Invoice-date revenue misstates "
+        "the years by the late invoices. Services have no ship date, so the report needs a rule for them, such as the "
+        "invoice date as a documented proxy for when the service was performed, and should disclose it, with the "
+        "invoice-date figures as a reconciliation."]))
     page.expect = ["Revenue by Ship Date", money(ctx["by_ship"][-1]), money(ctx["blank"]), "(Blank)",
                    early[0]["numbers"].split(" ")[0], "Model answer: Exercise 14.2"]
 

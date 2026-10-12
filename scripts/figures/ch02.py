@@ -105,7 +105,7 @@ def fig_02_03() -> Diagram:
           [(n, dt, money(f), t or "(blank)") for n, dt, f, t in miss],
           {(i, 3) for i, r in enumerate(miss, 1) if r[3] is None},
           "Completeness problem:",
-          "TrackingNumber is blank, so there is no carrier record for these shipments.")
+          "TrackingNumber is blank, so the extract holds no carrier reference for these shipments.")
 
     dup = examples['duplicates']
     assert [r[1] for r in dup].count("V0002-2024-000182") == 2, dup
@@ -113,7 +113,7 @@ def fig_02_03() -> Diagram:
           ["SupplierID", "InvoiceNumber", "InvoiceDate", "GrandTotal"], [80, 145, 95, 100],
           [(str(s), n, dt, money(t)) for s, n, dt, t in dup],
           {(i, 1) for i, r in enumerate(dup, 1) if r[1] == "V0002-2024-000182"},
-          "Duplicate:",
+          "Potential duplicate:",
           "The same supplier invoice number is recorded twice, with different dates and amounts. "
           "This is a duplicate-payment risk that requires investigation.")
 
@@ -167,8 +167,8 @@ def fig_02_06() -> Diagram:
     d.box(f'<font color="{CORAL}"><b>Tidy data principles violated:</b></font><br>'
           "1. Month is stored in column headers, not in its own column.<br>"
           "2. Each row contains three observations (three months), not one.<br>"
-          "This layout prevents direct use in PivotTables, SQL GROUP BY queries, or Power BI "
-          "data models.", 510, 26, 350, 124, fill=CORAL_TINT, stroke=CORAL, align="left",
+          "This layout makes grouping, filtering, and adding months harder in PivotTables, "
+          "SQL queries, and Power BI.", 510, 26, 350, 124, fill=CORAL_TINT, stroke=CORAL, align="left",
           valign="top")
 
     top = d.anchor(200, 136)

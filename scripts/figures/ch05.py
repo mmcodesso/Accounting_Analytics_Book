@@ -317,8 +317,9 @@ def fig_05_06() -> Diagram:
     xl.button(d, 680, y + 74, 76, "OK", primary=True)
     xl.button(d, 766, y + 74, 82, "Cancel")
     d.box("", 0, 28, 860, y + 112 - 28, fill="none", stroke=RULE, rounded=False)
-    d.text("<i>Outlined: the key column selected in each table, and the join kind.</i>", 0,
-           y + 120, 860, 20, size=SMALL, color=GRAY)
+    d.text("<i>Outlined: the key column selected in each table, and the join kind. The message is an "
+           "estimate of the matches; the row count after loading confirms it.</i>", 0,
+           y + 120, 860, 40, size=SMALL, color=GRAY)
     return d
 
 

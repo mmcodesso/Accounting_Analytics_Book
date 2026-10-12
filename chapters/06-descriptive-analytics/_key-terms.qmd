@@ -10,7 +10,7 @@
 
 **Control total.** A total calculated independently from a set of data, which the data must agree with, such as the sum of the invoice subtotals against the sum of the invoice lines. In a summary by category, the categories must add up to the control total, so a difference reveals a missing category, a duplicated row, or a formula that fails silently.
 
-**Cost effect.** The part of a change in margin caused by a change in the cost of the same items. In a margin measured at standard cost, it is zero unless the standard costs themselves change.
+**Cost effect.** The part of a change in margin caused by a change in the cost of the same items. In a margin measured at standard cost item by item, it is zero unless the standard costs themselves change; measured for a group of items, such as a product type, it also picks up shifts between items with different costs.
 
 **Cross-tabulation.** A summary of a measure across two dimensions at once, with one dimension in the rows and the other in the columns, such as revenue by product line and quarter. A PivotTable produces one.
 

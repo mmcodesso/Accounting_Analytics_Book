@@ -415,8 +415,9 @@ def ex2(b: Build) -> None:
              f"{num(n['tested'])} SalesInvoice postings of fiscal {year} that carry a SourceLineID point to an "
              f"existing invoice line (the anti-join returns no rows), and each line belongs to the invoice the posting "
              f"names. The header-level rows (receivable, freight, tax) carry no SourceLineID by design. The test "
-             f"proves that the line-level revenue postings are supported by invoice lines; it does not prove that "
-             f"every invoice line was posted, which needs the reverse anti-join, or that the amounts agree.")
+             f"shows that every line-level revenue posting points to an invoice line of the invoice it names; it does "
+             f"not show that every invoice line was posted, which needs the reverse anti-join, or that the amounts "
+             f"agree.")
 
 
 # --- Exercise 10.3 -------------------------------------------------------------------------------
@@ -771,6 +772,7 @@ def ex4(b: Build) -> None:
 
     top = n["top"]
     yrs = n["years"]
+    bridge = n["bridge"]
     rates = ", ".join(f"{y['year']} {num(100 * y['rate'], 2)}% of {money(y['amount'])}" for y in yrs)
     s.answer("Requirement (5), memo to the purchasing manager",
              f"Which suppliers bill above the order price? In fiscal {year} the ledger's purchase variance postings "
@@ -784,10 +786,14 @@ def ex4(b: Build) -> None:
              f"{num(100 * n['low'], 1)}% below to {num(100 * n['high'], 1)}% above. Recalculated from the documents, "
              f"the variance is {money(n['lines'])}, {money(n['gap'])} from the ledger because each posting is "
              f"rounded (by supplier, within {money(n['supplier_gap'])}).\n\n"
-             f"Did the account grow because prices rose or because we bought more? The variance is a steady share "
-             f"of what we buy: {rates}. Both the amount invoiced and the variance grew each year while the rate "
-             f"stayed near half a percent, so the account grew because purchases grew, not because suppliers raised "
-             f"their billing relative to the order price. The rest of account 5060 is nonrecoverable purchase tax "
+             f"Did the account grow because prices rose or because we bought more? The variance is a near-steady "
+             f"share of what we buy: {rates}. Both the amount invoiced and the variance grew each year while the rate "
+             f"stayed near half a percent: of the variance's growth from {bridge['first']} to {bridge['last']}, "
+             f"{money(bridge['increase'])}, {money(bridge['base'])} ({num(100 * bridge['base_share'], 0)}%) comes "
+             f"with the larger amount invoiced at the {bridge['first']} rate, and {money(bridge['rate'])} from the "
+             f"higher {bridge['last']} rate. Suppliers did not bill much further above the order price; the amount "
+             f"invoiced itself mixes the quantity bought, the order prices, and the mix of items, so this comparison "
+             f"cannot say how much of its growth was buying more. The rest of account 5060 is nonrecoverable purchase tax "
              f"({money(n['tax'])} in {year}).\n\n"
              f"What the comparison cannot show: it measures the invoice against the purchase order, so a price rise "
              f"already built into the purchase-order prices, or a better price negotiated elsewhere, does not appear "
@@ -869,7 +875,7 @@ def ex5(b: Build) -> None:
              Check("debits", n["total"], lambda r: r.value("Debits")),
              Check("credits", n["total"], lambda r: r.value("Credits"))])
 
-    s.query("Requirement (3): customers that have never placed a sales order",
+    s.query("Requirement (3): customers with no sales order in the database",
             f"Population: Customer; expected: {n['n_customers'].lower()} customers, all inactive",
             """
             SELECT c.CustomerID, c.CustomerName, c.CustomerSegment,
@@ -965,8 +971,9 @@ def ex5(b: Build) -> None:
              f"\"{n['credit_text']}\", {money(n['total'])} each side. Integrity failure: postings without a supporting "
              f"document. Follow-up: ask payroll for the payment records and bank evidence, and confirm whether cash "
              f"was disbursed.\n\n"
-             f"2. Customers without orders: {n['n_customers'].lower()}, all inactive. Expected condition: customers "
-             f"set up and never used or deactivated. Follow-up: none beyond confirming they stay inactive.\n\n"
+             f"2. Customers without orders: {n['n_customers'].lower()}, all inactive. Expected condition, on this "
+             f"evidence: dormant accounts with no order in the extract. Follow-up: check their setup and deactivation "
+             f"records, and confirm that they stay inactive.\n\n"
              f"3. Work orders without operations: {wording(wo)}, all Closed, yet {n['wo_labor']} direct time entries "
              f"were recorded on them. Process exception: a closed work order should have operations. Follow-up: ask "
              f"production how they were closed without a routing, and what the time recorded on them was for.\n\n"

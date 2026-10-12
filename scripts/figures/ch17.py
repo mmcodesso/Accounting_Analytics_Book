@@ -76,7 +76,7 @@ def fig_17_01() -> Diagram:
         ("Supplier invoice", ("PurchaseInvoice", None),
          "Clears the accrual its line refers to, up to the amount accrued"),
         ("Accrual Adjustment entry", ("JournalEntry", "Accrual Adjustment"),
-         "Clears what remains of the accrual it reverses"),
+         "Clears all or part of what remains of the accrual"),
         ("Shipment", ("Shipment", None), "Freight owed to carriers for the goods shipped"),
         ("Freight Settlement entry", ("JournalEntry", "Freight Settlement"),
          "Pays the carriers for the month's freight"),
@@ -96,7 +96,7 @@ def fig_17_01() -> Diagram:
 
 
 def fig_17_02() -> Diagram:
-    d = Diagram("How a Year-End Adjustment Moves Across the Periods Presented")
+    d = Diagram("How a Year-End Cutoff Adjustment Moves Across the Periods Presented")
     label_w, col_w, gap = 176, 128, 8
     heads = ["Retained earnings<br>1 January 2025", "Income<br>fiscal 2025",
              "Balance sheet<br>31 December 2025", "Income<br>fiscal 2026",
@@ -124,15 +124,17 @@ def fig_17_02() -> Diagram:
         for a, b in arrows:
             d.arrow(ids[a], ids[b], exit=RIGHT, entry=LEFT)
         y += 60
-    d.text("Each missed item reverses in the next year. An error that recurs every year can leave "
-           "income nearly right while the balance sheet stays wrong.", 0, y + 2, 860, 40,
-           align="left")
-    py = y + 60
+    d.text("Each item here is one that the next year records, such as a cutoff difference, so it "
+           "reverses there. A balance that persists, such as one with no document behind it, does not "
+           "reverse and needs an analysis of its own. An error that recurs every year can leave income "
+           "nearly right while the balance sheet stays wrong.", 0, y + 2, 860, 60, align="left")
+    py = y + 80
     panels = [
         ("Correction of an error", BLUE_TINT, BLUE,
          "The facts existed at the year-end and were missed or misapplied. The correction goes "
-         "to the period in which they existed: the prior year's figures are restated, and an "
-         "earlier error enters opening retained earnings."),
+         "to the period in which they existed: when the error is material to the prior "
+         "statements, the prior year's figures are restated, and an earlier error enters opening "
+         "retained earnings."),
         ("Change in estimate", AMBER_TINT, AMBER,
          "The year-end estimate was reasonable on the facts then available. A later difference "
          "goes to the period in which it becomes known, and to later periods if they are "

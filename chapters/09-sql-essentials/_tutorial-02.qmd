@@ -1,6 +1,6 @@
 ## Guided Tutorial 9.2: Filtering the Ledger to the Variance Postings
 
-**Context and objective.** The general ledger records every posting to the manufacturing variance account, but it records them among more than 800,000 rows. In this tutorial, you will filter the ledger down to the variance postings of fiscal 2026, find out which source documents produced them, and identify the one posting that must be left out of any analysis of the account. You will also confirm the check from Tutorial 9.1 for every row, list the work orders whose variance has not yet been recorded, and label them with functions.
+**Context and objective.** The general ledger records every posting to the manufacturing variance account, but it records them among more than 800,000 rows. In this tutorial, you will filter the ledger down to the variance postings of fiscal 2026, find out which source documents produced them, and identify the one posting that must be left out when you measure the year's variance. You will also confirm the check from Tutorial 9.1 for every row, list the work orders that have not yet closed, whose variance, if any, has not yet been recorded, and label them with functions.
 
 **Prerequisites.** Complete Tutorial 9.1, and open CharlesRiver_Work.sqlite in DB Browser for SQLite on the **Execute SQL** tab, with Chapter09.sql in the editor. If you closed it, click **Open SQL file(s)** and choose it. Type each query of this tutorial at the end of the script, under its comment, and run it by selecting it. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Chapter09.sql as it stands at the end of Tutorial 9.1 from [Companion Files](#sec-companion-files).
 
@@ -51,7 +51,7 @@ a. Type and run the query below.
 
 b. Read the values in the result.
 
-The result, shown in @fig-09-07, holds two values. WorkOrderClose rows are the variances recorded when work orders close. JournalEntry is the other value, and it needs a closer look, because a journal entry to this account is not a variance.
+The result, shown in @fig-09-07, holds two values. WorkOrderClose rows are the variances recorded when work orders close. JournalEntry is the other value, and it needs a closer look, because a journal entry to this account can adjust the variance or, at year-end, close the account, and only an adjustment belongs in the variance.
 
 ![The Source Document Types Behind the Variance Account.](/visuals/svg/fig-09-07-variance-sources.svg){#fig-09-07 fig-alt="A mock of the Execute SQL tab. The editor, on the tab Chapter09.sql, is scrolled to a comment and a query that selects the distinct SourceDocumentType values of the ledger rows for AccountID 93 in fiscal year 2026. The result holds two rows, WorkOrderClose and JournalEntry, and the JournalEntry row is outlined. The message pane reports that two rows were returned."}
 
@@ -60,7 +60,7 @@ The result, shown in @fig-09-07, holds two values. WorkOrderClose rows are the v
 a. Type and run the query below.
 
    ```sql
-   -- Tutorial 9.2: the closing entry, left out of any analysis
+   -- Tutorial 9.2: the closing entry, kept apart from the variance
    SELECT GLEntryID, PostingDate, Debit, Credit,
        VoucherNumber, Description
    FROM GLEntry
@@ -73,7 +73,7 @@ c. Change the last condition to `VoucherNumber LIKE 'JE-2026-%'`, run the query 
 d. Change the last condition to `SourceDocumentType = 'WorkOrderClose'`, run the query again, and compare the number of rows with Step 2.
 e. Change the last condition back to `SourceDocumentType = 'JournalEntry'`, so that the script keeps the query that finds the closing entry.
 
-The journal entry is JE-2026-000296, dated December 31, 2026, with the description Close Manufacturing Variance. Its credit equals the year's net variance, so it brings the account back to zero for the new year. A total of every row in Step 2 would therefore be zero, which is the same trap the closing entry set for the Furniture margin in the Part I case. The LIKE pattern finds the same single row, because it is the only posting to the account in 2026 whose voucher number begins with JE-2026-. The query with WorkOrderClose returns one row fewer than Step 2: every posting except the close.
+The journal entry is JE-2026-000296, dated December 31, 2026, with the description Close Manufacturing Variance. Its credit equals the year's net variance, so it brings the account back to zero for the new year. A total of every row in Step 2 would therefore be zero, which is the same trap the closing entry set for the Furniture margin in the Part I case. The LIKE pattern finds the same single row, because it is the only posting to the account in 2026 whose voucher number begins with JE-2026-. The query with WorkOrderClose returns one row fewer than Step 2: every posting except the close. Neither condition identifies a closing entry by itself, so in another year or account read the description of each journal entry before you leave it out: one that adjusts the variance belongs in it.
 
 **Step 5. Confirm the check for every work order close.** In Tutorial 9.1 you saw a zero CheckDifference in the rows on the screen. A filter can test all of them at once.
 
@@ -89,9 +89,9 @@ a. Type and run the query below.
 
 b. Read the message pane.
 
-The query runs without errors and returns no rows. An empty result is a finding here: no work order close records a total that differs from the sum of its parts, so the parts can be analyzed with confidence that they explain the whole variance.
+The query runs without errors and returns no rows. An empty result is a finding here: no work order close records a total that differs from the sum of its parts, so the parts account for the whole variance of every close. A close with a missing part would not appear either, because its calculation would be NULL; none of the three amounts is NULL in the Charles River data. The check shows that the records are consistent, not that each amount is right.
 
-**Step 6. Find the work orders that have not yet closed.** A work order's variance is recorded only when it closes, so the open work orders at year-end have variance still to come.
+**Step 6. Find the work orders that have not yet closed.** A work order's variance is recorded only when it closes, so any variance on the work orders open at year-end is not yet in the ledger.
 
 a. Type and run the query below.
 
@@ -107,7 +107,7 @@ b. Read the number of rows and the Status values in the result.
 c. Change `IS NULL` to `= NULL`, run the query again, and read the message pane.
 d. Change `= NULL` back to `IS NULL`.
 
-The query with IS NULL returns several hundred work orders that were released, in progress, or completed but not closed by the end of the data. Their variance will reach the ledger when they close, after the data ends. The query with `= NULL` returns no rows at all, because a comparison with NULL is never true.
+The query with IS NULL returns several hundred work orders that were released, in progress, or completed but not closed by the end of the data. Any variance they carry will be recorded when they close, after the data ends; the open status alone does not say how much that will be. The query with `= NULL` returns no rows at all, because a comparison with NULL is never true.
 
 **Step 7. Label the open work orders with functions.** Functions can replace a missing value with a label and take a code apart.
 
@@ -132,7 +132,7 @@ a. Add the condition `AND SUBSTR(WorkOrderNumber, 4, 4) = 2026` at the end of th
 b. Change `2026` in that condition to `'2026'`, with quotes, and run the query again.
 c. Remove the condition you added, so that the script keeps the query of Step 7.
 
-The condition in item a returns no rows, although every open work order was released in 2026. SUBSTR returns text, and SQLite does not convert text to compare it with a number that no column holds. With the quotes, the same condition finds every open work order. The empty result in Step 5 was a finding, but this one is a logical error, and knowing what the result should be is how you tell the two apart.
+The condition in item a returns no rows, although every open work order was released in 2026. SUBSTR returns text, and neither its result nor the number 2026 has the affinity of a column, so SQLite converts neither of them and compares text with a number, which are never equal. With the quotes, the same condition finds every open work order. The empty result in Step 5 was a finding, but this one is a logical error, and knowing what the result should be is how you tell the two apart.
 
 **Checkpoint.** Check that:
 
@@ -142,4 +142,4 @@ The condition in item a returns no rows, although every open work order was rele
 - `ClosedDate IS NULL` finds the open work orders, and `ClosedDate = NULL` finds none;
 - `SUBSTR(WorkOrderNumber, 4, 4) = 2026` finds no rows, while `= '2026'` finds every open work order.
 
-You have separated the variance postings from the entry that closes the account, and you have confirmed that the variance records add up. The postings are ready to be analyzed. The open work orders, all released during fiscal 2026, show that the variance of the year is complete only for the work orders that closed during it.
+You have separated the variance postings from the entry that closes the account, and you have confirmed that the variance records add up. The postings are ready to be analyzed. The open work orders, all released during fiscal 2026, show that the variance of the year covers only the work orders that closed during it.

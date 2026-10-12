@@ -196,7 +196,7 @@ def t2(d, claim):
     claim(abs(budget(accounts=("6130",)) - actual(accounts=("6130",))) < 0.005,
           "depreciation recorded equals depreciation budgeted, so the classification effects total zero")
     monthly_rates = {round(100 * rate([m]), 4) for m in year}
-    claim(len(monthly_rates) == 1, "the commission rate is the same in every month")
+    claim(len(monthly_rates) == 1, "the commission rate is the same in every month to four decimals of a percent")
     blank = next(c for c in centers if c["name"] == "(Blank)")
     flexed_total = flexed(year)
     opex, actual_total = budget(), actual()
@@ -209,6 +209,9 @@ def t2(d, claim):
     turns = sorted({m - 1 for m in above if m > 1} | set(above) | {12})     # where the year-to-date column turns
     commission_budget = budget(None, None, ("6290",))
     product_total = sum(product.values())
+    monthly_com = sum(rate([m]) * product.get(m, 0.0) for m in year)
+    claim(abs(ytd[-1] - (actual_total - flexed_total)) < 0.01,
+          "the running sum of the monthly variances ends within a cent of the year's remaining variance")
     return dict(rev=sum(r[6] for r in revenue), rev_lines=len(revenue), rev_cc=revenue[0][1],
                 cogs=sum(r[6] for r in cogs), cogs_cc=cogs[0][1],
                 opex_cat=sum(r[6] for r in bud if r[4] == "Operating Expense"),
@@ -226,6 +229,7 @@ def t2(d, claim):
                 frm=dict(name=frm["name"], remaining=frm["remaining"], pct=frm["remaining"] / frm["flexed"]),
                 blank=blank["remaining"], remaining=actual_total - flexed_total, flexed_total=flexed_total,
                 months=list(zip([m[:3] for m in MONTHS], by_month)), ytd=ytd, above=[MONTHS[m - 1] for m in above],
+                monthly_com=monthly_com, com_gap=rate(year) * product_total - monthly_com,
                 turns=[(MONTHS[m - 1], ytd[m - 1]) for m in turns])
 
 
@@ -268,12 +272,15 @@ def t3(d, claim):
     claim(every_year == TITLES, "the job titles with manufacturing time in every year are the three of Step 11")
     claim(d.one("SELECT COUNT(*) FROM LaborTimeEntry WHERE substr(WorkDate, 1, 4) = ?", str(d.N)) == 0,
           "there are no time records in the year after the data, the last year of the Date table")
+    # Step 11c: the card's window at December is the current year, so a work center's direct hours over all output
+    wrong = named[0][1] / by_year(p, "standard", d.C)
+    claim(wrong < series[-1][1], "a work center selected in the bar chart would show a ratio below the plant's")
     return dict(rows=sum(n for _, n in types), types=[(t.replace(" Manufacturing", ""), n) for t, n in types],
                 last=p["last"], matched=matched, completions=completions, items=items, tests=tests, ttm=series,
                 visual=[v for _, v in visual], centers=named, blank=blank,
                 titles=[(t, shares[(t, d.F)], shares[(t, d.C)]) for t in TITLES],
                 plant=[by_year(p, "overtime", y) / by_year(p, "hours", y) for y in d.years],
-                card=series[-1][1], first=tests[0]["ratio"])
+                card=series[-1][1], first=tests[0]["ratio"], top_center=named[0][0], wrong=wrong)
 
 
 # --- Exercise 15.1 --------------------------------------------------------------------------------
@@ -411,7 +418,8 @@ def ex4(d, claim):
     # The Part II case's finding, which the recommendation rests on.
     claim(all(abs(v["z"]) < 2 for v in volume(d)), "no promotion's months show an unusual increase in volume")
     gap = lifts[0][1] - max(measured)
-    return dict(id=pid, units=m["units"], price=m["price"], cost=m["cost"], lifts=lifts,
+    claim(all(round(100 * x) <= 20 for x in DISCOUNTS), "the exercise's discounts lie on the parameter's range, 0 to 20")
+    return dict(id=pid, units=m["units"], price=m["price"], cost=m["cost"], lifts=lifts, steps=len(range(0, 21)),
                 low=min(measured), high=max(measured),
                 five="about" if abs(gap) < 0.01 else "more than" if gap > 0 else "less than")
 
@@ -476,9 +484,17 @@ def ex6(d, claim):
         if r[2] == "Indirect Manufacturing" and r[0] == str(d.C):
             indirect[r[5]] = indirect.get(r[5], 0.0) + r[3]
     claim(None not in indirect, "the time clock places every indirect line at a work center")
-    direct = sum(1 for r in rows if r[2] == "Direct Manufacturing" and r[0] == str(d.C))
+    direct_rows = [r for r in rows if r[2] == "Direct Manufacturing" and r[0] == str(d.C)]
+    direct = len(direct_rows)
+    late_direct = sum(1 for r in direct_rows if r[6] and r[1] > r[6])
+    untested = sum(1 for r in direct_rows if not r[6])
+    claim(untested == sum(1 for r in direct_rows if not r[7]),
+          "the only direct lines that cannot be tested against an end date are the lines without an operation")
+    claim(direct - untested == len(now) and late_direct == late_all,
+          "every direct line with an operation also has a clock entry, so the two denominators differ only by those lines")
     return dict(both=len(both), years=years, total=sum(y["differ"] for y in years), m=matrix,
                 late_differ=late_differ, differ=len(differ), late_all=late_all, now=len(now), direct=direct,
+                late_direct=late_direct, untested=untested,
                 indirect=sorted(((short(n), v) for n, v in indirect.items()), key=lambda nv: -nv[1]))
 
 

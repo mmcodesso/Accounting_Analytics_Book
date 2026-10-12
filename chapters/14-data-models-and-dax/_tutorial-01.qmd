@@ -64,7 +64,7 @@ If a relationship window opens for a drag, check that it reads many to one, with
 a. On the **Sales and Discounts** page, replace the fields of the year slicer, the line chart's axis, and the matrix's columns.
 b. On the **Validation** page, replace FiscalYear in the table of totals.
 c. On the **Review** page, replace the fields and the visual filters of the four charts.
-d. Set the year slicer on Sales and Discounts back to 2026, and the Review page's visual filters to 2026.
+d. Set the year slicer on Sales and Discounts back to 2026, and the visual filters of the Review page's three monthly charts back to 2026. The chart of revenue by fiscal year has no visual filter and keeps all three years.
 
 | Field from SalesInvoice | Replace with, from Date |
 |----------------------|----------------------|
@@ -97,7 +97,7 @@ a. Open the **Validation** page.
 b. Compare each row of the table of totals with the values you recorded in Tutorial 13.1.
 c. Save the report.
 
-Every year's line count, line total, list amount, and discounts should be unchanged, which proves that the restructuring lost no invoice line and moved none to another year. @fig-14-01 compares the model before and after.
+Every year's line count, line total, list amount, and discounts should be unchanged. With the merge of Step 1, which matched every line to its invoice, that is good evidence that the restructuring lost no invoice line and moved none to another year, although equal totals alone could hide changes that offset, as Tutorial 4.1, Step 10 showed. @fig-14-01 compares the model before and after.
 
 
 

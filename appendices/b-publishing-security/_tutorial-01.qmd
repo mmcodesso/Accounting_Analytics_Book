@@ -114,7 +114,7 @@ The Warehouse Manager sees the Warehouse budget and an income statement that is 
 
 **Step 9. Tell readers what they are seeing.**
 
-a. Add the two measures below to the Key Measures table.
+a. Add the two measures below to the Key Measures table, each with a description, as Tutorial 15.3 gave every measure one.
 b. Add a card of Cost Centers Shown to the Budget page and the Income Statement page, titled `Cost centers shown`.
 c. Add a card of Who Am I to the About page.
 

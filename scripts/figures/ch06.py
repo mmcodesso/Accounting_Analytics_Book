@@ -182,7 +182,7 @@ def fig_06_histogram() -> Diagram:
     for i, n in enumerate(counts):
         x = left + i * slot
         d.box("", x, y_of(n), slot, y_of(0) - y_of(n), fill=BLUE, stroke=WHITE, rounded=False)
-    for i in range(0, len(counts), 3):
+    for i in range(0, len(counts) - 1, 3):      # the last bin, open-ended, is labeled 15k+ below
         label = "0" if i == 0 else f"{bounds[i] // 1000}k"
         d.text(label, left + i * slot - 10, top + height + 4, slot + 20, 20, size=SMALL, align="center")
     d.text("15k+", left + (len(counts) - 1) * slot - 10, top + height + 4, slot + 20, 20, size=SMALL,

@@ -99,7 +99,7 @@ Before relying on a statistic, look at the rows it summarizes. Tutorial 6.1 char
 
 - SUMIFS, COUNTIFS, AVERAGEIFS, MINIFS and MAXIFS share one pattern of criteria
 - Keep criteria in cells: a column of groups, a named ReportYear
-- A misspelled criterion returns zero, and a typed list can leave a category out
+- A misspelled criterion returns zero (AVERAGEIFS #DIV/0!); a typed list can omit a category
 - A control total of the whole population must equal the sum of the parts
 
 ::: {.notes}
@@ -113,7 +113,7 @@ What does each situation call for?
 1. Reporting the size of a typical invoice line
 2. The median of one year's lines
 3. A SUMIFS by item group that returns zero for one group
-4. Proving that a summary by group misses nothing
+4. Testing that a summary by group covers the whole population
 
 ::: {.notes}
 Ask students what would go wrong if they used the obvious alternative in each case.
@@ -127,7 +127,7 @@ Ask students what would go wrong if they used the obvious alternative in each ca
 4. A control total whose difference from the parts is zero
 
 ::: {.notes}
-The third and fourth are the same lesson from two sides: conditional totals fail silently, so a summary needs an independent total to prove it complete.
+The third and fourth are the same lesson from two sides: conditional totals fail silently, so a summary needs an independent total to show that its parts add up to the whole population.
 :::
 
 # Charting Descriptive Results
@@ -162,7 +162,7 @@ The histogram is the chart that shows the right skew of the invoice lines. Tutor
 The bar's length represents its value, which is why the axis starts at zero. The bridge in Tutorial 6.3 truncates its axis so that the small effects are visible, and its note says so.
 :::
 
-# Guided Tutorial 6.1: Profiling Fiscal 2026 and Proving the Total
+# Guided Tutorial 6.1: Profiling Fiscal 2026 and Checking the Total
 
 ## Steps 1 to 5: parameters and measures
 
@@ -222,7 +222,7 @@ Insert a PivotTable from an Excel Table, so it covers every row the next refresh
 - A PivotTable summarizes a copy, so refresh it; GETPIVOTDATA references it safely
 
 ::: {.notes}
-Date grouping follows the calendar and fails on a single text date, while period columns stay consistent with every other analysis. GETPIVOTDATA identifies a value by its field and items, not its cell, so it survives layout changes, and one slicer can control several PivotTables.
+Date grouping follows the calendar and fails on a single text date, while period columns stay consistent with every other analysis. GETPIVOTDATA identifies a value by its field and items, not its cell, so it survives layout changes, though not a change of the PivotTable's filters, and one slicer can control several PivotTables.
 :::
 
 ## A calculated field works on totals
@@ -347,10 +347,10 @@ SUMIFS on AccountSubType builds each line, with the sign reversed for revenue, a
 - The ledger already holds supplier payments of the next fiscal year
 - Without a date filter, a trial balance would mix two years
 - Filter by posting date before you group
-- Equal debits and credits show balance, not completeness: compare an independent figure
+- Equal debits and credits, and the closing entry, test totals, not completeness
 
 ::: {.notes}
-The closing entry is that independent figure here. Exercise 6.1 builds both the trial balance and the statements.
+The closing entry independently checks net income, but an entry missing from the extract that balances, such as the payment of a payable, would pass both checks; only evidence from outside the extract would reveal it. Exercise 6.1 builds both the trial balance and the statements.
 :::
 
 # From Description to Diagnosis
@@ -419,7 +419,7 @@ Only the promotions effect is large for Furniture, as Tutorial 6.3 shows; the ot
 Students add the list amount and the discount to InvoiceLines, build a driver PivotTable of Furniture totals for the two quarters with per-unit calculated fields, calculate the bridge, chart it, and drill into the discounts by promotion.
 :::
 
-## Promotions explain the whole decline
+## Promotions account for the whole decline
 
 {{< book-figure fig-06-09 >}}
 
@@ -440,7 +440,7 @@ The Furniture Seasonal Promotion priced orders placed in September and October, 
 {{< book-checkpoint 6.3 lead="true" >}}
 
 ::: {.notes}
-The controller now has her answer, and it is one she can check. The margin before discounts did not fall, which confirms that discounts, not prices or costs, explain the decline.
+The controller now has her answer, and it is one she can check. The margin before discounts did not fall, so the larger discounts more than offset everything else; the bridge measures the other effects, which are small.
 :::
 
 # Interpreting and Communicating Results

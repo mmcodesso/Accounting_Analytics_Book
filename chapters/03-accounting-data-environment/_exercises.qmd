@@ -96,7 +96,7 @@
 
 **Requirements.**
 
-(1) For the revenue completeness test, identify the table group and tables you would use. Explain which table contains the population of revenue transactions and which related tables you would need to join to verify that each transaction includes a valid customer, a valid item, and an amount. State the keys that connect the tables. Explain how you would use the SourceDocumentType column in GLEntry to confirm that every sales invoice generated corresponding ledger entries.
+(1) For the revenue completeness test, identify the table group and tables you would use. Explain which table contains the population of revenue transactions and which related tables you would need to join to verify that each transaction includes a valid customer, a valid item, and an amount. State the keys that connect the tables. Explain how you would use the SourceDocumentType column in GLEntry to confirm that every sales invoice generated corresponding ledger entries, why that posting test does not by itself show that every sale was invoiced, and which table would supply an independent population to test that.
 
 (2) For the purchasing cycle test, identify the table group and tables you would use. The test requires three-way matching by comparing the quantity and unit cost across PurchaseOrderLine, GoodsReceiptLine, and PurchaseInvoiceLine. Identify the foreign keys that link these three tables and note any gaps in the available data, such as a value that one of the three tables does not record.
 
@@ -117,7 +117,7 @@
 
 (1) Using the O2C and Accounting Core ER diagrams, identify at least six foreign key relationships to test. List each relationship by specifying the child table, the foreign key column, the parent table, and the primary key column. Include at least one cross-group relationship, such as SalesOrderLine.ItemID referencing Item.ItemID.
 
-(2) For each relationship, test whether every foreign key value in the child table exists as a primary key value in the parent table. For small tables, use XLOOKUP or COUNTIFS on each row. For the GLEntry table, which holds hundreds of thousands of rows, first build a PivotTable of the distinct AccountID values and test that short list against the Account table, as in Tutorial 2.2. Record the number of orphaned references, if any, for each relationship.
+(2) For each relationship, test whether every foreign key value that is filled in exists as a primary key value in the parent table. Count the blank values separately, and decide for each relationship whether a blank is allowed, as it is for an invoice line that bills a design service and has no shipment line. For small tables, use XLOOKUP or COUNTIFS on each row. For the GLEntry table, which holds hundreds of thousands of rows, first build a PivotTable of the distinct AccountID values and test that short list against the Account table, as in Tutorial 2.2. Record the number of orphaned references, if any, for each relationship.
 
 (3) Pay particular attention to the relationships between SalesOrder and Customer, between SalesOrderLine and Item, and between GLEntry and Account. For any orphaned references you find, record the specific foreign key values that have no match and the number of records affected.
 

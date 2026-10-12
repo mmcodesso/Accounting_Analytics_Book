@@ -15,7 +15,7 @@ d. On the **Error Alert** tab, choose the **Stop** style and type a short explan
 e. Type `1.5` in B3 to test the rule.
 f. When Excel displays the alert, click **Cancel** so that 0.9 remains.
 
-Excel refuses the entry and shows your explanation, so the parameter can only hold a sensible share. Selecting B3 now also displays the input message, which tells the next user what the cell expects.
+Excel refuses the entry and shows your explanation. The rule blocks an out-of-range value typed into the cell, the mistake it is there to catch, although, as the section on data validation explains, it cannot stop a value pasted into the cell. Selecting B3 now also displays the input message, which tells the next user what the cell expects.
 
 **Step 2. Highlight every line with a promotional discount.** A formula rule can shade an entire row based on the value in one of its columns.
 
@@ -89,7 +89,7 @@ a. In column B, beside each label, enter the information for your workbook:
    - Calculated columns: ListAmount and DiscountAmount on the SalesInvoiceLine Table, with their formulas.
    - Worksheets: each worksheet in the workbook and what it contains.
    - Conventions: blue font marks input cells; black font marks formulas.
-   - Prepared by: your name and today's date. Reviewed by: left blank for the reviewer.
+   - Prepared by: your name and today's date. Reviewed by: left blank until the workbook is reviewed, when the reviewer adds a name and the date of the review.
    - Open questions: Promotion 8, the Furniture Seasonal Promotion (10 percent, September 1 to October 31, 2026), has the most promotion lines and the most discount dollars, and its dates straddle the two quarters under review. Its effect on Furniture prices in each quarter cannot yet be measured, because the invoice lines carry no invoice date or item group.
 
 b. Open **Formulas > Name Manager** and read the list of names.
@@ -103,7 +103,7 @@ The Name Manager lists your two named cells alongside the four Tables, and it ma
 a. Arrange the worksheet tabs in the order of the layers in @fig-04-07: Documentation first, then the four data worksheets, then Parameters and Analysis.
 b. Choose **Data > Refresh All** one more time, and check that the calculated columns and the highlighting are still in place.
 c. Update the Last refreshed date on the Documentation worksheet.
-d. Save the workbook.
+d. With the Documentation worksheet still selected, save the workbook. Excel opens a workbook on the worksheet that was selected when it was saved.
 
 The workbook now opens on its own explanation, and a refresh repeats every query step without disturbing the formulas, formats, or documentation built on top of the data.
 

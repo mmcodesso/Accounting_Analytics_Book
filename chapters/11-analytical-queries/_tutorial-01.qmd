@@ -98,7 +98,7 @@ a. Type and run the query below.
 
 b. Compare LastWorkDate with MonthEnd, and read DaysNotRecorded.
 
-The time records end nearly three weeks before the end of December 2026. The measure of Tutorial 11.3 therefore counts the output only up to the same day, as Tutorial 10.3 did, so that its last month compares hours and output over the same days.
+The time records end nearly three weeks before the end of December 2026. The measure of Tutorial 11.3 therefore counts the output only up to the same day, as Tutorial 10.3 did, so that its last month compares hours and output up to the same last day. That day does not show that every kind of time is complete up to it: indirect time ends a week earlier, on 4 December 2026, as Tutorial 10.3 noted.
 
 **Step 4. Compare the overtime share of each kind of labor.** Hours rise and fall with the number of working days in a month, but shares of the total can be compared from month to month. Each share divides one conditional sum by another.
 

@@ -565,8 +565,9 @@ The Services items are design services whose StandardCost is zero, because their
 which posts to operating expense rather than to inventory (Chapter 6); their unit margin therefore equals their price.
 The measure is a gross margin at list price, not a contribution margin: for the {v['manufactured']} manufactured items
 StandardCost includes fixed overhead, which does not vary with one more unit (the {v['purchased']} purchased finished
-goods carry none), and for every item it leaves out variable selling costs such as commissions, freight, and
-discounts. List price is also not the price charged, since price lists, overrides, and promotions lower it. For a
+goods carry none), and for every item it leaves out the discounts, which lower the price actually charged, and
+variable selling costs such as commissions and outbound freight. List price is also not the price charged, since
+price lists, overrides, and promotions lower it. For a
 pricing or product-mix decision, the product manager should use the variable cost and the net price.""")
 
 
@@ -671,12 +672,13 @@ time by work date; the payroll year of Chapter 10 gives {v['payroll']:,.0f}). Th
 almost straight line, which is what an even spread looks like; a concentrated pattern would reach half within a
 handful of names.
 
-By job title: {by_title}. The averages are nearly the same, about {v['weekly']} hours a week for every employee.
+By job title: {by_title}. The averages are nearly the same, about {v['weekly']} hours for every week of the year (the
+year's total divided by 52) for every employee who recorded overtime.
 
-The plant manager's claim is not supported: overtime is plant-wide, not the habit of a few people. It points to a
-plant-level cause, such as the surge days and the hours paid beyond the work that Chapter 12 examines, rather than
-to individual scheduling, so the response should address how much overtime the plant plans and approves, not who
-works it.""")
+The plant manager's claim is not supported by these totals: recorded overtime is spread across the plant's hourly
+employees rather than held by a few people. The totals do not show the cause. Before naming one, examine staffing
+and demand, how overtime is approved, and how time is captured; Chapter 12 tests the surge days and the hours paid
+beyond the work.""")
 
 
 # --- Exercise 11.5 ---------------------------------------------------------------------------------------------------
@@ -782,11 +784,12 @@ The SQL tests give the counts of Tutorial 8.3 on all {v['entries']} journal entr
 time-stamped CreatedDate (strftime and date take the date part), and RoundAmount compares the amount with its value
 rounded to thousands, because the % operator truncates decimals in SQLite and is not safe on amounts.""")
     s.answer("Requirement (5)", """\
-A saved query is stronger evidence than a formula copied down a column because it is one definition applied to the
-whole population: it cannot skip rows, be overwritten in a single cell, or be left behind when new entries are
-added, and anyone can rerun it on the same file and get the same result. Its text documents exactly how each flag is
-calculated, so a reviewer can inspect the test itself rather than sample the cells, and next year's entries are
-tested by running the view again, without rebuilding a workbook.""")
+A saved query applies one inspectable definition to the population it reads, which avoids the cell-by-cell copying
+errors of a formula filled down a column, and a reviewer can read how each flag is calculated rather than sample the
+cells. Performing it again needs the same source snapshot, query, and parameters, and the query still depends on the
+completeness of the source and on its own logic, which must be tested. So keep its output, row counts, and
+reconciliations with the workpaper: the view alone is not a fixed audit record, because it runs on whatever data the
+file holds.""")
 
 
 # --- Exercise 11.6 ---------------------------------------------------------------------------------------------------
@@ -904,8 +907,9 @@ ORDER BY r.MiddleID;""",
 To: the audit senior. Subject: requisitions just under the approval limit.
 
 Counting requisitions in $50 bands from $4,700 to $5,250 gives {', '.join(str(n) for n in v['bands'])}: the band
-from $4,950.00 to $4,999.99 holds {v['bands'][5]}, {'twice as many as' if v['twice'] else 'more than'} its
-neighbors, just below the lowest nonzero approval limit of $5,000. LAG and LEAD find two runs of three consecutive
+from $4,950.00 to $4,999.99 holds {v['bands'][5]}, against {v['bands'][4]} just below it and {v['bands'][6]} just
+above{', at least twice either neighbor' if v['twice'] else ''}, just below the lowest nonzero approval limit of
+$5,000. LAG and LEAD find two runs of three consecutive
 requisitions for the same amount, {money(v['amount'])}, each on January 1: {runs}. In each run two requisitions have
 no approver and the third was approved by the {cfo_title.lower()}; all six were converted to purchase orders. The
 unapproved ones are among the six requisitions without an approver of Exercise 2.5, and all six of those fall just

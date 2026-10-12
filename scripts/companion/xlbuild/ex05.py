@@ -58,9 +58,7 @@ PRODUCT_TYPES = [("BKC", "Bookcase"), ("BNH", "Bench"), ("CON", "Console table")
 PLURAL = dict(BKC="bookcases", BNH="benches", CON="consoles", CTB="coffee tables", DSK="desks", NGT="nightstands",
               SDB="sideboards", TBL="dining tables")
 SHARE_THRESHOLD = 0.02                      # Exercise 5.3 (3): more than two percentage points
-SUPPLIER_COLUMNS = ["SupplierID", "SupplierName", "Address", "City", "State", "PostalCode", "Country", "IsApproved",
-                    "TaxID", "BankAccount", "SupplierRiskRating"]      # in the Table's order (Choose Columns keeps it)
-EMPLOYEE_COLUMNS = ["EmployeeID", "EmployeeName", "JobTitle", "Address", "City", "State"]
+EMPLOYEE_COLUMNS = ["EmployeeID", "EmployeeName", "JobTitle", "Address", "City"]   # Exercise 5.5 (1); Supplier keeps all
 
 
 # --- small helpers ---------------------------------------------------------------------------------------------------
@@ -437,9 +435,9 @@ def ex5_1(b: ExerciseBuild) -> None:
     ws.Range("F4").Value = "Total"
     ws.Range("B4:F4").Font.Bold = True
     ws.Range("B4:F4").HorizontalAlignment = -4152
-    labels = {5: "Gross Furniture revenue (InvoiceLines)", 6: "Furniture credit memo lines",
+    labels = {5: "Furniture revenue billed (InvoiceLines, after line discounts)", 6: "Furniture credit memo lines",
               7: "Net Furniture revenue", 9: "Furniture credit memo lines (count)",
-              10: "Credits as a share of gross revenue"}
+              10: "Credits as a share of revenue billed"}
     for r, label in labels.items():
         ws.Cells(r, 1).Value = label
     for col in "BCDE":
@@ -501,13 +499,13 @@ def ex5_1(b: ExerciseBuild) -> None:
         "quarter of the credit memo: that is how the ledger records it, and it leaves the closed periods of the earlier "
         "year unchanged. Assigning credits to the original invoice's quarter measures the net sale more precisely, but "
         "it restates periods already closed; either is defensible if the schedule says which it uses. Here the choice "
-        f"moves only {moved:,.2f} out of {q1}. The credits are small (at most {share:.1%} of gross Furniture revenue in "
+        f"moves only {moved:,.2f} out of {q1}. The credits are small (at most {share:.1%} of the Furniture revenue billed in "
         f"any quarter) and do not explain the change between {q3} and {q4}: net revenue falls by "
-        f"{net[q3] - net[q4]:,.2f}, against {gross[q3] - gross[q4]:,.2f} gross.")
+        f"{net[q3] - net[q4]:,.2f}, against {gross[q3] - gross[q4]:,.2f} billed.")
     model_answer(ws, top + n + 2, "Model answer, requirement (4)", answer, last="F")
 
     for col, p in zip("BCDE", periods):
-        b.check(e, f"gross Furniture revenue {p} (Ex 5.1!{col}5)", round(gross[p], 2), f"='Ex 5.1'!{col}5")
+        b.check(e, f"Furniture revenue billed {p} (Ex 5.1!{col}5)", round(gross[p], 2), f"='Ex 5.1'!{col}5")
         b.check(e, f"Furniture credit memo lines {p} (Ex 5.1!{col}6)", round(credits[p][1], 2), f"='Ex 5.1'!{col}6")
         b.check(e, f"net Furniture revenue {p} (Ex 5.1!{col}7)", round(net[p], 2), f"='Ex 5.1'!{col}7")
         b.check(e, f"Furniture credit memo line count {p} (Ex 5.1!{col}9)", credits[p][0], f"='Ex 5.1'!{col}9", 0, COUNT)
@@ -596,8 +594,9 @@ def ex5_2(b: ExerciseBuild) -> None:
         f"{long_date(min(r['date'] for r in o), False)} to {long_date(max(r['date'] for r in o))}, a day before their orders). "
         f"Together they are exactly the {word(len(f['tutorial21']))} invoices Tutorial 2.1 found dated before their first "
         "shipment. The three findings point the same way: these invoices are dated earlier than the events they record. "
-        f"The {word(len(p))} were numbered in the next year's sequence but dated in the year before, which suggests they "
-        "were created after the year began and backdated into the earlier period, a revenue cutoff risk; the "
+        f"The {word(len(p))} were numbered in the next year's sequence but dated in the year before, which is consistent "
+        "with invoices created after the year began and dated back into the earlier period, a revenue cutoff risk, "
+        "although neither test shows who dated them or why; the "
         f"{word(len(o))} are dated before the order was even placed. Sales order numbers always carry the year of their "
         "date, so the problem lies with how these invoices were dated, not with the numbering.")
     memo = (
@@ -607,8 +606,8 @@ def ex5_2(b: ExerciseBuild) -> None:
         f"November and December, numbered in the following year). Second, I compared each InvoiceDate with the "
         f"OrderDate of its sales order: {word(len(o))} invoices are dated before their order. These "
         f"{word(len(f['flagged']))} invoices are the same ones dated before their first shipment in the data-quality "
-        "review of Tutorial 2.1. The year in the invoice number is therefore reliable for every other invoice, but it "
-        "cannot replace a test of the dates for these.\n"
+        "review of Tutorial 2.1. For every other invoice the year in the number agrees with the InvoiceDate, but the "
+        "number cannot replace a test of the dates.\n"
         f"Effect on cutoff: the {word(len(p))} year-end invoices ({sum(r['subtotal'] for r in p):,.2f} of subtotal) "
         "are dated in one fiscal year and numbered in the next, and all of the flagged invoices are dated before their "
         "goods shipped, so their revenue may sit in the wrong period, whichever date the ledger follows. The amounts are "
@@ -699,7 +698,8 @@ def ex5_3(b: ExerciseBuild) -> None:
            if nh == 0 else f"{word(nh).capitalize()} product types moved by more than two points and are highlighted. ") +
         f"Quantities need care: {f['fractional'] / f['lines']:.0%} of these Furniture lines carry a fractional quantity, "
         "even for items sold by the unit, so the quantities are not counts of whole products. Revenue shares do not "
-        "depend on the quantity field, which makes them the more reliable measure of mix here.")
+        "depend on the quantity field, which makes them the more reliable measure of mix here, although they measure "
+        "the mix of dollars, which prices and discounts move as well as volume.")
     model_answer(ws, 19, "Model answer, requirement (4)", answer)
 
     for i, (code, name) in enumerate(PRODUCT_TYPES):
@@ -774,7 +774,7 @@ def ex5_4(b: ExerciseBuild) -> None:
         f"The median lag is {fmt(f['median'])} days and the average {f['mean']:.1f}. The average is higher because the "
         "distribution is skewed to the right: most orders are invoiced within a few weeks, but a minority take much "
         f"longer (the 90th percentile is {fmt(f['p90'])} days), and those long lags pull the average up while the median "
-        f"is unaffected. The lag is stable: in fiscal {y} the quarterly averages run from {min(means):.1f} to "
+        f"is unaffected. The lag is fairly stable: in fiscal {y} the quarterly averages run from {min(means):.1f} to "
         f"{max(means):.1f} days and the medians from {fmt(min(medians))} to {fmt(max(medians))}. "
         f"{word(f['negative']).capitalize()} invoices have a negative lag: they are dated before their order "
         "(Exercise 5.2).")
@@ -784,16 +784,18 @@ def ex5_4(b: ExerciseBuild) -> None:
     top = max(f["promotions"], key=lambda p: p["lines"])
     one_day_text = "a one-day promotion" if one_day == 1 else f"{word(one_day)} one-day promotions"
     memo = (
-        "Assign promotional revenue by invoice date. Revenue is earned and recorded when the goods are invoiced, so the "
-        "invoice date puts it in the right quarter and ties the analysis to the ledger. The order date explains the "
+        "Assign promotional revenue by invoice date. The ledger records revenue on the invoice, so for this analysis of "
+        "recorded revenue the invoice date assigns the quarter and ties the analysis to the ledger (whether that is "
+        "the right period depends on when the goods were delivered, which the invoice date alone does not show). "
+        "The order date explains the "
         "price: a promotional price is set when the order is placed, so promotion lines invoiced after a promotion ends "
         f"(for example {top['after']} of the {top['lines']} lines of {top['code']}) are not errors, and the order date "
-        "should be used only to attribute those discounts to the promotion that caused them. Because the lag is stable "
+        "should be used only to attribute those discounts to the promotion that caused them. Because the lag is fairly stable "
         "from quarter to quarter, the share of a promotion's orders invoiced in the following quarter is predictable "
         "rather than a distortion of the comparison. "
         f"Promotions {series(p['code'][-3:] for p in every)} have every line invoiced after the end date because "
-        f"their dates are wrong ({one_day_text} and {word(backwards)} whose end date precedes the start date), a "
-        "master-data problem left for the audit analytics chapter (Chapter 8).")
+        f"their recorded dates do not span their sales ({one_day_text} and {word(backwards)} whose end date precedes "
+        "the start date), a master-data question left for the audit analytics chapter (Chapter 8).")
     r = model_answer(ws, 21 + n, "Model answer, requirement (2)", answer2, last="G")
     model_answer(ws, r, "Model answer, requirement (4)", memo, last="G")
 
@@ -821,8 +823,7 @@ def ex5_5(b: ExerciseBuild) -> None:
     ws = new_sheet(b, "Ex 5.5")
     heading(ws, e)
     # (1) and (4): the three Tables (the exercise's "new workbook" is this file; see the cell note on A1)
-    load(b, "Supplier", "Supplier", "Ex 5.5 Supplier", ws,
-         extra=[("Removed Other Columns", select_in_order(SUPPLIER_COLUMNS))])
+    load(b, "Supplier", "Supplier", "Ex 5.5 Supplier", ws)        # every column, as requirement (1) asks
     load(b, "Employee", "Employee", "Ex 5.5 Employee", wb.Worksheets("Ex 5.5 Supplier"),
          extra=[("Removed Other Columns", select_in_order(EMPLOYEE_COLUMNS))])
     load(b, "DisbursementPayment", "DisbursementPayment", "Ex 5.5 DisbursementPayment", wb.Worksheets("Ex 5.5 Employee"))
@@ -847,9 +848,9 @@ def ex5_5(b: ExerciseBuild) -> None:
                   '[@SupplierID]),"")', MONEY)
     note(ws, "A1", "Exercise 5.5 asks for a new workbook. This solution keeps all six exercises in one file, so the "
                    "Supplier, Employee, and DisbursementPayment Tables are the worksheets Ex 5.5 Supplier, Ex 5.5 "
-                   "Employee, and Ex 5.5 DisbursementPayment. The Supplier query keeps the identifying and address "
-                   "columns and also IsApproved and SupplierRiskRating, which Exercise 5.6 uses; the Employee query "
-                   "also keeps JobTitle, which requirement (3) brings onto the Supplier Table.")
+                   "Employee, and Ex 5.5 DisbursementPayment. The Supplier query keeps every column, as requirement (1) "
+                   "asks, because Exercise 5.6 uses the same Table; the Employee query keeps the five columns the "
+                   "requirement names, including JobTitle, which requirement (3) brings onto the Supplier Table.")
 
     values(ws, {"A3": "Suppliers whose match key appears in the Employee Table",
                 "A4": "Matches on Address and City as recorded (without TRIM and UPPER)",
@@ -952,8 +953,8 @@ def ex5_6(b: ExerciseBuild) -> None:
     xl.add_column(lines, "BeforeLaunch", "=[@InvoiceDate]<[@LaunchDate]")
     xl.add_column(im, "PrelaunchLines", "=COUNTIFS(SalesInvoiceLine[ItemID],[@ItemID],SalesInvoiceLine[BeforeLaunch],TRUE)",
                   COUNT)
-    note(ws, "A1", "The supplier tests use the Supplier Table of Exercise 5.5 (worksheet Ex 5.5 Supplier), which kept "
-                   "IsApproved and SupplierRiskRating for this exercise. The shared-identifier counts compare values "
+    note(ws, "A1", "The supplier tests use the Supplier Table of Exercise 5.5 (worksheet Ex 5.5 Supplier), which keeps "
+                   "every column of the Supplier master file. The shared-identifier counts compare values "
                    "with = rather than COUNTIF, because the masked BankAccount values begin with asterisks, which "
                    "COUNTIF reads as wildcards.")
 
@@ -1064,7 +1065,8 @@ def ex5_6(b: ExerciseBuild) -> None:
         f"Supplier master: the names are consistently cased, and PROPER would damage {len(ch)} of {f['suppliers']}, so "
         "they were left unchanged. No TaxID or BankAccount is shared, so there are no duplicate suppliers on those keys. "
         f"{word(len(un)).capitalize()} suppliers are unapproved (IDs {un[0]['id']} to {un[-1]['id']}), and none has a "
-        "purchase order or a payment, so the approval control appears to work. "
+        "purchase order or a payment in the extract, which is consistent with an approval control that keeps them from "
+        "receiving business, although the extract alone cannot show how the control operates. "
         f"{word(len(hi)).capitalize()} suppliers are rated High risk (IDs {series(s['id'] for s in hi)}); "
         f"{word(len(hi_ok))} of them are approved and receiving business"
         + (f", and {series(s['id'] for s in hi_un)} is also unapproved" if hi_un else "") + ". "
@@ -1075,12 +1077,14 @@ def ex5_6(b: ExerciseBuild) -> None:
         f"{series(i for i, _ in f['conflict'])}: {series(c for _, c in f['conflict'])}), a status conflict that means the "
         f"two fields cannot both be right. {word(len(inactive)).capitalize()} inactive, Discontinued items were still "
         f"invoiced, through {long_date(latest[-1])} ({inactive_text}), "
-        f"so the inactive flag does not stop sales. {word(len(prelaunch)).capitalize()} items were invoiced before their "
+        f"although the master holds only current values, so whether each was already inactive when it was sold needs "
+        f"its status history. {word(len(prelaunch)).capitalize()} items were invoiced before their "
         f"LaunchDate ({prelaunch_text}; "
         f"{sum(p['lines'] for p in prelaunch)} lines and {sum(p['amount'] for p in prelaunch):,.2f} in all), so the "
         "launch dates are wrong or sales were recorded before launch. Together, the findings mean the status and launch "
-        "fields cannot be relied on to control sales; the item master needs a review of who maintains these fields, "
-        "and the sales tests should not use them to define their populations.")
+        "fields, as they stand, are not evidence that sales of inactive or unlaunched items are blocked; the item "
+        "master needs a review of who maintains these fields, and the sales tests should not use them to define "
+        "their populations.")
     r = p0 + np_ + 2
     r = model_answer(ws, r, "Model answer, requirement (1)", answer1, last="H")
     r = model_answer(ws, r, "Model answer, requirement (2)", answer2, last="H")

@@ -15,7 +15,7 @@ d. In the Account query, use **Home > Choose Columns** to keep AccountID, Accoun
 e. In the BudgetLine query, filter FiscalYear to 2026, and clear **Balance Sheet** in the filter list of BudgetCategory, so that the query keeps the revenue, cost of goods sold, and operating-expense lines.
 f. Merge BudgetLine with **Item** on ItemID, with a left outer join, and expand ItemGroup without the prefix.
 g. Merge BudgetLine with **Account** on AccountID, with a left outer join, and expand AccountNumber and AccountName without the prefix.
-h. Choose **Home > Close & Load**, and rename the two new worksheets `BudgetLine` and `Account`.
+h. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New worksheet**, and click **OK**. The choice applies to both new queries, as in Tutorial 4.1, Step 7, so Power Query loads BudgetLine and Account into two new worksheets as Tables. Rename the worksheets `BudgetLine` and `Account`.
 
 The BudgetLine Table now holds the 2026 budget, one row for each account and month, and for revenue and cost of goods sold, for each item, with the item group and the account number beside each row. The operating-expense rows have no item, so their ItemGroup is blank.
 
@@ -25,27 +25,28 @@ a. Choose **Data > Get Data > Launch Power Query Editor** to reopen the editor.
 b. In the **Queries** pane, right-click **BudgetLine**, choose **Reference**, and name the new query `PlannedPrices`.
 c. Filter BudgetCategory to Revenue, and use **Home > Choose Columns** to keep FiscalYear, Month, ItemID, and UnitAmount.
 d. Rename UnitAmount to `PlannedPrice`.
-e. Right-click **PlannedPrices** in the **Queries** pane, and clear **Enable Load**, so that the query is used only inside other queries.
+e. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection**, and click **OK**, so that the query is used only inside other queries.
 
-PlannedPrices lists one price for each item and month of 2026. Because its load is disabled, it will not add a worksheet to the workbook.
+PlannedPrices lists one price for each item and month of 2026. Because it is only a connection, it adds no worksheet to the workbook, and the **Queries & Connections** pane shows it as **Connection only**.
 
 **Step 3. Price the 2026 invoice lines at the planned prices.** Merging on the year, the month, and the item adds one planned price to each invoice line without adding rows.
 
-a. Right-click **InvoiceLines**, choose **Reference**, and name the new query `FlexLines`.
-b. Filter FiscalYear to 2026, and filter ItemGroup to exclude Services, which the budget does not plan.
-c. Choose **Add Column > Custom Column**, and add a column `Month` with the formula `Date.Month([InvoiceDate])`.
-d. Set the type of Month to **Whole Number**, the type of Month in PlannedPrices, so that the two columns can be matched.
-e. Choose **Home > Merge Queries**. In FlexLines, hold Ctrl and click FiscalYear, Month, and ItemID, in that order.
-f. Choose **PlannedPrices** in the lower list, click its FiscalYear, Month, and ItemID in the same order, keep **Left Outer**, and click **OK**.
-g. Expand PlannedPrice, without the prefix.
-h. Add a custom column `FlexRevenue` with the formula below. Power Query's `if`, `then`, and `else` work like Excel's IF: it returns the value after `then` when the condition is true and the value after `else` otherwise.
+a. Choose **Data > Get Data > Launch Power Query Editor** to reopen the editor.
+b. Right-click **InvoiceLines** in the **Queries** pane, choose **Reference**, and name the new query `FlexLines`.
+c. Filter FiscalYear to 2026, and filter ItemGroup to exclude Services, which the budget does not plan.
+d. Choose **Add Column > Custom Column**, and add a column `Month` with the formula `Date.Month([InvoiceDate])`.
+e. Set the type of Month to **Whole Number**, the type of Month in PlannedPrices, so that the two columns can be matched.
+f. Choose **Home > Merge Queries**. In FlexLines, hold Ctrl and click FiscalYear, Month, and ItemID, in that order.
+g. Choose **PlannedPrices** in the lower list, click its FiscalYear, Month, and ItemID in the same order, keep **Left Outer**, and click **OK**.
+h. Expand PlannedPrice, without the prefix.
+i. Add a custom column `FlexRevenue` with the formula below. Power Query's `if`, `then`, and `else` work like Excel's IF: it returns the value after `then` when the condition is true and the value after `else` otherwise.
 
    ```
    if [PlannedPrice] = null then [LineTotal] else [Quantity] * [PlannedPrice]
    ```
 
-i. Set the type of PlannedPrice and FlexRevenue to **Decimal Number**.
-j. Choose **Home > Close & Load**, and rename the new worksheet `FlexLines`.
+j. Set the type of PlannedPrice and FlexRevenue to **Decimal Number**.
+k. Choose **Home > Close & Load**, and rename the new worksheet `FlexLines`.
 
 FlexRevenue is what each line would have been billed at the budget's price. A few lines have no planned price, because their seasonal item was launched in the month it was first sold, and the budget did not plan sales that month. For those lines, FlexRevenue keeps the actual amount, so they create no price variance.
 
@@ -87,7 +88,7 @@ b. In B14, enter `=B12-B9`, the flexible-budget variance.
 c. Copy B13:B14 to C13:E14, and copy F12 to F13:F14.
 d. Check that, in every column, the static margin in row 6 plus the two variances in rows 13 and 14 equals the actual margin in row 12.
 
-The sales-volume variance dwarfs everything else in the report. Compare rows 17 and 18: the budget planned for several times the units that each product line sold. That variance measures the forecast behind the budget, not how the business was run, and it is the reason to judge 2026 against the flexible budget instead. Against the flexible budget, every product line earned less than planned on the units it sold, by a few percent of revenue.
+The sales-volume variance dwarfs everything else in the report. Compare rows 17 and 18: the budget planned for several times the units that each product line sold. A gap that large says more about the forecast behind the budget than about how the business was run, so the static budget is a poor measure of 2026's performance, and the reason to judge 2026 against the flexible budget instead. Against the flexible budget, every product line earned less than planned on the units it sold, by a few percent of revenue.
 
 **Step 6. Split the price variance.**
 
@@ -134,7 +135,7 @@ e. Filter VoucherNumber to exclude JE-2026-000296, the 2026 year-end closing ent
 f. Add a custom column `Amount` with the formula `[Debit] - [Credit]`.
 g. Choose **Home > Close & Load**, and rename the new worksheet `GLOpex`.
 
-GLOpex holds the 2026 postings to the operating-expense accounts without the closing entry, so the Amount of each account adds up to its expense for the year.
+GLOpex holds the 2026 postings to the accounts numbered 6000 to 7999 without the closing entry, so the Amount of each account adds up to its total for the year. The range holds the operating expenses and, at its end, the other income and expense accounts, such as interest expense.
 
 **Step 9. Compare the operating expenses with their budget.** The formulas below spill: each returns a list of values, which fills the cells below it. A reference such as `A5#` means the whole list that spills from A5, however long it is.
 
@@ -155,7 +156,7 @@ c. In B5, C5, and D5, enter these three formulas: the account name, the budget, 
 
 d. In E5, enter `=D5#-C5#`, the variance of each account.
 
-Most accounts are within a few percent of their budget, and several match it exactly. Two stand out, and both are under budget: Payroll Taxes and Benefits, and Sales Commission Expense.
+Most accounts are within a few percent of their budget, and several match it exactly. The list ends with 7030, Interest Expense, which the budget files under Operating Expense, although the income statement of Chapter 6 places interest below operating income, with the other income and expense. Two accounts stand out, and both are under budget: Payroll Taxes and Benefits, and Sales Commission Expense.
 
 **Step 10. Test the drivers of the two exceptions.** Each of the two budgets was calculated from a driver, and testing the driver shows whether the difference is a saving or a wrong assumption.
 
@@ -181,13 +182,13 @@ d. In H7, enter the budgeted commission rate, the commission budget divided by t
 e. In H8, enter `=H7*BudgetReport!F10`, the commission budget flexed to the actual revenue of the product lines.
 f. In H9, enter `=SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],6290)`.
 
-The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 reflects a rate assumption, not a saving in spending. The commission variance is mostly volume: flexed to the actual revenue, the commission budget comes within about a tenth of what Charles River paid. The rest of the difference comes from the rate, because the mix of customer segments determines the commission rate earned. The actual expense also includes the commissions on design services, which the budget did not plan, so on product sales alone the actual rate was lower still.
+The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 comes from the rate, not from the salaries it applies to; why the actual rate was lower is a question for the payroll team before anyone calls the difference a saving. The commission variance is mostly volume: flexed to the actual revenue, the commission budget comes within about a tenth of what Charles River paid. The rest of the difference is a lower rate than the budget assumed, and the rate earned depends on the mix of customer segments, because each segment earns its own commission rate. The actual expense also includes the commissions on design services, which the budget did not plan, so on product sales alone the actual rate was lower still.
 
 **Step 11. Document the analysis.**
 
 a. On the **Documentation** worksheet, add the BudgetLine, Account, PlannedPrices, FlexLines, and GLOpex queries to the Query steps entry, with the number of FlexLines rows that have no planned price.
 b. Add the BudgetLine, Account, FlexLines, GLOpex, BudgetReport, FurniturePrices, and OpexReport worksheets to the Worksheets entry.
-c. Add a `Finding` entry of three or four sentences that states the sales-volume variance and its cause, the price gap and the promotions, and the two expense assumptions that did not hold.
+c. Add a `Finding` entry of three or four sentences that states the sales-volume variance and what it reflects, the price gap and the promotions, and the two expense assumptions that did not hold.
 d. Save the workbook.
 
 The Documentation worksheet now lists every query and worksheet that the budget comparison added, and the finding that answers the controller's question.

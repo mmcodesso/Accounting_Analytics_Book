@@ -784,7 +784,7 @@ def t7_1(b: Build) -> None:
 
     months = [f"{m} {b.year}" for m in ("Oct", "Nov", "Dec")]
     values(ws, {"A40": "Method", "B40": months[0], "C40": months[1], "D40": months[2], "E40": "Quarter",
-                "F40": "Error", "G40": "Monthly error", "A41": "Actual", "A42": "Trend", "A43": "Mean",
+                "F40": "Quarter error", "G40": "Monthly MAPE", "A41": "Actual", "A42": "Trend", "A43": "Mean",
                 "A44": "Same quarter last year", "A47": f"Forecast, {b.year + 1} Q1", "A48": "Low", "A49": "High"})
     for col, r in zip("BCD", (35, 36, 37)):
         formulas(ws, {f"{col}41": f"=C{r}", f"{col}42": f"=FORECAST.LINEAR($B{r},$C$3:$C$34,$B$3:$B$34)",
@@ -812,7 +812,8 @@ def t7_1(b: Build) -> None:
                     f"business returns to. In the backtest on {b.year} Q4, the mean missed the quarter by "
                     f"{bt['mean']['error']:+.2%} with a monthly error of {bt['mean']['monthly']:.2%}, against "
                     f"{bt['trend']['error']:+.2%} for the trend and {bt['last']['error']:+.2%} (monthly "
-                    f"{bt['last']['monthly']:.2%}) for the same quarter last year. The range is the mean's monthly error."])
+                    f"{bt['last']['monthly']:.2%}) for the same quarter last year. The range is the mean's monthly error: it shows "
+                    "what a miss as large as the backtest's would mean, and it is not a confidence interval."])
     write_documentation(b)
 
     t = "7.1"
@@ -858,7 +859,7 @@ def t7_2(b: Build) -> None:
         ("Source", "BudgetLine"),
         ("Filtered Rows", pq.select_rows('([BudgetCategory] = "Revenue")')),
         ("Removed Other Columns", pq.select_columns(["FiscalYear", "Month", "ItemID", "UnitAmount"])),
-        ("Renamed Columns", pq.rename([("UnitAmount", "PlannedPrice")]))]))     # Enable Load cleared: not loaded
+        ("Renamed Columns", pq.rename([("UnitAmount", "PlannedPrice")]))]))     # Only Create Connection: not loaded
     xl.add_query(wb, "FlexLines", pq.steps_query([
         ("Source", "InvoiceLines"),
         ("Filtered Rows", pq.select_rows(f"([FiscalYear] = {y})")),
@@ -965,7 +966,7 @@ def t7_2(b: Build) -> None:
     fur = br["groups"]["Furniture"]
     b.doc["Query steps"] += (f" BudgetLine keeps fiscal {y} without the Balance Sheet lines, with ItemGroup from Item and "
                              "AccountNumber and AccountName from Account; Account keeps three columns; PlannedPrices "
-                             "(not loaded) keeps each item's planned net price by month; FlexLines prices the "
+                             "(connection only) keeps each item's planned net price by month; FlexLines prices the "
                              f"{y} product lines at those prices ({br['missing']} lines have no planned price and keep "
                              f"their actual amount); GLOpex keeps the {y} postings to accounts 6000 to 7999 without the "
                              f"closing entry {close}.")
@@ -975,8 +976,9 @@ def t7_2(b: Build) -> None:
                     BudgetReport="the static budget, flexible budget, and actual results by product line",
                     FurniturePrices="planned and actual Furniture prices as a percentage of list, by month",
                     OpexReport="operating expenses against their budget, and the two driver tests")
-    b.extra.append(["Finding", f"The sales-volume variance ({gsum('volume_var'):,.0f}) measures the budget's forecast, "
-                    "which planned several times the units sold, so 2026 is judged against the flexible budget. Against "
+    b.extra.append(["Finding", f"The sales-volume variance ({gsum('volume_var'):,.0f}) says more about the budget's "
+                    "forecast, which planned several times the units sold, than about the year, so 2026 is judged against "
+                    "the flexible budget. Against "
                     f"it, every product line earned less than planned ({gsum('flex_var'):,.0f} in all): the planned "
                     "net prices were a few percent above what the price lists delivered, and Furniture adds the "
                     f"promotional discounts ({fur['discounts']:,.0f}), which came later than the budget planned them. "
@@ -1007,7 +1009,7 @@ def t7_3(b: Build) -> None:
     labels = ["Discount rate", "Volume lift", "Units on promotion lines", "Price before discount per unit",
               "Variable cost per unit", "Commission rate"]
     names = ["Discount", "Lift", "PromoUnits", "PriceBeforeDiscount", "VariableCost", "CommissionRate"]
-    sources = [f"PromotionProgram, promotion {PROMO}", "Assumption; order data shows none",
+    sources = [f"PromotionProgram, promotion {PROMO}", "Assumption; no increase in orders",
                f"InvoiceLines, promotion {PROMO}", f"InvoiceLines, promotion {PROMO}", "Standard cost per unit",
                f"Tutorial 7.2, actual {y}"]
     values(ws, {"A1": "Input or result", "B1": "Value", "C1": "Name", "D1": "Source"})
@@ -1074,8 +1076,8 @@ def t7_3(b: Build) -> None:
     table = [("Assumption", "Value used", "Basis", "Sensitivity"),
              ("Discount rate", "10%", "The promotion's DiscountPct in the PromotionProgram Table",
               "A 5% discount would need a much smaller lift to break even"),
-             ("Volume lift", "0%", "Furniture orders in the promotion's months matched other months",
-              f"The break-even lift is {lift:.1%} (Goal Seek), between the data table's 30% and 35% columns"),
+             ("Volume lift", "0%", "Furniture orders in the promotion's months were in line with other months",
+              f"The break-even lift is {lift:.1%} (Goal Seek), between the data table's 30% and 35% rows"),
              ("Orders without the promotion", "Same orders at the price before discount",
               "Promotion lines carry the customer's usual price, with the discount applied on top",
               "If some orders would have been lost without it, the promotion's cost is lower"),
@@ -1096,11 +1098,12 @@ def t7_3(b: Build) -> None:
                             "VariableCost, CommissionRate (calculated, B4:B7), ContributionWithout, ContributionWith, "
                             "Difference (results, B9:B11).")
     b.sheets.update(Model="the promotion model, its data table, and its assumptions",
-                    OrderVolume=f"Furniture units by order month (PivotTable of SalesInvoiceLine)")
+                    OrderVolume=f"Furniture units invoiced, by order month (PivotTable of SalesInvoiceLine)")
     b.sheets["Scenario Summary"] = "the Scenario Manager summary of four scenarios"
     b.extra.append(["Recommendation", f"Do not repeat the promotion as it ran in {y}. At a 10% discount the promotion's "
-                    f"orders would have needed {lift:.0%} more volume to pay for itself, and Furniture orders in its "
-                    "months show no increase. A smaller discount, or one limited to the items and customers most "
+                    f"orders would have needed {lift:.0%} more volume to pay for itself, if the same orders would otherwise have "
+                    "been placed at the usual prices, and Furniture orders in its months show no increase near that, "
+                    "although orders alone cannot show what the promotion caused. A smaller discount, or one limited to the items and customers most "
                     "likely to respond, has a far lower bar; the recommendation would reverse only if a test showed a "
                     "volume response close to the break-even lift."])
     write_documentation(b)

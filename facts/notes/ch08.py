@@ -162,7 +162,7 @@ def ex2(d, claim):
     claim(abs(cash - opening_credit) < 0.005, "the opening entry debits cash with exactly the amount it credits to 2010")
     claim(d.one("SELECT COUNT(*) FROM DisbursementPayment p LEFT JOIN PurchaseInvoice pi ON pi.PurchaseInvoiceID = "
                 "p.PurchaseInvoiceID WHERE pi.PurchaseInvoiceID IS NULL") == 0,
-          "every supplier payment pays an invoice, so the opening payables have never been paid")
+          "every supplier payment pays an invoice, so no payment in the extract reduces the opening payables")
     capital = capital_invoices(d)
     reclass = [r for r in je_rows if r[0] != entry]
     claim(len(reclass) == len(capital) == 2 and all(r[3] == "Debt Reclass" and r[2] == 0 for r in reclass),
@@ -249,7 +249,7 @@ def ex4(d, claim):
     largest = max(spend, key=spend.get)
     name, category = next((r[3], r[4]) for r in rows if r[0] == largest)
     share = spend[largest] / total
-    claim(share < 0.05 and marks[0.5] >= 10, "concentration is low (the largest supplier under 5%, ten or more for half)")
+    claim(share < 0.05 and marks[0.5] >= 10, "dollar concentration is low (the largest supplier under 5%, ten or more for half)")
     categories = defaultdict(float)
     for r in rows:
         categories[r[4]] += r[1]
@@ -258,7 +258,7 @@ def ex4(d, claim):
     median = statistics.median(days)
     claim(median > 0, "the median payment is after the due date")
     claim(all(t.startswith("Net ") for (t,) in d.q("SELECT DISTINCT PaymentTerms FROM Supplier")),
-          "no supplier's terms offer an early-payment discount")
+          "no supplier's recorded terms offer an early-payment discount")
     return dict(n=len(rows), suppliers=len(spend), total=total, n50=marks[0.5], n80=marks[0.8], n90=marks[0.9],
                 top=dict(name=name, category=category, share=share),
                 categories=sorted(categories.items(), key=lambda kv: -kv[1]),
@@ -361,9 +361,11 @@ def ex5(d, claim):
     # purchase order numbers
     gaps = []
     for y in d.years:
-        n, low, high = d.q("SELECT COUNT(*), MIN(CAST(substr(PONumber, 9) AS INTEGER)), MAX(CAST(substr(PONumber, 9) AS INTEGER)) "
-                           "FROM PurchaseOrder WHERE substr(PONumber, 4, 4) = ?", str(y))[0]
-        gaps.append(dict(year=y, n=n, low=low, high=high))
+        n, low, high, distinct = d.q("SELECT COUNT(*), MIN(CAST(substr(PONumber, 9) AS INTEGER)), "
+                                     "MAX(CAST(substr(PONumber, 9) AS INTEGER)), COUNT(DISTINCT substr(PONumber, 9)) "
+                                     "FROM PurchaseOrder WHERE substr(PONumber, 4, 4) = ?", str(y))[0]
+        gaps.append(dict(year=y, n=n, low=low, high=high, distinct=distinct))
+    claim(all(g["n"] == g["distinct"] for g in gaps), "no purchase order number repeats within a year")
     claim(all(g["n"] == g["high"] - g["low"] + 1 for g in gaps), "no purchase order numbers are missing")
     claim(all(b["low"] == a["high"] + 1 for a, b in zip(gaps, gaps[1:])), "the sequence continues across years")
     claim(sum(g["n"] for g in gaps) == len(orders), "every purchase order is in a fiscal year of the window")
@@ -408,6 +410,7 @@ def ex6(d, claim):
         else:
             outside[pid].append((ordered, invoiced, discount))
     claim(all(inside[p["id"]] == 0 for p in flagged), "all of the flagged promotions' lines were ordered outside the dates")
+    same_day = [p["id"] for p in flagged if p["end"] == p["start"]]      # both dates count as inside above
     claim(set(outside) == {p["id"] for p in flagged}, "every line of the other promotions was ordered within its dates")
     flagged_lines = [dict(n=len(outside[p["id"]]), discount=sum(x[2] for x in outside[p["id"]])) for p in flagged]
     order_months = [{int(x[0][5:7]) for x in outside[p["id"]]} for p in flagged]
@@ -490,7 +493,7 @@ def ex6(d, claim):
     customers = list({r[0]: dict(id=r[0], name=r[1], segment=r[2], list=r[3]) for r in own}.values())
     cited = lists.get(own[0][7], dict(id=None, end=""))
     stale = sorted({int(r[5][:4]) for r in own if r[5] and r[5] > cited["end"]})   # the years the cited list had expired
-    return dict(flagged=flagged, pct=flagged[0]["pct"], approver=dict(id=approver[0], name=approver[1], title=approver[2]),
+    return dict(flagged=flagged, same_day=same_day, pct=flagged[0]["pct"], approver=dict(id=approver[0], name=approver[1], title=approver[2]),
                 flagged_lines=flagged_lines, n_lines=sum(f["n"] for f in flagged_lines),
                 discount=sum(f["discount"] for f in flagged_lines),
                 order_months=[MONTHS[m - 1] for m in sorted(order_months[0])], last_months=[MONTHS[m - 1] for m in last],

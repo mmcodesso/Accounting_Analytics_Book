@@ -31,7 +31,7 @@ a. Add a **Table** visual with Month and LineTotal.
 b. Read the revenue of January 2024, February 2024, and December 2026.
 c. Record the increase from January 2024 to December 2026, and from February 2024 to December 2026.
 
-The draft's claim is arithmetically true. January 2024 was the company's first month of recorded sales, with about half the usual number of invoices, the start-up month of Chapter 7, so any comparison that starts there shows growth that the business did not experience. Measured from February 2024, the increase is a small fraction of the draft's.
+The draft's claim is arithmetically true, but January 2024 was the company's first month of recorded sales, with about half the usual number of invoices, the start-up month of Chapter 7. A comparison that starts there measures the growth from a start-up month, not the growth of an established business. Measured from February 2024, the increase is a small fraction of the draft's.
 
 **Step 4. Compare whole years instead.**
 
@@ -74,7 +74,7 @@ a. Select each chart in turn, and under **Format visual > General**, type altern
 b. Check that every title says what the chart shows and over which period.
 c. Save the report.
 
-A screen reader now announces each chart by what it shows and what it means, and every title names its period, so the page tells the same story to every reader.
+A screen reader now announces each chart by what it shows and what it means, and every title names its period.
 
 
 

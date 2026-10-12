@@ -58,16 +58,24 @@ Open Exceptions = CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ) 
 
 
 ```
-// Test 3: every disposition must match an exception of the register
+// Test 3: every disposition must match exactly one exception of the register
 EVALUATE
-ROW (
-    "Dispositions", COUNTROWS ( Dispositions ),
-    "Reviewed exceptions", [Reviewed Exceptions],
-    "Open exceptions", [Open Exceptions]
-)
+VAR ExceptionKeys =
+    SUMMARIZE ( Exceptions, Exceptions[TestID], Exceptions[DocumentNumber] )
+VAR DispositionKeys =
+    SUMMARIZE ( Dispositions, Dispositions[TestID], Dispositions[DocumentNumber] )
+RETURN
+    ROW (
+        "Exceptions", COUNTROWS ( Exceptions ),
+        "Exception keys", COUNTROWS ( ExceptionKeys ),
+        "Dispositions", COUNTROWS ( Dispositions ),
+        "Disposition keys", COUNTROWS ( DispositionKeys ),
+        "Reviewed exceptions", [Reviewed Exceptions],
+        "Open exceptions", [Open Exceptions]
+    )
 ```
 
-The number of dispositions equals the number of reviewed exceptions, so every disposition found its exception. If the two differ, a test or document number has been mistyped, and the exception it was meant for still counts as open. The open exceptions are by far the larger group.
+Each table has as many keys as rows, so no test and document pair appears twice in either, and the reviewed exceptions equal the dispositions, so every disposition found exactly one exception. A disposition typed twice would copy its exception in the merge while the dispositions and the reviewed exceptions still agreed, which is why the test counts the keys. If the reviewed exceptions fall short, a test or document number has been mistyped, or an exception has left the register since its review, and the disposition is kept and explained, not deleted. The open exceptions, those not yet reviewed, are by far the larger group, and the follow-ups and deficiencies, though reviewed, still await action.
 
 **Step 4. Build the review page.**
 
@@ -93,33 +101,35 @@ b. Select it, and click **Run**.
 
 
 ```
-// Test 4: the purchase orders have no gaps, and three registers were never paid
+// Test 4: the order numbers have no gap; three registers have no payment record
 EVALUATE
 VAR Numbers =
     SELECTCOLUMNS (
         PurchaseOrder,
         "Number", VALUE ( RIGHT ( PurchaseOrder[PONumber], 6 ) )
     )
-VAR Unpaid =
+VAR NoPayment =
     FILTER ( PayrollRegister, ISBLANK ( PayrollRegister[PaymentDate] ) )
 RETURN
     ROW (
         "Orders", COUNTROWS ( PurchaseOrder ),
-        "First number", MINX ( Numbers, [Number] ),
-        "Last number", MAXX ( Numbers, [Number] ),
+        "Unique numbers", COUNTROWS ( DISTINCT ( Numbers ) ),
+        "First", MINX ( Numbers, [Number] ),
+        "Last", MAXX ( Numbers, [Number] ),
         "Registers", COUNTROWS ( PayrollRegister ),
-        "Registers not paid", COUNTROWS ( Unpaid )
+        "No payment record", COUNTROWS ( NoPayment )
     )
 ```
 
-The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment date. @fig-16-08 shows the result. The order numbers run from 1 to the number of orders, so none is missing, the gap test of Chapter 8 on a series that continues across the years. Three registers have no payment: the ones Chapter 12 found posted to the ledger as paid with no payment record behind them. Two of them already appear among the exceptions as pay after termination; the third, the chief executive's first register, is a finding for the memo.
+The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment record. @fig-16-08 shows the result. The order numbers are all different, the first is 1, and the last equals the number of orders, so none is missing between them, the gap test of Chapter 8 on a series that continues across the years. A repeated number could hide a missing one, which is why the test counts the unique numbers. Whether orders were numbered after the last one in the model is a question for the purchasing system's own count. Three registers have no payment record: the ones Chapter 12 found with payment postings in the ledger and no payment record behind them, a break in the trail to resolve with payroll's and the bank's records, not proof that the pay was never received. Two of them already appear among the exceptions as pay after termination; the third, the chief executive's first register, is a finding for the memo.
 
-![Test 4 in DAX Query View.](/visuals/svg/fig-16-08-population-test.svg){#fig-16-08 fig-alt="A mock of DAX query view in Audit Monitoring.pbix with the Tests tab open. The editor holds the query of Test 4, which counts the purchase orders, finds the first and last order numbers, and counts the payroll registers and those without a payment date. The Results grid shows one row: the number of orders equal to the last order number, a first number of 1, the number of registers, and 3 registers not paid."}
+![Test 4 in DAX Query View.](/visuals/svg/fig-16-08-population-test.svg){#fig-16-08 fig-alt="A mock of DAX query view in Audit Monitoring.pbix with the Tests tab open. The editor holds the query of Test 4, which counts the purchase orders and their unique numbers, finds the first and last order numbers, and counts the payroll registers and those without a payment record. The Results grid shows one row: the number of orders equal to the number of unique numbers and to the last number, a first number of 1, the number of registers, and 3 registers with no payment record."}
 
 **Step 7. State the date through which the data run.**
 
 a. Add the measure below to the Key Measures table, and set its format to a short date.
 b. On the Monitoring page, add a card of Data Through, titled `Data through`.
+c. Select the heat map, choose **Format > Edit interactions**, and click the **None** icon above the card; select the bar chart of approvers, and do the same.
 
 
 ```
@@ -134,7 +144,7 @@ MINX (
 )
 ```
 
-The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December 2026: the payroll tests have seen pay dates only through the 18th, while the journal entries and orders run to the 31st. The December column of the heat map is complete for two processes and partial for the third, and the card says so on the page the reviewer reads. With the Year slicer set to an earlier year, it shows that year's last payday.
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December 2026: the payroll tests have seen pay dates only through the 18th, while the journal entries and orders run to the 31st. The December column of the heat map covers the whole month for two processes and only part of it for the third, and the card says so on the page the reviewer reads. With the Year slicer set to an earlier year, it shows that year's last payday; the edited interactions keep a click on a cell or an approver from changing it. MINX skips a blank, so a population with no rows would leave the card showing the others' date: an empty table is caught by the counts of Tests 1 and 4, not by the card.
 
 **Step 8. Rerun the package's tests.**
 
@@ -144,11 +154,11 @@ c. Run Tests 2 to 5 in the same way, one at a time.
 d. Compare each result with the values its chapter expected, and record the result and today's date.
 e. Read the period that the About page states, and close the file without saving it.
 
-Each test returns the totals of the chapter it was written against, so the package's sales, ledger, budget, and plant pages still compute what Chapters 6, 7, and 11 computed. The About page's note that the time records end before the year does agrees with what Step 7 found for payroll. Closing without saving leaves the controller's file as you found it: internal audit tests the package but does not change it.
+Each test returns the totals of the chapter it was written against, so the package's measures still reproduce the totals of Chapters 6, 7, and 11 that the tests name. The tests check those totals, not every visual on the package's pages, which a reviewer checks by using the pages. The About page's note that the time records end before the year does agrees with what Step 7 found for payroll. Closing without saving leaves the controller's file as you found it: internal audit tests the package but does not change it.
 
 **Step 9. Write the memo.** Write a short memo to the chief audit executive.
 
-a. Report the dispositions recorded and the open exceptions, with the documents that fail more than one test listed first.
+a. Report the dispositions recorded, the follow-ups and deficiencies still awaiting action, and the open exceptions, with the documents that fail more than one test listed first.
 b. Report the registers approved by the employee they pay as one finding on the design of the payroll approval, and recommend a second approver.
 c. Report the results of Tests 1 to 4 of the monitoring file and Tests 1 to 5 of the package, with the date you ran them and the date through which the data run.
 d. Recommend change controls for both reports: a project under version control, a named owner, a reviewer who approves each change, the tests rerun before each release, and no copies of the file in circulation.
@@ -159,9 +169,9 @@ e. Save Audit Monitoring.pbix.
 
 **Checkpoint.** Before you send the memo, confirm the following:
 
-- The dispositions are merged into the register on the test and the document, and Test 3 shows that every one found its exception.
+- The dispositions are merged into the register on the test and the document, and Test 3 shows that every one found exactly one exception.
 - The Review page shows the open exceptions by test and year and lists the documents that fail two tests or more.
-- Test 4 shows the purchase orders complete and the three unpaid registers, and the Data Through card shows the date through which every process has been tested.
+- Test 4 shows the order numbers without a gap and the three registers without a payment record, and the Data Through card shows the latest date that every process's data reach.
 - The package's Tests 1 to 5 return the values their chapters expected, and the package was closed without saving.
 
-A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on both reports.
+A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on the totals they test in both reports.

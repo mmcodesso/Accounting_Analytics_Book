@@ -44,7 +44,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (3) For every SalesInvoice posting of fiscal 2026 that carries a SourceLineID, use an anti-join to find the postings whose SourceLineID matches no invoice line. Report the number of postings tested and the number of exceptions.
 
-(4) Write a short memo (one half page) explaining how the source-document columns let an auditor move from the ledger to the documents and back, and what requirement (3) proves.
+(4) Write a short memo (one half page) explaining how the source-document columns let an auditor move from the ledger to the documents and back, and what requirement (3) shows and does not show.
 
 **Deliverable.** A script with the trace queries and a half-page memo.
 
@@ -116,7 +116,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (2) Find the GLEntry rows whose SourceDocumentType is PayrollPayment and whose SourceDocumentID matches no PayrollPayment. List them with their posting date, amounts, and description, and total their debits and credits.
 
-(3) Find the customers that have never placed a sales order, and check their IsActive flag.
+(3) Find the customers with no sales order in the database, and check their IsActive flag.
 
 (4) Find the work orders that have no work order operations, and report their status.
 

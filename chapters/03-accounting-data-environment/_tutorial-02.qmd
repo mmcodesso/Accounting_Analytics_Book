@@ -45,7 +45,7 @@ Compare AccountID 42 with the RevenueAccountID of item 218 in the Item worksheet
 
 a. In the **CashReceiptApplication** worksheet, filter SalesInvoiceID for 7947. One application (CashReceiptApplicationID 10686) applies $787.48 from CashReceiptID 3043 on 2025-04-17.
 b. In the **CashReceipt** worksheet, receipt 3043 is CR-2025-003043, a check for $23,870.99.
-c. Filter the CashReceiptApplication worksheet for CashReceiptID 3043. You will see that this single check paid seven invoices, which is why a junction table is needed.
+c. In the CashReceiptApplication worksheet, clear the filter on SalesInvoiceID, then filter CashReceiptID for 3043. You will see seven applications: this single check paid seven invoices, which is why a junction table is needed.
 d. In GLEntry, find the receipt itself (SourceDocumentType CashReceipt, SourceDocumentID 3043). It debits AccountID 2 (1010, Cash and Cash Equivalents) and credits AccountID 27 (2060, Customer Deposits and Unapplied Cash).
 e. Then find the application (SourceDocumentType CashReceiptApplication, SourceDocumentID 10686). It debits AccountID 27 and credits AccountID 3 for $787.48, moving the payment out of unapplied cash to settle Accounts Receivable.
 
@@ -57,7 +57,7 @@ e. Then find the application (SourceDocumentType CashReceiptApplication, SourceD
 
 - show that the invoice's ledger postings balance and that the debit to Accounts Receivable equals the invoice's GrandTotal of $787.48;
 - identify SourceDocumentType and SourceDocumentID as the columns that trace a GLEntry row back to its source document;
-- explain why the same sale produces postings from several different documents: the shipment, the invoice, the sales commission accrual on the invoice line, the cash receipt, and its application;
+- explain why the same sale produces postings from several different documents: the shipment, the invoice, the cash receipt, and its application (the commission accrued on the invoice line posts from a fifth, a SalesCommissionAccrual record);
 - translate an AccountID in GLEntry into an account number through the Account table.
 
 If you can explain all of these points, you have the cross-group navigation skills that the remaining chapters require.

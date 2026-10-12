@@ -195,6 +195,12 @@ wait = [(D(max(a[0] for a in APPS[CM[r["cm"]]["inv"]])) - D(r["date"])).days for
 print("refund before payment", len(before), r2(sum(r["amt"] for r in before)), {y: (sum(r["date"][:4] == y for r in before), r2(sum(r["amt"] for r in before if r["date"][:4] == y))) for y in YEARS},
       "| nothing paid", len(nothing), r2(sum(r["amt"] for r in nothing)), "2026", sum(r["date"][:4] == "2026" for r in nothing), r2(sum(r["amt"] for r in nothing if r["date"][:4] == "2026")),
       "| before due date", len(before_due), "| days to payment", min(wait), max(wait), round(st.mean(wait), 1))
+# the receipt-date variant: the refund dated before the last receipt applied to the invoice, or before any receipt
+before_rcpt = [r for r in RF.values() if max(RCPT[a[3]]["date"] for a in APPS[CM[r["cm"]]["inv"]]) > r["date"]]
+nothing_rcpt = [r for r in RF.values() if not any(RCPT[a[3]]["date"] <= r["date"] for a in APPS[CM[r["cm"]]["inv"]])]
+print("refund before the last receipt", len(before_rcpt), r2(sum(r["amt"] for r in before_rcpt)),
+      {y: sum(r["date"][:4] == y for r in before_rcpt) for y in YEARS}, "| no receipt yet", len(nothing_rcpt),
+      r2(sum(r["amt"] for r in nothing_rcpt)), "| the definitions part on", len(before) - len(before_rcpt))
 cm_to_2060 = {doc: amt for doc, amt in q(f"SELECT SourceDocumentID, SUM(Credit) FROM GLEntry WHERE SourceDocumentType = 'CreditMemo' AND AccountID = {AID['2060']} AND Credit > 0 GROUP BY 1")}
 unpaid_at_credit = [k for k in cm_to_2060 if not any(a[0] <= CM[k]["date"] for a in APPS[CM[k]["inv"]])]
 fully_paid = [k for k in cm_to_2060 if sum(a[1] for a in APPS[CM[k]["inv"]] if a[0] <= CM[k]["date"]) >= INV[CM[k]["inv"]]["gt"] - CM[k]["gt"] - 0.01]

@@ -467,6 +467,9 @@ def t16_2(b: Build) -> None:
         "Category": [col("Employee", "EmployeeName")], "Y": [exc]}, sort=[(exc, "Descending")]))
     page.add(Visual("rates", "tableEx", 640, 370, 620, 330, {"Values": [
         col("Tests", "TestID"), exc, meas(MEASURES, "Population"), meas(MEASURES, "Rate per 1,000")]}))
+    # Step 12c: Employee filters the exceptions and, through the approver, the journal entries, but not the orders
+    # or the registers, so the bar chart does not filter the rates table (Edit interactions, None)
+    page.extra = {"visualInteractions": [{"source": "approvers", "target": "rates", "type": "NoFilter"}]}
     months = Counter(int(e["date"][5:7]) for e in register)
     page.expect = ["TestID", "PR SelfApproved", "Jan", f"{months[1]:,}", names[approvers[0][0]],
                    f"{1000 * by_test['JE Weekend'] / len(pops['JE']):.1f}"]
@@ -584,6 +587,8 @@ def t16_3(b: Build) -> None:
     # Step 7: the Data through card on the Monitoring page
     mon = b.report.page("monitoring")
     mon.add(card("dataThrough", 900, 20, 360, 150, meas(MEASURES, "Data Through"), title="Data through"))
+    mon.extra["visualInteractions"] += [{"source": s, "target": "dataThrough", "type": "NoFilter"}
+                                        for s in ("heatMap", "approvers")]
     mon.expect = mon.expect + ["Data through", f"Data Through, {through.month}/{through.day}/{through.year} card"]
     b.add_tests("_tutorial-03.qmd")
 
@@ -592,6 +597,10 @@ def t16_3(b: Build) -> None:
     process = {p: next(r[2] for r in md_table(CHAPTER / "chapter.qmd", "tbl-16-01") if r[0].startswith(p))
                for p in ch16.PROCESSES}
     b.check(t, "Dispositions rows", len(rows), "COUNTROWS ( Dispositions )", 0)
+    b.check(t, "Test 3: exception keys", f3["n_keys"],
+            "COUNTROWS ( SUMMARIZE ( Exceptions, Exceptions[TestID], Exceptions[DocumentNumber] ) )", 0)
+    b.check(t, "Test 3: disposition keys", f3["n_disp_keys"],
+            "COUNTROWS ( SUMMARIZE ( Dispositions, Dispositions[TestID], Dispositions[DocumentNumber] ) )", 0)
     b.check(t, "Test 3: reviewed exceptions (every disposition found its exception)", len(reviewed),
             "[Reviewed Exceptions]", 0)
     b.check(t, "Test 3: open exceptions", len(open_), "[Open Exceptions]", 0)
@@ -614,10 +623,11 @@ def t16_3(b: Build) -> None:
                 f'CALCULATE ( [Open Exceptions], Exceptions[DocumentNumber] = "{doc}" )', 0)
     numbers = "SELECTCOLUMNS ( PurchaseOrder, \"Number\", VALUE ( RIGHT ( PurchaseOrder[PONumber], 6 ) ) )"
     b.check(t, "Test 4: orders", f3["orders"], "COUNTROWS ( PurchaseOrder )", 0)
+    b.check(t, "Test 4: unique numbers", f3["unique"], f"COUNTROWS ( DISTINCT ( {numbers} ) )", 0)
     b.check(t, "Test 4: first number", f3["first"], f"MINX ( {numbers}, [Number] )", 0)
     b.check(t, "Test 4: last number", f3["last_number"], f"MAXX ( {numbers}, [Number] )", 0)
     b.check(t, "Test 4: registers", f3["registers"], "COUNTROWS ( PayrollRegister )", 0)
-    b.check(t, "Test 4: registers not paid", len(f3["unpaid"]),
+    b.check(t, "Test 4: registers with no payment record", len(f3["unpaid"]),
             "COUNTROWS ( FILTER ( PayrollRegister, ISBLANK ( PayrollRegister[PaymentDate] ) ) )", 0)
     b.check(t, "Data Through", f3["through"], 'FORMAT ( [Data Through], "yyyy-mm-dd" )')
     for y, day in zip(d.years, f3["through_years"]):

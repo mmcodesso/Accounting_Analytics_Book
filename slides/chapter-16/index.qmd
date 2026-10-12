@@ -90,7 +90,7 @@ The purchase order tests come from Chapter 12 and the payroll tests from Exercis
 {{< book-figure fig-16-01 crop="0,0,1,0.888" >}}
 
 ::: {.notes}
-Gonzalez and Hoffman found that telling people promptly which of their transactions a monitoring system had flagged also told them what it could not detect, and that with a weak system, prompt notification made participants more inclined to commit fraud. So the report goes to the people who oversee the controls, not to those whose approvals it tests, which is why it lives in a file of its own rather than in the controller's package.
+Gonzalez and Hoffman found that telling people promptly which of their transactions a monitoring system had flagged also told them what it could not detect, and that with a weak system, prompt notification made participants more inclined to commit fraud. So the report, with what its tests can and cannot detect, goes to the people who oversee the controls, which is why it lives in a file of its own rather than in the controller's package. The people whose approvals it tests still hear of the exceptions they must explain, through internal audit's questions rather than the report.
 :::
 
 ## Check your understanding {.check}
@@ -151,7 +151,7 @@ A measure divides the exceptions of each test by the documents of its process. I
 
 ## From flags to the register in Power Query
 
-{{< book-figure fig-16-02 crop="0,0,1,0.4703" >}}
+{{< book-figure fig-16-02 crop="0,0,1,0.4567" >}}
 
 ::: {.notes}
 Each flagged table feeds an exception query through Unpivot and a filter on the flag value, and the three exception queries, not loaded, are appended into one Exceptions table.
@@ -159,10 +159,10 @@ Each flagged table feeds an exception query through Unpivot and a filter on the 
 
 ## The register beside the populations it tests
 
-{{< book-figure fig-16-02 crop="0,0.4777,1,0.4604" >}}
+{{< book-figure fig-16-02 crop="0,0.4639,1,0.4759" >}}
 
 ::: {.notes}
-Exceptions relates to Tests on TestID, to Date on EventDate, and to Employee on EmployeeID. The three flagged tables stay in the model as the populations the rates divide by, and JournalLines relates to JournalEntry.
+Exceptions relates to Tests on TestID, to Date on EventDate, and to Employee on EmployeeID. Employee also reaches JournalEntry through the entry's approver, but not the orders or the registers. The three flagged tables stay in the model as the populations the rates divide by, and JournalLines relates to JournalEntry.
 :::
 
 # Guided Tutorial 16.1: Journal Entry Monitoring
@@ -180,7 +180,7 @@ The monitoring report is a new file of its own. The approver's limit is merged o
 {{< book-steps 16.1 7-12 >}}
 
 ::: {.notes}
-The ledger is filtered to the journal entry postings before anything else, so only a few thousand of its rows reach the model. JE Exceptions is not loaded, because Tutorial 16.2 appends it to the other processes. Test 1 shows the entries equal to their ledger postings.
+The ledger is filtered to the journal entry postings before anything else, so only a few thousand of its rows reach the model. JE Exceptions is not loaded, because Tutorial 16.2 appends it to the other processes. Test 1 shows the entries' total equal to the debits and credits of their ledger postings: good evidence, though agreeing totals alone could hide an entry missing from both, as Tutorial 4.1 showed.
 :::
 
 ## Each rule becomes a flag column
@@ -232,7 +232,7 @@ The detail shows the first lines of the Entry Lines page for the opening balance
 {{< book-checkpoint 16.1 lead="true" >}}
 
 ::: {.notes}
-The tests of Chapter 8, which took an afternoon in a workbook, now run again with every refresh, on a population that has been reconciled.
+The tests of Chapter 8, which took an afternoon in a workbook, now run again with every refresh, on a population reconciled to the ledger.
 :::
 
 # The Monitoring Page
@@ -267,7 +267,7 @@ January is when the first entries, orders and payrolls of a new year are process
 - A count alone hides that as volume changes
 
 ::: {.notes}
-Over the three years, the journal entry rate fell and rose again, the purchase order rate fell by about two-thirds while the number of orders more than doubled, and the payroll rate barely moved, held in place by the recurring test.
+Over the three years, the journal entry rate fell and rose again, the purchase order rate fell by about two-thirds while the number of orders more than doubled, and the payroll rate barely moved, held in place by the recurring test. A process's rate adds the exceptions of its tests, so a document that fails two tests counts twice: it counts failed tests per thousand documents, not documents with an exception.
 :::
 
 ## Check your understanding {.check}
@@ -309,7 +309,7 @@ A comparison with null returns null in Power Query, not false, so the terminatio
 {{< book-steps 16.2 8-14 >}}
 
 ::: {.notes}
-The Tests table is the register's dimension, with the process each test runs on. Test 2 returns the counts of Chapters 8 and 12 for each of the eleven tests, so the register is complete.
+The Tests table is the register's dimension, with the process each test runs on. Test 2 returns the counts of Chapters 8 and 12 for each of the eleven tests, so the register reproduces the earlier tests. Step 12c sets the approver chart's interaction with the rates table to None, because Employee reaches only the journal entries' population.
 :::
 
 ## Population counts the test's own documents
@@ -343,7 +343,7 @@ The matrix shows all three years by month of the year. The January column is the
 {{< book-figure fig-16-05 crop="0,0.535,0.6211,0.373" >}}
 
 ::: {.notes}
-The journal entry tests have the highest rates, because the population is small. The recurring payroll test has a far higher rate than the other payroll tests.
+The journal entry tests have the highest rates, because the population is small. The recurring payroll test has a far higher rate than the other payroll tests. The table keeps whole-process rates: a click on an approver leaves it unchanged, because Employee filters the exceptions and the journal entries but not the orders or the registers.
 :::
 
 ## From a cell to the documents behind it
@@ -369,10 +369,10 @@ The page separates two kinds of problem that a once-a-year test would have repor
 - Each exception needs a disposition: expected, follow up, or report
 - Text typed beside a refreshed query can move to the wrong row
 - So keep the dispositions in a table, keyed by test and document
-- Merge them into the register; those without one are the open exceptions
+- Merge them into the register; those without one are open, not yet reviewed
 
 ::: {.notes}
-Chapter 8 kept its dispositions on a worksheet of pasted values for the same reason. Every refresh attaches each conclusion to its exception, and a new exception arrives with none. The dispositions are internal audit's workpaper: only reviewers change them, each shows who reached it and when, and the register is tested to confirm that every disposition found its exception.
+Chapter 8 kept its dispositions on a worksheet of pasted values for the same reason. Every refresh attaches each conclusion to its exception, and a new exception arrives with none. The dispositions are internal audit's workpaper: only reviewers change them, a full record shows who reached each one and when (columns the tutorial's short table leaves out), and Test 3 confirms that every disposition found exactly one exception. A disposition records a conclusion, not a resolution: follow-ups and deficiencies stay on the list until they are closed.
 :::
 
 ## Order the review by score and novelty
@@ -435,11 +435,11 @@ Both reports are evidence that someone relies on, and neither is better than the
 
 - Reconcile each population to the ledger, as Test 1 does
 - With nothing to reconcile to, test the document numbers for gaps
-- A count equal to the last order number shows none is missing
+- Unique numbers from one to the count leave no gap between them
 - Rerun the tests at every review, and keep their results and date
 
 ::: {.notes}
-Charles River numbers its purchase orders in one series across the years, as Exercise 8.5 found, so the gap test of Chapter 8 applies. The package's Tests tab reproduces control totals of Chapters 6, 7 and 11. A test that passed in April says nothing about a measure changed in May.
+Charles River numbers its purchase orders in one series across the years, as Exercise 8.5 found, so the gap test of Chapter 8 applies; a repeated number could hide a missing one, which is why the test counts the unique numbers, and whether orders were numbered past the last one in the model is a question for the purchasing system's own count. The package's Tests tab reproduces control totals of Chapters 6, 7 and 11. A test that passed in April says nothing about a measure changed in May.
 :::
 
 ## Currency: each population has its own last date
@@ -450,7 +450,7 @@ Charles River numbers its purchase orders in one series across the years, as Exe
 - So a page should state the date through which every test has run
 
 ::: {.notes}
-A December page that shows no payroll exceptions after the last payday has not tested those days at all. A measure that returns the earliest of the populations' last dates, shown on the page, states the date through which every test has run, as the package's About page states its period.
+A December page that shows no payroll exceptions after the last payday has not tested those days at all. A measure that returns the earliest of the populations' last dates, shown on the page, states the date through which every test has run, as the package's About page states its period. It bounds what the tests can have seen; it does not show that a refresh succeeded or that nothing is missing before it.
 :::
 
 ## Change control: a project shows every change
@@ -466,7 +466,7 @@ A report that managers act on every month is a system and deserves the change co
 
 ## Watch out: a copy of a .pbix escapes every control {.watch-out}
 
-- A copy holds every row of every table, whatever its pages show
+- A copy of an import model holds every row, whatever its pages show
 - Its data stop at the date of the copy
 - Its measures can drift from the version readers use
 - Treat the controlled report as the only version; ask who holds copies
@@ -479,7 +479,7 @@ Whoever opens a copy in Power BI Desktop sees everything. Control totals are evi
 
 Which question does each piece of evidence answer?
 
-1. Order numbers that run from one to the count of orders
+1. Unique order numbers that run from one to the count of orders
 2. The package's tests, rerun and dated
 3. The Data Through card on the page
 4. The Git history of the report's project
@@ -506,7 +506,7 @@ A test that passed last month cannot answer the second for a measure changed sin
 {{< book-steps 16.3 >}}
 
 ::: {.notes}
-The first review records three dispositions: the year-end closes are expected; the orders and registers of the employee who had left are deficiencies to report; and the payments made before their registers were approved need a question for payroll. Open Exceptions counts the exceptions with no disposition, and Test 3 shows that every disposition found its exception. Step 8 reruns the package's tests and closes it without saving: internal audit tests the package but does not change it.
+The first review records three dispositions: the year-end closes are expected; the orders and registers of the employee who had left are deficiencies to report; and the payments made before their registers were approved need a question for payroll. Open Exceptions counts the exceptions not yet reviewed, those with no disposition, and Test 3 shows that every disposition found exactly one exception; the follow-ups and deficiencies, though reviewed, still await action. Step 8 reruns the package's tests and closes it without saving: internal audit tests the package but does not change it.
 :::
 
 ## Most open exceptions are one design finding
@@ -525,20 +525,20 @@ Most open exceptions belong to the registers approved by the employee they pay, 
 At the top is the opening balance entry, which failed four tests; the other entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The orders outlined with dashes were reviewed for one of their two tests and are still open for the other: a disposition belongs to an exception, not to a document. The list continues with the remaining orders, among them the third approved after the approver had left and the two capital orders the purchasing manager approved alone.
 :::
 
-## Test 4 checks the numbers and the payments
+## Test 4 checks the numbers and the payment records
 
-{{< book-figure fig-16-08 crop="0.0904,0.2302,0.7254,0.5065" >}}
+{{< book-figure fig-16-08 crop="0.0904,0.2302,0.7254,0.5386" >}}
 
 ::: {.notes}
-The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment date. The query returns one row of counts, the first and last order numbers, and the registers not paid.
+The variables hold the order numbers, taken from the last six characters of each PONumber, and the registers with no payment record. The query returns one row: the orders and their unique numbers, the first and last numbers, the registers, and those with no payment record.
 :::
 
-## Test 4: no order is missing; three registers unpaid
+## Test 4: no gap; three registers lack a payment record
 
-{{< book-figure fig-16-08 crop="0.0881,0.7424,0.6952,0.1525" >}}
+{{< book-figure fig-16-08 crop="0.0881,0.7713,0.7100,0.1525" >}}
 
 ::: {.notes}
-The order numbers run from one to the number of orders, so none is missing. The three registers with no payment are the ones Chapter 12 found posted to the ledger as paid with no payment record behind them. Two already appear as pay after termination; the third, the chief executive's first register, is a finding for the memo.
+The order numbers are all different and run from one to the number of orders, so none is missing between them; whether any was numbered after the last is a question for the purchasing system's count. The three registers without a payment record are the ones Chapter 12 found with payment postings in the ledger and no payment record behind them, a break in the trail to resolve with payroll's and the bank's records, not proof that the pay was never received. Two already appear as pay after termination; the third, the chief executive's first register, is a finding for the memo.
 :::
 
 ## Data Through states how far the tests have run
@@ -558,7 +558,7 @@ MINX (
 - The earliest of the three last dates: here, the last payday
 
 ::: {.notes}
-The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December: the December column of the heat map is complete for two processes and partial for the third, and the card says so on the page the reviewer reads.
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December: the December column of the heat map covers the whole month for two processes and only part of it for the third, and the card says so on the page the reviewer reads. Step 7c keeps a click on a cell or an approver from changing it, and MINX skips a blank, so an empty population is caught by the counts of Tests 1 and 4, not by the card.
 :::
 
 ## Checkpoint
@@ -566,7 +566,7 @@ The braces build a one-column table of the three last dates, whose column DAX na
 {{< book-checkpoint 16.3 lead="true" >}}
 
 ::: {.notes}
-A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on both reports.
+A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on the totals they test in both reports.
 :::
 
 # Looking Ahead
@@ -575,11 +575,11 @@ A monitoring report earns its place when its conclusions accumulate and its own 
 
 - Exceptions cluster in the first month of every year
 - One recurs every month, because a control has no one to perform it
-- Dispositions survive every refresh; open exceptions are the work
-- The reports are complete and tested, current only to a date by process
+- Dispositions survive every refresh; open exceptions await review
+- Entries reconcile, orders have no gap, and currency differs by process
 
 ::: {.notes}
-Most of this work was descriptive and diagnostic analytics, and its recommendations, on the controls and on the reports, are prescriptive. The reports' changes need controls that a single file cannot provide.
+Most of this work was descriptive and diagnostic analytics, and its recommendations, on the controls and on the reports, are prescriptive. The follow-ups and deficiencies stay on the list until they are closed, and the reports' changes need controls that a single file cannot provide.
 :::
 
 ## Part IV is complete
@@ -620,7 +620,7 @@ Every term is defined at the end of the chapter. Exception register, open except
 Next: {{< book-next >}}
 
 ::: {.notes}
-Assign one exercise from each perspective; Exercise 16.2 makes cutoff a monthly test, Exercise 16.4 follows the exception rates over time, and Exercise 16.6 measures the concentration of approval. The Part IV Comprehensive Case follows.
+Assign one exercise from each perspective; Exercise 16.2 adds the year-end cutoff tests to the monitoring report, Exercise 16.4 follows the exception rates over time, and Exercise 16.6 measures the concentration of approval. The Part IV Comprehensive Case follows.
 :::
 
 ## About these slides

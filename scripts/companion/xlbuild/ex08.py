@@ -241,12 +241,21 @@ class Facts:
             after.append(dict(label=r["label"], count=r["count"] - len(s), balance=bal, small=len(s),
                               loss=xr(bal * r["rate"])))
         old = [i for i in small if i["days"] >= 61]
+        # C8-16: the old balances written off under a small-balance policy (the current invoice stays), and the allowance
+        # the remaining invoices need afterwards
+        after_old = []
+        for r in rows:
+            s = [i for i in old if i["bucket"] == r["label"]]
+            after_old.append(xr((r["balance"] - sum(i["balance"] for i in s)) * r["rate"]))
+        old_total = sum(i["balance"] for i in old)
         gl_rows = sum(v["count"] for (acc, _), v in a["ledger"].items() if acc in (ALLOWANCE, BAD_DEBT))
         return dict(rows=rows, loss=loss, opening=opening, voucher=voucher, opening_loss=opening_loss,
                     with_opening=loss + opening_loss, small=small, small_total=sum(i["balance"] for i in small),
                     small_current=[i for i in small if i["bucket"] == "Current"], old=old,
                     old_low=min(i["balance"] for i in old), old_high=max(i["balance"] for i in old),
                     after=after, after_loss=sum(r["loss"] for r in after), gl_rows=gl_rows,
+                    old_total=old_total, after_old_loss=sum(after_old),
+                    topup=sum(after_old) - (loss - old_total),
                     total=a["subledger"], count=len(a["invoices"]))
 
     # --- Exercise 8.2 ------------------------------------------------------------------------------------------------
@@ -388,9 +397,10 @@ class Facts:
             return ("Design and operation",
                     f"Follow up: the note-financed capital purchase behind invoice {cap['invoice']['number']} "
                     f"(Exercise 8.2), {money(o['total'])}, created and approved by the purchasing manager, {a['name']}, "
-                    f"far above the approval limit of {money(a['limit'])}. Request the approval of the purchase and of "
-                    "the note by someone with the authority (the chief financial officer or the board), and agree the "
-                    "asset to the fixed-asset register.")
+                    f"far above the approval limit of {money(a['limit'])}. No recorded limit, the chief financial officer's "
+                    f"included, reaches {money(o['total'])}: request the board's approval of the purchase and of the note, "
+                    "or of an approver with documented authority above the amount, and agree the asset to the "
+                    "fixed-asset register.")
         if only("self", "above") and a["limit"] == 0 and a["family"] == "Purchasing and Procurement" \
                 and o["date"][5:7] == "01":
             return ("Design and operation",
@@ -406,9 +416,10 @@ class Facts:
         if only("above", "term") and a["limit"] == 0:
             return ("Design and operation",
                     f"Follow up: approved by {a['name']}, {audit.article(a['title'].lower())} terminated on "
-                    f"{a['terminated']}, on an order dated {o['date']}, created by {c['name']}. The approver had "
-                    "left and had no approval authority ($0); the login was still active. Find out who used it, vouch "
-                    "the order, and report the access failure.")
+                    f"{a['terminated']}, on an order dated {o['date']}, created by {c['name']}. The approver's "
+                    "recorded termination precedes the order date, and the recorded limit is $0. The data hold no "
+                    "approval timestamp or access log: obtain them to find out when the approval was recorded and who "
+                    "recorded it, vouch the order, and report the finding.")
         if only("above") and a["limit"] > 0:
             return ("Operation",
                     f"Follow up: approved by the {a['title'].lower()}, {a['name']}, for {money(o['total'])}, "
@@ -455,7 +466,7 @@ class Facts:
         gaps = []
         for y in range(self.year - 2, self.year + 1):
             seqs = [int(o["number"][-6:]) for o in orders if int(o["number"][3:7]) == y]
-            gaps.append(dict(year=y, n=len(seqs), low=min(seqs), high=max(seqs)))
+            gaps.append(dict(year=y, n=len(seqs), low=min(seqs), high=max(seqs), distinct=len(set(seqs))))
         return dict(orders=len(orders), cfo=sum(1 for o in orders if o["approver"]["title"] == CFO),
                     flags={k: sum(1 for o in orders if o["flags"][k]) for k in ("self", "above", "term")},
                     scores=Counter(o["score"] for o in orders), flagged=flagged, dispositions=dispositions,
@@ -594,11 +605,13 @@ def ex8_1(b: ExerciseBuild) -> None:
         f"Treating the {money(f['opening'])} as more than 90 days past due adds {money(f['opening_loss'])} and raises "
         f"the allowance from {money(f['loss'])} to {money(f['with_opening'])}. But its age cannot be known from the "
         f"data: {f['voucher']} posted it to account 1020 as a single line on the conversion date, with no customer, "
-        "invoice, invoice date, or due date behind it, and no cash application has ever reduced it, because every "
-        "receipt is applied to an invoice. A balance with no customer detail cannot be aged, confirmed, or collected, so "
-        "the real question is whether it belongs in receivables at all. It should not simply be aged: the controller "
-        "should obtain the customer-level detail from the conversion date and age that detail, or, if no support "
-        "exists, remove the balance (a correction of the opening balances) rather than reserve 40 percent of it."])
+        "invoice, invoice date, or due date behind it, and no cash application in the extract has reduced it, because "
+        "every receipt is applied to an invoice. A balance with no customer detail cannot be aged, confirmed, or "
+        "collected, so the real question is whether it belongs in receivables at all. It should not simply be aged: the "
+        "controller should obtain the customer-level detail from the conversion date and age that detail. If the "
+        "evidence then shows that the balance is not a receivable, the correction of the opening balances is a decision "
+        "for management and the auditor; the extract alone cannot settle it, because the detail may simply be missing "
+        "from it."])
 
     # (3) the open invoices under $10, and the aging without them.
     heading(ws, row, f"(3) Open invoices with a balance under ${SMALL}")
@@ -647,11 +660,13 @@ def ex8_1(b: ExerciseBuild) -> None:
         + (f"One is current ({', '.join(i['number'] + ' ' + money(i['balance']) for i in current)}); "
            if len(current) == 1 else f"{word(len(current), True)} are current; ")
         + f"the other {word(len(old))} are 61 or more days past due, from {money(f['old_low'])} to {money(f['old_high'])}: "
-        "residuals left after the customers paid, not amounts anyone is disputing. Writing them off removes "
-        f"{word(n_small)} invoices and {money(f['small_total'])} from the aging and lowers the expected loss from "
-        f"{money(f['loss'])} to {money(f['after_loss'])}. The amounts are trivial, but the write-off matters for the "
-        f"aging itself: after it, the two oldest buckets hold {sum(r['count'] for r in after_61)} invoices instead of "
-        f"{sum(r['count'] + r['small'] for r in after_61)}, so what is left there is worth a collection call."])
+        "small balances left after the customers paid; nothing in the data shows whether any of them is disputed. "
+        f"Writing all {word(n_small)} off, as the requirement asks, removes {money(f['small_total'])} from the aging and "
+        f"lowers the expected loss from {money(f['loss'])} to {money(f['after_loss'])}, and the two oldest buckets then "
+        f"hold {sum(r['count'] for r in after_61)} invoices instead of {sum(r['count'] + r['small'] for r in after_61)}, "
+        "so what is left there is worth a collection call. "
+        + ("The current invoice is a whole invoice not yet due rather than a residual, so a small-balance policy "
+           "would keep it; the old balances are the candidates." if current else "")])
 
     # (4) the adjusting entry.
     heading(ws, row, "(4) Adjusting journal entry")
@@ -671,12 +686,20 @@ def ex8_1(b: ExerciseBuild) -> None:
     row = text_block(ws, e + 7, f"{MA}, requirement (4)", [
         f"Dr 6170 Bad Debt Expense {money(f['loss'])}; Cr 1030 Allowance for Doubtful Accounts {money(f['loss'])}. "
         "The recommended allowance covers the invoices only; the opening balance is resolved separately, as "
-        "requirement (2) explains. Neither account has ever had a posting, so this would be the first allowance.",
+        "requirement (2) explains. Neither account has a posting in the three years, so this would be the first "
+        "allowance in the extract. "
+        + (f"If the {word(len(old))} old balances are then written off under an approved small-balance policy, the "
+           f"write-off is charged to the allowance (Dr 1030, Cr 1020, {money(f['old_total'])}), which leaves "
+           f"{money(f['loss'] - f['old_total'])} against an estimate of {money(f['after_old_loss'])} on the invoices that "
+           f"remain, so a further {money(f['topup'])} (Dr 6170, Cr 1030) restores it."
+           if current else ""),
         "The credit loss standard (FASB, 2016; ASC 326-20) accepts an aging schedule as a method of estimating expected "
-        "credit losses, and it requires an allowance even when the risk of loss is remote. The rates must start from "
+        "credit losses, and it requires the estimate to reflect the risk of loss even when it is remote. The rates must "
+        "start from "
         "historical loss experience for each bucket and then be adjusted for current conditions and reasonable and "
-        "supportable forecasts (the standard's illustration of an aging schedule does exactly that). Charles River has "
-        "no write-off history, so the proposed rates are not its own experience: document their source, then raise "
+        "supportable forecasts (the standard's illustration of an aging schedule does exactly that). The data hold no "
+        "write-off history, so the proposed rates are not Charles River's own experience: document their source, then "
+        "raise "
         "them if customers' industries or the economy weaken, or if forecast conditions are worse than the period the "
         "rates come from, and lower them only with evidence. The adjustment is a judgment the controller documents and "
         "revisits every reporting date."])
@@ -688,18 +711,24 @@ def ex8_1(b: ExerciseBuild) -> None:
         f"Estimate. Applying the credit department's loss rates to the aging of the {f['count']:,} open invoices "
         f"({money(f['total'])}) gives an expected credit loss of {money(f['loss'])}, {pct_ar:.2%} of the open balance. "
         f"Almost all of it comes from the current bucket ({money(f['rows'][0]['loss'])}) and the 1 to 30 days bucket "
-        f"({money(f['rows'][1]['loss'])}), because customers pay mostly on time. I recommend recording it: Dr 6170 Bad "
-        f"Debt Expense, Cr 1030 Allowance for Doubtful Accounts, {money(f['loss'])}. Charles River has never recorded an "
-        "allowance, and the credit loss standard requires one even when the risk is low; the rates should be documented "
-        "and adjusted for current conditions and forecasts.",
+        f"({money(f['rows'][1]['loss'])}), because almost all of the open balance is current or less than 30 days past "
+        "due. I recommend recording it: Dr 6170 Bad Debt Expense, Cr 1030 Allowance for Doubtful Accounts, "
+        f"{money(f['loss'])}. The ledger shows no allowance in the three years, and the credit loss standard requires "
+        "the estimate to reflect the risk of loss even when it is low; the rates should be documented and adjusted for "
+        "current conditions and forecasts.",
         f"Opening balance. Account 1020 also holds {money(f['opening'])} posted by {f['voucher']} with no invoice detail. "
         f"If it were aged as more than 90 days past due, the allowance would rise to {money(f['with_opening'])}, but "
         "its age and collectability cannot be determined, and no customer can be asked to pay it. I recommend not "
-        "reserving it as if it were a receivable: obtain the customer detail from the conversion date, or, if none "
-        "exists, remove the balance as a correction of the opening balances.",
-        f"Small balances. {word(n_small, True)} open invoices carry residual balances under ${SMALL}, together "
-        f"{money(f['small_total'])}, most of them more than 60 days past due. I recommend writing them off, which leaves "
-        "the oldest buckets with the balances that deserve collection effort."])
+        "reserving it as if it were a receivable: obtain the customer detail from the conversion date and age it; if the "
+        "evidence shows the balance is not a receivable, decide the correction of the opening balances with the "
+        "auditor.",
+        f"Small balances. {word(n_small, True)} open invoices have balances under ${SMALL}, together "
+        f"{money(f['small_total'])}. "
+        + (f"{word(len(old), True)} are old balances left after the customers' payments ({money(f['old_total'])}); the "
+           "other is a current invoice not yet due, which stays. I recommend writing off the old balances under an "
+           "approved small-balance policy and charging them to the allowance, which then needs "
+           f"{money(f['topup'])} more to cover the invoices that remain (requirement (4))."
+           if current else "I recommend writing them off under an approved small-balance policy.")])
 
     t = "8.1"
     for i, r in enumerate(f["rows"]):
@@ -872,9 +901,11 @@ def ex8_2(b: ExerciseBuild) -> None:
     approver = cap[0]["po"]["approver"]
     row = text_block(ws, end + 2, f"{MA}, requirement (4)", [
         f"Opening balance ({opening['voucher']}, {money(opening['amount'])}): accounts payable carried over at "
-        "conversion with no invoice detail and never paid since. The ledger may be right only if the conversion-date "
-        "supplier detail supports it; request that detail. Until it is found, the balance is unsupported and the "
-        "correction belongs in the ledger, the same finding as the opening receivables. That the same entry debits "
+        "conversion with no invoice detail in the extract, which no payment in the extract reduces, because every "
+        "payment names an invoice. The ledger may be right only if the conversion-date supplier detail supports it; "
+        "request that detail. Until it is found, the balance is unsupported by the extract's detail, and whether the "
+        "correction belongs in the ledger or in missing invoice detail depends on what the conversion records show, "
+        "the same finding as the opening receivables. That the same entry debits "
         "cash with exactly the same amount is a coincidence that adds to the question.",
         "Debt reclassifications (" + "; ".join(
             f"{j['voucher']}, {money(j['invoice']['total'])}, invoice {j['invoice']['number']}" for j in cap)
@@ -1041,18 +1072,20 @@ def ex8_3(b: ExerciseBuild) -> None:
         f"Customers over their limits. {word(len(over), True)} customers owe more than their credit limit: "
         + "; ".join(f"{o['name']} {money(o['balance'])} against {money(o['limit'])} ({o['segment']}, {o['terms']})"
                     for o in over)
-        + ". None of them has any past-due balance: they are over the limit because of recent billing, not slow "
-          "payment.",
-        "Payment behavior. Past-due balances are "
+        + ". None of them has any past-due balance at this date: their excess comes from current billing, not from "
+          "overdue amounts. The snapshot says nothing about how they have paid in the past.",
+        "Past due. Past-due balances are "
         + ("concentrated in the shorter terms" if [k for k, _ in by_rate] == [k for k, _ in terms] else "uneven")
         + f": {worst[0]} customers have "
         f"{worst[1][1] / worst[1][0]:.1%} of their balance past due, against "
         + series(f"{k} {v[1] / v[0]:.1%}" for k, v in terms if k != worst[0])
         + ". Every open invoice's due date follows its customer's terms.",
         "Recommendations. (1) Review the limits of the customers over them rather than stopping their shipments: "
-        "they pay on time, so raise the limits where their volume justifies it, and otherwise require approval of new "
-        "orders until the balance falls. (2) Make the system block or route for approval any order that would take a "
-        f"customer over its limit, since {word(len(over))} exceeded theirs unnoticed. (3) Focus collection effort on the "
+        "they have nothing past due at this date, so review their payment history and any approved exceptions, raise "
+        "the limits where the history and their volume justify it, and otherwise require approval of new orders until "
+        "the balance falls. (2) Make the system block or route for approval any order that would take a customer over "
+        f"its limit, since {word(len(over))} exceed theirs with no approved exception recorded in the data. (3) Focus "
+        "collection effort on the "
         f"past-due balances of the {by_rate[0][0]} and {by_rate[1][0]} customers. (4) Watch the largest balances, which are not dangerously "
         "concentrated today but would hurt most if a large customer failed."])
 
@@ -1195,19 +1228,21 @@ def ex8_4(b: ExerciseBuild) -> None:
     text_block(ws, t0 + 12, f"{MA}, requirement (4): memo to the treasurer", col=5, span=6, paragraphs=[
         f"To: the treasurer. Subject: supplier payments in fiscal {b.year}.",
         f"Concentration. Charles River paid {money(f['total'])} to {f['suppliers']} suppliers in {f['n']:,} payments. "
-        f"Spending is not concentrated: {marks[0.5]} suppliers make up half of it, {marks[0.8]} make up 80 percent, and "
+        f"Spending is not concentrated in dollars: {marks[0.5]} suppliers make up half of it, {marks[0.8]} make up 80 percent, and "
         f"{marks[0.9]} make up 90 percent, and the largest supplier, {f['top']} ({f['top_category']}), receives only "
         f"{f['top_share']:.2%}. The dependence is on categories rather than on single suppliers: {cats[0][0]} takes "
-        f"{cats[0][1] / f['total']:.1%} of the spending and {cats[1][0]} {cats[1][1] / f['total']:.1%}. Supplier risk is "
-        f"therefore low for any one supplier, but a disruption in {cats[0][0].lower()} would reach many suppliers at "
-        "once.",
+        f"{cats[0][1] / f['total']:.1%} of the spending and {cats[1][0]} {cats[1][1] / f['total']:.1%}. The dollars put "
+        "little weight on any one supplier, though a low-spend supplier can still be critical, which the dollars do not "
+        f"show; and a disruption in {cats[0][0].lower()} would reach many suppliers at once.",
         f"Timing. {f['late']:,} payments ({f['late'] / f['n']:.1%}, holding {f['late_value']:.1%} of the value) were made "
         f"after the due date, {f['on']:,} on it, and {f['early']:,} before it. The median payment is {f['median']:.0f} "
         f"days late and the mean {f['mean']:.1f} days; {f['late30']:,} payments were more than 30 days late.",
         "What it means for cash. Paying late keeps cash in the business a few days longer, but it risks late fees, "
         "credit holds, worse prices, and strained relationships, and the payments more than 30 days late are the ones "
-        "suppliers notice. Paying early gives up cash with nothing in return: the data records no early-payment "
-        "discounts, so an early payment is a free loan to the supplier. Recommendation: schedule payment runs by due "
+        "suppliers notice. Paying early uses cash sooner: no early-payment discount is recorded in the data or in the "
+        "suppliers' terms, so unless a contract gives something in return, an early payment is a free loan to the "
+        "supplier. Review the terms and the reasons before standardizing the timing. Recommendation: schedule payment "
+        "runs by due "
         "date, so that invoices are paid on time rather than early or late; negotiate discounts or longer terms with "
         "the largest suppliers if cash is tight; and investigate why so many payments are late, whether approval delays "
         "or cash planning."])
@@ -1537,25 +1572,29 @@ def ex8_5(b: ExerciseBuild) -> None:
         f"SameAmount flags {n_dup} payments, {f['pairs']} pairs of payments to the same supplier for the same amount "
         f"(no group is larger than two; {f['within30']} pairs are at most 30 days apart). SameInvoice flags "
         f"{word(f['same_invoice']) if f['same_invoice'] else 'none'}: no pair also pays the same invoice. The difference shows that every pair pays two "
-        "different invoices for the same amount, repeat purchases at the same price, and that no invoice was paid "
-        "twice. The duplicate payment test is clean; the close pairs deserve only a glance at their invoices.")
+        "different invoices for the same amount, most likely repeat purchases at the same price. The test is clean "
+        "for what it tests: it does not exclude a bill entered under two invoice numbers, or an invoice overpaid in "
+        "unequal parts. The close pairs deserve a look at their invoices and receipts.")
     g0 = 12 + n_dup + 2
     heading(wp, g0, "(6) Gap test on the purchase order numbers (POApprovals, POYear and POSeq)")
     header(wp, g0 + 1, 1, ["Year", "Orders", "Smallest number", "Largest number", "Largest - smallest + 1", "Missing",
-                           "Continues from the year before"])
+                           "Continues from the year before", "Distinct numbers"])
     for k, g in enumerate(f["gaps"]):
         r = g0 + 2 + k
         put(wp, {f"A{r}": g["year"], f"B{r}": f"=COUNTIF(POApprovals[POYear],A{r})",
                  f"C{r}": f"=MINIFS(POApprovals[POSeq],POApprovals[POYear],A{r})",
                  f"D{r}": f"=MAXIFS(POApprovals[POSeq],POApprovals[POYear],A{r})", f"E{r}": f"=D{r}-C{r}+1",
-                 f"F{r}": f"=E{r}-B{r}", f"G{r}": "" if k == 0 else f"=C{r}=D{r - 1}+1"})
+                 f"F{r}": f"=E{r}-B{r}", f"G{r}": "" if k == 0 else f"=C{r}=D{r - 1}+1",
+                 f"H{r}": f"=ROWS(UNIQUE(FILTER(POApprovals[POSeq],POApprovals[POYear]=A{r})))"})
     g_last = g0 + 1 + len(f["gaps"])
     fmt(wp, f"B{g0 + 2}:F{g_last}", COUNT)
+    fmt(wp, f"H{g0 + 2}:H{g_last}", COUNT)
     wp.Range(f"A{g0 + 2}:A{g_last}").HorizontalAlignment = -4131
     gaps = f["gaps"]
     row = text_block(wp, g_last + 2, f"{MA}, requirement (6)", [
         "; ".join(f"{g['year']}: numbers {g['low']:,} to {g['high']:,}, {g['n']:,} orders" for g in gaps)
-        + ". In every year the count equals the range, so no number is missing, and each year starts where the year "
+        + ". In every year the count equals the number of distinct sequence numbers, so no number repeats, and it "
+        "equals the range, so no number is missing; each year starts where the year "
         "before ended: the sequence runs on across years instead of restarting in January, which a reader of the "
         "PONumber prefix might not expect."])
 
@@ -1569,8 +1608,8 @@ def ex8_5(b: ExerciseBuild) -> None:
     text_block(ws, i_last + 2, f"{MA}, requirement (7): memo to the chief audit executive", [
         f"Exceptions. Of {f['orders']:,} purchase orders, the chief financial officer approved {f['cfo']:,} "
         f"({f['cfo'] / f['orders']:.1%}). {sc[2] + sc[1]} orders fail at least one test: {fl['self']} were approved "
-        f"by their creator, {fl['above']} exceed the approver's limit, and {fl['term']} were approved after the "
-        f"approver's termination ({sc[2]} fail two tests, {sc[1]} one). They include the two note-financed capital "
+        f"by their creator, {fl['above']} exceed the approver's limit, and {fl['term']} carry the ID of an approver "
+        f"whose recorded termination precedes the order date ({sc[2]} fail two tests, {sc[1]} one). They include the two note-financed capital "
         "purchases (" + ", ".join(f"{j['po']['number']} {money(j['po']['total'])}" for j in cap)
         + f"), created and approved by the purchasing manager with a {money(cap[0]['po']['approver']['limit'])} "
         f"limit, and {word(len(term))} orders approved by "
@@ -1580,17 +1619,20 @@ def ex8_5(b: ExerciseBuild) -> None:
         "production supervisor outside the purchasing and accounting roles, and the purchasing manager, on the two "
         f"capital invoices. The requisitions cluster just below $5,000, with {word(f['unapproved'])} converted to orders "
         "without approval.",
-        "Design or operation. The design is weak: the systems accept an approval by the person who created the "
-        "document, by someone whose limit is $0 or below the amount, and by a terminated employee, and they convert "
-        "requisitions to orders without an approval. Approval limits exist in the Employee table but nothing enforces "
-        "them. Operation failed too: managers approved above their limits, and the access of departed employees was "
-        "not removed. Because every exception got through a control that should have stopped it, fixing the design "
-        "matters more than retraining.",
+        "Design or operation. The records point to a weak design: they hold approvals by the person who created "
+        "the document, by someone whose limit is $0 or below the amount, and under the ID of a terminated employee, "
+        "and requisitions converted to orders without an approval, so no control in the data stopped them. The limits "
+        "in the Employee table were not applied to these documents. Operation failed too: managers approved above their "
+        "limits. Whether each control was absent, bypassed, or misconfigured takes the approval policy, the system's "
+        "configuration, and the access logs, so the classification is provisional until they are seen; if the design "
+        "let the exceptions through, fixing it matters more than retraining.",
         f"Clean results. The near-duplicate test flags {f['same']} payments in {f['pairs']} pairs of the same supplier "
-        "and amount, but none pays the same invoice, so no invoice was paid twice. Purchase order numbers have no gaps in "
-        "any year and continue across years.",
-        "Follow-up. Obtain the approvals of the two capital purchases and their notes; find out who used the "
-        "terminated employee's login; vouch the self-approved and above-limit orders to receipts and invoices; ask "
+        "and amount, but none pays the same invoice, which rules out a second payment of the same invoice for the same "
+        "amount but not every duplicate. Purchase order numbers are unique, have no gaps in any year, and continue "
+        "across years.",
+        "Follow-up. Obtain the board's approval of the two capital purchases and their notes; obtain the approval "
+        "timestamps and access logs behind the orders that carry the terminated employee's ID; vouch the self-approved "
+        "and above-limit orders to receipts and invoices; ask "
         "whether a $5,000 practice exempts requisitions from approval; and recommend system controls that block "
         "self-approval, enforce limits, require an approved requisition, and disable users at termination."])
 
@@ -1642,6 +1684,7 @@ def ex8_5(b: ExerciseBuild) -> None:
         b.check(t, f"PO-{g['year']}: smallest number", g["low"], f"='Ex 8.5 Payments'!C{r}", 0, COUNT)
         b.check(t, f"PO-{g['year']}: largest number", g["high"], f"='Ex 8.5 Payments'!D{r}", 0, COUNT)
         b.check(t, f"PO-{g['year']}: missing numbers", 0, f"='Ex 8.5 Payments'!F{r}", 0, COUNT)
+        b.check(t, f"PO-{g['year']}: distinct numbers, one per order", g["distinct"], f"='Ex 8.5 Payments'!H{r}", 0, COUNT)
 
 
 # --- Exercise 8.6 ----------------------------------------------------------------------------------------------------
@@ -1859,20 +1902,23 @@ def ex8_6(b: ExerciseBuild) -> None:
         f"recorded under {own[0]['method']} and cite list {cited['id']}, the {cited['segment']} segment list, which "
         f"ended on {cited['end']}. Their UnitPrice equals the customer's own list ("
         + ", ".join(f"{o['price']:,.2f}" for o in own) + "), not the list they cite ("
-        + ", ".join(f"{o['cited_price']:,.2f}" for o in own) + "). The customer paid its contract price, so nothing "
-        "was overcharged or undercharged; the pricing record is wrong: it names a list that did not set the price"
+        + ", ".join(f"{o['cited_price']:,.2f}" for o in own) + "). The order lines carry the customer's contract "
+        "price, so the order prices show no overcharge or undercharge; the pricing record is wrong: it names a list "
+        "that did not set the price"
         + (f", and for the lines of {' and '.join(sorted({o['date'][:4] for o in stale}))} a list that had already "
            "expired" if stale else "")
-        + ". No other customer with its own list has lines priced another way."])
+        + ". No other customer with its own list has lines priced another way. Whether the invoices and the "
+        "payments followed the same price would take a trace to them."])
     row = text_block(wl, row, f"{MA}, requirement (4)", [
         "; ".join(f"{'L' if i == 0 else 'l'}ist {x['id']} ({x['name']}) ends {x['end']}" for i, x in enumerate(fl))
         + f": all {word(len(fl))} are Expired"
         + (", " + " and ".join(f"list {x['id']}" for x in backwards) + " even ends before it starts" if backwards else "")
         + f", and none has a later list for its segment. Yet {f['after']:,} order lines dated after the lists' end "
-        f"dates ({money(f['after_total'])}) were priced from them: " + "; ".join(
+        f"dates cite them ({money(f['after_total'])} of order value, not a loss): " + "; ".join(
             f"list {x['id']}: " + ", ".join(f"{f['grid'][(x['id'], y)]:,} in {y}" for y in years if f["grid"][(x["id"], y)])
             for x in fl)
-        + f". The system prices from lists that have expired. Lists {series(x['id'] for x in unused)} are "
+        + f". Nothing in the records stops an order line from citing an expired list. Lists "
+        f"{series(x['id'] for x in unused)} are "
         "Active copies of the Design Trade list, with no lines, that price nothing: clutter that makes it harder to see "
         "which list is in force."])
 
@@ -1894,21 +1940,22 @@ def ex8_6(b: ExerciseBuild) -> None:
     classes = [
         (f"Promotions {series(p['id'] for p in pt_rows)}: end dates on or before their start dates",
          "Yes", "Yes",
-         "The system accepts an end date that is not after the start date (design), and the sales manager approved "
-         "the promotions that way on their start dates; their discount was then granted on every collection line "
-         f"ordered in {ordered_in} (operation)."),
+         "The promotions were recorded, and approved by the sales manager on their start dates, with an end date "
+         "that is not after the start date (design: nothing in the records validates the dates); their discount was "
+         f"then granted on every collection line ordered in {ordered_in} (operation)."),
         (f"{word(n_req, True)} pending override requests, billed at their ApprovedUnitPrice on "
          f"{len(pend)} invoice lines", "Yes", "Yes",
-         "An order line can carry the price of an override that is still Pending, under a price-list PricingMethod "
-         "and with no PriceOverrideApprovalID (design); nobody approved or rejected the requests (operation)."),
-        (f"Expired price lists {list_ids} pricing {f['after']:,} order lines after their end dates", "Yes", "Yes",
-         "The system prices from expired lists and accepts a list that ends before it starts (design); nobody "
-         "renewed or replaced the segment lists (operation)."),
+         "Order lines carry the price of an override that is still Pending, under a price-list PricingMethod and "
+         "with no PriceOverrideApprovalID (design: nothing in the records links a price to an approved request); the "
+         "requests were never approved or rejected (operation)."),
+        (f"Expired price lists {list_ids} cited by {f['after']:,} order lines after their end dates", "Yes", "Yes",
+         "Order lines cite expired lists, and one list ends before it starts (design: no date check in the "
+         "records); the segment lists were not renewed or replaced (operation)."),
         (f"Lists {series(x['id'] for x in unused)}: Active copies with no lines", "Yes", "",
          "Duplicate master data that nothing uses: a weakness in how price lists are set up and retired."),
         (f"Customer {own[0]['customer']}'s lines citing list {cited['id']}", "Yes", "",
-         "The price is right, but the record names the wrong list: the system does not check that the cited list "
-         "set the price."),
+         "The price is right, but the record names the wrong list: nothing in the records checks that the cited "
+         "list set the price."),
     ]
     width = sum(ws.Columns(c).ColumnWidth for c in "FGHIJ")
     for k, (exc, design, op, why) in enumerate(classes):
@@ -1930,15 +1977,18 @@ def ex8_6(b: ExerciseBuild) -> None:
         f"lines were billed at the pending ApprovedUnitPrice on {word(len(pend))} invoice lines, "
         f"{money(below)} below the reference prices, under a price-list pricing method with no approval recorded.",
         f"Price lists. {word(len(fl), True)} segment lists have expired with no successor, but "
-        f"{f['after']:,} order lines worth {money(f['after_total'])} were priced from them after their end dates"
+        f"{f['after']:,} order lines worth {money(f['after_total'])} (order value, not a loss) cite them after their "
+        "end dates"
         + (f"; {word(len(backwards))} of them ends before it starts" if backwards else "")
         + f". {word(len(unused), True)} Active copies of the Design Trade list are unused. Customer "
         f"{own[0]['customer']}'s contract prices were recorded as if they came from the {cited['segment']} segment list.",
         "Recommendations. Reject promotions and price lists whose end date is not after the start date; block "
         "pricing from expired lists, and renew or retire the segment lists; allow an override price only after the "
         "request is approved, and link the approval to the line; remove the unused copies; and review the promotion "
-        "and price-list setups each year before they take effect. Most exceptions are design weaknesses: the system "
-        "let them through, so the fixes belong in the system, with a periodic review as the detective control."])
+        "and price-list setups each year before they take effect. Most exceptions point to design weaknesses: nothing "
+        "in the records stopped them, so the fixes likely belong in the system, with a periodic review as the "
+        "detective control; the classification is provisional until the system's configuration and the pricing policy "
+        "are seen."])
 
     t = "8.6"
     b.check(t, "promotions flagged EndOnOrBeforeStart", n_f, "=COUNTIF(Promotions[EndOnOrBeforeStart],TRUE)", 0, COUNT)

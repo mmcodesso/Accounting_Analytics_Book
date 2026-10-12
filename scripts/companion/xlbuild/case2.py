@@ -788,7 +788,7 @@ def r1(b: ExerciseBuild) -> None:
             "ItemGroup, CollectionName, ListPrice), with ListAmount = [Quantity] * [ListPrice]. Overrides: "
             "T8_PriceOverrideApproval merged twice with Employees, for the requester's and the approver's name and "
             "job title. SourceCounts reads the row count of each source Table for the completeness checks. Invoices "
-            "is connection-only (Enable Load cleared), because it only feeds BilledLines."),
+            "is connection-only (loaded with Only Create Connection), because it only feeds BilledLines."),
         "Parameters": ("HarborRate, FurnitureRate, and DesignTradeRate (inputs, Parameters!B3:B5); CommissionRate "
                        "(Parameters!B6, Tutorial 7.3's formula, rows 18 to 20); ReportYear (input, B7), FirstYear and "
                        "PlanYear (B8:B9); HarborPromotion, FurniturePromotion, and DesignTradePromotion (B12:B14, the "

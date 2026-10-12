@@ -195,9 +195,9 @@ In Chapter 5 you merged the invoice, item and customer details into the invoice 
 Power BI marks the one side of each relationship with 1 and the many side with an asterisk, and the arrow shows the direction of the filter. Selecting Furniture in Item keeps only the Furniture lines, because each line looks up its item; the filter does not flow back from the lines to the items, which matters in Tutorial 13.2.
 :::
 
-## No declared keys, so define and test them
+## No relationships in the source: define and test them
 
-- The database declares no foreign keys, so you define each relationship
+- The workbook's Tables carry no relationships, so you define each one
 - Then test it, as Chapter 3 recommended for any logical key
 - A line whose key finds no match appears under (Blank)
 - A blank category is a signal to investigate, not to explain away
@@ -221,7 +221,7 @@ Students turn off the two defaults, choose four Tables in the Navigator, correct
 {{< book-steps 13.1 7-11 >}}
 
 ::: {.notes}
-After Close & Apply, students relate the three pairs of tables in Model view, set the year columns to Don't summarize, format the amounts, and build the Validation page.
+After Close & Apply, students relate the three pairs of tables in Model view, set the year columns to Don't summarize, format the amounts, and build the Validation page. The keys keep their default, Sum, until Chapter 14 hides them, because this chapter only counts them.
 :::
 
 ## The model ties to Chapter 6 before anyone reads it
@@ -274,13 +274,13 @@ The choice follows the question, as Chapter 6 set out, and stacked charts show c
 
 ## Visuals on a page filter one another
 
-- Click a bar, and every other visual on the page shows that category
+- Click a bar, and the visuals it reaches show that category
 - Charts highlight the selected part; cards and lines show the filtered value
 - Edit interactions sets, for each pair, filter, highlight or nothing
 - Filters pane entries are invisible on the canvas, so state them
 
 ::: {.notes}
-This is cross-filtering and cross-highlighting. A year slicer should filter every visual, while a chart that compares the years should be left alone by it. The Filters pane suits restrictions that belong to the report, such as keeping only the sellable items; a filter that changes the meaning of a number belongs in a slicer the reader can see, or in the title.
+This is cross-filtering and cross-highlighting, and it reaches only the visuals the relationships carry the filter to, as Tutorial 13.2 shows. A year slicer should filter every visual, while a chart that compares the years should be left alone by it. The Filters pane suits restrictions that belong to the report, such as keeping only the sellable items; a filter that changes the meaning of a number belongs in a slicer the reader can see, or in the title.
 :::
 
 ## Check your understanding {.check}
@@ -317,12 +317,12 @@ The third needs a measure, which Chapter 14 teaches, as Chapter 6's margins need
 Students add a year slicer first, because every other visual depends on it, then four cards, a line chart and a bar chart of the discounts, a matrix of revenue by item group and quarter, and slicers for segment and region. The cards count invoices with Count (Distinct) on the invoice lines' SalesInvoiceID.
 :::
 
-## The cards match the Validation page
+## Three cards match the Validation page
 
 {{< book-figure fig-13-06 crop="0,0,1,0.2012" >}}
 
 ::: {.notes}
-With the latest year selected in the tile slicer, the revenue and invoice cards match the Validation page, and the gap between the list amount and revenue is the price reduction that Chapter 6 analyzed. Display units set to None shows the amounts in full rather than as millions.
+With the latest year selected in the tile slicer, the revenue, list amount and discount cards match the Validation page. The invoice card counts invoices, not lines, so it is lower than the page's count of invoice lines. The gap between the list amount and revenue is the price reduction that Chapter 6 analyzed. Display units set to None shows the amounts in full rather than as millions.
 :::
 
 ## Discounts peak in the autumn, almost all on Furniture
@@ -367,7 +367,7 @@ The page already answers part of the controller's question: the discounts were c
 {{< book-figure fig-13-07 crop="0,0,1,0.4547" >}}
 
 ::: {.notes}
-Cleveland and McGill asked readers to judge the relative size of values encoded in different ways. Readers judged position along a common scale most accurately, as in bars that share a baseline, and length without a common baseline less accurately. The bars make the order and the gaps between the item groups easy to read; in the stacked bar, the smaller groups are hard to compare.
+Cleveland and McGill ranked the judgments a reader makes in decoding a graph, from position along a common scale, as in bars that share a baseline, down to shading. In their experiments, readers judged position more accurately than length without a common baseline, as in a stacked bar. The bars make the order and the gaps between the item groups easy to read; in the stacked bar, the smaller groups are hard to compare.
 :::
 
 ## Angles and areas are hard to compare
@@ -375,7 +375,7 @@ Cleveland and McGill asked readers to judge the relative size of values encoded 
 {{< book-figure fig-13-07 crop="0,0.4666,1,0.4606" >}}
 
 ::: {.notes}
-Readers judged angles, as in a pie, and areas, as in circles, less accurately still, and color shading least of all. The same values that bars make easy to compare become a matter of guessing as slices or circles, which is why a bar chart is usually better than a pie.
+Position was also judged about twice as accurately as angle, as in a pie. The ranking puts angle with length, area, as in circles, below them, and color shading last; those lower ranks rest on psychophysics more than on their experiments. The same values that bars make easy to compare become a matter of guessing as slices or circles, which is why a bar chart is usually better than a pie.
 :::
 
 ## Fit the visual to the reader's task
@@ -397,7 +397,7 @@ This is Vessey's theory of cognitive fit: a graph to see whether revenue is tren
 - So check the axis, the scales and the period of every chart
 
 ::: {.notes}
-Few concluded that two scales on one chart invite readers to compare magnitudes that mean nothing, and recommended two charts placed close together, or each series as a percentage of a common starting point. Compare whole years with whole years, or the same months, and say why a chart starts where it does. Beattie and Jones found that nearly a third of the graphs in large UK companies' annual reports distorted the figures, a form of impression management, and that readers with less financial knowledge were the most at risk.
+Few concluded that two scales on one chart invite readers to compare magnitudes that mean nothing, and recommended two charts placed close together, or each series as a percentage of a common starting point. Compare whole years with whole years, or the same months, and say why a chart starts where it does. Beattie and Jones found that nearly a third of the graphs of key financial figures in large UK companies' annual reports distorted them by more than 5%, a form of impression management, and a later experiment found readers with less financial understanding the most at risk.
 :::
 
 ## Check your understanding {.check}
@@ -434,7 +434,7 @@ Each of these charts misleads through a choice made by default or by habit, whic
 - A theme: one set of colors and fonts across the report
 
 ::: {.notes}
-Some readers cannot tell certain colors apart, some use a screen reader or a keyboard, and projectors wash out pale colors. The Web Content Accessibility Guidelines of the W3C set the standards, and Power BI has the settings to meet them: alt text under General in each visual's format settings, and the Themes gallery on the Design tab. These practices make a report clearer for every reader, and the book's figures follow the same rules.
+Some readers cannot tell certain colors apart, some use a screen reader or a keyboard, and projectors wash out pale colors. The Web Content Accessibility Guidelines of the W3C set the standards, and Power BI has the settings to meet them: alt text under General in each visual's format settings, and the Themes gallery on the Design tab. These practices make a report clearer for every reader, and the book's figures are drawn to the same rules.
 :::
 
 ## Check your understanding {.check}

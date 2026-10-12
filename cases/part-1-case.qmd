@@ -77,7 +77,7 @@ GLEntry stores each account's AccountID, the surrogate key of the Account table,
 
 - **Financial reporting:** the reconciliation of Furniture revenue and cost between the sub-ledger and the ledger, and what the cutoff findings from Chapter 2 do and do not mean for this quarter.
 - **Managerial accounting:** the margin measure you recommend (the accounts, the rows to include and exclude, and the quarters to compare), what the measure shows, and the product-level data available for the diagnostic analysis in Part II.
-- **Auditing:** the evidence that the data can be relied on, the closing-entry problem and how to avoid it, and any limitation, such as returns recorded in an account shared by every product line.
+- **Auditing:** the evidence on whether the data can be relied on for this question, the closing-entry problem and how to avoid it, and any limitation, such as returns recorded in an account shared by every product line.
 
 Close the memo with a recommendation for the analysis the team should perform next.
 
@@ -89,7 +89,7 @@ Close the memo with a recommendation for the analysis the team should perform ne
 - A clear distinction between the descriptive and the diagnostic question, and between what this case settles and what Part II must analyze.
 - A data map that names the keys and the cardinality of every join, and that translates AccountIDs into account numbers.
 - A justified choice of the two quarters to compare, based on the edges of the extract.
-- Reconciliations that agree to the cent, with an explanation of what agreement proves.
+- Reconciliations that agree to the cent, with an explanation of what agreement shows and what it does not.
 - Recognition that a reasonable-looking margin percentage can hide totals that make no sense, and a correct treatment of the year-end closing entry.
 - A memo written for the controller: concise, organized by perspective, and ending with a recommendation.
 

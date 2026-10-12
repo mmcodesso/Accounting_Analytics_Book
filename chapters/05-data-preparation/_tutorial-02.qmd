@@ -59,7 +59,7 @@ b. The six new columns sit side by side, so one COUNTIF can search them all. In 
    =COUNTIF(SalesInvoiceLine[[InvoiceDate]:[ProductType]],"No match")
    ```
 
-B41 should show zero. Every invoice line found its invoice, every invoice found its order, and every item sold is among the items you kept in Chapter 4, so the lookups are complete.
+B41 should show zero. Every invoice line found its invoice, every invoice found its order, and every item sold is among the items you kept in Chapter 4, so the lookups are complete. Each key is also the primary key of the Table it is looked up in, so each lookup found the one row its key can match, not merely the first of several.
 
 **Step 6. Reconcile the Furniture revenue by quarter.** The lines now carry a period and an item group, so their revenue can be summed by both.
 
@@ -72,7 +72,7 @@ b. In B45, enter this formula, then copy B45 and paste it into C45:E45 (copy and
 
 c. Compare the third and fourth quarters with the Furniture revenue you reconciled to the ledger in the Part I case.
 
-The totals should agree to the cent. That agreement is evidence that the lookups assigned every Furniture line to the right group and the right quarter.
+The totals should agree to the cent. The agreement shows that the lookups reproduce, quarter by quarter, the Furniture revenue you reconciled to the ledger. It is evidence at the level of those totals, not proof that every line has the right group and quarter: as with the control totals of Tutorial 4.1, Step 10, errors that offset within a total would leave it unchanged.
 
 **Step 7. Find the promotion lines invoiced after the promotion ended.**
 
@@ -90,7 +90,7 @@ f. Clear the filters.
 
 More than a hundred promotion lines were invoiced in November and December, after the promotion ended, and every one of them comes from an order placed while the promotion was running. The promotional price was set when the order was placed, but the revenue was recorded when the order was invoiced. @fig-05-05 shows some of these lines.
 
-![Invoice Lines with Their Looked-Up Dates and Groups.](/visuals/svg/fig-05-05-invoice-line-lookups.svg){#fig-05-05 fig-alt="A mock of the SalesInvoiceLine Table with the lookup columns added in this tutorial: InvoiceDate, Period, SalesOrderID, OrderDate, ItemGroup, and ProductType, next to the line's ID, promotion, and line total. The rows shown are Furniture lines of the Furniture Seasonal Promotion invoiced in December 2026, after the promotion's end date, whose orders were placed in September and October 2026. The InvoiceDate and OrderDate columns are outlined, and the formula bar shows the XLOOKUP formula for InvoiceDate."}
+![Invoice Lines with Their Looked-Up Dates and Groups.](/visuals/svg/fig-05-05-invoice-line-lookups.svg){#fig-05-05 fig-alt="A mock of the SalesInvoiceLine Table with the lookup columns added in this tutorial: InvoiceDate, Period, SalesOrderID, OrderDate, ItemGroup, and ProductType, next to the line's ID, promotion, and line total. The rows shown are Furniture lines of the Furniture Seasonal Promotion invoiced after the promotion's end date, each from an order placed while the promotion ran. The InvoiceDate and OrderDate columns are outlined, and the formula bar shows the XLOOKUP formula for InvoiceDate."}
 
 **Step 8. Record the new Table and columns.**
 

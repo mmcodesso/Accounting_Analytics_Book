@@ -106,11 +106,11 @@ OrderLines is built from the order lines and merged with the lookups and Promoti
 - Set Discount to a decimal number, as in Tutorial 4.1
 - Expand merged columns without the prefix
 - Import GLEntry with Transform Data, and filter it first
-- Clear Enable Load for queries that only feed others
+- Load queries that only feed others as connections only
 - Rename each loaded worksheet after its query
 
 ::: {.notes}
-Check the data types in each Changed Type step: Discount in OrderLines and BilledLines must be a decimal number, or the rates round to zero. GLEntry is far too large to load before it is filtered.
+Check the data types in each Changed Type step: Discount in OrderLines and BilledLines must be a decimal number, or the rates round to zero. GLEntry is far too large to load before it is filtered. In Excel, a query that only feeds others is loaded with Close & Load To and Only Create Connection; Enable load is Power BI's name for the same idea.
 :::
 
 ## Watch out: names that collide, and two kinds of date {.watch-out}

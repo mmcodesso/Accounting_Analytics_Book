@@ -16,7 +16,7 @@ B.  Foreign key
 C.  Composite key
 D.  Data type
 
-**3.** An ER diagram shows a line between two tables. The line has a single bar on one end and a crow's foot on the other end. This notation represents which type of relationship?
+**3.** An ER diagram shows a line between two tables. The line has a single bar on one end and a crow's foot on the other end. Ignoring optionality, this notation represents which type of relationship?
 
 A.  One-to-one
 B.  One-to-many
@@ -63,7 +63,7 @@ D.  CustomerID must first be converted to text before the two tables can be join
 A.  Every table must contain at least one foreign key.
 B.  Primary key values can be duplicated as long as the duplicates are in different tables.
 C.  Tables without relationships are automatically deleted from the database.
-D.  Every foreign key value must correspond to an existing primary key value in the referenced table.
+D.  Every foreign key value that is not blank must correspond to an existing primary key value in the referenced table.
 
 **10.** An analyst joins the Charles River Customer table to SalesOrder and then to SalesOrderLine. One customer has 10 orders, and those 10 orders contain a total of 45 line items. How many rows will this customer contribute to the joined result?
 

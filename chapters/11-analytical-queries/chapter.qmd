@@ -13,7 +13,7 @@ After completing this chapter, you will be able to:
 3. Apply window functions, with partitions, frames, ranking functions, and offset functions such as LAG, to compare rows and periods without collapsing the detail.
 4. Organize a multi-step analysis as a chain of common table expressions that can be read and checked one step at a time.
 5. Save a repeatable analysis as a view in a working copy of the database, and query it like a table.
-6. Combine these techniques into a monthly performance measure, matched over the same days, that management can track.
+6. Combine these techniques into a monthly performance measure, cut off at the last day with time records, that management can track.
 :::
 
 
@@ -100,7 +100,7 @@ In this data, the fiscal year is the calendar year, and GLEntry's FiscalPeriod i
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-The order of the modifiers matters. `date('2026-01-31', '+1 month')` returns 2026-03-03, because SQLite moves to 31 February and then carries the extra days into March, so apply `'start of month'` first whenever you step from month to month. Date functions also return text, except julianday, which returns a number. Chapter 9 showed that a quoted number is converted to the type of the column it is compared with, but a function's result is not a column, and nothing is converted: `strftime('%Y', PostingDate) = 2026` compares text with a number and finds no rows. Compare with text, as in `strftime('%Y', PostingDate) = '2026'`, or convert with CAST. Other database systems name these functions differently, for example YEAR, DATEADD, and DATEDIFF in Microsoft SQL Server, so date logic is the part of a query most likely to need rewriting in another system.
+The order of the modifiers matters. `date('2026-01-31', '+1 month')` returns 2026-03-03, because SQLite moves to 31 February and then carries the extra days into March, so apply `'start of month'` first whenever you step from month to month. Of the functions in @tbl-11-01, strftime and date return text, and julianday returns a number. Chapter 9 showed that a quoted number is converted to the type of the column it is compared with, but a function's result has no such type, and nothing is converted: `strftime('%Y', PostingDate) = 2026` compares text with a number and finds no rows. Compare with text, as in `strftime('%Y', PostingDate) = '2026'`, or convert with CAST. Other database systems name these functions differently, for example YEAR, DATEADD, and DATEDIFF in Microsoft SQL Server, so date logic is the part of a query most likely to need rewriting in another system.
 :::
 
 
@@ -189,7 +189,7 @@ The first two ties appear in the seventh to tenth rows. RANK and DENSE_RANK give
 
 ### Frames
 
-A frame clause sets exactly which rows of the partition each calculation uses. `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` takes the current row and the eleven rows before it, so a sum over months with that frame is a trailing twelve-month total. `ROWS UNBOUNDED PRECEDING` takes every row from the first of the partition to the current one, a running total that ignores ties. @fig-11-04 shows a partition and a moving frame over the months of two years.
+A frame clause sets exactly which rows of the partition each aggregate calculation uses. `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` takes the current row and the eleven rows before it, so a sum over months with that frame is a trailing twelve-month total. `ROWS UNBOUNDED PRECEDING` takes every row from the first of the partition to the current one, a running total that ignores ties. @fig-11-04 shows a partition and a moving frame over the months of two years. A frame shapes only the aggregates over a window, such as SUM and AVG: LAG, LEAD, and the ranking functions read the whole partition in its order, whatever the frame says.
 
 ![Partitions and Frames in a Window Function.](/visuals/svg/fig-11-04-window-frames.svg){#fig-11-04 fig-alt="Twenty-four months of fiscal 2025 and 2026 in a column, each with a monthly amount. One bracket shows a partition, the months of one fiscal year, and beside it a year-to-date total that restarts in January. A second bracket shows a moving frame of three months, the current month and the two before it, sliding down the column, with the total of the three months shown beside each row. A note explains that a partition decides which rows belong together and a frame decides which of them each row's calculation uses."}
 
@@ -209,7 +209,7 @@ WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)
 
 ### Comparing with Earlier Rows
 
-Offset functions return a value from another row of the partition. `LAG(x, 1)` returns x from the previous row, `LEAD(x, 1)` from the next, and the second argument can be left out when it is 1. Over rows ordered by year and month, `LAG(x, 12)` returns the value of the same month of the previous year, provided that every month has a row. Partitioning by the month removes that proviso: `LAG(x) OVER (PARTITION BY FiscalPeriod ORDER BY FiscalYear)` compares each month with the same month of the previous year, whatever else is missing. The query below compares each item group's manufacturing variance with its variance of the year before:
+Offset functions return a value from another row of the partition. `LAG(x, 1)` returns x from the previous row, `LEAD(x, 1)` from the next, and the second argument can be left out when it is 1. Over rows ordered by year and month, `LAG(x, 12)` returns the value of the same month of the previous year, provided that every month has a row. Partitioning by the month protects the comparison from gaps in other months: `LAG(x) OVER (PARTITION BY FiscalPeriod ORDER BY FiscalYear)` compares each month with the same month of the latest earlier year that has one, which is the previous year as long as no year is missing that month. The query below compares each item group's manufacturing variance with its variance of the year before:
 
 ```sql
 SELECT i.ItemGroup, strftime('%Y', woc.CloseDate) AS CloseYear,
@@ -253,7 +253,7 @@ In the logical order of @fig-10-05, window functions are calculated with the SEL
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Trailing twelve-month totals and year-over-year comparisons are standard in management reporting, because they separate a trend from the swings of a single month. A plant controller who reports that labor hours per standard hour rose in March may be reporting noise. A controller who reports that the trailing twelve-month figure has risen over two years is reporting a trend. The price of the smoothing is delay: a trailing figure turns months after the monthly figures do, so the two are read together, and the window functions of this section produce both from the same rows.
+Trailing twelve-month totals and year-over-year comparisons are standard in management reporting, because they separate a trend from the swings of a single month. A plant controller who reports that labor hours per standard hour rose in March may be reporting noise. A controller who reports that the trailing twelve-month figure has risen over two years is reporting a trend in the recorded measure, provided its coverage and definitions have not changed. The price of the smoothing is delay: a trailing figure turns months after the monthly figures do, so the two are read together, and the window functions of this section produce both from the same rows.
 :::
 
 ::: {.callout-note .connecting-dots icon=false}
@@ -320,7 +320,7 @@ A view is the one thing in this Part that you write into the database, which is 
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-A view depends on the names of the tables and columns it uses. If one of them is renamed or removed, the view stops working, and the error appears only when someone queries the view. Document every view with a comment in its script, stating its purpose, its source tables, and the checks its results should pass, just as you document any other query.
+A view depends on the tables and columns it uses. If one of them is removed or changed, the view can stop working or change what it means, and the error appears only when someone queries the view. SQLite carries a renamed table or column into the views that use it, but test a view again after any change to its tables. Document every view with a comment in its script, stating its purpose, its source tables, and the checks its results should pass, just as you document any other query.
 :::
 
 ::: {.callout-note .connecting-dots icon=false}

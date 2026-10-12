@@ -4,7 +4,7 @@
 
 **1.** Before testing Charles River's journal entries, an auditor compares the total of the JournalEntry table with the journal entry debits in the ledger. Why?
 
-A.  To confirm the tested population is complete before relying on the results
+A.  To check that the tested population agrees with the ledger before testing it
 B.  To find the journal entries approved by the same employees who created them
 C.  Because a query cannot read the JournalEntry table without first reading GLEntry
 D.  To calculate the risk score that Chapter 8 assigned to each journal entry
@@ -30,7 +30,7 @@ B.  SQLite stops with an error, because the column names of the queries differ
 C.  The values are stacked by position, under the column names of the first query
 D.  The rows of the second query are left out, because their columns do not match
 
-**5.** Goods were shipped and delivered on December 6, 2025, and their invoice was posted to the ledger on January 1, 2026. What does this indicate?
+**5.** Revenue is recognized when goods are delivered. Goods were shipped and delivered on December 6, 2025, and their invoice was posted to the ledger on January 1, 2026. What does this indicate?
 
 A.  The invoice was posted twice, once in each of the two fiscal years
 B.  Its revenue was recorded in the wrong fiscal year, a cutoff error
@@ -79,7 +79,7 @@ B.  Treat the pattern as an error in the data and leave the entries out of the t
 C.  Confirm the policy threshold with payroll, then test the longer entries
 D.  Ask the payroll department to remove the short entries from the payroll
 
-**12.** The share of direct labor recorded after its work order operation had ended rose to about two-thirds in fiscal 2026. What does this mean for the controller's analysis?
+**12.** Of the direct labor hours recorded against work order operations, the share recorded after the operation had ended rose to about two-thirds in fiscal 2026. What does this mean for the controller's analysis?
 
 A.  The manufacturing variance is overstated by about two-thirds of its amount
 B.  The operation records cannot show which operations the direct time belongs to
@@ -93,7 +93,7 @@ B.  It lists each pair once and never pairs a payment with itself
 C.  It makes the query faster by reading the payments in order of their IDs
 D.  It removes the payments whose amounts were entered more than once
 
-**14.** Why does the first-digit test use `printf('%e', Amount)` rather than the first character of the amount?
+**14.** Why does the first-digit test use `printf('%.15e', Amount)` rather than the first character of the amount?
 
 A.  Scientific notation starts with the first significant digit, even below $1
 B.  `printf` rounds each amount to the nearest dollar before its first digit is read
@@ -103,6 +103,6 @@ D.  SQLite cannot read the first character of a number that is stored as REAL
 **15.** An auditor multiplies the hours of each hourly earnings line by the employee's base rate, and by 1.5 for overtime, and compares the result with the amount paid. The totals differ by a few dollars a year, and no line differs by more than a cent. What does the result support?
 
 A.  The hours paid were worked, because the pay agrees with the expectation
-B.  The pay is right for the hours recorded, so the question is the hours
+B.  The pay fits the recorded hours and rates; the question is the hours
 C.  The payroll registers are complete, because they agree with the ledger
 D.  The pay rates are wrong, because the totals do not agree to the cent

@@ -79,6 +79,8 @@ def ex1(b):
     invoices = n.invoices_by_delivery(d)
     late = [i for i in invoices if i["late"]]
     before = sorted(i["number"] for i in invoices if i["before"])
+    early = sorted(i["number"] for i in invoices if i["early"])
+    both = [x for x in early if x not in before]
     s1, s2, value, cost = v["g1"]["sub"], v["g2"]["sub"], v["value"], v["cost"]
     effects = {d.F: -s1, d.P: s1 - s2, d.C: s2 - value}
     pi_count = d.one("SELECT COUNT(*) FROM PurchaseInvoice")
@@ -107,7 +109,7 @@ def ex1(b):
                  "revenue by delivery date; supplier invoices by posting date; payroll by work date; "
                  "effects by fiscal year")
     s.query("Exercise 12.1, test C1: revenue posted in a different fiscal year from the delivery",
-            "Population: all sales invoices (test L5); expected: no rows",
+            "Population: invoices for shipped goods (test L5); expected: no rows",
             f"""\
 {DELIVERY}
 SELECT si.InvoiceNumber, si.InvoiceDate, sh.ShipmentDate,
@@ -126,18 +128,22 @@ ORDER BY p.PostingDate, si.InvoiceNumber;""",
                    [i["number"] for i in v["g1"]["odd"] + v["g2"]["odd"]],
                    lambda r: [x for x, y, p in zip(r.col("InvoiceNumber"), r.col("InvoiceDate"), r.col("PostingDate"))
                               if y[:4] != p[:4]])])
-    s.query("Exercise 12.1, test C2: invoices dated before their shipment, posted in the year of delivery",
-            "Population: all sales invoices; expected: no rows",
+    s.query("Exercise 12.1, test C2: invoices dated before their shipment, whatever their posting year",
+            "Population: invoices for shipped goods; expected: no rows",
             f"""\
 {DELIVERY}
 SELECT si.InvoiceNumber, si.InvoiceDate, sh.ShipmentDate,
-    sh.DeliveryDate, p.PostingDate, ROUND(si.SubTotal, 2) AS SubTotal
+    sh.DeliveryDate, p.PostingDate, ROUND(si.SubTotal, 2) AS SubTotal,
+    CASE WHEN strftime('%Y', p.PostingDate)
+        <> strftime('%Y', sh.DeliveryDate) THEN 1 ELSE 0 END
+        AS AlsoPostedInAnotherYear
 {INVOICES}
-WHERE strftime('%Y', p.PostingDate) = strftime('%Y', sh.DeliveryDate)
-    AND si.InvoiceDate < sh.ShipmentDate
+WHERE si.InvoiceDate < sh.ShipmentDate
 ORDER BY si.InvoiceNumber;""",
-            [Check("invoices dated before their shipment", len(before), len),
-             Check("the invoices", before, lambda r: r.col("InvoiceNumber"))])
+            [Check("invoices dated before their shipment", len(early), len),
+             Check("the invoices", early, lambda r: r.col("InvoiceNumber")),
+             Check("also posted in another year (test C1)", both,
+                   lambda r: [x for x, y in zip(r.col("InvoiceNumber"), r.col("AlsoPostedInAnotherYear")) if y])])
     s.query("Exercise 12.1, test C3: the effect of revenue cutoff on each fiscal year",
             "Population: tests C1 and L6; expected: no effect in any year",
             f"""\
@@ -432,8 +438,9 @@ January: {len([i for i in late if i['delivered'][:4] == str(d.F)])} invoices for
 ({money(s2)}), among them {', '.join(i['number'] for i in v['g2']['odd'])}, dated before the year-end. Nine December {d.C} shipment lines were never invoiced
 ({money(value)} at order price). The net effect on revenue is {signed(effects[d.F])} in {d.F},
 {signed(effects[d.P])} in {d.P}, and {signed(effects[d.C])} in {d.C}; because cost of goods sold is posted at
-shipment, gross margin moves by the same amounts. The {len(before)} invoices dated before their shipment are posted in
-the year of delivery: an invoice-dating failure for the billing team, not a cutoff error.
+shipment, gross margin moves by the same amounts. Of the {len(early)} invoices dated before their shipment (test
+C2), {len(before)} were posted in the year of delivery, an invoice-dating failure for the billing team, not a cutoff
+error, and {' and '.join(both)} {'is' if len(both) == 1 else 'are'} also among the cutoff errors above.
 
 Supplier invoices are posted on the date received, and the one invoice that crosses a year-end was accrued, so the
 payables cutoff holds.
@@ -453,8 +460,9 @@ part of every close, with a cutoff report of deliveries not yet invoiced and a p
 periods.""")
     s.answer("Dispositions", f"""\
 C1 ({len(late)} invoices): revenue cutoff errors, to be adjusted in the year of delivery; the {d.C} effect
-({signed(effects[d.C])} with C3) is proposed as an adjustment before the statements are final. C2 ({len(before)}
-invoices): no revenue effect; reported to billing as invoices dated before shipment. C3 and C4: the unbilled lines
+({signed(effects[d.C])} with C3) is proposed as an adjustment before the statements are final. C2 ({len(early)}
+invoices): reported to billing as invoices dated before shipment; {len(before)} have no revenue effect, and
+{' and '.join(both)} {'is' if len(both) == 1 else 'are'} adjusted with C1. C3 and C4: the unbilled lines
 ({money(value)}) are referred for billing and accrued revenue at {d.C}-12-31; no exception in the cost postings. C5:
 no exception. C6 ({crossing['number']}): no exception, accrued by {accrual}. C7 and C8: late-December payroll recorded in the
 next fiscal year, an accrual deficiency in every year. C9: the {d.C} accrual of about {money(estimate)} is proposed.
@@ -785,7 +793,9 @@ WITH Flagged AS (
     SELECT lt.LaborTimeEntryID, lt.WorkDate, op.ActualEndDate,
         lt.RegularHours + lt.OvertimeHours AS Hours,
         CASE WHEN lt.WorkDate <= op.ActualEndDate THEN 1 ELSE 0 END
-            AS WhileOpen
+            AS WhileOpen,
+        CASE WHEN lt.WorkDate < op.ActualStartDate THEN 1 ELSE 0 END
+            AS BeforeStart
     FROM LaborTimeEntry AS lt
         INNER JOIN WorkOrderOperation AS op
             ON op.WorkOrderOperationID = lt.WorkOrderOperationID
@@ -796,9 +806,9 @@ CENTERS = """\
 FROM (
     SELECT strftime('%Y', op.ActualEndDate) AS EndYear,
         wc.WorkCenterName,
-        ROUND(SUM(op.PlannedLoadHours), 0) AS PlannedHours,
-        ROUND(SUM(lab.Hours), 0) AS RecordedHours,
-        ROUND(SUM(lab.OpenHours), 0) AS OpenHours,
+        SUM(op.PlannedLoadHours) AS PlannedHours,
+        SUM(lab.Hours) AS RecordedHours,
+        SUM(lab.OpenHours) AS OpenHours,
         ROUND(SUM(lab.OpenHours) / SUM(op.PlannedLoadHours), 2)
             AS OpenPerPlanned
     FROM WorkOrderOperation AS op
@@ -848,7 +858,7 @@ def ex3(b):
             f"""\
 {FLAGGED}
 SELECT strftime('%Y', WorkDate) AS WorkYear, COUNT(*) AS Entries,
-    SUM(WhileOpen) AS EntriesWhileOpen,
+    SUM(WhileOpen) AS EntriesWhileOpen, SUM(BeforeStart) AS BeforeStart,
     ROUND(SUM(Hours), 0) AS DirectHours,
     ROUND(SUM(CASE WHEN WhileOpen = 1 THEN Hours ELSE 0 END), 0)
         AS HoursWhileOpen,
@@ -857,7 +867,8 @@ SELECT strftime('%Y', WorkDate) AS WorkYear, COUNT(*) AS Entries,
 FROM Flagged
 GROUP BY WorkYear
 ORDER BY WorkYear;""",
-            [Check("entries flagged", entries, lambda r: r.total("Entries"))] +
+            [Check("entries flagged", entries, lambda r: r.total("Entries")),
+             Check("entries dated before their operation's start", 0, lambda r: r.total("BeforeStart"))] +
             [c for y, (h, lt) in by_year.items() for c in (
                 Check(f"{y} direct hours (test H9)", round(h), lambda r, y=y: r.where(WorkYear=str(y))["DirectHours"]),
                 Check(f"{y} share recorded after the end (test H9)", round(lt / h, 3),
@@ -865,7 +876,8 @@ ORDER BY WorkYear;""",
     s.query("Exercise 12.3, test T2: recorded against planned hours by work center, all hours and while open",
             f"Population: operations ended by {v['cutoff']}; expected: near 1 for every work center",
             f"""\
-SELECT EndYear, WorkCenterName, PlannedHours, RecordedHours, OpenHours,
+SELECT EndYear, WorkCenterName, ROUND(PlannedHours, 0) AS Planned,
+    ROUND(RecordedHours, 0) AS Recorded, ROUND(OpenHours, 0) AS WhileOpen,
     ROUND(RecordedHours / PlannedHours, 2) AS RecordedPerPlanned,
     OpenPerPlanned
 {CENTERS}
@@ -978,7 +990,8 @@ ORDER BY WorkMonth;""",
     s.answer("Requirement (3)", f"""\
 On all direct hours, {d.C} ranks {', '.join(short[i] for i in rank_all)} ({', '.join(f'{v["now_all"][i]:.2f}' for i
 in rank_all)}): Packing and Quality Assurance record about four times their planned hours. Counting only the time
-recorded while each operation was open, the order becomes {', '.join(short[i] for i in rank_open)}
+recorded while each operation was open (on or before its ActualEndDate; test T1 finds no time dated before an
+operation's start), the order becomes {', '.join(short[i] for i in rank_open)}
 ({', '.join(f'{v["now"][i]:.2f}' for i in rank_open)}): every work center is below plan, and Packing falls from first
 to last. The Packing excess was time charged after the operation had ended; Packing is the last operation of every
 routing, so time recorded late lands there. Quality Assurance ranks first while open, but its planned hours are
@@ -1136,11 +1149,13 @@ ORDER BY WorkYear;""",
              Check("other-day overtime", [round(x) for x in v["other"]], lambda r: r.col("OtherDayOvertime"))])
     growth_surge, growth_other = v["surge"][-1] - v["surge"][0], v["other"][-1] - v["other"][0]
     s.answer("Requirement (5)", f"""\
-The approval records overtime rather than authorizing it. The {v['n_reasons']} reason codes ({', '.join(v['reasons'])})
+The approval looks like a record of overtime rather than an authorization of it. The {v['n_reasons']} reason codes ({', '.join(v['reasons'])})
 each hold about a quarter of the approvals in every year, so the reasons say nothing about why overtime grew. The
 Production Manager approved {v['manager_n']:,} of the {v['n']:,} approvals ({100 * v['manager_share']:.1f}%), every
-approval grants exactly the hours requested, and every one is dated on the work date itself: no request was ever
-reduced, and none was approved before the work. All {v['entries']:,} clock entries of the {v['days']} surge days were
+approval grants exactly the hours requested, and every one is dated on the work date itself: no recorded request was
+reduced, and none was approved on an earlier day. A date cannot show whether approval came before the overtime within
+the day, so the requests, their timestamps, and any evidence of review should be inspected before the control is
+judged. All {v['entries']:,} clock entries of the {v['days']} surge days were
 approved by the Production Manager on the work date. Overtime on other days {v['other_trend']}
 ({', '.join(f'{x:,.0f}' for x in v['other'])} hours), while overtime on surge days grew from {v['surge'][0]:,.0f} to
 {v['surge'][1]:,.0f} and {v['surge'][2]:,.0f} hours ({growth_surge:+,.0f}, against {growth_other:+,.0f} on other
@@ -1152,8 +1167,9 @@ reason codes tied to a work order or a documented backlog, reviewed monthly by s
 schedules the surge days.""")
     s.answer("Dispositions", f"""\
 O1: the reason codes carry no information, a design deficiency. O2: concentration of approval in the Production
-Manager ({100 * v['manager_share']:.1f}%), a segregation-of-duties finding. O3: no approval reduces hours or precedes
-the work, so the approval is a record, not an authorization; reported as a design deficiency. O4 and O5: the surge-day
+Manager ({100 * v['manager_share']:.1f}%), a segregation-of-duties finding. O3: no approval reduces hours or is dated before
+the work day, so the approval appears to record rather than authorize the overtime; reported as a design deficiency,
+subject to the requests and their timestamps. O4 and O5: the surge-day
 overtime ({v['surge'][-1]:,.0f} hours in {d.C}) was scheduled and approved by one person on the day; referred to the
 controller for review of the surge days' business need.""")
 
@@ -1505,7 +1521,7 @@ ORDER BY Series;""",
             """\
 WITH Payments AS (
     SELECT dp.Amount, pi.GrandTotal,
-        CAST(SUBSTR(printf('%e', dp.Amount), 1, 1) AS INTEGER) AS Digit
+        CAST(SUBSTR(printf('%.15e', dp.Amount), 1, 1) AS INTEGER) AS Digit
     FROM DisbursementPayment AS dp
         INNER JOIN PurchaseInvoice AS pi
             ON pi.PurchaseInvoiceID = dp.PurchaseInvoiceID
@@ -1549,7 +1565,7 @@ ORDER BY PaymentGroup;""",
     s.answer("Requirement (6), results and dispositions", f"""\
 D1, duplicate supplier invoice numbers: {v['n_dupes']} numbers appear twice for the same supplier; each pair has
 different amounts and each invoice was paid once (Exercise 2.6). Disposition: obtain both invoices of each pair from
-the suppliers to confirm they are distinct bills; no duplicate payment found.
+the suppliers to confirm they are distinct bills; no invoice was paid twice.
 
 D2, standardized numbers: the same {v['n_dupes']} pairs and no others; the numbers are entered consistently.
 Disposition: no exception.
@@ -1559,8 +1575,10 @@ supplier {v['check_supplier']} (the AnomalyLog lists {v['n_logged']} duplicate r
 {v['n_with_check']} carry check numbers). Disposition: trace both payments of each check to the bank statement.
 
 D4 and D5, near-duplicate payments: {v['pairs']} pairs share supplier and amount on different dates, {v['within30']}
-within 30 days ({v['within14']} within 14, the chapter's example), and none pays the same invoice. Disposition:
-recurring purchases, no exception.
+within 30 days ({v['within14']} within 14, the chapter's example), and none pays the same recorded invoice.
+Disposition: no invoice was paid twice, but a duplicate bill entered under another number would pass this test, so
+review the invoices, purchase orders, and receipts behind the pairs within 30 days before treating them as distinct
+purchases.
 
 S1 and S2, document series: no gaps. Sales invoices, purchase orders, and cash receipts continue across years, and
 journal entries restart each year ({', '.join(f'1-{hi:,}' for _, hi in js)}). Disposition: no exception.
@@ -1578,9 +1596,10 @@ why the continuing series are ordered without a partition.
 
 What SQL gains over a workbook: the tests run on the whole population in the database, every quarter, without copying
 data into a workbook or refreshing formulas; each test is a saved, readable definition that a reviewer can rerun and
-get the same result; and printf writes every positive amount in scientific notation (688.42 as 6.884200e+02, the
-smallest payment {v['smallest']} as {v['smallest_e']}), so the first character is always the first significant digit,
-without the text tricks the workbook needed.""")
+get the same result; and printf('%.15e') writes every positive amount in scientific notation with fifteen decimals
+(688.42 as 6.884200000000000e+02, the smallest payment {v['smallest']} as {v['smallest_e']}), so the first character
+is the first significant digit, without the text tricks the workbook needed. The decimals matter: printf rounds, and
+with its default of six an amount just below a power of ten, such as 999,999.99, would read 1.000000e+06.""")
 
 
 EXERCISES = [("12.1", ex1), ("12.2", ex2), ("12.3", ex3), ("12.4", ex4), ("12.5", ex5), ("12.6", ex6)]

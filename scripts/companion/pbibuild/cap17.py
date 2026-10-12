@@ -408,6 +408,7 @@ def r2(b: Build) -> None:
                       title=f"Activity by source document, {P} and {C} (closes left out)",
                       filters=[keep("bySourceYears", yr, [P, C])]))
     detail.add(Visual("postingList", "tableEx", 600, 140, 660, 560, {"Values": [
+        col("GLEntry", "GLEntryID"),        # a unique key: without it a table visual merges identical postings
         col("GLEntry", "PostingDate"), col("GLEntry", "VoucherNumber"), src, col("GLEntry", "EntryType"),
         col("GLEntry", "Debit"), col("GLEntry", "Credit")]}, title=f"Postings in fiscal {C}",
         filters=[keep("postingYear", yr, [C])], sort=[(col("GLEntry", "PostingDate"), "Ascending")]))
@@ -480,8 +481,8 @@ def r2(b: Build) -> None:
         [7, f"Which part of the notes payable ({money(notes_c)} at the end of {C}) is due within a year? All of 2110 is "
             "classified long-term.", "2110", "Requirement 5"],
         [8, "2050 has no debits except credit memos: has sales tax ever been remitted?", "2050", "Requirement 9"],
-        [9, "Rent is paid every month from cash while 2120 and 1140 have never been used: are there leases to record?",
-         "6070, 6080, 2120, 1140", "Requirement 9"],
+        [9, "Rent is paid every month from cash while 2120 Lease Liability has never been used: are there leases to "
+            "record?", "6070, 6080, 2120", "Requirement 9"],
         [10, "The chart has no income tax account: what is the company's tax status?", "none", "Requirement 9"],
         [11, f"Why does 7010 show no interest income on more than {c2['millions']} million of cash?", "7010, 1010",
          "Requirement 9"],
@@ -677,8 +678,14 @@ def r6(b: Build) -> None:
     b.measure(P6, "Entries out of Balance", "COUNTROWS ( FILTER ( SUMMARIZE ( AdjustmentLines, AdjustmentLines[No], "
                                             "AdjustmentLines[YearEnd] ), ABS ( CALCULATE ( SUM ( AdjustmentLines[Amount] ) ) ) "
                                             "> 0.005 ) ) + 0", COUNT, "Entries whose debits and credits differ.")
+    b.measure(P6, "Lines with Inconsistent Amounts", "COUNTROWS ( FILTER ( AdjustmentLines, ABS ( AdjustmentLines[Amount] "
+                                                     "- ( AdjustmentLines[Debit] - AdjustmentLines[Credit] ) ) > 0.005 "
+                                                     "|| ( AdjustmentLines[Debit] > 0 && AdjustmentLines[Credit] > 0 ) ) ) + 0",
+              COUNT, "Adjustment lines whose Amount is not their Debit less their Credit, or that carry both: the "
+                     "balance tests read Amount, so each line's three columns must agree.")
     b.measure(P6, "Lines on Cash", "CALCULATE ( COUNTROWS ( AdjustmentLines ), AdjustmentLines[Account] = 1010 ) + 0",
-              COUNT, "Adjustment lines to 1010 Cash and Cash Equivalents: an adjustment never moves cash.")
+              COUNT, "Adjustment lines to 1010 Cash and Cash Equivalents: none of the package's adjustments moves "
+                     "cash.")
     b.measure(P6, "Adjusted P&L Amount", "[P&L Amount] - [Adjustment Amount]", MONEY,
               "P&L Amount of the year plus the adjustment lines at its year-end (revenue positive, expenses negative).")
     b.measure(P6, "Adjusted Net Income", f"CALCULATE ( [Adjusted P&L Amount], Account[AccountType] IN {PL} )", MONEY,
@@ -700,6 +707,11 @@ def r6(b: Build) -> None:
     b.measure(P6, "Accounts Disagreeing", "COUNTROWS ( FILTER ( VALUES ( WorkingTB[AccountNumber] ), "
                                           "ABS ( [Balance] - [Workbook Recorded Balance] ) > 0.005 ) ) + 0", COUNT,
               "Accounts whose ledger balance at the year-end differs from the workbook's trial balance.")
+    b.measure(P6, "Adjusted Accounts Disagreeing", "COUNTROWS ( FILTER ( VALUES ( WorkingTB[AccountNumber] ), ABS ( "
+                                                   "[Balance] + [Adjustment Amount] - [Workbook Adjusted Balance] ) "
+                                                   "> 0.005 ) ) + 0", COUNT,
+              "Accounts whose ledger balance plus the adjustment lines at the year-end differs from the workbook's "
+              "adjusted trial balance: the totals can agree while two accounts are off by the same amount.")
     b.measure(P6, "Adjusted Total Assets", 'CALCULATE ( [Balance] + [Adjustment Amount], Account[AccountType] = "Asset" )',
               MONEY, "Total assets after the adjustment lines at the year-end in the filter context.")
 
@@ -713,7 +725,8 @@ def r6(b: Build) -> None:
         "Rows": [no], "Columns": [yr], "Values": [M("Adjustment Debits"), M("Adjustment Credits"), M("Adjustment Amount")]},
         title="Each entry balances: debits, credits, and debits less credits by adjustment and year-end"))
     page.add(Visual("agreeTable", "tableEx", 600, 150, 660, 190, {"Values": [
-        yr, M("Adjusted Net Income"), M("Workbook Adjusted Net Income"), M("Net Income Difference")]},
+        yr, M("Adjusted Net Income"), M("Workbook Adjusted Net Income"), M("Net Income Difference"),
+        M("Adjusted Accounts Disagreeing")]},
         title="Adjusted net income: the ledger plus the adjustment lines, against the workbook",
         filters=[keep("agreeYears", yr, [P, C])]))
     page.add(Visual("assetTable", "tableEx", 600, 360, 660, 190, {"Values": [
@@ -725,12 +738,18 @@ def r6(b: Build) -> None:
         "Rows": [col("WorkingTB", "StatementLine")], "Columns": [yr], "Values": [M("Adjusted P&L Amount")]},
         title="The adjusted income statement by line (revenue positive, expenses negative)",
         filters=[keep("imYears", yr, [P, C]), keep("imTypes", col("Account", "AccountType"), pl_types)]))
+    # Each visual of the page tests the whole package; a click on an entry or a statement line would leave some of
+    # its measures filtered and others not (AdjustmentLines does not reach the ledger), so none filters another.
+    tests_ = ["testCards", "entryMatrix", "agreeTable", "assetTable", "incomeMatrix"]
+    page.extra = {"visualInteractions": [{"source": s_, "target": t_, "type": "NoFilter"}
+                                         for s_ in tests_ for t_ in tests_ if s_ != t_]}
     i_p, i_c = c6["i_p"], c6["i_c"]
     rec = c1["rec"]
     page.add(answer("packageAnswer", 800, 570, 460, 510, [
         f"The workbook's {len(lines)} adjustment lines form {len({(r['No'], r['YearEnd']) for r in lines})} entries "
         "(each numbered adjustment at each year-end); every entry balances and none touches 1010.",
-        f"Adjusted net income: {P} {money(i_p['ni'])} and {C} {money(i_c['ni'])}, the ledger's net income plus the "
+        f"Adjusted net income (with A3 on its stated assumption; no income tax recorded): {P} {money(i_p['ni'])} "
+        f"and {C} {money(i_c['ni'])}, the ledger's net income plus the "
         "lines on revenue and expense accounts, equal to the workbook's adjusted trial balance.",
         "Recorded total assets equal the trial balances of Requirement 1 account by account: " +
         ", ".join(f"{y} {money(r['ta'])}" for y, r in zip(years, rec)) + ". After the adjustments: " +
@@ -750,7 +769,8 @@ def r6(b: Build) -> None:
                "ORDER BY AdjustmentLines[YearEnd], AdjustmentLines[No]")
     b.add_test("Test 4: no adjustment touches cash, and no entry is out of balance",
                "EVALUATE\nROW (\n    \"Lines on Cash\", [Lines on Cash],\n    \"Entries\", [Entries],\n"
-               "    \"Entries out of Balance\", [Entries out of Balance]\n)")
+               "    \"Entries out of Balance\", [Entries out of Balance],\n"
+               "    \"Lines with Inconsistent Amounts\", [Lines with Inconsistent Amounts]\n)")
     b.add_test("Test 5: adjusted net income agrees with the workbook, and recorded total assets agree with the trial "
                "balances of Requirement 1",
                "EVALUATE\nSUMMARIZECOLUMNS (\n    'Date'[Year],\n    TREATAS ( { " + yl + " }, 'Date'[Year] ),\n"
@@ -758,7 +778,8 @@ def r6(b: Build) -> None:
                "    \"Workbook Adjusted Net Income\", ROUND ( [Workbook Adjusted Net Income], 2 ),\n"
                "    \"Total Assets\", ROUND ( [Total Assets], 2 ),\n"
                "    \"Workbook Recorded Total Assets\", ROUND ( [Workbook Recorded Total Assets], 2 ),\n"
-               "    \"Accounts Disagreeing\", [Accounts Disagreeing]\n)\nORDER BY 'Date'[Year]")
+               "    \"Accounts Disagreeing\", [Accounts Disagreeing],\n"
+               "    \"Adjusted Accounts Disagreeing\", [Adjusted Accounts Disagreeing]\n)\nORDER BY 'Date'[Year]")
 
     s = "Requirement 6"
     n_entries = len({(r["No"], r["YearEnd"]) for r in lines})
@@ -769,6 +790,7 @@ def r6(b: Build) -> None:
     b.check(s, "every entry nets to zero: entries out of balance", 0, "[Entries out of Balance]", 0)
     b.check(s, "every entry nets to zero: the largest imbalance", 0, "[Largest Entry Imbalance]")
     b.check(s, "lines on 1010 Cash", 0, "[Lines on Cash]", 0)
+    b.check(s, "lines whose Amount is not their Debit less their Credit", 0, "[Lines with Inconsistent Amounts]", 0)
     b.check(s, "lines whose account is not in the chart", 0,
             "COUNTROWS ( FILTER ( AdjustmentLines, ISBLANK ( RELATED ( Account[AccountID] ) ) ) ) + 0", 0)
     b.check(s, "lines dated on a year-end of the window", len(lines),
@@ -792,6 +814,8 @@ def r6(b: Build) -> None:
         b.check(s, f"recorded total assets at {ch17.ye(y)}: difference", 0, f"CALCULATE ( [Total Assets Difference], {cy} )")
         b.check(s, f"accounts whose balance at {ch17.ye(y)} differs from the workbook's", 0,
                 f"CALCULATE ( [Accounts Disagreeing], {cy} )", 0)
+        b.check(s, f"accounts whose adjusted balance at {ch17.ye(y)} differs from the workbook's", 0,
+                f"CALCULATE ( [Adjusted Accounts Disagreeing], {cy} )", 0)
     b.check(s, f"the workbook's adjusted trial balance at {ch17.ye(C)} balances", 0,
             f"ROUND ( SUM ( WorkingTB[Adjusted{C}] ), 2 )")
 

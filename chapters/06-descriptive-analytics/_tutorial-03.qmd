@@ -53,7 +53,7 @@ The formula of MarginBeforeDiscountPct is:
 =(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)
 ```
 
-Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. The drivers point to a single cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost.
+Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. In this comparison at standard cost, the drivers point to one dominant cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost. The bridge in the next steps measures each effect separately.
 
 ![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-08-furniture-drivers.svg){#fig-06-08 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
 
@@ -69,7 +69,7 @@ b. In B4, type an equal sign, click the 2026-Q3 value of Sum of Quantity on the 
 c. Fill B4:C8 in the same way, clicking the matching value of the PivotTable for each cell.
 d. Type `Margin` in A9, enter `=B6-B8` in B9, and copy it to C9.
 
-B4:C9 now hold the totals of both quarters and their margins, each linked to the PivotTable by GETPIVOTDATA.
+B4:C9 now hold the totals of both quarters and their margins, each linked to the PivotTable by GETPIVOTDATA. The formulas name the period but not the item group, so they return Furniture totals only while the ItemGroup filter in B1 of the **Drivers** worksheet shows Furniture.
 
 **Step 5. Calculate the per-unit measures and the bridge.**
 
@@ -87,7 +87,7 @@ d. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Pro
    - B23: `=B16+SUM(B17:B21)-B22`
 e. Format B16:B23 as numbers with no decimals.
 
-B23 is zero: the effects account for the whole change in margin. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin.
+B23 is zero: the effects account for the whole change in margin. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin. It is slightly smaller than the increase in discount dollars on the **Drivers** worksheet, because the volume effect values the extra units at the third quarter's margin per unit, which already deducts that quarter's discount per unit.
 
 **Step 6. Chart the bridge as a waterfall.** Chart types are compared in the section on charting earlier in this chapter; a waterfall suits a change that is built from parts.
 

@@ -287,6 +287,10 @@ def words(n: int, capital: bool = False) -> str:
     return text[0].upper() + text[1:] if capital else text
 
 
+MONTH_ORDER = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+               "October", "November", "December"]
+
+
 def month_name(iso: str) -> str:
     import calendar
     return calendar.month_name[int(iso[5:7])]
@@ -599,7 +603,9 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"posting through that date except the two {y} closing entries, grouped by account ({f['accounts']} accounts, "
         f"debit and credit balances of {money(f['debits'])} each). Net income is {money(L['ni'])}, "
         f"{pct(L['ni'] / net, 2)} of net revenue, and it equals the amount closing entry {c2} moved to retained "
-        f"earnings; the balance sheet balances once net income is added to equity (assets {money(f['assets'])}).",
+        f"earnings; the balance sheet balances once net income is added to equity (assets {money(f['assets'])}). "
+        "These checks show that the statement agrees with the ledger and its closing entry, not that the ledger "
+        "holds every transaction.",
         f"The common-size statement shows the cost structure: of each dollar of net revenue ({money(net)}), cost of "
         f"goods sold takes {pct(-L['cogs'] / net, 1)}, leaving a gross margin of {pct(L['gm'] / net, 1)}; operating "
         f"expenses take {pct(-L['opex'] / net, 1)}, so operating income is {pct(L['oi'] / net, 1)}, and other items "
@@ -611,7 +617,8 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"({money(gap(5050))}), the purchase price variance ({money(gap(5060))}), and the manufacturing variance "
         f"({money(gap(5080))}), which is the largest cost to explain.",
         f"Product revenue in the ledger agrees with the invoice lines except for "
-        f"{money(sum(r['diff'] for r in diffs))} in {words(len(diffs))} accounts: {words(len(odd))} invoices dated in December {y - 1} "
+        f"{money(sum(r['diff'] for r in diffs))} in {words(len(diffs))} accounts: {words(len(odd))} invoices dated in "
+        f"{' and '.join(sorted({month_name(i['date']) for i in odd}, key=lambda m: MONTH_ORDER.index(m)))} {y - 1} "
         f"but numbered and posted in {y}. One of them, {e['number']} ({money(e['amount'])}), shipped in {y - 1} and is "
         "a cutoff error that belongs in the prior year; it is immaterial, but the invoicing and posting dates should "
         f"be reviewed at every year-end. The other {words(len(later))} shipped in {month_name(later_dates[0])} "
@@ -810,15 +817,31 @@ def ex6_2(b: ExerciseBuild) -> None:
         f"{name(up[1][0])} ({spct(up[1][3])}), and the largest decreases {name(down[0][0])} ({spct(down[0][3])}) and "
         f"{name(down[1][0])} ({spct(down[1][3])}). By region, revenue changed "
         f"{', '.join(f'{r} {spct(reg[r])}' for r in regions)}, which the Company presents as supplementary "
-        "information, because it sets its price lists and promotions by customer type and product line, not by region.")
+        "information, because it sets its price lists and promotions by customer type and product line, not by region. "
+        "These amounts are invoice-based; before they could support the disclosure, they would be reconciled to the "
+        "revenue the income statement reports.")
     why = ("Why these categories: product line and type of customer are how Charles River manages and prices its "
            "business (price lists by segment, promotions by item group and segment), and they separate revenues with "
            "different economic characteristics. Design Services buys only design services, so for that segment the "
            "customer type and the product line coincide; presenting the two categories as separate splits, rather "
            "than as a full cross-table, avoids repeating that revenue.")
     widths(ws, {"A": max(ws.Columns("A").ColumnWidth, 18)})
-    model_answer(ws, end_row(pt3) + 3, "Model answer, requirement (4): disclosure paragraph", [para, why],
-                 last_col=c0 - 2)
+    row = model_answer(ws, end_row(pt3) + 3, "Model answer, requirement (4): disclosure paragraph", [para, why],
+                       last_col=c0 - 2)
+    # (5) the differences between the invoice lines and the revenue of the income statement (Exercise 6.1)
+    g = facts_6_1(y)
+    cutoff = sum(r["diff"] for r in g["recon"])
+    freight, returns = -g["bal"].get(4050, 0.0), g["bal"].get(4060, 0.0)
+    assert abs(f["total"] + cutoff + freight - g["lines"]["opr"]) < 0.01, "the reconciliation to operating revenue"
+    assert abs(g["lines"]["opr"] - returns - g["lines"]["net"]) < 0.01, "the reconciliation to net revenue"
+    model_answer(ws, row, "Model answer, requirement (5): differences to reconcile", [
+        f"The invoice lines total {money(f['total'])} in fiscal {y}. Adding the {money(cutoff)} of the "
+        f"{words(len(g['odd']))} invoices the ledger records in {y} although they are dated in {y - 1} (Exercise 6.1) "
+        f"gives the product revenue accounts; adding freight revenue, {money(freight)} in account 4050, which has no "
+        f"invoice line, gives operating revenue of {money(g['lines']['opr'])}; deducting sales returns and "
+        f"allowances, {money(returns)} in account 4060, gives the net revenue of {money(g['lines']['net'])}. A "
+        "disclosure would also need the cutoff invoices assigned on the basis the Company uses, delivery, which "
+        "Exercise 6.1 shows moves only one of them into the prior year."], last_col=c0 - 2)
 
 
 def checks_6_2(b: ExerciseBuild) -> None:
@@ -1363,8 +1386,9 @@ def ex6_6(b: ExerciseBuild) -> None:
         f"Concentration. Revenue is concentrated in Furniture ({pct(gr['Furniture']['revenue'] / f['revenue'])} of the "
         f"year), not in customers: the five largest customers hold {pct(f['top5'])} of revenue and the ten largest "
         f"{pct(f['top10'])}, all of them {', '.join(f['top10_segments'])} accounts (the largest are "
-        f"{', '.join(f['largest'][:-1])}, and {f['largest'][-1]}). No single customer is material to the population "
-        "on its own.",
+        f"{', '.join(f['largest'][:-1])}, and {f['largest'][-1]}). By these measures concentration by customer "
+        "is modest, although related customers, their receivables, and changes over time would also bear on the "
+        "risk.",
         "Pricing. By revenue, "
         + ", ".join(f"{pct(s)}{' was priced' if i == 0 else ''} {PRICING.get(m, m)} ({n:,} lines)"
                     for i, (m, (n, s)) in enumerate(meth[:-1]))

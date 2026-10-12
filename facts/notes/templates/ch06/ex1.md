@@ -11,8 +11,9 @@
      {{ r.balance|money }} vs {{ r.group }}{% if r.diff == 0 %}, equal{% else %} {{ r.lines|money }} ({{ '+' if r.diff > 0 }}{{ r.diff|money }}){% endif %}{{ '; ' if not loop.last }}{% endfor %}. The differences are
      {% for i in invoices %}{{ 'and ' if loop.last and not loop.first }}{{ i.number }} ({{ i.group }}, {{ 'dated ' if loop.first }}{{ i.date }}){{ ', ' if not loop.last }}{% endfor %},
      dated in {{ d.P }} with the next year's number and posted {{ posted }}. InvoiceLines assigns them to fiscal {{ d.P }} by their invoice dates,
-     the ledger to fiscal {{ d.C }}. The date that determines the period is the delivery of the goods, not the invoice date or number (every
-     shipment is delivered in the year it ships). {% if early.part %}Only {{ early.number }} shipped in part in {{ d.P }} ({{ early.cut|money }} on {{ early.shipped }}), so that {{ early.cut|money }} is a revenue cutoff error; the rest of it ({{ early.rest|money }}) and the other
+     the ledger to fiscal {{ d.C }}. On the basis the book uses, control of the goods passes on delivery, so the delivery date, not the
+     invoice date or number, determines the period (every shipment is delivered in the year it ships); students who name transfer of
+     control, with delivery as its evidence, have the right idea. {% if early.part %}Only {{ early.number }} shipped in part in {{ d.P }} ({{ early.cut|money }} on {{ early.shipped }}), so that {{ early.cut|money }} is a revenue cutoff error; the rest of it ({{ early.rest|money }}) and the other
      {{ others }} shipped {{ others_shipped }}{% else %}Only {{ early.number }} shipped in {{ d.P }} (on {{ early.shipped }}), so its {{ early.amount|money }} is a revenue cutoff error; the other
-     {{ others }} shipped {{ others_shipped }}{% endif %}, so the ledger is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for
+     {{ others }} shipped {{ others_shipped }}{% endif %}, so on that basis the ledger's period is right and their invoice dates are wrong. Tutorial 12.1 tests cutoff by delivery date for
      every invoice. Freight revenue (4050, {{ freight|money }}) has no invoice line. -->

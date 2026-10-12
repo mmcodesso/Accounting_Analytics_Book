@@ -3,9 +3,10 @@
 Every value is computed here from the dataset with the logic of the chapter's measures: the gross
 to net of Tutorial 15.1 (List Amount, Price Before Discount, Revenue), the budget of Tutorial 15.2
 (BudgetLine without the balance-sheet lines, operating expense by AccountSubType, the ledger with
-the year-end closes excluded, the commission budget flexed at the budget's monthly rate on invoiced
-product revenue), and the plant measures of Tutorial 15.3 (direct and indirect hours per standard
-hour of output, the output cut off at the last work date). The same values were checked against
+the year-end closes excluded, the commission budget flexed on invoiced product revenue at the year's
+rate for a row of cost centers and at each month's rate for a row of months, as the measure evaluates
+them), and the plant measures of Tutorial 15.3 (direct and indirect hours per standard hour of
+output, the output cut off at the last work date). The same values were checked against
 Power BI Desktop 2.158's engine on a reference model of the tutorials.
 """
 
@@ -90,7 +91,7 @@ def fig_15_01() -> Diagram:
         d.header_box(esc(name), x, 56, 156, 30, fill=BLUE, size=SMALL)
         d.text(f"<b>{esc(reader)}</b>", x + 6, 90, 144, 20, size=SMALL)
         d.text(esc(kpi), x + 6, 112, 144, 100, size=SMALL)
-    details = [("Promotion Detail", "Drill-through: one promotion's terms, months, and lines", 190, 270,
+    details = [("Promotion Detail", "Drill-through: one promotion's terms and its discounts by month", 190, 270,
                 "Promotions"),
                ("Promotion Tooltip", "Tooltip: one promotion's discounts by month", 190, 400, "Promotions"),
                ("Cost Center Detail", "Drill-through: one cost center's accounts", 360, 270, "Budget")]
@@ -132,7 +133,7 @@ def fig_15_02() -> Diagram:
     page = d.box("", 560, 250, 300, 140, fill=WHITE, stroke=BLUE, stroke_width=2, rounded=False)
     pbi.back_button(d, 568, 258)
     d.text(f"<b>Promotion Detail</b>: {esc(names[0])} only", 646, 260, 210, 40, size=SMALL)
-    d.text("Its terms, its discounts by month, and its invoice lines", 568, 304, 284, 60, size=SMALL)
+    d.text("Its terms, its discounts by month, and its count of invoice lines", 568, 304, 284, 60, size=SMALL)
     d.arrow(menu, page, exit=(0.5, 1), entry=(0.5, 0))
     d.text("<i>Left: expanding Furniture shows its product types in the same matrix. Right: right-clicking "
            "a promotion's bar and choosing Drillthrough opens a separate page filtered to that promotion, "
@@ -187,12 +188,12 @@ def fig_15_04() -> Diagram:
     pbi.frame(d, 16, 90, 300, 84, None)
     pbi.card(d, 22, 96, 140, 72, "Invoice Lines", f"{lines_n:,}")
     pbi.card(d, 170, 96, 140, 72, "Discounts", money(disc))
-    chart = pbi.column_chart(d, 330, 90, 514, 300, "Discounts by YearMonth", [m for m, _, _ in months],
+    chart = pbi.column_chart(d, 330, 90, 514, 284, "Discounts by YearMonth", [m for m, _, _ in months],
                              [v for _, v, _ in months], "K", pbi.nice_ticks(0, max(v for _, v, _ in months), 4),
                              labels=True)
     step = chart["width"] / 4
     xl.emphasis(d, chart["left"] + step * 2 + 4, chart["top"], step * 2 - 8, chart["height"] + 22)
-    d.text("Outlined: invoiced after the promotion's end date", 330, 394, 514, 20, size=SMALL, color=CORAL,
+    d.text("Outlined: invoiced after the promotion's end date", 330, 380, 514, 20, size=SMALL, color=CORAL,
            align="center")
     pbi.page_tabs(d, 4, 414, ["Promotions", "Promotion Detail"], "Promotion Detail")
     d.text("<i>The page reached by drilling through on the Furniture Seasonal Promotion. Power BI added the "
@@ -346,7 +347,8 @@ def fig_15_09() -> Diagram:
                            money(r["remaining"]), pct(r["remaining"] / r["flexed"])])
     tot = {k: sum(r[k] or 0 for r in rows.values()) for k in ("variance", "volume", "classification", "remaining",
                                                               "flexed")}
-    assert abs(tot["remaining"] + 174758.97) < 0.05 and abs(tot["classification"]) < 0.01, tot
+    # the year as one context, as the table visual evaluates each row (summing the months would give a cent less)
+    assert abs(tot["remaining"] + 174758.97) < 0.005 and abs(tot["classification"]) < 0.01, tot
     widths = [184, 128, 128, 140, 136, 100]
     pbi.canvas(d, 0, 0, 860, 340)
     t = pbi.table_visual(d, 16, 16, ["CostCenterName", "Variance", "Volume Effect", "Classification Effect",

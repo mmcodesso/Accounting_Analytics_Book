@@ -49,6 +49,10 @@ SITE = "https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-co
 SUPPLEMENTARY = REPO / "supplementary"              # gitignored; scripts/release.py uploads it to the release
 DOWNLOADS = REPO / "front-matter" / "downloads.qmd"
 NEUTRAL = "C:\\CharlesRiver\\CharlesRiver.xlsx"   # where the Excel and Power BI files look for the workbook
+# Functions of Excel 2024 and Microsoft 365 that Excel 2021 lacks (the preface accepts Excel 2021 for the tutorials, and
+# the tutorial builders use none of them); a solution whose builder writes one says so in its README.
+NEWER_FUNCTIONS = re.compile(r"\b(BYCOL|BYROW|CHOOSECOLS|CHOOSEROWS|DROP|EXPAND|HSTACK|IMAGE|LAMBDA|MAKEARRAY|MAP|"
+                             r"REDUCE|SCAN|TAKE|TEXTAFTER|TEXTBEFORE|TEXTSPLIT|TOCOL|TOROW|VSTACK|WRAPCOLS|WRAPROWS)\(")
 
 
 def load_yaml(path: Path) -> dict:
@@ -388,7 +392,8 @@ def project_contents(project) -> dict[str, list[str]]:
         "Roles": [r.name for r in m.roles],
         "Report pages": [p.display + (" (hidden)" if p.hidden else "") for p in project.report.pages
                          if p.name != "notes"],
-        "DAX query tabs": list(project.queries),
+        # notes_page writes the Checks tab after this list is made, so the first checkpoint of a chain would read none
+        "DAX query tabs": list(dict.fromkeys([*project.queries, "Checks"])),
     }
 
 
@@ -626,6 +631,11 @@ def build_excel_solution(entry: dict, variables: dict, out_root: Path, start_fol
               "instructor notes. Its queries read " + NEUTRAL + "; point them at your copy with",
               "Data > Get Data > Data Source Settings > Change Source, and choose Data > Refresh All.",
               "These files are public, like the rest of the book. Try an exercise first, then compare your work.", ""]
+    newer = sorted(set(NEWER_FUNCTIONS.findall(Path(module.__file__).read_text(encoding="utf-8"))))
+    if newer:
+        readme[-2:-2] = [f"Some formulas use functions that Excel 2021 lacks ({', '.join(newer)}), so open the",
+                         "workbook in Excel for Microsoft 365 or Excel 2024. The tutorials and their start files need",
+                         "only the Excel version the book asks for."]
     (folder / "README.txt").write_text("\n".join(readme), encoding="utf-8", newline="\n")
     return zip_folder(folder, suffix="")
 

@@ -206,6 +206,10 @@ def fig_08_04() -> Diagram:
     assert conformity(full["mad"]) == "Acceptable conformity", full["mad"]
     assert conformity(part["mad"]) == "Nonconformity", part["mad"]
     assert min(r["total"] for r in p if r["amount"] < r["total"]) >= 1000
+    over = [dg for dg in range(1, 10) if part["actual"][dg] > 1.2 * part["expected"][dg]]
+    under = [dg for dg in range(1, 10) if part["actual"][dg] < 0.7 * part["expected"][dg]]
+    note_over, note_under = [5, 6, 7, 8, 9], [2, 3]                    # the digits the note names
+    assert over == note_over and under == note_under, (over, under)
     for i, (label, b) in enumerate([("Full payments: Partial is FALSE", full),
                                     ("Partial payments: Partial is TRUE", part)]):
         x = i * 440
@@ -215,8 +219,8 @@ def fig_08_04() -> Diagram:
     chart_legend(d, 0, 344)
     note(d, 376, "Supplier payments dated in fiscal 2024 through 2026, split by the Partial column "
          "(a payment smaller than its invoice). Every partial payment belongs to an invoice of $1,000 or "
-         "more, and most of those invoices are between $1,000 and $2,000, so their parts start with "
-         "digits from 3 to 9 far more often than Benford's Law expects.", h=56)
+         "more, and most of those invoices are between $1,000 and $2,000, so their parts start with the "
+         "digits 5 to 9 far more often than Benford's Law expects, and with 2 and 3 far less often.", h=56)
     return d
 
 
@@ -333,14 +337,20 @@ def fig_08_07() -> Diagram:
             return dict(label=f"<b>{esc(value)}</b>", align="center")
         return {}
 
-    xl.formula_bar(d, 0, 0, 860, "I2", "=[@Weekend]+[@Backdated]+[@SelfApproved]+[@AboveLimit]+[@RoundAmount]")
+    # The JournalEntries Table of Tutorial 8.3: the JournalEntry columns, the five merged Employee columns, the five
+    # flags, and RiskScore. The mock shows nine of them under their own column letters, as hidden columns keep theirs.
+    table = [r[1] for r in q("PRAGMA table_info(JournalEntry)")] + [
+        "ApproverName", "ApproverTitle", "ApproverLimit", "CreatorName", "CreatorTitle", *names, "RiskScore"]
+    letters = [chr(65 + table.index(h)) for h in heads]
+    assert all(len(x) == 1 for x in letters), letters
+    xl.formula_bar(d, 0, 0, 860, f"{letters[-1]}2", "=[@Weekend]+[@Backdated]+[@SelfApproved]+[@AboveLimit]+[@RoundAmount]")
     widths = [32, 108, 144, 104, 64, 74, 92, 80, 92, 70]
-    geo = xl.table_view(d, 0, 40, [chr(65 + i) for i in range(9)], widths, heads, body, extra=extra)
+    geo = xl.table_view(d, 0, 40, letters, widths, heads, body, extra=extra)
     xl.emphasis(d, *geo[(1, 0)][:2], sum(widths[1:]), ROW_H)
     bottom = 40 + 22 + ROW_H * (len(body) + 1)
     note(d, bottom + 8, "The JournalEntries Table sorted by RiskScore from largest to smallest, with the "
-         "entries that score 2 or more; other columns are hidden. Outlined: the only entry with four "
-         "flags, the opening balance entry.")
+         "entries that score 2 or more; the other columns are hidden, and the visible ones keep their letters. "
+         "Outlined: the only entry with four flags, the opening balance entry.")
     return d
 
 

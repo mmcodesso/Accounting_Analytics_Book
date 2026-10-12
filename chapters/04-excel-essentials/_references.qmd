@@ -2,7 +2,7 @@
 
 ## References
 
-Caulkins, J. P., Morrison, E. L., & Weidemann, T. (2007). Spreadsheet errors and decision making. *Journal of Organizational and End User Computing*, *19*(3), 1–23. <https://doi.org/10.4018/joeuc.2007070101>
+Caulkins, J. P., Morrison, E. L., & Weidemann, T. (2007). Spreadsheet errors and decision making: Evidence from field interviews. *Journal of Organizational and End User Computing*, *19*(3), 1–23. <https://doi.org/10.4018/joeuc.2007070101>
 
 Church, K. S., Riley, J., & Schmidt, P. J. (2022). Has Excel become a "golden hammer": The paradox of data analytics in SME clusters. *Journal of Emerging Technologies in Accounting*, *19*(2), 211–234. <https://doi.org/10.2308/jeta-2020-051>
 

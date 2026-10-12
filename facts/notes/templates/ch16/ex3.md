@@ -3,10 +3,12 @@
      first is {{ first }}, then surge days in {{ with_surge }} of the {{ span }} months from {{ several }} (about {{ average|num }} a month), up to {{ peak }} in {{ peak_month }}; every surge day has all {{ employees }} hourly
      manufacturing employees at {{ regular|num(1) }} regular plus {{ overtime|num(1) }} overtime hours. Surge overtime {% for h in on_surge %}{{ h|num }}{{ sep(loop) }}{% endfor %} hours, {% for s in shares %}{{ s|num(3) }}{{ sep(loop) }}{% endfor %}
      of the year's manufacturing overtime; overtime on other days did not grow ({{ other|map('num')|join(', ') }}). All {{ entries|count }} surge entries
-     were approved by the Production Manager on the work date. Distinct values of total hours: Group By's "Count Distinct Rows"
-     counts distinct rows, not the values of one column, so the aggregation is written List.Count ( List.Distinct (
-     [TotalHours] ) ) (or only WorkDate and TotalHours are kept before grouping); one value means everyone clocked the
-     same hours. (5) The production manager approved every entry the
+     were approved by the Production Manager on the work date. Distinct values: Power BI Desktop's Group By has no Count distinct values
+     (Power Query Online only) and its Count Distinct Rows counts whole rows, so the aggregations are edited to List.Count (
+     List.Distinct ( [EmployeeID] ) ) and List.Count ( List.Distinct ( [TotalHours] ) ); one value of total hours means everyone
+     clocked the same hours. {{ dup|capitalize }} employee-days of the plant have two clock entries, so a count of rows is not a count of
+     employees in general, though on every surge day the two agree. The share's denominator is all of the month's
+     manufacturing overtime, from ClockEntries; filtering ClockEntries itself to surge days would make the share 100%. (5) The production manager approved every entry the
      test flags; telling the approver what the test detects is the prompt notification that Gonzalez and Hoffman (2018) found
      can encourage fraud when detection is weak, so the test stays with internal audit and goes to the audit committee. The
      Plant page's overtime share is a management measure; the surge-day test is an audit test. -->

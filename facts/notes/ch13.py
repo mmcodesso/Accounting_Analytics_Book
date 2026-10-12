@@ -240,12 +240,16 @@ def ex1(d, claim):
                           freight=freight, tax=tax, grand=grand))
     claim(d.one("SELECT COUNT(*) FROM SalesInvoice si WHERE NOT EXISTS (SELECT 1 FROM SalesInvoiceLine l "
                 "WHERE l.SalesInvoiceID = si.SalesInvoiceID)") == 0, "no invoice without lines")
+    # Equal annual totals could hide differences that offset (Tutorial 4.1, Step 10); the note states the test by invoice.
+    claim(d.one("SELECT COUNT(*) FROM SalesInvoice si JOIN (SELECT SalesInvoiceID, SUM(LineTotal) AS s FROM "
+                "SalesInvoiceLine GROUP BY SalesInvoiceID) l ON l.SalesInvoiceID = si.SalesInvoiceID "
+                "WHERE ABS(si.SubTotal - l.s) > 0.005") == 0, "every invoice equals its lines within half a cent")
     header = {r[0] for r in d.q("SELECT DISTINCT a.AccountNumber FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
                                 "WHERE g.SourceDocumentType = 'SalesInvoice' AND g.SourceLineID IS NULL")}
     claim({str(a) for a in header} == {"1020", "4050", "2050"},
           "the header-level postings of invoices go to receivables, freight revenue (4050), and sales tax (2050)")
     traced = d.one("SELECT InvoiceNumber FROM SalesInvoice WHERE SalesInvoiceID = ?", TRACED_SALE_ID)
-    return dict(years=years, traced=traced)
+    return dict(years=years, traced=traced, n_all=d.one("SELECT COUNT(*) FROM SalesInvoice"))
 
 
 # --- Exercise 13.2 -------------------------------------------------------------------------------
@@ -348,8 +352,24 @@ def ex3(d, claim):
     claim(all(p["after"] == p["n"] for p in invalid), "all the lines of the promotion that ends before it starts fall after its end date")
     claim(all(p["after"] > 0 for p in current), "each current promotion has lines invoiced after its end date")
     claim(current[0]["within"], "all of the first current promotion's late lines were ordered within its dates")
+    # Requirement (5) asks on which item groups the discounts fell: the promotions' names do not say, since a
+    # segment promotion reaches every group its customers buy.
+    by_group = defaultdict(float)
+    for r in with_promo:
+        by_group[r["group"]] += r["disc"]
+    groups = sorted(by_group.items(), key=lambda kv: -kv[1])
+    no_disc = sorted({r["group"] for r in rows} - set(by_group))
+    for p in listed:
+        p["groups"] = sorted({r["group"] for r in with_promo if r["promo"] == p["id"]})
+    one_group = [p for p in listed if len(p["groups"]) == 1]
+    spread = [p for p in listed if len(p["groups"]) > 1]
+    claim(all(promos[p["id"]]["scope"] != "Segment" for p in one_group) and
+          all(promos[p["id"]]["scope"] == "Segment" for p in spread),
+          "the item-group and collection promotions stay in one group, while the segment promotions spread over several")
+    claim(len({tuple(p["groups"]) for p in spread}) == 1, "the segment promotions spread over the same groups")
     return dict(promos=listed, total=total(with_promo, "disc"), blank=len(blank), blank_rev=total(blank, "rev"),
-                current=current, earlier=earlier, invalid=invalid[0])
+                current=current, earlier=earlier, invalid=invalid[0], groups=groups, no_disc=no_disc,
+                one_group=one_group, spread=spread)
 
 
 # --- Exercise 13.4 -------------------------------------------------------------------------------
@@ -437,7 +457,33 @@ def ex5(d, claim):
                      "JOIN PromotionProgram p ON p.PromotionID = l.PromotionID WHERE p.ScopeType = 'Collection' "
                      "AND i.ListPrice IS NOT NULL AND i.ItemGroup = 'Furniture' AND COALESCE(i.CollectionName, '') = ''")
     claim(len(collection) == 1, "one of the Furniture items without a CollectionName was ordered under a collection promotion")
-    return dict(n=n, promo=empty(all_lines, 0), override=empty(all_lines, 1), override_top=empty(top, 1),
+    # Requirements (2) and (3) ask for every column with empty values, on both bases: the census of the four raw
+    # Tables, in the workbook's column and row order (a column's blanks are nulls; no text cell is empty).
+    census = []
+    for query, table, key in [("Profile_Lines", "SalesInvoiceLine", "SalesInvoiceLineID"),
+                              ("Profile_Invoices", "SalesInvoice", "SalesInvoiceID"),
+                              ("Profile_Items", "Item", "ItemID"), ("Profile_Customers", "Customer", "CustomerID")]:
+        rows_n = d.one(f"SELECT COUNT(*) FROM {table}")
+        columns = []
+        for c in [r[1] for r in d.q(f"PRAGMA table_info({table})")]:
+            full = d.one(f"SELECT COUNT(*) FROM {table} WHERE {c} IS NULL OR {c} = ''")
+            if full:
+                top_k = d.one(f"SELECT COUNT(*) FROM (SELECT {c} FROM {table} ORDER BY {key} LIMIT ?) "
+                              f"WHERE {c} IS NULL OR {c} = ''", TOP_ROWS)
+                columns.append(dict(name=c, top=top_k, full=full, moves=abs(full / rows_n - top_k / min(rows_n, TOP_ROWS))))
+        census.append(dict(query=query, n=rows_n, top_n=min(rows_n, TOP_ROWS), columns=columns))
+    moved = {c["name"]: c["moves"] for t in census for c in t["columns"]}
+    claim(moved["PromotionID"] > 0.02 and moved["PaymentDate"] > 0.02,
+          "PromotionID's and PaymentDate's blanks change by more than two percentage points between the bases")
+    small = [k for k in ("PriceListLineID", "ShipmentLineID", "PriceOverrideApprovalID") if moved[k] < 0.01]
+    claim(len(small) == 3, "the blanks of PriceListLineID, ShipmentLineID, and PriceOverrideApprovalID move by under "
+                           "one percentage point")
+    claim(set(moved) - {"PromotionID", "PaymentDate", *small} <= {c["name"] for c in census[2]["columns"]},
+          "every other column with blanks is an Item column, which the top 1,000 rows hold in full")
+    claim(census[3]["columns"] == [], "Customer has no empty values")
+    coll_raw = d.one("SELECT COUNT(*) FROM Item WHERE CollectionName IS NULL OR CollectionName = ''")
+    return dict(census=census, small=small, coll_raw=coll_raw,
+                n=n, promo=empty(all_lines, 0), override=empty(all_lines, 1), override_top=empty(top, 1),
                 base=empty(all_lines, 2), base_top=empty(top, 2), methods=methods_all, discounts=len({r[5] for r in all_lines}),
                 discounts_top=len(rates_top), top_empty=empty(top, 0) / len(top),
                 fractional=sum(r[6] != int(r[6]) for r in all_lines),
@@ -479,7 +525,12 @@ def ex6(d, claim):
     for r in rows:
         discounts[r["month"]] += r["disc"]
     peak = max(monthly, key=lambda m: discounts[m] / monthly[m])
+    # The draft's combo chart leaves out Services, so its own denominator is the revenue without them; services carry
+    # no promotion, so the discounts are the same in both.
+    shown = sum(r["rev"] for r in rows if r["month"] == peak and r["group"] != "Services")
+    claim(all(r["disc"] == 0 for r in rows if r["group"] == "Services"), "services carry no discount")
     return dict(n_slices=word(len(slices)), slices=slices, avg=sum(r["rate"] for r in rows) / len(rows),
+                peak_shown=discounts[peak] / shown,
                 ratio=total(rows, "disc") / total(rows, "price"), of_list=total(rows, "disc") / total(rows, "list"),
                 f_avg=sum(furniture) / len(furniture), start=everything[start], low=min(others), high=max(others),
                 early=early, growth=growth, changes=changes,

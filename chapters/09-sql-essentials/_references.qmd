@@ -18,4 +18,4 @@ SQLite. (n.d.-c). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.
 
 SQLite. (n.d.-d). *SQL language expressions*. <https://www.sqlite.org/lang_expr.html>
 
-Taipalus, T., Siponen, M., & Vartiainen, T. (2018). Errors and complications in SQL query formulation. *ACM Transactions on Computing Education*, *18*(3), 1–29. <https://doi.org/10.1145/3231712>
+Taipalus, T., Siponen, M., & Vartiainen, T. (2018). Errors and complications in SQL query formulation. *ACM Transactions on Computing Education*, *18*(3), Article 15. <https://doi.org/10.1145/3231712>

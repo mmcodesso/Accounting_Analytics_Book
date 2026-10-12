@@ -67,7 +67,7 @@ CASE works like Excel's IFS from Chapter 5, and it can appear anywhere a value c
 {{< book-table tbl-11-01 >}}
 
 ::: {.notes}
-The dates are text in year-month-day form, and the functions read, calculate with and return text, except julianday, which returns a number. Modifiers such as 'start of month' and '+1 month' are applied in order, from left to right.
+The Charles River dates are text in year-month-day form; strftime and date read and return text, and julianday returns a number. Modifiers such as 'start of month' and '+1 month' are applied in order, from left to right.
 :::
 
 ## Month ends and the days between dates
@@ -227,10 +227,10 @@ The year-to-date total restarts in January because each fiscal year is its own p
 - `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW` is a trailing twelve months
 - A ROWS frame counts rows: a missing month reaches one month further
 - `WINDOW w AS (...)` names a window that several functions share
-- `LAG(x)` partitioned by month compares each month with a year earlier
+- `LAG(x)` partitioned by month: the latest earlier year with that month
 
 ::: {.notes}
-Check that a query relying on a frame has one row for every month. COUNT over the window shows where it holds fewer than twelve months. An alias of the SELECT list cannot be used inside OVER, so the window repeats the expression; SQLite answers "no such column".
+Check that a query relying on a frame has one row for every month. COUNT over the window shows where it holds fewer than twelve months. A frame shapes only the aggregates: LAG, LEAD and the ranking functions read the whole partition. LAG partitioned by month returns the previous year only when no year is missing that month. An alias of the SELECT list cannot be used inside OVER, so the window repeats the expression; SQLite answers "no such column".
 :::
 
 ## The window functions of this chapter
@@ -387,15 +387,15 @@ A view cannot be changed in place, so a script drops it first and can be run aga
 That is why Chapter 9 made a working copy: the view lives in CharlesRiver_Work.sqlite, and the downloaded file is never changed. A chain of CTEs is the SQL form of Power Query's Applied Steps, and a view the counterpart of a refreshable query.
 :::
 
-## Watch out: a view breaks when its columns change {.watch-out}
+## Watch out: a view can break when its tables change {.watch-out}
 
-- A view depends on the names of the tables and columns it uses
-- Rename or remove one, and the view stops working
+- A view depends on the tables and columns it uses
+- Remove or change one, and the view can fail or change its meaning
 - The error appears only when someone queries the view
 - Document every view: purpose, source tables, and the checks its results pass
 
 ::: {.notes}
-Document a view in its script just as you document any other query.
+SQLite carries a renamed table or column into the views that use it, but test a view again after any change to its tables. Document a view in its script just as you document any other query.
 :::
 
 ## Check your understanding {.check}
@@ -403,7 +403,7 @@ Document a view in its script just as you document any other query.
 What happens in each case?
 
 1. You close the database without clicking Write Changes
-2. A column the view uses is renamed
+2. A column the view uses is removed
 3. You put ORDER BY inside the view
 4. You need the view only for this session
 
@@ -437,7 +437,7 @@ Students build the output step and the hours step, join them, add the trailing t
 {{< book-figure fig-11-08 >}}
 
 ::: {.notes}
-Output counts standard hours only up to the last day with time records, so the two steps cover the same days. The Trailing step calculates the trailing ratios over the named window, and the final SELECT keeps the months whose window holds twelve months.
+Output counts standard hours only up to the last day with time records, so the last month compares hours and output up to the same day, although indirect time ends a week earlier. The Trailing step calculates the trailing ratios over the named window, and the final SELECT keeps the months whose window holds twelve months.
 :::
 
 ## The saved view in the database
@@ -453,7 +453,7 @@ After Write Changes, the view appears under Views on the Database Structure tab 
 {{< book-figure fig-11-10 crop="0,0,1,0.7876" >}}
 
 ::: {.notes}
-The monthly ratio swings from month to month, while the trailing figures change slowly. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
+The monthly ratio swings from month to month, while the trailing figures change slowly. Each trailing figure pools twelve months' hours and standard hours, and the December row covers only the days to the last time record, so it is provisional. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
 :::
 
 ## Checkpoint
@@ -491,7 +491,7 @@ The trailing measure reached its highest point late in the latest year. The audi
 - Date functions group by period, find period ends and count days, in text
 - Window functions rank, accumulate and compare rows while keeping them
 - CTEs name the steps of a long query; a view saves it for every month's run
-- The monthly measure combines them, matched over the same days
+- The monthly measure combines them, cut off at the last day with time records
 
 ::: {.notes}
 This was diagnostic analytics, tracing when and where the extra hours arose. The trailing measure is also a predictive baseline: each new month can be judged against it, and Chapter 7's forecasting methods could project it.

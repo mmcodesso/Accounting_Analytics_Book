@@ -1,6 +1,6 @@
 ## Guided Tutorial 4.1: Building the Furniture Analysis Workbook with Power Query
 
-**Context and objective.** In this tutorial, you will create the workbook in which you will analyze the controller's question. Instead of working in CharlesRiver.xlsx, you will start a new workbook and use Power Query to import the four Tables the analysis needs: the sales invoices, the invoice lines, the items Charles River sells, and the promotion programs. You will filter and trim the data before loading it, add two calculated columns with structured references, and build control totals that prove the imported data is complete. The master workbook is never changed, and the new workbook can be refreshed whenever the data is updated.
+**Context and objective.** In this tutorial, you will create the workbook in which you will analyze the controller's question. Instead of working in CharlesRiver.xlsx, you will start a new workbook and use Power Query to import the four Tables the analysis needs: the sales invoices, the invoice lines, the items Charles River sells, and the promotion programs. You will filter and trim the data before loading it, add two calculated columns with structured references, and build control totals that check the imported data. The master workbook is never changed, and the new workbook can be refreshed whenever the data is updated.
 
 **Prerequisites.** You need the desktop version of Microsoft Excel with Power Query (see the Watch out box earlier in this chapter) and the CharlesRiver.xlsx file provided with this textbook. You do not need to open CharlesRiver.xlsx, because Power Query reads it directly.
 
@@ -57,7 +57,7 @@ Discount needs the most care. The first 200 invoice lines carry no promotion, so
 
 **Step 7. Load the queries into the workbook.**
 
-a. Choose **Home > Close & Load**. Power Query loads each query into a new worksheet as an Excel Table.
+a. Choose **Home > Close & Load > Close & Load To**. In the **Import Data** dialog, select **Table** and **New worksheet**, and click **OK**. The choice applies to all four queries, so Power Query loads each into a new worksheet as an Excel Table; a plain **Close & Load** would load several new queries at once to the Data Model instead, which is Excel's default.
 b. Open the **Queries & Connections** pane, which shows each query with the number of rows it loaded.
 c. Rename each new worksheet after the Table it holds: `SalesInvoice`, `SalesInvoiceLine`, `Item`, and `PromotionProgram`.
 
@@ -80,7 +80,7 @@ Discount holds a rate, such as 0.10 for 10 percent, and it is zero on lines with
 
 ![The SalesInvoiceLine Table with Its Calculated Columns.](/visuals/svg/fig-04-04-salesinvoiceline-table.svg){#fig-04-04 fig-alt="A mock of the SalesInvoiceLine Table after Tutorial 4.1, with columns B through F and L through O hidden. The Table Name box on the Table Design tab reads SalesInvoiceLine, and the formula bar shows =ROUND([@Quantity]*[@BaseListPrice],2) for the selected ListAmount cell. Of five consecutive invoice lines, two carry a promotional discount of 0.1 and have a DiscountAmount greater than zero, and the other three have a DiscountAmount of zero. The ListAmount and DiscountAmount calculated columns are outlined."}
 
-**Step 10. Build control totals that prove the import is complete.** A control total is a total calculated independently from a set of data, which the data must agree with. Here, the invoice lines must add up to the invoices they belong to.
+**Step 10. Build control totals to check the import.** A control total is a total calculated independently from a set of data, which the data must agree with. Here, the invoice lines must add up to the invoices they belong to.
 
 a. Insert a new worksheet and name it `Analysis`.
 b. In cell A1, type `Control totals`.
@@ -96,6 +96,8 @@ e. Add one more row: type `List amount` in A9 and enter `=SUM(SalesInvoiceLine[L
 f. Format the amounts with a thousands separator and two decimals.
 
 The SubTotal on each invoice is the sum of its lines, so the two totals in B5 and B6 come from different Tables but should agree to the cent, and B7 should show zero. The ROUND in B7 removes the tiny differences, far smaller than a cent, that computers produce when they add long columns of decimal numbers. Compare the list amount in B9 with the line total in B5.
+
+Notice what the zero difference compares: two Tables that came through the same import. If one invoice and all its lines had been left out of both, B5 and B6 would fall by the same amount, and B7 would still show zero although a whole invoice was missing; two errors of the same size in opposite directions would cancel in the same way. Agreement inside the workbook cannot reveal an omission like that. Only evidence from outside the import can, such as the number of rows in each source Table, counted in CharlesRiver.xlsx itself, or a test for gaps in the invoice numbers, which Chapter 8 introduces. The control totals therefore show that the invoice lines and the invoices you imported agree with each other. On their own, they do not show that the import is complete.
 
 **Step 11. Test the refresh.** Power Query reads CharlesRiver.xlsx again and repeats every step, so a refresh should change nothing while the source is unchanged.
 
@@ -114,4 +116,4 @@ The calculated columns survive the refresh because Excel keeps a Table's calcula
 - the list amount is well above the line total;
 - the discount taken is a small fraction of the line total, but not zero.
 
-The zero difference tells you that every invoice line was imported and that the lines add up to the invoices they belong to. The list amount is above the line total because most lines are billed at price-list prices below the item's list price and some also carry a promotional discount. The discount is not zero because some lines were billed under a promotion, and Tutorial 4.3 finds out which ones.
+The zero difference tells you that the imported lines add up to the imported invoices, which they would not if lines had been lost without their invoices; as Step 10 explained, it cannot tell you whether an invoice is missing together with all its lines. The list amount is above the line total because most lines are billed at price-list prices below the item's list price and some also carry a promotional discount. The discount is not zero because some lines were billed under a promotion, and Tutorial 4.3 finds out which ones.

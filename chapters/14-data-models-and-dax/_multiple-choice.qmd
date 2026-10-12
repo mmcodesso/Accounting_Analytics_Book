@@ -30,7 +30,7 @@ B.  The relationship becomes inactive until a measure switches it on
 C.  Every measure that uses DIVIDE begins to return an error
 D.  A selection on Item can then filter the ledger through Date
 
-**5.** SalesInvoiceLine has an InvoiceDate and a ShipmentDate, and the Date table is related to both. How does a measure calculate revenue by ship date?
+**5.** A fact table of invoice lines has an InvoiceDate and a ShipmentDate, and the Date table is related to both. How does a measure calculate revenue by ship date?
 
 A.  By setting the ship-date relationship to Both
 B.  By adding a second date table filtered with FILTER

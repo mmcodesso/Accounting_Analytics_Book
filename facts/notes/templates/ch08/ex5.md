@@ -16,6 +16,7 @@
      and PI {% for i in g.beyond.ids %}{{ i }}{{ sep(loop) }}{% endfor %} ({% for t in g.beyond.totals %}{{ t|money }}{{ sep(loop) }}{% endfor %}), approved by {{ g.beyond.name }},
      the {{ g.beyond.title }}, above the {{ g.beyond.limit|num }} limit, the note-financed capital invoices of
      Exercise 8.2. Near-duplicates, payments dated before {{ d.N }}-01-01: SameAmount flags {{ n_payments }} payments in {{ pairs }} pairs (no group larger than
-     two; {{ within30 }} pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices and no invoice was paid twice.
-     Gap test: {% for g in gaps %}PO-{{ g.year }} {{ 'runs ' if loop.first }}{{ g.low|count }} to {{ g.high|count }} ({{ g.n|count }}{{ ' orders' if loop.first }}){{ ', ' if not loop.last }}{% endfor %}; no numbers
-     are missing, and the sequence continues across years rather than restarting. -->
+     two; {{ within30 }} pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices; the test does not exclude a bill entered under
+     two invoice numbers or an invoice overpaid in unequal parts, which are other tests.
+     Gap test: {% for g in gaps %}PO-{{ g.year }} {{ 'runs ' if loop.first }}{{ g.low|count }} to {{ g.high|count }} ({{ g.n|count }}{{ ' orders' if loop.first }}){{ ', ' if not loop.last }}{% endfor %}; the numbers
+     are unique, none is missing, and the sequence continues across years rather than restarting. -->

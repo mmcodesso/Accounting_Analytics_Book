@@ -22,7 +22,7 @@ b. In the **PivotTable Fields** pane, drag FiscalYear to **Filters**, Period to 
 c. Open the FiscalYear filter in cell B1 and select 2026.
 d. In the **Values** area, click **Sum of LineTotal**, choose **Value Field Settings > Number Format**, and choose **Number** with two decimals and a thousands separator.
 
-Compare the grand total at the bottom right of the PivotTable with the control total in B3 of the Profile worksheet, and each item group's Grand Total with its revenue in column C of the Profile worksheet. They agree to the cent, so the PivotTable covers the same lines as the formulas, and it adds the quarterly detail.
+Compare the grand total at the bottom right of the PivotTable with the control total in B3 of the Profile worksheet, and each item group's Grand Total with its revenue in column C of the Profile worksheet. They agree to the cent, as two summaries of the same Table and year should, and the PivotTable adds the quarterly detail. Its FiscalYear filter is a setting of its own: changing ReportYear on the Parameters worksheet does not change it.
 
 **Step 3. Add the margin as a calculated field.**
 
@@ -66,7 +66,7 @@ b. Drag FiscalYear to **Filters** and select 2026, Period to **Axis (Categories)
 c. Open the ItemGroup filter on the chart and clear Services, whose 100 percent margin would squeeze the other lines together.
 d. Right-click the chart, choose **Change Chart Type**, and choose **Line with Markers**.
 
-The chart shows four lines. The Furniture line is the lowest in every quarter, and it is the only one that turns down in the fourth quarter. Because the chart is built on a PivotTable, changing its FiscalYear filter redraws it for another year.
+The chart shows four lines. The Furniture line is the lowest in every quarter and has by far the largest fall in the fourth quarter, while the other lines stay close to level. Because the chart is built on a PivotTable, changing its FiscalYear filter redraws it for another year.
 
 **Step 8. Refresh and document.**
 

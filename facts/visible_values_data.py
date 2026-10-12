@@ -244,7 +244,7 @@ def sql_chapters(d) -> dict:
 def payroll_registers(d) -> dict:
     """Tutorial 16.3's dispositions: the three registers paid after the payee's termination and the three paid
     before their approval (the first of each fiscal year), from the note that builds the register; and the
-    number of registers never paid."""
+    number of registers with no payment record."""
     t2 = note(d, "ch16.t2")
     out = {}
     for i, n in enumerate(t2["after"]["ids"], 1):

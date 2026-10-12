@@ -11,7 +11,7 @@ D.  They move strongly in opposite directions along a straight line.
 
 **2.** Removing a single unusual month from a data set changes the correlation between revenue and the number of customers from strong to weak. What should an analyst do?
 
-A.  Investigate the month, and report both results unless it can be explained.
+A.  Investigate the month, and report both results with the reason for any exclusion.
 B.  Report the weaker correlation, because unusual months should always be deleted.
 C.  Report neither, because correlation cannot be used with monthly data.
 D.  Report the stronger correlation, because it uses more of the data.
@@ -27,7 +27,7 @@ D.  The forecast will be accurate to within 17 percent of actual revenue.
 
 A.  Revenue has a strong upward trend that should be extended into the forecast.
 B.  The start-up month should be kept, because it makes the result significant.
-C.  The trend depends on one unusual month, so there is no reliable evidence of one.
+C.  Its significance rests on one unusual month, so test the trend before using it.
 D.  A p-value above 0.05 proves that revenue will not grow in the coming year.
 
 **5.** What is a backtest of a forecasting method?
@@ -68,7 +68,7 @@ D.  The effect of producing more units than were sold in the period
 **10.** Actual sales commission expense is 75 percent below the static budget, and actual revenue is far below the budgeted revenue. What is the best interpretation?
 
 A.  The sales team cut its commission rates, which saved the company money.
-B.  Most of it reflects lower revenue, so flex the budget before judging the rest.
+B.  Much of it may reflect lower revenue, so flex the budget before judging the rest.
 C.  Part of the commission expense was never recorded in the ledger.
 D.  Commissions are a fixed cost, so the whole difference is a spending variance.
 

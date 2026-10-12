@@ -146,12 +146,26 @@ def ex3(d, claim):
     opex = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND BudgetCategory = 'Operating Expense'", d.C)
     budget_commission = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?",
                               d.C, d.account("6290"))
-    fixed = opex - budget_commission
+    # The budget files interest (7030) under Operating Expense, but the chart of accounts makes it Other Expense, which
+    # Chapter 6's income statement shows below operating income; Requirement (2) takes it out of the fixed costs.
+    interest = d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?", d.C, d.account("7030"))
+    claim(d.one("SELECT AccountSubType FROM Account WHERE AccountNumber = 7030") == "Other Expense"
+          and {r[0] for r in d.q("SELECT DISTINCT BudgetCategory FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?",
+                                 d.C, d.account("7030"))} == {"Operating Expense"},
+          "the budget files interest (7030) under Operating Expense, although the chart of accounts makes it Other Expense")
+    claim(not [r for r in d.q("SELECT DISTINCT a.AccountSubType FROM BudgetLine bl JOIN Account a USING (AccountID) "
+                              "WHERE bl.FiscalYear = ? AND bl.BudgetCategory = 'Operating Expense'", d.C)
+               if r[0] not in ("Operating Expense", "Other Expense")]
+          and d.one("SELECT COUNT(DISTINCT bl.AccountID) FROM BudgetLine bl JOIN Account a USING (AccountID) "
+                    "WHERE bl.FiscalYear = ? AND bl.BudgetCategory = 'Operating Expense' "
+                    "AND a.AccountSubType = 'Other Expense'", d.C) == 1,
+          "interest is the only budgeted operating-expense account outside operating expenses")
+    fixed = opex - budget_commission - interest
     budget = dict(d.q("SELECT CAST(a.AccountNumber AS TEXT), SUM(bl.BudgetAmount) FROM BudgetLine bl JOIN Account a USING (AccountID) "
                       "WHERE bl.FiscalYear = ? AND bl.BudgetCategory = 'Operating Expense' GROUP BY 1", d.C))
     actual = dict(d.q(f"SELECT CAST(a.AccountNumber AS TEXT), SUM(g.Debit - g.Credit) FROM GLEntry g JOIN Account a USING (AccountID) "
                       f"WHERE g.FiscalYear = ? AND {d.no_closes()} GROUP BY 1", d.C))
-    recurring = [n for n in budget if n not in ("6060", "6290")]
+    recurring = [n for n in budget if n not in ("6060", "6290", "7030")]
     claim(all(abs(actual.get(n, 0) / budget[n] - 1) < 0.05 for n in recurring),
           "every budgeted operating-expense account except 6060 and 6290 (salaries, rent, depreciation, and the others) "
           "came within a few percent of actual")
@@ -168,7 +182,8 @@ def ex3(d, claim):
     breakeven2 = fixed2 / ratio
     target = 4_000_000
     return dict(revenue=revenue, cost=cost, close=close, commissions=commissions, cm=cm, ratio=ratio, opex=opex,
-                budget_commission=budget_commission, fixed=fixed, breakeven=breakeven, safety=revenue - breakeven,
+                budget_commission=budget_commission, interest=interest, interest_effect=interest / ratio,
+                fixed=fixed, breakeven=breakeven, safety=revenue - breakeven,
                 safety_pct=(revenue - breakeven) / revenue, added=added, added_total=fixed2 - fixed,
                 breakeven2=breakeven2, safety2_pct=(revenue - breakeven2) / revenue,
                 goal=(target + fixed2) / ratio, goal_without=(target + fixed) / ratio)
@@ -338,8 +353,16 @@ def ex6(d, claim):
         ordered = sum(orders[(g, y)] for g in PRODUCTS)
         years.append(dict(year=y, ratio=total / ordered, groups=[(g, forecast[(g, y)] / orders[(g, y)]) for g in PRODUCTS],
                           forecast=total, orders=ordered))
-    claim(all(r > 2 for y in years for _, r in y["groups"]), "the forecast is more than twice the orders in every group and year")
+    claim(all(r > 2 for y in years for _, r in y["groups"]), "the forecast is more than twice the orders in every product group and year")
     claim(all(a["ratio"] < b["ratio"] for a, b in zip(years, years[1:])), "the bias grows each year")
+    # Services, which the exercise keeps in a row of its own: forecast and ordered in hours, and forecast well under its orders
+    svc = [forecast[("Services", y)] / orders[("Services", y)] for y in d.years]
+    claim(all(r < 0.5 for r in svc), "Services runs the other way: its forecast is well under its orders in every year")
+    claim({r[0] for r in d.q("SELECT DISTINCT i.UnitOfMeasure FROM DemandForecast f JOIN Item i USING (ItemID) "
+                             "WHERE i.ItemGroup = 'Services'")}
+          | {r[0] for r in d.q("SELECT DISTINCT i.UnitOfMeasure FROM SalesOrderLine l JOIN Item i USING (ItemID) "
+                               "WHERE i.ItemGroup = 'Services'")} == {"Hour"},
+          "the Services forecasts and orders are hours of design work")
     budget = d.one("SELECT SUM(Quantity) FROM BudgetLine WHERE FiscalYear = ? AND BudgetCategory = 'Revenue'", d.C)
     claim(budget > years[-1]["forecast"], "the budget's quantity is higher still than the forecast")
     invoiced = d.one("SELECT SUM(l.Quantity) FROM SalesInvoiceLine l JOIN SalesInvoice si USING (SalesInvoiceID) "
@@ -363,7 +386,8 @@ def ex6(d, claim):
     claim(len({round(r[5] / r[6], 1) for r in adjusted}) == 1, "all are the same multiple of their baseline")
     claim(all(r[8] is None for r in adjusted), "none has an ApprovedByEmployeeID")
     unapproved = [r[0] for r in all_rows if r[8] is None]
-    claim(unapproved == [r[0] for r in adjusted], "they are the only unapproved forecasts, so every other adjustment was approved")
+    claim(unapproved == [r[0] for r in adjusted], "they are the only unapproved forecasts, so every other adjustment has an approver recorded")
+    claim(all(r[5] / r[6] > 1.5 for r in adjusted), "all the overrides beyond half of their baseline are increases")
     first = adjusted[0]
     code, name, group = d.q("SELECT ItemCode, ItemName, ItemGroup FROM Item WHERE ItemID = ?", first[2])[0]
     warehouse = d.one("SELECT WarehouseName FROM Warehouse WHERE WarehouseID = ?", first[3])
@@ -374,7 +398,7 @@ def ex6(d, claim):
     claim(planned > rows / 2, f"employee {first[7]} plans most forecasts")
     pos = d.one("SELECT COUNT(*) FROM PurchaseOrder WHERE CreatedByEmployeeID = ?", first[7])
     claim(title == "Buyer" and pos > 0, "the planner is a buyer who also places purchase orders")
-    return dict(years=years, budget=budget, invoiced=invoiced, methods=methods, last_month=MONTHS[int(last[5:7]) - 1],
+    return dict(years=years, svc=svc, budget=budget, invoiced=invoiced, methods=methods, last_month=MONTHS[int(last[5:7]) - 1],
                 rows=rows, version=versions[0], low=min(ratios), high=max(ratios),
                 adjusted=[dict(id=r[0], date=r[1], forecast=r[5], baseline=r[6]) for r in adjusted],
                 code=code, name=name, group=group, warehouse_id=first[3], warehouse=warehouse, method=first[4],

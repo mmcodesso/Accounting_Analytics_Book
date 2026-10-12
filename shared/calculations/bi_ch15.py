@@ -69,11 +69,16 @@ def budget_data(db: sqlite3.Connection) -> dict:
                          "JOIN SalesInvoice si USING (SalesInvoiceID) JOIN Item i USING (ItemID) "
                          "WHERE si.InvoiceDate BETWEEN '2026-01-01' AND '2026-12-31' AND i.ItemGroup <> 'Services' "
                          "GROUP BY 1"))
+    # A row of months (Step 10) flexes each month at its own month's rate; a row of cost centers (Step 9) evaluates
+    # the year as one context, the year's rate times the year's product revenue, as the measure does. The two
+    # can differ by a fraction of a cent, because the monthly rates agree with the year's only to their last digits.
     flexed_com = {m: bud_com[("month", m)] / rev_budget[m] * product_rev[m] for m in range(1, 13)}
+    flexed_year = (sum(bud_com[("month", m)] for m in range(1, 13)) / sum(rev_budget.values())
+                   * sum(product_rev.values()))
     centers = sorted(k for k in set(bud) | set(act) if isinstance(k, str))
     rows = {}
     for cc in centers:
-        flexed = bud[cc] - bud_com[cc] + (sum(flexed_com.values()) if bud_com[cc] else 0)
+        flexed = bud[cc] - bud_com[cc] + (flexed_year if bud_com[cc] else 0)
         variance = act[cc] - bud[cc]
         volume = flexed - bud[cc]
         classification = act_dep[cc] - bud_dep[cc] if (act_dep[cc] or bud_dep[cc]) else None
@@ -84,7 +89,7 @@ def budget_data(db: sqlite3.Connection) -> dict:
     for m in range(1, 13):
         flexed_m = bud[("month", m)] - bud_com[("month", m)] + flexed_com[m]
         monthly.append(act[("month", m)] - flexed_m)
-    data = dict(rows=rows, centers=centers, monthly=monthly, flexed_commission=sum(flexed_com.values()))
+    data = dict(rows=rows, centers=centers, monthly=monthly, flexed_commission=flexed_year)
     total_b = sum(r["budget"] for r in rows.values())
     total_a = sum(r["actual"] for r in rows.values())
     assert abs(total_b - 8289648.80) < 0.01 and abs(total_a - 6471696.58) < 0.01, (total_b, total_a)

@@ -7,10 +7,12 @@ and the conclusions on controls are drawn for d.C. Every value is the SQL twin o
 CreditMemoDate, the refund's RefundDate) and ledger postings by PostingDate. The control tests follow the case's
 definitions: a credit or refund above authority exceeds the approver's MaxApprovalAmount; the credit approver handled
 cash if they applied a receipt to the credited invoice; a refund precedes the customer's payment if its date is before
-the last application on the credited invoice; a customer is past due on the refund date if an invoice dated by then,
-less the applications and credits dated by then, is still open with its DueDate before the refund date. Materiality is
-5% of the income before income taxes the ledger records for d.C (the chart has no income tax account), and the
-sampling statistics come from the binomial (beta) and hypergeometric distributions, as the case's workbook computes them.
+the last application on the credited invoice (an application date, not a receipt date: the notes give the
+receipt-date variant beside it, which a stated definition may use); a customer is past due on the refund date if an
+invoice dated by then, less the applications and credits dated by then, is still open with its DueDate before the
+refund date. Materiality is 5% of the income before income taxes the ledger records for d.C (the chart has no income
+tax account), and the sampling statistics come from the binomial (beta) and hypergeometric distributions, as the
+case's workbook computes them.
 
 Rounding: a clawback's amount is base x rate rounded half up from the exact product, and a credit line's LineTotal is
 SQLite's ROUND(Q x P x (1 - D), 2) except on a few exact half-cent products, rounded the other way. Where SQLite's ROUND,
@@ -25,6 +27,7 @@ cycle's tables (Requirement 1), and the expectation of returns calling for inves
 
 from __future__ import annotations
 
+import math
 import statistics as st
 from collections import Counter, defaultdict
 from datetime import date
@@ -49,6 +52,8 @@ MATERIALITY, PERFORMANCE, TRIVIAL = 0.05, 0.75, 0.05
 KEY_AMOUNT, KEY_CUSTOMER = 5000, 10000
 CONFIDENCE, TOLERABLE, SAMPLE = 0.95, 0.05, 59
 TAIL = 0.05                 # the plausible draws of Requirement 6: the tightest range with each tail below 5%
+NONCONFORMITY = 0.015       # Chapter 8's tbl-08-01: a first-digit MAD above it is nonconformity
+SPREAD = 1.5                # counts or rates spread evenly when the largest is below 1.5 times the smallest
 REVENUE = ("4010", "4020", "4030", "4040", "4080")     # the product and service revenue accounts (Requirement 3)
 SOURCES = ("SalesReturn", "CreditMemo", "CustomerRefund", "SalesCommissionAdjustment", "CashReceipt",
            "CashReceiptApplication")
@@ -228,6 +233,24 @@ def last_payment(c, inv: int) -> str | None:
     return max((a[0] for a in c.apps[inv]), default=None)
 
 
+def last_receipt(c, inv: int) -> str | None:
+    """The latest ReceiptDate of the receipts applied to an invoice (the receipt-date variant of last_payment)."""
+    return max((c.rcpt[a[3]]["date"] for a in c.apps[inv]), default=None)
+
+
+def chance_mad(n: int) -> float:
+    """The first-digit MAD a population of n amounts that followed Benford's Law exactly would show by chance
+    (the normal approximation: the mean over the digits of sqrt(2 / pi) x sqrt(p(1 - p) / n))."""
+    ps = [math.log10(1 + 1 / k) for k in range(1, 10)]
+    return sum(math.sqrt(2 / math.pi) * math.sqrt(p * (1 - p) / n) for p in ps) / 9
+
+
+def first_digit_mad(values) -> float:
+    """The first-digit MAD of positive amounts, the first digit read from printf('%.15e'), as Chapter 12 reads it."""
+    digits = [int(f"{v:.15e}"[0]) for v in values if v > 0]
+    return sum(abs(digits.count(k) / len(digits) - math.log10(1 + 1 / k)) for k in range(1, 10)) / 9
+
+
 @lru_cache(maxsize=None)
 def tests(d) -> SimpleNamespace:
     c = cycle(d)
@@ -239,6 +262,10 @@ def tests(d) -> SimpleNamespace:
     rf_above = [r for r in rf.values() if r["amt"] > emp[r["appr"]]["limit"]]
     before = [r for r in rf.values() if (last_payment(c, cm[r["cm"]]["inv"]) or "") > r["date"]]
     nothing = [r for r in rf.values() if not any(a[0] <= r["date"] for a in c.apps[cm[r["cm"]]["inv"]])]
+    # the receipt-date variant: the refund dated before the last receipt applied to the invoice, or before any receipt
+    before_rcpt = [r for r in rf.values() if (last_receipt(c, cm[r["cm"]]["inv"]) or "") > r["date"]]
+    nothing_rcpt = [r for r in rf.values()
+                    if not any(c.rcpt[a[3]]["date"] <= r["date"] for a in c.apps[cm[r["cm"]]["inv"]])]
     by_cust = defaultdict(list)
     for i, v in c.inv.items():
         by_cust[v["cust"]].append(i)
@@ -254,8 +281,27 @@ def tests(d) -> SimpleNamespace:
                 total += bal
         return total
     pdue = {k: past_due(r["cust"], r["date"]) for k, r in rf.items()}
+    # the same balance on the receivable as posted: each credit reduces it only by its part posted to 1020
+    posted = defaultdict(list)
+    for m in cm.values():
+        posted[m["inv"]].append((m["date"], c.parts.get(m["id"], [0.0, 0.0])[0]))
+
+    def past_due_posted(cust: int, asof: str) -> float:
+        total = 0.0
+        for i in by_cust[cust]:
+            v = c.inv[i]
+            if v["date"] > asof:
+                continue
+            bal = v["gt"] - paid_by(c, i, asof) - sum(a for day, a in posted[i] if day <= asof)
+            if bal > 0.005 and v["due"] < asof:
+                total += bal
+        return total
+    pdue_posted = {k: past_due_posted(r["cust"], r["date"]) for k, r in rf.items()}
     methods = {k: {c.rcpt[a[3]]["method"] for a in c.apps[cm[r["cm"]]["inv"]]} for k, r in rf.items()}
     mism = [r for k, r in rf.items() if r["method"] not in methods[k]]
+    # the method test reads every receipt ever applied to the invoice; these match only on receipts dated after the refund
+    late_method = [r for k, r in rf.items() if r["method"] in methods[k] and r["method"] not in
+                   {c.rcpt[a[3]]["method"] for a in c.apps[cm[r["cm"]]["inv"]] if c.rcpt[a[3]]["date"] <= r["date"]}]
     above_ids = {r["id"] for r in rf_above}
     cm_above_ids = {m["id"] for m in cm_above}
     mism_ids = {r["id"] for r in mism}
@@ -264,7 +310,9 @@ def tests(d) -> SimpleNamespace:
              for k, r in rf.items()}
     score = {k: sum(f) for k, f in flags.items()}
     return SimpleNamespace(cm_above=cm_above, cash_credit=cash_credit, cc_early=cc_early, cc_rec=cc_rec, rf_above=rf_above,
-                           before=before, nothing=nothing, pdue=pdue, methods=methods, mism=mism, flags=flags, score=score)
+                           before=before, nothing=nothing, before_rcpt=before_rcpt, nothing_rcpt=nothing_rcpt, pdue=pdue,
+                           pdue_posted=pdue_posted, methods=methods, mism=mism, late_method=late_method, flags=flags,
+                           score=score)
 
 
 def amount(items, key="gt") -> float:
@@ -409,6 +457,9 @@ def substantive(d) -> dict:
                                         "UnitPrice * (1 - Discount), 2)) > 0.004 ORDER BY 1")]
     half = [l for l in off if l is not None and abs(abs(Decimal(repr(l["total"])) - exact(l)) - HALF_CENT) < Decimal("1e-9")]
     total_off = [l for l in off if l not in half]          # differences that are not a half-cent rounding
+    # the stored totals against the exact product rounded half up: the lines that differ are half-cents rounded down
+    half_up = [l for l in lines if Decimal(repr(l["total"])) != exact(l).quantize(Decimal("0.01"), ROUND_HALF_UP)]
+    qty_off = [l for l in lines if abs(l["qty"] - l["returned"]) > 1e-9]   # credited against returned quantity
     twice = d.one("SELECT COUNT(*) FROM (SELECT ShipmentLineID FROM SalesReturnLine GROUP BY 1 HAVING COUNT(*) > 1)")
     distinct_inv = len({m["inv"] for m in c.cm.values()})
     above_invoice = [m for m in c.cm.values() if m["gt"] > c.inv[m["inv"]]["gt"] + 0.005]
@@ -420,10 +471,11 @@ def substantive(d) -> dict:
     with_freight = [m for m in c.cm.values() if m["freight"] > 0.005]
     freight_over = [m for m in c.cm.values() if m["freight"] > c.inv[m["inv"]]["freight"] + 0.005]
     gt_ok = all(abs(m["gt"] - m["sub"] - m["freight"] - m["tax"]) < 0.005 for m in c.cm.values())
-    clean = (len(traced) == n_lines == len(lines) and not over and not twice and not price_off and not total_off
+    clean = (len(traced) == n_lines == len(lines) and not over and not qty_off and not twice and not price_off and not total_off
              and distinct_inv == len(c.cm) and not above_invoice and sub_ok == len(c.cm) and len(tax_ok) == len(c.cm)
              and not freight_over and gt_ok)
-    return dict(lines=n_lines, traced=len(traced), over=len(over), price_off=len(price_off), total_off=total_off, half=half,
+    return dict(lines=n_lines, traced=len(traced), over=len(over), qty_off=len(qty_off), price_off=len(price_off),
+                total_off=total_off, half=half, half_up=half_up,
                 twice=twice, distinct_inv=distinct_inv, above_invoice=len(above_invoice), sub_ok=sub_ok, rate=rate,
                 tax_ok=len(tax_ok), tax_sub_flags=tax_sub_flags, with_freight=with_freight, freight_over=len(freight_over),
                 gt_ok=gt_ok, clean=clean)
@@ -585,6 +637,12 @@ def sampling(d) -> dict:
     rest = [r for r in c.rf.values() if r["id"] not in key_ids]
     before_ids = {r["id"] for r in t.before}
     dev = [r for r in rest if r["id"] in before_ids]
+    rcpt_ids = {r["id"] for r in t.before_rcpt}
+    dev_rcpt = [r for r in rest if r["id"] in rcpt_ids]
+    # A3, the inspection record, applies only to refunds of Damaged returns: its own population
+    damaged = lambda r: c.sr[c.cm[r["cm"]]["ret"]]["reason"] == "Damaged"  # noqa: E731
+    dmg_key, dmg_rest = [r for r in key if damaged(r)], [r for r in rest if damaged(r)]
+    dmg_mean = SAMPLE * len(dmg_rest) / len(rest)
     hg = hypergeom(len(rest), len(dev), SAMPLE)
     lo = max(k for k in range(SAMPLE + 1) if hg.cdf(k - 1) < TAIL)
     hi = min(k for k in range(SAMPLE + 1) if hg.sf(k) < TAIL)
@@ -596,7 +654,11 @@ def sampling(d) -> dict:
                 rest_total=amount(rest, "amt"), dev=dev, key_dev=sum(1 for r in key if r["id"] in before_ids),
                 share=SAMPLE / len(rest), udl=[udl(k) for k in range(4)], mean=float(hg.mean()), lo=lo, hi=hi, mid=mid,
                 cdf_lo=float(hg.cdf(lo - 1)), cdf_hi=float(hg.cdf(hi)), inside=float(hg.cdf(hi) - hg.cdf(lo - 1)),
-                udl_lo=udl(lo), udl_mid=udl(mid), udl_hi=udl(hi))
+                udl_lo=udl(lo), udl_mid=udl(mid), udl_hi=udl(hi), zero_draw=float(hg.pmf(0)), dev_rcpt=dev_rcpt,
+                key_dev_rcpt=sum(1 for r in key if r["id"] in rcpt_ids),
+                rest_cur=sum(1 for r in rest if year_of(r["date"]) == d.C),
+                dmg=dict(n=len(dmg_key) + len(dmg_rest), key=len(dmg_key), rest=len(dmg_rest), mean=dmg_mean,
+                         k=round(dmg_mean), udl=float(beta.ppf(CONFIDENCE, 1, round(dmg_mean)))))
 
 
 # --- Milestones ------------------------------------------------------------------------------------
@@ -621,20 +683,23 @@ def m2(d, claim):
     unpaid = inv["gt"] - paid_by(c, inv["id"], big["date"])
     return dict(cm_above=len(t.cm_above), cm_above_total=amount(t.cm_above), cash_credit=len(t.cash_credit),
                 rf_above=len(t.rf_above), rf_above_total=amount(t.rf_above, "amt"), before=len(t.before),
-                before_total=amount(t.before, "amt"), key=len(s["key"]), key_total=s["key_total"], sample=SAMPLE,
+                before_total=amount(t.before, "amt"), before_rcpt=len(t.before_rcpt),
+                before_rcpt_total=amount(t.before_rcpt, "amt"), key=len(s["key"]), key_total=s["key_total"], sample=SAMPLE,
                 rest=len(s["rest"]), big=big["num"], big_amount=big["amt"], unpaid=unpaid)
 
 
 @note("ch19.m3", CHAPTER)
 def m3(d, claim):
-    t = tests(d)
+    c, t = cycle(d), tests(d)
     design = commission_design(d)
     am = accounting_manager(d)
     claim(am is not None and design["people"] == {am}, "the Accounting Manager approved the commission rates and payments "
           "and created the accruals")
     m = materiality(d)
     claim(amount(in_year(t.cm_above, d.C)) < m["mat"] and amount(in_year(t.rf_above, d.C), "amt") < m["mat"],
-          f"the {d.C} exposure of each authority deficiency is below materiality (no material weakness)")
+          f"the {d.C} exposure of each authority deficiency is below materiality")
+    claim(amount(in_year(c.cm.values(), d.C)) > m["mat"],
+          f"all {d.C} credits exceed materiality, so the rating rests on the compensating controls, not on the exposure")
     return dict(additions=[len(t.cm_above), len(t.cash_credit), len(t.rf_above), len(t.before)])
 
 
@@ -857,9 +922,33 @@ def r4(d, claim):
     claim(final, "each credit's part to 1020 is what the invoice's final payments leave unpaid, the rest goes to 2060")
     to_2060 = [k for k, p in c.parts.items() if p[1] > 0]
     unpaid_2060 = [k for k in to_2060 if not any(a[0] <= c.cm[k]["date"] for a in c.apps[c.cm[k]["inv"]])]
+    # the receipt-date variant (an accepted definition when stated): a subset of the application-date test
+    rcpt = t.before_rcpt
+    rcpt_ids = {r["id"] for r in rcpt}
+    claim(rcpt_ids <= {r["id"] for r in t.before}, "every refund before the last receipt is also before the last application")
+    same = [r for r in t.before if r["id"] not in rcpt_ids]
+    claim(all(last_receipt(c, c.cm[r["cm"]]["inv"]) == r["date"] for r in same),
+          "the refunds the two definitions part on were dated the day of the last receipt")
+    same_lag = [(D(last_payment(c, c.cm[r["cm"]]["inv"])) - D(r["date"])).days for r in same]
+
+    def supported(r) -> float:
+        """The credit balance the cash received by the refund date supports: the invoice's receipts and credits dated by
+        then, less its total and the refunds paid on it earlier."""
+        inv = c.cm[r["cm"]]["inv"]
+        paid = sum(a[1] for a in c.apps[inv] if c.rcpt[a[3]]["date"] <= r["date"])
+        credited = sum(x["gt"] for x in c.cm.values() if x["inv"] == inv and x["date"] <= r["date"])
+        earlier = sum(x["amt"] for x in c.rf.values() if c.cm[x["cm"]]["inv"] == inv and x["date"] < r["date"])
+        return max(0.0, paid + credited - c.inv[inv]["gt"] - earlier)
+    excess = [(r, r["amt"] - supported(r)) for r in c.rf.values() if r["amt"] > supported(r) + 0.005]
+    claim({r["id"] for r, _ in excess} == rcpt_ids, "the refunds above the balance the cash received supports are the "
+          "refunds before the last receipt")
     # past due
     pd1 = [r for k, r in c.rf.items() if t.pdue[k] > 0.005]
     pd2 = [r for k, r in c.rf.items() if t.pdue[k] >= r["amt"]]
+    claim({k for k, r in c.rf.items() if t.pdue_posted[k] >= r["amt"]} == {r["id"] for r in pd2},
+          "on the receivable as posted, the refunds past due by at least the refund are the same")
+    pd_diff = sum(1 for k in c.rf if abs(t.pdue_posted[k] - t.pdue[k]) > 0.005)
+    pd_any_posted = sum(1 for k in c.rf if t.pdue_posted[k] > 0.005)
     # method mismatch
     claim(all(len({r["method"] for r in c.rcpt.values() if r["cust"] == cu}) > 1 for cu in {r["cust"] for r in c.rcpt.values()}),
           "no customer pays by one method only")
@@ -894,6 +983,13 @@ def r4(d, claim):
                 within=dict(n=len(within_rf), amt=amount(within_rf, "amt")),
                 before=dict(n=len(t.before), amt=amount(t.before, "amt"), years=yr(t.before), cur=cur(t.before, "amt")),
                 nothing=dict(n=len(t.nothing), amt=amount(t.nothing, "amt"), cur=cur(t.nothing, "amt")),
+                rcpt=dict(n=len(rcpt), amt=amount(rcpt, "amt"), years=yr(rcpt), cur=cur(rcpt, "amt")),
+                nothing_rcpt=dict(n=len(t.nothing_rcpt), amt=amount(t.nothing_rcpt, "amt")),
+                same=dict(n=len(same), amt=amount(same, "amt"), nums=abbreviated([r["num"] for r in same]),
+                          lo=min(same_lag, default=0), hi=max(same_lag, default=0)),
+                excess=dict(n=len(excess), amt=r2(sum(e for _, e in excess))),
+                pd_diff=pd_diff, pd_any_posted=pd_any_posted,
+                late=dict(n=len(t.late_method), amt=amount(t.late_method, "amt")),
                 before_due=len(before_due), wait=dict(lo=min(wait), hi=max(wait), mean=st.mean(wait)),
                 unpaid_2060=len(unpaid_2060), to_2060=len(to_2060),
                 pd1=dict(n=len(pd1), amt=amount(pd1, "amt")), pd2=dict(n=len(pd2), amt=amount(pd2, "amt"), cur=cur(pd2, "amt")),
@@ -939,10 +1035,23 @@ def r5(d, claim):
     segments = sorted({l["segment"] for l in lines}, key=lambda s: -sum(seg_year[(s, y)] for y in yrs))
     top_segment = segments[0]
     carriers = Counter(l["carrier"] for l in lines if l["reason"] == reason)
-    claim(max(carriers.values()) < 1.5 * min(carriers.values()), f"no concentration of {reason} lines by carrier")
+    claim(max(carriers.values()) < SPREAD * min(carriers.values()), f"{reason} lines spread evenly by carrier (counts)")
     warehouses = sorted(Counter(l["warehouse"] for l in lines).items())
     wn = [n for _, n in warehouses]
-    claim(max(wn) < 1.5 * min(wn), "no concentration by warehouse")
+    claim(max(wn) < SPREAD * min(wn), "returned lines spread evenly by warehouse (counts)")
+    # counts compare rates only when volumes match: the credits as a share of the revenue each carrier and warehouse shipped
+    shipped_car, shipped_wh, cr_car, cr_wh = defaultdict(float), defaultdict(float), defaultdict(float), defaultdict(float)
+    for car, wh, v in d.q("SELECT s.ShippedBy, s.WarehouseID, SUM(sil.LineTotal) FROM SalesInvoiceLine sil JOIN ShipmentLine sl "
+                          "ON sl.ShipmentLineID = sil.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID GROUP BY 1, 2"):
+        shipped_car[car] += v
+        shipped_wh[wh] += v
+    for l in lines:
+        cr_car[l["carrier"]] += l["total"]
+        cr_wh[l["warehouse"]] += l["total"]
+    car_rates = [cr_car[k] / shipped_car[k] for k in sorted(cr_car)]
+    wh_rates = [cr_wh[k] / shipped_wh[k] for k, _ in warehouses]
+    claim(max(car_rates) < SPREAD * min(car_rates) and max(wh_rates) < SPREAD * min(wh_rates),
+          "no carrier's or warehouse's return rate on the revenue it shipped stands out")
     lag_s = [(D(l["return_date"]) - D(l["ship_date"])).days for l in lines]
     lag_d = [(D(l["return_date"]) - D(l["delivered"])).days for l in lines if l["delivered"]]
     # rates by shipment month
@@ -985,6 +1094,7 @@ def r5(d, claim):
     focus_rf = [r for r in c.rf.values() if r["cust"] == focus]
     before_ids = {r["id"] for r in t.before}
     focus_before = sum(1 for r in focus_rf if r["id"] in before_ids)
+    focus_none_rcpt = sum(1 for r in focus_rf if r["id"] in {x["id"] for x in t.nothing_rcpt})
     # the customers with a higher return rate, with their sales; "small" ones sell under a tenth of the customer's sales
     higher = sorted(((k, cred[k] / sales[k], sales[k]) for k in cred if k in sales and cred[k] / sales[k] > rate),
                     key=lambda x: -x[1])
@@ -1001,12 +1111,13 @@ def r5(d, claim):
     return dict(by_group=by_group, top_rates=top_rates, top_account=top_account, damaged=damaged, top_damaged=top_damaged,
                 top=top, families=families, top_segment=top_segment,
                 segment=[r2(seg_year[(top_segment, y)]) for y in yrs], car_lo=min(carriers.values()), car_hi=max(carriers.values()),
-                warehouses=wn, lag=dict(lo=min(lag_s), hi=max(lag_s), mean=st.mean(lag_s), dlo=min(lag_d), dhi=max(lag_d)),
+                car_rlo=min(car_rates), car_rhi=max(car_rates), wh_rates=wh_rates, warehouses=wn, lag=dict(lo=min(lag_s), hi=max(lag_s), mean=st.mean(lag_s), dlo=min(lag_d), dhi=max(lag_d)),
                 by_ship_year=by_ship_year, dec=dec, mlo=min(others), mhi=max(others), cross=len(cross),
                 cross_amt=r2(sum(l["total"] for l in cross)), overall=overall, focus=focus, seg=seg, terms=terms,
                 rate=rate, focus_cred=cred[focus], focus_sales=sales[focus], focus_n=len(focus_cm),
                 focus_gt=amount(focus_cm), top_two=sum(n for _, n in top_two), focus_rf=len(focus_rf),
-                focus_rf_amt=amount(focus_rf, "amt"), two=two, focus_before=focus_before, higher=higher,
+                focus_rf_amt=amount(focus_rf, "amt"), two=two, focus_before=focus_before,
+                focus_none_rcpt=focus_none_rcpt, higher=higher,
                 n_small=word(n_small), approvers=approvers, big_above=t.flags[big["id"]][0],
                 scores=[scores.get(s, 0) for s in range(6)], hi=len(hi), hi_amt=r2(sum(c.rf[k]["amt"] for k in hi)),
                 big=big["num"], big_score=t.score[big["id"]], weekend_rf=weekend_rf, weekend_cm=weekend_cm)
@@ -1020,6 +1131,11 @@ def r6(d, claim):
     claim(s["udl"][0] < TOLERABLE <= s["udl"][1], "only zero deviations supports reliance at 5%")
     claim(s["udl_lo"] > TOLERABLE and len(s["dev"]) / len(s["rest"]) > TOLERABLE,
           "every plausible draw concludes the control is ineffective, as the population did")
+    claim(len(s["dev_rcpt"]) / len(s["rest"]) > TOLERABLE, "by receipt date, too, the remainder deviates above the "
+          "tolerable rate")
+    claim(s["dmg"]["udl"] > TOLERABLE, "the Damaged refunds a draw is expected to hold cannot support reliance at 5% even "
+          "with no deviation")
+    claim(s["dmg"]["rest"] < SAMPLE, "the remainder holds fewer Damaged refunds than a sample of 59")
     return dict(s=s, key_numbers=abbreviated([r["num"] for r in s["key"]]), n=SAMPLE)
 
 
@@ -1031,6 +1147,10 @@ def r7(d, claim):
     sub = substantive(d)
     claim(sub["traced"] == sub["lines"], "every credit line traces to its return, shipment, and invoice lines")
     claim(sub["over"] == 0 and sub["twice"] == 0, "no quantity above shipped and no shipment line returned twice")
+    claim(sub["qty_off"] == 0, "credited quantity equals the returned quantity on every line")
+    claim(all(abs(abs(Decimal(repr(l["total"])) - Decimal(repr(l["qty"])) * Decimal(repr(l["price"]))
+                  * (1 - Decimal(repr(l["disc"])))) - HALF_CENT) < Decimal("1e-9") for l in sub["half_up"]),
+          "the lines whose total is not the exact product rounded half up are exact half-cents")
     claim(sub["price_off"] == 0, "price and discount equal the invoice line's")
     claim(not sub["total_off"], "LineTotal is ROUND(Q x P x (1 - D), 2) on every credit line but half-cent roundings")
     claim(sub["distinct_inv"] == len(c.cm) and sub["above_invoice"] == 0, "one credit per invoice, none above its invoice")
@@ -1060,7 +1180,13 @@ def r7(d, claim):
     lap = lapping(d)
     claim(lap["clean"], "lapping tests clean: no other customer's invoice, every receipt deposited and fully applied")
     claim(sides(d, "CashReceipt") == {("Dr", "1010"), ("Cr", "2060")}, "receipts are held in 2060 until applied")
-    claim(len(c.cm) < 1000 and len(c.rf) < 1000, "credits and refunds are too few for a first-digit test")
+    chance_rf, chance_cm = chance_mad(len(c.rf)), chance_mad(len(c.cm))
+    mad_rf = first_digit_mad([r["amt"] for r in c.rf.values()])
+    mad_cm = first_digit_mad([m["gt"] for m in c.cm.values()])
+    claim(chance_rf > NONCONFORMITY, "a conforming population of the refunds' size would show a MAD beyond the "
+          "nonconformity threshold by chance alone")
+    claim(mad_rf < SPREAD * chance_rf and mad_cm < SPREAD * chance_cm,
+          "the credits' and refunds' MADs are of the size chance alone would give")
     # the timeline of the largest refund, from the data: each step with its date and who did it
     rf = largest_refund(d)
     claim(sum(1 for r in c.rf.values() if r["amt"] == rf["amt"]) == 1, "one refund is the largest")
@@ -1148,6 +1274,8 @@ def r7(d, claim):
     return dict(sub=sub, rate=sub["rate"], half=[x["id"] for x in sub["half"]],
                 with_freight=len(sub["with_freight"]), dmg=dmg, dmg_total=r2(sum(dmg)), both=both, both_c=both_c, lap=lap,
                 n_frac=len(frac), frac_gap=frac_gap, frac_dq=frac_dq, n_cm=len(c.cm), n_rf=len(c.rf),
+                half_up=[x["id"] for x in sub["half_up"]], chance_rf=chance_rf, chance_cm=chance_cm, mad_rf=mad_rf,
+                mad_cm=mad_cm, threshold=NONCONFORMITY,
                 timeline=timeline, payee=payee, why=", and ".join(why))
 
 
@@ -1186,9 +1314,17 @@ def r8(d, claim):
     claim(warehouse_receipt(d) and sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
           "damaged goods go back to inventory at full cost")
     claim(reconciles(d) and clawbacks(d)["clean"] and sub["clean"], "the reconciliations, clawbacks, and substantive tests are clean")
+    u12 = [x for x in in_year(c.cm.values(), d.C) if x["id"] in {y["id"] for y in t.cm_above + t.cash_credit}]
+    u34 = [x for x in in_year(c.rf.values(), d.C) if x["id"] in {y["id"] for y in t.rf_above + t.before}]
+    claim(amount(u12) < amount(in_year(t.cm_above, d.C)) + amount(in_year(t.cash_credit, d.C)),
+          "the credits failing D1 or D2 overlap, so their union is less than the sum")
     return dict(rf_centers=rf_centers, am_largest=am is not None and largest_refund(d)["appr"] == am,
-                d1_n=len(t.cm_above), d1=d1, perf=m["perf"], all_c=all_c, d2=len(t.cash_credit), d3_n=len(t.rf_above),
-                d3=(len(d3), amount(d3, "amt")), d4_n=len(t.before), d4=(len(d4), amount(d4, "amt")))
+                d1_n=len(t.cm_above), d1=d1, perf=m["perf"], all_c=all_c, d2=len(t.cash_credit), d2_early=len(t.cc_early),
+                d3_n=len(t.rf_above), d3=(len(d3), amount(d3, "amt")), d4_n=len(t.before), d4=(len(d4), amount(d4, "amt")),
+                d4r=(len(t.before_rcpt), len(in_year(t.before_rcpt, d.C))), u12=(len(u12), amount(u12)),
+                u34=(len(u34), amount(u34, "amt")), all_r=amount(in_year(c.rf.values(), d.C), "amt"),
+                n_frac=d.one("SELECT COUNT(*) FROM SalesReturnLine srl JOIN Item i ON i.ItemID = srl.ItemID WHERE "
+                             "ABS(srl.ExtendedStandardCost - ROUND(srl.QuantityReturned * i.StandardCost, 2)) > 0.011"))
 
 
 # --- Requirement 9 ---------------------------------------------------------------------------------
@@ -1196,11 +1332,14 @@ def r8(d, claim):
 @note("ch19.r9", CHAPTER)
 def r9(d, claim):
     t = tests(d)
-    claim(reconciles(d) and substantive(d)["clean"], "the records reconcile and the balances tested are right")
+    claim(reconciles(d) and substantive(d)["clean"], "the recorded populations reconcile to the ledger and the trace and "
+          "recomputation tests agree")
+    claim(no_preparer(d), "no preparer, payee, request, or inspection is recorded, so those stay untested")
     claim(len(t.cm_above) > 0 and len(t.rf_above) > 0, "credits and refunds were granted above authority")
     claim(lapping(d)["clean"], "no trace of lapping")
     design = commission_design(d)
-    claim(design["rate_ends"] == [year_end(d.C)], f"the commission rates end at the end of {d.C}, so {d.N} needs approved rates")
+    claim(design["rate_ends"] == [year_end(d.C)], f"the commission rates in the records end with the data, at the end of "
+          f"{d.C}, so the {d.N} rates are requested rather than reported missing")
     return {}
 
 
@@ -1211,6 +1350,7 @@ def r10(d, claim):
     c, t = cycle(d), tests(d)
     pop_c = [len(in_year(c.cm.values(), y)) for y in d.years]
     pop_r = [len(in_year(c.rf.values(), y)) for y in d.years]
+    rcpt_years = [len(in_year(t.before_rcpt, y)) for y in d.years]
     tests_ = []
     for name, rows, pop in (("CM AboveLimit", t.cm_above, pop_c), ("CM CashAndCredit", t.cash_credit, pop_c),
                             ("RF AboveLimit", t.rf_above, pop_r), ("RF BeforePayment", t.before, pop_r)):
@@ -1234,4 +1374,6 @@ def r10(d, claim):
     rf_last = max(r["date"] for r in c.rf.values())
     claim(cm_last > through and rf_last > through, "the credits and refunds run past Data Through, so it stays")
     return dict(tests=tests_, pop_c=pop_c, pop_r=pop_r, old=len(old), new=new, through=through, cm_last=cm_last,
-                rf_last=rf_last)
+                rf_last=rf_last, rcpt_n=len(t.before_rcpt), rcpt_years=rcpt_years,
+                rcpt_rates=[1000 * k / p for k, p in zip(rcpt_years, pop_r)],
+                rcpt_new=new - len(t.before) + len(t.before_rcpt))

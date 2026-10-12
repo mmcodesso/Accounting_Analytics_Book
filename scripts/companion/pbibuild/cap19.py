@@ -57,11 +57,12 @@ FLAG_COLUMNS = [("RefundNumber", "type text"), ("RefundDate", "type date"), ("Fi
                 ("PastDue", "type number"), ("PastDueAtLeastRefund", "Int64.Type"), ("PastDueAny", "Int64.Type"),
                 ("Score", "Int64.Type")]
 FLAGS = ["AboveLimit", "CreditAboveLimit", "MethodMismatch", "BeforePayment", "PastDueAtLeastRefund"]
-FLAG_NAMES = ["Refund above authority", "Credit above authority", "Method mismatch", "Before payment",
+FLAG_NAMES = ["Refund above authority", "Credit above authority", "Method mismatch", "Before the last application",
               "Past due at least the refund"]
 
 # Credits.sql's export (Requirement 4): one row per refund with its five flags and its score. A refund precedes the
-# customer's payment if it is dated before the last application on the credited invoice; the customer is past due on the
+# customer's payment if it is dated before the last application on the credited invoice (the application's date, not
+# the receipt's; Credits.sql's test T6 gives the receipt-date variant beside it); the customer is past due on the
 # refund date if an invoice dated by then, less the applications and credits dated by then, is open with its DueDate
 # before the refund date; the method mismatches if no receipt applied to the credited invoice used the refund's method.
 # Credits.sql (sqlbuild/cap19.py) holds this text verbatim, in the book's SQL style.
@@ -294,8 +295,10 @@ def r5(b: Build) -> None:
     receipts = (Query.navigator("CashReceipt", x, 19, "CashReceipt")
                 .select(["CashReceiptID", "ReceiptNumber", "ReceiptDate", "PaymentMethod", "RecordedByEmployeeID"])
                 .types({"ReceiptDate": "type date"}))
-    flags_q = (CsvQuery.csv("RefundFlags", FLAG_COLUMNS).select(["RefundNumber"] + FLAGS[:4] + ["PastDue", FLAGS[4], "Score"])
-               .rename({"Score": "ExportedScore"}))         # the score Credits.sql exported, beside the one computed here
+    flags_q = (CsvQuery.csv("RefundFlags", FLAG_COLUMNS)
+               .select(["RefundNumber", "RefundDate", "Amount"] + FLAGS[:4] + ["PastDue", FLAGS[4], "Score"])
+               .rename({"Score": "ExportedScore", "RefundDate": "ExportedDate", "Amount": "ExportedAmount"}))
+    # the score, date, and amount Credits.sql exported, beside the refund's own: Test 3 compares them
     # Loaded queries
     item = (Query.navigator("Item", x, 44, "Item").select(["ItemID", "ItemCode", "ItemName", "ItemGroup"])
             .custom("Family", "Text.Start([ItemCode], 7)", "type text"))
@@ -375,7 +378,8 @@ def r5(b: Build) -> None:
     # merged, so Power Query never combines the two sources)
     t_rf.columns.append(Column("Score", "int64", expression=" + ".join(f"RELATED ( RefundFlags[{f}] )" for f in FLAGS),
                                fmt="0", summarize="none"))
-    m.add(query_table(flags_q, formats={"PastDue": MONEY}, summarize=none(*FLAGS, "ExportedScore")))
+    m.add(query_table(flags_q, formats={"PastDue": MONEY, "ExportedAmount": MONEY, "ExportedDate": "Short Date"},
+                      summarize=none(*FLAGS, "ExportedScore")))
     t_apps = m.add(query_table(apps, formats={"AppliedAmount": MONEY},
                                summarize=none("CashReceiptApplicationID", "CashReceiptID", "SalesInvoiceID",
                                               "AppliedByEmployeeID", "RecordedByEmployeeID")))
@@ -437,9 +441,11 @@ def r5(b: Build) -> None:
          "Credits as a share of revenue, each by its own date (the month of the credit)."),
         ("Returns", "Credits by Ship Date", "CALCULATE ( [Credits], USERELATIONSHIP ( CreditMemoLine[ShipmentDate], "
                                            "'Date'[Date] ) )", MONEY, "Credits by the date the goods were shipped."),
-        ("Returns", "Revenue by Ship Date", "CALCULATE ( [Revenue], USERELATIONSHIP ( SalesInvoiceLine[ShipmentDate], "
-                                            "'Date'[Date] ) )", MONEY,
-         "Revenue of the shipped lines by the date they were shipped (design services ship nothing)."),
+        ("Returns", "Revenue by Ship Date", "CALCULATE (\n    [Revenue],\n    USERELATIONSHIP ( "
+                                            "SalesInvoiceLine[ShipmentDate], 'Date'[Date] ),\n    NOT ISBLANK ( "
+                                            "SalesInvoiceLine[ShipmentDate] )\n)", MONEY,
+         "Revenue of the shipped lines by the date they were shipped; the lines with no shipment (design services) "
+         "are left out even with no date filter."),
         ("Returns", "Return Rate by Ship Date", "DIVIDE ( [Credits by Ship Date], [Revenue by Ship Date] )", RATE,
          "Credits on the goods shipped in a period as a share of the revenue of those shipments."),
         ("Returns", "Fewest Days after Shipment", "MIN ( CreditMemoLine[DaysAfterShipment] )", "0",
@@ -484,6 +490,14 @@ def r5(b: Build) -> None:
         ("Validation", "Scores Different", "COUNTROWS ( FILTER ( CustomerRefund, CustomerRefund[Score] <> "
                                            "RELATED ( RefundFlags[ExportedScore] ) ) ) + 0", COUNT,
          "Refunds whose score here differs from the score Credits.sql exported: must be zero."),
+        ("Validation", "Flag Rows", "COUNTROWS ( RefundFlags )", COUNT,
+         "Rows of RefundFlags.csv, one per refund: must equal Refunds."),
+        ("Validation", "Exports Different", "COUNTROWS (\n    FILTER (\n        CustomerRefund,\n"
+                                            "        ABS ( CustomerRefund[Amount] - RELATED ( RefundFlags[ExportedAmount] ) ) > 0.005\n"
+                                            "            || CustomerRefund[RefundDate] <> RELATED ( RefundFlags[ExportedDate] )\n"
+                                            "    )\n) + 0", COUNT,
+         "Refunds whose amount or date differs from their row of RefundFlags.csv: must be zero, or the export is stale "
+         "or matched to the wrong refund."),
     ]
     mt.measures += [Measure(n, dax, fmt, desc, display_folder=folder) for folder, n, dax, fmt, desc in measures]
 
@@ -550,8 +564,9 @@ def r5(b: Build) -> None:
         f"Refund flags: RefundFlags.csv, the export of the refund flags of Credits.sql (Requirement 4), related to the "
         "refunds by RefundNumber (a relationship, so Power Query never combines the CSV with the workbook). Each refund scores one point for each flag: refund above the approver's authority, credit above "
         "the approver's authority, a refund method unlike the receipts on the credited invoice, a refund dated before "
-        "the customer's last payment on the invoice, and a past-due balance on the refund date at least as large as "
-        "the refund. The report recomputes the score and the Validation page compares it with the export.",
+        "the last application of the customer's payments to the credited invoice (the application's date, not the "
+        "receipt's), and a past-due balance on the refund date at least as large as the refund. The report recomputes "
+        "the score, and the Validation page compares it, the date, and the amount with the export.",
         "Drill-through: on the Refund Ranking page, right-click a refund and choose Drill through > Refund Detail to see "
         "its credit, its invoice, and the receipts applied to that invoice (CashReceiptApplication has no relationship; "
         "the measure Applied to the Invoice reads it through TREATAS).",
@@ -649,18 +664,22 @@ def r5(b: Build) -> None:
     higher = ctx["higher"]
     small = sum(1 for _, _, s in higher if s < ctx["focus_sales"] / 10)
     page.add(answer("concAnswer", 860, 210, 400, 500, "concentration", [
-        f"No concentration by carrier (Damaged lines {ctx['car_lo']} to {ctx['car_hi']} per carrier) or by warehouse "
-        f"({' and '.join(f'{n:,}' for n in ctx['warehouses'])} lines).",
+        f"Damaged lines spread evenly across carriers ({ctx['car_lo']} to {ctx['car_hi']} each) and returned lines across "
+        f"warehouses ({' and '.join(f'{n:,}' for n in ctx['warehouses'])}), counts that compare rates only when volumes "
+        f"match. As a share of the revenue each shipped (computed from the shipments, not shown here), the carriers "
+        f"return {pct(ctx['car_rlo'], 2)} to {pct(ctx['car_rhi'], 2)} and the warehouses "
+        f"{' and '.join(pct(v, 2) for v in ctx['wh_rates'])}, so none stands out, before any adjustment for product mix.",
         f"By customer, as a share of each customer's sales: customer {focus}, {focus_name} ({ctx['seg']}, "
         f"{ctx['terms']}), has the largest credits, {money(ctx['focus_cred'])} on sales of {money(ctx['focus_sales'])}, "
         f"{pct(ctx['rate'], 2)} against {pct(ctx['overall'])} for all customers: {ctx['focus_n']} credits "
         f"({money(ctx['focus_gt'])}), {ctx['top_two']} of them approved by {ctx['two']}, and {ctx['focus_rf']} refunds "
         f"({money(ctx['focus_rf_amt'])}), {'all' if ctx['focus_before'] == ctx['focus_rf'] else ctx['focus_before']} "
-        "dated before the customer's payment.",
+        f"dated before the last application of the customer's payments to the credited invoice, "
+        f"{ctx['focus_none_rcpt']} of them before any receipt.",
         "Customers " + ", ".join(f"{k} ({pct(r, 2)} on sales of {money(s)})" for k, r, s in higher) +
         f" rank higher by rate, {small} of them on sales under a tenth of customer {focus}'s, so the rate alone "
         f"overstates small customers. Customer {focus} is the one to follow up: the credits, their approvers, and the "
-        "refunds paid before the customer paid."]))
+        "refunds paid before the customer's payments were applied."]))
     page.expect = ["Carrier", "Warehouse", "CustomerName", f"{higher[0][1]:.3%}", f"{ctx['rate']:.3%}",
                    money(ctx["focus_cred"]), f"{ctx['overall']:.3%} card"]
 
@@ -720,7 +739,8 @@ def r5(b: Build) -> None:
         A("AppliedByEmployeeID"), A("AppliedByTitle"), M("Applied to the Invoice")]},
         title="Receipts applied to the credited invoice", sort=[(A("ApplicationDate"), "Ascending")]))
     first_after = next((a for a in big_apps if a[0] > big["date"]), None)
-    page.add(answer("detailAnswer", 20, 560, 1240, 155, f"{big['num']}, the largest refund", [
+    page.add(answer("detailAnswer", 20, 560, 1240, 155, f"{big['num']}, the largest refund (this text describes that "
+                    "refund only; the tables above follow the refund you drill through on)", [
         f"{big['num']} ({money(big['amt'])}, {big['method']}, dated {big['date']}, approved by the "
         f"{c.emp[big['appr']]['title']}) refunds {big_cm['num']} ({money(big_cm['gt'])}, approved on {big_cm['date']} by "
         f"{ch19.title_of(d, big_cm['appr']).lower()} {big_cm['appr']} with a limit of {c.emp[big_cm['appr']]['limit']:,.0f}). "
@@ -738,21 +758,24 @@ def r5(b: Build) -> None:
     page.add(Visual("tieOut", "tableEx", 20, 20, 1240, 150, {"Values": [
         year_col, M("Credits"), M("Credit Memo Subtotal"), M("Ledger Credits 4060"), M("Credits less 4060"),
         M("Refund Amount"), M("Ledger Refunds 1010")]}, title="Credits to 4060 and refunds to 1010, by year (Tests 1 and 2)"))
-    page.add(card("flagCards", 20, 185, 1240, 100, [M("Refunds"), M("Refunds Flagged"), M("Scores Different"),
-                                                    M("Credit Lines"), M("Credit Memos")], units_none=True))
+    page.add(card("flagCards", 20, 185, 1240, 100, [M("Refunds"), M("Refunds Flagged"), M("Flag Rows"),
+                                                    M("Scores Different"), M("Exports Different"), M("Credit Lines"),
+                                                    M("Credit Memos")], units_none=True))
     l4060 = {y: ch19.gl_year(d, "CreditMemo", "4060", y, "Dr") for y in years}
     l1010 = {y: ch19.gl_year(d, "CustomerRefund", "1010", y, "Cr") for y in years}
     rf_year = {y: sum(r["amt"] for r in c.rf.values() if int(r["date"][:4]) == y) for y in years}
     page.add(answer("valAnswer", 20, 300, 1240, 150, "what the totals mean", [
         "The credits equal the debits of credit memos to 4060 in every year (" +
         "; ".join(f"{y} {money(l4060[y])}" for y in years) + "), and the refunds the credits of refunds to cash (" +
-        "; ".join(f"{y} {money(l1010[y])}" for y in years) + "): the populations the analytics read are complete. "
+        "; ".join(f"{y} {money(l1010[y])}" for y in years) + "): the populations the analytics read agree with the "
+        "ledger, by year, to the cent. "
         "GLEntry holds only the credit memo, refund, and sales invoice postings, so the year-end closes, which also post "
         "to 4060, are left out.",
-        f"Every one of the {len(c.rf)} refunds found its row of RefundFlags.csv, and the score recomputed here equals the "
-        "score Credits.sql exported."]))
+        f"Every one of the {len(c.rf)} refunds found its own row of RefundFlags.csv, one row each, with the same date "
+        "and amount, and the score recomputed here equals the score Credits.sql exported. That shows the export "
+        "matches these refunds; it does not rerun the flags' definitions, which Credits.sql holds."]))
     page.expect = [money(l4060[years[-1]]), money(l1010[years[-1]]), f"Refunds Flagged, {len(c.rf)} card",
-                   "Scores Different, 0 card"]
+                   "Scores Different, 0 card", "Exports Different, 0 card"]
 
     # The Tests tab ------------------------------------------------------------------------------------------------
     tests = [
@@ -765,8 +788,10 @@ def r5(b: Build) -> None:
          "SUMMARIZECOLUMNS (\n    'Date'[Year],\n    \"Refunds\", [Refunds],\n"
          "    \"Refund amount\", ROUND ( [Refund Amount], 2 ),\n    \"Ledger 1010\", ROUND ( [Ledger Refunds 1010], 2 )\n)",
          "'Date'[Year]", len(years)),
-        ("Test 3: every refund must find its flags in RefundFlags.csv, with the same score",
+        ("Test 3: every refund must find its own row of RefundFlags.csv, one row each, with the same date, amount, "
+         "and score",
          "ROW (\n    \"Refunds\", [Refunds],\n    \"With flags\", [Refunds Flagged],\n"
+         "    \"Flag rows\", [Flag Rows],\n    \"Exports different\", [Exports Different],\n"
          "    \"Scores different\", [Scores Different]\n)", None, 1),
     ]
     b.project.queries["Tests"] = "\n\n".join(
@@ -789,6 +814,8 @@ def r5(b: Build) -> None:
             "COUNTROWS ( FILTER ( CreditMemoLine, ISBLANK ( CreditMemoLine[ReasonCode] ) ) )", 0)
     b.check(s, "refunds with their flags (Test 3)", len(c.rf), "[Refunds Flagged]", 0)
     b.check(s, "scores different from the export (Test 3)", 0, "[Scores Different]", 0)
+    b.check(s, "rows of RefundFlags.csv (Test 3)", len(c.rf), "[Flag Rows]", 0)
+    b.check(s, "refunds whose date or amount differs from the export (Test 3)", 0, "[Exports Different]", 0)
     b.check(s, "refunds without their invoice", 0,
             "COUNTROWS ( FILTER ( CustomerRefund, ISBLANK ( CustomerRefund[InvoiceNumber] ) ) )", 0)
     for y in years:
@@ -855,6 +882,12 @@ def r5(b: Build) -> None:
     for k, (cr, rv, _) in months_ship.items():
         b.check(s, f"credits on the shipments of {k}", round(cr, 2), f"CALCULATE ( [Credits by Ship Date], 'Date'[YearMonth] = \"{k}\" )")
         b.check(s, f"revenue of the shipments of {k}", round(rv, 2), f"CALCULATE ( [Revenue by Ship Date], 'Date'[YearMonth] = \"{k}\" )")
+    shipped = d.one("SELECT SUM(LineTotal) FROM SalesInvoiceLine WHERE ShipmentLineID IS NOT NULL")
+    credits_all = sum(l["total"] for l in lines_)
+    b.check(s, "revenue by ship date with no date filter: the shipped lines only", round(shipped, 2),
+            "[Revenue by Ship Date]")
+    b.check(s, "return rate by ship date with no date filter (credits over the shipped lines' revenue)",
+            round(credits_all / shipped, 9), "[Return Rate by Ship Date]", 1e-7)
     b.check(s, "return lines in a later year than their shipment", ctx["cross"], "[Lines Returned in a Later Year]", 0)
     b.check(s, "credits returned in a later year than their shipment", ctx["cross_amt"], "[Credits Returned in a Later Year]")
     b.check(s, f"credit lines shipped before {years[0]} (no carry-in)", 0,
@@ -875,7 +908,8 @@ def r5(b: Build) -> None:
             f"[Credit Memos] ), {fc} )", 0)
     b.check(s, f"customer {focus}: refunds", ctx["focus_rf"], f"CALCULATE ( [Refunds], {fc} )", 0)
     b.check(s, f"customer {focus}: refund amount", ctx["focus_rf_amt"], f"CALCULATE ( [Refund Amount], {fc} )")
-    b.check(s, f"customer {focus}: refunds dated before the customer's payment", ctx["focus_before"],
+    b.check(s, f"customer {focus}: refunds dated before the last application of the customer's payments",
+            ctx["focus_before"],
             f"CALCULATE ( [Refunds], {fc}, RefundFlags[BeforePayment] = 1 )", 0)
     b.check(s, f"customers with a higher rate than customer {focus}", len(higher),
             f"VAR Focus = CALCULATE ( [Return Rate], {fc} ) RETURN COUNTROWS ( FILTER ( VALUES ( Customer[CustomerID] ), "
@@ -952,9 +986,9 @@ def m2(b: Build) -> None:
     b.check(s, "refunds above the approver's limit", ctx["rf_above"], f"CALCULATE ( [Flagged Refunds], {fl(FLAG_NAMES[0])} )", 0)
     b.check(s, "refunds above the approver's limit: amount", ctx["rf_above_total"],
             f"CALCULATE ( [Flagged Amount], {fl(FLAG_NAMES[0])} )")
-    b.check(s, "refunds dated before the customer's payment", ctx["before"],
+    b.check(s, "refunds dated before the last application of the customer's payments", ctx["before"],
             f"CALCULATE ( [Flagged Refunds], {fl(FLAG_NAMES[3])} )", 0)
-    b.check(s, "refunds dated before the customer's payment: amount", ctx["before_total"],
+    b.check(s, "refunds dated before the last application of the customer's payments: amount", ctx["before_total"],
             f"CALCULATE ( [Flagged Amount], {fl(FLAG_NAMES[3])} )")
     b.check(s, "the largest refund", ctx["big"],
             "MAXX ( TOPN ( 1, CustomerRefund, CustomerRefund[Amount], DESC ), CustomerRefund[RefundNumber] )")

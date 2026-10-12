@@ -10,7 +10,9 @@ the committed costs are the Manufacturing cost center's payroll with its employe
 staff) and the depreciation charged to 1090, and the time-driven rate is the committed cost per practical hour. The
 routing time of a unit is its routing's run hours plus its setup hours over the family's average batch of d.C. Every
 value is the SQL twin of the case's workbook (scripts/verify/twins/ch18_twins.py): its regressions, Goal Seek targets,
-Data Tables, and the Solver model, solved here with scipy's linprog. The explorer's totals of Requirement 5 and
+Data Tables, and the Solver model, solved here with scipy's linprog (the relaxed model the case asks for, and the plan
+that keeps the quote's minimum volume, found by solving it for every choice of families). The explorer's totals of
+Requirement 5 and
 Milestone 2 come from the CR18 reference model, which loads the item costs from a CSV written to six decimals; the
 totals here use the same rounded costs.
 
@@ -39,7 +41,7 @@ import numpy as np
 from scipy.optimize import linprog
 
 from notes import note
-from notes.case2 import volume
+from notes.case2 import promotions, volume
 from notes.case3 import burden as part3_burden
 from notes.case3 import depreciation as part3_depreciation
 from notes.case3 import rate as part3_rate
@@ -55,6 +57,8 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 QUOTE = {"FUR-BNH": (1450, 325, 18000), "FUR-NGT": (3200, 270, 22000), "FUR-SDB": (3800, 325, 25000),
          "FUR-TBL": (5000, 315, 30000), "LGT-SCN": (4600, 180, 15000), "TXT-PIL": (700, 220, 8000)}
 FREIGHT = 0.03                  # inbound freight, a share of the quoted price
+MINIMUM = 0.80                  # the least share of a family's quoted volume Charles River may buy each year
+PRICE_YEARS = 2                 # the quote's prices are fixed for two years
 # tbl-18-02, the controller's planning assumptions that the text sets.
 PRACTICAL = 0.80                # practical capacity, a share of the calendar's available hours
 RATE, BURDEN = 26.62, 0.1414    # straight-time labor rate and burden
@@ -65,6 +69,7 @@ SEVERANCE_WEEKS, WEEK_HOURS = 8, 40
 DAY_HOURS = 8                   # a position's day
 MATERIALITY = 0.05              # of income before income taxes as recorded
 DATA_TABLE = (0.75, 0.80, 0.85, 0.90)   # Requirement 4's Data Table of practical capacity
+NORMAL_RANGE = (0.90, 1.10)     # Requirement 9's sensitivity: normal capacity at 90% and 110% of the plan volume
 TOP_SHARE = 0.20                # the top fifth of items
 COST_PLACES = 6                 # the reference model's item costs, as its CSV holds them
 EXAMPLE = max(QUOTE, key=lambda f: QUOTE[f][0])  # the family the notes follow through: the quote's largest volume
@@ -230,6 +235,35 @@ def model(d) -> dict:
                        "l.ExtendedStandardFixedOverheadCost) FROM ProductionCompletionLine l JOIN ProductionCompletion pc "
                        "ON pc.ProductionCompletionID = l.ProductionCompletionID GROUP BY 1"))
     fo_ratio = [sum(v for m, v in fo_m.items() if m.startswith(str(y))) / applied[str(y)] for y in d.years]
+    comp_m = defaultdict(lambda: defaultdict(float))   # the payroll's parts by the month of their pay date
+    for mo, t, k, a in d.q("SELECT substr(pp.PayDate, 1, 7), l.LineType, lte.LaborType, SUM(l.Amount) FROM PayrollRegisterLine l "
+                           "JOIN PayrollRegister pr ON pr.PayrollRegisterID = l.PayrollRegisterID JOIN PayrollPeriod pp "
+                           "ON pp.PayrollPeriodID = pr.PayrollPeriodID JOIN CostCenter cc ON cc.CostCenterID = pr.CostCenterID "
+                           "LEFT JOIN LaborTimeEntry lte ON lte.LaborTimeEntryID = l.LaborTimeEntryID "
+                           "WHERE cc.CostCenterName = 'Manufacturing' AND l.LineType NOT IN "
+                           "('Benefits Deduction', 'Employee Tax Withholding') GROUP BY 1, 2, 3"):
+        comp_m[(t, k)][mo] += a
+    comp_gap = max(abs(sum(s[mo] for s in comp_m.values()) - pay_m[mo]) for mo in months)
+    pay_days = defaultdict(set)
+    for (day,) in d.q("SELECT PostingDate FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = 'PayrollSummary'", a1090):
+        pay_days[day[:7]].add(day)
+    three = sorted(mo for mo in with_start if len(pay_days[mo]) == 3)
+    a5080 = d.account("5080")
+    startup = dict(month=start, payroll=pay_m[start], foh=fo_m[start], dep=dep_m[start], stdh=std_m.get(start, 0.0),
+                   to_5080=d.one("SELECT COALESCE(SUM(Debit), 0) FROM GLEntry WHERE AccountID = ? AND "
+                                 "SourceDocumentType = 'PayrollSummary' AND substr(PostingDate, 1, 7) = ?", a5080, start),
+                   pay_date=d.one("SELECT MIN(PostingDate) FROM GLEntry WHERE AccountID = ? AND "
+                                  "SourceDocumentType = 'PayrollSummary' AND substr(PostingDate, 1, 7) = ?", a5080, start))
+    # completions whose credit to 1090 posted in the year but which are dated in another (and the reverse)
+    dated_off = [dict(number=r[0], date=r[1], posted=r[2], amount=r[3]) for r in d.q(
+        "SELECT pc.CompletionNumber, pc.CompletionDate, g.PostingDate, SUM(g.Credit) - SUM(g.Debit) FROM GLEntry g "
+        "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = g.SourceDocumentID WHERE g.AccountID = ? "
+        "AND g.SourceDocumentType = 'ProductionCompletion' AND g.FiscalYear = ? AND pc.CompletionDate NOT BETWEEN ? AND ? "
+        "GROUP BY 1, 2, 3 ORDER BY 2", a1090, d.C, first, last)]
+    posted_off = d.one("SELECT COALESCE(SUM(g.Credit) - SUM(g.Debit), 0) FROM GLEntry g JOIN ProductionCompletion pc "
+                       "ON pc.ProductionCompletionID = g.SourceDocumentID WHERE g.AccountID = ? AND g.SourceDocumentType = "
+                       "'ProductionCompletion' AND g.FiscalYear <> ? AND pc.CompletionDate BETWEEN ? AND ?", a1090, d.C, first,
+                       last)
     dep_months = [dep_m[f"{year}-{k:02d}"] for k in range(1, 13)]
     runs = []
     for k, v in enumerate(dep_months):
@@ -314,12 +348,18 @@ def model(d) -> dict:
     for g in groups:
         fs = [v for v in fam.values() if v["group"] == g["name"]]
         g["m_td"] = 1 - sum(v["unit"]["td"] * v["units"] for v in fs) / g["rev"]
+    # the item costs applied to the year's completions: setup over the family's average batch assigns a little less
+    # setup than the work orders ran, so the item costs fall short of the routing time used by that difference
+    alloc_setup = sum(q * setup[items[i]["routing"]] / batch[items[i]["fam"]] for i, q in comp_item.items())
+    item_conv = sum(q * (fo_rate * items[i]["stdh"] + td_rate * time_per_unit(i)) for i, q in comp_item.items())
     data_table = []
     for share in DATA_TABLE:
         p = avail_total * share
         rate = committed / p
         ex = fam[EXAMPLE]
-        data_table.append(dict(share=share, rate=rate, unused=(p - used) * rate,
+        below = sorted(f for f, v in fam.items()
+                       if 1 - sum(sold[i][0] * costs(i, rate)["td"] for i in v["ids"]) / v["rev"] < FLOOR)
+        data_table.append(dict(share=share, rate=rate, unused=(p - used) * rate, below=below,
                                example=sum(sold[i][0] * costs(i, rate)["td"] for i in ex["ids"]) / ex["units"]))
 
     # Requirement 5: the explorer, on the finished goods sold (Services left out).
@@ -430,7 +470,9 @@ def model(d) -> dict:
         binding = [dict(short=wc_short(wc_names[wcs[k]]), price=-duals[k]) for k in range(len(wcs)) if abs(slack[k]) < 1e-6]
         bought = [dict(short=q["short"], units=x, all=x >= bounds[k][1] - 0.5) for k, (q, x) in enumerate(zip(qf, res.x))
                   if x > 0.5]
-        lp.append(dict(growth=growth, status=res.status, cost=res.fun, binding=binding, bought=bought))
+        lp.append(dict(growth=growth, status=res.status, cost=res.fun, binding=binding, bought=bought,
+                       short_of_minimum=[q["short"] for q, x in zip(qf, res.x) if 0.5 < x < MINIMUM * q["volume"] - 0.5],
+                       contract=contract_plan(qf, a_ub, b_ub, growth, wcs, wc_names)))
 
     # Requirement 8: reprice.
     reprice = []
@@ -450,6 +492,8 @@ def model(d) -> dict:
                  supervision=plan_salary * (1 + BURDEN) / plan_stdh, depreciation=plan_dep / plan_stdh)
     new_rate = sum(parts.values())
     one_rate = new_rate - parts["indirect"]
+    spread = parts["supervision"] + parts["depreciation"]            # the part normal capacity spreads
+    normal = [dict(share=k, rate=new_rate - spread + spread / k) for k in NORMAL_RANGE]
     td_std = fo_rate + td_rate * used / stdh
     actual_rate = inputs / stdh
     for q in quoted:
@@ -476,13 +520,16 @@ def model(d) -> dict:
         cv = sum(u * items[i]["conv"] for i, u in on_hand.items())
         stock.append(dict(year=y, units=sum(on_hand.values()), std=sum(u * items[i]["std"] for i, u in on_hand.items()),
                           stdh=sh, conv=cv, per_hour=cv / sh, negative=negative, plan=sh * new_rate - cv,
-                          one=sh * one_rate - cv, td=sh * td_std - cv, actual=sh * actual_rate - cv))
+                          one=sh * one_rate - cv, td=sh * td_std - cv, actual=sh * actual_rate - cv,
+                          normal=[sh * n["rate"] - cv for n in normal]))
 
     return dict(items=items, fams=fams, fam=fam, unsold=unsold, groups=groups, totals=totals, mv_rate=mv_rate,
                 comp=comp, comp_item=comp_item, sold=sold, pay=pay, src=src, inputs=inputs, foh=foh, dep=dep,
                 released_gl=released_gl, labor=labor, var_oh=var_oh, fixed_oh=fixed_oh, conversion=conversion, stdh=stdh,
                 direct=direct, months=months, with_start=with_start,
                 fits=dict(fo=fit(fo_m, months), pay=fit(pay_m, months), dep=fit(dep_m, months), pay_start=fit(pay_m, with_start)),
+                comp_fits={k: fit(s, months) for k, s in comp_m.items()}, comp_gap=comp_gap, three=three, startup=startup, std_m=std_m,
+                dated_off=dated_off, posted_off=posted_off, alloc_setup=alloc_setup, item_conv=item_conv,
                 fo_ratio=fo_ratio, dep_months=dep_months, runs=runs, activities=activities, centers=centers,
                 avail=avail_total, pract=pract, used=used, run_total=run_total, setup_total=setup_total, pclass=pclass,
                 crew=crew, sal=sal, committed=committed, td_rate=td_rate, crew_rate=crew_rate, fo_rate=fo_rate,
@@ -493,7 +540,33 @@ def model(d) -> dict:
                 freed={wc: freed[wc] for wc in wcs if freed[wc] > 0.5}, wc_names=wc_names, supervision=supervision,
                 headroom=headroom, wcs=wcs, lp=lp, reprice=reprice, plan_stdh=plan_stdh, plan_salary=plan_salary,
                 plan_dep=plan_dep, parts=parts, new_rate=new_rate, one_rate=one_rate, td_std=td_std,
-                actual_rate=actual_rate, stock=stock, batch=batch)
+                actual_rate=actual_rate, stock=stock, batch=batch, normal=normal, spread=spread)
+
+
+def contract_plan(quoted: list, a_ub: list, b_ub: list, growth: float, wcs: list, wc_names: dict) -> dict:
+    """Requirement 7's growth test with the quote's terms kept: a family bought takes at least MINIMUM of its quoted
+    volume and its tooling, so the Solver model is solved for every choice of families, each family chosen bounded
+    below by its minimum (and above by its demand at growth), and the plan with the least added cost over the years the
+    prices are fixed, tooling included, is kept. It also records whether the least annual cost picks the same families."""
+    from itertools import product
+    plans = []
+    for pick in product((False, True), repeat=len(quoted)):
+        bounds = [(MINIMUM * q["volume"], q["units"] * (1 + growth)) if y else (0, 0) for q, y in zip(quoted, pick)]
+        if any(lo > hi for lo, hi in bounds):
+            continue
+        res = linprog([q["delivered"] - q["kept"] for q in quoted], A_ub=a_ub, b_ub=b_ub, bounds=bounds, method="highs")
+        if res.status != 0:
+            continue
+        tooling = sum(q["tooling"] for q, y in zip(quoted, pick) if y)
+        slack = np.array(b_ub) - np.array(a_ub) @ res.x
+        plans.append(dict(pick=pick, annual=float(res.fun), tooling=tooling, total=PRICE_YEARS * float(res.fun) + tooling,
+                          bought=[dict(short=q["short"], units=float(x), minimum=bool(abs(x - MINIMUM * q["volume"]) < 0.5))
+                                  for q, x, y in zip(quoted, res.x, pick) if y],
+                          binding=[dict(short=wc_short(wc_names[wcs[k]]), price=float(-res.ineqlin.marginals[k]))
+                                   for k in range(len(wcs)) if abs(slack[k]) < 1e-6]))
+    best = min(plans, key=lambda x: x["total"])
+    best["same_as_annual"] = min(plans, key=lambda x: x["annual"])["pick"] == best["pick"]
+    return best
 
 
 @lru_cache(maxsize=None)
@@ -529,6 +602,16 @@ def ledger_5080(d) -> float:
                  d.account("5080"), d.C)
 
 
+def paths_compared(m: dict) -> dict:
+    """The whole paths, a year at the base-year volume: make every quoted family and raise every family below the
+    floor to it, against buying the families worth buying with the crew reduced and raising the rest."""
+    names = {q["name"] for q in m["buy"]}
+    rest = sum(r["revenue"] for r in m["reprice"] if r["name"] not in names)
+    return dict(make=sum(r["revenue"] for r in m["reprice"]), buy=m["gain"] + rest,
+                once=m["tooling"] + m["positions"] * m["severance"],
+                kept_up=sum(r["revenue"] for r in m["reprice"] if r["name"] in names))
+
+
 def make_buy_claims(m: dict, claim) -> None:
     claim(all(q["a_kept"] < 0 < q["a_reduced"] for q in m["buy"]),
           "the families to buy gain only with the crew reduced (with the crew kept, buying them costs more)")
@@ -544,9 +627,11 @@ def m1(d, claim):
     m = model(d)
     claim(any(g["name"] == STORY_GROUP for g in m["groups"]), f"{STORY_GROUP} is one of the manufactured groups")
     g0 = story(m)
+    cf = m["comp_fits"]
     return dict(g0=g0, rest=[g for g in m["groups"] if g is not g0], variance=m["totals"]["total"], inputs=m["inputs"],
                 released=m["released_gl"], r_fo=m["fits"]["fo"]["r"], r_pay=m["fits"]["pay"]["r"],
-                use=m["used"] / m["pract"])
+                r_dreg=cf[("Regular Earnings", "Direct Manufacturing")]["r"],
+                r_ireg=cf[("Regular Earnings", "Indirect Manufacturing")]["r"], use=m["used"] / m["pract"])
 
 
 @note("ch18.m2", CHAPTER)
@@ -564,7 +649,7 @@ def m3(d, claim):
     claim(kept > 0, "with the crew kept, buying the families costs money")
     return dict(buy=m["buy"], lose=m["lose"], gain=m["gain"], positions=m["positions"],
                 net=2 * m["gain"] - m["positions"] * m["severance"] - m["tooling"], kept_cost=kept,
-                n_floor=word(len(m["reprice"])), reprice=sum(r["revenue"] for r in m["reprice"]))
+                n_floor=word(len(m["reprice"])), reprice=sum(r["revenue"] for r in m["reprice"]), paths=paths_compared(m))
 
 
 @note("ch18.m4", CHAPTER)
@@ -573,7 +658,7 @@ def m4(d, claim):
     stock = m["stock"]
     incomes = [dict(year=b["year"], amount=b["plan"] - a["plan"]) for a, b in zip(stock, stock[1:])]
     return dict(new_rate=m["new_rate"], one_rate=m["one_rate"], current=m["conversion"] / m["stdh"], stock=stock,
-                incomes=incomes)
+                incomes=incomes, normal=m["normal"])
 
 
 # --- Requirement 1 -----------------------------------------------------------------------------------
@@ -622,6 +707,8 @@ def r1(d, claim):
                            "MAX(l.UnitCost / i.StandardCost) FROM PurchaseOrderLine l JOIN PurchaseOrder p ON p.PurchaseOrderID = "
                            "l.PurchaseOrderID JOIN Item i ON i.ItemID = l.ItemID WHERE i.SupplyMode = 'Purchased' AND "
                            "i.ItemType = 'Finished Good' AND p.OrderDate BETWEEN ? AND ?", first, last)[0]
+    claim(d.one("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND (name LIKE '%History%' OR name LIKE '%Audit%' "
+                "OR name LIKE '%ChangeLog%')") == 0, "the dataset keeps no history of master-data changes")
     return dict(unsold=m["unsold"], t=m["totals"], fams=fams, groups=m["groups"], story=g0, beats=beats, lines=lines,
                 max_diff=max_diff, all_years=all_years, n_years=word(len(d.years)), purchased=purchased, avg_ratio=total,
                 low_ratio=low, high_ratio=high)
@@ -669,6 +756,29 @@ def r2(d, claim):
           "the year's depreciation has three monthly levels: January, a middle run, and the rest of the year")
     claim(m["used"] / m["avail"] < 0.75, "the plant runs well below its capacity")
     months = m["months"]
+    claim(m["comp_gap"] < 0.005, "by pay date, the payroll's parts add up to the PayrollSummary debits to 1090 in every month "
+                                "of the test")
+    cf = m["comp_fits"]
+    parts = {key: cf[kind] for key, kind in (("dreg", ("Regular Earnings", "Direct Manufacturing")),
+                                            ("dot", ("Overtime Earnings", "Direct Manufacturing")),
+                                            ("ireg", ("Regular Earnings", "Indirect Manufacturing")),
+                                            ("iot", ("Overtime Earnings", "Indirect Manufacturing")),
+                                            ("sal", ("Salary Earnings", None)), ("tax", ("Employer Payroll Tax", None)),
+                                            ("ben", ("Employer Benefits", None)))}
+    claim(parts["dreg"]["r"] > 0.5 and parts["ireg"]["r"] < -0.3,
+          "direct regular earnings move with output and indirect regular earnings against it")
+    claim(all(abs(parts[k]["r"]) < 0.2 for k in ("dot", "sal", "tax", "ben")) and parts["iot"]["r"] < -0.3,
+          "direct overtime, salaries, employer tax, and benefits barely move with output; indirect overtime moves against it")
+    su = m["startup"]
+    claim(su["payroll"] == 0 and su["foh"] == 0 and su["dep"] > 0 and su["to_5080"] > 0,
+          "the start-up month posted no payroll and no Factory Overhead entry to 1090, only depreciation, and its payroll "
+          "went to 5080")
+    typical = st.median(m["std_m"][mo] for mo in months)
+    claim(su["stdh"] < 0.25 * typical, "the start-up month completed under a quarter of a typical month's standard hours")
+    claim(len(m["three"]) >= 2, "several months carry three payroll dates")
+    off = m["dated_off"]
+    claim(len(off) == 1 and abs(m["released_gl"] - m["conversion"] - (off[0]["amount"] - m["posted_off"])) < 0.005,
+          "the completion lines and 1090's credits differ only by one completion posted in the year but dated in another")
     return dict(dreg=line("Regular Earnings", "Direct Manufacturing"), dot=line("Overtime Earnings", "Direct Manufacturing"),
                 ireg=line("Regular Earnings", "Indirect Manufacturing"), iot=line("Overtime Earnings", "Indirect Manufacturing"),
                 salaries=line("Salary Earnings", None)["a"], tax=line("Employer Payroll Tax", None)["a"],
@@ -679,7 +789,8 @@ def r2(d, claim):
                 actual_oh=actual_oh, actual_oh_rate=actual_oh / m["stdh"], times=actual_oh / applied, third=third,
                 n_months=len(months), first_month=month_name(months[0]), last_month=month_name(months[-1]),
                 start_month=month_name(m["with_start"][0]), fo=fits["fo"], pay=fits["pay"], pay_start=fits["pay_start"],
-                dep_fit=fits["dep"], fo_ratio=m["fo_ratio"],
+                dep_fit=fits["dep"], fo_ratio=m["fo_ratio"], parts=parts, startup=su, three=m["three"],
+                start_date=su["pay_date"], off=off[0],
                 runs=[dict(amount=r["amount"], first=MONTHS[r["first"]], last=MONTHS[r["last"]]) for r in runs])
 
 
@@ -707,6 +818,10 @@ def r4(d, claim):
     conv = m["used"] * m["td_rate"] + m["foh"]
     unused = m["unused_h"] * m["td_rate"]
     claim(abs(conv + unused - m["inputs"]) < 0.01, "the products' conversion plus the unused capacity equals the inputs to 1090")
+    bridge = conv - m["item_conv"]
+    claim(abs(bridge - m["td_rate"] * (m["setup_total"] - m["alloc_setup"])) < 0.01 and 0 < bridge < 1000,
+          "the item costs fall short of the routing time used only by the setup the family-average batch does not assign, "
+          "a few hundred dollars")
     hourly = d.one("SELECT COUNT(*) FROM Employee e JOIN CostCenter c ON c.CostCenterID = e.CostCenterID "
                    "WHERE c.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly'")
     claim(m["pclass"]["Hourly"]["n"] == hourly, "the hourly crew is every hourly manufacturing employee")
@@ -729,15 +844,21 @@ def r4(d, claim):
     table = m["data_table"]
     steps = [abs(a["example"] - b["example"]) for a, b in zip(table, table[1:])]
     moves = [abs(a["unused"] - b["unused"]) for a, b in zip(table, table[1:])]
-    claim(max(steps) < 10, f"{EXAMPLE}'s cost moves by a few dollars across the Data Table")
+    claim(max(steps) < 10, f"{EXAMPLE}'s cost moves by a few dollars at each step of the Data Table")
     claim(all(100_000 <= x < 1_000_000 for x in moves), "the unused capacity moves by hundreds of thousands at each step")
+    base = next(x for x in table if x["share"] == PRACTICAL)
+    crossings = [dict(share=x["share"], fell=[f for f in x["below"] if f not in base["below"]],
+                      rose=[f for f in base["below"] if f not in x["below"]]) for x in table if x is not base]
+    crossings = [c for c in crossings if c["fell"] or c["rose"]]
     return dict(committed=m["committed"], crew=m["pclass"]["Hourly"], sal=m["pclass"]["Salary"], dep=m["dep"],
                 pract=m["pract"], td_rate=m["td_rate"], crew_rate=m["crew_rate"], sup_rate=m["td_rate"] - m["crew_rate"],
                 fo_rate=m["fo_rate"], mv_rate=m["mv_rate"], conv=conv, unused_h=m["unused_h"], unused=unused,
                 unused_crew=m["unused_h"] * m["crew_rate"], total=conv + unused, fams=fams, groups=m["groups"],
                 n_items=m["explorer"]["n_items"], top_n=m["explorer"]["top_n"], tops=tops, table=table, example=EXAMPLE,
                 above=above, td_over=e["std"] - e["td"], absorp_over=e["td"] - e["absorp"], near_std=near["standard"],
-                near_absorp=near["absorption"])
+                near_absorp=near["absorption"], item_conv=m["item_conv"], bridge=bridge, alloc_setup=m["alloc_setup"],
+                setup=m["setup_total"], span=table[0]["example"] - table[-1]["example"],
+                unused_span=table[-1]["unused"] - table[0]["unused"], crossings=crossings, n_below=len(base["below"]))
 
 
 # --- Requirement 5 -----------------------------------------------------------------------------------
@@ -808,6 +929,11 @@ def r7(d, claim):
     least = wc_short(m["wc_names"][min(head, key=head.get)])
     claim(all(b["short"] == least for b in lp[0]["binding"]),
           "a work center that binds at the first growth rate is the one with the least headroom")
+    claim(all(s["short_of_minimum"] for s in lp), "at each growth rate the relaxed model buys a family below its minimum")
+    claim(all(s["contract"]["same_as_annual"] for s in lp),
+          "with the minimum kept, the least annual cost and the least two-year cost pick the same families")
+    claim(all(s["contract"]["total"] > PRICE_YEARS * s["cost"] for s in lp),
+          "the plan that keeps the terms costs more over the two years than the relaxed optimum")
     return dict(buy=m["buy"], freed=freed, total=total, use_before=m["used"] / m["pract"],
                 use_after=(m["used"] - total) / m["pract"], unused_h=m["unused_h"],
                 unused_positions=m["unused_h"] / m["pos_hours"], n_buy=word(len(m["buy"])), supervision=m["supervision"],
@@ -815,8 +941,9 @@ def r7(d, claim):
                 headroom=[dict(short=wc_short(m["wc_names"][wc]), ratio=head[wc]) for wc in m["wcs"]],
                 lp=[dict(growth=s["growth"], cost=float(s["cost"]),
                          binding=[dict(short=b["short"], price=float(b["price"])) for b in s["binding"]],
-                         bought=[dict(short=b["short"], units=float(b["units"]), all=bool(b["all"])) for b in s["bought"]])
-                    for s in lp])
+                         bought=[dict(short=b["short"], units=float(b["units"]), all=bool(b["all"])) for b in s["bought"]],
+                         short_of=s["short_of_minimum"], contract=s["contract"])
+                    for s in lp], minimum=MINIMUM, years=word(PRICE_YEARS))
 
 
 # --- Requirement 8 -----------------------------------------------------------------------------------
@@ -827,7 +954,12 @@ def r8(d, claim):
     buy_names = {q["name"] for q in m["buy"]}
     claim(all(q["margin"] >= FLOOR for q in m["buy"]), "the families to buy clear the floor at their delivered price")
     need = [r["short"] for r in m["reprice"] if r["name"] not in buy_names]
-    claim(all(v["z"] < 2 for v in volume(d)), "no promotion raised volume (no lift is unusually high)")
+    vol = volume(d)
+    claim(all(v["z"] < 2 for v in vol), "no promotion's lift passes a z of 2 (none is unusually high)")
+    years = {p["id"]: p["year"] for p in promotions(d)}
+    up = [dict(label=v["label"], year=years[v["id"]], lift=v["lift"]) for v in vol if v["lift"] > 0]
+    claim(0 < len(up) < len(vol), "some promotions' lifts are positive and some negative")
+    top = max(vol, key=lambda v: v["z"])
     lists = d.q("SELECT pl.PriceListID, pl.Status, MIN(pll.UnitPrice / i.ListPrice), MAX(pll.UnitPrice / i.ListPrice) "
                 "FROM PriceList pl JOIN PriceListLine pll ON pll.PriceListID = pl.PriceListID JOIN Item i ON i.ItemID = pll.ItemID "
                 "GROUP BY 1, 2 ORDER BY 1")
@@ -844,7 +976,9 @@ def r8(d, claim):
                                    "a.ApprovedByEmployeeID WHERE a.Status = 'Approved'")}
     claim(approvers == {"Sales Manager"}, "the Sales Manager approves the overrides")
     return dict(reprice=m["reprice"], revenue=sum(r["revenue"] for r in m["reprice"]), buy=m["buy"], need=need,
-                low=min(r[2] for r in active), high=max(r[3] for r in active), expired=expired)
+                low=min(r[2] for r in active), high=max(r[3] for r in active), expired=expired, up=up,
+                n_up=word(len(up)), n_promos=word(len(vol)), n_down=word(len(vol) - len(up)),
+                lowest=min(v["lift"] for v in vol), top=dict(label=top["label"], year=years[top["id"]], z=top["z"]))
 
 
 # --- Requirement 9 -----------------------------------------------------------------------------------
@@ -861,6 +995,8 @@ def r9(d, claim):
     claim(s_p["plan"] - s_f["plan"] < mat_p and s_c["plan"] - s_p["plan"] < mat_c, "the income effects are below materiality")
     claim(s_p["one"] < mat_p and s_c["one"] > mat_c,
           "at 1.0 hours the prior year's balance falls below materiality and the current year's stays above")
+    claim(all(s_p["normal"][k] > mat_p and s_c["normal"][k] > mat_c for k in range(len(NORMAL_RANGE))),
+          "at 90% and 110% of the plan volume both balance sheet effects stay above materiality")
     negatives = [dict(code=c, year=s["year"]) for s in m["stock"] for c in s["negative"]]
     opening = d.one("SELECT EntryNumber FROM JournalEntry WHERE EntryType = 'Opening' ORDER BY PostingDate LIMIT 1")
     opening_fg = d.one("SELECT SUM(Debit) - SUM(Credit) FROM GLEntry WHERE AccountID = ? AND VoucherNumber = ?",
@@ -869,7 +1005,7 @@ def r9(d, claim):
                 plan_salary=m["plan_salary"], plan_dep=m["plan_dep"], new_rate=m["new_rate"], one_rate=m["one_rate"],
                 current=m["conversion"] / m["stdh"], td_std=m["td_std"], actual=m["actual_rate"], quoted=m["quoted"],
                 negatives=negatives, stock=m["stock"], s_f=s_f, s_p=s_p, s_c=s_c, mat_p=mat_p, mat_c=mat_c,
-                opening_fg=opening_fg)
+                opening_fg=opening_fg, normal=m["normal"], spread=m["spread"])
 
 
 # --- Requirement 10 ----------------------------------------------------------------------------------
@@ -880,9 +1016,13 @@ def r10(d, claim):
     make_buy_claims(m, claim)
     unused_positions = m["unused_h"] / m["pos_hours"]
     claim(unused_positions > m["positions"] and m["unused_h"] * m["crew_rate"] > m["gain"],
-          "fitting the crew to the work is worth more than outsourcing")
+          "the unused capacity costs more than buying would save")
+    paths = paths_compared(m)
+    claim(paths["make"] > paths["buy"], "if volume holds, making and repricing every family below the floor earns more a "
+                                       "year than buying the families and repricing the rest")
     below = {r["name"] for r in m["reprice"]}
     buy_names = [q["name"] for q in m["buy"]]
     need = [r["short"] for r in m["reprice"] if r["name"] not in buy_names]
     return dict(lose=m["lose"], buy=m["buy"], positions=m["positions"], unused_positions=unused_positions, need=need,
-                buy_below=[q["short"] for q in m["buy"] if q["name"] in below])
+                buy_below=[q["short"] for q in m["buy"] if q["name"] in below], unused_crew=m["unused_h"] * m["crew_rate"],
+                paths=paths, n_below=word(len(below)), n_lose=word(len(m["lose"])))

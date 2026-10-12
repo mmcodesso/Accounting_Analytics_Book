@@ -23,7 +23,7 @@ _APPROVAL_CTE = (
     "            ON e.EmployeeID = po.ApprovedByEmployeeID\n"
     "    WHERE po.OrderTotal > e.MaxApprovalAmount\n"
     "    UNION ALL\n"
-    "    SELECT 'Approved after termination', po.PONumber, po.OrderTotal\n"
+    "    SELECT 'Dated after approver left', po.PONumber, po.OrderTotal\n"
     "    FROM PurchaseOrder AS po\n"
     "        INNER JOIN Employee AS e\n"
     "            ON e.EmployeeID = po.ApprovedByEmployeeID\n"
@@ -137,7 +137,7 @@ QUERIES = [
      "WHERE pay.PayrollPaymentID IS NULL;"),
     ("revenue_cutoff",
      "-- Tutorial 12.1, test L5: revenue posted in the year of delivery\n"
-     "-- Population: all sales invoices; expected: no rows",
+     "-- Population: invoices for shipped goods; expected: no rows",
      "WITH Shipped AS (\n"
      "    SELECT sil.SalesInvoiceID, MIN(s.ShipmentDate) AS ShipmentDate,\n"
      "        MAX(s.DeliveryDate) AS DeliveryDate\n"
@@ -336,7 +336,7 @@ QUERIES = [
      "FROM TimeClockEntry;"),
     ("hours_chain",
      "-- Tutorial 12.3, test H2: clocked, recorded, and paid hours\n"
-     "-- Population: every pay period; expected: equal in every period",
+     "-- Population: pay periods with time records; expected: equal in each",
      "WITH Clocked AS (\n"
      "    SELECT PayrollPeriodID, SUM(RegularHours + OvertimeHours) AS Hours\n"
      "    FROM TimeClockEntry\n"
@@ -453,7 +453,7 @@ QUERIES = [
      "-- Tutorial 12.3, test H8: days when everyone clocked the same hours\n"
      "-- Population: manufacturing clock entries; expected: no such days",
      "WITH PlantDays AS (\n"
-     "    SELECT tc.WorkDate, COUNT(*) AS Employees,\n"
+     "    SELECT tc.WorkDate, COUNT(DISTINCT tc.EmployeeID) AS Employees,\n"
      "        COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours)\n"
      "            AS HourPatterns,\n"
      "        SUM(tc.OvertimeHours) AS OvertimeHours\n"
@@ -462,7 +462,7 @@ QUERIES = [
      "SELECT strftime('%Y', WorkDate) AS WorkYear,\n"
      "    SUM(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
      "        THEN 1 ELSE 0 END) AS SurgeDays,\n"
-     "    MAX(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
+     "    MIN(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
      "        THEN Employees END) AS EmployeesPerDay,\n"
      "    ROUND(SUM(CASE WHEN HourPatterns = 1 AND Employees > 1\n"
      "        THEN OvertimeHours ELSE 0 END), 0) AS SurgeOvertime,\n"

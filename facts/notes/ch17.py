@@ -478,6 +478,23 @@ def statement(d, year: int) -> dict:
                 wc=xr(ca - cl), cr=ca / cl, qr=(cash + recv) / cl, cash_net=xr(cash - stax))
 
 
+def retained(d, year: int) -> dict:
+    """The adjusted balance sheet if the old accruals are kept (A3 left out, every other adjustment as recorded): the
+    retained-liability answer the notes accept beside the model answer."""
+    s, old = statement(d, year), adjustments(d)["old"][year]
+    cl = xr(s["cl"] + old)
+    return dict(accexp=xr(s["accexp"] + old), accrued=xr(s["accrued"] + old), cl=cl, tl=xr(s["tl"] + old),
+                re=xr(s["re"] - old), equity=xr(s["equity"] - old), wc=xr(s["wc"] - old), cr=s["ca"] / cl,
+                qr=(s["cash"] + s["recv"]) / cl)
+
+
+def kept_income(d) -> dict:
+    """Income before income taxes, and retained earnings at the start of the comparative year, without A3."""
+    adj = adjustments(d)
+    a3 = adj["a"]["A3"]
+    return {d.P: xr(adj["adj_ni"][d.P] - a3["P"]), d.C: xr(adj["adj_ni"][d.C] - a3["C"]), "re": xr(adj["total"]["re"] - a3["re"])}
+
+
 @lru_cache(maxsize=None)
 def adjusted_income(d, year: int) -> dict:
     adj = adjustments(d)
@@ -584,7 +601,7 @@ def m2(d, claim):
     comp = [composition(d, y) for y in ys]
     claim(all(abs(c["total"] - c["ledger"]) < 0.005 for c in comp), "the parts of 2040 add up to the ledger at each year-end")
     adj = adjustments(d)
-    return dict(comp=comp, opening=comp[0]["opening"], cut=[adj["cut"][y] for y in ys],
+    return dict(comp=comp, opening=comp[0]["opening"], cut=[adj["cut"][y] for y in ys], a3=adj["a"]["A3"],
                 pay=[adj["pay"][y]["total"] for y in ys], intr=[adj["intr"][y] for y in ys], total=adj["total"],
                 mat_c=materiality(d, d.C), mat_p=materiality(d, d.P))
 
@@ -597,8 +614,10 @@ def m3(d, claim):
     reported = xr(recorded(d, d.F)["re"] + net_income(d, d.F))
     cost = xr(bal(d, accounts_of(d, "Fixed Asset"), ye(d.C)))
     accumulated = xr(-bal(d, accounts_of(d, "Contra Fixed Asset"), ye(d.C)))
+    keep = kept_income(d)
     return dict(adj_ni=adj["adj_ni"], s_c=s_c, s_p=s_p, reported=reported, restated=xr(reported + adj["total"]["re"]),
-                cf=cf, cost=cost, accumulated=accumulated)
+                cf=cf, cost=cost, accumulated=accumulated, keep=keep, k_c=retained(d, d.C), k_p=retained(d, d.P),
+                keep_restated=xr(reported + keep["re"]))
 
 
 @note("ch17.m4", CHAPTER)
@@ -819,7 +838,8 @@ def r3(d, claim):
                 origin=[xr(v[0]) for _, v in sorted(by_year.items())],
                 by_account=[(n, xr(v)) for n, v in sorted(by_account.items())],
                 young_f=young[d.F], young_f_entries=abbreviated(young[d.F]["entries"]), young_p=young[d.P],
-                p_item=p_item, cleaned_in=cleaned_in, a3=a3, young_c=last["young"])
+                p_item=p_item, cleaned_in=cleaned_in, a3=a3, young_c=last["young"],
+                keep=dict(accexp_p=retained(d, d.P)["accexp"], accexp_c=retained(d, d.C)["accexp"]))
 
 
 # --- Requirement 4 -------------------------------------------------------------------------------------------
@@ -955,6 +975,9 @@ def r5(d, claim):
     # P1 and P2 are estimates: each is measured at the year-end and, net of the same estimate at the end of d.P (which
     # reverses in d.C), on d.C income
     p1 = -allowance(d)
+    aging = xr(sum(i["balance"] for i in open_invoices(d)))
+    claim(abs(statement(d, d.C)["recv"] - aging - opening_line(d, "1020") - adj["cut"][d.C]) < 0.005,
+          "the adjusted receivables are the invoice aging plus the opening line plus the unbilled deliveries")
     claim(abs(allowance_at(d, d.C) - allowance(d)) < 0.005, "the allowance at the end of each year is measured as Exercise 8.1 measures it")
     p1_prior = -allowance_at(d, d.P)
     ra = returns_across(d)
@@ -990,7 +1013,8 @@ def r5(d, claim):
                 p2=dict(n=rc["n"], rev=rc["rev"], cost=rc["cost"], n_prior=rp["n"], rev_prior=rp["rev"], cost_prior=rp["cost"],
                         effect=p2, income=xr(p2 - p2_prior)),
                 p3=dict(effect=p3, total=xr(sum(p3_years)), years=p3_years), aggregate=aggregate, agg_income=agg_income,
-                agg_share=-aggregate / mat_c, residual=residual)
+                agg_share=-aggregate / mat_c, residual=residual, aging=aging, opening_ar=opening_line(d, "1020"),
+                keep=kept_income(d))
 
 
 # --- Requirement 6 -------------------------------------------------------------------------------------------
@@ -1024,8 +1048,10 @@ def r6(d, claim):
         claim(abs(cf["dep"] - cf["depreciation_entries"]) < 0.005, f"{y}'s depreciation is the depreciation entries'")
     claim(no_tax_account(d), "no income tax is recorded")
     claim(cf_p["notes_financed"] == 0 and cf_c["notes_financed"] > 0, f"equipment was financed by a note only in {d.C}")
+    keep = kept_income(d)
     return dict(s_c=s_c, s_p=s_p, i_p=i_p, i_c=i_c, reported=reported, correction=adj["total"]["re"],
-                restated=xr(reported + adj["total"]["re"]), cf_c=cf_c, cf_p=cf_p)
+                restated=xr(reported + adj["total"]["re"]), cf_c=cf_c, cf_p=cf_p, keep=keep,
+                k_c=retained(d, d.C), k_p=retained(d, d.P), keep_restated=xr(reported + keep["re"]))
 
 
 # --- Requirement 7 -------------------------------------------------------------------------------------------
@@ -1349,6 +1375,7 @@ def r9(d, claim):
     claim(equity_used == {"3010", "3030"}, "equity is common stock and retained earnings, with no distributions")
     adj_ni = adjustments(d)["adj_ni"][d.C]
     provision = round(adj_ni * FEDERAL, -4)
+    provision_keep = round(kept_income(d)[d.C] * FEDERAL, -4)
     claim(adj_ni * FEDERAL > 3 * materiality(d, d.C), "the omitted provision is several times materiality")
     rent_rows = d.q("SELECT j.PostingDate, a.AccountNumber, SUM(g.Debit), SUM(g.Credit) FROM JournalEntry j JOIN GLEntry g "
                     "ON g.SourceDocumentType = 'JournalEntry' AND g.SourceDocumentID = j.JournalEntryID JOIN Account a "
@@ -1392,5 +1419,6 @@ def r9(d, claim):
     reval = revaluation(d)
     claim(reval[d.C] > 0 and reval[d.P] > 0, "the finished goods would be higher at a standard rebuilt on normal capacity")
     return dict(years=word(len(d.years)), adj_ni=adj_ni, provision=provision, rent=rent, stax=stax, memo_debits=memo_debits,
+                provision_keep=provision_keep,
                 o=o, equity=xr(liabilities - assets), assets=assets, liabilities=liabilities,
                 reval_c=round(reval[d.C], -3), reval_p=round(reval[d.P], -3))

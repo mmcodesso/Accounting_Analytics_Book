@@ -81,7 +81,7 @@ b. Type and run the query below, which totals the variance postings of fiscal 20
 
 c. Add up the TotalVariance column of item a, and compare it with the ledger total.
 
-Three item groups carry the variance: Furniture, Lighting, and Textiles, the groups whose items Charles River makes in quantity. Furniture holds more than two-thirds of it. The three groups add up to the ledger total to the cent, so the work order records and the ledger tell the same story.
+Three item groups carry the variance: Furniture, Lighting, and Textiles, the groups whose items Charles River makes in quantity. Furniture holds more than two-thirds of it. The three groups add up to the ledger total to the cent, so the work order records and the ledger agree in total for fiscal 2026.
 
 **Step 4. Compare the three years.** The year of a close is the first four characters of its CloseDate, and GROUP BY can use the alias CloseYear that the SELECT list gives it.
 
@@ -106,19 +106,19 @@ The result, shown in @fig-10-03, holds one row for each group and year. Furnitur
 
 ![The Manufacturing Variance by Item Group and Year.](/visuals/svg/fig-10-03-variance-by-group-year.svg){#fig-10-03 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins WorkOrderClose to WorkOrder and Item and groups the closes by item group and close year, with the number of closes, the total variance, and the overhead variance. The result holds nine rows, three years each for Furniture, Lighting, and Textiles. The Furniture rows, whose total variance rises in each year while the number of closes falls, are outlined."}
 
-**Step 5. Keep the items that carry the most variance.** WHERE keeps the closes of fiscal 2026, and HAVING then keeps the items whose total passes a threshold. Group by the item's key, and include its code and name so that the result is readable.
+**Step 5. Keep the items that carry the most variance.** WHERE keeps the closes of fiscal 2026, and HAVING then keeps the items whose total passes a threshold. Group by the item's key, and include its code, name, and group so that the result is readable.
 
 a. Type and run the query below.
 
    ```sql
    -- Tutorial 10.1: items with more than $50,000 of variance in 2026
-   SELECT i.ItemID, i.ItemCode, i.ItemName, COUNT(*) AS Closes,
+   SELECT i.ItemCode, i.ItemName, i.ItemGroup, COUNT(*) AS Closes,
        ROUND(SUM(woc.TotalVarianceAmount), 2) AS TotalVariance
    FROM WorkOrderClose AS woc
        INNER JOIN WorkOrder AS wo ON wo.WorkOrderID = woc.WorkOrderID
        INNER JOIN Item AS i ON i.ItemID = wo.ItemID
    WHERE woc.CloseDate BETWEEN '2026-01-01' AND '2026-12-31'
-   GROUP BY i.ItemID, i.ItemCode, i.ItemName
+   GROUP BY i.ItemID, i.ItemCode, i.ItemName, i.ItemGroup
    HAVING SUM(woc.TotalVarianceAmount) > 50000
    ORDER BY TotalVariance DESC;
    ```
@@ -127,7 +127,7 @@ b. Read the items and their totals, and note the item groups they come from.
 c. Change 50000 to 30000, run the query again, and read the number of rows.
 d. Change the threshold back to 50000.
 
-Only a handful of items pass the threshold of item a, a mix of dining tables, sideboards, and a throw blanket, each with a few dozen closes. At the lower threshold, several times as many pass. No single item stands out, and the largest carries only a small share of the year's variance. The variance is spread across most of the items Charles River makes, which points to a cause that affects production as a whole rather than one product.
+Only a handful of items pass the threshold of item a, a mix of dining tables, sideboards, and a throw blanket, each with a few dozen closes. At the lower threshold, several times as many pass. No single item stands out, and the largest carries only a small share of the year's variance. The variance is spread across most of the items Charles River makes. A ranking by total dollars shows where the amounts accumulate, not which items are made inefficiently, but a spread this wide points first to causes that affect production as a whole, alongside the effects of the product mix.
 
 **Step 6. List every manufactured item, including those with no closes.** A complete list starts from the table that holds the whole population, the items, and left joins the others to it.
 
@@ -161,4 +161,4 @@ The query of item a returns one row for every manufactured item, and the first r
 - the complete list of Step 6 keeps the items with no closes only while the date condition is in the ON clause;
 - Chapter10.sql holds the header and the queries of this tutorial, each under a comment.
 
-The variance is not a product problem. It rises in the groups the plant makes most, while the number of work orders falls, and that pattern turns the question toward the cost of production itself.
+The variance is not concentrated in a few products. It rises in the groups the plant makes most, while the number of work orders falls, and that pattern turns the question toward the cost of production itself.

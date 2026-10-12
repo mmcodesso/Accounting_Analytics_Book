@@ -20,8 +20,9 @@ The table holds one row for each promotion, nine in all, three a year.
 a. Select **Model view**, and drag PromotionID from **SalesInvoiceLine** onto PromotionID in **PromotionProgram**.
 b. Check that the relationship reads many to one, with a single cross filter direction.
 c. Hide PromotionID in both tables, as you hid the other keys in Tutorial 14.1.
+d. Select DiscountPct in the **Data** pane, and on the **Column tools** tab set **Summarization** to **Don't summarize** and format it as a percentage with no decimals.
 
-Most invoice lines carry no promotion, so their PromotionID is blank. In a visual grouped by promotion, they appear under (Blank), a meaningful blank in Chapter 5's term, which Chapter 13 met in a visual: lines sold without a promotion.
+Most invoice lines carry no promotion, so their PromotionID is blank. In a visual grouped by promotion, they appear under (Blank), a meaningful blank in Chapter 5's term, which Chapter 13 met in a visual: lines sold without a promotion. DiscountPct is a rate, so the detail page of Step 7 shows it as it is, never added up.
 
 **Step 3. Build a table of the steps from list price to net.** The waterfall needs one category for each step, and no table in the model holds them, so you will type them in.
 
@@ -50,7 +51,7 @@ SWITCH (
 )
 ```
 
-SELECTEDVALUE returns the step of the current bar, or a blank when the filter context holds more than one step, as it does for a total. SWITCH compares that step with each name in turn and returns the matching expression. The last argument is the value when no single step is selected, revenue itself. The three steps add up to revenue: the list amount, less what the price lists and approved overrides took off, less what the promotions took off. The promotions step is taken as the price before discount less revenue rather than the Discounts measure, so that the steps add up to the cent; the two differ only by the rounding of each line's total.
+SELECTEDVALUE returns the step of the current bar, or a blank when the filter context holds more than one step, as it does for a total. SWITCH compares that step with each name in turn and returns the matching expression. The last argument is the value when no single step is selected, revenue itself. The three steps add up to revenue: the list amount, less what the price lists and approved overrides took off, less what the promotions took off. The promotions step is revenue less the price before discount, a negative amount, rather than the Discounts measure with its sign reversed, so that the steps add up to the cent; the two differ only by the rounding of each line's total.
 
 **Step 5. Chart the steps as a waterfall.**
 

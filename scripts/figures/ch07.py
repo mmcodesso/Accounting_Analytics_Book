@@ -98,6 +98,8 @@ def fig_07_01() -> Diagram:
     xs = list(range(1, 37))
     full, trimmed = regression(xs, ys), regression(xs[1:], ys[1:])
     assert full["p_b"] < 0.05 < trimmed["p_b"], (full["p_b"], trimmed["p_b"])
+    share = 1 - trimmed["b"] / full["b"]                    # the part of the slope that the start-up month makes
+    assert 0.4 < share < 0.5, share                         # "almost half", as the note and Chapter 7 say
     left, right, top, height = 96, 846, 20, 380
     y_of = axis(d, left, right, top, height, 1_200_000, 2_800_000, 400_000,
                 lambda v: f"${v / 1e6:.1f}M")
@@ -120,8 +122,8 @@ def fig_07_01() -> Diagram:
     legend(d, 0, y, [(BLUE, False, "Monthly revenue"),
                      (CORAL, True, f"Trend, all 36 months (R² {full['r2']:.2f})"),
                      (TEAL, False, f"Trend without January 2024 (R² {trimmed['r2']:.2f})")], gap=285)
-    d.text("<i>Revenue is the total of the invoice lines in each month. The dashed line's upward slope "
-           "comes mostly from the first month.</i>", 0, y + 32, 860, 40, size=SMALL, color=GRAY)
+    d.text("<i>Revenue is the total of the invoice lines in each month. Almost half of the dashed line's "
+           "slope comes from the first month.</i>", 0, y + 32, 860, 40, size=SMALL, color=GRAY)
     return d
 
 
@@ -185,7 +187,7 @@ def fig_07_03() -> Diagram:
     d = Diagram("Backtesting Three Forecasts of the Fourth Quarter of 2026")
     backtest = forecast_backtest(connection())
     actual, methods = backtest["actual"], backtest["methods"]
-    body = [("40", ["Method", "Oct 2026", "Nov 2026", "Dec 2026", "Quarter", "Error", "Monthly error"])]
+    body = [("40", ["Method", "Oct 2026", "Nov 2026", "Dec 2026", "Quarter", "Quarter error", "Monthly MAPE"])]
     body.append(("41", ["Actual", *(xl.num(v, 0) for v in actual), xl.num(sum(actual), 0), "", ""]))
     errors = {}
     for i, (name, f) in enumerate(methods):
@@ -203,15 +205,15 @@ def fig_07_03() -> Diagram:
             return dict(fill=BLUE_TINT, label=f"<b>{esc(value)}</b>", align="left" if c == 0 else "right")
         return dict(align="left") if c == 0 else dict(align="right")
 
-    widths = [36, 230, 96, 96, 96, 100, 90, 112]
+    widths = [36, 206, 96, 96, 96, 100, 114, 112]
     geo = xl.sheet(d, 0, 0, ["A", "B", "C", "D", "E", "F", "G"], widths, body, style)
     x0, y0, _, _ = geo[(2, 5)]
     xl.emphasis(d, x0, y0, widths[6] + widths[7], ROW_H * 3)
     bottom = 22 + ROW_H * len(body)
     d.text("<i>Every method is fitted to February 2024 through September 2026 and compared with the "
-           "actual fourth quarter: Trend with FORECAST.LINEAR, Mean as the average of the fitted months. Error "
-           "is the quarter's forecast against its actual; monthly error is the average absolute percentage "
-           "error of the three months. Outlined: the errors.</i>", 0,
+           "actual fourth quarter: Trend with FORECAST.LINEAR, Mean as the average of the fitted months. Quarter "
+           "error is the quarter's forecast against its actual, positive when the forecast is too high; Monthly "
+           "MAPE is the mean absolute percentage error of the three months. Outlined: the errors.</i>", 0,
            bottom + 8, 860, 60, size=SMALL, color=GRAY)
     return d
 
@@ -322,6 +324,7 @@ def fig_07_06() -> Diagram:
     actual = [f[("Furniture", m, "actual")] / f[("Furniture", m, "list")] for m in range(1, 13)]
     assert min(range(12), key=lambda i: planned[i]) in (8, 9), planned
     assert actual[10] < before[10] - 0.01, "promotion discounts continue in November"
+    assert any(actual[i] < before[i] - 0.005 for i in range(8)), "smaller discounts appear earlier in the year"
     left, right, top, height = 96, 846, 20, 360
     y_of = axis(d, left, right, top, height, 0.80, 0.96, 0.04, lambda v: f"{100 * v:.0f}%")
     x_of = lambda i: left + 30 + i * (right - left - 60) / 11
@@ -338,9 +341,9 @@ def fig_07_06() -> Diagram:
                      (TEAL, False, "Actual price before promotions"),
                      (CORAL, False, "Actual price after promotions")], gap=285)
     d.text("<i>Each point is revenue divided by the list value of the Furniture units invoiced in the "
-           "month of fiscal 2026. The budget lowered its planned price in September and October; the actual "
-           "discounts started in September and continued into November and December.</i>", 0, y + 32, 860,
-           40, size=SMALL, color=GRAY)
+           "month of fiscal 2026. The budget lowered its planned price in September and October; the large "
+           "autumn discounts began in September and continued into November and December, and smaller "
+           "discounts appear earlier in the year.</i>", 0, y + 32, 860, 40, size=SMALL, color=GRAY)
     return d
 
 
@@ -350,7 +353,7 @@ def fig_07_07() -> Diagram:
     rows = [
         ("1", ["Input or result", "Value", "Name", "Source"]),
         ("2", ["Discount rate", "10.00%", "Discount", "PromotionProgram, promotion 8"]),
-        ("3", ["Volume lift", "0.00%", "Lift", "Assumption; order data shows none"]),
+        ("3", ["Volume lift", "0.00%", "Lift", "Assumption; no increase in orders"]),
         ("4", ["Units on promotion lines", xl.num(m["units"]), "PromoUnits", "InvoiceLines, promotion 8"]),
         ("5", ["Price before discount per unit", xl.num(m["price"]), "PriceBeforeDiscount",
                "InvoiceLines, promotion 8"]),

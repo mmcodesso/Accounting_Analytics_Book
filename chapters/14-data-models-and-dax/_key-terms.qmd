@@ -2,7 +2,7 @@
 
 ## Key Terms
 
-**Calculated column.** A column of an Excel Table whose formula Excel applies to every row automatically, including rows added later. In a Power BI model, a calculated column is a column added to a table with a DAX formula, evaluated for each row when the model is refreshed and stored like any other column, so it can be used to filter, group, or sort.
+**Calculated column.** A column of an Excel Table whose formula Excel applies by default to every row, including rows added later. In a Power BI model, a calculated column is a column added to a table with a DAX formula, evaluated for each row when the model is refreshed and stored like any other column, so it can be used to filter, group, or sort.
 
 **Context transition.** The conversion of the current row of a row context into an equivalent filter context, which CALCULATE performs. It happens whenever CALCULATE is used, or a measure is referred to, inside a row context, such as a calculated column or an iterator.
 

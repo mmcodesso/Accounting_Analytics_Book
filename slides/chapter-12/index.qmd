@@ -44,7 +44,7 @@ Auditors do not test their own work, so read Chapters 9 to 11 as a colleague's. 
 - An incomplete table can report a clean result that means nothing
 
 ::: {.notes}
-In a workbook, each of those tables would have to be imported and merged, and a test that reaches across a whole process is the kind that shows whether a control worked. The PCAOB amended its standards to clarify the auditor's responsibilities with technology-assisted analysis; internal auditors follow the IIA's Global Internal Audit Standards. A join on keys that do not match can also report a clean result that means nothing, so every test in this chapter begins with a reconciliation.
+In a workbook, each of those tables would have to be imported and merged, and a test that reaches across a whole process is the kind that shows whether a control worked. The PCAOB amended its standards, which govern the external audits of public companies and broker-dealers, to clarify the auditor's responsibilities with technology-assisted analysis; internal auditors follow the IIA's Global Internal Audit Standards. A join on keys that do not match can also report a clean result that means nothing, so every test in this chapter begins with a reconciliation.
 :::
 
 # Reconciling and Profiling Before Testing
@@ -78,7 +78,7 @@ Chapter 8's workflow began every test by defining and reconciling its population
 {{< book-figure fig-12-01 crop="0,0,1,0.7337" >}}
 
 ::: {.notes}
-An anti-join from the ledger to a document table finds postings that point to nothing, which tests existence, or occurrence for transactions. An anti-join from the documents to the ledger finds documents never posted, which tests completeness. The completeness test finds only documents that were recorded but not posted: a transaction with no document at all escapes it. The figure's third test, cutoff, follows on its own slide.
+An anti-join from the ledger to a document table finds postings that point to nothing, which tests existence, or occurrence for transactions, as far as a document record can support it. An anti-join from the documents to the ledger finds documents never posted, which tests completeness. The completeness test finds only documents that were recorded but not posted: a transaction with no document at all escapes it. The figure's third test, cutoff, follows on its own slide.
 :::
 
 ## UNION ALL lists every test's exceptions together
@@ -112,12 +112,12 @@ No error says so. Check that every query lists its columns in the same order bef
 ## Cutoff compares the posting with the event behind it
 
 - PostingDate says when it was recorded; the event has its own date
-- Revenue belongs to the period of delivery: compare the delivery dates
-- An invoice dated before its goods shipped is itself an error
+- Revenue on delivery, as the chapter assumes: compare the delivery dates
+- An invoice dated before its goods shipped needs correction or a reason
 - Wages belong to the period of the work: compare the work with the pay date
 
 ::: {.notes}
-A company that records transactions when it invoices or pays them, rather than when it earns or incurs them, needs an accrual at each period end for the difference; without one, each year-end is misstated by the transactions on either side of it. Tutorial 3.2 traced one sale; these tests trace every document at once, and Exercise 10.5 already found six payroll payment postings with no payment, which Tutorial 12.1 explains.
+Revenue from goods belongs to the period in which control passed to the customer, which depends on the terms of the sale; the chapter assumes it passes on delivery, and that invoices are dated no earlier than the goods ship. Services ship nothing, so their revenue needs a test of its own. A company that records transactions when it invoices or pays them, rather than when it earns or incurs them, needs an accrual at each period end for the difference; without one, each year-end is misstated by the transactions on either side of it. Tutorial 3.2 traced one sale; these tests trace whole tables at once, and Exercise 10.5 already found six payroll payment postings with no payment, which Tutorial 12.1 explains.
 :::
 
 ## Check your understanding {.check}
@@ -159,7 +159,7 @@ Students start Audit.sql with a header comment. Each test goes at the end of the
 {{< book-figure fig-12-02 crop="0,0.6003,0.9224,0.2219" >}}
 
 ::: {.notes}
-The four traces return six rows, all from the first test: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. Every supplier payment has its document, and every sales and supplier invoice was posted. Step 4 matches the six to three approved registers with no payment: one pays the chief executive, and two pay an Account Executive who left in the first year, charged to the Executive cost center at the chief executive's gross pay. Only the bank records can confirm who received the cash.
+The four traces, two from the ledger to the payments and two from the invoices to the ledger, return six rows, all from the first test: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. Every supplier payment has its document, and every sales and supplier invoice was posted. Step 4 matches the six to three approved registers with no payment: one pays the chief executive, and two pay an Account Executive who left in the first year, charged to the Executive cost center at the chief executive's gross pay. Only the bank records can confirm who received the cash.
 :::
 
 ## December deliveries were posted in January
@@ -167,7 +167,7 @@ The four traces return six rows, all from the first test: three pairs, each a de
 {{< book-figure fig-12-03 crop="0,0.619,0.8552,0.1977" >}}
 
 ::: {.notes}
-More than twenty invoices for goods delivered in December were invoiced and posted in January, so their revenue fell in the next fiscal year, while their cost was recorded when the goods shipped. Eight invoices are dated before their shipment but were posted in the year of delivery: errors in dating, not in posting. Step 6 finds a handful of the latest December's shipment lines that were never invoiced.
+More than twenty invoices for goods delivered in December were posted in January, so their revenue fell in the next fiscal year, while their cost was recorded when the goods shipped. Eight invoices are dated before their shipment but were posted in the year of delivery: errors in dating, not in posting. A ninth dated before its shipment was also posted in the next year, and the CASE counts only its first finding. The test covers only the invoices for goods; the design services ship nothing. Step 6 finds a handful of the latest December's shipment lines that were never invoiced.
 :::
 
 ## Checkpoint
@@ -175,7 +175,7 @@ More than twenty invoices for goods delivered in December were invoiced and post
 {{< book-checkpoint 12.1 1-3 lead="true" >}}
 
 ::: {.notes}
-The reconciliations agree to the cent because both sides record payroll on its pay date. The six postings are the only exceptions of the trace, and they record cash paid without a payment record.
+The reconciliations agree to the cent; the payroll agrees because both sides record it on its pay date. Agreement of totals supports the populations' completeness; it is not a comparison of every record. The six postings are the only exceptions of the trace, and they record cash paid without a payment record.
 :::
 
 ## Checkpoint (continued)
@@ -183,7 +183,7 @@ The reconciliations agree to the cent because both sides record payroll on its p
 {{< book-checkpoint 12.1 4-6 >}}
 
 ::: {.notes}
-The ledger is reliable as a whole, and its weakness is timing. Revenue and payroll are recorded when they are invoiced and paid, so each year-end is misstated, and the accrued payroll account holds only its opening balance: the wages of each December's last weeks are charged to the next year.
+Within the populations tested the ledger holds up, and its weakness is timing. Revenue and payroll are recorded when they are invoiced and paid, so each year-end is misstated, and the accrued payroll account holds only its opening balance: the wages of each December's last weeks are charged to the next year.
 :::
 
 # The Three-Way Match
@@ -221,11 +221,11 @@ A sum of fractional quantities can differ from the quantity ordered by a tiny ro
 
 - Join each document to its approver's Employee row
 - An amount above MaxApprovalAmount is an approval above authority
-- A document dated after TerminationDate came from someone who had left
+- One dated after TerminationDate may have come from someone who had left
 - A creator who also approves breaks the segregation of duties
 
 ::: {.notes}
-Where a table records no approval date, as PurchaseOrder does not, the document's own date stands in for it. An approver whose job title has nothing to do with the process, such as a sales employee approving purchases, is not a violation in itself, but it is worth a question.
+Where a table records no approval date, as PurchaseOrder does not, the document's own date stands in for it, so a document dated after a termination is a question for the approval records. An approver whose job title has nothing to do with the process, such as a sales employee approving purchases, is not a violation in itself, but it is worth a question.
 :::
 
 ## Concentration is a risk, not an exception
@@ -286,7 +286,7 @@ Nearly every line is matched; the others are not yet received, partly received, 
 {{< book-figure fig-12-06 crop="0,0.6781,0.7277,0.1367" >}}
 
 ::: {.notes}
-Step 5 lists fourteen orders, most failing two tests. The two largest are capital-equipment orders created and approved by the Purchasing Manager, above even the chief financial officer's limit. Three were approved by the Account Executive of Tutorial 12.1 after that employee had left, and several small ones by buyers and analysts with a limit of zero. Step 6 shows that the chief financial officer approved nearly every other order.
+Step 5 lists fourteen orders, most failing two tests. The two largest are capital-equipment orders created and approved by the Purchasing Manager, above even the chief financial officer's limit. Three name the Account Executive of Tutorial 12.1 as approver and are dated after that employee had left, and several small ones by buyers and analysts with a limit of zero. Step 6 shows that the chief financial officer approved nearly every other order.
 :::
 
 ## Checkpoint
@@ -294,7 +294,7 @@ Step 5 lists fourteen orders, most failing two tests. The two largest are capita
 {{< book-checkpoint 12.2 lead="true" >}}
 
 ::: {.notes}
-The purchasing chain holds together: what it received it was billed for, at prices close to the orders, and its unbilled receipts agree with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.
+The purchasing chain holds together in the records tested: no line was billed above what was received, prices were close to the orders, and its unbilled receipts agree with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.
 :::
 
 # Testing the Records Behind a Cost
@@ -304,15 +304,15 @@ The purchasing chain holds together: what it received it was billed for, at pric
 {{< book-figure fig-12-07 >}}
 
 ::: {.notes}
-An employee clocks in and out, the hours are recorded against a work order operation or as indirect time, the payroll register pays for them, a payment disburses the net pay, and the ledger records the cost and the payment. Tutorial 12.3 tests the hours and the pay for them; Exercise 12.5 tests the pay of people who had left and the approval of the registers.
+An employee clocks in and out, the hours are recorded against a work order operation or as indirect time, the payroll register pays for them through earnings lines that point to the labor time, a payment disburses the net pay, and the ledger records the cost and the payment. Tutorial 12.3 tests the hours and the pay for them; Exercise 12.5 tests the pay of people who had left and the approval of the registers.
 :::
 
 ## Test each link of the chain
 
 - The hours clocked were recorded and paid, to the person who worked
 - Overtime was approved, and the records look like individual work
-- Direct time was recorded against work still in progress
-- Each register was approved independently, and paid once, after approval
+- Direct time was not charged to work already finished
+- Each register was approved independently, and paid after approval
 
 ::: {.notes}
 Records entered in bulk, rather than clocked by each employee, are one of the things the third assignment looks for. The people paid must also have been employed, and paid what they earned.
@@ -337,7 +337,7 @@ A single register paid to a terminated employee is isolated; a large share of ho
 - A reconciliation asks if records agree; an expectation, if amounts fit
 
 ::: {.notes}
-Chapter 6 defined the procedure, which the PCAOB's standards describe, and Exercise 7.5 built expectations with regression; among the four types of analytics, it adds a predictive element. Payroll is a common area for population testing because its typical frauds leave traces: employees paid after they left, hours paid but never clocked, overtime without approval, and time entered in bulk. Such tests often run every pay period, so that an exception can still be corrected.
+Chapter 6 defined the procedure, which the PCAOB's standards describe, and Exercise 7.5 built expectations with regression; among the four types of analytics, it adds a predictive element. A payroll expectation from rates the payroll system itself stores is a recalculation; data from outside the system make a stronger expectation. Payroll is a common area for population testing because its typical frauds leave traces: employees paid after they left, hours paid but never clocked, overtime without approval, and time entered in bulk. Such tests often run every pay period, so that an exception can still be corrected.
 :::
 
 ## Check your understanding {.check}
@@ -371,7 +371,7 @@ Which kind an exception is depends on its cause, which the auditor must find. Th
 {{< book-steps 12.3 1-5 >}}
 
 ::: {.notes}
-The profile fixes the dates over which every total is measured. The hours clocked, recorded and paid agree in every pay period, and the four quiet months are complete: the plant was building stock, completing thousands of units more than it shipped, which kept most hours on work orders. Every earnings line agrees with its hours times the employee's rate to within a cent.
+The profile fixes the dates over which every total is measured. The hours clocked, recorded and paid agree in every pay period the records share, and the four quiet months are recorded like any others: the plant was building stock, completing thousands of units more than it shipped, which kept most hours on work orders. Every earnings line agrees with its hours times the paid employee's rate on file to within a cent.
 :::
 
 ## Steps 6 to 10: overtime, surge days and late time
@@ -387,7 +387,7 @@ No overtime of half an hour or less has an approval, and nearly every longer ent
 {{< book-figure fig-12-08 crop="0,0.6941,0.832,0.1298" >}}
 
 ::: {.notes}
-The number of surge days grew each year, and by the latest year their overtime was more than two-thirds of the plant's, while overtime on other days stayed about the same. This is the most important finding of the audit. Identical times for a whole plant look like time entered in bulk; they do not prove that the hours were not worked, but the records cannot show that they were.
+The number of surge days grew each year, and by the latest year their overtime was more than two-thirds of the plant's, while overtime on other days stayed about the same. This is the most important finding of the audit. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock; they do not prove that the hours were not worked, but the records cannot show that they were.
 :::
 
 ## On an ordinary day, times and hours differ
@@ -411,7 +411,7 @@ The same six on a surge day clock in and out at the same minutes on one of two s
 {{< book-figure fig-12-10 crop="0,0.6293,0.8204,0.1573" >}}
 
 ::: {.notes}
-The share of direct labor recorded after its operation had ended rose from about a fifth to half and then to about two-thirds, and most of it fell on surge days. Step 9 finds it at Packing, where nearly all of the latest year's direct time came after the operation ended, and at Quality Assurance: the hours above plan there in Tutorial 11.2 are time charged to finished work.
+The share of the direct hours recorded against an operation that came after the operation had ended rose from about a fifth to half and then to about two-thirds, and most of it fell on surge days. Step 9 finds it at Packing, where nearly all of the latest year's direct time came after the operation ended, and at Quality Assurance: the hours above plan there in Tutorial 11.2 are time charged to finished work.
 :::
 
 ## Checkpoint
@@ -427,7 +427,7 @@ The time that pays one employee's hours to others belongs to an Inventory Specia
 {{< book-checkpoint 12.3 5-8 >}}
 
 ::: {.notes}
-The hours were recorded, paid at the right rates, and posted, so the variance is a cost the records say the plant incurred. The chief audit executive will report the exceptions for correction, the time-recording practice as a weakness in the design of controls, and the surge-day overtime as a matter to corroborate before the committee relies on it.
+The hours were recorded, paid at the rates on file, and posted, so the variance is a cost the records say the plant incurred. The chief audit executive will report the exceptions for correction, the time-recording practice as a weakness in the design of controls, and the surge-day overtime as a matter to corroborate before the committee relies on it.
 :::
 
 # Chapter 8's Tests in SQL
@@ -447,11 +447,11 @@ GROUP BY does what COUNTIFS and SUMIFS did in Chapter 8, and the as-of date in a
 
 - LAG compares each document number with the one before it
 - A series that restarts each year is partitioned by year
-- `printf('%e', Amount)` writes the first significant digit first
+- `printf('%.15e', Amount)` writes the first significant digit first
 - `LOG10(1 + 1.0 / Digit)` gives Benford's expectation for each digit
 
 ::: {.notes}
-A series that continues from one year to the next, such as the sales invoice numbers, is ordered without a partition, so a gap at the year boundary is not missed. Leave zero and negative amounts out of the first-digit test. LOG10 is one of SQLite's math functions; a build without them answers "no such function: LOG10". Grouped and compared, the digits give the same mean absolute deviation as the workbook of Tutorial 8.1, and Exercise 12.6 builds the other tests.
+A series that continues from one year to the next, such as the sales invoice numbers, is ordered without a partition, so a gap at the year boundary is not missed. Leave zero and negative amounts out of the first-digit test. Fifteen decimals keep printf's rounding from carrying an amount such as 999,999.99 to 1.000000e+06, which would read as a 1. LOG10 is one of SQLite's math functions, which the Windows release of DB Browser for SQLite includes; DB Browser for SQLCipher lacks them and answers "no such function: LOG10", and a CASE that lists the nine expected proportions can take its place. Grouped and compared, the digits give the same mean absolute deviation as the workbook of Tutorial 8.1, and Exercise 12.6 builds the other tests.
 :::
 
 ## Watch out: a self-join pairs every row twice {.watch-out}
@@ -472,7 +472,7 @@ In the near-duplicate test, requiring different payment dates happens to remove 
 {{< book-table tbl-12-01 1-4 >}}
 
 ::: {.notes}
-A test that is saved, documented and run again every period becomes part of the company's control environment. Each test in the library states its objective, its population and the reconciliation that proves it complete, the query, the expected result, and the disposition of any exception.
+A test that is saved, documented and run again every period becomes part of the company's control environment. Each test in the library states its objective, its population and the reconciliation that supports its completeness, the query, the expected result, and the disposition of any exception.
 :::
 
 ## The library's purchasing and hours tests
@@ -493,13 +493,13 @@ The header names the script's purpose, the database, the preparer and reviewer, 
 
 ## The library needs the controls it tests
 
-- Save each test as a view, and one query counts every view's exceptions
+- Save each test as a view; count the rows of those that list exceptions
 - Review and record every change to a test
 - Keep each run's results as a workpaper: the date, the data and the reviewer
 - A library that anyone can change without a record undermines its evidence
 
 ::: {.notes}
-Saved as views, as in Tutorial 11.3, the tests run again every quarter with a single line. The library of views becomes the SQL counterpart of Chapter 8's workbook, with nothing to import, filter or refresh by hand.
+Saved as views, as in Tutorial 11.3, the tests run again every quarter with a single line, on whatever data the file holds, so each run starts from a refreshed copy with its as-of dates moved. A test that returns totals or a status for every line, such as L1 or P1, is compared with its expected result rather than counted. The library of views becomes the SQL counterpart of Chapter 8's workbook, with nothing to import, filter or refresh by hand.
 :::
 
 # Looking Ahead
@@ -517,13 +517,13 @@ Revenue and payroll are recorded when invoiced and paid, so each year-end is mis
 
 ## Do the standards still fit?
 
-- Yes: the direct time the output needed stayed within the standards
+- The records give no reason to revise them: direct time stayed within them
 - What grew is the time paid beyond the work: indirect time and overtime
-- The plant became less efficient, not at the work but around it
+- By the records, less efficient not at the work but around it
 - Part of the growth is the calendar: the first year charged two payrolls fewer
 
 ::: {.notes}
-This answers the question the controller asked at the start of Chapter 9. The plant-level conclusions of Chapters 10 and 11 survive the audit; the operation-level comparison does not until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. Management decides what to do: hours that bring nothing can be cut, and a standard is revised only if the work itself has changed. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
+This answers the question the controller asked at the start of Chapter 9. The plant-level conclusions of Chapters 10 and 11 survive the audit; the operation-level comparison does not until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. How much of the extra time was avoidable, the records cannot measure. Management decides what to do once the hours are corroborated: hours that bring nothing can be cut, and a standard is revised only if the work itself has changed. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
 :::
 
 ## Summary

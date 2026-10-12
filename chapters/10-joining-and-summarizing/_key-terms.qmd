@@ -28,9 +28,9 @@
 
 **NOT EXISTS.** A condition that is true when its subquery returns no rows, used to find the rows of one table that have no match in another. Unlike NOT IN, it is not defeated by a NULL in the other table.
 
-**Production-volume variance.** The part of an overhead variance that arises because output differs from the volume on which the fixed overhead rate was set. When output falls, some fixed overhead is left unabsorbed.
+**Production-volume variance.** The part of an overhead variance that arises because output differs from the volume on which the fixed overhead rate was set. When output falls below that volume, some fixed overhead is left unabsorbed.
 
-**Scalar subquery.** A subquery that returns a single value, which can stand wherever a value can, in the SELECT list or in a condition.
+**Scalar subquery.** A subquery that returns a single value, which can stand wherever a value can, in the SELECT list or in a condition. When it finds no row, its value is NULL.
 
 **Standard hours allowed.** The labor hours that the standards allow for the output actually produced, calculated as the units completed times the standard hours per unit. The direct labor efficiency variance compares them with the direct labor hours actually used, priced at the standard rate.
 

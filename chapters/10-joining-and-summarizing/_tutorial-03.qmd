@@ -73,7 +73,7 @@ a. Type and run the query below.
 
 b. Compare the Registers and Employees columns.
 
-Each employee has a register in every pay period, so `COUNT(*)` counts well over a thousand registers a year, while `COUNT(DISTINCT pr.EmployeeID)` counts the people. The manufacturing payroll paid the same number of people in each year. The extra hours were worked by the same workforce, more of them as overtime.
+Each employee has a register in every pay period, so `COUNT(*)` counts well over a thousand registers a year, while `COUNT(DISTINCT pr.EmployeeID)` counts the people. The manufacturing payroll paid the same number of people in each year, so the extra hours did not come from a larger workforce, and more of them were paid as overtime.
 
 **Step 4. Profile the two tables before comparing them.** A ratio compares like with like only if its two sides cover the same period. A profile of each table, with the tests of @tbl-10-03, shows what it holds and which days it covers.
 
@@ -100,7 +100,7 @@ b. Type and run the query below.
 
 c. Compare the first and last dates of the two tables.
 
-About three-quarters of the labor time entries carry a work order operation. The rest are the indirect and non-manufacturing time of the section on measuring the plant, which Step 7 tests. Both tables begin in January 2024, and the completions run to the last day of fiscal 2026, but the time records end on 11 December 2026. Hours counted to the end of the year would miss the last three weeks of December, while the output would not, and the ratio of the two would look better than it is. This is the timeliness test of @tbl-02-03: the date range of each extract, and a partial last period.
+About three-quarters of the labor time entries carry a work order operation. The rest are the indirect and non-manufacturing time of the section on measuring the plant, which Step 7 tests. Both tables begin in January 2024, and the completions run to the last day of fiscal 2026, but the time records end on 11 December 2026. Hours counted to the end of the year would miss the last three weeks of December, while the output would not, and the ratio of the two would look better than it is. The kinds of time do not all end together, either: Exercise 10.5 profiles them by LaborType and finds that indirect time ends a week earlier, on 4 December 2026, so its 2026 ratio covers a little less of the year than the output it is compared with. This is the timeliness test of @tbl-02-03: the date range of each extract, and a partial last period.
 
 **Step 5. Find why the time records end early.** The pay periods show which time has been processed.
 
@@ -151,7 +151,7 @@ a. Type and run the query below.
 b. Read the HoursPerStandardHour column for Direct Manufacturing across the three years.
 c. Read it for Indirect Manufacturing, and add the two rows of each year.
 
-The result, shown in @fig-10-09, has two rows for each year. Both derived tables return the year as text, so the join compares text with text. Counting the output only to the last day with time records changes only fiscal 2026, the one year whose time records stop early. The direct labor recorded against work order operations stayed below the standard hours in every year, although it moved closer to them. Indirect time, which no work order carries, grew from about a third of the standard hours to more than half. Together, by fiscal 2026 the plant recorded about half as many hours again as the standard hours of its output, and most of the growth was indirect.
+The result, shown in @fig-10-09, has two rows for each year. Both derived tables return the year as text, so the join compares text with text. Counting the output only to the last day with time records changes only fiscal 2026, the one year whose time records stop early. The Direct Manufacturing hours recorded stayed below the standard hours in every year, although they moved closer to them; a few dozen of those hours carry no valid operation, as Step 7 shows. Indirect time, which no work order carries, grew from about a third of the standard hours to more than half. The two rows of a year share the same standard hours, so their sum is the plant's total hours per standard hour. Together, by fiscal 2026 the plant recorded about half as many hours again as the standard hours of its output, and most of the growth was indirect.
 
 ![Hours per Standard Hour by Labor Type and Year.](/visuals/svg/fig-10-09-hours-per-standard-hour.svg){#fig-10-09 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter10.sql, is scrolled to a comment and a query that joins two derived tables on the year: one with the hours of labor time by year and labor type, without NonManufacturing time, and one with the standard labor hours of the units completed. The result has six rows, Direct Manufacturing and Indirect Manufacturing for 2024, 2025, and 2026. The HoursPerStandardHour column, outlined, stays below one for direct labor in every year and rises for indirect labor."}
 
@@ -202,4 +202,4 @@ The script now holds every query of the chapter under a comment that says what i
 - a few direct labor entries have no valid operation;
 - Chapter10.sql is saved with a completed header and a comment above each query.
 
-The answer to the volume question is mostly no. The plant produced about as much as before, and its direct labor stayed within the standards, but it recorded many more hours of indirect time and paid for more overtime. Indirect labor is overhead, so the extra hours reached the variance through its overhead part, which is where Tutorial 10.2 found it growing.
+The answer to the volume question is mostly no. The plant produced about as much as before, and its direct labor stayed within the standards, but it recorded many more hours of indirect time and paid for more overtime. Indirect labor is overhead, so the extra hours are consistent with the growth that Tutorial 10.2 found in the variance's overhead part, although these queries do not measure how much of that growth each cause explains.

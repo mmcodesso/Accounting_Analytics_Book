@@ -220,10 +220,12 @@ def ex6(d, claim):
               for r in pending),
           "the Pending requests' sales order lines were invoiced at the pending ApprovedUnitPrice under a price-list "
           "PricingMethod")
+    # requirement (5) asks for the range on the Approved requests: a Pending request's price is not approved
+    low, high = min(r[6] for r in approved), max(r[6] for r in approved)
     return dict(requests=len(rows), approved=len(approved), pending=len(pending), pending_word=WORDS[len(pending)],
                 approver=dict(id=approver, name=name, title=title),
                 by_requester=[(e, sum(1 for r in rows if r[2] == e)) for e in requesters],
                 self_approved=self_approved, own=len(own), own_other=len(own_other),
                 all_pending_own=len(own_other) == len(pending), pending_requesters=and_join(pending_requesters),
-                ids=and_join(r[0] for r in pending), lines=[r[1] for r in pending],
-                low=min(r[6] for r in rows), high=max(r[6] for r in rows))
+                ids=and_join(r[0] for r in pending), lines=[r[1] for r in pending], low=low, high=high,
+                pending_inside=all(low <= r[6] <= high for r in pending))

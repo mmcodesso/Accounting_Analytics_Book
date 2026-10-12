@@ -2,7 +2,7 @@
 
 ## Key Terms
 
-**Calculated column.** A column of an Excel Table whose formula Excel applies to every row automatically, including rows added later. In a SQL query, a calculated column is an expression in the SELECT list, such as `Debit - Credit AS Net`, calculated for each row when the query runs and not stored in the table.
+**Calculated column.** A column of an Excel Table whose formula Excel applies by default to every row, including rows added later. In a SQL query, a calculated column is an expression in the SELECT list, such as `Debit - Credit AS Net`, calculated for each row when the query runs and not stored in the table.
 
 **Clause.** A part of a SQL statement that begins with a keyword and performs one task, such as SELECT, FROM, WHERE, ORDER BY, or LIMIT. The clauses of a query must be written in a fixed order.
 
@@ -18,7 +18,7 @@
 
 **Manufacturing variance.** The difference between what production actually cost and the standard cost of the items made. Charles River records it in account 5080 when a work order closes, in a material part and a conversion part, and reports it with cost of goods sold.
 
-**NULL.** The marker SQL uses for a missing value: a value that is unknown or does not exist. NULL is not zero or empty text, no comparison with it is true, and it is found with IS NULL and IS NOT NULL and replaced with COALESCE.
+**NULL.** The marker SQL uses for a missing value: a value that is unknown or does not exist. NULL is not zero or empty text, no ordinary comparison with it, such as `=` or `<`, is true, and it is found with IS NULL and IS NOT NULL and replaced with COALESCE.
 
 **Operator precedence.** The order in which SQL evaluates the operators of an expression. AND is evaluated before OR, so a condition that mixes them needs parentheses to express the intended grouping.
 
@@ -34,11 +34,11 @@
 
 **SQL script.** A plain text file, usually with the extension .sql, that holds one or more SQL statements and their comments. A documented script records what was asked of the database, so that the queries can be reviewed and run again.
 
-**SQLite.** A lightweight relational database system that stores the entire database in a single file. SQLite has no separate date type, so dates are stored as text, and it treats column types as advisory, so queries must compare values of the same kind.
+**SQLite.** A lightweight relational database system that stores the entire database in a single file. SQLite has no separate date type, so the Charles River dates are stored as text, and it treats column types as advisory, so queries must compare values of the same kind.
 
 **Standard cost.** The cost that one unit of an item should require in materials, direct labor, and overhead, at standard prices and rates. A standard cost system values inventory and cost of goods sold at standard cost and records the difference from actual cost as variances.
 
-**Syntax error.** A mistake in the wording of a query, such as a misspelled column or clauses out of order, that stops the query from running. SQLite reports it with a message that names the problem.
+**Syntax error.** A mistake in the wording of a query, such as clauses out of order or a quotation mark left open, that stops the query from running. A misspelled table or column name stops it too, with a message such as no such column. SQLite reports either with a message that names the problem or points near it.
 
 **WHERE clause.** The clause of a query that keeps only the rows meeting a condition, built from comparison operators such as `=` and `>`, from BETWEEN, IN, LIKE, and IS NULL, and from the logical operators AND, OR, and NOT.
 

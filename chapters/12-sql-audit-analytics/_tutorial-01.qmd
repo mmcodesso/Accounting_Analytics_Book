@@ -31,7 +31,7 @@ a. Type and run the test below.
 
 b. Compare the first two columns with the last two.
 
-The number of entries and their total agree with the entries and the debits posted to the ledger, as Tutorial 8.3 found in Excel. Agreement of counts and totals shows that the population is complete with respect to the ledger; the trace of Step 3 then tests the postings one by one.
+The number of entries and their total agree with the entries and the debits posted to the ledger, as Tutorial 8.3 found in Excel. The agreement supports the completeness of the population with respect to the ledger, at the level of counts and totals. As Tutorial 4.1, Step 10 showed, differences that offset would leave the totals equal, and only a comparison of the entries themselves, an anti-join like those of Step 3, would find them.
 
 **Step 2. Reconcile the manufacturing payroll to the ledger.** The payroll registers state what each employee was paid and what the company paid on top, and GLEntry records the cost center of each posting.
 
@@ -67,7 +67,7 @@ a. Type and run the test below.
 
 b. Read the Difference column.
 
-The registers of the manufacturing cost center agree with the ledger's payroll postings to the cent in each year. The ledger side counts the postings to every account, not only account 1090: the manufacturing part of the first payroll of 2024 was posted to the variance account, as Tutorial 11.2 noted, so a comparison with account 1090 alone would differ in that year. Both sides record payroll on its pay date, so the test shows that the registers are complete with respect to the ledger. It cannot show whether wages earned but not yet paid were recorded, the question of Steps 7 and 8.
+The registers of the manufacturing cost center agree with the ledger's payroll postings to the cent in each year. The ledger side counts the postings to every account, not only account 1090: the manufacturing part of the first payroll of 2024 was posted to the variance account, as Tutorial 11.2 noted, so a comparison with account 1090 alone would differ in that year. Both sides record payroll on its pay date, so the agreement shows that the registers and the ledger record the same manufacturing payroll in each year. It cannot show whether wages earned but not yet paid were recorded, the question of Steps 7 and 8.
 
 **Step 3. List the trace exceptions in both directions.** Each test is an anti-join, and UNION ALL stacks their results into one list, labeled by test.
 
@@ -110,11 +110,11 @@ a. Type and run the test below.
 
 b. Read the Test column of each row in the result.
 
-The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. Six ledger rows record payroll payments that do not exist in the PayrollPayment table, three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted.
+The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. The six ledger rows refer to three payroll payments that do not exist in the PayrollPayment table: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted. Each kind of document is traced in one direction only, and no amounts are compared; a full trace would run both directions, and compare the amounts, for every kind of document the ledger records.
 
 ![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
 
-**Step 4. Explain the six postings.** A payroll payment normally carries the same ID as the payroll register it pays, so the missing payments point to their registers. CostCenter appears twice in the test, as ec for the employee's own cost center and as rc for the register's, so that each row can show both.
+**Step 4. Explain the six postings.** In this data, a payroll payment carries the same ID as the payroll register it pays, so the missing payments point to their registers. CostCenter appears twice in the test, as ec for the employee's own cost center and as rc for the register's, so that each row can show both.
 
 a. Type and run the test below.
 
@@ -141,13 +141,13 @@ c. Compare each register's cost center with its employee's.
 
 Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash, but the payment documents are missing. The first register pays the chief executive officer. The other two pay an Account Executive of the Sales cost center, terminated in April 2024, in January 2025 and January 2026, and they are charged to the Executive cost center at the same gross pay as the chief executive's register. A credit to cash does not say who received the money, so the bank records must confirm the payee. Exercise 12.5 follows the employee further.
 
-**Step 5. Test the cutoff of revenue.** Revenue belongs to the fiscal year in which the goods were delivered, so the test compares each invoice's posting date with the delivery date of the shipments it bills, and uses the invoice date as a second check. Read the test from the top: Shipped finds the first shipment date and the last delivery date of the goods each invoice bills, Posted finds the date on which each invoice was posted, Classified gives each invoice a finding with CASE, and the final query counts the exceptions.
+**Step 5. Test the cutoff of revenue.** With control of the goods assumed to pass on delivery, revenue belongs to the fiscal year in which the goods were delivered, so the test compares each invoice's posting date with the delivery date of the shipments it bills, and uses the invoice date as a second check. The joins to the shipments keep only the invoices for goods: the invoices for design services ship nothing, so they are left out here and need a cutoff test of their own. Read the test from the top: Shipped finds the first shipment date and the last delivery date of the goods each invoice bills, Posted finds the date on which each invoice was posted, Classified gives each invoice a finding with CASE, and the final query counts the exceptions.
 
 a. Type and run the test below.
 
    ```sql
    -- Tutorial 12.1, test L5: revenue posted in the year of delivery
-   -- Population: all sales invoices; expected: no rows
+   -- Population: invoices for shipped goods; expected: no rows
    WITH Shipped AS (
        SELECT sil.SalesInvoiceID, MIN(s.ShipmentDate) AS ShipmentDate,
            MAX(s.DeliveryDate) AS DeliveryDate
@@ -190,7 +190,7 @@ a. Type and run the test below.
 
 b. Read the rows of each finding.
 
-The result, shown in @fig-12-03, has two findings. More than twenty invoices for goods delivered in December were invoiced and posted in January, so their revenue was recorded in the next fiscal year, while the cost of the goods was recorded when they shipped. Eight invoices are dated before their shipment, the kind of error that Tutorial 2.1 and Exercise 5.2 found; Exercise 12.1 lists them. The eight were posted in the year of delivery, so they are failures in the dating of invoices, not in the posting of revenue.
+The result, shown in @fig-12-03, has two findings. More than twenty invoices for goods delivered in December were posted in January, so their revenue was recorded in the next fiscal year, while the cost of the goods was recorded when they shipped. Eight invoices are dated before their shipment, the kind of error that Tutorial 2.1 and Exercise 5.2 found, and were posted in the year of delivery, so they are failures in the dating of invoices, not in the posting of revenue. A ninth invoice dated before its shipment was also posted in the next year; the CASE gives each invoice the first finding whose condition it meets, so it counts that invoice only as revenue posted in another year. Exercise 12.1 lists all nine.
 
 ![Revenue Posted Outside the Year of Delivery.](/visuals/svg/fig-12-03-revenue-cutoff.svg){#fig-12-03 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, is scrolled to the part of a test that classifies each sales invoice with CASE: revenue posted in another year than the delivery of its goods, invoice dated before shipment, or in the year of delivery, and counts the exceptions by finding and delivery year. The result has five rows: invoices dated before shipment in each of the three years, and invoices whose revenue was posted in another year for deliveries of 2024 and 2025. The rows of revenue posted in another year are outlined."}
 
@@ -262,15 +262,15 @@ a. Type and run the test below.
 
 b. Read the Balance of each source.
 
-The balance of account 2030 is the opening entry of 2024, and the payroll summaries and payments net to zero, so no entry ever accrued the wages earned but not yet paid at a year-end. Each year's payroll cost follows its pay dates, and the liability at each year-end is understated by a little more than one pay period's payroll, a few hundred thousand dollars. Exercise 12.1 estimates the amounts.
+At the end of fiscal 2026, the balance of account 2030 is the opening entry of 2024: the only journal entry posted to the account is that opening line, and the payroll summaries and payments net to zero. No journal entry accrued the wages earned but not yet paid, and Exercise 12.1 finds the same balance at each earlier year-end. Each year's payroll cost follows its pay dates, and the liability at each year-end is understated by a little more than one pay period's payroll, a few hundred thousand dollars. Exercise 12.1 estimates the amounts.
 
 **Checkpoint.** Check that:
 
 - the journal entries and the manufacturing payroll reconcile to the ledger to the cent;
 - the combined trace returns six postings with no payroll payment and nothing else;
 - the six postings match three approved registers without payments, two of them for a terminated employee, charged to the Executive cost center;
-- the revenue of December deliveries invoiced in January was posted in the next fiscal year, and a few December 2026 shipments were never invoiced;
-- no entry accrues the wages of late December at any year-end;
+- the revenue of December deliveries posted in January fell in the next fiscal year, and a few December 2026 shipments were never invoiced;
+- account 2030 holds only its opening balance, with no accrual of the wages of late December;
 - Audit.sql holds the header and the eight tests of this tutorial, each under its comment.
 
-The ledger is reliable as a whole: its populations reconcile, and nearly every posting traces to a document and back. Its weakness is timing. Revenue and payroll are recorded when they are invoiced and paid, not when they are earned, so each year-end is misstated by the transactions on either side of it, and the wages of each December's last weeks, manufacturing wages among them, are charged to the next year.
+Within the populations tested, the ledger holds up: the journal entries and the manufacturing payroll reconcile to it, and the traces found only the six postings of three missing payments. Its weakness is timing. Revenue and payroll are recorded when they are invoiced and paid, not when they are earned, so each year-end is misstated by the transactions on either side of it, and the wages of each December's last weeks, manufacturing wages among them, are charged to the next year.

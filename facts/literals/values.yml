@@ -122,6 +122,7 @@ everywhere:
   "$688.42": val.trace.line_total
   "688.42": val.trace.line_total
   "6.884200e+02": {key: val.trace.line_total, format: ".6e"}
+  "6.884200000000000e+02": {key: val.trace.line_total, format: ".15e"}
   "68,842": val.trace.line_total_x100
   "$344.21": val.trace.unit_price
   "344.21": val.trace.unit_price
@@ -234,7 +235,7 @@ files:
   chapters/06-descriptive-analytics/_exercises.qmd:
     constants: ["$500,000", "10 percent", "$50,000"]   # thresholds the exercise sets
   chapters/06-descriptive-analytics/_tutorial-01.qmd:
-    constants: ["$1,000", "15,000", "0%", "1,000"]   # the bin width and the last bin of the frequency table
+    constants: ["$1,000", "15,000", "$15,000", "0%", "1,000"]   # the bin width and the last bin of the frequency table
   chapters/06-descriptive-analytics/_tutorial-02.qmd:
     constants: ["100 percent"]               # Services carries no standard cost
   chapters/06-descriptive-analytics/_tutorial-03.qmd:
@@ -271,7 +272,8 @@ files:
     "35 percent": {key: val.promo.breakeven_lift, format: "ceil5 .0 percent"}
   chapters/07-analysis-and-modeling/chapter.qmd:
     constants: ["−1", "+1", "95 percent", "0.05", "$600,000", "40 percent", "$1,500,000", "$2,000,000", "$500,000",
-                "$200,000", "$300,000", "0.40", "$2,250,000"]
+                "$200,000", "$300,000", "0.40", "$2,250,000",
+                "32", "31"]   # the fitted months in C3:C34 and the steps between them (Tutorial 7.1's layout, not the data)
   chapters/08-audit-analytics/_exercises.qmd:
     constants: ["0.5 percent", "2 percent", "5 percent", "15 percent", "40 percent", "$10", "50 percent", "80 percent",
                 "90 percent", "$50", "$4,800", "$5,199.99", "$5,000"]
@@ -288,7 +290,7 @@ files:
     review:
       "2": "the first-digit chart: the columns for 1 and 2 below the line and those for 5 to 9 above it describe the payments' digit shape; check them against the new window"
   chapters/08-audit-analytics/_tutorial-02.qmd:
-    constants: ["-9999", "-1", "50000", "20", "2"]
+    constants: ["-9999", "-1", "50000", "20", "2", "1.2", "123"]   # 1.2 and 123: the decimal and whole number icons
   chapters/08-audit-analytics/_tutorial-03.qmd:
     constants: ["$250,000", "2"]
   chapters/08-audit-analytics/chapter.qmd:
@@ -338,7 +340,7 @@ files:
   chapters/11-analytical-queries/_tutorial-02.qmd:
     "92": val.account_id.1090
   chapters/11-analytical-queries/_tutorial-03.qmd:
-    constants: ["36"]
+    constants: ["36", "25"]
   chapters/11-analytical-queries/chapter.qmd:
     constants: ["0", "10"]
     "92": val.account_id.1090
@@ -355,7 +357,7 @@ files:
     constants: ["1.5", "0.5", "1"]
     "64": val.plant.hourly_employees
   chapters/12-sql-audit-analytics/chapter.qmd:
-    constants: ["0.0001", "14", "1.0"]
+    constants: ["0.0001", "14", "1.0", "999999.99", "1.000000e+06"]   # 999999.99: printf's rounding at six decimals
   cases/part-3-case.qmd:
     "64": val.plant.hourly_employees
     "14": {key: val.open_period.start_day, format: ".0"}
@@ -370,7 +372,7 @@ files:
   chapters/13-power-bi-essentials/_tutorial-03.qmd:
     "80%": {key: val.revenue.growth_first_to_last, format: "~10 .0%"}
   chapters/13-power-bi-essentials/chapter.qmd:
-    constants: ["13", "14", "15", "240", "30%", "11%", "10%", "4.5"]   # chapter numbers in tbl-13-01; Beattie and Jones; the contrast ratio
+    constants: ["13", "14", "15", "240", "30%", "11%", "10%", "5%", "4.5"]   # chapter numbers in tbl-13-01; Beattie and Jones; the contrast ratio
   chapters/14-data-models-and-dax/_exercises.qmd:
     constants: ["-1"]
   chapters/14-data-models-and-dax/_tutorial-02.qmd:
@@ -380,7 +382,7 @@ files:
   chapters/14-data-models-and-dax/chapter.qmd:
     constants: ["13", "14", "15", "16", "100 percent", "10000", "100"]
   chapters/15-management-reports/_exercises.qmd:
-    constants: ["0.2", "0.01", "5", "8", "10", "12", "15 percent", "95 percent"]
+    constants: ["0.2", "0.01", "0.19", "20", "100", "5", "8", "10", "12", "15 percent", "95 percent"]
     "0.12": val.promo.segment_rate
     "12 percent": {key: val.promo.segment_rate, format: ".0 percent"}
     "1.903 percent": {key: val.promo.commission_rate, format: ".3 percent"}
@@ -445,7 +447,8 @@ files:
       "4,600": "see 1,450"
       "700": "see 1,450"
   chapters/19-customer-credits-audit/chapter.qmd:
-    constants: ["5%", "90%", "75%", "95%", "10%", "0%", "59", "29", "45", "22", "1%", "93", "46", "77", "38", "2%", "181", "132", "$5,000", "$10,000"]
+    constants: ["5%", "90%", "75%", "95%", "10%", "0%", "59", "29", "45", "22", "1%", "93", "46", "77", "38", "2%", "181", "132", "$5,000", "$10,000",
+                "100%"]   # the upper deviation limit when every item deviates
 
   # ---- the slide decks (slides/chapter-NN/index.qmd); their figures and tables come from the book ---------
   slides/chapter-01/index.qmd:
@@ -461,9 +464,11 @@ files:
   slides/chapter-09/index.qmd:
     constants: ["1.0", "2.0", "3.5", "1234.567", "-2", "1235.0", "1200"]   # the chapter's examples of SQLite arithmetic and ROUND
   slides/chapter-12/index.qmd:
-    constants: ["1.0"]              # the Benford expectation LOG10(1 + 1.0 / Digit), as the chapter writes it
+    constants: ["1.0", "999,999.99", "1.000000e+06"]   # LOG10(1 + 1.0 / Digit); printf's rounding at six decimals
   slides/chapter-13/index.qmd:
-    constants: ["4.5"]              # the WCAG contrast ratio for ordinary text, 4.5 to 1
+    constants: ["4.5", "5%"]        # the WCAG contrast ratio for ordinary text, 4.5 to 1; Beattie and Jones
+  slides/chapter-19/index.qmd:
+    constants: ["100%"]             # the upper deviation limit when every item deviates
 
   # ---- shared/calculations: the tutorial SQL and calculations that figures and slides share -----------------
   shared/calculations/bi_ch13.py:
@@ -529,7 +534,7 @@ files:
     review:
       "$1,600,000": "the bridge chart's axis minimum (see Tutorial 6.3): check that it still sits below the quarters' margins"
   scripts/figures/ch07.py:
-    constants: ["0.02", "0.045", "95%", "0.05", "10", "15%", "8", "9"]
+    constants: ["0.02", "0.045", "95%", "0.05", "10", "15%", "8", "9", "0.4", "0.5"]   # 0.4-0.5: "almost half" of the slope
     "10.00%": {key: val.promo.furniture_rate, format: ".2%"}
   scripts/figures/ch08.py:
     constants: ["0.7", "0.25", "100.00%", "$1,000", "$2,000", "0.8"]
@@ -644,7 +649,7 @@ files:
       "4600": "see 1450"
       "700": "see 1450"
     constants: ["1.0", "999999", "40%", "50%", "0.025", "75%", "90%", "0.2", "0%", "100%", "10%", "80%", "1.5%", "0.5", "-0.05",
-                "5%", "0.0%"]
+                "5%", "0.0%", "-0.5"]
     "68,912.79": val.plan.standard_hours
     "68,912.7917": {key: val.plan.standard_hours, format: ",.4"}
     "263,191.24": val.plan.salary
@@ -654,7 +659,7 @@ files:
     "0.18": val.plan.indirect_ratio
     "1.18": val.plan.hours_ratio
   scripts/companion/xlbuild/cap19.py:
-    constants: ["5%", "75%", "$0", "$25,000", "95%", "0.05", "0.95", "$5,000", "$10,000", "$14", "3"]
+    constants: ["5%", "75%", "$0", "$25,000", "95%", "0.05", "0.95", "$5,000", "$10,000", "$14", "3", "100%", "0.015"]
   scripts/companion/xlbuild/case2.py:
     constants: ["5%", "-0.02", "1,000", "2"]
     "8 percent": val.promo.collection_rate
@@ -685,7 +690,7 @@ files:
   scripts/companion/pbibuild/cap17.py:
     constants: ["0.05", "5%", "1,000,000", "25,000"]
   scripts/companion/pbibuild/cap18.py:
-    constants: ["0.8", "100%"]
+    constants: ["0.8", "100%", "80%"]
   scripts/companion/pbibuild/cap19.py:
     constants: ["100"]
   scripts/companion/pbibuild/ex13.py:
@@ -695,11 +700,11 @@ files:
   scripts/companion/pbibuild/ex15.py:
     review:
       "2435621.24": "FORECAST: the values the Analytics-pane forecast shows on the canvas (point, lower and upper bound), read through UI Automation in Desktop 2.158; read them again after a roll"
-    constants: ["1.5", "0.2", "0%", "0.21", "20%", "95%", "5 percent"]
+    constants: ["1.5", "0.2", "0.19", "0%", "95%", "5 percent"]
     "12%": val.promo.segment_rate
     "12 percent": val.promo.segment_rate
   scripts/companion/pbibuild/ex16.py:
-    constants: ["$1,000", "30", "2"]
+    constants: ["$1,000", "30", "2", "100%"]
   scripts/companion/pbibuild/project.py:
     constants: ["1.0", "4.2", "4.0", "250"]
   scripts/companion/pbibuild/reports.py:
@@ -707,7 +712,7 @@ files:
   scripts/companion/sqlbuild/cap17.py:
     constants: ["5%", "0.05", "0.5%", "2%", "15%", "40%", "0.005", "0.02", "0.15", "0.40", "1.0", "21%", "30", "60", "90", "31", "61"]
   scripts/companion/sqlbuild/cap18.py:
-    constants: ["0.1", "80%", "99", "1.0"]
+    constants: ["0.1", "80%", "99", "1.0", "5%"]
   scripts/companion/sqlbuild/cap19.py:
     constants: ["30", "5%", "75%", "11"]
   scripts/companion/sqlbuild/case3.py:
@@ -720,7 +725,8 @@ files:
     constants: ["100.0", "12", "1.000", "0.5", "4950", "4999.99", "$5,000", "$50", "$4,700", "$5,250", "$4,950.00", "$4,999.99",
                 "4700", "50", "5250"]
   scripts/companion/sqlbuild/ex12.py:
-    constants: ["1.0", "30", "1,000", "10,000", "50,000", "1000", "10000", "50000", "$50,000", "0.2", "0.3"]
+    constants: ["1.0", "30", "1,000", "10,000", "50,000", "1000", "10000", "50000", "$50,000", "0.2", "0.3",
+                "999,999.99", "1.000000e+06"]
   scripts/companion/sqlbuild/script.py:
     constants: ["9.1"]
 
@@ -771,7 +777,7 @@ files:
       "5000": "see 1450"
       "4600": "see 1450"
       "700": "see 1450"
-    constants: ["80%", "40%", "50%", "5%", "0.02", "10%", "90%", "1.0"]
+    constants: ["80%", "40%", "50%", "5%", "0.02", "10%", "90%", "1.0", "110%"]
     "26.62": val.plan.rate
     "14.14%": val.plan.burden
     "1.18": val.plan.hours_ratio

@@ -100,7 +100,7 @@ c. Do the same for FiscalQuarter.
 d. Select **SalesInvoiceLine**, click the LineTotal header, and on **Column tools** select the thousands separator button and set the decimal places to 2.
 e. Format ListAmount and DiscountAmount in the same way.
 
-FiscalYear and FiscalQuarter now act as categories in every visual, and the three amounts appear as 1,234.56.
+FiscalYear and FiscalQuarter now act as categories in every visual, and the three amounts appear as 1,234.56. The keys keep their default, Sum, for now: this chapter's tutorials only count them, choosing **Count** or **Count (Distinct)** in the visual, and Tutorial 14.1 sets the keys that connect its tables to Don't summarize when it hides them.
 
 **Step 10. Reconcile the model to Chapter 6.** A report is reconciled before anyone reads it.
 

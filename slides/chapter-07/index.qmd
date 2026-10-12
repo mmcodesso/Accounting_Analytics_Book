@@ -49,7 +49,7 @@ The tests are a residual plot that shows where a regression fails, a backtest th
 - One unusual observation can change it, and the conclusion with it
 
 ::: {.notes}
-With the start-up month included, monthly revenue seems to move with the number of customers invoiced; without it, revenue moves more with the average size of a line, as Tutorial 7.1 shows. Look at the data before reading any coefficient. The ToolPak is an add-in you enable under File, Options, Add-ins.
+With the start-up month included, monthly revenue seems to move with the number of customers invoiced; without it, revenue moves more with the average size of a line, as Tutorial 7.1 shows. Look at the data before reading any coefficient. The ToolPak is an add-in you enable under File, Options, Add-ins, or under Tools, Excel Add-ins on a Mac.
 :::
 
 ## Regression fits a least-squares line
@@ -71,12 +71,12 @@ Datar and Rajan treat regression as one of the quantitative methods for estimati
 R Square is the share of the variation the line explains, and Significance F the chance of a fit this good if there were no relationship. The slope's p-value below the conventional five percent threshold marks it as statistically significant, and with one x variable it equals Significance F.
 :::
 
-## One start-up month makes a trend
+## One start-up month makes a trend look significant
 
 {{< book-figure fig-07-01 >}}
 
 ::: {.notes}
-Fitted to all the months, the line slopes upward and its slope is significant, but almost all of that comes from the start-up month, when the company issued about half its usual invoices. Without that month, the line is nearly flat and its slope is no longer significant.
+Fitted to all the months, the line slopes upward and its slope is significant, but almost half of that slope comes from the start-up month, when the company issued about half its usual invoices. Without that month, the line rises about half as steeply and its slope is no longer significant, which is not proof that there is no trend, only that the data give no reliable evidence of one.
 :::
 
 ## Watch out: a significant slope does not prove a trend {.watch-out}
@@ -84,7 +84,7 @@ Fitted to all the months, the line slopes upward and its slope is significant, b
 - One unusual point at an end can tilt a line enough to make its slope significant
 - Data sets with identical lines and fit statistics can look nothing alike (Anscombe)
 - Plot the data and the residuals before you report a regression
-- Investigate a point that stands apart; report with and without it if it stays
+- Investigate a point that stands apart; report with and without it, and why
 
 ::: {.notes}
 A residual plot should look like a patternless band around zero. A single point far from the rest, or a curve, means the line describes the data poorly.
@@ -108,7 +108,7 @@ Add Trendline draws the same line on a chart and can show its equation and R Squ
 {{< book-table tbl-07-01 >}}
 
 ::: {.notes}
-Hyndman and Athanasopoulos recommend comparing every method with these four, because a method that cannot beat them is not worth using. Each is a single Excel formula.
+Hyndman and Athanasopoulos recommend comparing every method with the four benchmarks, because a method that cannot beat them is not worth using. Each is a single Excel formula. The last row, the linear trend, is a regression rather than a benchmark: it is the method Tutorial 7.1 tests against them. Drift draws its line through the first and last values only; the trend fits it to all of them.
 :::
 
 ## A backtest forecasts a period with a known answer
@@ -143,7 +143,7 @@ Ask students what they would do next in each case, not only what it means.
 4. The method to use, with its error as a range
 
 ::: {.notes}
-The second and third belong together: Charles River's significant trend came from the start-up month alone.
+The second and third belong together: Charles River's trend was significant only with the start-up month in the data.
 :::
 
 # Guided Tutorial 7.1: Forecasting Revenue and Testing the Forecast
@@ -153,7 +153,7 @@ The second and third belong together: Charles River's significant trend came fro
 {{< book-steps 7.1 >}}
 
 ::: {.notes}
-Students build the monthly revenue series and prove it complete, measure what moves with revenue, fit the trend with and without the start-up month, and backtest three forecasts of the year's last quarter before forecasting the next one.
+Students build the monthly revenue series and check it against the InvoiceLines total, measure what moves with revenue, fit the trend with and without the start-up month, and backtest three forecasts of the year's last quarter before forecasting the next one.
 :::
 
 ## The mean beat the trend in the backtest
@@ -169,7 +169,7 @@ The trend overshoots the quarter by several percent, while the mean of the earli
 {{< book-checkpoint 7.1 lead="true" >}}
 
 ::: {.notes}
-The controller now has a forecast she can defend. It is not the most sophisticated method you could build, but it performed best on the most recent quarter with an answer, and its range tells her how much to rely on it.
+The controller now has a forecast she can defend. It is not the most sophisticated method you could build, but it performed best on the most recent quarter with an answer, and its range shows how far the forecast would move with an error as large as the backtest's. The range is not a confidence interval.
 :::
 
 # Budgets, Flexible Budgets, and Variances
@@ -220,7 +220,7 @@ Both Charles River's budget and its results value units at standard cost, so for
 - Test a driver directly, such as actual burden over actual salaries
 
 ::: {.notes}
-Comparing each expense with the right benchmark is the point. Tutorial 7.2 finds that the two largest expense variances come from a burden rate set too high and a commission budget that was never flexed.
+Comparing each expense with the right benchmark is the point. Tutorial 7.2 finds that the two largest expense variances come from a budgeted burden rate above the actual rate and a commission budget that was never flexed.
 :::
 
 ## Check your understanding {.check}
@@ -233,15 +233,15 @@ What does each finding mean?
 4. Actual payroll burden is a lower rate than budgeted
 
 ::: {.notes}
-Ask students who would answer for each finding, using the last column of the variance table.
+Ask students whom they would ask about each finding first, using the last column of the variance table.
 :::
 
 ## Each finding has its meaning {.answer}
 
-1. A sales-volume variance that measures the forecast, not the business
+1. A sales-volume variance that reflects the forecast more than the business
 2. A flexible-budget variance, here entirely a price variance
 3. Mostly volume: compare it with the flexed commission instead
-4. A rate assumption, not a saving in spending
+4. A rate difference to explain before calling it a saving
 
 ::: {.notes}
 Only the second is something pricing managers can act on; the others are about how the budget was built.
@@ -387,7 +387,7 @@ The difference is zero when the promotion ends and negative in every other scena
 {{< book-table tbl-07-05 columns="Assumption,Value used,Sensitivity" >}}
 
 ::: {.notes}
-The book's table also records the basis of each assumption, such as the promotion's discount in the PromotionProgram Table and the commission rate over all revenue. The break-even lift is almost a third, and the order data shows no lift at all, so the lift decides the recommendation.
+The book's table also records the basis of each assumption, such as the promotion's discount in the PromotionProgram Table and the commission rate over all revenue. The break-even lift is almost a third, and the invoiced orders show no increase near that, so the lift decides the recommendation. The orders describe what happened; they cannot show what the promotion caused, which is why zero lift stays an assumption.
 :::
 
 ## Checkpoint
@@ -395,7 +395,7 @@ The book's table also records the basis of each assumption, such as the promotio
 {{< book-checkpoint 7.3 lead="true" >}}
 
 ::: {.notes}
-Repeated as it ran, the promotion would cost margin unless it lifted volume by roughly a third, and the orders show no lift. A smaller discount, or one limited to the items and customers most likely to respond, has a far lower bar to clear, and the model shows how low.
+If the same orders would otherwise have been placed at the usual prices, the promotion, repeated as it ran, would cost margin unless it lifted volume by roughly a third, and the orders show no increase near that. A smaller discount, or one limited to the items and customers most likely to respond, has a far lower bar to clear, and the model shows how low.
 :::
 
 # Communicating Forecasts and Models
@@ -403,7 +403,7 @@ Repeated as it ran, the promotion would cost margin unless it lifted volume by r
 ## Give the range, the meaning and the key assumption
 
 - Give a forecast as a range, with its method and the period it was fitted to
-- Say which variances are meaningful: the volume variance measures the forecast
+- Say which variances are meaningful: the volume variance reflects the forecast
 - State the assumption that matters most, and how far it would have to move
 - Record when each assumption was last reviewed, and revisit it
 
@@ -417,7 +417,7 @@ A forecast presented as a single number invites more confidence than it deserves
 
 - Forecast: the mean beat the trend, so next quarter is stated as a range
 - Budget: the volume assumption failed; flexed, prices were slightly optimistic
-- Promotion: as it ran, it needed a third more volume, and saw none
+- Promotion: as it ran, it needed a third more volume; orders showed no such rise
 - Next, Chapter 8 looks at the Charles River data through the auditor's eyes
 
 ::: {.notes}

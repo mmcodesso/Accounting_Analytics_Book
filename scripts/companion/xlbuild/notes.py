@@ -109,7 +109,8 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
         line(f"{check_prefix} {t}".strip() + f": {c.label}", c.expected, c.actual, "check",
              style=f"check:{c.tolerance}:{c.number_format}")
     last = len(rows)
-    line("All checks agree", "", "", f"=AND(D{first}:D{last})", style="bold")
+    # every row must hold TRUE: AND would ignore a check whose cell had been cleared or held text
+    line("All checks agree", "", "", f"=COUNTIF(D{first}:D{last},TRUE)=ROWS(D{first}:D{last})", style="bold")
     line()
     line(meaning_heading, style="head")
     for sec in sections:

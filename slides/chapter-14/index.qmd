@@ -147,11 +147,11 @@ The ledger runs into the year after the latest, so the table covers four full ye
 
 - Write the date table as 'Date' and the item table as 'Item'
 - An unquoted reserved name fails with a syntax error
-- One broken measure can stop every measure from showing a value
+- Every visual that uses the broken measure shows an error
 - The suggestion list adds the quotes for you
 
 ::: {.notes}
-Power BI compiles the measures of a model together, which is why one error can blank every visual. Choosing a name from the suggestion list as you type avoids the problem.
+A measure with a syntax error shows an error in every visual that uses it, and in every measure built on it. Choosing a name from the suggestion list as you type avoids the problem.
 :::
 
 # Guided Tutorial 14.1: Building the Sales Star and the Date Table
@@ -177,7 +177,7 @@ CALENDAR supplies the Date column, and each pair in ADDCOLUMNS adds one column: 
 {{< book-checkpoint 14.1 lead="true" >}}
 
 ::: {.notes}
-A model is restructured safely only when the totals it reports are the same before and after. The Validation page proves that no invoice line was lost or moved to another year.
+A model is restructured safely only when the totals it reports are the same before and after. With the merge matching every line to its invoice, the unchanged Validation page is good evidence that no invoice line was lost or moved to another year, though equal totals alone could hide changes that offset.
 :::
 
 # Measures and Calculated Columns
@@ -425,7 +425,7 @@ Each function takes the date column of the marked date table and shifts or exten
 - So filter a prior-year visual to the years with data
 
 ::: {.notes}
-Without that filter, the reader sees a row for the year after the latest with a prior year and no current year. These functions are the model-level counterpart of Chapter 11's window functions. Power BI's newer calendar-based time intelligence, for fiscal calendars that do not follow the calendar year, was still a preview feature, so the book uses the classic functions, which suit Charles River's calendar year.
+Without that filter, the reader sees a row for the year after the latest with a prior year and no current year. These functions are the model-level counterpart of Chapter 11's window functions. Power BI's newer calendar-based time intelligence, which adds week-based calculations and calendars such as a retail 4-4-5 calendar, was still a preview feature, so the book uses the classic functions, which follow any calendar of whole months, including Charles River's calendar year.
 :::
 
 ## Check your understanding {.check}
@@ -536,7 +536,7 @@ As in Part II, the ledger is opened with Transform Data, never Load, so it is sh
 {{< book-figure fig-14-10 crop="0.0139,0.2088,0.8853,0.5386" >}}
 
 ::: {.notes}
-On the report page, a card above the matrix, filtered to the latest year, shows the same net income as the matrix's total for that year. Grouping P&L Amount by AccountType and AccountSubType reproduces Chapter 6's income statement, now monthly and interactive. Each year's total equals the amount its closing entry transferred to retained earnings The card is filtered with a visual filter, not a slicer, which would filter the matrix too.
+On the report page, a card above the matrix, filtered to the latest year, shows the same net income as the matrix's total for that year. Grouping P&L Amount by AccountType and AccountSubType reproduces Chapter 6's income statement, now interactive, and by month with YearMonth in place of Year. Each year's total equals the amount its closing entry transferred to retained earnings. The card is filtered with a visual filter, not a slicer, which would filter the matrix too.
 :::
 
 ## Expense spikes in the months with three pay dates
@@ -544,7 +544,7 @@ On the report page, a card above the matrix, filtered to the latest year, shows 
 {{< book-figure fig-14-11 crop="0,0,1,0.8453" >}}
 
 ::: {.notes}
-Expected Operating Expense averages the three months before each month with DATESBETWEEN, guarded by HASONEVALUE so it is blank unless the context is one month. The expectation excludes the month itself, so a spike cannot raise its own expectation. Apart from the second month, whose expectation rests on the start-up month alone, the months well above it are the six with three pay dates, which Chapter 11 traced to payroll recorded when paid. Power BI recalculates the measure on every refresh, which turns a one-time check into a monitoring tool.
+Expected Operating Expense averages the three months before each month with DATESBETWEEN, guarded by HASONEVALUE so it is blank unless the context is one month. The expectation excludes the month itself, so a spike cannot raise its own expectation. Apart from the second month, whose expectation rests on the start-up month alone, the months well above it are the six with three pay dates, which Chapter 11 traced to payroll recorded when paid. After every refresh the measure is evaluated against the new data, which turns a one-time check into a monitoring tool.
 :::
 
 ## Checkpoint
@@ -577,7 +577,7 @@ Most of this was descriptive analytics, but the comparisons it makes possible, a
 - Closes excluded, signs reversed, and every measure tested
 
 ::: {.notes}
-Every number the managers asked for is now in the model, and the controller's monthly income statement ties to the ledger.
+Every number the managers asked for is now in the model, and the controller's income statement ties to the ledger by year and reads by month.
 :::
 
 ## Key terms

@@ -251,11 +251,12 @@ def slicer(name: str, x, y, w, h, f: dict, selected: list = (), style: str = "li
 
 
 def card(name: str, x, y, w, h, fields: list, units_none: bool = False, title: str | None = None,
-         filters: list | None = None) -> Visual:
+         filters: list | None = None, alt_text: str | None = None) -> Visual:
     """The card visual, one card for each value; Callout values > Display units None shows whole amounts."""
     objects = ({"value": [{"properties": {"labelDisplayUnits": lit(1)}, "selector": {"id": "default"}}]}
                if units_none else None)
-    return Visual(name, "cardVisual", x, y, w, h, {"Data": fields}, title=title, objects=objects, filters=filters)
+    return Visual(name, "cardVisual", x, y, w, h, {"Data": fields}, title=title, objects=objects, filters=filters,
+                  alt_text=alt_text)
 
 
 def value_axis(**props) -> dict:
@@ -588,6 +589,57 @@ DESCRIPTIONS = {
 }
 
 
+# Tutorial 15.3, Step 12c: a description on every measure that Tutorial 14.2 did not describe, and on the measures of
+# Tutorials 14.3 to 15.3, so that the About page's "every measure has a description" is true.
+DESCRIPTIONS_15 = {
+    "GL Amount": "Debits less credits on the ledger postings, without the year-end closing entries.",
+    "P&L Amount": "GL Amount with its sign reversed, so that revenue is positive and expenses negative, as on an income "
+                  "statement.",
+    "Net Income": "P&L Amount of the revenue and expense accounts: net income for the period, without the closing "
+                  "entries.",
+    "Operating Expense": "GL Amount of the accounts whose AccountSubType is Operating Expense.",
+    "Expected Operating Expense": "The average monthly operating expense of the three months before, for one month at a "
+                                  "time; blank for a total or where no earlier month exists.",
+    "Operating Expense Deviation": "Operating expense less its expectation, as a share of the expectation.",
+    "Gross to Net": "The waterfall's steps: the list amount, the reduction by price lists and overrides, and the "
+                    "reduction by promotions (revenue less the price before discount); revenue for the total.",
+    "Budget": "The sum of BudgetAmount on the budget lines, dated the first day of their month: read by month or above.",
+    "Actual": "GL Amount, as recorded in the ledger without the closing entries; for an expense, the amount spent.",
+    "Variance": "Actual less budget: for an expense, a positive variance is spending above the budget (unfavorable).",
+    "Variance %": "Variance as a share of the budget.",
+    "Flexed Budget": "The budget with the commission budget replaced by the budget's commission rate times actual "
+                     "product revenue, design services left out.",
+    "Variance to Flexed": "Actual less the flexed budget.",
+    "Volume Effect": "Flexed budget less budget: the part of the variance that the commission budget's sales volume "
+                     "explains.",
+    "Classification Effect": "Actual less budget on depreciation, budgeted in one cost center and recorded partly in "
+                             "another; it totals zero across the cost centers.",
+    "Remaining Variance": "The variance less the volume and classification effects: what remains to be explained.",
+    "Remaining %": "Remaining variance as a share of the flexed budget.",
+    "Manufacturing Hours": "Regular and overtime hours of direct and indirect manufacturing time; non-manufacturing time "
+                           "is left out.",
+    "Direct Hours": "Manufacturing hours of direct manufacturing time.",
+    "Indirect Hours": "Manufacturing hours of indirect manufacturing time.",
+    "Overtime Hours": "Overtime hours of direct and indirect manufacturing time.",
+    "Standard Hours": "The labor hours the standards allow for the units completed: quantity completed times the item's "
+                      "standard hours per unit.",
+    "Standard Hours to Cut-off": "Standard hours of the output completed up to the last day with time records, so that "
+                                 "hours and output cover the same days.",
+    "Hours per Standard Hour": "Manufacturing hours divided by standard hours to the cut-off.",
+    "Hours per Standard Hour TTM": "Hours per standard hour over the twelve months ending with the current month, blank "
+                                   "until twelve months exist; for the whole plant, because work centers and job titles "
+                                   "do not filter the output.",
+    "Hours per Standard Hour 2024": "Hours per standard hour of the first year of the data, whatever the date filter: "
+                                    "the comparison for the trailing figure.",
+    "Overtime Share": "Overtime hours as a share of manufacturing hours.",
+}
+# The appendix's Guided Tutorial B.1, Step 9: its two measures, described like the others.
+DESCRIPTIONS_B = {
+    "Cost Centers Shown": "The cost centers that the reader's view includes, to check what a role shows.",
+    "Who Am I": "The sign-in name that the security rules compare (USERPRINCIPALNAME).",
+}
+
+
 def t14_2(b: Build) -> None:
     m, y, path = b.model, b.year, CH14 / "_tutorial-02.qmd"
     ctx = ch14.t2(b.data, claim)
@@ -789,6 +841,8 @@ def t15_1(b: Build) -> None:
     m.relate("SalesInvoiceLine.PromotionID", "PromotionProgram.PromotionID")
     hide(m.tables["SalesInvoiceLine"], "PromotionID")
     hide(programs, "PromotionID")
+    rate = programs.column("DiscountPct")                   # Step 2d: a rate, as a percentage, never summed
+    rate.fmt, rate.summarize = "0%", "none"
     # Step 3: the Steps table the reader types (its rows read from the text), Step sorted by Order
     text = path.read_text(encoding="utf-8")
     typed = re.findall(r"`([^`]+)` and `(\d+)`", text[text.index("Type three rows"):].split("\n")[0])
@@ -818,7 +872,7 @@ def t15_1(b: Build) -> None:
     detail = b.report.add(Page("promotionDetail", "Promotion Detail"))
     drillthrough(detail, name)
     detail.add(Visual("promotionTable", "tableEx", 20, TOP, 1240, 300, {"Values": [
-        name, col("PromotionProgram", "ScopeType"), agg("PromotionProgram", "DiscountPct"),
+        name, col("PromotionProgram", "ScopeType"), col("PromotionProgram", "DiscountPct"),
         col("PromotionProgram", "EffectiveStartDate"), col("PromotionProgram", "EffectiveEndDate")]}))
     detail.add(Visual("promotionMonths", "clusteredColumnChart", 20, 370, 900, 340,
                       {"Category": [col("Date", "YearMonth")], "Y": [M("Discounts")]}))
@@ -1024,10 +1078,16 @@ def t15_3(b: Build) -> None:
     page.add(Visual("overtimeShare", "clusteredColumnChart", 20, 436, 1240, 274, {
         "Category": [col("Employee", "JobTitle")], "Series": [year], "Y": [M("Overtime Share")]},
         filters=[keep("overtimeShareYears", year, years), keep("overtimeShareTitles", col("Employee", "JobTitle"), titles)]))
+    # Step 11c: WorkCenter and Employee filter the labor time and not the completions, so the two charts do not filter
+    # the card or the trailing line (Edit interactions, None)
+    page.extra = {"visualInteractions": [{"source": s, "target": t_, "type": "NoFilter"}
+                                         for s in ("directByCenter", "overtimeShare") for t_ in ("plantCards", "ttmLine")]}
     page.expect = ["Hours per Standard Hour TTM", f"{ctx['card']:.2f}", f"{ctx['first']:.2f}",
                    center_name(ctx["centers"][0][0]), titles[0]]
     # Step 12: the About page with a page navigator, first; the detail pages hidden; a navigator on every visible page
     about = b.report.add(Page("about", "About"), before="salesDiscounts")
+    for ms_ in m.tables[MEASURES_TABLE].measures:                     # Step 12c: every measure described
+        ms_.description = ms_.description or DESCRIPTIONS_15[ms_.name]
     last = ctx["last"]
     about.add(textbox("aboutText", 20, TOP, 1240, 300, [
         ("Charles River Reports", True),
@@ -1036,8 +1096,8 @@ def t15_3(b: Build) -> None:
         "Readers: the sales manager (Promotions), the department managers (Budget), and the production manager (Plant).",
         "Source: CharlesRiver.xlsx, refreshed through Power Query. Period: fiscal years "
         f"{years[0]} to {y}; the time records end on {last}, because the last pay periods are still open.",
-        f"Definitions: every KPI is a measure of the {MEASURES_TABLE} table, with its description; the trailing hours per "
-        "standard hour is Hours per Standard Hour TTM.",
+        f"Definitions: every measure of the {MEASURES_TABLE} table has a description; point at it in the Data pane. The "
+        "trailing hours per standard hour, for the whole plant, is Hours per Standard Hour TTM.",
         "Checks: the Validation page reconciles the model to the control totals, and the Tests tab in DAX query view "
         "tests the measures."], size=12))
     for p_ in b.report.pages:
@@ -1138,8 +1198,8 @@ def ta_1(b: Build) -> None:
     employee = m.tables["Employee"]
     rechoose(employee.query, ["CostCenterID"], b.xlsx, "Employee")
     sync(employee)
-    # Step 3: the security table the reader types (tbl-a-02 without its Cost center column), hidden
-    rows_ = md_table(path, "tbl-a-02")
+    # Step 3: the security table the reader types (tbl-b-02 without its Cost center column), hidden
+    rows_ = md_table(path, "tbl-b-02")
     security = m.add(entered("Security", [("UserPrincipalName", "string"), ("CostCenterID", "int64")],
                              [[u, c] for u, c, _ in rows_], hidden=True))
     for c in security.columns:
@@ -1151,7 +1211,8 @@ def ta_1(b: Build) -> None:
                                               "Security": rule_security}),
                 Role("Finance")]
     # Step 9: the two measures and their cards
-    m.tables[MEASURES_TABLE].measures += text_measures(path, {"Cost Centers Shown": None, "Who Am I": None})
+    m.tables[MEASURES_TABLE].measures += text_measures(path, {"Cost Centers Shown": None, "Who Am I": None},
+                                                       DESCRIPTIONS_B)
     M = lambda n: meas(MEASURES_TABLE, n)
     shown = "Cost centers shown"
     b.report.page("budget").add(card("costCentersShown", 20, 216, 200, 140, [M("Cost Centers Shown")], title=shown))

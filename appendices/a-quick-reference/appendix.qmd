@@ -31,10 +31,11 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 | `LEN(text)` | The number of characters | 5 |
 | `FIND(find, text)` | The position of one text inside another | 5 |
 | `TRIM(text)` | The text without leading, trailing, or repeated spaces | 5 |
-| `CLEAN(text)` | The text without non-printing characters | 5 |
+| `CLEAN(text)` | The text without the basic non-printing control characters | 5 |
 | `SUBSTITUTE(text, old, new)` | The text with one string replaced by another | 5 |
 | `CHAR(n)` | The character with code n; `CHAR(160)` is the non-breaking space, which TRIM leaves in place | 5 |
 | `UPPER`, `LOWER`, `PROPER` | The text in capitals, in lower case, or with each word capitalized | 5 |
+| `EXACT(text1, text2)` | TRUE if two texts are identical, including their case, which `=` ignores | 5 |
 | `VALUE(text)` | The number that a text value represents | 5 |
 | `TEXT(value, format)` | A number or date as text, in a format such as scientific notation | 8 |
 
@@ -122,8 +123,9 @@ Power Query is the same editor in Excel, where Part II uses it, and in Power BI,
 | Replace Values | Replaces one value with another in a column | 8 |
 | Append Queries | Stacks the rows of two or more queries that have the same columns | 16 |
 | Unpivot Only Selected Columns | Turns the chosen columns into rows of attribute and value | 16 |
-| Enable Load | Cleared for a query that only feeds other queries | 6, 13 |
-| Close & Load, Close & Apply | Loads the queries into Excel worksheets, or into the Power BI model | 4, 13 |
+| Only Create Connection | In Excel, the Load To choice for a query that only feeds other queries (Close & Load To, or right-click the query under Data > Queries & Connections) | 6, 7, 8 |
+| Enable load | In Power BI, cleared for a query that only feeds other queries | 13 |
+| Close & Load, Close & Load To, Close & Apply | Loads the queries into Excel, where Close & Load To chooses a Table, a connection only, or the Data Model, or into the Power BI model | 4, 6, 13 |
 | Refresh All, Refresh | Runs every query again against its source | 4, 13 |
 | Column quality, distribution, profile | Profile each column, on the first rows only unless profiling is set to the entire data set | 13 |
 

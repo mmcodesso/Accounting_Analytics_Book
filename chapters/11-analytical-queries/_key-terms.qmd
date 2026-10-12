@@ -10,9 +10,9 @@
 
 **Date function.** A function that reads, formats, or moves a date. In SQLite, strftime formats a date into parts such as a year or a month, date moves a date with modifiers applied in order, and julianday converts a date to a number of days.
 
-**Frame.** The part of a window partition that a window function's calculation uses for each row, such as `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`, the current row and the eleven before it. A ROWS frame counts rows, not periods. Without a frame clause, an ordered window runs from the first row of the partition through the current row and the rows tied with it.
+**Frame.** The part of a window partition that an aggregate window function's calculation uses for each row, such as `ROWS BETWEEN 11 PRECEDING AND CURRENT ROW`, the current row and the eleven before it. A ROWS frame counts rows, not periods. Without a frame clause, an ordered window runs from the first row of the partition through the current row and the rows tied with it. LAG, LEAD, and the ranking functions ignore the frame.
 
-**LAG and LEAD.** Window functions that return a value from an earlier or a later row of the partition. Over rows ordered by month, with one row for every month, `LAG(x, 12)` returns x for the same month of the previous year; partitioned by the month and ordered by the year, `LAG(x)` does so whatever months are missing.
+**LAG and LEAD.** Window functions that return a value from an earlier or a later row of the partition. Over rows ordered by month, with one row for every month, `LAG(x, 12)` returns x for the same month of the previous year; partitioned by the month and ordered by the year, `LAG(x)` returns the same month of the latest earlier year that has one, which is the previous year when no year is missing.
 
 **Named window.** A window defined once in a WINDOW clause, as in `WINDOW w AS (ORDER BY Month ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)`, and used by several window functions with `OVER w`.
 

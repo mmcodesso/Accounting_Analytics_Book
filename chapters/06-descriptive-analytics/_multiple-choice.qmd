@@ -100,7 +100,7 @@ D.  The year-end closing entry, which debits every revenue account, is included.
 **12.** An analyst builds a trial balance at December 31, 2026, from GLEntry and leaves out the two 2026 closing entries. Why are they left out?
 
 A.  The closing entries do not balance, so the trial balance would not balance.
-B.  The closing entries zero the revenue and expense accounts, so the income statement could not be prepared.
+B.  The closing entries zero the revenue and expense accounts, so the income statement could not be prepared from the balances.
 C.  The closing entries are posted in fiscal 2027, after the cutoff.
 D.  The closing entries hold the opening balances of the balance sheet accounts.
 
@@ -113,7 +113,7 @@ D.  The cost effect is always combined with the volume effect in a bridge.
 
 **14.** From the third quarter to the fourth, the Furniture margin at standard cost falls, while the margin before promotional discounts rises slightly. What can you conclude?
 
-A.  The decline comes from the promotional discounts, not from list prices, mix, or costs.
+A.  The larger discounts more than offset the other effects, which on balance raised the margin.
 B.  The decline comes from higher standard costs of the Furniture items in the fourth quarter.
 C.  The decline comes from a fall in the number of Furniture units sold in the fourth quarter.
 D.  The two margins are calculated inconsistently, so no conclusion is possible.

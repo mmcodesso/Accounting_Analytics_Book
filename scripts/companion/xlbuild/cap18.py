@@ -17,7 +17,9 @@ Three outputs cannot be produced live, and each is labeled in a cell note: the G
 target prices, left in their changing cells as Goal Seek leaves them, each beside its closed form), and Solver's optimum
 and Sensitivity reports for the optional growth test of Requirement 7 (computed by the bounded-variable simplex of
 ex07.py, the method of Solver's Simplex LP, written into the variable cells, with the model saved in Solver's hidden
-worksheet names so Data > Solver opens it ready to solve).
+worksheet names so Data > Solver opens it ready to solve). That model, as the case states it, leaves out the quote's
+minimum volume and tooling, so each growth sheet also holds a plan the supplier would accept, found by solving the same
+model for every choice of families (contract_lp) and written as values.
 
 Every value the instructor notes state is checked on the Solution Notes worksheet with a live formula against a value
 computed here, independently of Excel, from CharlesRiver.sqlite (read-only): `model` mirrors the twin
@@ -61,6 +63,7 @@ MATERIALITY = 0.05              # of income before income taxes as recorded
 FLOOR = 0.40                    # gross margin floor on time-driven cost
 GROWTH = (0.40, 0.50)           # the optional demand-growth tests
 DATA_TABLE = (0.75, 0.80, 0.85, 0.90)   # Requirement 4's Data Table of practical capacity
+NORMAL_RANGE = (0.90, 1.10)     # Requirement 9's sensitivity: normal capacity at 90% and 110% of the plan volume
 TWO_WAY_CREW = (0.0, 0.5, 1.0)          # Requirement 6's two-way Data Table: share of freed crew time removed
 TWO_WAY_QUOTE = (-0.10, 0.0, 0.10)      # ... and the quote, 10% either side
 TOP_SHARE = 0.20
@@ -284,6 +287,25 @@ def model(d: Data) -> dict:
                        "l.ExtendedStandardFixedOverheadCost) FROM ProductionCompletionLine l JOIN ProductionCompletion pc "
                        "ON pc.ProductionCompletionID = l.ProductionCompletionID GROUP BY 1"))
     fo_ratio = [sum(v for m, v in fo_m.items() if m.startswith(str(y))) / applied[str(y)] for y in d.years]
+    pay_parts = defaultdict(lambda: defaultdict(float))     # the payroll's parts by the month of their pay date
+    for mo, t_, k_, a in d.q("SELECT substr(pp.PayDate, 1, 7), l.LineType, lte.LaborType, SUM(l.Amount) FROM "
+                             "PayrollRegisterLine l JOIN PayrollRegister pr ON pr.PayrollRegisterID = l.PayrollRegisterID "
+                             "JOIN PayrollPeriod pp ON pp.PayrollPeriodID = pr.PayrollPeriodID JOIN CostCenter cc ON "
+                             "cc.CostCenterID = pr.CostCenterID LEFT JOIN LaborTimeEntry lte ON lte.LaborTimeEntryID = "
+                             "l.LaborTimeEntryID WHERE cc.CostCenterName = 'Manufacturing' AND l.LineType NOT IN "
+                             "('Benefits Deduction', 'Employee Tax Withholding') GROUP BY 1, 2, 3"):
+        pay_parts[(t_, k_)][mo] += a
+    a5080 = d.account(5080)
+    startup = dict(payroll=pay_m[start], foh=fo_m[start], dep=dep_m[start], stdh=std_m.get(start, 0.0),
+                   paid=sum(s_[start] for s_ in pay_parts.values()),
+                   to_5080=d.one("SELECT COALESCE(SUM(Debit), 0) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = "
+                                 "'PayrollSummary' AND substr(PostingDate, 1, 7) = ?", a5080, start),
+                   pay_date=d.one("SELECT MIN(PostingDate) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = "
+                                  "'PayrollSummary' AND substr(PostingDate, 1, 7) = ?", a5080, start))
+    dated_off = d.q("SELECT pc.CompletionNumber, pc.CompletionDate, g.PostingDate, SUM(g.Credit) - SUM(g.Debit) FROM "
+                    "GLEntry g JOIN ProductionCompletion pc ON pc.ProductionCompletionID = g.SourceDocumentID WHERE "
+                    "g.AccountID = ? AND g.SourceDocumentType = 'ProductionCompletion' AND g.FiscalYear = ? AND "
+                    "pc.CompletionDate NOT BETWEEN ? AND ? GROUP BY 1, 2, 3 ORDER BY 2", a1090, d.C, first, last)
     dep_months = [dep_m[f"{d.C}-{k:02d}"] for k in range(1, 13)]
     runs = []
     for k, v in enumerate(dep_months):
@@ -374,12 +396,18 @@ def model(d: Data) -> dict:
     for g in groups:
         fs = [v for v in fam.values() if v["group"] == g["name"]]
         g["m_td"] = 1 - sum(v["unit"]["td"] * v["units"] for v in fs) / g["rev"]
+    # the item costs applied to the year's completions: setup over the family's average batch assigns a little less
+    # setup than the work orders ran
+    alloc_setup = sum(q * setup[items[i]["routing"]] / batch[items[i]["fam"]] for i, q in comp_item.items())
+    item_conv = sum(q * (fo_rate * items[i]["stdh"] + td_rate * time_per_unit(i)) for i, q in comp_item.items())
     data_table = []
     for share in DATA_TABLE:
         p = avail_total * share
         rate = committed / p
         ex = fam[EXAMPLE]
-        data_table.append(dict(share=share, rate=rate, unused=(p - used) * rate,
+        below = sorted(f for f, v in fam.items()
+                       if 1 - sum(sold[i][0] * costs(i, rate)["td"] for i in v["ids"]) / v["rev"] < FLOOR)
+        data_table.append(dict(share=share, rate=rate, unused=(p - used) * rate, below=below,
                                example=sum(sold[i][0] * costs(i, rate)["td"] for i in ex["ids"]) / ex["units"]))
 
     # Requirement 5: the explorer's totals, the finished goods sold (Services left out)
@@ -468,6 +496,7 @@ def model(d: Data) -> dict:
                 load[f][wc] += sold[i][0] * (rh + setup_wc[rid][wc] / batch[f])
     headroom = {wc: avail[wc] * PRACTICAL / sum(load[f][wc] for f in fam) for wc in wcs}
     lp = [growth_lp(quoted, fam, load, wcs, avail, g) for g in GROWTH]
+    contract = [contract_lp(quoted, fam, load, wcs, avail, g) for g in GROWTH]
 
     # Requirement 8
     reprice = []
@@ -485,6 +514,8 @@ def model(d: Data) -> dict:
                  supervision=pclass["Salary"]["gross"] * (1 + BURDEN) / stdh, depreciation=plan_dep / stdh)
     new_rate = sum(parts.values())
     one_rate = new_rate - parts["indirect"]
+    spread = parts["supervision"] + parts["depreciation"]          # the part that normal capacity spreads
+    normal = [new_rate - spread + spread / k for k in NORMAL_RANGE]
     td_std = fo_rate + td_rate * used / stdh
     actual_rate = inputs / stdh
     for q in quoted:
@@ -512,7 +543,8 @@ def model(d: Data) -> dict:
         cv = sum(u * items[i]["conv"] for i, u in on_hand.items())
         stock.append(dict(year=y, units=sum(on_hand.values()), std=sum(u * items[i]["std"] for i, u in on_hand.items()),
                           stdh=sh, conv=cv, per_hour=cv / sh, negative=negative, plan=sh * new_rate - cv,
-                          one=sh * one_rate - cv, td=sh * td_std - cv, actual=sh * actual_rate - cv))
+                          one=sh * one_rate - cv, td=sh * td_std - cv, actual=sh * actual_rate - cv,
+                          normal=[sh * r_ - cv for r_ in normal]))
     income = {y: d.one(f"SELECT SUM(g.Credit) - SUM(g.Debit) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
                        f"WHERE a.AccountType IN ('Revenue', 'Expense') AND g.FiscalYear = ? AND {d.no_closes()}", y)
               for y in d.years}
@@ -529,6 +561,9 @@ def model(d: Data) -> dict:
                 with_start=with_start,
                 fits=dict(fo=fit(fo_m, months), pay=fit(pay_m, months), dep=fit(dep_m, months),
                           pay_start=fit(pay_m, with_start)),
+                part_fits={k_: fit(s_, months) for k_, s_ in pay_parts.items()}, startup=startup, dated_off=dated_off,
+                comp_item=comp_item, alloc_setup=alloc_setup, item_conv=item_conv, contract=contract, normal=normal,
+                spread=spread,
                 fo_ratio=fo_ratio, dep_months=dep_months, runs=runs, activities=activities, fam_setup=fam_setup,
                 issue_lines=issue_lines, comp_wo={f: len(v) for f, v in comp_wo.items()}, centers=centers,
                 avail=avail_total, pract=pract, used=used, run_total=run_total, setup_total=setup_total,
@@ -572,6 +607,51 @@ def growth_lp(quoted: list[dict], fam: dict, load: dict, wcs: list, avail: dict,
                 per_unit=per_unit, cap=cap, full=full, used=used, binding=binding, shadow=[-y for y in s["y"]],
                 reduced=[v["reduced"] for v in var], c_inc=[v["inc"] for v in var], c_dec=[v["dec"] for v in var],
                 r_inc=[v["inc"] for v in con], r_dec=[v["dec"] for v in con])
+
+
+def contract_lp(quoted: list[dict], fam: dict, load: dict, wcs: list, avail: dict, growth: float) -> dict:
+    """Requirement 7's growth test with the quote's terms kept, which growth_lp's model (the case's) leaves out: a family
+    bought takes at least MINIMUM of its quoted volume each year, and its tooling. The model is solved, in growth_lp's
+    form (units made, maximize the added cost avoided), for every choice of families: a family chosen is made from zero
+    to its demand at growth less its minimum, a family not chosen is made in full. The plan with the least added cost
+    over the years the prices are fixed, tooling included, is kept; `same_as_annual` says whether the least annual cost
+    picks the same families."""
+    from itertools import product
+    names = {q["name"] for q in quoted}
+    n = len(quoted)
+    c = [q["delivered"] - q["kept"] for q in quoted]
+    upper = [q["units"] * (1 + growth) for q in quoted]
+    low = [MINIMUM * q["volume"] for q in quoted]
+    per_unit = [[load[q["name"]][wc] / q["units"] for q in quoted] for wc in wcs]
+    others = [sum(load[f][wc] * (1 + growth) for f in fam if f not in names) for wc in wcs]
+    cap = [avail[wc] * PRACTICAL for wc in wcs]
+    plans = []
+    for pick in product((False, True), repeat=n):
+        idx = [j for j in range(n) if pick[j]]
+        if any(low[j] > upper[j] for j in idx):
+            continue
+        rhs = [cap[k] - others[k] - sum(per_unit[k][j] * upper[j] for j in range(n) if not pick[j])
+               for k in range(len(wcs))]
+        if any(r_ < 0 for r_ in rhs):
+            continue
+        if not idx:
+            plans.append(dict(pick=pick, annual=0.0, tooling=0, total=0.0, bought=[0.0] * n, at_minimum=[False] * n,
+                              binding=[]))
+            continue
+        a_ = [[per_unit[k][j] for j in idx] for k in range(len(wcs))]
+        s = solve_lp([c[j] for j in idx], a_, rhs, [upper[j] - low[j] for j in idx])
+        made = dict(zip(idx, s["x"]))
+        bought = {j: upper[j] - made[j] for j in idx}
+        annual = sum(c[j] * bought[j] for j in idx)
+        tooling = sum(quoted[j]["tooling"] for j in idx)
+        slack = [rhs[k] - sum(a_[k][i] * s["x"][i] for i in range(len(idx))) for k in range(len(wcs))]
+        plans.append(dict(pick=pick, annual=annual, tooling=tooling, total=PRICE_YEARS * annual + tooling,
+                          bought=[bought.get(j, 0.0) for j in range(n)], at_minimum=[abs(bought.get(j, 0.0) - low[j]) < 0.5
+                                                                                     for j in range(n)],
+                          binding=[(k, s["y"][k]) for k in range(len(wcs)) if slack[k] < 1e-6]))
+    best = min(plans, key=lambda x: x["total"])
+    best["same_as_annual"] = min(plans, key=lambda x: x["annual"])["pick"] == best["pick"]
+    return best
 
 
 def volume_test(d: Data) -> list[dict]:
@@ -723,7 +803,8 @@ WHERE a.AccountNumber = 1090 AND g.PostingDate BETWEEN :first AND :last
 GROUP BY COALESCE(je.EntryType, g.SourceDocumentType)
 ORDER BY Source;"""),
     "released": ("what the base year's completions released at standard, by part, with their standard labor hours; and "
-                 "the ProductionCompletion credits to 1090", """
+                 "the ProductionCompletion credits to 1090, with those posted in the year for completions dated in "
+                 "another", """
 SELECT SUM(l.QuantityCompleted * i.StandardLaborHoursPerUnit) AS StandardHours,
     SUM(l.ExtendedStandardMaterialCost) AS Material,
     SUM(l.ExtendedStandardDirectLaborCost) AS DirectLabor,
@@ -732,13 +813,19 @@ SELECT SUM(l.QuantityCompleted * i.StandardLaborHoursPerUnit) AS StandardHours,
     SUM(l.ExtendedStandardConversionCost) AS Conversion,
     (SELECT SUM(g.Credit) - SUM(g.Debit) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID
         WHERE a.AccountNumber = 1090 AND g.FiscalYear = :year
-            AND g.SourceDocumentType = 'ProductionCompletion') AS CreditsTo1090
+            AND g.SourceDocumentType = 'ProductionCompletion') AS CreditsTo1090,
+    COALESCE((SELECT SUM(g.Credit) - SUM(g.Debit) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID
+        JOIN ProductionCompletion x ON x.ProductionCompletionID = g.SourceDocumentID
+        WHERE a.AccountNumber = 1090 AND g.FiscalYear = :year
+            AND g.SourceDocumentType = 'ProductionCompletion'
+            AND x.CompletionDate NOT BETWEEN :first AND :last), 0) AS CreditsDatedOtherYears
 FROM ProductionCompletionLine l
 JOIN ProductionCompletion pc ON pc.ProductionCompletionID = l.ProductionCompletionID
 JOIN Item i ON i.ItemID = l.ItemID
 WHERE pc.CompletionDate BETWEEN :first AND :last;"""),
     "monthly": ("the inputs to 1090 by month with the standard hours completed and the overhead they applied, from the "
-                "ledger's first month to the end of the base year, and the payroll dates posted to 1090 each month", """
+                "ledger's first month to the end of the base year, the payroll dates posted to 1090 each month, and the "
+                "Manufacturing payroll's parts by the month of their pay date", """
 WITH made AS (
     SELECT substr(pc.CompletionDate, 1, 7) AS Month,
         SUM(l.QuantityCompleted * i.StandardLaborHoursPerUnit) AS StandardHours,
@@ -760,12 +847,38 @@ posted AS (
         ON je.JournalEntryID = g.SourceDocumentID AND g.SourceDocumentType = 'JournalEntry'
     WHERE a.AccountNumber = 1090
     GROUP BY substr(g.PostingDate, 1, 7)
+),
+paid AS (
+    SELECT substr(pp.PayDate, 1, 7) AS Month,
+        SUM(CASE WHEN l.LineType = 'Regular Earnings' AND t.LaborType = 'Direct Manufacturing'
+            THEN l.Amount ELSE 0 END) AS DirectRegular,
+        SUM(CASE WHEN l.LineType = 'Overtime Earnings' AND t.LaborType = 'Direct Manufacturing'
+            THEN l.Amount ELSE 0 END) AS DirectOvertime,
+        SUM(CASE WHEN l.LineType = 'Regular Earnings' AND t.LaborType = 'Indirect Manufacturing'
+            THEN l.Amount ELSE 0 END) AS IndirectRegular,
+        SUM(CASE WHEN l.LineType = 'Overtime Earnings' AND t.LaborType = 'Indirect Manufacturing'
+            THEN l.Amount ELSE 0 END) AS IndirectOvertime,
+        SUM(CASE WHEN l.LineType = 'Salary Earnings' THEN l.Amount ELSE 0 END) AS Salaries,
+        SUM(CASE WHEN l.LineType = 'Employer Payroll Tax' THEN l.Amount ELSE 0 END) AS EmployerTax,
+        SUM(CASE WHEN l.LineType = 'Employer Benefits' THEN l.Amount ELSE 0 END) AS Benefits
+    FROM PayrollRegisterLine l
+    JOIN PayrollRegister pr ON pr.PayrollRegisterID = l.PayrollRegisterID
+    JOIN PayrollPeriod pp ON pp.PayrollPeriodID = pr.PayrollPeriodID
+    JOIN CostCenter cc ON cc.CostCenterID = pr.CostCenterID
+    LEFT JOIN LaborTimeEntry t ON t.LaborTimeEntryID = l.LaborTimeEntryID
+    WHERE cc.CostCenterName = 'Manufacturing'
+    GROUP BY substr(pp.PayDate, 1, 7)
 )
 SELECT m.Month, m.StandardHours, m.AppliedOverhead,
     COALESCE(p.FactoryOverhead, 0) AS FactoryOverhead, COALESCE(p.Payroll, 0) AS Payroll,
-    COALESCE(p.Depreciation, 0) AS Depreciation, COALESCE(p.PayDates, 0) AS PayDates
+    COALESCE(p.Depreciation, 0) AS Depreciation, COALESCE(p.PayDates, 0) AS PayDates,
+    COALESCE(w.DirectRegular, 0) AS DirectRegular, COALESCE(w.DirectOvertime, 0) AS DirectOvertime,
+    COALESCE(w.IndirectRegular, 0) AS IndirectRegular, COALESCE(w.IndirectOvertime, 0) AS IndirectOvertime,
+    COALESCE(w.Salaries, 0) AS Salaries, COALESCE(w.EmployerTax, 0) AS EmployerTax,
+    COALESCE(w.Benefits, 0) AS Benefits
 FROM made m
 LEFT JOIN posted p ON p.Month = m.Month
+LEFT JOIN paid w ON w.Month = m.Month
 WHERE m.Month BETWEEN substr(:start, 1, 7) AND substr(:last, 1, 7)
 ORDER BY m.Month;"""),
     "activity": ("activities of the base year's completions by family: work orders, units, routing run and setup hours "
@@ -1220,19 +1333,31 @@ def documentation(b: ExerciseBuild) -> None:
                          '&TEXT(DataThrough[LastClose],"d mmmm yyyy")&", and the time records end "&TEXT('
                          'DataThrough[LastTimeRecord],"d mmmm yyyy")&" (pay periods after that are open)."'),
         ("Sources: CharlesRiver.xlsx", "Power Query (Data > Refresh All): ItemCosts (Item finished goods with their "
-                                       "routing hours and the base year's sales by item, from the queries RoutingTotals, "
-                                       "Invoices, and ItemSales, which are connection only) and RoutingHours (routing "
-                                       "hours by routing and work center)."),
+                                       "routing hours, the base year's sales by item, and the base year's completions by "
+                                       "item, from the queries RoutingTotals, Invoices, ItemSales, Completions, and "
+                                       "ItemCompletions, which are connection only) and RoutingHours (routing hours by "
+                                       "routing and work center)."),
         ("Sources: MakeBuy.sql", "Run on CharlesRiver_Capstone.sqlite and pasted with Copy with Headers as Excel Tables "
                                  "(each table's first cell names its query): "
                                  + "; ".join(f"{t} on {s}" for s, t, _ in pasted) + "."),
         ("Inputs", "Blue cells are typed inputs: the quote (tbl-18-01) and the controller's assumptions (tbl-18-02) on "
                    "Assumptions, and the sensitivity inputs of the Data Tables. Black cells are formulas or pasted "
                    "query results."),
-        ("Not from a refresh", "Goal Seek leaves its results in the changing cells (break-even quotes on Make or Buy, "
-                               "target prices on Prices), each beside the same value computed directly. Solver's optimum "
-                               "(Growth 40% and Growth 50%) and its Sensitivity reports are written as values; each "
-                               "model is saved with its sheet, so Data > Solver opens it ready to solve."),
+        ("Not from a refresh", "Goal Seek, run when the solution was built, leaves its results in the changing cells "
+                               "(break-even quotes on Make or Buy, target prices on Prices), each beside the same value "
+                               "computed directly. Solver itself was not run: the optimum of each growth sheet's model and "
+                               "its Sensitivity report were computed by the bounded-variable simplex method (the method of "
+                               "Solver's Simplex LP) and written as values, and each model is saved with its sheet, so "
+                               "Data > Solver opens it ready to solve. That model leaves out the quote's minimum volume and "
+                               "tooling; the plan the supplier would accept (columns N and P of each growth sheet) was "
+                               "found by solving it for every choice of families, and is written as values too."),
+        ("Refresh order", "1. Rerun MakeBuy.sql on the capstone copy and paste each result over its Table (Copy with "
+                          "Headers): Refresh All does not rerun them. 2. Data > Refresh All (ItemCosts and RoutingHours; "
+                          "ItemSales and ItemCompletions keep the base year in their Filtered Rows step, so change it "
+                          "there with BaseYear). 3. Rerun Goal Seek on Make or Buy and Prices and, for the optional test, "
+                          "Solver on each growth sheet; the Data Tables recalculate by themselves. 4. Save, then refresh "
+                          "Product Costs.pbix, whose Practical Share measure is typed at the case's 80% and must change "
+                          "with the Assumptions value."),
         ("Worksheets", "; ".join(sheets) + "."),
         ("Checks", "The Solution Notes worksheet checks every result the instructor notes state against values computed "
                    "independently from CharlesRiver.sqlite."),
@@ -1282,7 +1407,10 @@ def assumptions(b: ExerciseBuild) -> None:
              ("Burden, a share of pay", BURDEN, "0.00%", "Burden"),
              ("Hours per standard hour at plan", PLAN_HOURS, "0.00", "PlanHours"),
              ("  of which indirect", INDIRECT, "0.00", "IndirectHours"),
-             ("Plan volume, the normal capacity (standard hours a year)", PLAN_VOLUME, MONEY, "PlanVolume"),
+             ("Plan volume, taken as normal capacity (standard hours a year)", PLAN_VOLUME, MONEY, "PlanVolume"),
+             ("Normal capacity sensitivity (Requirement 9): a lower share of the plan volume", NORMAL_RANGE[0], PCT1,
+              "NormalLow"),
+             ("  and a higher share", NORMAL_RANGE[1], PCT1, "NormalHigh"),
              ("Salaried production staff at plan, a year, before burden", PLAN_SALARIES, MONEY, "PlanSalaries"),
              ("Depreciation at plan, a year", PLAN_DEPRECIATION, MONEY, "PlanDepreciation"),
              ("Hours in a position's day", DAY_HOURS, "0", "DayHours"),
@@ -1293,8 +1421,8 @@ def assumptions(b: ExerciseBuild) -> None:
              ("  hours a week", WEEK_HOURS, "0", "WeekHours"),
              ("Severance per position, with burden", "=SeveranceWeeks*WeekHours*LaborRate*(1+Burden)", MONEY,
               "SeverancePerPosition"),
-             ("Materiality for the statements, a share of income before income taxes as recorded", MATERIALITY, PCT1,
-              "MaterialityShare"),
+             ("Materiality screen for the statements, a share of income before income taxes as recorded (a first, "
+              "quantitative screen)", MATERIALITY, PCT1, "MaterialityShare"),
              ("Margin floor for pricing: gross margin on time-driven cost, before unused capacity", FLOOR, PCT1,
               "MarginFloor"),
              ("Demand-growth test (optional), lower", GROWTH[0], PCT1, "GrowthLow"),
@@ -1326,6 +1454,14 @@ def item_queries(b: ExerciseBuild) -> None:
         ("Grouped Rows", 'Table.Group({prev}, {"ItemID"}, {{"Units", each List.Sum([Quantity]), type number}, '
                          '{"Revenue", each List.Sum([LineTotal]), type number}, '
                          '{"ListValue", each List.Sum([ListValue]), type number}})')]))
+    xl.add_query(wb, "Completions", nav(b, 56, "ProductionCompletion", {"CompletionDate": "type date"}, extra=[
+        ("Removed Other Columns", pq.select_columns(["ProductionCompletionID", "CompletionDate"]))]))
+    xl.add_query(wb, "ItemCompletions", nav(b, 57, "ProductionCompletionLine", {"QuantityCompleted": num}, extra=[
+        ("Merged Queries", pq.merge("Completions", "ProductionCompletionID", "ProductionCompletionID", "Completions")),
+        ("Expanded Completions", pq.expand("Completions", ["CompletionDate"])),
+        ("Filtered Rows", pq.select_rows(f"Date.Year([CompletionDate]) = {y}")),
+        ("Grouped Rows", 'Table.Group({prev}, {"ItemID"}, {{"UnitsCompleted", each List.Sum([QuantityCompleted]), '
+                         'type number}})')]))
     hours = {"StandardSetupHours": num, "StandardRunHoursPerUnit": num}
     xl.add_query(wb, "RoutingTotals", nav(b, 50, "RoutingOperation", hours, extra=[
         ("Grouped Rows", 'Table.Group({prev}, {"RoutingID"}, {{"RunHours", each List.Sum([StandardRunHoursPerUnit]), '
@@ -1337,7 +1473,7 @@ def item_queries(b: ExerciseBuild) -> None:
         ("Sorted Rows", 'Table.Sort({prev},{{"RoutingID", Order.Ascending}, {"WorkCenterID", Order.Ascending}})')]))
     keep = ["ItemID", "ItemCode", "ItemName", "ItemGroup", "SupplyMode", "RoutingID", "StandardCost",
             "StandardConversionCost", "StandardLaborHoursPerUnit"]
-    order = keep[:3] + ["Family"] + keep[3:] + ["RunHours", "SetupHours", "Units", "Revenue", "ListValue"]
+    order = keep[:3] + ["Family"] + keep[3:] + ["RunHours", "SetupHours", "Units", "Revenue", "ListValue", "UnitsCompleted"]
     xl.add_query(wb, "ItemCosts", nav(b, 44, "Item", {"StandardCost": num, "StandardConversionCost": num,
                                                       "StandardLaborHoursPerUnit": num, "ListPrice": num}, extra=[
         ("Filtered Rows", pq.select_rows('([ItemType] = "Finished Good")')),
@@ -1347,10 +1483,13 @@ def item_queries(b: ExerciseBuild) -> None:
         ("Expanded RoutingTotals", pq.expand("RoutingTotals", ["RunHours", "SetupHours"])),
         ("Merged Queries1", pq.merge("ItemSales", "ItemID", "ItemID", "ItemSales")),
         ("Expanded ItemSales", pq.expand("ItemSales", ["Units", "Revenue", "ListValue"])),
+        ("Merged Queries2", pq.merge("ItemCompletions", "ItemID", "ItemID", "ItemCompletions")),
+        ("Expanded ItemCompletions", pq.expand("ItemCompletions", ["UnitsCompleted"])),
         ("Replaced Value", 'Table.ReplaceValue({prev},null,0,Replacer.ReplaceValue,{"RunHours", "SetupHours", "Units", '
-                           '"Revenue", "ListValue"})'),
+                           '"Revenue", "ListValue", "UnitsCompleted"})'),
         ("Changed Type1", pq.transform_types([("Family", "type text"), ("RunHours", num), ("SetupHours", num),
-                                              ("Units", num), ("Revenue", num), ("ListValue", num)])),
+                                              ("Units", num), ("Revenue", num), ("ListValue", num),
+                                              ("UnitsCompleted", num)])),
         ("Reordered Columns", "Table.ReorderColumns({prev},{" + ", ".join(pq.m_string(c) for c in order) + "})"),
         ("Sorted Rows", 'Table.Sort({prev},{{"ItemID", Order.Ascending}})')]))
     last = b.wb.Worksheets(b.wb.Worksheets.Count)
@@ -1470,9 +1609,11 @@ def r1(b: ExerciseBuild) -> None:
     r += 4
     prem = lines(ws, r, [
         ("Conclusion", '=IF(AND(Premises[ListPriceDiffers]=0,Premises[ShipmentCostDiffers]=0,'
-                       'Premises[LargestCompletionDifference]<0.025),"Neither list prices nor standard costs changed: '
-                       'every invoice line carries the item\'s list price, every shipment line its standard cost, and '
-                       'completion lines differ only by component rounding","A price or a standard changed")', None),
+                       'Premises[LargestCompletionDifference]<0.025),"No change in list prices or standard costs shows '
+                       'in the records: every invoice line carries the item\'s list price, every shipment line its '
+                       'standard cost, and completion lines differ only by component rounding (a change made and '
+                       'reversed, or one no line used, would not show)","A price or a standard differs from today\'s '
+                       'master data")', None),
         ("Furniture: margin at standard less margin with the year's variance (the CFO's \"ten points\")",
          f"=F{gro['Furniture']}-H{gro['Furniture']}", "0.0%"),
         ("Families whose margin after the variance (either measure) beats their purchased products'",
@@ -1488,9 +1629,12 @@ def r1(b: ExerciseBuild) -> None:
         f"{(g0['m_std'] - g0['m_year']) * 100:.0f} points less; the purchased furniture earns about what its standards "
         f"say, and only {series(beats)} beats its purchased benchmark after the variance. The families' variances add "
         f"up to {m['totals']['total']:,.2f}, which is account 5080 for fiscal {d.C} without the year-end close.",
-        f"The second premise holds too: list prices and standard costs never changed in the three years (every invoice "
-        f"line carries the item's list price, every shipment line its standard cost, completion lines differ by at most "
-        f"{m['max_diff']:.2f}, and {m['all_years']} items sold in every year). But the premise is not a diagnosis: the "
+        f"The records show no change in list prices or standard costs in the three years either (every invoice line "
+        f"carries the item's list price, every shipment line its standard cost, completion lines differ by at most "
+        f"{m['max_diff']:.2f}, and {m['all_years']} items sold in every year). That supports the second premise for what "
+        "was sold and made, but agreement with today's master data cannot show that nothing was changed and changed back: "
+        "the dataset keeps no history of its master data, so dated price and standard records, or a change log, would be "
+        "the evidence. And the premise is not a diagnosis: the "
         f"variance is almost all overhead ({m['totals']['overhead']:,.0f} of {m['totals']['total']:,.0f}), so whether the "
         f"products are under-costed depends on how that overhead behaves, which Requirement 2 tests."], last_col="H")
     ws.Columns("A").ColumnWidth = 30
@@ -1564,6 +1708,8 @@ PAY_ROWS = [("Direct labor, regular earnings", "Regular Earnings", "Direct Manuf
             ("Employer benefits", "Employer Benefits", None)]
 MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
                "November", "December"]
+PART_COLS = ["DirectRegular", "DirectOvertime", "IndirectRegular", "IndirectOvertime", "Salaries", "EmployerTax",
+             "Benefits"]               # the monthly query's columns for PAY_ROWS, in their order
 
 
 def pay_dates(d: Data) -> list[str]:
@@ -1589,13 +1735,23 @@ def r2(b: ExerciseBuild) -> None:
                                                                             "Conversion", "CreditsTo1090")})
     r = 19
     header(ws, r, ["Input to 1090", "Hours", "Amount", "Per standard hour", "Behavior (the evidence is below)"])
-    behavior = {"Direct labor, regular earnings": "Committed: the crew's pay (payroll does not move with output)",
-                "Direct labor, overtime earnings": "Committed: surge-day overtime, scheduled, not driven by output",
-                "Indirect labor, regular earnings": "Committed: the crew's time with no work order",
-                "Indirect labor, overtime earnings": "Committed",
-                "Salaries": "Committed: supervision",
-                "Employer payroll tax": "Committed: follows the payroll it is charged on",
-                "Employer benefits": "Committed: follows the payroll it is charged on"}
+    pr = {label: m["part_fits"][(lt, lb)]["r"] for label, lt, lb in PAY_ROWS}
+    behavior = {"Direct labor, regular earnings":
+                f"Moves with output (r = {pr['Direct labor, regular earnings']:.2f}) as hours are recorded as direct; the "
+                "crew's pay, committed while the crew is kept",
+                "Direct labor, overtime earnings":
+                f"Barely moves with output (r = {pr['Direct labor, overtime earnings']:.2f}): surge-day overtime, "
+                "scheduled; committed while the schedule stands",
+                "Indirect labor, regular earnings":
+                f"Moves against output (r = {pr['Indirect labor, regular earnings']:.2f}): the crew's time with no work "
+                "order; committed",
+                "Indirect labor, overtime earnings":
+                f"Moves against output (r = {pr['Indirect labor, overtime earnings']:.2f}); committed",
+                "Salaries": f"Does not move with output (r = {pr['Salaries']:.2f}): supervision, committed",
+                "Employer payroll tax": f"Follows the pay it is charged on (r = {pr['Employer payroll tax']:.2f}): "
+                                        "committed with the crew",
+                "Employer benefits": f"Follows the pay it is charged on (r = {pr['Employer benefits']:.2f}): committed "
+                                     "with the crew"}
     for i, (label, line_type, labor) in enumerate(PAY_ROWS):
         rr = r + 1 + i
         crit = f'PayrollLines[LineType],"{line_type}"' + (f',PayrollLines[LaborType],"{labor}"' if labor else "")
@@ -1613,7 +1769,7 @@ def r2(b: ExerciseBuild) -> None:
     ws.Range(f"E{rows['foh']}").Value = "Varies with output, at about the rate the standards apply"
     ws.Cells(rows["dep"], 1).Value = "Depreciation entries"
     ws.Range(f"C{rows['dep']}").Formula = '=SUMIFS(Debits1090[Debits],Debits1090[Source],"Depreciation")'
-    ws.Range(f"E{rows['dep']}").Value = "Neither: follows the asset schedule (a committed capacity cost)"
+    ws.Range(f"E{rows['dep']}").Value = "Committed: the equipment, on the asset schedule"
     ws.Cells(rows["total"], 1).Value = "Total inputs to 1090"
     ws.Range(f"C{rows['total']}").Formula = f"=C{rows['payroll']}+C{rows['foh']}+C{rows['dep']}"
     ws.Cells(rows["ledger"], 1).Value = "PayrollSummary debits to 1090 (the ledger)"
@@ -1653,16 +1809,20 @@ def r2(b: ExerciseBuild) -> None:
         ("Actual overhead per standard hour", "=ActualOverhead/StdHours", MONEY),
         ("Actual overhead as a multiple of the overhead applied", "=ActualOverhead/AppliedOverhead", "0.00"),
         ("Overhead applied as a share of actual overhead (the CFO's \"a third\")", "=AppliedOverhead/ActualOverhead",
-         "0.00")])
+         "0.00"),
+        ("  of the ProductionCompletion credits: completions dated in another year (the date bridge)",
+         "=Released[CreditsDatedOtherYears]", MONEY),
+        ("Credits for the year's completions less the completion lines",
+         "=Released[CreditsTo1090]-Released[CreditsDatedOtherYears]-ConversionReleased", MONEY)])
     b.found["rel2"] = rel
     r += len(rel) + 3
 
     heading(ws, r, "The inputs by month, with the standard hours completed (pasted from MakeBuy.sql)")
     mon = paste(b, ws, f"A{r + 1}", "monthly", "Monthly", text=("Month",), formats={
         "StandardHours": MONEY, "AppliedOverhead": MONEY, "FactoryOverhead": MONEY, "Payroll": MONEY,
-        "Depreciation": MONEY, "PayDates": "0"})
+        "Depreciation": MONEY, "PayDates": "0", **{c: MONEY for c in PART_COLS}})
     top = r + 1
-    k = 10                                   # column J: the tests
+    k = mon.Range.Columns.Count + 3          # the tests, to the right of the monthly table
     J = col(k)
     heading(ws, top, f"Cost behavior: each input regressed on the standard hours completed, {MONTH_NAMES[1]} {d.F} to "
                      f"December {d.C}", col=J)
@@ -1673,6 +1833,7 @@ def r2(b: ExerciseBuild) -> None:
     fits = [("Factory Overhead entries", "FactoryOverhead", x), ("Payroll to 1090", "Payroll", x),
             ("Depreciation entries", "Depreciation", x),
             ("Payroll to 1090, the start-up month included", "Payroll", "Monthly[StandardHours]")]
+    fits += [(f"{label} (by pay date)", c, x) for (label, _, _), c in zip(PAY_ROWS, PART_COLS)]
     fit_rows = {}
     for i, (label, c, xs) in enumerate(fits):
         rr = top + 4 + i
@@ -1682,9 +1843,9 @@ def r2(b: ExerciseBuild) -> None:
                                f"=RSQ({ys},{xs})", f"=COUNT({xs})")):
             ws.Cells(rr, k + 1 + j).Formula2 = f
         fit_rows[label] = rr
-    ws.Range(f"{col(k + 1)}{top + 4}:{col(k + 2)}{top + 7}").NumberFormat = MONEY
-    ws.Range(f"{col(k + 3)}{top + 4}:{col(k + 4)}{top + 7}").NumberFormat = "0.000"
-    r = top + 9
+    ws.Range(f"{col(k + 1)}{top + 4}:{col(k + 2)}{top + 3 + len(fits)}").NumberFormat = MONEY
+    ws.Range(f"{col(k + 3)}{top + 4}:{col(k + 4)}{top + 3 + len(fits)}").NumberFormat = "0.000"
+    r = top + 5 + len(fits)
     header(ws, r, ["Year", "Factory Overhead entries", "Overhead applied", "Ratio"], col=k)
     ratio_rows = {}
     for i, y in enumerate(d.years):
@@ -1708,8 +1869,14 @@ def r2(b: ExerciseBuild) -> None:
         dep_rows.append(rr)
     r += len(m["runs"]) + 2
     three = lines(ws, r, [("Months whose 1090 debits carry three payroll dates",
-                           '=TEXTJOIN(", ",TRUE,FILTER(Monthly[Month],Monthly[PayDates]=3,"none"))', None)], col=J)
-    chart = ws.Shapes.AddChart2(-1, xl.XL_XY_SCATTER, ws.Range(f"{J}{r + 2}").Left, ws.Range(f"{J}{r + 2}").Top,
+                           '=TEXTJOIN(", ",TRUE,FILTER(Monthly[Month],Monthly[PayDates]=3,"none"))', None),
+                          ("The start-up month: payroll posted to 1090", "=INDEX(Monthly[Payroll],1)", MONEY),
+                          ("  its payroll by pay date (posted to 5080 instead)",
+                           f"=SUM(INDEX(Monthly[[{PART_COLS[0]}]:[{PART_COLS[-1]}]],1,0))", MONEY),
+                          ("  its Factory Overhead entries", "=INDEX(Monthly[FactoryOverhead],1)", MONEY),
+                          ("  its depreciation", "=INDEX(Monthly[Depreciation],1)", MONEY),
+                          ("  its standard hours completed", "=INDEX(Monthly[StandardHours],1)", MONEY)], col=J)
+    chart = ws.Shapes.AddChart2(-1, xl.XL_XY_SCATTER, ws.Range(f"{J}{r + 7}").Left, ws.Range(f"{J}{r + 7}").Top,
                                 480, 288).Chart
     while chart.SeriesCollection().Count:
         chart.SeriesCollection(1).Delete()
@@ -1724,6 +1891,9 @@ def r2(b: ExerciseBuild) -> None:
         chart.Axes(axis).HasTitle = True
         chart.Axes(axis).AxisTitle.Text = text
     b.found["r2"] = dict(fit_rows=fit_rows, ratio_rows=ratio_rows, dep_rows=dep_rows, three=three, J=J, k=k)
+    su, pf = m["startup"], m["part_fits"]
+    off = m["dated_off"][0] if m["dated_off"] else None
+    part = lambda label: pf[next((lt, lb) for lab, lt, lb in PAY_ROWS if lab == label)]["r"]   # noqa: E731
 
     fo, pay, dep, ps = (m["fits"][x] for x in ("fo", "pay", "dep", "pay_start"))
     applied = m["var_oh"] + m["fixed_oh"]
@@ -1732,26 +1902,39 @@ def r2(b: ExerciseBuild) -> None:
     months3 = pay_dates(d)
     answer(ws, mon.Range.Row + mon.Range.Rows.Count + 2, [
         f"Per standard hour, the year's inputs cost {m['inputs'] / m['stdh']:.2f} against the {m['conversion'] / m['stdh']:.2f} "
-        f"the standards released ({m['labor'] / m['stdh']:.2f} labor, {applied / m['stdh']:.2f} overhead). Actual overhead, "
+        f"the standards released ({m['labor'] / m['stdh']:.2f} labor, {applied / m['stdh']:.2f} overhead). The completion "
+        f"lines release {m['conversion']:,.2f} and 1090's ProductionCompletion credits are {m['released_gl']:,.2f}"
+        + (f": the {off[3]:,.2f} between them is {off[0]}, a completion dated {off[1]} whose credit posted on {off[2]}, a "
+           "date exception, not rounding" if off else "") + ". Actual overhead, "
         f"the inputs less the direct earnings, is {actual_oh:,.2f}, {actual_oh / m['stdh']:.2f} a standard hour and "
-        f"{actual_oh / applied:.2f} times what the standards applied: the CFO's \"a third\" is {applied / actual_oh:.2f}.",
+        f"{actual_oh / applied:.2f} times what the standards applied: the CFO's \"a third\" is {applied / actual_oh:.2f}, "
+        "a comparison of totals that does not say what the overhead that varies costs.",
         f"Factory Overhead entries vary with output: over the {len(m['months'])} months from {MONTH_NAMES[1]} {d.F}, "
         f"r = {fo['r']:.3f} (R Square {fo['r2']:.3f}), with a slope of {fo['slope']:.2f} a standard hour, about the rate the "
         f"standards apply, and they run at {m['fo_ratio'][0]:.3f}, {m['fo_ratio'][1]:.3f}, and {m['fo_ratio'][2]:.3f} of "
         "the overhead applied in each year. They are the overhead that varies, and the standards already cover them.",
-        f"Payroll to 1090 (direct and indirect labor, regular and overtime, salaries, employer tax, and benefits) does not "
-        f"move with output: r = {pay['r']:.3f}, R Square {pay['r2']:.3f}, an intercept of {pay['intercept']:,.0f} a month "
-        f"and a slope of {pay['slope']:.2f}. It is a committed capacity cost: the crew and supervision are paid for their "
-        f"hours whatever the plant completes. Salaries are committed by contract; employer tax and benefits follow the "
-        f"payroll they are charged on.",
-        f"Depreciation is neither: it follows the asset schedule ({runs[0]['amount']:,.2f} a month, then "
+        f"Payroll to 1090 as a whole (direct and indirect labor, regular and overtime, salaries, employer tax, and "
+        f"benefits) does not move with output: r = {pay['r']:.3f}, R Square {pay['r2']:.3f}, an intercept of "
+        f"{pay['intercept']:,.0f} a month and a slope of {pay['slope']:.2f}. Its parts, by pay date, move differently: "
+        f"direct regular earnings r = {part('Direct labor, regular earnings'):.3f}, indirect regular "
+        f"{part('Indirect labor, regular earnings'):.3f}, indirect overtime {part('Indirect labor, overtime earnings'):.3f}, "
+        f"while direct overtime ({part('Direct labor, overtime earnings'):.3f}), salaries ({part('Salaries'):.3f}), "
+        f"employer tax ({part('Employer payroll tax'):.3f}), and benefits ({part('Employer benefits'):.3f}) barely move. "
+        "That is consistent with the same crew's hours being recorded as direct when there is work and as indirect when "
+        "there is not. The crew is a committed capacity cost while it is kept: whether any of its pay would stop is a "
+        "staffing decision that no correlation shows. Salaries are committed by contract; employer tax and benefits "
+        "follow the payroll they are charged on.",
+        f"Depreciation is a committed cost of the equipment: it follows the asset schedule ({runs[0]['amount']:,.2f} a "
+        "month, then "
         + ", then ".join(f"{x['amount']:,.2f} from {MONTH_NAMES[x['first']]}" for x in runs[1:])
         + f" {d.C}), and its r of {dep['r']:.3f} is spurious, a coincidence of the schedule's steps with output.",
-        f"January {d.F}, the start-up month, has a full month of costs on almost no output; with it, payroll appears to "
-        f"move with output (r = {ps['r']:.3f}), an artifact, so the test starts in {MONTH_NAMES[1]}. Payroll posts on its "
-        f"pay dates, so the months with three pay dates ({series(months3)}) carry a third payroll with no more output: "
-        "they add noise to a monthly test of payroll and would inflate any month's cost per unit; testing by pay period, "
-        "or leaving those months out, removes it.",
+        f"January {d.F}, the start-up month, posted no payroll and no Factory Overhead entry to 1090 (its one payroll, "
+        f"{su['to_5080']:,.2f} on {su['pay_date']}, went to 5080) and only {su['dep']:,.2f} of depreciation, on "
+        f"{su['stdh']:,.0f} standard hours: a point low on both axes, which alone makes payroll look as if it moved with "
+        f"output (r = {ps['r']:.3f}), so the test starts in {MONTH_NAMES[1]}. Payroll posts on its pay dates, so the "
+        f"months with three pay dates ({series(months3)}) carry a third payroll with no more output: they add noise to a "
+        "monthly test of payroll and would inflate any month's cost per unit; testing by pay period, or marking those "
+        "months, removes it.",
         "Conclusion: the gap between the inputs and the standards is not variable overhead the standards miss. It is the "
         "crew and supervision, which do not move with output, plus depreciation, spread over a plant that runs well "
         "below its capacity. The question is what the committed capacity is for."], last_col="H")
@@ -1802,6 +1985,19 @@ def r2(b: ExerciseBuild) -> None:
             b.check(t, f"{label}: intercept", round(f["intercept"], 6), f"='Cost Behavior'!{col(kk + 2)}{rr}", 1e-4)
             b.check(t, f"{label}: R Square", round(f["r2"], 9), f"='Cost Behavior'!{col(kk + 4)}{rr}", 1e-9, "0.000")
         b.check(t, f"{label}: r", round(f["r"], 9), f"='Cost Behavior'!{col(kk + 3)}{rr}", 1e-9, "0.000")
+    for label, lt, lb in PAY_ROWS:
+        rr, f = fit_rows[f"{label} (by pay date)"], m["part_fits"][(lt, lb)]
+        b.check(t, f"{label} by pay date: slope", round(f["slope"], 9), f"='Cost Behavior'!{col(kk + 1)}{rr}", 1e-6)
+        b.check(t, f"{label} by pay date: r", round(f["r"], 9), f"='Cost Behavior'!{col(kk + 3)}{rr}", 1e-9, "0.000")
+    th = list(b.found["r2"]["three"].values())
+    b.check(t, "the start-up month: payroll posted to 1090", round(su["payroll"], 2), "=" + th[1], 0.005)
+    b.check(t, "the start-up month: its payroll by pay date", round(su["paid"], 2), "=" + th[2], 0.005)
+    b.check(t, "the start-up month: its Factory Overhead entries", round(su["foh"], 2), "=" + th[3], 0.005)
+    b.check(t, "the start-up month: its depreciation", round(su["dep"], 2), "=" + th[4], 0.005)
+    b.check(t, "the start-up month: its standard hours", round(su["stdh"], 4), "=" + th[5], 0.0005)
+    b.check(t, "completions dated in another year, credited this year", round(sum(x[3] for x in m["dated_off"]), 2),
+            "=" + rel[labels[16]], 0.005)
+    b.check(t, "credits for the year's completions less the completion lines", 0, "=" + rel[labels[17]], 0.005)
     b.check(t, "months in the test", len(m["months"]), f"='Cost Behavior'!{col(kk + 5)}{fit_rows['Factory Overhead entries']}",
             0, COUNT)
     for y, ratio in zip(d.years, m["fo_ratio"]):
@@ -1953,8 +2149,9 @@ def r4(b: ExerciseBuild) -> None:
     b.wb.Application.Calculation = CALC_EXCEPT_TABLES
     ws = sheet(b, "Costs")
     title(ws, f"Requirement 4: three costs for each family (fiscal {d.C})",
-          "Standard: the item's standard cost. Actual absorption: standard plus the family's variance per unit "
-          "completed. Time-driven: material at the actual rate, the Factory Overhead entries per standard hour, and the "
+          "Standard: the item's standard cost. Actual absorption, the case's proxy: standard plus the family's variance "
+          "per unit completed (the year's close variance over the year's completions). Time-driven: material at the "
+          "actual rate, the Factory Overhead entries per standard hour, and the "
           "committed cost of the crew, supervision, and equipment per hour of practical capacity, times the routing time "
           "per unit (setup spread over the family's average batch).")
     heading(ws, 3, "The committed capacity cost (pasted from MakeBuy.sql)")
@@ -2018,15 +2215,32 @@ def r4(b: ExerciseBuild) -> None:
         specs.append((f"{s}Hours", f"=IF([@Costed],{hours},0)", "0.0000"))
     specs += [("MarginStandard", "=[@Revenue]-[@Units]*[@StandardCost]", MONEY),
               ("MarginAbsorption", "=[@Revenue]-[@Units]*[@AbsorptionCost]", MONEY),
-              ("MarginTimeDriven", "=[@Revenue]-[@Units]*[@TimeDrivenCost]", MONEY)]
+              ("MarginTimeDriven", "=[@Revenue]-[@Units]*[@TimeDrivenCost]", MONEY),
+              ("SetupAssigned", "=IF([@Costed],[@UnitsCompleted]*[@SetupHours]/[@Batch],0)", "0.0000"),
+              ("ConversionCompleted",
+               "=IF([@Costed],[@UnitsCompleted]*(FORate*[@StandardLaborHoursPerUnit]+TDRate*[@RoutingTime]),0)", MONEY)]
     add_cols(ic, specs)
     note(ic.Parent, "A1", "ItemCosts: the finished goods (Item, through Power Query on CharlesRiver.xlsx) with their routing "
-                          "hours and the base year's sales by item; the columns from Costed on are formulas. Purchased "
+                          "hours and the base year's sales and completions by item; the columns from Costed on are "
+                          "formulas. Purchased "
                           "items, and manufactured items with no routing or no completions in the base year, carry their "
                           "standard cost in every view. This Table is what Product Costs.pbix loads.", height=120)
+    # the item costs applied to the year's completions, after the columns they read exist
+    recon2 = lines(ws, r + 1 + len(recon), [
+        ("The item costs, applied to the year's completions: setup hours the work orders ran (Activities)",
+         "=SetupHoursUsed", MONEY),
+        ("  setup hours the item costs assign (setup over the family's average batch)", "=SUM(ItemCosts[SetupAssigned])",
+         MONEY, "SetupHoursAssigned"),
+        ("  the item costs' conversion on the year's completions", "=SUM(ItemCosts[ConversionCompleted])", MONEY,
+         "ItemConversion"),
+        ("  setup-allocation difference: the setup hours the average batch leaves out, at the time-driven rate",
+         "=(SetupHoursUsed-SetupHoursAssigned)*TDRate", MONEY, "SetupDifference"),
+        ("  item costs' conversion, plus the setup difference, plus unused capacity",
+         "=ItemConversion+SetupDifference+UnusedCost", MONEY),
+        ("  difference from the inputs to 1090", "=ItemConversion+SetupDifference+UnusedCost-Inputs1090", MONEY)])
 
     # Families at the base-year mix
-    r += 11
+    r += len(recon) + len(recon2) + 3
     heading(ws, r, "By family, at the base-year mix of items sold (manufactured items only)")
     header(ws, r + 1, ["Family", "Group"] + [lab for _, lab, _ in FAM_COLS])
     f0 = r + 2
@@ -2111,6 +2325,7 @@ def r4(b: ExerciseBuild) -> None:
                 < sum((f["unit"]["absorp"] - f["unit"]["td"]) * f["units"] for f in fl.values() if f["group"] == g["name"])]
     near_abs = [g["name"] for g in m["groups"] if g["name"] not in near_std]
     dt = m["data_table"]
+    base_below = next(x["below"] for x in dt if x["share"] == PRACTICAL)
     tops_m = e["tops"]
     paras = [
         f"The committed capacity cost is {m['committed']:,.2f}: the hourly crew {m['crew']:,.2f} "
@@ -2118,7 +2333,12 @@ def r4(b: ExerciseBuild) -> None:
         f"Over {m['pract']:,.1f} practical hours it costs {m['td_rate']:.2f} an hour ({m['crew_rate']:.2f} for the crew). "
         f"The products' routing time and the Factory Overhead entries absorb {m['used'] * m['td_rate'] + m['foh']:,.2f}; "
         f"the {m['unused_h']:,.1f} practical hours left unused cost {m['unused_h'] * m['td_rate']:,.2f}, and the two add up "
-        f"to the {m['inputs']:,.2f} that flowed into 1090.",
+        f"to the {m['inputs']:,.2f} that flowed into 1090. The item costs themselves, applied to the year's completions, "
+        f"come to {m['item_conv']:,.2f}: setup spread over each family's average batch assigns {m['alloc_setup']:,.2f} "
+        f"hours where the work orders ran {m['setup_total']:,.2f}, and those "
+        f"{m['setup_total'] - m['alloc_setup']:,.2f} hours at the rate, "
+        f"{m['used'] * m['td_rate'] + m['foh'] - m['item_conv']:,.2f}, are a line of their own in the reconciliation, "
+        "not rounding.",
         "Time-driven cost lies between standard and actual absorption for every family: the products cost more than "
         "their standards say (the standards miss the labor rate's increase, supervision, and depreciation) but less than "
         "absorption says, because idle capacity is not theirs. It sits nearer standard for "
@@ -2128,12 +2348,17 @@ def r4(b: ExerciseBuild) -> None:
         f"of the margin at standard, {tops_m['absorp']['share']:.1%} under absorption, and {tops_m['td']['share']:.1%} "
         f"time-driven; no item loses money under any view (the lowest under absorption is {tops_m['absorp']['low']}, "
         f"{tops_m['absorp']['low_margin']:.1%}).",
-        f"The Data Table shows what moves. From {DATA_TABLE[0]:.0%} to {DATA_TABLE[-1]:.0%} of available hours, the rate "
-        f"falls from {dt[0]['rate']:.2f} to {dt[-1]['rate']:.2f} and the unused capacity rises from {dt[0]['unused']:,.0f} "
-        f"to {dt[-1]['unused']:,.0f}, while {EXAMPLE}'s cost moves only from {dt[0]['example']:.2f} to "
-        f"{dt[-1]['example']:.2f}: the product costs move by a few dollars, the unused capacity by hundreds of thousands. "
-        "The choice of practical capacity decides how much of the plant's cost is reported as idle, not what the products "
-        "cost."]
+        f"The Data Table shows how the choice divides the plant's cost. From {DATA_TABLE[0]:.0%} to {DATA_TABLE[-1]:.0%} "
+        f"of available hours, the rate falls from {dt[0]['rate']:.2f} to {dt[-1]['rate']:.2f} and {EXAMPLE}'s time-driven "
+        f"cost from {dt[0]['example']:.2f} to {dt[-1]['example']:.2f} ({dt[0]['example'] - dt[-1]['example']:.2f} a unit), "
+        f"while the unused capacity rises from {dt[0]['unused']:,.0f} to {dt[-1]['unused']:,.0f}: the same committed cost, "
+        "split differently between the products and the idle capacity."
+        + "".join(f" At {x['share']:.0%}, {series(sorted(set(x['below']) - set(base_below)))} also "
+                  f"{'falls' if len(set(x['below']) - set(base_below)) == 1 else 'fall'} below the margin floor."
+                  for x in dt if set(x["below"]) - set(base_below))
+        + "".join(f" At {x['share']:.0%}, {series(sorted(set(base_below) - set(x['below'])))} "
+                  f"{'rises' if len(set(base_below) - set(x['below'])) == 1 else 'rise'} above it."
+                  for x in dt if set(base_below) - set(x["below"]))]
     answer(ws, r, paras, last_col="J")
     b.found["costs_next"] = r + len(paras) + 2
     ws.Columns("A").ColumnWidth = 40
@@ -2171,6 +2396,15 @@ def r4(b: ExerciseBuild) -> None:
     b.check(t, "  of which the crew", round(m["unused_h"] * m["crew_rate"], 2), "=" + recon[list(recon)[4]], 0.01)
     b.check(t, "products plus unused capacity", round(m["inputs"], 2), "=" + recon[list(recon)[5]], 0.01)
     b.check(t, "difference from the inputs to 1090", 0, "=" + recon[list(recon)[7]], 0.005)
+    b.check(t, "units completed in the year (ItemCosts)", round(sum(m["comp_item"].values()), 4),
+            "=SUM(ItemCosts[UnitsCompleted])", 0.0005, UNITS)
+    b.check(t, "setup hours the item costs assign to the year's completions", round(m["alloc_setup"], 4),
+            "=SetupHoursAssigned", 0.0005)
+    b.check(t, "the item costs' conversion on the year's completions", round(m["item_conv"], 2), "=ItemConversion", 0.01)
+    b.check(t, "setup-allocation difference", round(m["used"] * m["td_rate"] + m["foh"] - m["item_conv"], 2),
+            "=SetupDifference", 0.01)
+    b.check(t, "item costs, setup difference, and unused capacity less the inputs to 1090", 0,
+            "=" + recon2[list(recon2)[5]], 0.005)
     for f in fams:
         u, rr = m["fam"][f]["unit"], b.found["fam_rows"][f]
         b.check(t, f"{f}: price at the mix", round(u["price"], 6), f"=Costs!D{rr}", 1e-6)
@@ -2405,7 +2639,8 @@ def r6(b: ExerciseBuild) -> None:
         f"Buy {series([x['short'] for x in buy])} only with the crew reduced: together they save {m['gain']:,.0f} a year, "
         f"free {m['hours']:,.0f} routing hours ({m['positions']:.2f} positions of {m['pos_hours']:,.1f} hours), and cost "
         f"{m['positions'] * m['severance']:,.0f} of severance and {m['tooling']:,.0f} of tooling, a net of about "
-        f"{2 * m['gain'] - m['positions'] * m['severance'] - m['tooling']:,.0f} over the two years the prices are fixed. With "
+        f"{2 * m['gain'] - m['positions'] * m['severance'] - m['tooling']:,.0f} over the two years the prices are fixed "
+        f"(before taxes and undiscounted). With "
         f"the crew kept, buying them costs {kept_cost:,.0f} a year, because the quote replaces only materials and the "
         f"overhead that varies. Make {series([x['short'] for x in lose])}: they lose under either crew case.",
         f"The CFO's absorption view would buy {len(absorp_buy)} of the {len(m['quoted'])} families. The two disagree "
@@ -2567,24 +2802,37 @@ def r7(b: ExerciseBuild) -> None:
         + f"), and the plant's use of its practical capacity would fall from {m['used'] / m['pract']:.1%} to "
         f"{(m['used'] - freed_total) / m['pract']:.1%}.",
         f"The plant already leaves {m['unused_h']:,.1f} practical hours unused, {m['unused_h'] / m['pos_hours']:.2f} "
-        f"positions, more than buying would free ({m['positions']:.2f} positions). Fitting the crew to the work matters "
-        "more than outsourcing. The production manager is right that idle capacity is not the products' fault, but the "
-        "point cuts both ways: it is still a cost, and keeping the crew while buying adds to it.",
+        f"positions, more than buying would free ({m['positions']:.2f} positions), so fitting the crew to the work is a "
+        "larger question than outsourcing; the two reductions add up only if both can be made. The production manager "
+        "is right that idle capacity is not the products' fault, but the point cuts both ways: it is still a cost, and "
+        "keeping the crew while buying adds to it.",
         f"If the crew is kept, the families bought take with them only materials and the overhead that varies; the crew's "
         f"time and the supervision and equipment that time carried (about {m['supervision']:,.0f}) stay. Under absorption "
         "they spread over the remaining families, whose cost per unit rises; under time-driven costing the remaining "
         "families' costs do not change and the unused capacity grows by the same amount.",
         "Optional growth test (Solver, sheets " + growth_name(GROWTH[0]) + " and " + growth_name(GROWTH[1]) + "): "
         f"practical capacity covers the base year's sales {min(m['headroom'].values()):.2f} times at the tightest work "
-        f"center, so growth of about {min(m['headroom'].values()) - 1:.0%} reaches the first limit. At "
-        f"+{GROWTH[0]:.0%}, {bind(lp0)} binds (an hour is worth about {lp0['shadow'][lp0['binding'][0]] * -1:.2f}) and "
-        "Solver buys "
+        f"center, so growth of about {min(m['headroom'].values()) - 1:.0%} reaches the first limit. Solver's model, as "
+        "the case states it, leaves out the quote's minimum volume and tooling, so its answer is a relaxed benchmark. "
+        f"At +{GROWTH[0]:.0%}, {bind(lp0)} binds (an hour is worth about {lp0['shadow'][lp0['binding'][0]] * -1:.2f} in "
+        "that model) and it buys "
         + series([f"{x:,.0f} {short(q['name'])}" for q, x in zip(m["quoted"], lp0["bought"]) if x > 0.5])
         + f" at an added cost of about {lp0['cost']:,.0f}; at +{GROWTH[1]:.0%}, {bind(lp1)} binds (about "
-        f"{lp1['shadow'][lp1['binding'][0]] * -1:.2f} an hour), and Solver buys "
+        f"{lp1['shadow'][lp1['binding'][0]] * -1:.2f} an hour), and it buys "
         + series([f"{x:,.0f} {short(q['name'])}" for q, x in zip(m["quoted"], lp1["bought"]) if x > 0.5])
-        + f" at about {lp1['cost']:,.0f}. Growth, not the base year, is when the quote becomes useful: as overflow "
-        "capacity for the families with the smallest added cost."]
+        + f" at about {lp1['cost']:,.0f}. Those plans buy "
+        + " and ".join(f"{series(below_minimum(s))} below the minimum at +{g:.0%}" for s, g in zip(m["lp"], GROWTH)
+                       if below_minimum(s))
+        + ", so the supplier could not accept them. Solved for every choice of families, with each family chosen at its "
+        "minimum or more, the plan the supplier would accept "
+        + "; ".join(f"at +{g:.0%} buys {contract_text(m, c)}, about {c['annual']:,.0f} a year of added cost plus "
+                    f"{c['tooling']:,.0f} of tooling, {c['total']:,.0f} over the two years"
+                    + (f", with {series([m['centers'][k]['name'] for k, _ in c['binding']])} binding (about "
+                       f"{c['binding'][0][1]:.2f} an hour for that choice)" if c["binding"] else ", with no work center "
+                       "binding")
+                    for c, g in zip(m["contract"], GROWTH))
+        + ". The relaxed model's shadow prices do not carry over. Growth, not the base year, is when the quote becomes "
+        "useful: as overflow capacity for the families with the smallest added cost."]
     answer(ws, last + 4, paras, last_col="G")
     ws.Columns("A").ColumnWidth = 62
     ws.Columns("B:G").ColumnWidth = 15
@@ -2611,6 +2859,18 @@ def r7(b: ExerciseBuild) -> None:
         growth_sheet(b, k, t)
 
 
+def below_minimum(s: dict) -> list[str]:
+    """The families a relaxed growth plan buys below the quote's minimum (MINIMUM of the quoted volume)."""
+    return [short(f) for f, x in zip(QUOTE, s["bought"]) if 0.5 < x < MINIMUM * QUOTE[f][1] - 0.5]
+
+
+def contract_text(m: dict, c: dict) -> str:
+    """The plan the supplier would accept as the answers write it: the units and family of each family bought, with
+    (the minimum) after those bought at their minimum."""
+    return series([f"{x:,.0f} {short(f)}" + (" (the minimum)" if at else "")
+                   for f, x, at in zip(QUOTE, c["bought"], c["at_minimum"]) if x > 0.5])
+
+
 def growth_sheet(b: ExerciseBuild, k: int, t: str) -> None:
     m = ms(b)
     wcs = centers(b)
@@ -2618,13 +2878,16 @@ def growth_sheet(b: ExerciseBuild, k: int, t: str) -> None:
     name = growth_name(g)
     ws = sheet(b, name)
     rep = sheet(b, f"{name} Sensitivity")
-    title(ws, f"Requirement 7 (optional): which quoted families to buy if volume grew by {g:.0%}",
+    title(ws, f"Requirement 7 (optional): which quoted families to buy if volume grew by {g:.0%}: a relaxed benchmark, "
+              "and a plan the supplier would accept",
           "Solver (Simplex LP) minimizes the added cost of buying, with the crew kept (the delivered quote less the "
-          "relevant cost kept, per unit bought), keeping every work center within its practical capacity.")
+          "relevant cost kept, per unit bought), keeping every work center within its practical capacity. As the case "
+          "states it, the model leaves out the quote's minimum volume and tooling, so its answer is a relaxed "
+          "benchmark; columns N to R hold a plan that keeps them.")
     lines(ws, 3, [("Growth in volume (Assumptions)", f"={('GrowthLow', 'GrowthHigh')[k]}", PCT1)])
     header(ws, 5, ["Work center", "Practical capacity", "Load of the base year's sales", "Load at growth, nothing bought",
                    "Hours used after buying", "Slack", "Status", "Shadow price (Sensitivity report)",
-                   "Value of an hour of capacity"])
+                   "Value of an hour of capacity", "Hours used, the plan the supplier would accept"])
     fam0 = 14
     n = len(QUOTE)
     for i, (w, wname, sh) in enumerate(wcs):
@@ -2635,23 +2898,38 @@ def growth_sheet(b: ExerciseBuild, k: int, t: str) -> None:
         formulas(ws, {f"B{rr}": f"=Capacity!B{hr}", f"C{rr}": f"=Capacity!C{hr}", f"D{rr}": f"=C{rr}*(1+$B$3)",
                       f"E{rr}": f"=D{rr}-SUMPRODUCT({hcol}${fam0}:{hcol}${fam0 + n - 1},$L${fam0}:$L${fam0 + n - 1})",
                       f"F{rr}": f"=B{rr}-E{rr}", f"G{rr}": f'=IF(F{rr}<=0.001,"Binding","Not binding")',
-                      f"I{rr}": f"=-H{rr}"})
+                      f"I{rr}": f"=-H{rr}",
+                      f"J{rr}": f"=D{rr}-SUMPRODUCT({hcol}${fam0}:{hcol}${fam0 + n - 1},$P${fam0}:$P${fam0 + n - 1})"})
     w1 = 5 + len(wcs)
     ws.Range(f"B6:F{w1}").NumberFormat = COUNT
     ws.Range(f"H6:I{w1}").NumberFormat = MONEY
+    ws.Range(f"J6:J{w1}").NumberFormat = COUNT
     header(ws, fam0 - 1, ["Family", "Base-year units", "Units at growth (the most that can be bought)", "Delivered quote",
                           "Relevant cost, crew kept", "Added cost per unit bought"]
-           + [f"{wname} hours per unit" for _, wname, _ in wcs] + ["Units bought (variable cells)", "Added cost"])
+           + [f"{wname} hours per unit" for _, wname, _ in wcs] + ["Units bought (variable cells)", "Added cost",
+                                                                   "Chosen in the plan the supplier would accept (1 or 0)",
+                                                                   "Its minimum if chosen", "Units bought in that plan",
+                                                                   "Added cost in that plan", "Tooling in that plan"])
     for j, f in enumerate(QUOTE):
         rr = fam0 + j
         ws.Cells(rr, 1).Value = f
         formulas(ws, {f"B{rr}": f"=XLOOKUP($A{rr},{mb('A')},{mb('C')})", f"C{rr}": f"=B{rr}*(1+$B$3)",
                       f"D{rr}": f"=XLOOKUP($A{rr},{mb('A')},{mb('G')})", f"E{rr}": f"=XLOOKUP($A{rr},{mb('A')},{mb('I')})",
-                      f"F{rr}": f"=D{rr}-E{rr}", f"M{rr}": f"=L{rr}*F{rr}"})
+                      f"F{rr}": f"=D{rr}-E{rr}", f"M{rr}": f"=L{rr}*F{rr}",
+                      f"O{rr}": f"=MinimumShare*XLOOKUP($A{rr},Quote[Family],Quote[QuotedVolume])",
+                      f"Q{rr}": f"=P{rr}*F{rr}", f"R{rr}": f"=N{rr}*XLOOKUP($A{rr},Quote[Family],Quote[Tooling])"})
         for i, (_, _, sh) in enumerate(wcs):
             ws.Cells(rr, 7 + i).Formula2 = (f'=SUMPRODUCT((ItemCosts[Family]=$A{rr})*(ItemCosts[SupplyMode]="Manufactured")'
                                             f"*ItemCosts[Units],ItemCosts[{sh}Hours])/$B{rr}")
     f1 = fam0 + n - 1
+    plan = m["contract"][k]
+    ws.Range(f"N{fam0}:N{f1}").Value = tuple((1 if y else 0,) for y in plan["pick"])
+    ws.Range(f"P{fam0}:P{f1}").Value = tuple((x,) for x in plan["bought"])
+    for c_ in "NP":
+        ws.Range(f"{c_}{fam0}:{c_}{f1}").Interior.Color = AMBER
+    ws.Range(f"O{fam0}:Q{f1}").NumberFormat = UNITS
+    ws.Range(f"Q{fam0}:Q{f1}").NumberFormat = MONEY
+    ws.Range(f"R{fam0}:R{f1}").NumberFormat = COUNT
     ws.Range(f"L{fam0}:L{f1}").Value = tuple((x,) for x in s["bought"])
     ws.Range(f"L{fam0}:L{f1}").Interior.Color = AMBER
     blue(ws, f"L{fam0}:L{f1}")
@@ -2666,17 +2944,36 @@ def growth_sheet(b: ExerciseBuild, k: int, t: str) -> None:
         ("Families bought", f'=TEXTJOIN(", ",TRUE,FILTER(A{fam0}:A{f1},L{fam0}:L{f1}>0.5,"none"))', None),
         ("Every work center within its practical capacity", f"=AND(E6:E{w1}<=B6:B{w1}+0.001)", None),
         ("Every family bought within its units at growth", f"=AND(L{fam0}:L{f1}>=0,L{fam0}:L{f1}<=C{fam0}:C{f1}+0.001)",
-         None)])
+         None),
+        ("Families this relaxed answer buys below the quote's minimum",
+         f'=TEXTJOIN(", ",TRUE,FILTER(A{fam0}:A{f1},(L{fam0}:L{f1}>0.5)*(L{fam0}:L{f1}<O{fam0}:O{f1}-0.5),"none"))', None),
+        ("The plan the supplier would accept: families bought",
+         f'=TEXTJOIN(", ",TRUE,FILTER(A{fam0}:A{f1},N{fam0}:N{f1}=1,"none"))', None),
+        ("  added cost a year", f"=SUM(Q{fam0}:Q{f1})", MONEY, None),
+        ("  tooling", f"=SUM(R{fam0}:R{f1})", COUNT),
+        ("  over the years the prices are fixed, tooling included", f"=PriceYears*B{f1 + 9}+B{f1 + 10}", MONEY),
+        ("  every family chosen at its minimum or more, and at most its units at growth",
+         f"=AND(P{fam0}:P{f1}>=O{fam0}:O{f1}*N{fam0}:N{f1}-0.001,P{fam0}:P{f1}<=C{fam0}:C{f1}*N{fam0}:N{f1}+0.001)", None),
+        ("  every work center within its practical capacity", f"=AND(J6:J{w1}<=B6:B{w1}+0.001)", None)])
     obj = res[list(res)[0]].split("!")[1]
     save_solver_min(ws, obj, f"$L${fam0}:$L${f1}", [(f"$E$6:$E${w1}", 1, f"$B$6:$B${w1}"),
                                                     (f"$L${fam0}:$L${f1}", 1, f"$C${fam0}:$C${f1}")])
-    note(ws, f"L{fam0 - 1}", f"Variable cells. Solver's optimum (Simplex LP; minimize {obj}; E6:E{w1} <= B6:B{w1}; "
-                             f"L{fam0}:L{f1} <= C{fam0}:C{f1}; Make Unconstrained Variables Non-Negative), computed when "
-                             "the solution was built by the bounded-variable simplex method and written here as values, as "
-                             "Solver leaves them after Keep Solver Solution. The model is saved with the worksheet: Data > "
-                             "Solver opens it ready to solve.", height=150)
+    note(ws, f"L{fam0 - 1}", f"Variable cells. The optimum of Solver's model (Simplex LP; minimize {obj}; E6:E{w1} <= "
+                             f"B6:B{w1}; L{fam0}:L{f1} <= C{fam0}:C{f1}; Make Unconstrained Variables Non-Negative), "
+                             "computed when the solution was built by the bounded-variable simplex method, the method of "
+                             "Solver's Simplex LP (Solver itself was not run), and written here as values, as Solver leaves "
+                             "them after Keep Solver Solution. The model is saved with the worksheet: Data > Solver opens it "
+                             "ready to solve. It is the case's model, a relaxed benchmark: it leaves out the quote's "
+                             "minimum volume and tooling.", height=170)
+    note(ws, f"N{fam0 - 1}", "A plan the supplier would accept: the builder solved the model above for every choice of "
+                             "families, each family chosen bought from its minimum (the minimum share of its quoted "
+                             "volume) to its units at growth, and kept the choice with the least added cost over the years "
+                             "the prices are fixed, tooling included"
+                             + (" (the least annual cost picks the same families)" if plan["same_as_annual"] else "")
+                             + ". Solver can do the same with a binary cell for each family and the constraints minimum x "
+                             "binary <= units bought <= units at growth x binary.", height=170)
     ws.Columns("A").ColumnWidth = 44
-    ws.Columns("B:M").ColumnWidth = 14
+    ws.Columns("B:R").ColumnWidth = 14
 
     book = b.wb.Name
     rows = [("Microsoft Excel Sensitivity Report (written in Solver's layout; see the note)",),
@@ -2713,6 +3010,18 @@ def growth_sheet(b: ExerciseBuild, k: int, t: str) -> None:
     b.check(t, f"growth {g:.0%}: added cost (Solver's objective)", round(s["cost"], 4), "=" + res[list(res)[0]], 0.005)
     b.check(t, f"growth {g:.0%}: every work center within its capacity", True, "=" + res[list(res)[3]], 0, "General")
     b.check(t, f"growth {g:.0%}: units bought within their limits", True, "=" + res[list(res)[4]], 0, "General")
+    b.check(t, f"growth {g:.0%}: families the relaxed answer buys below the minimum",
+            ", ".join(f for f, x in zip(QUOTE, s["bought"]) if 0.5 < x < MINIMUM * QUOTE[f][1] - 0.5) or "none",
+            "=" + res[list(res)[5]], 0, "@")
+    b.check(t, f"growth {g:.0%}: the plan the supplier would accept, families",
+            ", ".join(f for f, y in zip(QUOTE, plan["pick"]) if y), "=" + res[list(res)[6]], 0, "@")
+    b.check(t, f"growth {g:.0%}: that plan's added cost a year", round(plan["annual"], 4), "=" + res[list(res)[7]], 0.005)
+    b.check(t, f"growth {g:.0%}: that plan's tooling", plan["tooling"], "=" + res[list(res)[8]], 0, COUNT)
+    b.check(t, f"growth {g:.0%}: that plan over the years the prices are fixed", round(plan["total"], 4),
+            "=" + res[list(res)[9]], 0.005)
+    b.check(t, f"growth {g:.0%}: that plan keeps every minimum and limit", True, "=" + res[list(res)[10]], 0, "General")
+    b.check(t, f"growth {g:.0%}: that plan keeps every work center within its capacity", True, "=" + res[list(res)[11]], 0,
+            "General")
 
 
 # --- Requirement 8: reprice the families below the floor ------------------------------------------------------------
@@ -2792,7 +3101,8 @@ def r8(b: ExerciseBuild) -> None:
          f'=TEXTJOIN(", ",TRUE,FILTER(A5:A{last},F5:F{last}*ISNA(XMATCH(A5:A{last},'
          f'FILTER({mb("A")},{mb("P")}=1))),"none"))', None, "StillToReprice"),
         ("  their revenue a year if volume holds",
-         f'=SUMPRODUCT(--F5:F{last},ISNA(XMATCH(A5:A{last},FILTER({mb("A")},{mb("P")}=1)))*1,N5:N{last})', COUNT)])
+         f'=SUMPRODUCT(--F5:F{last},ISNA(XMATCH(A5:A{last},FILTER({mb("A")},{mb("P")}=1)))*1,N5:N{last})', COUNT,
+         "StillToRepriceRevenue")])
     r += 6
     heading(ws, r, "Delivered margins of the families bought (the quote against the base-year price)")
     header(ws, r + 1, ["Family", "Delivered margin", "Above the floor"])
@@ -2805,7 +3115,8 @@ def r8(b: ExerciseBuild) -> None:
         buy_rows[x["name"]] = rr
     r += len(m["buy"]) + 3
 
-    heading(ws, r, "Evidence on how customers respond to price: order volume in the months of past promotions")
+    heading(ws, r, "What past promotions show about volume: a screen of list-price order value, not a measure of how "
+                   "customers would answer an increase")
     pv = paste(b, ws, f"A{r + 1}", "promotions", "PromotionVolume", text=("PromotionMonths",),
                formats={f"M{k:02d}": COUNT for k in range(1, 13)})
     flags = 'ISNUMBER(SEARCH(","&SEQUENCE(1,12)&",",","&[@PromotionMonths]&","))'
@@ -2824,8 +3135,9 @@ def r8(b: ExerciseBuild) -> None:
     ev = lines(ws, r, [("Lowest lift", "=MIN(PromotionVolume[Lift])", PCT1),
                        ("Highest lift", "=MAX(PromotionVolume[Lift])", PCT1),
                        ("Largest Z", "=MAX(PromotionVolume[Z])", "0.00"),
-                       ("Promotions with a Z of 2 or more", '=COUNTIF(PromotionVolume[Z],">=2")', COUNT)])
-    r += 6
+                       ("Promotions with a Z of 2 or more", '=COUNTIF(PromotionVolume[Z],">=2")', COUNT),
+                       ("Promotions with a positive lift", '=COUNTIF(PromotionVolume[Lift],">0")', COUNT)])
+    r += 7
     heading(ws, r, "The price lists: their dates and use (Exercise 8.6's test)")
     pl = paste(b, ws, f"A{r + 1}", "pricelists", "PriceLists", dates=("EffectiveStartDate", "EffectiveEndDate"),
                formats={"LowestPriceToList": "0.000", "HighestPriceToList": "0.000", "OrderLinesAfterEnd": COUNT})
@@ -2846,6 +3158,7 @@ def r8(b: ExerciseBuild) -> None:
     ov = lines(ws, r + 3, [("Who approves price overrides", '=TEXTJOIN(", ",TRUE,Overrides[ApproverJobTitle])', None)])
     r += 6
     need = [x["short"] for x in m["reprice"] if x["name"] not in m["buy_names"]]
+    top_z = max(vol, key=lambda v: v["z"])
     paras = [
         f"{len(m['reprice'])} families earn less than the 40% floor on their time-driven cost: "
         + "; ".join(f"{x['short']} needs {x['increase']:+.2%} and can lose {x['loss']:.1%} of its volume before it earns "
@@ -2853,15 +3166,18 @@ def r8(b: ExerciseBuild) -> None:
         + f". If volume holds, the increases add {sum(x['revenue'] for x in m['reprice']):,.0f} of revenue a year. If "
         f"{series([x['short'] for x in m['buy']])} are bought, their delivered margins are "
         + ", ".join(f"{x['margin']:.1%}" for x in m["buy"]) + f", above the floor, so only {series(need)} need increases.",
-        f"The evidence says customers do not respond much to price in the short run: no past promotion raised order "
-        f"volume (lifts from {min(v['lift'] for v in vol):+.1%} to {max(v['lift'] for v in vol):+.1%}, none unusual), "
-        "so increases of a few percent are unlikely to lose the volume they can afford. But the prices customers pay "
-        f"come from price lists: the active lists run at {pe['low']:.2f} to {pe['high']:.2f} of list and every one ends "
-        f"on {', '.join(pe['ends'])}, lists {series([str(x) for x in pe['expired_used']])} had expired and were still "
-        f"used, and the {', '.join(pe['approvers'])} approves the overrides.",
+        f"Past promotions show no unusually large response in order volume: none passes a z of 2 (the largest, "
+        f"{top_z['label']} {top_z['year']}, is {top_z['z']:.2f}), and {sum(1 for v in vol if v['lift'] > 0)} of the "
+        f"{len(vol)} lifts are positive, from {min(v['lift'] for v in vol):+.1%} to {max(v['lift'] for v in vol):+.1%}. "
+        "That is a descriptive screen: seasonality, mix, and targeting move the same numbers, and a discount's response "
+        "is not the response to an increase, so it cannot say how much volume an increase would cost. The loss each "
+        "family can absorb is a threshold, not a forecast. The prices customers pay come from price lists: the active "
+        f"lists run at {pe['low']:.2f} to {pe['high']:.2f} of list and every one ends on {', '.join(pe['ends'])}, lists "
+        f"{series([str(x) for x in pe['expired_used']])} had expired and were still used, and the "
+        f"{', '.join(pe['approvers'])} approves the overrides, so an increase reaches the invoices only through the lists.",
         "Recommendation: raise the families below the floor to it (and the families bought, if they are kept) through new, "
         "approved price lists for 2028 with stated end dates; renegotiate the customer-specific lists rather than "
-        "inheriting them; and watch the volume of each family against the loss it can afford."]
+        "inheriting them; and stage the increases, watching the volume of each family against the loss it can afford."]
     answer(ws, r, paras, last_col="N")
     ws.Columns("A").ColumnWidth = 30
     ws.Columns("B:Z").ColumnWidth = 13
@@ -2886,6 +3202,7 @@ def r8(b: ExerciseBuild) -> None:
     b.check(t, "highest lift", round(max(v["lift"] for v in vol), 9), "=" + ev[list(ev)[1]], 1e-9, PCT1)
     b.check(t, "largest Z", round(max(v["z"] for v in vol), 9), "=" + ev[list(ev)[2]], 1e-9, "0.00")
     b.check(t, "promotions with a Z of 2 or more", sum(1 for v in vol if v["z"] >= 2), "=" + ev[list(ev)[3]], 0, COUNT)
+    b.check(t, "promotions with a positive lift", sum(1 for v in vol if v["lift"] > 0), "=" + ev[list(ev)[4]], 0, COUNT)
     b.check(t, "active lists: lowest price to list", round(pe["low"], 9), "=" + lists[list(lists)[0]], 1e-9, "0.000")
     b.check(t, "active lists: highest price to list", round(pe["high"], 9), "=" + lists[list(lists)[1]], 1e-9, "0.000")
     serial = lambda iso: float((date.fromisoformat(iso) - date(1899, 12, 30)).days)
@@ -2912,16 +3229,19 @@ def typed_plan(m: dict) -> dict:
     items, sold = m["items"], m["sold"]
     revised = {f: sum(sold[i][0] * ((items[i]["std"] - items[i]["conv"]) + new * items[i]["stdh"])
                       for i in m["fam"][f]["ids"]) / m["fam"][f]["units"] for f in QUOTE}
-    stock = {x["year"]: dict(plan=x["stdh"] * new - x["conv"], one=x["stdh"] * one - x["conv"]) for x in m["stock"]}
-    return dict(parts=parts, new_rate=new, one_rate=one, revised=revised, stock=stock)
+    spread = parts["supervision"] + parts["depreciation"]
+    normal = [new - spread + spread / k for k in NORMAL_RANGE]
+    stock = {x["year"]: dict(plan=x["stdh"] * new - x["conv"], one=x["stdh"] * one - x["conv"],
+                             normal=[x["stdh"] * r_ - x["conv"] for r_ in normal]) for x in m["stock"]}
+    return dict(parts=parts, new_rate=new, one_rate=one, revised=revised, stock=stock, normal=normal)
 
 
 def r9(b: ExerciseBuild) -> None:
     m, d = ms(b), data(b)
     ws = sheet(b, "Standards")
     title(ws, "Requirement 9: standards on normal capacity, and what they mean for the statements",
-          "Normal capacity is the plan volume at its hours per standard hour (tbl-18-02); the rates are next year's plan "
-          "applied to the stock of earlier years, an approximation.")
+          "Normal capacity is taken as the plan volume (tbl-18-02); the rates are next year's plan applied to the stock "
+          "of earlier years: a sensitivity, not an established error.")
     header(ws, 4, ["Proposed standard conversion rate, per standard hour", "Amount", "Basis"])
     parts = [("Direct labor at the straight-time rate with burden", "=LaborRate*(1+Burden)", "26.62 x 1.1414"),
              ("Overhead that varies with output (Factory Overhead entries per standard hour)", "=FORate",
@@ -2934,25 +3254,31 @@ def r9(b: ExerciseBuild) -> None:
         ws.Range(f"B{5 + i}").Formula = f
         ws.Cells(5 + i, 3).Value = basis
     rate = lines(ws, 10, [
-        ("Proposed rate, normal capacity (1.18 hours per standard hour)", "=SUM(B5:B9)", MONEY, "NewRate"),
-        ("Proposed rate at 1.0 hours per standard hour (no indirect time)", "=NewRate-B7", MONEY, "OneRate"),
+        ("Proposed rate, normal capacity at the plan volume (1.18 hours per standard hour)", "=SUM(B5:B9)", MONEY,
+         "NewRate"),
+        ("Labor-content case: the proposed rate with no indirect hours (1.0 hours per standard hour)", "=NewRate-B7",
+         MONEY, "OneRate"),
         ("Current standard: conversion released per standard hour", "=ConversionReleased/StdHours", MONEY, "CurrentRate"),
         ("Time-driven, per standard hour", "=FORate+TDRate*UsedHours/StdHours", MONEY, "TDStdRate"),
-        ("The base year's actual cost per standard hour", "=Inputs1090/StdHours", MONEY, "ActualRate")])
+        ("The base year's actual cost per standard hour", "=Inputs1090/StdHours", MONEY, "ActualRate"),
+        ("Normal capacity at the lower share of the plan volume (Assumptions): the proposed rate",
+         "=NewRate-(B8+B9)+(B8+B9)/NormalLow", MONEY, "NormalLowRate"),
+        ("Normal capacity at the higher share of the plan volume (Assumptions): the proposed rate",
+         "=NewRate-(B8+B9)+(B8+B9)/NormalHigh", MONEY, "NormalHighRate")])
     ws.Range("B5:B9").NumberFormat = MONEY
-    heading(ws, 16, "The plan's figures against the records")
-    paste(b, ws, "E17", "plandep", "PlanDepreciationSchedule", formats={"PlanYearDepreciation": MONEY})
-    plan = lines(ws, 17, [
+    heading(ws, 18, "The plan's figures against the records")
+    paste(b, ws, "E19", "plandep", "PlanDepreciationSchedule", formats={"PlanYearDepreciation": MONEY})
+    plan = lines(ws, 19, [
         ("Plan volume (Assumptions) equals the base year's standard hours, rounded", "=ROUND(StdHours,2)=PlanVolume", None),
         ("Salaried staff at plan equals the base year's salaried gross pay",
          '=ROUND(XLOOKUP("Salary",PayClass[PayClass],PayClass[GrossPay]),2)=PlanSalaries', None),
         ("Depreciation at plan equals the FixedAsset schedule for the next year (column E)",
          "=ROUND(PlanDepreciation-PlanDepreciationSchedule[PlanYearDepreciation],2)=0", None)])
-    heading(ws, 21, "Revised standard costs of the quoted families, at the base-year mix")
-    header(ws, 22, ["Family", "Revised standard (proposed rate)", "Time-driven cost", "Current standard cost"])
+    heading(ws, 23, "Revised standard costs of the quoted families, at the base-year mix")
+    header(ws, 24, ["Family", "Revised standard (proposed rate)", "Time-driven cost", "Current standard cost"])
     rev_rows = {}
     for i, f in enumerate(QUOTE):
-        rr = 23 + i
+        rr = 25 + i
         ws.Cells(rr, 1).Value = f
         mask = f'(ItemCosts[Family]=$A{rr})*(ItemCosts[SupplyMode]="Manufactured")*ItemCosts[Units]'
         formulas(ws, {f"B{rr}": f"=SUMPRODUCT({mask},ItemCosts[Material]+NewRate*ItemCosts[StandardLaborHoursPerUnit])/"
@@ -2960,7 +3286,7 @@ def r9(b: ExerciseBuild) -> None:
                       f"C{rr}": f"=XLOOKUP($A{rr},{famref('Family')},{famref('TimeDriven')})",
                       f"D{rr}": f"=XLOOKUP($A{rr},{famref('Family')},{famref('Standard')})"})
         rev_rows[f] = rr
-    ws.Range(f"B23:D{22 + len(QUOTE)}").NumberFormat = MONEY
+    ws.Range(f"B25:D{24 + len(QUOTE)}").NumberFormat = MONEY
 
     # The stock the standards apply to (pasted at J4), revalued at each year-end
     years = d.years
@@ -2968,8 +3294,9 @@ def r9(b: ExerciseBuild) -> None:
     add_cols(oh, [("StdHoursPerUnit", "=XLOOKUP([@ItemID],ItemCosts[ItemID],ItemCosts[StandardLaborHoursPerUnit])", "0.0000"),
                   ("ConversionPerUnit", "=XLOOKUP([@ItemID],ItemCosts[ItemID],ItemCosts[StandardConversionCost])", MONEY),
                   ("StandardCostPerUnit", "=XLOOKUP([@ItemID],ItemCosts[ItemID],ItemCosts[StandardCost])", MONEY)])
-    r = 23 + len(QUOTE) + 2
-    heading(ws, r, "Manufactured finished goods made since the ledger opened and on hand at each year-end")
+    r = 25 + len(QUOTE) + 2
+    heading(ws, r, "Manufactured finished goods made since the ledger opened and on hand at each year-end, as the "
+                   "movements can rebuild them")
     header(ws, r + 1, ["Measure"] + [f"End of fiscal {y}" for y in years])
     measures = [("Units on hand (items with a positive balance)", "SUMPRODUCT((OnHand[{c}]>0)*OnHand[{c}])", UNITS),
                 ("Standard hours", "SUMPRODUCT((OnHand[{c}]>0)*OnHand[{c}]*OnHand[StdHoursPerUnit])", MONEY),
@@ -2978,12 +3305,17 @@ def r9(b: ExerciseBuild) -> None:
                 ("Value at the current standard", "SUMPRODUCT((OnHand[{c}]>0)*OnHand[{c}]*OnHand[StandardCostPerUnit])", MONEY),
                 ("Conversion per standard hour in that stock", "{col}{r2}/{col}{r1}", MONEY),
                 ("Revaluation at the proposed rate (1.18 hours)", "{col}{r1}*NewRate-{col}{r2}", COUNT),
-                ("Revaluation at 1.0 hours per standard hour", "{col}{r1}*OneRate-{col}{r2}", COUNT),
+                ("Revaluation with no indirect hours (1.0 hours per standard hour, labor content)",
+                 "{col}{r1}*OneRate-{col}{r2}", COUNT),
                 ("Revaluation at the time-driven rate", "{col}{r1}*TDStdRate-{col}{r2}", COUNT),
                 ("Revaluation at the base year's actual cost (capitalizes idle capacity)", "{col}{r1}*ActualRate-{col}{r2}",
                  COUNT),
-                ("Items with a negative balance (proof of opening stock; left out)",
-                 'TEXTJOIN(", ",TRUE,FILTER(OnHand[ItemCode],OnHand[{c}]<-0.05,"none"))', None)]
+                ("Items with a negative balance (the opening stock was drawn on; left out)",
+                 'TEXTJOIN(", ",TRUE,FILTER(OnHand[ItemCode],OnHand[{c}]<-0.05,"none"))', None),
+                ("Revaluation with normal capacity at the lower share of the plan volume",
+                 "{col}{r1}*NormalLowRate-{col}{r2}", COUNT),
+                ("Revaluation with normal capacity at the higher share of the plan volume",
+                 "{col}{r1}*NormalHighRate-{col}{r2}", COUNT)]
     s0 = r + 2
     srow = {}
     for i, (label, f, fmt) in enumerate(measures):
@@ -3002,6 +3334,7 @@ def r9(b: ExerciseBuild) -> None:
     yc = {y: col(2 + j) for j, y in enumerate(years)}
     reval = srow[keys[5]]
     one = srow[keys[6]]
+    nlow, nhigh = srow[keys[10]], srow[keys[11]]
     P, C, F_ = d.P, d.C, d.F
     eff = lines(ws, r + 1, [
         (f"Retained earnings at the start of fiscal {P}", f"={yc[F_]}{reval}", COUNT, "RevalOpening"),
@@ -3009,22 +3342,26 @@ def r9(b: ExerciseBuild) -> None:
         (f"Fiscal {C} income", f"={yc[C]}{reval}-{yc[P]}{reval}", COUNT, "RevalIncomeCurrent"),
         (f"Inventories at the end of fiscal {P}", f"={yc[P]}{reval}", COUNT, "RevalBalancePrior"),
         (f"Inventories at the end of fiscal {C}", f"={yc[C]}{reval}", COUNT, "RevalBalanceCurrent"),
-        (f"Materiality for fiscal {P} (5% of income before income taxes as recorded)",
+        (f"Materiality screen for fiscal {P} (5% of income before income taxes as recorded)",
          f"=ROUND(MaterialityShare*XLOOKUP({P},Income[FiscalYear],Income[IncomeBeforeTaxes]),2)", MONEY, "MaterialityPrior"),
-        (f"Materiality for fiscal {C}",
+        (f"Materiality screen for fiscal {C}",
          f"=ROUND(MaterialityShare*XLOOKUP({C},Income[FiscalYear],Income[IncomeBeforeTaxes]),2)", MONEY,
          "MaterialityCurrent"),
-        ("Both balance sheet effects above materiality",
+        ("Both balance sheet effects above the screen",
          "=AND(RevalBalancePrior>MaterialityPrior,RevalBalanceCurrent>MaterialityCurrent)", None),
-        ("Both income effects below materiality",
+        ("Both income effects below the screen",
          "=AND(RevalIncomePrior<MaterialityPrior,RevalIncomeCurrent<MaterialityCurrent)", None),
-        (f"At 1.0 hours: fiscal {P} balance above materiality", f"={yc[P]}{one}>MaterialityPrior", None),
-        (f"At 1.0 hours: fiscal {C} balance above materiality", f"={yc[C]}{one}>MaterialityCurrent", None)])
-    r += 13
+        (f"With no indirect hours: fiscal {P} balance above the screen", f"={yc[P]}{one}>MaterialityPrior", None),
+        (f"With no indirect hours: fiscal {C} balance above the screen", f"={yc[C]}{one}>MaterialityCurrent", None),
+        ("At either end of the normal-capacity range: both balance sheet effects above the screen",
+         f"=AND({yc[P]}{nlow}>MaterialityPrior,{yc[C]}{nlow}>MaterialityCurrent,{yc[P]}{nhigh}>MaterialityPrior,"
+         f"{yc[C]}{nhigh}>MaterialityCurrent)", None)])
+    r += 14
     paste(b, ws, f"A{r}", "openingfg", "OpeningFG", formats={"OpeningFinishedGoods": MONEY})
     r += 3
     sp, sc, sf = (next(x for x in m["stock"] if x["year"] == y) for y in (P, C, F_))
     tp = typed_plan(m)
+    negs = sorted({c_ for x in m["stock"] for c_ in x["negative"]})
     mat_p = round(MATERIALITY * m["income"][P] + 1e-9, 2)
     mat_c = round(MATERIALITY * m["income"][C] + 1e-9, 2)
     paras = [
@@ -3032,22 +3369,36 @@ def r9(b: ExerciseBuild) -> None:
         f"{PLAN_HOURS} hours per standard hour: direct labor {m['parts']['direct']:.2f} + the overhead that varies "
         f"{m['parts']['variable']:.2f} + indirect labor {m['parts']['indirect']:.2f} + supervision "
         f"{m['parts']['supervision']:.2f} + depreciation {m['parts']['depreciation']:.2f} = {m['new_rate']:.2f} a standard "
-        f"hour ({m['one_rate']:.2f} at 1.0 hours), against {m['conversion'] / m['stdh']:.2f} today, "
-        f"{m['td_std']:.2f} time-driven, and {m['actual_rate']:.2f} actual. A standard built on the base year's actual "
-        "cost would carry the idle capacity and the hours paid beyond the work into inventory; ASC Topic 330 allocates "
-        "fixed overhead on normal capacity and charges abnormal costs, such as idle facility expense, to the period.",
-        f"Revalued at the proposed rate, the manufactured finished goods made since the opening and on hand rise by "
+        f"hour, against {m['conversion'] / m['stdh']:.2f} today, {m['td_std']:.2f} time-driven, and "
+        f"{m['actual_rate']:.2f} actual. A standard built on the base year's actual cost would carry the idle capacity "
+        "and the hours paid beyond the work into inventory; ASC Topic 330 allocates fixed overhead on normal capacity "
+        "and charges abnormal costs, such as idle facility expense, to the period.",
+        f"Revalued at the proposed rate, the manufactured finished goods made since the opening and on hand, as the "
+        "movements can rebuild them, rise by "
         f"{sf['plan']:,.0f}, {sp['plan']:,.0f}, and {sc['plan']:,.0f} at the {F_}, {P}, and {C} year-ends: retained "
         f"earnings at the start of fiscal {P} +{sf['plan']:,.0f}, fiscal {P} income +{sp['plan'] - sf['plan']:,.0f}, fiscal "
-        f"{C} income +{sc['plan'] - sp['plan']:,.0f}. The balance sheet effects exceed materiality ({mat_p:,.2f} for {P}, "
-        f"{mat_c:,.2f} for {C}); the income effects do not. The answer depends on what is treated as normal capacity: at "
-        f"1.0 hours the {P} balance effect ({sp['one']:,.0f}) falls below materiality and the {C} one ({sc['one']:,.0f}) "
-        f"stays above; at the actual rate the {C} effect would be {sc['actual']:,.0f}, by capitalizing idle capacity.",
-        "Recommendation: on the plan's definition of normal capacity the inventory error is material to the balance "
-        f"sheets the shareholders received, so the fiscal {P} and {C} statements should be revised (inventories, retained "
-        "earnings, and income corrected, with the correction disclosed), and the CFO should tell the shareholders that "
-        "the standards had not been updated in three years and understated the cost of the stock on hand. If the CFO "
-        "judges the effect immaterial on a narrower definition of normal capacity, the correction belongs in the next "
+        f"{C} income +{sc['plan'] - sp['plan']:,.0f}. The rebuild counts the stock as made since the opening only if "
+        f"shipments drew on new production first, and {series(negs)} "
+        "go negative, so the opening stock was drawn on; "
+        "item-level opening balances would be needed to know which layers remain. The balance sheet effects exceed the "
+        f"5% screen ({mat_p:,.2f} for {P}, {mat_c:,.2f} for {C}); the income effects do not. What is treated as normal "
+        "capacity moves the answer: with supervision and depreciation spread over "
+        f"{NORMAL_RANGE[0]:.0%} or {NORMAL_RANGE[1]:.0%} of the plan volume, the rate is {m['normal'][0]:.2f} or "
+        f"{m['normal'][1]:.2f}, and the {C} effect {sc['normal'][0]:,.0f} or {sc['normal'][1]:,.0f}, still above the "
+        "screen. The indirect hours the rate allows are a different question, of labor content: with none "
+        f"({m['one_rate']:.2f}), the {P} balance effect ({sp['one']:,.0f}) falls below the screen and the {C} one "
+        f"({sc['one']:,.0f}) stays above; at the actual rate the {C} effect would be {sc['actual']:,.0f}, by "
+        "capitalizing idle capacity.",
+        "The 5% is a first, quantitative screen: the nature of the item, its aggregate with any other misstatements, the "
+        "line items and periods it touches, and the tax effect the ledger cannot supply bear on materiality too. And the "
+        "revaluation applies next year's plan to the stock of earlier years: a sensitivity, not an established error. "
+        "Recommendation: before anything is restated, establish whether the standards in use, the normal capacity of "
+        "those years, and the costs known when each set of statements was prepared would have given a materially "
+        "different inventory under Topic 330 (the period costs and volumes, the variances' disposition, counts and "
+        f"item-level opening balances). If a material prior-period error is established, the fiscal {P} and {C} "
+        "statements should be revised (inventories, retained earnings, and income corrected, with the correction "
+        "disclosed) and the CFO should tell the shareholders what was wrong; if the difference is a change in estimate, "
+        "the new standard applies from now on; if an error is established but immaterial, it is corrected in the next "
         f"statements with disclosure. The decision is the CFO's. The opening {m['opening_fg']:,.2f} of finished goods "
         "has no item detail and is left out."]
     answer(ws, r, paras, last_col="H")
@@ -3057,6 +3408,8 @@ def r9(b: ExerciseBuild) -> None:
     b.found["stock_rows"] = srow
 
     t = "Requirement 9"
+    b.check(t, "proposed rate, normal capacity at the lower share", round(tp["normal"][0], 9), "=NormalLowRate", 1e-9)
+    b.check(t, "proposed rate, normal capacity at the higher share", round(tp["normal"][1], 9), "=NormalHighRate", 1e-9)
     for (label, _, _), (k, v) in zip(parts, tp["parts"].items()):
         b.check(t, f"{label}", round(v, 9), f"=Standards!B{5 + list(tp['parts']).index(k)}", 1e-9)
     b.check(t, "proposed rate per standard hour", round(tp["new_rate"], 9), "=NewRate", 1e-9)
@@ -3085,6 +3438,9 @@ def r9(b: ExerciseBuild) -> None:
                     f"=Standards!{c}{srow[keys[k]]}", 0.01, COUNT)
         b.check(t, f"end of fiscal {x['year']}: items with a negative balance", text_list(x["negative"]),
                 f"=Standards!{c}{srow[keys[9]]}", 0, "@")
+        for j, kk_ in ((0, 10), (1, 11)):
+            b.check(t, f"end of fiscal {x['year']}: {keys[kk_][0].lower() + keys[kk_][1:]}",
+                    round(tp["stock"][x["year"]]["normal"][j], 2), f"=Standards!{c}{srow[keys[kk_]]}", 0.01, COUNT)
     b.check(t, f"end of fiscal {C}: value at standard", round(sc["std"], 2), f"=Standards!{yc[C]}{srow[keys[3]]}", 0.01)
     rf, rp_, rc = (tp["stock"][y]["plan"] for y in (F_, P, C))
     b.check(t, f"retained earnings at the start of fiscal {P}", round(rf, 2), "=RevalOpening", 0.01, COUNT)
@@ -3093,7 +3449,8 @@ def r9(b: ExerciseBuild) -> None:
     b.check(t, f"materiality for fiscal {P}", mat_p, "=MaterialityPrior", 0.005)
     b.check(t, f"materiality for fiscal {C}", mat_c, "=MaterialityCurrent", 0.005)
     one_p, one_c = tp["stock"][P]["one"], tp["stock"][C]["one"]
-    flags = [rp_ > mat_p and rc > mat_c, rp_ - rf < mat_p and rc - rp_ < mat_c, one_p > mat_p, one_c > mat_c]
+    flags = [rp_ > mat_p and rc > mat_c, rp_ - rf < mat_p and rc - rp_ < mat_c, one_p > mat_p, one_c > mat_c,
+             all(tp["stock"][P]["normal"][j] > mat_p and tp["stock"][C]["normal"][j] > mat_c for j in range(2))]
     for label, flag in zip(list(eff)[7:], flags):
         b.check(t, label, flag, "=" + eff[label], 0, "General")
     b.check(t, "finished goods on the opening entry (no item detail)", round(m["opening_fg"], 2),
@@ -3153,12 +3510,16 @@ def r10(b: ExerciseBuild) -> None:
     need = [x["short"] for x in m["reprice"] if x["name"] not in m["buy_names"]]
     unused_pos = m["unused_h"] / m["pos_hours"]
     sp, sc = (next(x for x in m["stock"] if x["year"] == y) for y in (d.P, d.C))
+    make_path = sum(x["revenue"] for x in m["reprice"])
+    buy_path = m["gain"] + sum(x["revenue"] for x in m["reprice"] if x["name"] not in m["buy_names"])
+    once = m["tooling"] + m["positions"] * m["severance"]
     paras = [
         "To: the CFO and the production manager. From: the staff accountant. Subject: make, buy, or reprice; and the "
         "standards.",
         f"The plant already pays for about {unused_pos:.1f} positions of capacity it does not use ({m['unused_h']:,.0f} "
-        f"practical hours, {m['unused_h'] * m['td_rate']:,.0f} a year): fitting the crew to the work is worth more than "
-        f"any outsourcing decision. Both of you are right about part of the cost. The CFO is right that the products cost "
+        f"practical hours, {m['unused_h'] * m['td_rate']:,.0f} a year), a larger question than any outsourcing decision; "
+        "fitting the crew to the work and buying a family save money only as far as the production manager can make "
+        "those reductions, and the two add up only if both are made. Both of you are right about part of the cost. The CFO is right that the products cost "
         f"more than their standards say ({m['new_rate']:.2f} a standard hour on normal capacity against "
         f"{m['conversion'] / m['stdh']:.2f}); the production manager is right that idle capacity is not the products' "
         "fault, and should be reported as a cost of the plant, not spread over the products.",
@@ -3166,17 +3527,26 @@ def r10(b: ExerciseBuild) -> None:
         f"{series([x['short'] for x in buy])} only with a committed plan to reduce the crew in step, about "
         f"{m['positions']:.1f} positions: that saves {m['gain']:,.0f} a year, about "
         f"{2 * m['gain'] - m['positions'] * m['severance'] - m['tooling']:,.0f} over the two years the prices are fixed "
-        f"after severance and tooling. With the crew kept, buying them costs {sum(-x['a_kept'] for x in buy):,.0f} a year, "
-        "so if the crew stays, keep making them and reprice them.",
+        f"after severance and tooling (before taxes, undiscounted). With the crew kept, buying them costs "
+        f"{sum(-x['a_kept'] for x in buy):,.0f} a year, so if the crew stays, keep making them and reprice them. Compare "
+        f"the whole paths, though: if volume holds, making all {len(QUOTE)} and raising the {len(m['reprice'])} families "
+        f"below the floor gains {make_path:,.0f} a year with no one-time cost, against {buy_path:,.0f} for buying the "
+        f"{len(buy)} and raising the rest, with {once:,.0f} once. Buying is a cost advantage at today's prices, not the "
+        "better path under every assumption about price and demand: which wins depends on how much volume the increases "
+        f"on {series([x['short'] for x in buy])} would cost.",
         f"Raise {series(need)} to the 40% floor through new, approved price lists for 2028 with end dates (and the "
-        f"families bought, if they are kept); the past promotions show no volume response large enough to undo "
-        f"increases of this size, which add about {sum(x['revenue'] for x in m['reprice'] if x['name'] not in m['buy_names']):,.0f} "
-        "a year if volume holds.",
+        f"families bought, if they are kept): about {sum(x['revenue'] for x in m['reprice'] if x['name'] not in m['buy_names']):,.0f} "
+        "a year if volume holds. Past promotions show no unusually large response in volume, but that cannot say how "
+        "customers would answer an increase, so stage the increases and watch each family's volume against the loss it "
+        "can afford.",
         f"Standards: adopt {m['new_rate']:.2f} a standard hour on normal capacity for inventory, and time-driven costs "
-        "(capacity at its practical cost, idle capacity reported apart) for decisions. The fiscal "
-        f"{d.C} statements need attention: revalued at the proposed standard, inventories were understated by about "
-        f"{sp['plan']:,.0f} at the end of {d.P} and {sc['plan']:,.0f} at the end of {d.C}, above materiality, so the CFO "
-        "should decide whether to issue revised statements to the shareholders.",
+        "(capacity at its practical cost, idle capacity reported apart) for decisions. Applied to the stock of earlier "
+        f"years, the proposed standard would raise inventories by about {sp['plan']:,.0f} at the end of {d.P} and "
+        f"{sc['plan']:,.0f} at the end of {d.C}, above the 5% screen, but that is a sensitivity on next year's plan, not "
+        "an established error. Before the shareholders are told anything, the CFO needs the evidence of whether the old "
+        "standards misstated those statements (the costs and capacity of those years, the variances' disposition, counts "
+        "and opening balances): revised statements if a material error is established, the new standard from now on if "
+        "the difference is a change in estimate.",
         "The one decision only the production manager can make: whether, and how fast, to reduce the crew to the work "
         "the plant has. Every saving above depends on it."]
     answer(ws, last + 4, paras, last_col="E")
@@ -3224,6 +3594,9 @@ def m1(b: ExerciseBuild) -> None:
             1e-9, "0.000")
     b.check(t, "payroll r", round(m["fits"]["pay"]["r"], 9), f"='Cost Behavior'!{col(k + 3)}{fr['Payroll to 1090']}", 1e-9,
             "0.000")
+    for label, lt, lb in PAY_ROWS[0:1] + PAY_ROWS[2:3]:
+        b.check(t, f"{label} r (by pay date)", round(m["part_fits"][(lt, lb)]["r"], 9),
+                f"='Cost Behavior'!{col(k + 3)}{fr[label + ' (by pay date)']}", 1e-9, "0.000")
     b.check(t, "use of practical capacity", round(m["used"] / m["pract"], 9), f"=Activities!F{b.found['cap_rows']['Plant']}",
             1e-9, PCT1)
 
@@ -3258,6 +3631,11 @@ def m3(b: ExerciseBuild) -> None:
     b.check(t, "families below the floor", len(m["reprice"]), '=COUNTIF(Prices!F5:F40,TRUE)', 0, COUNT)
     b.check(t, "revenue a year if volume holds", round(sum(x["revenue"] for x in m["reprice"]), 2), "=RepriceRevenue", 1,
             COUNT)
+    buy_path = m["gain"] + sum(x["revenue"] for x in m["reprice"] if x["name"] not in m["buy_names"])
+    b.check(t, "buying the families and repricing the rest, a year", round(buy_path, 2), "=BuyGain+StillToRepriceRevenue",
+            1, COUNT)
+    b.check(t, "its one-time cost", round(m["tooling"] + m["positions"] * m["severance"], 2), "=BuySeverance+BuyTooling",
+            0.01, COUNT)
 
 
 def m4(b: ExerciseBuild) -> None:
@@ -3265,7 +3643,9 @@ def m4(b: ExerciseBuild) -> None:
     t = "Milestone 4"
     tp = typed_plan(m)
     b.check(t, "proposed rate", round(tp["new_rate"], 9), "=NewRate", 1e-9)
-    b.check(t, "at 1.0 hours", round(tp["one_rate"], 9), "=OneRate", 1e-9)
+    b.check(t, "with no indirect hours (labor content)", round(tp["one_rate"], 9), "=OneRate", 1e-9)
+    b.check(t, "normal capacity at the lower share", round(tp["normal"][0], 9), "=NormalLowRate", 1e-9)
+    b.check(t, "normal capacity at the higher share", round(tp["normal"][1], 9), "=NormalHighRate", 1e-9)
     b.check(t, "current rate", round(m["conversion"] / m["stdh"], 9), "=CurrentRate", 1e-9)
     srow = b.found["stock_rows"]
     reval = srow[next(k for k in srow if k.startswith("Revaluation at the proposed"))]

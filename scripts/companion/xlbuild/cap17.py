@@ -45,6 +45,7 @@ from functools import lru_cache
 
 from paths import REPO
 from xlbuild import pq, xl
+from xlbuild.ex04 import validate
 from xlbuild.solutions import COUNT, MONEY, PCT, RATIO, ExerciseBuild
 
 FACTS = REPO / "facts"
@@ -53,6 +54,7 @@ DATE = "yyyy-mm-dd"
 STMT = '#,##0.00;(#,##0.00);"-"'
 GENERAL = "General"
 XL_MANUAL, XL_AUTOMATIC = -4135, -4105
+XL_VALIDATE_CUSTOM = 7
 SQL_FILE = "LenderPackage.sql"
 MA = "Model answer"
 BLUE = 0xFF0000                 # input cells (BGR)
@@ -522,9 +524,10 @@ def documentation_header(b: ExerciseBuild) -> None:
     title(ws, "Charles River Lender Package", "Charles River Lender Package.xlsx: financial statements for the bank's "
                                               "credit committee (instructor solution, the Excel part of the case)")
     put(ws, {"A4": "Purpose",
-             "B4": f"Turn the ledger into GAAP statements for fiscal {C} with fiscal {P} for comparison: trial balances, "
-                   "the adjustments with their evidence, the adjusted statements, and the required notes. Nothing is "
-                   "posted to the ledger; every adjustment is a numbered entry here, for the CFO's approval.",
+             "B4": f"Prepare a draft of GAAP statements for fiscal {C} with fiscal {P} for comparison, held until the CFO "
+                   "releases it: trial balances, the adjustments with their evidence, the adjusted statements, and the "
+                   "required notes. Nothing is posted to the ledger; every adjustment is a numbered entry here, for the "
+                   "CFO's approval.",
              "A5": "Prepared by", "B5": "Staff accountant (model solution); reviewed by the controller",
              "A6": "Sources",
              "B6": "CharlesRiver.xlsx through Power Query (refresh with Data > Refresh All); query results pasted from "
@@ -579,7 +582,11 @@ def documentation(b: ExerciseBuild) -> None:
              ("Adjustments", "Numbered A (recorded), R (reclassification), P (passed), T (trivial); entry lines in the "
                              "AdjustmentLines Table, one row per account and year-end, as debits less credits."),
              ("Inputs", "Blue: typed parameters. Green headers: results pasted from LenderPackage.sql."),
-             ("Checks", "The Solution Notes worksheet compares every result with the dataset after a refresh.")]
+             ("Checks", "The Solution Notes worksheet compares every result with the dataset after a refresh."),
+             ("Refresh order", f"Data > Refresh All rereads CharlesRiver.xlsx but not the results pasted from "
+                               f"{SQL_FILE}. On a new dataset release, rerun the script on the new working copy, paste "
+                               "its results again on SQL Results, then refresh, check the Solution Notes, and save "
+                               "before refreshing Charles River Lender Review, which reads this workbook.")]
     for i, (a, t) in enumerate(rows, start=12):
         ws.Cells(i, 1).Value = a
         ws.Cells(i, 2).Value = t
@@ -598,6 +605,10 @@ def trial_balance_sheet(b: ExerciseBuild, year: int) -> None:
              "A4": "Rule", "B4": "Postings on or before the as-of date; a year-end close left out only when dated on it"})
     ws.Range("B3").NumberFormat = DATE
     ws.Range("B3").Font.Color = BLUE
+    # the ledger summary is by year, so only a year-end gives a true as-of balance
+    validate(ws.Range("B3"), XL_VALIDATE_CUSTOM, None, "=AND(MONTH(B3)=12,DAY(B3)=31)", title="As-of date",
+             message="A 31 December: the ledger summary is by year, so other dates would take in the whole year.",
+             error="Enter a year-end (31 December).")
     heads = ["AccountNumber", "AccountName", "AccountType", "AccountSubType", "Balance", "DebitBalance",
              "CreditBalance", "Postings"]
     for i, h in enumerate(heads, start=1):
@@ -731,6 +742,9 @@ def statement_block(ws, top: int, columns: list[tuple[str, str, int | None]]) ->
     total("Income before income taxes", lambda c: f"{c}{rows['Operating income']}-{c}{rows['Interest expense']}+"
                                                   f"{c}{rows['Loss on disposal of equipment']}+{c}{rows['Other income']}")
     write("Income taxes", ["=0" for _ in columns])
+    note(ws, f"A{rows['Income taxes']}", "None recorded: the chart has no income tax account, and the tax status is "
+                                          "a matter for the CFO (Memo, matter 1). Until it is settled, net income "
+                                          "here equals income before income taxes.")
     total("Net income", lambda c: f"{c}{rows['Income before income taxes']}-{c}{rows['Income taxes']}")
     for k, (_, c, a) in enumerate(columns):
         ws.Cells(re_row, 2 + k).Formula2 = f"={value('Retained earnings', c, a, -1)}+{col(2 + k)}{rows['Net income']}"
@@ -1257,7 +1271,7 @@ def r3(b: ExerciseBuild) -> None:
     for y, c in zip((F, P, C), "BCD"):
         name(b, f"OldByAccount_{y}", ws, f"{c}{r}")
     r += 2
-    put(ws, {f"A{r}": "A3: old accruals reversed at each year-end (corrections of errors)",
+    put(ws, {f"A{r}": "A3: old accruals reversed at each year-end, if the evidence shows nothing is owed",
              f"B{r}": f"Retained earnings, 1 January {P}", f"C{r}": f"Income {P}", f"D{r}": f"Income {C}",
              f"A{r + 1}": "Effect", f"B{r + 1}": f"=Old_{F}", f"C{r + 1}": f"=Old_{P}-Old_{F}", f"D{r + 1}": f"=Old_{C}-Old_{P}"})
     bold(ws, f"A{r}:D{r}")
@@ -1300,9 +1314,14 @@ def r3(b: ExerciseBuild) -> None:
     r = model_answer(ws, r + 3, MA + ": which open accruals are still liabilities", [
         f"The longest wait for an invoice was {facts('r3')['window']} days, and several accruals cleared at exactly "
         f"that lag, so an accrual older than {facts('r3')['window']} days at a year-end is past the invoicing window. "
-        "Those accruals should have been reversed at that year-end, because the facts existed then: they are "
-        "corrections of errors at each year-end (A3), not changes in estimate. A rule of \"older than the last two "
-        "month-ends\" would wrongly flag an accrual that an invoice cleared on the first day of the next year.",
+        "Age and the missing invoice show that such an accrual has gone unbilled, not that nothing is owed. A3 "
+        "reverses them at each year-end on the assumption that they will never be billed, which the suppliers' "
+        "statements or confirmations, the service contracts, and the absence of any later invoice or settlement must "
+        "support; if they do, the facts existed at each year-end and A3 corrects errors, not estimates. Until that "
+        "evidence is in hand, keeping them as liabilities is equally sound: it lowers income before income taxes by "
+        f"{money(facts('r3')['a3']['P'])} in {P} and {money(facts('r3')['a3']['C'])} in {C}. A rule of \"older "
+        "than the last two month-ends\" would wrongly flag an accrual that an invoice cleared on the first day of the "
+        "next year.",
         "An accrual within the window is an estimate; if it later proves unneeded, that is a change in estimate in the "
         f"year it goes stale. Keep the {money(facts('r3')['young_c'])} of young {C} accruals as liabilities, and leave "
         f"the {money(facts('r3')['opening'])} opening line to the memo (Requirement 9). Allocating the old items by "
@@ -1921,7 +1940,7 @@ def adjustment_lines(b: ExerciseBuild) -> list[list]:
         for acct, row in old_rows.items():
             lines.append((int(acct), "", f"=-('Accrued Expenses'!{gcol[y]}{row}" +
                           (f"-'Accrued Expenses'!{gcol[q]}{row})" if q else ")")))
-        out += [["A3", "Accruals past the invoicing window reversed", ye_, a, p, f, typ,
+        out += [["A3", "Accruals past the invoicing window reversed (assumes nothing is owed)", ye_, a, p, f, typ,
                  "Accrued Expenses worksheet: the Accrual entries, AccrualClearing (invoice debits to 2040) and the "
                  "Accrual Adjustment entries; old = open longer than the longest clearing lag"] for a, p, f in lines]
         lines = []
@@ -1981,11 +2000,14 @@ def r5(b: ExerciseBuild) -> None:
          "Dr 1020; Cr 4010-4040 (and retained earnings)", "Tests L5 and L6 (Cutoff worksheet)",
          "=AdjA2_RE", f"=AdjA2_{P}", f"=AdjA2_{C}", f"=Cutoff_{P}", f"=Cutoff_{C}",
          "Correction of an error", "Record."),
-        ("A3", "Accruals open longer than the clearing window, reversed at each year-end",
+        ("A3", "Accruals open longer than the clearing window, reversed at each year-end on the assumption that "
+               "nothing is owed",
          "Dr 2040; Cr expense accounts (and retained earnings)", "Accrual entries, AccrualClearing, Accrual Adjustments",
          "=AdjA3_RE", f"=AdjA3_{P}", f"=AdjA3_{C}", f"=Old_{P}", f"=Old_{C}",
-         "Correction of an error (an accrual within the window that later proves unneeded is a change in estimate)",
-         "Record."),
+         "Correction of an error, if the evidence shows nothing was owed at each year-end (an accrual within the "
+         "window that later proves unneeded is a change in estimate)",
+         "Record once the suppliers' statements or the contracts show nothing is owed; until then hold it, which "
+         "keeps 2040 at its ledger balance (Solution Notes, Requirement 3)."),
         ("A4", "Interest accrued on the notes since the last payment",
          "Dr 7030 (and retained earnings); Cr 2080", "DebtScheduleLine (Cutoff worksheet)",
          "=AdjA4_RE", f"=AdjA4_{P}", f"=AdjA4_{C}", f"=-Interest_{P}", f"=-Interest_{C}",
@@ -2019,30 +2041,37 @@ def r5(b: ExerciseBuild) -> None:
              f"C{r + 1}": "Dr 1090; Cr 1046", f"D{r + 1}": "Trial balance",
              f"H{r + 1}": f"=-SUMIFS(WorkingTB[Recorded{P}],WorkingTB[AccountNumber],1090)",
              f"I{r + 1}": f"=-SUMIFS(WorkingTB[Recorded{C}],WorkingTB[AccountNumber],1090)", f"J{r + 1}": "Reclassification",
-             f"K{r + 1}": "Record: a credit balance cannot sit among current assets."})
+             f"K{r + 1}": "Record: 1090 clears conversion cost into work in process, so its balance is presented with "
+                         "it; the cost study (Memo) would show how its variances belong between inventory and cost of "
+                         "goods sold."})
     name(b, f"CurPortion_{P}", ws, f"H{r}")
     name(b, f"CurPortion_{C}", ws, f"I{r}")
     name(b, f"Reclass2_{P}", ws, f"H{r + 1}")
     name(b, f"Reclass2_{C}", ws, f"I{r + 1}")
     r += 3
     passed = r
-    put(ws, {f"A{r}": "P1", f"B{r}": "Allowance for credit losses at Exercise 8.1's rates",
+    put(ws, {f"A{r}": "P1", f"B{r}": "Allowance for credit losses at Exercise 8.1's rates, on the invoice aging (the "
+                                     "opening line and the unbilled deliveries need their own assessment)",
              f"C{r}": "Dr 6170; Cr 1030", f"D{r}": "ReceivableAging (SQL Results)",
              f"G{r}": f"=I{r}-H{r}", f"H{r}": f"=-SUMPRODUCT(ROUND(ReceivableAging[Balance{P}]*LossRates,2))",
              f"I{r}": f"=-SUMPRODUCT(ROUND(ReceivableAging[Balance{C}]*LossRates,2))",
              f"J{r}": "Change in estimate", f"K{r}": "Pass; list for the CFO's approval.",
              f"A{r + 1}": "P2", f"B{r + 1}": "Returns expected after the year-end on the year's deliveries",
-             f"C{r + 1}": "Dr 4060, Dr 1040; Cr 1020", f"D{r + 1}": "ReturnsAfterYearEnd (SQL Results)",
+             f"C{r + 1}": "Dr 4060, Cr refund liability (revenue); Dr returns recovery asset, Cr cost of goods sold "
+                          "(cost)", f"D{r + 1}": "ReturnsAfterYearEnd (SQL Results)",
              f"G{r + 1}": f"=I{r + 1}-H{r + 1}",
              f"H{r + 1}": (f"=-(SUMIFS(ReturnsAfterYearEnd[CreditMemoRevenue],ReturnsAfterYearEnd[ReturnYear],{P})-"
                            f"SUMIFS(ReturnsAfterYearEnd[StandardCost],ReturnsAfterYearEnd[ReturnYear],{P}))"),
              f"I{r + 1}": (f"=-(SUMIFS(ReturnsAfterYearEnd[CreditMemoRevenue],ReturnsAfterYearEnd[ReturnYear],{C})-"
                            f"SUMIFS(ReturnsAfterYearEnd[StandardCost],ReturnsAfterYearEnd[ReturnYear],{C}))"),
              f"J{r + 1}": "Change in estimate", f"K{r + 1}": "Pass; list for the CFO's approval.",
-             f"A{r + 2}": "P3", f"B{r + 2}": "Write-down of Damaged and Quality Concern returns restocked at full cost",
+             f"A{r + 2}": "P3", f"B{r + 2}": "Damaged and Quality Concern returns restocked at full cost: the exposure "
+                                         "if none of them can be sold",
              f"C{r + 2}": "Dr 5070; Cr 1040", f"D{r + 2}": "ReturnLines (SalesReturn, SalesReturnLine)",
              f"G{r + 2}": f"=I{r + 2}", f"I{r + 2}": f"=-DamagedRestocked_{C}",
-             f"J{r + 2}": "Estimate (valuation of inventory)", f"K{r + 2}": "Pass; list for the CFO's approval.",
+             f"J{r + 2}": "Estimate (valuation of inventory)",
+             f"K{r + 2}": "Pass; list for the CFO's approval with the count and the condition review that would "
+                          "measure it.",
              f"A{r + 3}": "P1-P3", f"B{r + 3}": "Passed items, in aggregate",
              f"G{r + 3}": f"=SUM(G{r}:G{r + 2})", f"I{r + 3}": f"=SUM(I{r}:I{r + 2})",
              f"A{r + 4}": "T1", f"B{r + 4}": "Freight estimates above the carriers' settlements",
@@ -2084,7 +2113,10 @@ def r5(b: ExerciseBuild) -> None:
     r += 11
     f5 = facts("r5")
     r = model_answer(ws, r, MA + ": what to record, what to pass, and how to present 2025", [
-        f"Record A1 to A4, R1, and R2. In {C} their effect on income ({money(f5['total']['C'])}) is only "
+        f"Record A1, A2, A4, R1, and R2, and A3 once the suppliers' evidence supports it; holding A3, as a "
+        f"retained-liability answer does, lowers income before income taxes by {money(f5['a']['A3']['P'])} in "
+        f"{P} and {money(f5['a']['A3']['C'])} in {C}. In {C} the effect of A1 to A4 on income "
+        f"({money(f5['total']['C'])}) is only "
         f"{pct(f5['share'], 0)} of materiality ({money(f5['mat_c'])}), but size on income is not the whole test: the "
         f"payroll liability alone ({money(f5['pay_c']['total'])}) exceeds materiality, current liabilities at "
         f"{ye(C)} rise by {money(f5['rise'])} before the reclassification, and working capital falls by "
@@ -2165,9 +2197,13 @@ def r5(b: ExerciseBuild) -> None:
     ws.Range(f"B{first}:B{last}").NumberFormat = DATE
     ws.Range(f"C{first}:E{last}").NumberFormat = MONEY
     put(ws, {f"A{last + 1}": "Largest imbalance", f"E{last + 1}": f"=MAX(ABS(E{first}:E{last}))",
-             f"A{last + 2}": "Lines on cash (1010)", f"E{last + 2}": "=COUNTIFS(AdjustmentLines[Account],1010)"})
+             f"A{last + 2}": "Lines on cash (1010)", f"E{last + 2}": "=COUNTIFS(AdjustmentLines[Account],1010)",
+             f"A{last + 3}": "Lines whose entry is not in this list",
+             f"E{last + 3}": (f"=SUMPRODUCT(--(COUNTIFS(A{first}:A{last},AdjustmentLines[No],B{first}:B{last},"
+                              "AdjustmentLines[YearEnd])=0))")})
     name(b, "EntryImbalance", ws, f"E{last + 1}")
     name(b, "CashLines", ws, f"E{last + 2}")
+    name(b, "EntryLinesUnlisted", ws, f"E{last + 3}")
     b.found["entry_rows"] = {p: r + k for k, p in enumerate(pairs, start=1)}
     widths(ws, {"A": 34, "B": 44, "C": 30, "D": 34, "E": 16, "F": 16, "G": 16, "H": 16, "I": 16, "J": 30, "K": 34})
 
@@ -2234,7 +2270,7 @@ def checks_r5(b: ExerciseBuild) -> None:
     b.check(e, f"P2 on {C} income", f["p2"]["income"], "=PassedP2Income")
     b.check(e, f"P2 basis: returns in {C} of {P} deliveries", f["p2"]["n"],
             f"=SUMIFS(ReturnsAfterYearEnd[Returns],ReturnsAfterYearEnd[ReturnYear],{C})", 0, COUNT)
-    b.check(e, f"P3 write-down at {ye(C)}", f["p3"]["effect"], "=PassedP3")
+    b.check(e, f"P3 exposure at {ye(C)}", f["p3"]["effect"], "=PassedP3")
     for y, v in zip((F, P, C), f["p3"]["years"]):
         b.check(e, f"P3 basis: damaged and quality-concern returns restocked in {y}", v, f"=DamagedRestocked_{y}")
     b.check(e, "P3 basis: restocked since the first year", f["p3"]["total"], "=DamagedTotal")
@@ -2245,6 +2281,7 @@ def checks_r5(b: ExerciseBuild) -> None:
     b.check(e, "T1 freight residual", -f["residual"], "=TrivialT1")
     b.check(e, "largest imbalance of an entry", 0, "=EntryImbalance")
     b.check(e, "entry lines on cash", 0, "=CashLines", 0, COUNT)
+    b.check(e, "entry lines whose entry the balance list leaves out", 0, "=EntryLinesUnlisted", 0, COUNT)
     for y in (F, P, C):
         b.check(e, f"adjusted trial balance at {ye(y)}, debits less credits", 0, f"=ROUND(WorkingTB[[#Totals],[Adjusted{y}]],2)")
         b.check(e, f"adjustments at {ye(y)}, debits less credits", 0, f"=ROUND(WorkingTB[[#Totals],[Adj{y}]],2)")
@@ -2869,15 +2906,16 @@ def note_texts() -> list[str]:
         f"which {money(f5['cur_c'])} is due within a year and shown as current. Principal due: {mats}. Interest paid "
         f"was {money(f6['cf_c']['interest_paid'])} in {C} and {money(f6['cf_p']['interest_paid'])} in {P}. The records "
         "link each note to the asset it financed; they do not show a security interest, so the note claims none.",
-        f"Revenue. Revenue from goods and freight is recognized at a point in time, when the goods are delivered; "
+        f"Revenue. Revenue from goods and freight is recognized at a point in time, when control passes to the "
+        f"customer on delivery; "
         f"design services are recognized over time, as the hours are worked and billed monthly. Revenue by product "
         f"line, {C} ({P}): {lines}; design services {money(f7['svc_c'])} ({money(f7['svc_p'])}); freight "
         f"{money(f7['fr_c'])} ({money(f7['fr_p'])}). By customer segment: {segs}. At a point in time "
         f"{money(f7['point_c'])} ({money(f7['point_p'])}); over time {money(f7['svc_c'])} ({money(f7['svc_p'])}). "
         f"Receivables were {money(f7['recv_f'])} at 1 January {P}, {money(f7['recv_p'])}, and {money(f7['recv_c'])}; "
-        "there are no contract assets and no contract liabilities; customer credits awaiting refund were "
-        f"{money(f7['credits'][0])}, {money(f7['credits'][1])}, and {money(f7['credits'][2])}. No service work was "
-        "done and not billed at a year-end. The revenue of each year includes the shipments delivered in it and "
+        "no contract asset or contract liability is recorded; customer credits awaiting refund were "
+        f"{money(f7['credits'][0])}, {money(f7['credits'][1])}, and {money(f7['credits'][2])}. The records show no "
+        "service work done and not billed at a year-end. The revenue of each year includes the shipments delivered in it and "
         "invoiced later or not yet invoiced (note on the correction of the 2025 statements).",
         f"Accrued liabilities. At {ye(C)} ({ye(P)}): payroll and related {money(f7['s_c']['payroll'])} "
         f"({money(f7['s_p']['payroll'])}), including wages owed for the last days of the year and "
@@ -2887,12 +2925,14 @@ def note_texts() -> list[str]:
         f"({money(f7['s_p']['accrued'])}).",
         f"Correction of the {P} statements. The {P} statements given to the shareholders were prepared from the ledger "
         "without year-end adjustments. They have been restated to accrue the payroll owed for the last days of each "
-        "year, to recognize revenue in the year of delivery, to reverse accruals open longer than the invoicing window, "
+        "year, to recognize revenue in the year of delivery, to reverse accruals open longer than the invoicing window "
+        "(on the assumption, still to be supported by the suppliers' evidence, that they were not owed), "
         "and to accrue interest on the notes payable. The correction reduced retained earnings at 1 January "
         f"{P} by {money(-f5['total']['re'])} (from {money(f6['reported'])} to {money(f6['restated'])}) and {P} net "
         f"income by {money(-f5['total']['P'])}, to {money(f5['adj_ni_p'])}; it increased {C} net income by "
         f"{money(f5['total']['C'])}, to {money(f5['adj_ni_c'])}. Current liabilities at {ye(P)} increased by "
-        f"{money(f5['under_p'])} before the current portion of the notes was reclassified. No adjustment affected "
+        f"{money(f5['under_p'])} before the current portion of the notes was reclassified. None of these adjustments "
+        "affected "
         "cash or the totals of the statements of cash flows."]
 
 
@@ -3205,7 +3245,7 @@ def r9(b: ExerciseBuild) -> None:
              "B11": f"Rent paid from cash, {C}", "C11": f"={rent(C)}",
              "B12": "Postings to 2120 Lease Liability and 1140 Leasehold Improvements",
              "C12": "=COUNTIFS(LedgerSummary[AccountNumber],2120)+COUNTIFS(LedgerSummary[AccountNumber],1140)",
-             "A13": "3. Sales tax collected", "B13": f"Sales tax payable (2050) at {ye(C)}", "C13": f"=S_stax_{C}",
+             "A13": "3. Sales tax payable", "B13": f"Sales tax payable (2050) at {ye(C)}", "C13": f"=S_stax_{C}",
              "B14": "Debits to 2050 from credit memos (the only debits)",
              "C14": f'=SUMIFS(LedgerSummary[Debit],LedgerSummary[AccountNumber],2050,LedgerSummary[SourceDocumentType],"CreditMemo",LedgerSummary[Year],"<="&{C})',
              "B15": "Debits to 2050 from any other source (remittances)",
@@ -3237,46 +3277,55 @@ def r9(b: ExerciseBuild) -> None:
     memo = [
         f"To: Chief Financial Officer. From: Staff accountant. Date: July {C + 1}. Subject: The lender package for "
         f"fiscal {C}: what it required and what remains open.",
-        f"What the package required. The ledger was turned into GAAP statements by four recorded adjustments and two "
+        f"What the draft package required. The draft statements rest on four proposed adjustments and two "
         f"reclassifications (Adjustments worksheet): the payroll owed for each year's last days (A1), revenue "
-        f"recognized in the year of delivery (A2), accruals past the invoicing window reversed (A3), and interest "
-        f"accrued on the notes (A4); the current portion of the notes (R1) and the credit balance of 1090 netted into "
-        f"work in process (R2). Net income becomes {money(f5['adj_ni_c'])} in {C} and {money(f5['adj_ni_p'])} in {P}; "
-        f"{P} is presented as restated, and retained earnings at 1 January {P} fall by {money(-f5['total']['re'])}. "
-        "Cash and the totals of the statements of cash flows do not change.",
+        f"recognized in the year of delivery (A2), accruals past the invoicing window reversed (A3, on the "
+        f"assumption that they will never be billed, which the suppliers' statements and the contracts must "
+        f"support), and interest accrued on the notes (A4); the current portion of the notes (R1) and the credit "
+        f"balance of 1090 netted into work in process (R2). Income before income taxes becomes "
+        f"{money(f5['adj_ni_c'])} in {C} and {money(f5['adj_ni_p'])} in {P} ({money(f5['keep'][C])} and "
+        f"{money(f5['keep'][P])} if the old accruals are kept); {P} is presented as restated, and retained earnings "
+        f"at 1 January {P} fall by {money(-f5['total']['re'])}. None of these adjustments moves cash, so cash and "
+        "the totals of the statements of cash flows do not change.",
         f"1. Tax status. The chart has no income tax account and no tax has been recorded in {f9['years']} years; "
         "equity is common stock with no distributions. The legal form or tax election, the returns, and the payments "
-        "would settle it. If the company is a C corporation, the omitted provision is several times materiality "
-        f"(21% federal on {money(f9['adj_ni'])} alone is about {f9['provision']:,.0f}). I propose stating the matter "
-        "and recording nothing until the evidence is in hand.",
+        "would settle it. If the company is a C corporation, a provision could be several times materiality: 21% "
+        f"federal on {money(f9['adj_ni'])}, a magnitude screen that measures neither taxable income nor state or "
+        f"deferred taxes, is about {f9['provision']:,.0f}. I propose stating the matter and recording nothing until "
+        "the evidence is in hand.",
         "2. Leases. Office and warehouse rent is paid from cash on the first weekday of each month ("
-        + " / ".join(money(x) for x in f9["rent"]) + "), in amounts that vary slightly; 2120 and 1140 are unused and "
-        "no lessor appears among the suppliers. The agreements (term, options, escalation, discount rate) would settle "
+        + " / ".join(money(x) for x in f9["rent"]) + "), in amounts that vary slightly; 2120 Lease Liability has "
+        "never been used (1140 Leasehold Improvements, also unused, is not a right-of-use account), and no lessor "
+        "appears among the suppliers. The agreements (term, options, escalation, discount rate) would settle "
         "it; recognizing right-of-use assets and lease liabilities would move the bank's ratios.",
-        f"3. Sales tax. 2050 holds {money(f9['stax'])} collected with no remittance recorded (its only debits are "
-        f"credit memos, {money(f9['memo_debits'])}). The returns, the bank statements, and the tax authority's account "
-        "would settle it: either the liability is overstated because the tax was paid outside the ledger (which would "
-        "also overstate cash), or penalties and interest may be owed (ASC Topic 450).",
+        f"3. Sales tax. 2050 holds {money(f9['stax'])} recorded as payable on invoicing, with no remittance recorded "
+        f"(its only debits are credit memos, {money(f9['memo_debits'])}). The returns, the bank statements, and the "
+        "tax authority's account would settle it: if the tax was paid from company cash outside the ledger, the "
+        "liability and cash are both overstated; if it was not paid, penalties and interest may be owed (ASC Topic "
+        "450).",
         f"4. Opening balances. Receivables {money(o['ar'])}, prepaid {money(o['prepaid'])}, payables {money(o['ap'])} "
         f"(equal to the opening cash to the cent), accrued payroll {money(o['payroll'])}, and accrued expenses "
         f"{money(o['accrued'])} have not changed in {f9['years']} years and no document supports them. If none is "
         f"real, equity rises by {money(f9['equity'])} (assets {money(-f9['assets'])}, liabilities "
-        f"{money(-f9['liabilities'])}); if the payables are real, they are three years past due.",
+        f"{money(-f9['liabilities'])}); if the payables are real, the records show them unpaid for three years, and "
+        "the suppliers' statements would give their terms and due dates.",
         "5. Cash: there is no interest income and no bank reconciliation in the records; confirm the balance with the "
         "bank. 6. Inventories: a physical count and a net realizable value review are needed, and standards unchanged "
         f"since {F} need a cost study: at a standard rebuilt on normal capacity, manufactured finished goods would be "
         f"about {f9['reval_c']:,.0f} higher at the end of {C} and {f9['reval_p']:,.0f} at the end of {P}. "
         "7. Later events and going concern: see the Later Events worksheet; the evaluation needs evidence from "
         "outside the database.",
-        f"8. Passed adjustments for your approval: P1 an allowance for credit losses ({money(f5['p1'])}), P2 expected "
-        f"returns ({money(f5['p2']['effect'])}), and P3 a write-down of damaged returns restocked at full cost "
-        f"({money(f5['p3']['effect'])}); in aggregate {money(f5['aggregate'])}, {pct(f5['agg_share'], 0)} of "
-        "materiality.",
+        f"8. Passed adjustments for your approval: P1 an allowance for credit losses on the invoice aging "
+        f"({money(f5['p1'])}), P2 expected returns ({money(f5['p2']['effect'])}), and P3 the full cost of damaged "
+        f"returns restocked ({money(f5['p3']['effect'])}), the exposure until a count and a review of their "
+        f"condition measure it; in aggregate {money(f5['aggregate'])}, {pct(f5['agg_share'], 0)} of materiality.",
         "Changes to the year-end close: accrue payroll for the days worked and not yet paid; review open accruals "
-        "monthly and reverse those past the invoicing window; cut revenue off by delivery date; accrue interest on the "
+        "monthly and confirm with the supplier any past the invoicing window, reversing only what is not owed; cut "
+        "revenue off by delivery date; accrue interest on the "
         "notes at each month-end.",
-        "Recommendation: record A1 to A4 and R1 to R2, and do not send the package to the bank until matters 1 to 4 "
-        "are settled, because each could change the statements by more than materiality."]
+        "Recommendation: record A1, A2, A4, R1, and R2, and A3 once the suppliers' evidence supports it; do not "
+        "send the package to the bank until matters 1 to 4 are settled, because each could change the statements "
+        "by more than materiality."]
     model_answer(ws, 30, MA + ": the memo to the CFO (two pages at most; exhibits from this workbook)", memo, last_col=6)
     documentation(b)
 

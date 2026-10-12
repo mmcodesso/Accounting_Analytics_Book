@@ -73,10 +73,10 @@ Chapter 7 left the closes out when it compared operating expenses with the budge
 - A population is every record a test's conclusion covers
 - A test on an incomplete extract can find nothing because records are missing
 - Agree its count and total to the ledger, such as the cash credits of payments
-- Use the same cutoff on both sides, so they describe the same population
+- Use the same cutoff on both sides; agreement is in total, not record by record
 
 ::: {.notes}
-The ledger already holds supplier payments dated early in the next fiscal year, so a review of the three years filters them out on both sides. Fay and Negangard begin their journal entry testing case with the same step: validate that the file is complete before testing it.
+The ledger already holds supplier payments dated early in the next fiscal year, so a review of the three years filters them out on both sides. Agreeing totals do not show that each record is present, as Tutorial 4.1 showed, and the ledger is itself the company's record. Fay and Negangard begin their journal entry testing case with the same step: validate that the file is complete before testing it.
 :::
 
 # Stratification
@@ -198,7 +198,7 @@ The columns are the actual shares and the line Benford's expected shares. The pa
 {{< book-figure fig-08-04 >}}
 
 ::: {.notes}
-Full payments conform acceptably; partial payments do not. Charles River pays in parts only larger invoices, most of them just above a thousand dollars, so their parts are amounts in the hundreds that start with the higher digits. The cause is the payment process, not invented amounts.
+Full payments conform acceptably; partial payments do not. Charles River pays in parts only larger invoices, most of them just above a thousand dollars, so their parts are amounts in the hundreds that start with the digits 5 to 9 far more often than expected, and with 2 and 3 far less often. The cause is the payment process, not invented amounts.
 :::
 
 ## Checkpoint
@@ -206,7 +206,7 @@ Full payments conform acceptably; partial payments do not. Charles River pays in
 {{< book-checkpoint 8.1 lead="true" >}}
 
 ::: {.notes}
-The first test found no exception that points to an error, and that is a result worth documenting. The payments reconcile, the largest are identified for vouching, and the one departure from expectations has an explanation the data supports.
+The first test found no exception that points to an error, and that is a result worth documenting. The payments agree with the ledger in count and total, the largest are identified for vouching, and the one departure from expectations has an explanation the data supports.
 :::
 
 # Aging and Reconciling Receivables
@@ -215,7 +215,7 @@ The first test found no exception that points to an error, and that is a result 
 
 - Buckets such as current, 1 to 30, 31 to 60, 61 to 90 and over 90 days
 - It serves the credit department and the estimate of uncollectible amounts
-- The FASB's credit-loss standard requires an allowance, often estimated from an aging
+- The FASB's credit-loss standard requires an estimate of expected losses, often from an aging
 - The as-of date matters: later payments must not reduce the balance
 
 ::: {.notes}
@@ -278,12 +278,12 @@ Tutorial 8.2 applies all four, and the second turns out to be the most important
 Students calculate each invoice's open balance at the year-end from its receipts and credit memos, age it into five buckets with a lookup table, reconcile the total to the ledger, investigate the difference, and select balances for confirmation.
 :::
 
-## The ledger holds a balance no invoice supports
+## The ledger holds a balance with no invoice detail
 
 {{< book-figure fig-08-05 >}}
 
 ::: {.notes}
-The aging shows that customers pay mostly on time. The receivables account exceeds the open invoices by a round amount, a difference that needs an explanation.
+The aging shows that most of the balance open at the year-end is not yet due; it describes what is owed, not how promptly customers paid. The receivables account exceeds the open invoices by a round amount. The same cutoff on both sides rules out one cause, but the difference still has to be traced.
 :::
 
 ## The difference traces to one journal entry line
@@ -299,7 +299,7 @@ Grouped by source document, the receivables postings are invoices, receipts and 
 {{< book-checkpoint 8.2 lead="true" >}}
 
 ::: {.notes}
-Part of the receivables balance is supported by no invoice, and no allowance has been recorded against any of it. Both findings affect the amount at which receivables would be reported, and both go to the audit committee with their evidence.
+Part of the receivables balance has no invoice detail in the extract, and no allowance has been recorded against any of the balance. Both findings could affect the amount at which receivables are reported, and both go to the audit committee with their evidence.
 :::
 
 # Journal Entry Testing
@@ -320,7 +320,7 @@ The PCAOB's fraud standard requires the auditor to identify and test journal ent
 {{< book-table tbl-08-03 >}}
 
 ::: {.notes}
-A backdated entry is created on a later day than the date it posts to, the journal entry counterpart of a post-closing entry. An entry approved by its creator defeats segregation of duties.
+A backdated entry is created on a later day than the date it posts to, so it may change a period already closed; the flag tests only that part of the characteristic, since the closing dates are not in the data. An entry approved by its creator defeats segregation of duties.
 :::
 
 ## A risk score ranks entries for review
@@ -342,7 +342,7 @@ Digit tests apply to journal entries with care: Debreceny and Gray found that jo
 - A misstatement or control deficiency: report it
 
 ::: {.notes}
-Nigrini emphasizes refining and rerunning tests, and grouping and filtering results, to deal with false positives. A test whose exceptions are mostly expected is refined, for example by excluding a recurring entry type examined once, and rerun.
+Nigrini emphasizes refining and rerunning tests, and grouping and filtering results, to deal with false positives. A test whose exceptions are mostly expected is refined, for example by excluding a recurring entry type whose evidence has been examined, with the exclusion recorded, and rerun.
 :::
 
 ## Check your understanding {.check}
@@ -395,7 +395,7 @@ The opening balance entry was created by the chief financial officer on a Saturd
 A FILTER formula spills the entry's eighteen ledger lines from its number. The entry sets up the opening balances of every balance sheet account.
 :::
 
-## Its receivables line has no invoice behind it
+## Its receivables line has no invoice detail behind it
 
 {{< book-figure fig-08-08 crop="0,0,1,0.414" >}}
 
@@ -408,7 +408,7 @@ The outlined line is the receivables difference found in Tutorial 8.2. The journ
 {{< book-checkpoint 8.3 lead="true" >}}
 
 ::: {.notes}
-The tests found no sign of a concealed misstatement in the recurring entries, but they found weaknesses in how entries are approved. The opening balance entry, created after its date, approved by its own creator, and carrying balances the detail does not support, is the first item for the audit committee.
+The flags on the recurring entries are explained by their timing, which leaves their amounts and approvals to check against their schedules; the tests also found weaknesses in how entries are approved. The opening balance entry, created after its date, approved by its own creator, and carrying balances the detail does not support, is the first item for the audit committee.
 :::
 
 # Duplicate, Gap, and Threshold Tests
@@ -418,15 +418,15 @@ The tests found no sign of a concealed misstatement in the recurring entries, bu
 - A duplicate payment need not repeat a reference number
 - Look for the same supplier and amount on different dates
 - Add the invoice as a criterion to tell a second payment from a second invoice
-- About a hundred such pairs each pay two different invoices: false positives
+- About a hundred such pairs each pay two different invoices: likely ordinary
 
 ::: {.notes}
-The test is still worth running, because a near-duplicate that pays the same invoice twice is exactly the error an exact-duplicate test misses. Exercise 8.5 runs it.
+The pairs still need their invoices and receipts to confirm that they are two obligations, and the test cannot catch a bill entered under two invoice numbers. It is worth running, because a near-duplicate that pays the same invoice twice is exactly the error an exact-duplicate test misses. Exercise 8.5 runs it.
 :::
 
 ## Gap tests need a series meant to be continuous
 
-- Compare the count with the range of the numbers: largest less smallest, plus one
+- Check the numbers are unique, then compare the count with largest less smallest, plus one
 - Charles River's invoice, entry, order and receipt numbers run without gaps
 - A clean result is recorded as carefully as an exception
 - Check numbers follow all payments, so every gap is a payment of another kind
@@ -482,8 +482,8 @@ The parameters include the strata bounds, the aging buckets and the approval lim
 
 ## What the review found
 
-- Payments: complete, the largest identified, and the one nonconformity explained
-- Receivables: part of the balance has no invoice behind it, and no allowance
+- Payments: agree with the ledger; the largest identified; the nonconformity explained
+- Receivables: part of the balance has no invoice detail, and no allowance
 - Journal entries: approval weaknesses, led by the opening balance entry
 - Next: the Part II case, then Part III and the database
 

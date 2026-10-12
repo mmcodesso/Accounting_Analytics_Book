@@ -44,7 +44,7 @@ b. Under **Apply settings to**, set **Cards** to **Revenue**.
 c. Under **Value**, set **Display units** to **None**.
 d. Repeat the two actions for At list price, Discounts, and Invoices.
 
-**Display units** appears under **Value** only when **Apply settings to** names one card, not **All**, which is why it is set four times. The four cards now show fiscal 2026 in full, as on the Validation page.
+**Display units** appears under **Value** only when **Apply settings to** names one card, not **All**, which is why it is set four times. The four cards now show fiscal 2026 in full, as the Validation page shows its amounts.
 
 **Step 6. Chart the discounts by month, in month order.**
 
@@ -79,7 +79,7 @@ The report keeps the name you gave it in Guided Tutorial C.1, so the button save
 
 **Checkpoint.** Confirm that your page does the following:
 
-- With 2026 selected, the four cards match the Validation page: revenue, list amount, discounts, and the number of invoices.
+- With 2026 selected, the revenue, list amount, and discount cards match the Validation page, and the invoice card shows fewer invoices than the page shows invoice lines.
 - The months of the line chart are in order, and the discount line rises sharply in September and October.
 - Furniture leads the bar chart, and both charts have alt text.
 

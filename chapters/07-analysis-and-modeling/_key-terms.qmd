@@ -24,7 +24,7 @@
 
 **Flexible-budget variance.** The difference between actual results and the flexible budget. It measures the effect of actual prices and costs differing from the plan on the units actually sold.
 
-**Forecast error.** The difference between a forecast and the actual value, often expressed as a percentage of the actual value. The mean absolute percentage error averages these percentages, ignoring their sign, over the periods forecast.
+**Forecast error.** The difference between a forecast and the actual value, often expressed as a percentage of the actual value. The mean absolute percentage error (MAPE) averages these percentages, ignoring their sign, over the periods forecast.
 
 **Goal Seek.** An Excel what-if tool that finds the value of one input cell that makes a formula cell equal a target value, such as the volume at which a decision breaks even.
 
@@ -38,11 +38,11 @@
 
 **Residual.** The difference between an actual value and the value a regression line predicts for it. A plot of the residuals shows where a line fits poorly and which observations stand apart.
 
-**Sales-volume variance.** The difference between the flexible budget and the static budget. It measures the effect of selling a different volume than planned, at the planned margins per unit.
+**Sales-volume variance.** The difference between the flexible budget and the static budget. It measures the effect of selling a different volume and mix of units than planned, at the planned margins per unit.
 
 **Scenario.** A named set of values for a model's input cells. Excel's Scenario Manager stores scenarios and compares their results in a Scenario Summary report.
 
-**Shadow price.** In an optimization model, the amount by which the objective would improve if a constraint, such as the hours available in a work center, were relaxed by one unit. Solver reports it in the Sensitivity report of a linear model.
+**Shadow price.** In an optimization model, the amount by which the objective would improve if a constraint, such as the hours available in a work center, were relaxed by one unit. Solver reports it in the Sensitivity report of a linear model, with the range over which the constraint can change before the value changes.
 
 **Simple linear regression.** A method that fits the straight line `y = a + bx` minimizing the squared differences between the actual values of a dependent variable and the line, using one independent variable.
 

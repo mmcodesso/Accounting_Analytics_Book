@@ -8,7 +8,7 @@ HEADER = (
     "/* Chapter 9: manufacturing variance, first look\n"
     "   Database: CharlesRiver_Work.sqlite (a copy of CharlesRiver.sqlite)\n"
     "   Prepared by: your name, date\n"
-    "   Checks: every close adds up; the 2026 postings exclude JE-2026-000296 */"
+    "   Checks: every close adds up; the closing entry is JE-2026-000296 */"
 )
 
 QUERIES = [
@@ -40,7 +40,7 @@ QUERIES = [
      "SELECT DISTINCT SourceDocumentType\n"
      "FROM GLEntry\n"
      "WHERE AccountID = 93 AND FiscalYear = 2026;"),
-    ("closing_entry", "-- Tutorial 9.2: the closing entry, left out of any analysis",
+    ("closing_entry", "-- Tutorial 9.2: the closing entry, kept apart from the variance",
      "SELECT GLEntryID, PostingDate, Debit, Credit,\n"
      "    VoucherNumber, Description\n"
      "FROM GLEntry\n"

@@ -33,7 +33,7 @@ a. Add another column, `CodeCheck`, with this formula:
 
 b. On the **Analysis** worksheet, type `Item codes failing the check` in A40 and enter `=COUNTIF(Item[CodeCheck],FALSE)` in B40.
 
-Every item Charles River sells passes the check, so B40 shows zero, which means the product type formula can be trusted for every item.
+Every item Charles River sells passes the check, so B40 shows zero: every code has its hyphens in the expected places, so MID takes the product type from the same position in every code. The check cannot show that the three letters it takes are a real product type; for that, read the values in the ProductType column's filter list against @tbl-05-03, which lists the Furniture codes.
 
 @fig-05-02 shows the Item Table with both new columns.
 
@@ -54,7 +54,7 @@ b. If Excel formats the result as a date, change the column's number format to *
 
 Each invoice now shows its payment terms as a whole number of days. @fig-05-03 shows the SalesInvoice Table with the four new columns.
 
-![The SalesInvoice Table with Fiscal Period and Payment Terms Columns.](/visuals/svg/fig-05-03-salesinvoice-periods.svg){#fig-05-03 fig-alt="A mock of the SalesInvoice Table in the analysis workbook, showing SalesInvoiceID, InvoiceNumber, InvoiceDate, and DueDate for several invoices, and four new calculated columns: FiscalYear, FiscalQuarter, Period, which joins the two into a label such as 2024-Q1, and DaysToDue, the number of days between the invoice date and the due date. The formula bar shows the formula for Period. The new columns are outlined."}
+![The SalesInvoice Table with Fiscal Period and Payment Terms Columns.](/visuals/svg/fig-05-03-salesinvoice-periods.svg){#fig-05-03 fig-alt="A mock of the SalesInvoice Table in the analysis workbook, showing SalesInvoiceID, InvoiceNumber, InvoiceDate, and DueDate for several invoices dated at the end of the third quarter of 2026 and the start of the fourth, and four new calculated columns: FiscalYear, FiscalQuarter, Period, which joins the two into a label such as 2026-Q3 or 2026-Q4, and DaysToDue, the number of days between the invoice date and the due date. The formula bar shows the formula for Period. The new columns are outlined."}
 
 **Step 5. Group and test the payment terms.** Logical functions turn the terms into a label for reporting and a check for review.
 
@@ -73,7 +73,7 @@ b. Add a column `StandardTerms` with this formula, which is TRUE when the terms 
 c. On the **Analysis** worksheet, type `Invoices with nonstandard terms` in A39.
 d. In B39, enter `=COUNTIF(SalesInvoice[StandardTerms],FALSE)`.
 
-B39 shows zero: every invoice has one of the four standard terms, so no due date appears to have been typed by hand. Most invoices fall in the two lower bands of TermsGroup, and only a few hundred have terms longer than 60 days.
+B39 shows zero: every invoice has one of the four standard terms. The test shows that the recorded terms conform; it cannot show whether a due date was calculated by the system or typed by hand, which only the system's settings or its change records could. Most invoices fall in the two lower bands of TermsGroup, and only a few hundred have terms longer than 60 days.
 
 **Step 6. Check the period labels.** Open the filter list on the Period column and read the values it shows.
 
@@ -82,7 +82,7 @@ The Period column holds one label for each quarter of the three fiscal years in 
 **Step 7. Record the new columns.**
 
 a. On the **Documentation** worksheet, add the new calculated columns to the Calculated columns entry, each with its formula: ProductType and CodeCheck on Item, and FiscalYear, FiscalQuarter, Period, DaysToDue, TermsGroup, and StandardTerms on SalesInvoice.
-b. Add the check in B39 to the entry that describes the Analysis worksheet.
+b. Add the checks in B39 and B40 to the entry that describes the Analysis worksheet.
 c. Save the workbook.
 
 The Documentation worksheet now accounts for every column this tutorial added, so a reviewer can see how each value was calculated.

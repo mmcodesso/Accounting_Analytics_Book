@@ -16,7 +16,7 @@ The case works in CharlesRiver_Work.sqlite, and every requirement can be complet
 
 ## The Situation
 
-It is early 2027, and the internal auditors have reported on the manufacturing variance (Chapter 12). The plant's records reconcile, and the pay is right for the hours. The growth in overtime, though, sits on surge days, days on which every hourly manufacturing employee clocked the same hours, and the timekeeping records alone cannot show that those hours were worked. The audit committee has asked management to respond, and the chief audit executive will review the response.
+It is early 2027, and the internal auditors have reported on the manufacturing variance (Chapter 12). The plant's records reconcile, and the pay agrees with the hours at the rates on file. The growth in overtime, though, sits on surge days, days on which every hourly manufacturing employee clocked the same hours, and the timekeeping records alone cannot show that those hours were worked. The audit committee has asked management to respond, and the chief audit executive will review the response.
 
 You are the staff accountant again, as in Chapters 9 to 11. The controller asks you for a decision memo before the fiscal 2026 statements are final and the 2027 plan is set. She wants to know four things:
 

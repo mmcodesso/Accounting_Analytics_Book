@@ -21,7 +21,8 @@ What the builder decides where the case leaves a choice (the workbook says so wh
     first); the credits, refunds, return lines, clawbacks, receipts and applications by year and by job title, the
     commission accruals and payments by year, and the commission rates. The control-test flags the case defines are
     computed in M where M can do it (authority, the credit approver's cash on the invoice, the refund before the last
-    payment, the refund method), as the Requirement 10 note describes for the register.
+    application of the customer's payments, the refund method), as the Requirement 10 note describes for the register;
+    the model answers give the receipt-date variant of the timing test beside it.
   - What M cannot do reasonably is pasted as values from the queries Credits.sql answers (the as-of past-due balance on
     each refund date, the open items in 2060, the timeline of the largest refund, the substantive and lapping
     results, the payroll approvals of Chapters 12 and 16), with an amber fill and a cell note naming the query. The
@@ -178,8 +179,9 @@ class Facts:
         self.emp = {r[0]: dict(id=r[0], title=r[1], limit=r[2] or 0, hire=r[3], term=r[4]) for r in self.q(
             "SELECT EmployeeID, JobTitle, MaxApprovalAmount, HireDate, TerminationDate FROM Employee")}
         self.holders = Counter(e["title"] for e in self.emp.values())
-        self.inv = {r[0]: dict(id=r[0], num=r[1], cust=r[2], date=r[3], due=r[4], gt=r[5]) for r in self.q(
-            "SELECT SalesInvoiceID, InvoiceNumber, CustomerID, InvoiceDate, DueDate, GrandTotal FROM SalesInvoice")}
+        self.inv = {r[0]: dict(id=r[0], num=r[1], cust=r[2], date=r[3], due=r[4], gt=r[5], freight=r[6]) for r in self.q(
+            "SELECT SalesInvoiceID, InvoiceNumber, CustomerID, InvoiceDate, DueDate, GrandTotal, FreightAmount "
+            "FROM SalesInvoice")}
         self.cm = {r[0]: dict(id=r[0], num=r[1], date=r[2], ret=r[3], cust=r[4], inv=r[5], sub=r[6], freight=r[7],
                               tax=r[8], gt=r[9], status=r[10], appr=r[11]) for r in self.q(
             "SELECT CreditMemoID, CreditMemoNumber, CreditMemoDate, SalesReturnID, CustomerID, OriginalSalesInvoiceID, "
@@ -293,6 +295,14 @@ class Facts:
         t["rf_above"] = [r for r in rf.values() if r["amt"] > emp[r["appr"]]["limit"]]
         t["before"] = [r for r in rf.values() if (self.last_payment(cm[r["cm"]]["inv"]) or "") > r["date"]]
         t["nothing"] = [r for r in rf.values() if not any(a[0] <= r["date"] for a in self.apps[cm[r["cm"]]["inv"]])]
+        # the receipt-date variant, for the model answers (the flags keep the case's application-date definition)
+        rdate = lambda a: self.rcpt[a[3]]["date"]  # noqa: E731
+        t["before_rcpt"] = [r for r in rf.values()
+                            if max((rdate(a) for a in self.apps[cm[r["cm"]]["inv"]]), default="") > r["date"]]
+        t["nothing_rcpt"] = [r for r in rf.values()
+                             if not any(rdate(a) <= r["date"] for a in self.apps[cm[r["cm"]]["inv"]])]
+        rcpt_ids = {r["id"] for r in t["before_rcpt"]}
+        t["same_day"] = [r for r in t["before"] if r["id"] not in rcpt_ids]
         t["same_approver"] = [r for r in rf.values() if r["appr"] == cm[r["cm"]]["appr"]]
         dated = ([(m["appr"], m["date"]) for m in cm.values()] + [(r["appr"], r["date"]) for r in rf.values()])
         t["outside_employment"] = [x for x in dated if (emp[x[0]]["term"] and x[1] > emp[x[0]]["term"])
@@ -314,6 +324,9 @@ class Facts:
         t["pdue"] = {k: past_due(r["cust"], r["date"]) for k, r in rf.items()}
         t["methods"] = {k: {self.rcpt[a[3]]["method"] for a in self.apps[cm[r["cm"]]["inv"]]} for k, r in rf.items()}
         t["mism"] = [r for k, r in rf.items() if r["method"] not in t["methods"][k]]
+        # the method test reads every receipt ever applied to the invoice: these match only on receipts after the refund
+        t["late_method"] = [r for k, r in rf.items() if r["method"] in t["methods"][k] and r["method"] not in
+                            {self.rcpt[a[3]]["method"] for a in self.apps[cm[r["cm"]]["inv"]] if rdate(a) <= r["date"]}]
         t["pd1"] = [r for k, r in rf.items() if t["pdue"][k] > 0.005]
         t["pd2"] = [r for k, r in rf.items() if t["pdue"][k] >= r["amt"]]
         above_ids = {r["id"] for r in t["rf_above"]}
@@ -360,8 +373,12 @@ class Facts:
         rest = [r for r in self.rf.values() if r["id"] not in key_ids]
         before_ids = {r["id"] for r in self.tests["before"]}
         dev = [r for r in rest if r["id"] in before_ids]
+        rcpt_ids = {r["id"] for r in self.tests["before_rcpt"]}
+        damaged = lambda r: self.sr[self.cm[r["cm"]]["ret"]]["reason"] == "Damaged"  # noqa: E731
+        dmg_key, dmg_rest = [r for r in key if damaged(r)], [r for r in rest if damaged(r)]
         n = next(x[2] for x in TBL_19_03[EXPECTED] if x[0] == CONFIDENCE and x[1] == TOLERABLE)
         N, K = len(rest), len(dev)
+        dmg_mean = n * len(dmg_rest) / N
         cdf = lambda k: hypergeom_cdf(k, N, K, n)  # noqa: E731
         lo = max(k for k in range(n + 1) if cdf(k - 1) < TAIL)
         hi = min(k for k in range(n + 1) if 1 - cdf(k) < TAIL)
@@ -373,7 +390,10 @@ class Facts:
                     cdf_lo=cdf(lo - 1), cdf_hi=cdf(hi), udl_lo=beta_inv(CONFIDENCE, lo, n),
                     udl_mid=beta_inv(CONFIDENCE, mid, n), udl_hi=beta_inv(CONFIDENCE, hi, n),
                     big_customers={c: v for c, v in by_cust.items() if v > KEY_CUSTOMER},
-                    zero_draw=hypergeom_cdf(0, N, K, n))
+                    zero_draw=hypergeom_cdf(0, N, K, n), dev_rcpt=[r for r in rest if r["id"] in rcpt_ids],
+                    key_dev_rcpt=sum(1 for r in key if r["id"] in rcpt_ids),
+                    dmg=dict(n=len(dmg_key) + len(dmg_rest), key=len(dmg_key), rest=len(dmg_rest), mean=dmg_mean,
+                             k=round(dmg_mean), udl=beta_inv(CONFIDENCE, 0, round(dmg_mean))))
 
     # --- Requirement 2 ---------------------------------------------------------------------------------------------
     def balance(self, acct: str, y: int) -> float:
@@ -501,12 +521,17 @@ class Facts:
     def substantive(self) -> dict:
         """Requirement 7's recomputations and lapping tests, as Credits.sql answers them (pasted in the workbook)."""
         lines = self.q("SELECT l.CreditMemoLineID, l.Quantity, l.UnitPrice, l.Discount, l.LineTotal, sl.QuantityShipped, "
-                       "sil.UnitPrice, sil.Discount, sil.SalesInvoiceID, cm.OriginalSalesInvoiceID FROM CreditMemoLine l "
+                       "sil.UnitPrice, sil.Discount, sil.SalesInvoiceID, cm.OriginalSalesInvoiceID, srl.QuantityReturned "
+                       "FROM CreditMemoLine l "
                        "JOIN CreditMemo cm ON cm.CreditMemoID = l.CreditMemoID JOIN SalesReturnLine srl ON "
                        "srl.SalesReturnLineID = l.SalesReturnLineID JOIN ShipmentLine sl ON sl.ShipmentLineID = "
                        "srl.ShipmentLineID LEFT JOIN SalesInvoiceLine sil ON sil.ShipmentLineID = sl.ShipmentLineID")
         traced = sum(1 for r in lines if r[8] is not None and r[8] == r[9])
         over = sum(1 for r in lines if r[1] > r[5] + 1e-9)
+        qty_off = sum(1 for r in lines if abs(r[1] - r[10]) > 1e-9)
+        exact = lambda r: Decimal(repr(r[1])) * Decimal(repr(r[2])) * (1 - Decimal(repr(r[3])))  # noqa: E731
+        half_up = sorted(r[0] for r in lines if Decimal(repr(r[4])) != exact(r).quantize(Decimal("0.01"), ROUND_HALF_UP))
+        freight_over = sum(1 for m in self.cm.values() if m["freight"] > self.inv[m["inv"]]["freight"] + 0.005)
         price_off = sum(1 for r in lines if r[6] is None or abs(r[2] - r[6]) > 0.004 or abs(r[3] - r[7]) > 1e-9)
         total_off = [r[0] for r in self.q("SELECT CreditMemoLineID FROM CreditMemoLine WHERE ABS(LineTotal - "
                                           "ROUND(Quantity * UnitPrice * (1 - Discount), 2)) > 0.004 ORDER BY 1")]
@@ -525,11 +550,27 @@ class Facts:
             applied[rid] += a
         not_full = sum(1 for k, r in self.rcpt.items() if abs(applied[k] - r["amt"]) > 0.005)
         early = [(rid, a) for inv, day, a, e, rid in self.all_apps if self.rcpt[rid]["date"] < self.inv[inv]["date"]]
-        return dict(lines=len(lines), traced=traced, over=over, price_off=price_off, total_off=total_off, twice=twice,
+        return dict(lines=len(lines), traced=traced, over=over, qty_off=qty_off, half_up=half_up, freight_over=freight_over,
+                    price_off=price_off, total_off=total_off, twice=twice,
                     distinct_inv=distinct_inv, above_invoice=above_invoice, rate=rate, tax_ok=tax_ok,
                     with_freight=with_freight, other=other, dep_lo=min(dep), dep_hi=max(dep), lag_lo=min(lag),
                     lag_hi=max(lag), not_full=not_full, early_receipts=len({rid for rid, _ in early}),
                     early_apps=len(early), early_amount=r2(sum(a for _, a in early)))
+
+    @cached_property
+    def first_digits(self) -> dict:
+        """The first-digit MADs of the refunds and credits, and the MAD a population of their size that followed
+        Benford's Law exactly would show by chance (the normal approximation)."""
+        ps = [math.log10(1 + 1 / k) for k in range(1, 10)]
+
+        def chance(n: int) -> float:
+            return sum(math.sqrt(2 / math.pi) * math.sqrt(p * (1 - p) / n) for p in ps) / 9
+
+        def mad(values) -> float:
+            digits = [int(f"{v:.15e}"[0]) for v in values if v > 0]
+            return sum(abs(digits.count(k) / len(digits) - p) for k, p in zip(range(1, 10), ps)) / 9
+        return dict(chance_rf=chance(len(self.rf)), chance_cm=chance(len(self.cm)),
+                    mad_rf=mad([r["amt"] for r in self.rf.values()]), mad_cm=mad([m["gt"] for m in self.cm.values()]))
 
     @cached_property
     def payroll_approvals(self) -> dict:
@@ -1035,8 +1076,8 @@ SHEETS = [
     ("Risks", "The fraud brainstorm and the risk-and-control matrix", "Requirement 3"),
     ("Tests", "The control tests on every document, by year, the combined exception list, and the refund flags "
               "reconciled to RefundFlags (appendix: the test results)", "Requirement 4"),
-    ("Sample", "Attributes, parameters, key items, the frozen random selection, the evaluation rule, and the data "
-               "attribute applied to the sample (appendix: the sample plan)", "Requirement 6"),
+    ("Sample", "Attributes, parameters, key items, the frozen random selection, the evaluation rule, the data "
+               "attribute applied to the sample, and A3's own population (appendix: the sample plan)", "Requirement 6"),
     ("Timeline", "The largest refund from shipment to the last receipt, its disposition, the restocking by reason, and the "
                  "substantive and lapping results", "Requirement 7"),
     ("Deficiencies", "The evaluation matrix against the materiality cells, the combined classification, and the clean "
@@ -1071,6 +1112,11 @@ def documentation(b: ExerciseBuild, ws) -> int:
                           "compute reasonably (balances as of each refund date, the items in 2060, the timeline, the "
                           "substantive and lapping results). They do not refresh; rerun the query and paste again."),
         ("Written parts", f"Text labeled \"{MA}\" is the instructor's model answer; reasoned alternatives are accepted."),
+        ("Refresh order", "1. Rerun Credits.sql on the capstone copy and paste its results again over the amber cells "
+                          "and the RefundFlags sheet: Data > Refresh All does not rerun them. 2. Data > Refresh All. 3. The "
+                          "Sample sheet's selection is frozen and the written answers describe this release of the data: on "
+                          "a new release, draw and freeze a new selection, then revise the written answers. 4. Save, then "
+                          "refresh Credits Analytics.pbix, which reads RefundFlags.csv from the same export."),
         ("Prepared by", "Accounting Analytics instructor solution; replace with your name and the date."),
         ("Reviewed by", ""),
     ]
@@ -1763,8 +1809,8 @@ def r3(b: ExerciseBuild) -> None:
         f"{money(e['diff'])} or {pct(e['diff_pct'])} more. The difference is above clearly trivial and below "
         "performance materiality, so it is not a misstatement in itself, but it calls for an explanation: Requirement "
         "5 looks for where returns grow (by item group, reason, customer, and shipment month).",
-        f"The {f.F} rate ({pct(e['rates'][0], 3)}) would make a poorer expectation ({money(e['exp_f'])}, "
-        f"{pct(e['f_pct'])} below the recorded returns). Fiscal {f.F} was the first year of operations in the data "
+        f"The {f.F} rate ({pct(e['rates'][0], 3)}) would make a poorer expectation ({money(e['exp_f'])}: the recorded "
+        f"returns are {pct(e['f_pct'])} above it). Fiscal {f.F} was the first year of operations in the data "
         f"(the first shipment is dated {e['first_shipment'][:10]}): it had no earlier sales to return, and returns "
         "arrive weeks after shipment, so its early months carry almost no returns and its rate understates the "
         "steady state. The prior year is the closest complete, comparable period."], span=4)
@@ -1869,9 +1915,10 @@ def r3(b: ExerciseBuild) -> None:
          "approver against the credit approver", "SQL", "Database for the limit; the delegation of authority for "
          "refunds is outside", "163 refunds above the limit", "High"],
         ["A refund pays out a credit balance the customer has not paid", "Occurrence of disbursements; existence of 2060",
-         "C7", "A refund only of a credit balance the customer has paid", "Refund date against the last payment on the "
-         "credited invoice", "SQL; the sample's data attribute in Excel", "Database (dates); clearance is outside",
-         "58 refunds before the payment", "High"],
+         "C7", "A refund only of a credit balance the customer has paid", "Refund date against the last application "
+         "of the payments to the credited invoice (or, if stated, its last receipt)", "SQL; the sample's data attribute in "
+         "Excel", "Database (dates); clearance is outside",
+         f"{len(tt['before'])} refunds before the last application ({len(tt['before_rcpt'])} by receipt date)", "High"],
         ["A refund is diverted to another payee", "Occurrence of disbursements (fraud)", "C8",
          "Refunds to the payer's method or a verified account, open balances offset first", "Refund method against the "
          "receipts' methods; past-due balance on the refund date; sample for the payee check and the written request",
@@ -1965,7 +2012,7 @@ def r4(b: ExerciseBuild) -> None:
     receiver = ("(XLOOKUP(Credits[SalesReturnID],ReturnLines[SalesReturnID],ReturnLines[ReceivedByEmployeeID])"
                 "=Credits[ApprovedByEmployeeID])")
     spec = [
-        ("T1", "Credit above the approver's limit (GrandTotal > MaxApprovalAmount)", "C2", "Credit memos",
+        ("T1", "Credit above the approver's recorded limit (GrandTotal > MaxApprovalAmount)", "C2", "Credit memos",
          cflag("AboveLimit"), "Credits", tt["cm_above"], "gt"),
         ("T2", "Credit approver also applied cash to the credited invoice", "C4", "Credit memos", cflag("CashAndCredit"),
          "Credits", tt["cash_credit"], "gt"),
@@ -1982,13 +2029,14 @@ def r4(b: ExerciseBuild) -> None:
                    "Refunds[OutsideEmployment],TRUE,Refunds[FiscalYear],{c}$4)",
               total="=COUNTIF(Credits[OutsideEmployment],TRUE)+COUNTIF(Refunds[OutsideEmployment],TRUE)", amount="",
               cur=""), "Credits, Refunds", tt["outside_employment"], None),
-        ("T7", "Refund above the approver's limit", "C6", "Refunds", rflag("AboveLimit"), "Refunds", tt["rf_above"],
+        ("T7", "Refund above the approver's recorded limit", "C6", "Refunds", rflag("AboveLimit"), "Refunds",
+         tt["rf_above"],
          "amt"),
         ("T8", "Refund approved by the credit's approver", "C6", "Refunds", rflag("SameApprover"), "Refunds",
          tt["same_approver"], "amt"),
-        ("T9", "Refund dated before the last payment on the credited invoice", "C7", "Refunds",
+        ("T9", "Refund dated before the last application of the payments to the credited invoice", "C7", "Refunds",
          rflag("BeforePayment"), "Refunds", tt["before"], "amt"),
-        ("T10", "... and before any payment on it", "C7", "Refunds", rflag("BeforeAnyPayment"), "Refunds",
+        ("T10", "... and before any application to it", "C7", "Refunds", rflag("BeforeAnyPayment"), "Refunds",
          tt["nothing"], "amt"),
         ("T11", "Customer past due on the refund date (any amount)", "C8", "Refunds", pflag("PastDueAny"),
          "RefundFlags (Credits.sql)", tt["pd1"], "amt"),
@@ -2098,10 +2146,10 @@ def r4(b: ExerciseBuild) -> None:
     r += 1
 
     # timing of the refunds before payment
-    heading(ws, r, "Refunds dated before the customer's payment: timing and cause")
+    heading(ws, r, "Refunds dated before the last application of the customer's payments: timing and cause")
     r += 1
     w = tt["wait"]
-    timing = [("Days from the refund to the last payment: fewest",
+    timing = [("Days from the refund to the last application: fewest",
                "=MINIFS(Refunds[DaysToLastPayment],Refunds[BeforePayment],TRUE)", min(w), COUNT),
               ("Most", "=MAXIFS(Refunds[DaysToLastPayment],Refunds[BeforePayment],TRUE)", max(w), COUNT),
               ("Mean", "=AVERAGEIFS(Refunds[DaysToLastPayment],Refunds[BeforePayment],TRUE)", sum(w) / len(w), "0.0")]
@@ -2112,12 +2160,17 @@ def r4(b: ExerciseBuild) -> None:
         r += 1
     cz = f.cause
     pasted = [["Refunds before payment also dated before the invoice's due date", cz["before_due"]],
+              ["Refunds dated before the last receipt applied to the invoice (by the receipts' dates)",
+               len(tt["before_rcpt"])],
+              ["... before any receipt", len(tt["nothing_rcpt"])],
+              ["Refunds the two definitions part on: dated the day of the last receipt", len(tt["same_day"])],
               ["Credits that posted a part to 2060", cz["to_2060"]],
               ["... of which posted when nothing had been paid on the invoice", cz["unpaid"]]]
     for i, (label, v) in enumerate(pasted):
         put(ws, {f"B{r + i}": label})
-    paste(ws, r, 8, [[v] for _, v in pasted], "refunds before payment and the credits' 2060 parts (the timing of the "
-                                               "credits posted to 2060 against the payments on their invoices)",
+    paste(ws, r, 8, [[v] for _, v in pasted], "refunds before payment, by application and by receipt dates (test T6), "
+                                               "and the credits' 2060 parts (the timing of the credits posted to 2060 "
+                                               "against the payments on their invoices)",
           {0: COUNT})
     r += len(pasted) + 1
 
@@ -2213,7 +2266,8 @@ def r4(b: ExerciseBuild) -> None:
     expected_mism = sum(1 - len(tt["methods"][k] & set(methods)) / len(methods) for k in f.rf)
     text_block(ws, text_row, MA, [
         f"Authority. {len(tt['cm_above'])} credits ({money(f.stat(tt['cm_above'])['amt'])}; {len(f.in_year(tt['cm_above'], f.C))} "
-        f"in fiscal {f.C}, {money(f.stat(tt['cm_above'])['cur_amt'])}) were approved above the approver's limit, all by "
+        f"in fiscal {f.C}, {money(f.stat(tt['cm_above'])['cur_amt'])}) were approved above the approver's recorded limit, "
+        "all by "
         "customer service representatives, whose general limit is $0; the Customer Service Manager's $25,000 is never "
         f"exceeded. {len(tt['rf_above'])} refunds ({money(f.stat(tt['rf_above'], 'amt')['amt'])}) were approved above "
         "the limit by Staff Accountants and Administrative Specialists, also with limits of $0; the Accounting "
@@ -2230,18 +2284,25 @@ def r4(b: ExerciseBuild) -> None:
         "executive on every sales invoice, so the records cannot show who keyed a credit or a refund. That is a gap "
         "in the evidence, not evidence of self-approval.",
         f"Refunds and payment. {len(tt['before'])} refunds ({money(f.stat(tt['before'], 'amt')['amt'])}) are dated "
-        "before the last payment applied to the credited invoice (definition: the refund date is earlier than the "
-        f"latest ApplicationDate on the invoice), {len(tt['nothing'])} of them before any payment; the payment arrived "
-        f"{min(w)} to {max(w)} days later (mean {sum(w) / len(w):.1f}). The cause is in how credits post: a credit "
-        "goes to receivables only for what the invoice's final payments leave unpaid, and the rest to 2060, so "
-        f"{cz['unpaid']} of the {cz['to_2060']} credits to 2060 were posted when nothing had been paid, and the refund "
-        "control pays out 2060 without checking that the customer's payment has arrived.",
+        "before the last application of the customer's payments to the credited invoice (definition: the refund date "
+        f"is earlier than the latest ApplicationDate on the invoice), {len(tt['nothing'])} of them before any "
+        f"application; the last application came {min(w)} to {max(w)} days later (mean {sum(w) / len(w):.1f}). By "
+        f"the receipts' own dates, {len(tt['before_rcpt'])} refunds ({money(f.stat(tt['before_rcpt'], 'amt')['amt'])}) "
+        f"precede the last receipt, {len(tt['nothing_rcpt'])} of them any receipt; the {len(tt['same_day'])} the two "
+        "definitions part on are dated the day of the last receipt, applied later, and the records hold no times, so "
+        "their order that day is unknown; neither date shows when a payment cleared the bank. The cause is in how "
+        "credits post: a credit goes to receivables only for what the invoice's final payments leave unpaid, and the "
+        f"rest to 2060, so {cz['unpaid']} of the {cz['to_2060']} credits to 2060 were posted when nothing had been "
+        "applied to the invoice, and nothing in the records shows the refund step checking the customer's payments "
+        "before it pays out 2060.",
         f"Offset and method. On the refund date (as of that date: GrandTotal less the applications and credits dated by "
         "then, for invoices whose DueDate had passed, as Chapter 8 aged receivables), "
         f"{len(tt['pd1'])} refunds went to customers with a past-due balance, {pd2['n']} of them past due by at least "
-        f"the refund ({money(pd2['amt'])}; {pd2['cur']} in fiscal {f.C}, {money(pd2['cur_amt'])}): balances that could "
-        f"have been offset. {mism['n']} refunds ({money(mism['amt'])}) went by a method that none of the receipts on "
-        f"the credited invoice used. No customer pays by one method only, and a method chosen at random from the "
+        f"the refund ({money(pd2['amt'])}; {pd2['cur']} in fiscal {f.C}, {money(pd2['cur_amt'])}): balances an offset "
+        f"could have reduced, if the customer's terms allow it. {mism['n']} refunds ({money(mism['amt'])}) went by a "
+        f"method that none of the receipts on the credited invoice used, counting every receipt, later ones included "
+        f"({len(tt['late_method'])} refunds match only on receipts dated after the refund). No customer pays by one "
+        "method only, and a method chosen at random from the "
         f"{word(len(methods))} would mismatch about {expected_mism:.0f} times, so this is an anomaly to follow up, not "
         "a rule.",
         f"Clean. One refund per refunded credit, equal to the credit's part in 2060; a clawback for every credit line "
@@ -2257,6 +2318,7 @@ def r4(b: ExerciseBuild) -> None:
 NOT_KEY = ("LET(c,Refunds[CustomerID],a,Refunds[Amount],t,SUMIFS(Refunds[Amount],Refunds[CustomerID],c),"
            "(a<KeyAmount)*(t<=KeyCustomerTotal)=1)")
 NOT_DOC = "Not tested: no document in the database"
+OVERALL = "No material weakness identified (provisional)"   # Requirement 8: the ratings wait for the evidence outside
 
 
 def r6(b: ExerciseBuild) -> None:
@@ -2279,10 +2341,12 @@ def r6(b: ExerciseBuild) -> None:
          "customer service, or a payee or account that differs from the customer master."],
         ["A3. For refunds of returns coded Damaged, an inspection record of the goods", "The warehouse's inspection "
          "record of the goods returned (and any carrier claim); outside the database.",
-         "No inspection record, or a record that does not support the reason code. Applies to Damaged returns only."],
-        ["D1. The refund dated before the customer's payment (the data attribute)", "The database: the refund date "
-         "against the last payment applied to the credited invoice (Refunds[BeforePayment]).",
-         "The refund is dated before the last payment on the credited invoice."]])
+         "No inspection record, or a record that does not support the reason code. Applies to Damaged returns only, "
+         "so its population and sample are its own (below)."],
+        ["D1. The refund dated before the last application of the customer's payments (the data attribute)",
+         "The database: the refund date against the last application of a payment to the credited invoice "
+         "(Refunds[BeforePayment]); the receipts' dates are the alternative, if stated.",
+         "The refund is dated before the last application of a payment to the credited invoice."]])
 
     # parameters and tbl-19-03
     heading(ws, 11, "Parameters (chosen before the selection)")
@@ -2370,7 +2434,8 @@ def r6(b: ExerciseBuild) -> None:
     fmt(ws, f"A{e0 + 2}:A{e0 + 5}", COUNT)
     fmt(ws, f"B{e0 + 2}:B{e0 + 5}", "0.00%")
     put(ws, {f"A{e0 + 6}": "Rule: rely on the control only if the upper deviation limit is at or below the tolerable "
-                           "rate; at n = 59 that means no deviation at all."})
+                           "rate; at n = 59 that means no deviation at all. The rule runs past what the plan allows, and "
+                           "BETA.INV holds while the deviations are fewer than the items (all deviating: 100%)."})
     ws.Range(f"A{e0 + 6}").Font.Italic = True
 
     # the frozen selection
@@ -2421,15 +2486,15 @@ def r6(b: ExerciseBuild) -> None:
     heading(ws, v0, "D1 applied to the sample, and compared with the population test of Requirement 4")
     put(ws, {f"A{v0 + 1}": "Deviations in the sample", f"B{v0 + 1}": f'=COUNTIF(K{first}:K{last},"Deviation")',
              f"A{v0 + 2}": "Sample deviation rate", f"B{v0 + 2}": f"=B{v0 + 1}/SampleSize",
-             f"A{v0 + 3}": "Upper deviation limit", f"B{v0 + 3}": f"=BETA.INV(SampleConfidence,B{v0 + 1}+1,"
-                                                                   f"SampleSize-B{v0 + 1})",
+             f"A{v0 + 3}": "Upper deviation limit", f"B{v0 + 3}": f"=IF(B{v0 + 1}>=SampleSize,1,BETA.INV("
+                                                                   f"SampleConfidence,B{v0 + 1}+1,SampleSize-B{v0 + 1}))",
              f"A{v0 + 4}": "The sample's conclusion",
              f"B{v0 + 4}": f'=IF(B{v0 + 3}<=TolerableRate,"Supports reliance","Does not support reliance")',
-             f"A{v0 + 5}": "Remaining refunds dated before the payment (population test)",
+             f"A{v0 + 5}": "Remaining refunds dated before the last application (population test)",
              f"B{v0 + 5}": f"=SUM(--FILTER(Refunds[BeforePayment],{NOT_KEY}))",
              f"A{v0 + 6}": "Their rate", f"B{v0 + 6}": f"=B{v0 + 5}/B27",
-             f"A{v0 + 7}": "Key items dated before the payment", f"B{v0 + 7}": "=COUNTIF(INDEX(A32#,0,7),TRUE)",
-             f"A{v0 + 8}": "All refunds dated before the payment (Requirement 4)",
+             f"A{v0 + 7}": "Key items dated before the last application", f"B{v0 + 7}": "=COUNTIF(INDEX(A32#,0,7),TRUE)",
+             f"A{v0 + 8}": "All refunds dated before the last application (Requirement 4)",
              f"B{v0 + 8}": "=COUNTIF(Refunds[BeforePayment],TRUE)",
              f"A{v0 + 9}": "Deviations a sample of SampleSize expects", f"B{v0 + 9}": f"=SampleSize*B{v0 + 5}/B27",
              f"A{v0 + 10}": "Plausible draws: lowest count (each tail below 5%)",
@@ -2482,7 +2547,41 @@ def r6(b: ExerciseBuild) -> None:
     k_drawn = int(ws.Range(f"B{v0 + 1}").Value)
     udl_drawn = float(ws.Range(f"B{v0 + 3}").Value)
     b.found["sample"] = dict(k=k_drawn, udl=udl_drawn, first=first, last=last, conclusion=f"Sample!B{v0 + 4}")
-    text_block(ws, v0 + 20, MA, [
+    # A3 applies only to the refunds of Damaged returns: its own population, and what this draw holds of it
+    a0 = v0 + 20
+    dmg = s["dmg"]
+    reason_of = ("XLOOKUP(XLOOKUP({ids},Credits[CreditMemoID],Credits[SalesReturnID]),ReturnLines[SalesReturnID],"
+                 "ReturnLines[ReasonCode])")
+    heading(ws, a0, "A3, the inspection record: its own population (refunds of Damaged returns)")
+    put(ws, {f"A{a0 + 1}": "Refunds of Damaged returns",
+             f"B{a0 + 1}": "=SUM(--(" + reason_of.format(ids="Refunds[CreditMemoID]") + '="Damaged"))',
+             f"A{a0 + 2}": "... of which key items, examined in full",
+             f"B{a0 + 2}": "=SUM(--(" + reason_of.format(
+                 ids="XLOOKUP(INDEX(A32#,0,1),Refunds[RefundNumber],Refunds[CreditMemoID])") + '="Damaged"))',
+             f"A{a0 + 3}": "... in the remainder", f"B{a0 + 3}": f"=B{a0 + 1}-B{a0 + 2}",
+             f"A{a0 + 4}": "Of them, a draw of SampleSize is expected to hold", f"B{a0 + 4}": f"=SampleSize*B{a0 + 3}/B27",
+             f"A{a0 + 5}": "Of them, this draw holds", f"B{a0 + 5}": f'=COUNTIF(G{first}:G{last},"Damaged")',
+             f"A{a0 + 6}": "Upper deviation limit if every one of them passes",
+             f"B{a0 + 6}": f'=IF(B{a0 + 5}=0,"No conclusion",BETA.INV(SampleConfidence,1,B{a0 + 5}))',
+             f"A{a0 + 7}": "A3's conclusion from this draw",
+             f"B{a0 + 7}": f'=IF(AND(ISNUMBER(B{a0 + 6}),B{a0 + 6}<=TolerableRate),"Supports reliance",'
+                          '"Does not support reliance: examine all the Damaged refunds, or size a sample for them")'})
+    fmt(ws, f"B{a0 + 1}:B{a0 + 3}", COUNT)
+    fmt(ws, f"B{a0 + 4}", "0.0")
+    fmt(ws, f"B{a0 + 5}", COUNT)
+    fmt(ws, f"B{a0 + 6}", "0.0%")
+    b.check(t, "A3: refunds of Damaged returns", dmg["n"], f"=Sample!B{a0 + 1}", 0, COUNT)
+    b.check(t, "A3: Damaged refunds among the key items", dmg["key"], f"=Sample!B{a0 + 2}", 0, COUNT)
+    b.check(t, "A3: Damaged refunds in the remainder", dmg["rest"], f"=Sample!B{a0 + 3}", 0, COUNT)
+    b.check(t, "A3: Damaged refunds a draw is expected to hold", dmg["mean"], f"=Sample!B{a0 + 4}", 5e-5, "0.0")
+    # fewer Damaged refunds than 59 exist in the remainder, so no draw can support reliance on A3 at 5%
+    b.check(t, "A3: the draw's conclusion", "Does not support reliance: examine all the Damaged refunds, or size a "
+            "sample for them", f"=Sample!B{a0 + 7}")
+    xl.retry(wb.Application.Calculate)
+    xl.wait_ready(wb.Application)
+    dmg_drawn = int(ws.Range(f"B{a0 + 5}").Value)
+    udl_dmg = beta_inv(CONFIDENCE, 0, dmg_drawn) if dmg_drawn else 1.0
+    text_block(ws, a0 + 9, MA, [
         f"Plan. The three attributes need evidence outside the database, so they are sampled: a written request "
         f"(A1), an independent payee check (A2), and, for refunds of Damaged returns, an inspection record (A3). At "
         f"95% confidence, a 5% tolerable rate, and no expected deviations, tbl-19-03 gives a sample of {n} with no "
@@ -2491,19 +2590,31 @@ def r6(b: ExerciseBuild) -> None:
         f"$10,000; they are examined in full. The other {len(s['rest'])} refunds ({money(s['rest_total'])}) were put in "
         f"random order with SORTBY and RANDARRAY, the first {n} kept and frozen with Paste Values on {pq.today()}. "
         f"A sample of {n} is {pct(s['share'])} of {len(s['rest'])}: the large-population table is conservative here, "
-        "and a finite-population correction would allow a smaller sample.",
+        "and a finite-population correction would allow a smaller sample. A1 and A2 apply to every refund; A3 "
+        "applies only to the refunds of Damaged returns and needs a population of its own (below). The draw covers "
+        f"fiscal {f.F} to {f.C}, so it supports a conclusion on the three years together; a conclusion as at the end "
+        f"of {f.C} also needs evidence that the controls did not change.",
         f"Rule, written before testing. The upper deviation limit at {n} is {pct(s['udl'][0], 2)} for no deviation, "
         f"{pct(s['udl'][1], 2)} for one, {pct(s['udl'][2], 2)} for two, and {pct(s['udl'][3], 2)} for three. Only "
         "zero deviations supports reliance at 5%; one deviation in any attribute means the control cannot be relied "
-        "on.",
-        f"The data attribute. Applied to this draw, D1 finds {k_drawn} refunds dated before the customer's payment "
-        f"({pct(k_drawn / n)}), an upper limit of {pct(udl_drawn)}: the control does not support reliance. The "
-        f"population test agrees: {len(s['dev'])} of the {len(s['rest'])} remaining refunds deviate "
-        f"({pct(len(s['dev']) / len(s['rest']))}), and {s['key_dev']} of the {len(s['key'])} key items. Any draw "
-        f"would say the same: a sample of {n} expects {s['mean']:.1f} deviations, and about "
+        "on. BETA.INV holds while the deviations are fewer than the items; if every item deviated, the limit would be "
+        "100%.",
+        f"The data attribute. Applied to this draw, D1 finds {k_drawn} refunds dated before the last application of "
+        f"the customer's payments ({pct(k_drawn / n)}), an upper limit of {pct(udl_drawn)}: the control does not "
+        f"support reliance. The population test agrees: {len(s['dev'])} of the {len(s['rest'])} remaining refunds "
+        f"deviate ({pct(len(s['dev']) / len(s['rest']))}), and {s['key_dev']} of the {len(s['key'])} key items (by the "
+        f"receipts' dates, {len(s['dev_rcpt'])} and {s['key_dev_rcpt']}: the same conclusion). Almost any draw would "
+        f"say the same: a sample of {n} expects {s['mean']:.1f} deviations, about "
         f"{pct(s['cdf_hi'] - s['cdf_lo'], 0)} of draws find {s['lo']} to {s['hi']}, with upper limits of about "
-        f"{pct(s['udl_lo'], 0)} to {pct(s['udl_hi'], 0)}. Where the data allow, the population test replaces the "
-        "sample: it found all of them, not an estimate.",
+        f"{pct(s['udl_lo'], 0)} to {pct(s['udl_hi'], 0)}, and a draw with no deviation at all has a probability of "
+        f"about {s['zero_draw']:.1e}. Where the data allow, the population test replaces the sample: it found all of "
+        "them, not an estimate.",
+        f"A3. The inspection record applies only to the {dmg['n']} refunds of Damaged returns ({dmg['key']} key "
+        f"items, {dmg['rest']} in the remainder). This draw holds {dmg_drawn} of them (a draw of {n} expects about "
+        f"{dmg['mean']:.1f}), so even if every one passed, the upper limit would be {pct(udl_dmg, 2)}, far above 5%, "
+        f"and the other {n - dmg_drawn} refunds of the draw are not tests of an inspection at all. Plan A3 on its own "
+        f"population: examine all {dmg['n']} (no sampling risk), or size a sample for the {dmg['rest']}, and record "
+        "the other refunds as not applicable, never as passes.",
         "What is delivered. The database holds no requests, payee checks, or inspection records, so A1 to A3 cannot "
         "be completed here: the deliverable is the plan, the frozen selection, and the rule, with the attribute "
         "columns marked as not tested. No results are invented; the documents are requested from the owners for "
@@ -2538,7 +2649,7 @@ def r7(b: ExerciseBuild) -> None:
             ("Credit approver's job title", ck("ApproverTitle"), None, f.title(L["cm"]["appr"])),
             ("Credit approver's limit", ck("ApproverLimit"), COUNT, f.emp[L["cm"]["appr"]]["limit"]),
             ("Credit approver applied cash to the invoice", ck("CashAndCredit"), None, None),
-            ("Refund dated before the last payment on the invoice", lk("BeforePayment"), None, None),
+            ("Refund dated before the last application on the invoice", lk("BeforePayment"), None, None),
             ("Last payment on the invoice", lk("LastPayment"), DATE, L["settled"][:10]),
             ("Methods of the receipts on the invoice", lk("ReceiptMethods"), None, ", ".join(L["methods"])),
             ("Customer", lk("CustomerID"), COUNT, L["rf"]["cust"]),
@@ -2564,7 +2675,7 @@ def r7(b: ExerciseBuild) -> None:
     flag_rows = {"Above the approver's limit": L["rf"]["amt"] > f.emp[L["rf"]["appr"]]["limit"],
                  "The largest credit of the three years": L["largest_credit"],
                  "Credit approver applied cash to the invoice": L["cm"]["id"] in {m["id"] for m in f.tests["cash_credit"]},
-                 "Refund dated before the last payment on the invoice": L["rf"]["id"] in {x["id"] for x in
+                 "Refund dated before the last application on the invoice": L["rf"]["id"] in {x["id"] for x in
                                                                                           f.tests["before"]}}
     for i, (label, *_x) in enumerate(rows):
         if label in flag_rows:
@@ -2598,14 +2709,15 @@ def r7(b: ExerciseBuild) -> None:
         f"entirely to 2060 while {money(L['unpaid_credit'])} of {inv['num']} was unpaid; the refund was paid while "
         f"{money(L['unpaid_refund'])} was still unpaid, and the invoice was settled on {L['settled'][:10]} by checks"
         + (", one of them applied by the credit's approver" if m["appr"] in appliers else "") + ". Every step is in "
-        "the records and balances, but the pattern (a credit above authority, a refund before payment, by a method "
-        "the customer did not use, on a weekend) is the trace a diverted refund would leave, so it is reported as "
-        "what the records show.",
+        "the records and balances, but the pattern (a credit above the recorded authority, a refund before the "
+        "invoice's payments were applied, by a method the customer did not use for it) is consistent with the trace a "
+        "diverted refund would leave, though it proves none, so it is reported as what the records show; the Sunday "
+        "date adds nothing, because weekend dates are spread evenly across the refunds.",
         "Evidence outside the database: the wire confirmation's beneficiary and account against the customer's known "
         "bank details; a confirmation from the customer of the credit and the refund received; the warehouse's "
         "receiving and inspection record of the damaged goods and any carrier claim; the customer's written request "
         "for the refund; and an explanation of why the refund went by wire to a customer who paid by check, and why "
-        "before its checks arrived."], span=5)
+        "before the rest of the invoice's payments arrived."], span=5)
 
     # restocking by reason
     heading(ws, r, "What returned goods were put back into inventory at, by reason (standard cost, live)")
@@ -2667,14 +2779,21 @@ def r7(b: ExerciseBuild) -> None:
         ("Credit lines traced to their return, shipment, and invoice lines", f"{sb['traced']} of {sb['lines']}",
          "Clean"),
         ("Credit lines for more than was shipped; shipment lines returned twice", f"{sb['over']}; {sb['twice']}", "Clean"),
+        ("Credit lines whose quantity differs from the return line's", f"{sb['qty_off']}", "Clean"),
         ("Credit lines whose price or discount differs from the invoice line's", f"{sb['price_off']}", "Clean"),
         ("Credit lines whose LineTotal is not ROUND(Q x P x (1 - D), 2) (SQLite)",
          f"{len(sb['total_off'])} (credit line {', '.join(map(str, sb['total_off']))})",
          "A half-cent rounding, not an error"),
+        ("Credit lines whose LineTotal is not the exact product rounded half up",
+         f"{len(sb['half_up'])} (credit line{'s' if len(sb['half_up']) != 1 else ''} "
+         f"{', '.join(map(str, sb['half_up']))})", "Exact half-cents rounded down: no single rounding rule, not an error"),
         ("Credits per invoice; credits above their invoice's total", f"{sb['distinct_inv']} credits on "
          f"{sb['distinct_inv']} invoices; {sb['above_invoice']}", "Clean"),
         (f"Tax at {sb['rate']:.1%} of SubTotal plus freight", f"{sb['tax_ok']} of {len(f.cm)} (a test on SubTotal alone "
-         f"falsely flags the {sb['with_freight']} credits with freight)", "Clean"),
+         f"falsely flags the {sb['with_freight']} credits with freight)",
+         "Clean (the rate is read from the credits themselves: a diagnostic)"),
+        ("Freight credits above the invoice's freight", f"{sb['freight_over']}",
+         "Clean (an upper bound: no freight policy in the records)"),
         ("Receipts applied to another customer's invoices", f"{sb['other']}", "Clean"),
         ("Days from receipt to deposit", f"{sb['dep_lo']} to {sb['dep_hi']}", "Clean"),
         ("Days from the later of receipt and invoice date to application", f"{sb['lag_lo']} to {sb['lag_hi']}",
@@ -2692,13 +2811,18 @@ def r7(b: ExerciseBuild) -> None:
         f"Damaged were restocked at {money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))} over three "
         f"years ({money(f.restock.get(('Damaged', f.C), 0.0))} in fiscal {f.C}), and with Quality Concern "
         f"{money(sum(f.restock.get((x, f.C), 0.0) for x in dq))} in fiscal {f.C}; no write-down account exists. "
-        "This is a valuation question for the inventory at the year-end (lower of cost and net realizable value), "
-        "below performance materiality but worth an inspection step.",
-        "First digits. A first-digit test does not suit these populations, by Chapter 8's criteria: "
-        f"{len(f.cm)} credits and {len(f.rf)} refunds are too few for the test to have power, and their amounts are "
-        "not naturally occurring: each is a price times a quantity plus tax, set by the invoice it reverses, so "
-        "their digits follow the price list rather than Benford's law. The tests that fit are the recomputation of "
-        "each credit and the comparison of each refund with its credit and payments."], span=5)
+        "These are gross flows, not the inventory still held: a valuation question for the inventory at the "
+        "year-end (lower of cost and net realizable value), below performance materiality but worth an inspection "
+        "step.",
+        "First digits. A first-digit test is a weak procedure here, by Chapter 8's criteria, though no minimum count "
+        "rules it out: the credits and refunds are subsets selected by events (a return, then the part of a credit "
+        "posted to customer deposits), and their amounts follow the invoice lines they reverse. With "
+        f"{len(f.rf)} refunds, a population that followed Benford's Law exactly would show a MAD of about "
+        f"{f.first_digits['chance_rf']:.4f} by chance alone, beyond the 0.015 of nonconformity, and the {len(f.cm)} "
+        f"credits about {f.first_digits['chance_cm']:.4f}; their MADs, {f.first_digits['mad_rf']:.4f} and "
+        f"{f.first_digits['mad_cm']:.4f}, are of that size, so a departure could not be told from chance. The tests "
+        "that fit are the recomputation of each credit and the comparison of each refund with its credit and "
+        "payments."], span=5)
 
 
 # --- Requirement 8: the evaluation of deficiencies -------------------------------------------------------------------
@@ -2734,36 +2858,39 @@ def r8(b: ExerciseBuild) -> None:
          f"{pct(len(tt['cm_above']) / len(f.cm), 0)} of the credits.",
          "Every credit traces to a return received in the warehouse, at invoice prices and quantities (Requirement 7); "
          "the manager's limit is never exceeded. These limit what a credit can be for, not who grants it.",
-         "D2", "Significant deficiency (combined with D2)", "Control deficiency: report"],
+         "D2", "Significant deficiency (combined with D2), provisional", "Control deficiency: report"],
         ["D2", "Customer service records receipts, applies cash, and approves credits and clawbacks (approver applied "
                "cash to the credited invoice)", "C4", "Design", *tref("T2"), against,
          "Reasonably possible: one department can take a payment and close the invoice with a credit.",
          "The warehouse receipt behind every credit; refunds are approved outside customer service (in "
          "Administration); no lapping or false-credit trace (Requirement 7).", "D1",
-         "Significant deficiency (combined with D1)", "Control deficiency: report"],
+         "Significant deficiency (combined with D1), provisional", "Control deficiency: report"],
         ["D3", "Refunds approved above the approver's authority", "C6", "Design", *tref("T7"), against,
          "Reasonably possible: Staff Accountants and Administrative Specialists with a limit of $0 approve refunds.",
          "Each refund equals its credit's 2060 part; the credits are clean. No control over the payee.", "D4, D6",
-         "Significant deficiency (combined with D4 and D6)", "Control deficiency: report"],
-        ["D4", "Refunds dated before the customer's payment on the credited invoice", "C7", "Design", *tref("T9"),
-         against, "Reasonably possible: credits on unpaid invoices go to 2060, and the refund step does not check "
-                  "payment.", f"None found: the payments arrived {min(tt['wait'])} to {max(tt['wait'])} days later, which no control "
+         "Significant deficiency (combined with D4 and D6), provisional", "Control deficiency: report"],
+        ["D4", "Refunds dated before the last application of the customer's payments to the credited invoice", "C7",
+         "Design", *tref("T9"),
+         against, "Reasonably possible: credits on unpaid invoices go to 2060, and nothing in the records shows the "
+                  "refund step checking payment.",
+         f"None found: the last application came {min(tt['wait'])} to {max(tt['wait'])} days later, which no control "
          "required.",
-         "D3, D6", "Significant deficiency (combined with D3 and D6)", "Control deficiency: report"],
+         "D3, D6", "Significant deficiency (combined with D3 and D6), provisional", "Control deficiency: report"],
         ["D5", "No offset of past-due balances before a refund (refunds to customers past due by at least the refund)",
          "C8", "Design (no policy)", *tref("T12"), against,
          "Not a misstatement in itself: the receivable remains collectible.", "Collection of the past-due balances "
                                                                                "afterwards.", "D3",
-         "Follow up; a policy recommendation, not a deficiency until a policy exists", "Follow up"],
+         "Follow up: any policy lies outside the records; recommend one", "Follow up"],
         ["D5", "Refund method unlike every receipt on the credited invoice", "C8", "Design (no policy)", *tref("T13"),
          against, "An anomaly: a method chosen at random would mismatch about as often.",
          "None in the records: no payee or account to verify.", "D3",
-         "Follow up; a policy recommendation, not a deficiency until a policy exists", "Follow up"],
+         "Follow up: any policy lies outside the records; recommend one", "Follow up"],
         ["D6", "No preparer recorded on credits or refunds (all refunds)", "C2, C6", "Design", "=ROWS(Refunds)",
          f"=COUNTIFS(Refunds[FiscalYear],{cy})", "=SUM(Refunds[Amount])",
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", against,
-         "The approver cannot be shown to differ from the preparer, so separation cannot be evidenced at all.",
-         "None in the records.", "D3, D4", "Significant deficiency (combined with D3 and D4)",
+         "An evidence gap: the records cannot show that the preparer differs from the approver; a design deficiency if "
+         "the system keeps no preparer.",
+         "None in the records.", "D3, D4", "Evidence gap; combines with D3 and D4 if the system keeps no preparer",
          "Control deficiency: report"],
         ["D7", f"The {am}'s concentration: commission rates, accruals, and payments; refunds within limit, "
                "including the largest; all payroll registers (Chapters 12 and 16)", "C5, C6", "Design",
@@ -2834,14 +2961,16 @@ def r8(b: ExerciseBuild) -> None:
          "Every credit rests on a warehouse receipt at invoice prices; no lapping or false-credit trace.",
          "Significant deficiency",
          "Any credit could be granted without authority by the department that handles the cash, and the year's "
-         "credits exceed materiality; not a material weakness, because a material misstatement would need a "
-         "falsified warehouse record, and none of the traces appears."],
+         "credits exceed materiality. Provisionally not a material weakness: a material misstatement would need a "
+         "warehouse record that does not reflect a real return, or collusion, and the records show no sign of either, "
+         "but the receiving records and the delegation of authority lie outside the database."],
         ["G2", "D3, D4, D6", "Customer refunds and 2060: occurrence of disbursements", refunds_c,
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", pot, "Refund equals the credit's 2060 part; clean "
                                                                      "credits.",
-         "Significant deficiency", "Cash leaves on a record that no one with authority approved, before the customer "
-                                   "has paid, with no preparer recorded: a fraud risk factor, although the magnitude is "
-                                   "well below materiality."],
+         "Significant deficiency", "Cash leaves on a record that no one with recorded authority approved, before the "
+                                   "customer's payments were applied, with no preparer recorded (an evidence gap until "
+                                   "the system's design is known): a fraud risk factor, although the magnitude is well "
+                                   "below materiality."],
         ["G3", "D7", "Commissions, refunds, and payroll: segregation of duties",
          f'=SUMIFS(Refunds[Amount],Refunds[ApproverTitle],"{am}",Refunds[FiscalYear],{cy})',
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", pot, "Clawbacks complete and accurate.", "Deficiency",
@@ -2849,8 +2978,9 @@ def r8(b: ExerciseBuild) -> None:
          "and payroll; it may combine entity-wide."],
         ["G4", "D5", "Refunds: offset and payee", f"=Tests!J{T['T13']}",
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", pot, "None in the records.",
-         "Follow up (not a deficiency until a policy exists)", "No policy requires an offset or the original payment "
-                                                               "instrument; recommend one."],
+         "Follow up (no policy in the records)", "The records hold no policy that requires an offset or the original "
+                                                 "payment instrument; a refund that can reach another account is a risk "
+                                                 "either way, so recommend one."],
         ["G5", "D8", "Inventory: valuation of returned goods",
          f'=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Damaged",ReturnLines[FiscalYear],{cy})'
          f'+SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Quality Concern",ReturnLines[FiscalYear],'
@@ -2870,7 +3000,7 @@ def r8(b: ExerciseBuild) -> None:
     cls = f"J{c0}:J{c0 + len(comb) - 1}"
     put(ws, {f"A{r}": "Significant deficiencies", f"D{r}": f'=COUNTIF({cls},"Significant deficiency")',
              f"A{r + 1}": "Material weaknesses", f"D{r + 1}": f'=COUNTIF({cls},"Material weakness")',
-             f"A{r + 2}": "Overall", f"D{r + 2}": f'=IF(D{r + 1}=0,"No material weakness","Material weakness")'})
+             f"A{r + 2}": "Overall", f"D{r + 2}": f'=IF(D{r + 1}=0,"{OVERALL}","Material weakness")'})
     bold(ws, f"A{r}:D{r + 2}")
     b.found["deficiencies"] = dict(sd=f"Deficiencies!D{r}", mw=f"Deficiencies!D{r + 1}",
                                    overall=f"Deficiencies!D{r + 2}", g3=f"Deficiencies!J{c0 + 2}")
@@ -2924,21 +3054,28 @@ def r8(b: ExerciseBuild) -> None:
         f"({money(m['perf'])}) and below materiality ({money(m['mat'])}), and all {cy} credits, "
         f"{money(all_c)}, exceed materiality, because any credit could have been approved without authority. D2 "
         "(customer service records receipts, applies cash, approves credits, and approves clawbacks) is a design "
-        "deficiency, mitigated but not removed by every credit tracing to a return received in the warehouse at "
+        "deficiency, mitigated, if they operate, by every credit tracing to a return received in the warehouse at "
         "invoice prices, by refunds approved outside customer service, and by the absence of any lapping or "
-        "false-credit trace. It is not a material weakness: a material misstatement through credits would need a "
-        "falsified warehouse record, and none of the traces appears. A student who argues material weakness from "
-        "gross exposure must address that compensating link and the likelihood test.",
+        "false-credit trace. The rating is provisional: a material misstatement through credits would need a "
+        "warehouse record that does not reflect a real return, or collusion between the warehouse and customer "
+        "service, and the records show no sign of either, but the receiving and inspection records, the delegation "
+        "of authority, and the access rights lie outside the database, and finding no error does not show that the "
+        "compensating controls operate. A student who argues material weakness from the potential magnitude and the "
+        "untested evidence is accepted if the answer addresses that compensating link and the likelihood test.",
         f"D3, D4, and D6 combine into a significant deficiency over refunds: {st3['n']} refunds above authority "
-        f"({st3['cur']} in {cy}, {money(st3['cur_amt'])}), {st4['n']} paid before the customer's payment arrived "
-        f"({st4['cur']} in {cy}, {money(st4['cur_amt'])}), and no preparer recorded. The magnitude is well below "
-        "materiality, but cash leaves on the strength of a record, which makes it a fraud risk factor worth the "
-        "committee's attention. D5 (no offset; refund method) is a follow-up and a policy recommendation, not a "
-        f"deficiency until a policy exists. D7, the {AM}'s concentration (all {f.commission['n_rates']} commission "
+        f"({st3['cur']} in {cy}, {money(st3['cur_amt'])}), {st4['n']} paid before the last application of the "
+        f"customer's payments ({st4['cur']} in {cy}, {money(st4['cur_amt'])}; {len(tt['before_rcpt'])} by the "
+        "receipts' dates), and no preparer recorded, an evidence gap until the system's design is known. The "
+        "magnitude is well below materiality, but cash leaves on the strength of a record, which makes it a fraud "
+        "risk factor worth the committee's attention; this rating is provisional too. D5 (no offset; refund method) "
+        "is a follow-up: whether a policy requires an offset or the original instrument lies outside the records, "
+        "and a refund that can reach another account is a risk to address either way, so recommend a policy. "
+        f"D7, the {AM}'s concentration (all {f.commission['n_rates']} commission "
         f"rates, all {f.commission['n_accruals']:,} accruals, all {f.commission['n_payments']} commission payments, "
         f"the largest refund, and all {f.payroll_approvals['registers']:,} payroll registers of Chapters 12 and 16), is "
         "a deficiency in this cycle that may combine entity-wide into a significant deficiency. D8, damaged goods "
-        "restocked at full cost, is a valuation follow-up. There is no material weakness.",
+        "restocked at full cost, is a valuation follow-up. No material weakness is identified on the records; the "
+        "final ratings wait for the evidence outside them.",
         "Clean: the reconciliations, the clawbacks, the employment dates, the separation of refund and credit "
         "approvers, one refund per credit, the substantive tests of every credit, and the lapping tests."], span=11)
 
@@ -2965,9 +3102,9 @@ def r9(b: ExerciseBuild) -> None:
     keys = [("Credits approved above the approver's limit", f"=Tests!H{T['T1']}", c1["n"]),
             ("Credits whose approver applied cash to the credited invoice", f"=Tests!H{T['T2']}", c2["n"]),
             ("Refunds approved above the approver's limit", f"=Tests!H{T['T7']}", r3_["n"]),
-            ("Refunds dated before the customer's payment", f"=Tests!H{T['T9']}", r4_["n"]),
+            ("Refunds dated before the last application of the customer's payments", f"=Tests!H{T['T9']}", r4_["n"]),
             ("Significant deficiencies", "=" + b.found["deficiencies"]["sd"], 2),
-            ("Overall", "=" + b.found["deficiencies"]["overall"], "No material weakness")]
+            ("Overall", "=" + b.found["deficiencies"]["overall"], OVERALL)]
     for i, (label, formula, exp) in enumerate(keys):
         r = 5 + i
         put(ws, {f"A{r}": label, f"D{r}": formula})
@@ -2980,15 +3117,19 @@ def r9(b: ExerciseBuild) -> None:
         f"To the audit committee, November {f.C + 1} meeting. Internal audit tested the customer credits cycle (sales "
         f"returns, credit memos, customer refunds, commission clawbacks, and cash application) over fiscal {f.F} to "
         f"{f.C}, and states its conclusions on controls as at the end of fiscal {f.C}.",
-        "Overall conclusion. The records reconcile, and the balances we tested are right: every population agrees "
-        "with the ledger to the cent in every year, every credit recomputes from its return, shipment, and invoice, "
-        "and we found no trace of lapping or of a credit covering stolen cash. The controls over who may grant credits "
-        f"and refunds, however, are not designed to prevent an unauthorized one: {c1['n']} credits "
-        f"({money(c1['amt'])}) and {r3_['n']} refunds ({money(r3_['amt'])}) were approved by employees whose approval "
-        f"limit is $0, and {r4_['n']} refunds ({money(r4_['amt'])}) were dated before the customer's payment on the "
-        "credited invoice had arrived. We rate two significant deficiencies, one over credits and one over refunds, "
-        "and one deficiency in the concentration of duties with the Accounting Manager. There is no material "
-        "weakness. One refund, the largest, is under follow-up.",
+        "Overall conclusion. The recorded populations agree with the ledger to the cent in every year, every credit "
+        "recomputes from its return, shipment, and invoice, and the lapping tests found no trace, on the definitions "
+        "we state; the customer's requests, the payee checks, the inspection of returned goods, the bank clearance "
+        "of refunds, and the operation of the compensating controls lie outside the database and remain untested, so "
+        "this report gives no assurance on them. The controls over who may grant credits and refunds, however, are "
+        f"not designed to prevent an unauthorized one: {c1['n']} credits ({money(c1['amt'])}) and {r3_['n']} "
+        f"refunds ({money(r3_['amt'])}) were approved by employees whose recorded approval limit is $0, and "
+        f"{r4_['n']} refunds ({money(r4_['amt'])}) were dated before the customer's payments on the credited invoice "
+        f"had been applied ({len(tt['before_rcpt'])} before the last receipt, by the receipts' own dates). We rate "
+        "two significant deficiencies, one over credits and one over refunds, and one deficiency in the "
+        "concentration of duties with the Accounting Manager, provisionally, until the evidence outside the "
+        "database is examined; we have identified no material weakness. One refund, the largest, is under "
+        "follow-up.",
         f"Scope and populations. {len(f.sr)} returns, {len(f.cm)} credit memos ({money(sum(x['gt'] for x in f.cm.values()))}), "
         f"{len(f.rf)} refunds ({money(sum(x['amt'] for x in f.rf.values()))}), {len(f.adj)} clawbacks "
         f"({money(sum(a['amt'] for a in f.adj))}), and {len(f.rcpt):,} receipts ({money(rec_total)}) with "
@@ -2996,8 +3137,8 @@ def r9(b: ExerciseBuild) -> None:
         "year with no difference (appendix: Reconciliation). Magnitude is judged against materiality of "
         f"{money(m['mat'])}, 5% of fiscal {f.C} income before income taxes as the ledger records it. Sampling was "
         "used only for what the records cannot show (the customer's request, an independent payee check, and the "
-        "inspection of damaged goods); the plan and the frozen selection are in the appendix, and the documents have "
-        "been requested."], span=7)
+        "inspection of damaged goods, which needs a population of its own); the plan and the frozen selection are "
+        "in the appendix, and the documents have been requested."], span=7)
     heading(ws, r, "Findings")
     r += 1
     findings = [
@@ -3010,39 +3151,45 @@ def r9(b: ExerciseBuild) -> None:
          "service records receipts, applies cash, and approves credits and clawbacks.",
          f"A credit could be granted, or cash concealed, without independent approval. Fiscal {f.C} credits above "
          f"authority ({money(c1['cur_amt'])}) exceed performance materiality; every credit traces to a return "
-         "received in the warehouse at invoice prices.", "Significant deficiency",
+         "received in the warehouse at invoice prices.", "Significant deficiency (provisional)",
          "Approve a delegation of authority for credits and enforce it in the system; have credits approved by "
          "someone who does not record or apply the customer's cash."],
-        ["F2. Refunds approved without authority and paid before the customer's payment, with no preparer recorded "
-         "(D3, D4, D6)",
+        ["F2. Refunds approved without recorded authority and dated before the customer's payments were applied, "
+         "with no preparer recorded (D3, D4, D6)",
          f"{r3_['n']} refunds ({money(r3_['amt'])}) were approved above the approver's limit by Staff Accountants and "
          f"Administrative Specialists (limit $0). {r4_['n']} refunds ({money(r4_['amt'])}; {r4_['cur']} in fiscal "
-         f"{f.C}) were dated before the last payment on the credited invoice, {len(tt['nothing'])} before any "
-         "payment. Neither a credit nor a refund records who prepared it.",
+         f"{f.C}) were dated before the last application of the customer's payments to the credited invoice, "
+         f"{len(tt['nothing'])} before any application ({len(tt['before_rcpt'])} before the last receipt, by the "
+         "receipts' dates). Neither a credit nor a refund records who prepared it, an evidence gap until the "
+         "system's design is known.",
          "Refunds are approved within authority, outside customer service, and only of credit balances the customer "
          "has paid (C6, C7).",
-         "Credits on unpaid invoices are booked to customer deposits (2060), and the refund step pays out 2060 without "
-         "checking that the customer's payment has arrived; no delegation of authority for refunds.",
+         "Credits on unpaid invoices are booked to customer deposits (2060), and nothing in the records shows the "
+         "refund step checking the customer's payments before it pays out 2060; no delegation of authority for "
+         "refunds is in the records.",
          f"Cash could leave for balances not yet paid for, or go to the wrong payee. The magnitude is below "
          f"materiality (fiscal {f.C} refunds {money(st([x for x in f.rf.values() if year_of(x['date']) == f.C])['amt'])}), "
-         "but cash leaving on a record is a fraud risk factor.", "Significant deficiency",
+         "but cash leaving on a record is a fraud risk factor.", "Significant deficiency (provisional)",
          "Book credits on unpaid invoices against the receivable; release refunds only after the payment has cleared; "
          "record a preparer separate from the approver; approve a delegation of authority for refunds."],
         ["F3. Concentration of duties with the Accounting Manager (D7)",
-         f"The Accounting Manager approved all {f.commission['n_rates']} commission rates (which ended on "
-         f"{f.commission['rate_ends'][-1]}), created all {f.commission['n_accruals']:,} commission accruals, approved "
+         f"The Accounting Manager approved all {f.commission['n_rates']} commission rates (whose recorded end date, "
+         f"{f.commission['rate_ends'][-1]}, is the end of the data), created all {f.commission['n_accruals']:,} commission accruals, approved "
          f"all {f.commission['n_payments']} commission payments and {sum(1 for x in f.rf.values() if f.title(x['appr']) == AM)} "
          f"refunds (the largest among them), and approved all {f.payroll_approvals['registers']:,} payroll registers "
          "(Chapters 12 and 16).", "Incompatible duties are separated, or reviewed independently.",
          "A small accounting team with no independent review of commissions and refunds.",
          "An error or a fraud in commissions or refunds could go undetected; no exception was found in the "
          "clawbacks.", "Deficiency (may combine entity-wide)",
-         "Have someone independent approve commission rates and payments; approve the 2027 rates."],
+         f"Have someone independent approve commission rates and payments; obtain the approved {f.C + 1} rates and "
+         "who approved them."],
         ["F4. No offset of past-due balances, and refunds by another method (D5)",
          f"{pd2['n']} refunds went to customers past due by at least the refund on the refund date; {mism['n']} refunds "
          "went by a method that none of the receipts on the credited invoice used.",
-         "No policy exists; good practice pays refunds to the original instrument or a verified account, net of open "
-         "balances.", "No refund policy.", "An anomaly, not a misstatement: a diverted refund would look like this.",
+         "No policy is in the records; good practice pays refunds to the original instrument or a verified account, net "
+         "of the open balances the customer's terms allow to be offset.", "No refund policy in the records.",
+         "An anomaly, not a misstatement: consistent with a diverted refund, and with a legitimate refund by another "
+         "method.",
          "Follow up", "Adopt a refund policy: original instrument or verified account, open balances offset first."],
         ["F5. Damaged goods restocked at full cost (D8)",
          f"Damaged returns were restocked at standard cost ({money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))}"
@@ -3090,17 +3237,21 @@ def r9(b: ExerciseBuild) -> None:
          f"{f.C + 2}-06-30", "Agree", "Cost of a system change; the audit committee can weigh it against the risk."],
         ["Review the concentration of duties with the Accounting Manager (commissions, refunds, payroll)",
          "Chief financial officer", f"{f.C + 1}-12-31", "May argue that the team is small",
-         "Managers resist a weakness when no error has been detected (Cohen et al., 2020): answer with the likelihood "
-         "and the absence of any independent review, not with a detected error."],
-        [f"Approve the {f.C + 1} commission rates (the approved rates ended on {f.commission['rate_ends'][-1]})",
-         "Chief financial officer", f"{f.C + 1}-11-30", "Agree", "None expected."],
+         "The audit partners Cohen et al. (2020) interviewed describe managers who resist a weakness when no error has "
+         "been detected: answer with the likelihood and the absence of any independent review, not with a detected "
+         "error."],
+        [f"Obtain the approved {f.C + 1} commission rates and who approved them (the records end on "
+         f"{f.commission['rate_ends'][-1]}, the end of the data)",
+         "Chief financial officer", f"{f.C + 1}-11-30", "Will provide them", "None expected."],
         ["Inspect returned goods and write down damaged items before restocking", "Warehouse manager, with the "
          "controller", f"{f.C + 2}-03-31", "Agree; may question the cost of inspection",
          "Show the Damaged and Quality Concern returns restocked at full cost."],
         ["Settle the follow-up of the largest refund", "Internal audit", f"{f.C + 1}-10-31", "Owners will supply the "
          "documents", "None expected; the result goes to the committee."],
         ["Keep the four rule tests running in the exception register (credits and refunds above authority, the credit "
-         "approver's cash, refunds before payment), with the historical exceptions recorded once as a design finding",
+         "approver's cash, refunds before payment), with the historical exceptions recorded once as a design finding "
+         "and each kept in the register; review later exceptions as they arrive, and close the findings on a retest "
+         "after the fix",
          "Internal audit", f"{f.C + 1}-11-30", "Agree", "None expected; after remediation the two authority tests "
                                                          "should fall to zero."],
     ]
@@ -3167,7 +3318,7 @@ def m3(b: ExerciseBuild) -> None:
     d = b.found["deficiencies"]
     b.check(t, "significant deficiencies", 2, "=" + d["sd"], 0, COUNT)
     b.check(t, "the Accounting Manager's concentration", "Deficiency", "=" + d["g3"])
-    b.check(t, "overall", "No material weakness", "=" + d["overall"])
+    b.check(t, "overall", OVERALL, "=" + d["overall"])
     rows = b.found["register_rows"]
     tt = f.tests
     for tid, items in (("CM AboveLimit", tt["cm_above"]), ("CM CashAndCredit", tt["cash_credit"]),

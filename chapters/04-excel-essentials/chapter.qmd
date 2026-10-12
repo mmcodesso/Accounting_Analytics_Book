@@ -60,7 +60,7 @@ To see why Tables matter, consider the alternative. A plain range is simply a bl
 |---|---|---|
 | Boundaries | Formulas name fixed cells, such as K2:K27934, that must be extended by hand when rows are added | The Table knows its own extent, and new rows typed directly below it become part of it |
 | Formula references | Cell addresses, such as `K2:K27934` | Structured references, such as `SalesInvoiceLine[LineTotal]` |
-| Column formulas | Copied down by hand, and easy to leave incomplete | A formula entered in a column fills every row automatically as a calculated column |
+| Column formulas | Copied down by hand, and easy to leave incomplete | A formula entered in an empty column fills every row as a calculated column, by default |
 | Filter buttons and banding | Added separately | Built into the header row |
 | Slicers | Not available | Available from the Table Design tab |
 | Charts and PivotTables | Their source ranges must be extended by hand | They follow the Table as it grows, although a PivotTable still needs to be refreshed |
@@ -80,11 +80,11 @@ Structured references make formulas self-documenting. A reviewer who reads `=AVE
 
 ### Calculated Columns
 
-When you type a formula into an empty column of a Table, Excel copies it to every row of that column, creating a calculated column. If rows are added later, the formula extends to them as well. Calculated columns are the natural place for row-level measures such as an extended amount or a discount, because every row is guaranteed to use the same formula. In a plain range, the same column takes a formula typed in the first row and copied down by hand. Every row then holds its own copy, and rows added later get no formula at all, as the top half of @fig-04-01 shows. If you ever need a different formula in a single row, Excel marks the inconsistency with a small triangle in the corner of the cell, which is a useful warning when you review someone else's workbook.
+When you type a formula into an empty column of a Table, Excel by default copies it to every row of that column, creating a calculated column. If rows are added later, the formula extends to them as well. Calculated columns are the natural place for row-level measures such as an extended amount or a discount, because one formula serves the whole column. In a plain range, the same column takes a formula typed in the first row and copied down by hand. Every row then holds its own copy, and nothing ensures that rows added later get one, as the top half of @fig-04-01 shows. A calculated column makes one formula the default rather than a guarantee, because a value or a different formula can still be typed into a single row. When that happens, Excel's error checking, which is on unless someone turns it off, marks the cell with a small triangle in its corner, a useful warning when you review someone else's workbook.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-A Table grows when you type next to it. A value or formula typed in the row directly below a Table becomes a new row of the Table, and one typed in the column directly to its right becomes a new column. That behavior is convenient when you mean to extend the data, but a summary formula typed beside a Table ends up inside it, where it may be copied to thousands of rows or refer to itself. Keep summaries, parameters, and notes on separate worksheets, and leave the data worksheets for the Tables alone.
+By default, a Table grows when you type next to it. A value or formula typed in the row directly below a Table becomes a new row of the Table, and one typed in the column directly to its right becomes a new column. That behavior is convenient when you mean to extend the data, but a summary formula typed beside a Table ends up inside it, where it may be copied to thousands of rows or refer to itself. Keep summaries, parameters, and notes on separate worksheets, and leave the data worksheets for the Tables alone.
 :::
 
 
@@ -149,7 +149,7 @@ A named cell gives a cell a descriptive name that formulas can use instead of it
 =COUNTIFS(SalesInvoiceLine[LineTotal],">"&LargeLineThreshold)
 ```
 
-A named cell behaves like an absolute reference, so it never shifts when the formula is copied, and the formula states its own logic: it counts the lines above the large-line threshold. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed.
+A name created this way refers to its cell with an absolute reference, so it does not shift when the formula is copied, and the formula states its own logic: it counts the lines above the large-line threshold. Names cannot contain spaces or look like a cell address, which is why a name such as Q4 is not allowed.
 
 Named cells are the natural home for the parameters of an analysis, such as the percentile that defines a large transaction (a percentile is the value below which a given share of the data falls), the start and end dates of the period under review, or a materiality amount (the size of an error that would change the decisions of someone relying on the numbers). Placing every parameter on one worksheet, each with a name and a short description, makes the assumptions of the analysis easy to find and easy to change. When a parameter changes, every formula that uses it updates, and a reviewer can see in one place which values drove the results. The Name Manager, on the Formulas tab, lists every name in the workbook with its value and the cell it refers to. It also lists every Table, because a Table name is a name too.
 
@@ -184,7 +184,7 @@ A slicer is a panel of buttons, one for each value in a column, that filters a T
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-Slicers also filter PivotTables, which you will build later in Part II, and they reappear in the Power BI reports of Part IV, where they filter every visual on a report page. The skill is the same in all three places: isolating one part of the data to answer a focused question, while keeping track of the filter that produced the answer.
+Slicers also filter PivotTables, which you will build later in Part II, and they reappear in the Power BI reports of Part IV, where, by default, a slicer filters the other visuals on its report page. The skill is the same in all three places: isolating one part of the data to answer a focused question, while keeping track of the filter that produced the answer.
 :::
 
 
@@ -219,7 +219,7 @@ Data validation controls what can be entered in a cell. In an analytical workboo
 
 The dialog has two more tabs. The Input Message tab lets you write a note that appears whenever the cell is selected, which is a convenient place to explain what the parameter means and what values are sensible. The Error Alert tab decides what happens when someone enters an invalid value. The Stop style refuses the entry. The Warning and Information styles only caution the user, who can accept the invalid value anyway. For a parameter cell, Stop is usually the right choice.
 
-Validation has limits worth knowing. It checks values that are typed into a cell, but pasting over a validated cell replaces both the value and the validation rule, and a formula result is never checked. Adding a rule does not check the values already in the cells, although the Circle Invalid Data command on the Data Validation menu marks any existing values that break a rule. Validation is therefore a guard against typing mistakes, not a complete control, and it works best alongside the review of parameters that a documentation worksheet makes possible.
+Validation has limits worth knowing. It checks only values typed into a cell. A value pasted or filled into the cell gets no alert, and an ordinary paste also replaces the cell's rule with that of the copied cell, while Paste Values leaves the rule in place. A formula whose result breaks the rule raises no alert either. Adding a rule does not check the values already in the cells, although the Circle Invalid Data command on the Data Validation menu marks every value that breaks a rule, whether it was typed, pasted, or calculated by a formula. Validation is therefore a guard against typing mistakes, not a complete control, and it works best alongside the review of parameters that a documentation worksheet makes possible.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
@@ -247,13 +247,13 @@ Every analytical workbook should begin with a documentation worksheet that tells
 - the source of the data, including the file, the Tables used, and the filters applied in each query;
 - the date the data was last refreshed;
 - the parameters and what each one controls;
-- the name of the preparer and, once reviewed, of the reviewer;
+- the name of the preparer and the date the work was completed and, once it has been reviewed, the name of the reviewer and the date of the review;
 - the worksheets and what each contains;
 - any open questions or limitations.
 
 A short note on formatting conventions helps too. A common convention uses blue font for input cells that a user may change and black font for formulas. Whatever convention you choose, apply it consistently and state it on the documentation worksheet.
 
-Within the analysis worksheets, cell notes can explain a formula that is not self-evident or record a decision made during the analysis. The goal of all of this is the one that auditing standards set for audit documentation. For audits of public companies, the Public Company Accounting Oversight Board (PCAOB, n.d.) requires audit documentation that lets an experienced auditor with no previous connection to the engagement understand the work performed, the evidence obtained, and the conclusions reached. The documentation must also show who performed and who reviewed the work. An analysis workbook documented to that standard can be reviewed, refreshed, and extended by someone other than the person who built it.
+Within the analysis worksheets, cell notes can explain a formula that is not self-evident or record a decision made during the analysis. The goal of all of this is the one that auditing standards set for audit documentation. For audits of public companies, the Public Company Accounting Oversight Board (PCAOB, n.d.) requires audit documentation that lets an experienced auditor with no previous connection to the engagement understand the work performed, the evidence obtained, and the conclusions reached. The documentation must also show who performed the work and who reviewed it, and when. An analysis workbook documented to that standard can be reviewed, refreshed, and extended by someone other than the person who built it.
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots

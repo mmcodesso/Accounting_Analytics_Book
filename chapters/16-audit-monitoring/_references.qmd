@@ -24,7 +24,7 @@ Microsoft. (2026a). *Append queries*. Microsoft Learn. <https://learn.microsoft.
 
 Microsoft. (2026b). *Power BI Desktop projects (PBIP)*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview>
 
-Nickell, E. B., Schwebke, J. M., & Goldwater, P. M. (2023). An introductory audit data analytics case study: Using Microsoft Power BI and Benford's Law to detect accounting irregularities. *Journal of Accounting Education*, *64*, 100855. <https://doi.org/10.1016/j.jaccedu.2023.100855>
+Nickell, E. B., Schwebke, J., & Goldwater, P. (2023). An introductory audit data analytics case study: Using Microsoft Power BI and Benford's Law to detect accounting irregularities. *Journal of Accounting Education*, *64*, 100855. <https://doi.org/10.1016/j.jaccedu.2023.100855>
 
 Tronto, S., & Killingsworth, B. L. (2021). How internal audit can champion continuous monitoring in a business operation via visual reporting and overcome barriers to success. *The International Journal of Digital Accounting Research*, *21*, 23–59. <https://doi.org/10.4192/1577-8517-v21_2>
 

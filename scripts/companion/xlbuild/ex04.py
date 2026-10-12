@@ -162,14 +162,18 @@ def facts() -> dict:
     out["ex6"] = dict(
         n=len(req), status={s: sum(1 for r in req if r["status"] == s) for s in sorted({r["status"] for r in req})},
         approvers=sorted({r["appr"] for r in req if r["appr"] is not None}), names=names,
+        # a request counts as approved only when its Status is Approved; a blank approver is not an approval by someone else
         grid=[dict(id=e, name=names[e][0], title=names[e][1], n=sum(1 for r in req if r["by"] == e),
-                   other=sum(1 for r in req if r["by"] == e and r["appr"] is not None and r["appr"] != e),
-                   own=sum(1 for r in req if r["by"] == e and r["appr"] == e),
-                   open=sum(1 for r in req if r["by"] == e and r["appr"] is None)) for e in requesters],
+                   other=sum(1 for r in req if r["by"] == e and r["status"] == "Approved" and r["appr"] is not None
+                             and r["appr"] != e),
+                   own=sum(1 for r in req if r["by"] == e and r["status"] == "Approved" and r["appr"] == e),
+                   open=sum(1 for r in req if r["by"] == e and r["status"] == "Pending")) for e in requesters],
         blank=sum(1 for r in req if r["appr"] is None), self=sum(1 for r in req if r["appr"] == r["by"]),
         blank_by={s: sum(1 for r in req if r["appr"] is None and r["status"] == s) for s in ("Approved", "Pending")},
         self_by={s: sum(1 for r in req if r["appr"] == r["by"] and r["status"] == s) for s in ("Approved", "Pending")},
-        pending=pending, low=min(r["disc"] for r in req), high=max(r["disc"] for r in req),
+        # requirement (5): the range of the discounts on the Approved requests
+        pending=pending, low=min(r["disc"] for r in req if r["status"] == "Approved"),
+        high=max(r["disc"] for r in req if r["status"] == "Approved"),
         top=by_disc[0], top_unique=by_disc[0]["disc"] != by_disc[1]["disc"])
     con.close()
     return out
@@ -682,7 +686,8 @@ def ex4_2(b: ExerciseBuild) -> None:
         "Consistency test: for each promotion I counted the invoice lines whose Discount differs from the promotion's "
         "DiscountPct. The count is zero for every promotion, no invoice line carries a discount without a "
         "PromotionID, and every PromotionID on the lines is in the PromotionProgram Table. Every promotion was "
-        "therefore applied at its approved rate.",
+        "therefore applied at its approved rate. A matching rate shows that the rates are consistent, not that "
+        "each line was eligible for its promotion or billed within its dates.",
         "What the analysis cannot yet show: the invoice lines carry no invoice date, so this workbook cannot test "
         "whether each discounted line was billed within its promotion's effective dates. That test matters here, "
         f"because the PromotionProgram Table itself is suspect: {and_join(oddities)}, so the recorded dates "
@@ -1167,11 +1172,18 @@ def ex4_5(b: ExerciseBuild) -> None:
     d2, d1 = date.fromisoformat(review2), date.fromordinal(date.fromisoformat(review).toordinal() - 1)
     window = (f"{d2:%B} {d2.day} to {d1:%B} {d1.day}, {d1.year}" if d2.year == d1.year
               else f"{long_date(review2)} to {long_date(d1.isoformat())}")
+    not_due = fx["due_on_or_after"]
+    gap = ("" if not not_due else
+           f"The In Transit count is {not_due:,} more than the {fx['late']:,} shipments past their DeliveryDate, because "
+           "a slicer on Status cannot test the date: "
+           + ("one In Transit shipment is" if not_due == 1 else f"{not_due:,} In Transit shipments are")
+           + " due on or after the review date, so the slicer confirms the late count only together with a filter on "
+           "DeliveryDate. ")
     nxt = answer(an, r3 + 4, "Model answer (5)", [
         f"With the slicer on In Transit, SUBTOTAL shows {fx['status']['In Transit']:,} shipments, "
         f"{fx['blank_by'].get('In Transit', 0)} of them without a tracking number; on Delivered it shows "
         f"{fx['status']['Delivered']:,}, {fx['blank_by'].get('Delivered', 0)} without one, the same counts COUNTIFS "
-        f"gives. With ReviewDate on {long_date(review2)}, the In Transit shipments past their DeliveryDate fall from "
+        f"gives. {gap}With ReviewDate on {long_date(review2)}, the In Transit shipments past their DeliveryDate fall from "
         f"{fx['late']:,} to {fx['late2']:,}: the {drop} shipments due from {window} are not yet late on the earlier "
         "date. The second category depends on the review date, "
         "which is why it is a validated parameter rather than TODAY()."])
@@ -1181,18 +1193,23 @@ def ex4_5(b: ExerciseBuild) -> None:
         f"1. Blank tracking number: {fx['blank']:,} shipments ({fx['blank_by'].get('Delivered', 0)} Delivered, "
         f"{fx['blank_by'].get('In Transit', 0)} In Transit) have no TrackingNumber, a completeness problem. Likely "
         "cause: shipments recorded without the carrier's reference (manual entry, customer pickup, or a field the "
-        "system does not require). Without it, delivery cannot be traced to the carrier. Evidence: the carrier's "
-        "bills of lading or invoices and proof of delivery for a sample, and the shipping procedure for recording "
-        "tracking numbers.",
+        "system does not require). Without it, the extract gives no way to trace these shipments to the carrier's "
+        "records. Evidence: the carrier's bills of lading or invoices and proof of delivery for a sample, and the "
+        "shipping procedure for recording tracking numbers.",
         f"2. Stale In Transit status: {fx['late']:,} of the {fx['status']['In Transit']:,} In Transit shipments have "
-        f"a DeliveryDate before the review date, and they come from every year of the data ({by_year}). The status "
-        "was not updated when the goods arrived, a consistency and timeliness problem (Chapter 2). Likely cause: no "
-        "process or interface updates the status on delivery. Evidence: proof of delivery or carrier tracking for a "
-        "sample, the customers' receipt of the goods, and the process that is meant to close a shipment.",
+        f"a DeliveryDate before the review date, and they come from every year of the data ({by_year}). If "
+        "DeliveryDate records the actual delivery, the status was not updated when the goods arrived; if it is a "
+        "planned date, the shipments may still be unresolved. Either way the two fields conflict, a consistency and "
+        "timeliness problem (Chapter 2). Likely cause: no process or interface updates the status on delivery. "
+        "Evidence: proof of delivery or carrier tracking for a sample, the customers' receipt of the goods, the "
+        "history of status changes, and the process that is meant to close a shipment.",
         f"3. Both: all {fx['both']} In Transit shipments without a tracking number are past their DeliveryDate, so "
-        "neither the system nor the carrier shows that they arrived. They are the first items to confirm with "
-        "customers, because revenue and receivables for them rest on deliveries no record supports.",
-        "The report is refreshable: the same rules and counts apply to the next extract once ReviewDate is changed."])
+        "the records hold neither a carrier reference nor a delivered status for them. They are the first items to "
+        "confirm with customers, because the revenue and receivables recorded for them rest on deliveries that the "
+        "extract alone cannot confirm.",
+        "Neither exception proves that goods were lost or that a balance is misstated; each calls for the evidence "
+        "above. The report is refreshable: the same rules and counts apply to the next extract once ReviewDate is "
+        "changed."])
 
     settle(b)
     e = "4.5"
@@ -1317,7 +1334,7 @@ def ex4_6(b: ExerciseBuild) -> None:
     g0 = r2 + len(statuses) + 2
     heading(ws, f"A{g0}", "Requests by requesting employee", 11)
     heads = ["RequestedByEmployeeID", "EmployeeName", "JobTitle", "Requests", "Approved by someone else",
-             "Approved by the requester", "Not yet approved"]
+             "Approved by the requester", "Pending"]
     for j, h in enumerate(heads):
         ws.Cells(g0 + 1, 1 + j).Value = h
     bold(ws, f"A{g0 + 1}:G{g0 + 1}")
@@ -1327,27 +1344,33 @@ def ex4_6(b: ExerciseBuild) -> None:
         r = g0 + 2 + i
         grow[row["id"]] = r
         req = f"{P}[RequestedByEmployeeID],$A{r}"
+        done = f'{P}[Status],"Approved"'
         values(ws, {f"A{r}": row["id"]})
         ws.Range(f"A{r}").HorizontalAlignment = -4131
         formulas(ws, {f"B{r}": f"=XLOOKUP($A{r},Employee[EmployeeID],Employee[EmployeeName])",
                       f"C{r}": f"=XLOOKUP($A{r},Employee[EmployeeID],Employee[JobTitle])",
                       f"D{r}": f"=COUNTIFS({req})",
-                      f"E{r}": f'=COUNTIFS({req},{P}[ApprovedByEmployeeID],"<>"&$A{r},{P}[ApprovedByEmployeeID],"<>")',
-                      f"F{r}": f"=COUNTIFS({req},{P}[ApprovedByEmployeeID],$A{r})",
-                      f"G{r}": f'=COUNTIFS({req},{P}[ApprovedByEmployeeID],"")'})
+                      f"E{r}": f'=COUNTIFS({req},{done},{P}[ApprovedByEmployeeID],"<>"&$A{r},'
+                               f'{P}[ApprovedByEmployeeID],"<>")',
+                      f"F{r}": f"=COUNTIFS({req},{done},{P}[ApprovedByEmployeeID],$A{r})",
+                      f"G{r}": f'=COUNTIFS({req},{P}[Status],"Pending")'})
     gt = g0 + 2 + len(fx["grid"])
     values(ws, {f"A{gt}": "Total"})
     for cl in "DEFG":
         ws.Range(f"{cl}{gt}").Formula2 = f"=SUM({cl}{g0 + 2}:{cl}{gt - 1})"
     bold(ws, f"A{gt}:G{gt}")
     ws.Range(f"D{g0 + 2}:G{gt}").NumberFormat = COUNT
-    note(ws, f"G{g0 + 1}", "Added so that each row adds up: requests with no approver yet (the Pending ones).")
+    note(ws, f"E{g0 + 1}", "Counts only requests whose Status is Approved: a blank ApprovedByEmployeeID differs from the "
+                           "requester's ID, but it is not an approval by someone else, so the formula also requires a "
+                           "nonblank approver.")
 
     # (5) the range of discounts, and (6) the evidence for the follow-up on the pending requests
     d0 = gt + 2
     heading(ws, f"A{d0}", "DiscountFromReference (the Table is sorted from largest to smallest)", 11)
-    values(ws, {f"A{d0 + 1}": "Smallest", f"A{d0 + 2}": "Largest", f"A{d0 + 3}": "Request with the largest (first row)"})
-    formulas(ws, {f"B{d0 + 1}": f"=MIN({P}[DiscountFromReference])", f"B{d0 + 2}": f"=MAX({P}[DiscountFromReference])",
+    values(ws, {f"A{d0 + 1}": "Smallest, Approved requests", f"A{d0 + 2}": "Largest, Approved requests",
+                f"A{d0 + 3}": "Request with the largest (first row)"})
+    formulas(ws, {f"B{d0 + 1}": f'=MINIFS({P}[DiscountFromReference],{P}[Status],"Approved")',
+                  f"B{d0 + 2}": f'=MAXIFS({P}[DiscountFromReference],{P}[Status],"Approved")',
                   f"B{d0 + 3}": f"=INDEX({P}[PriceOverrideApprovalID],1)"})
     ws.Range(f"B{d0 + 1}:B{d0 + 2}").NumberFormat = "0.0%"
     p0 = d0 + 5
@@ -1388,19 +1411,24 @@ def ex4_6(b: ExerciseBuild) -> None:
     a_name, a_title = fx["names"][approver]
     own = next(r for r in fx["grid"] if r["id"] == approver)
     assert own["open"] == len(pend), "the memo says the approver requested every pending request"
+    assert top["status"] == "Approved", "the largest discount is on a Pending request: model answer (5) names it"
+    inside = all(fx["low"] <= p["disc"] <= fx["high"] for p in pend)
     nxt = answer(ws, p0 + 3 + len(pend), "Model answer (5)", [
         f"Sorted from the largest, the approved prices run from {pct(fx['high'])} below the reference price "
-        f"(request {top['id']}) down to {pct(fx['low'])}: every override is a modest reduction of about "
+        f"(request {top['id']}) down to {pct(fx['low'])}: every approved override is a modest reduction of about "
         f"{round(100 * fx['low'])} to {round(100 * fx['high'])} percent, none of them extreme, so the risk lies in "
-        "who approved them rather than in their size."])
+        "who approved them rather than in their size. "
+        + ("The Pending requests' prices fall inside that range, but they have not been approved, so they are not "
+           "part of it." if inside else "The Pending requests' prices have not been approved, so they are left out "
+                                        "of the range.")])
     answer(ws, nxt, "Model answer (6): memo", [
         f"To: Audit senior. Subject: Preliminary review of price override approvals ({fx['n']} requests; "
         f"{fx['status'].get('Approved', 0)} Approved, {fx['status'].get('Pending', 0)} Pending).",
         f"Exception 1, approvals made by the requester: all {fx['status'].get('Approved', 0)} approvals were made by "
         f"one person, EmployeeID {approver} ({a_name}, {a_title}), who also requested {own['n']} of the "
         f"{fx['n']} overrides and approved {own['own']} of her own requests. A control in which the only approver is "
-        "also a requester is not designed to prevent an unjustified price: nobody independent reviews the "
-        "manager's own overrides, and nobody can approve when she is the requester.",
+        "also a requester is not designed to prevent an unjustified price: the records show no independent review "
+        "of the manager's own overrides, and no other approver for them.",
         f"Exception 2, requests without an approval: requests {ids} are Pending, with no approver and no approval "
         f"date, and all {len(pend)} were requested by the {a_title}. A pending request should never reach an "
         "invoice, so the design question is whether the system blocks a price until it is approved.",
@@ -1408,8 +1436,9 @@ def ex4_6(b: ExerciseBuild) -> None:
         f"overrides and whether self-approval is allowed; (b) for the pending requests, filter SalesInvoiceLine on "
         f"their SalesOrderLineIDs ({lines}) and compare the billed UnitPrice with the ApprovedUnitPrice: this "
         f"workbook finds {n_inv} invoice lines billed at the pending prices under "
-        f"{and_join(methods)} pricing methods, so the overrides were used without approval and the invoices hide "
-        "them; (c) for a sample of the self-approved overrides, inspect the documented reason and the customer "
+        f"{and_join(methods)} pricing methods, so the pending prices were billed without a recorded approval, and "
+        "the invoice lines name a price list rather than an override (an exception to follow up, not yet evidence "
+        "of a misstatement); (c) for a sample of the self-approved overrides, inspect the documented reason and the customer "
         "agreement; (d) recommend an independent approver, such as the controller, for the manager's own requests "
         "and a system block on unapproved prices."])
 
@@ -1440,11 +1469,11 @@ def ex4_6(b: ExerciseBuild) -> None:
                 0, COUNT)
         b.check(e, f"requester {row['id']}: approved by the requester (Ex 4.6!F{r})", row["own"], f"='Ex 4.6'!F{r}",
                 0, COUNT)
-        b.check(e, f"requester {row['id']}: not yet approved (Ex 4.6!G{r})", row["open"], f"='Ex 4.6'!G{r}", 0, COUNT)
+        b.check(e, f"requester {row['id']}: Pending (Ex 4.6!G{r})", row["open"], f"='Ex 4.6'!G{r}", 0, COUNT)
     b.check(e, f"grid total equals the requests (Ex 4.6!D{gt})", fx["n"], f"='Ex 4.6'!D{gt}", 0, COUNT)
-    b.check(e, f"smallest DiscountFromReference (Ex 4.6!B{d0 + 1})", round(fx["low"], 9), f"='Ex 4.6'!B{d0 + 1}",
+    b.check(e, f"smallest DiscountFromReference, Approved requests (Ex 4.6!B{d0 + 1})", round(fx["low"], 9), f"='Ex 4.6'!B{d0 + 1}",
             1e-9, PCT)
-    b.check(e, f"largest DiscountFromReference (Ex 4.6!B{d0 + 2})", round(fx["high"], 9), f"='Ex 4.6'!B{d0 + 2}",
+    b.check(e, f"largest DiscountFromReference, Approved requests (Ex 4.6!B{d0 + 2})", round(fx["high"], 9), f"='Ex 4.6'!B{d0 + 2}",
             1e-9, PCT)
     if fx["top_unique"]:
         b.check(e, f"first row after the sort, the largest discount (Ex 4.6!B{d0 + 3})", top["id"],

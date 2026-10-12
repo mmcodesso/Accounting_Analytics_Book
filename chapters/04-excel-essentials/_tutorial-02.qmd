@@ -45,7 +45,9 @@ b. In A12, type `Share of line total`, and in B12, enter this formula, which div
    ```
 
 c. Format B12 as a percentage.
-d. Return to the **Parameters** worksheet, change B3 to `0.95`, and watch B4, B11, and B12 update. Then set B3 back to `0.9`.
+d. Return to the **Parameters** worksheet, change B3 to `0.95`, and watch B4 update.
+e. Go back to the **Analysis** worksheet and read B11 and B12, which have updated as well.
+f. Set Parameters!B3 back to `0.9`.
 
 About a tenth of the lines are large by this definition, yet together they account for close to a third of the value billed.
 

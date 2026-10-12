@@ -1190,33 +1190,52 @@ WHERE gl.SourceDocumentType = '{doc}'""")
             "Population: ledger rows of the cycle, sales invoices, and supplier payments; expected: a separate preparer",
             "\nUNION ALL\n".join(parts) + ";", checks)
     before = v["before"]
-    s.query("Requirement 4, test T6: refunds dated before the last payment on the credited invoice",
-            "Population: every refund and the applications to its credit's invoice; expected: no rows",
+    rcpt = v["rcpt"]
+    s.query("Requirement 4, test T6: refunds dated before the last application of the payments to the credited "
+            "invoice, and before its last receipt",
+            "Population: every refund and the receipts applied to its credit's invoice; expected: no rows",
             """\
 WITH LastPayment AS (
     SELECT SalesInvoiceID, MAX(ApplicationDate) AS LastPaymentDate
     FROM CashReceiptApplication
     GROUP BY SalesInvoiceID
+),
+LastReceipt AS (
+    SELECT cra.SalesInvoiceID, MAX(cr.ReceiptDate) AS LastReceiptDate
+    FROM CashReceiptApplication AS cra
+        INNER JOIN CashReceipt AS cr ON cr.CashReceiptID = cra.CashReceiptID
+    GROUP BY cra.SalesInvoiceID
 )
 SELECT rf.RefundNumber, rf.RefundDate,
     CAST(strftime('%Y', rf.RefundDate) AS INTEGER) AS FiscalYear,
     ROUND(rf.Amount, 2) AS Amount, si.InvoiceNumber, si.DueDate,
-    lp.LastPaymentDate,
+    lp.LastPaymentDate, lr.LastReceiptDate,
     julianday(lp.LastPaymentDate) - julianday(rf.RefundDate)
         AS DaysUntilPaid,
     CASE WHEN rf.RefundDate < si.DueDate THEN 1 ELSE 0 END
         AS BeforeDueDate,
+    CASE WHEN lr.LastReceiptDate > rf.RefundDate THEN 1 ELSE 0 END
+        AS BeforeLastReceipt,
     CASE WHEN NOT EXISTS (
             SELECT 1
             FROM CashReceiptApplication AS cra
             WHERE cra.SalesInvoiceID = si.SalesInvoiceID
                 AND cra.ApplicationDate <= rf.RefundDate)
-        THEN 1 ELSE 0 END AS NothingPaidYet
+        THEN 1 ELSE 0 END AS NothingPaidYet,
+    CASE WHEN NOT EXISTS (
+            SELECT 1
+            FROM CashReceiptApplication AS cra
+                INNER JOIN CashReceipt AS cr
+                    ON cr.CashReceiptID = cra.CashReceiptID
+            WHERE cra.SalesInvoiceID = si.SalesInvoiceID
+                AND cr.ReceiptDate <= rf.RefundDate)
+        THEN 1 ELSE 0 END AS NothingReceivedYet
 FROM CustomerRefund AS rf
     INNER JOIN CreditMemo AS cm ON cm.CreditMemoID = rf.CreditMemoID
     INNER JOIN SalesInvoice AS si
         ON si.SalesInvoiceID = cm.OriginalSalesInvoiceID
     INNER JOIN LastPayment AS lp ON lp.SalesInvoiceID = si.SalesInvoiceID
+    INNER JOIN LastReceipt AS lr ON lr.SalesInvoiceID = si.SalesInvoiceID
 WHERE lp.LastPaymentDate > rf.RefundDate
 ORDER BY rf.RefundNumber;""",
             [Check("refunds before the payment", before["n"], len),
@@ -1231,6 +1250,17 @@ ORDER BY rf.RefundNumber;""",
                    lambda r: [sum(1 for x in dicts(r) if x["NothingPaidYet"] and x["FiscalYear"] == d.C),
                               round(sum(x["Amount"] for x in dicts(r) if x["NothingPaidYet"]
                                         and x["FiscalYear"] == d.C), 2)]),
+             Check("before the last receipt", rcpt["n"], lambda r: r.total("BeforeLastReceipt")),
+             Check("before the last receipt, amount", rcpt["amt"],
+                   lambda r: round(sum(x["Amount"] for x in dicts(r) if x["BeforeLastReceipt"]), 2)),
+             Check("before the last receipt, by year", rcpt["years"],
+                   lambda r: by_year([x for x in dicts(r) if x["BeforeLastReceipt"]], "FiscalYear", yrs)),
+             Check("before any receipt", v["nothing_rcpt"]["n"], lambda r: r.total("NothingReceivedYet")),
+             Check("before any receipt, amount", v["nothing_rcpt"]["amt"],
+                   lambda r: round(sum(x["Amount"] for x in dicts(r) if x["NothingReceivedYet"]), 2)),
+             Check("the refunds the definitions part on, dated the day of the last receipt", v["same"]["n"],
+                   lambda r: sum(1 for x in dicts(r) if not x["BeforeLastReceipt"]
+                                 and x["LastReceiptDate"] == x["RefundDate"])),
              Check("also before the due date", v["before_due"], lambda r: r.total("BeforeDueDate")),
              Check("fewest days until paid", v["wait"]["lo"], lambda r: min(r.col("DaysUntilPaid"))),
              Check("most days until paid", v["wait"]["hi"], lambda r: max(r.col("DaysUntilPaid"))),
@@ -1493,20 +1523,25 @@ FROM PayrollRegister;""",
 Definitions used. Authority: a document above its approver's MaxApprovalAmount (a blank limit read as 0), the only
 authority the records hold; a delegation of authority for credits and refunds, if one exists, is outside them. Cash and
 credit: the credit's approver applied a receipt to the credited invoice (T3; recorded or applied, {v['cc_rec']['n']}).
-Before payment: the refund is dated before the last application on the credited invoice (T6). Past due: on the refund
+Before payment: the refund is dated before the last application of the customer's payments to the credited invoice
+(T6), the case's definition; the receipts' own dates are the alternative T6 reports beside it. Past due: on the refund
 date, an invoice of the customer dated by then, less the applications and credits dated by then, still open with its
 DueDate before the refund date (T10). Method mismatch: no receipt applied to the credited invoice used the refund's
 method.
 
-Results. {v['cm_above']['n']} credits ({money(v['cm_above']['amt'])}) exceed their approver's limit, all approved by
+Results. {v['cm_above']['n']} credits ({money(v['cm_above']['amt'])}) exceed their approver's recorded limit, all approved by
 customer service representatives with a limit of {v['above_limit']}; {v['rf_above']['n']} refunds
 ({money(v['rf_above']['amt'])}) exceed theirs, while the Accounting Manager's {v['within']['n']} are within limit (T1).
 No document falls outside its person's employment (T2). The credit's approver applied cash to the credited invoice on
 {v['cc']['n']} credits ({money(v['cc']['amt'])}; {v['cc_early']['n']} by the credit date) (T3); no refund approver
 approved the credit, and every return was received in the warehouse by someone other than the credit's approver (T4).
-{v['before']['n']} refunds ({money(v['before']['amt'])}) precede the customer's last payment, {v['nothing']['n']} of them
-before any payment (T6); the cause is in T7: {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were
-posted when nothing had been paid, so a refundable balance existed before the cash did. {v['pd2']['n']} refunds were
+{v['before']['n']} refunds ({money(v['before']['amt'])}) precede the last application of the customer's payments,
+{v['nothing']['n']} of them before any application; by the receipts' dates, {rcpt['n']} ({money(rcpt['amt'])}),
+{v['nothing_rcpt']['n']} of them before any receipt, and the {v['same']['n']} the definitions part on are dated the day
+of the last receipt, whose order on that day the records cannot show; neither date shows when the cash cleared the
+bank (T6). The cause is in
+T7: {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were posted when nothing had been applied to the
+invoice, so a refundable balance appeared in 2060 before the cash that supports it. {v['pd2']['n']} refunds were
 paid to customers whose past-due balance was at least the refund ({money(v['pd2']['amt'])}), and {v['mism']['n']} went
 by a method none of the invoice's receipts used, an anomaly to follow up (T10). The clawbacks are complete and at the
 accrual's rate; the {len(off)} amounts T8 lists are exact half-cent products that SQLite's ROUND, in binary floating
@@ -1598,7 +1633,8 @@ def r7(b):
             """\
 WITH Lines AS (
     SELECT cml.CreditMemoLineID, cml.Quantity, cml.UnitPrice,
-        cml.Discount, cml.LineTotal, sl.QuantityShipped,
+        cml.Discount, cml.LineTotal, srl.QuantityReturned,
+        sl.QuantityShipped,
         sil.UnitPrice AS InvoicePrice, sil.Discount AS InvoiceDiscount,
         sil.SalesInvoiceID, cm.OriginalSalesInvoiceID
     FROM CreditMemoLine AS cml
@@ -1615,6 +1651,8 @@ SELECT COUNT(*) AS CreditLines,
         THEN 1 ELSE 0 END) AS TracedToTheInvoice,
     SUM(CASE WHEN Quantity > QuantityShipped THEN 1 ELSE 0 END)
         AS AboveShipped,
+    SUM(CASE WHEN ABS(Quantity - QuantityReturned) > 0.000000001
+        THEN 1 ELSE 0 END) AS NotTheQuantityReturned,
     (SELECT COUNT(*)
      FROM (SELECT ShipmentLineID
            FROM SalesReturnLine
@@ -1634,6 +1672,7 @@ FROM Lines;""",
             [Check("credit lines", sub["lines"], lambda r: r.value("CreditLines")),
              Check("traced", sub["traced"], lambda r: r.value("TracedToTheInvoice")),
              Check("above shipped", sub["over"], lambda r: r.value("AboveShipped")),
+             Check("not the quantity returned", sub["qty_off"], lambda r: r.value("NotTheQuantityReturned")),
              Check("returned twice", sub["twice"], lambda r: r.value("ShipmentLinesReturnedTwice")),
              Check("price or discount off", sub["price_off"], lambda r: r.value("PriceOrDiscountOff")),
              Check("line totals off (half-cent roundings)", len(v["half"]) + len(sub["total_off"]),
@@ -1977,12 +2016,15 @@ ORDER BY StepDate, StepOrder, Document;""",
              Check("the refund's clearing date", rf["cleared"],
                    lambda r: r.where(Step="Customer refund")["Detail"].split("cleared ")[1])])
     s.answer("Requirement 7", f"""\
-The balances test clean. Every one of the {sub['lines']} credit lines traces to its return, shipment, and invoice
-lines, none returns more than was shipped and no shipment line was returned twice, and price and discount equal the
-invoice line's (S1); LineTotal is ROUND(Q x P x (1 - D), 2) except a half-cent on line {', '.join(str(x) for x in
-v['half'])}, an exact half-cent product. The {v['n_cm']} credits are on as many invoices, none above its invoice, with
-SubTotal equal to the lines and tax at {sub['rate']:.1%} of SubTotal plus freight on all of them (S2); a test on SubTotal
-alone would flag the {v['with_freight']} credits with freight. 2060 holds {len(items)} Issued credits at the year-end
+The recorded credits test clean. Every one of the {sub['lines']} credit lines traces to its return, shipment, and
+invoice lines, none returns more than was shipped or credits more than was returned, no shipment line was returned
+twice, and price and discount equal the invoice line's (S1); LineTotal is ROUND(Q x P x (1 - D), 2) except a
+half-cent on line {', '.join(str(x) for x in v['half'])}, an exact half-cent product, while by exact decimal rounding
+half up lines {', '.join(str(x) for x in v['half_up'])} are a cent lower: rounding, not errors. The {v['n_cm']} credits
+are on as many invoices, none above its invoice, with SubTotal equal to the lines and tax at {sub['rate']:.1%} of
+SubTotal plus freight on all of them (S2), a rate read from the credits' own totals, so a diagnostic the invoices'
+tax treatment would confirm; a test on SubTotal alone would flag the {v['with_freight']} credits with freight. No
+freight credit exceeds the invoice's freight, an upper bound, since no freight policy is in the records. 2060 holds {len(items)} Issued credits at the year-end
 (S3). Returned goods go back at standard cost, with no write-down for damaged goods: Damaged
 {money(v['dmg_total'])}, Damaged and Quality Concern {money(v['both'])} ({money(v['both_c'])} in {d.C}), a valuation
 follow-up (S4); {v['n_frac']} lines of less than one unit sit {money(v['frac_gap'])} below standard.
@@ -1990,10 +2032,12 @@ follow-up (S4); {v['n_frac']} lines of less than one unit sit {money(v['frac_gap
 Lapping (S5): no receipt is applied to another customer's invoice, deposits follow receipts within {lap['dep_hi']}
 days, every application falls within {lap['lag_hi']} days of the later of the receipt and invoice dates, and every
 receipt is fully applied; the {lap['early_receipts']} receipts applied to invoices dated after them are deposits held
-in 2060, not lapping. A first-digit test does not suit these populations, on Chapter 8's criteria: Benford's Law
-describes large populations of amounts that combine many quantities, span several orders of magnitude, and have no
-built-in maximum, while the {v['n_cm']} credits and {v['n_rf']} refunds are too few to judge conformity, their amounts
-are prices set by people times the quantities returned, plus tax, and each credit is capped by its invoice.
+in 2060, not lapping, as far as these tests reach. A first-digit test is a weak procedure here, on Chapter 8's
+criteria, though no minimum count rules it out: the credits and refunds are subsets selected by events (a return, then
+the part of a credit posted to customer deposits), their amounts follow the invoice lines they reverse, and each
+credit is capped by its invoice; with {v['n_rf']} refunds, a population that followed Benford's Law exactly would show a
+MAD of about {v['chance_rf']:.4f} by chance alone, beyond the {v['threshold']} of nonconformity, and the {v['n_cm']}
+credits about {v['chance_cm']:.4f}, so a departure could not be told from chance.
 
 Timeline (S6): {v['timeline']}. Disposition: follow up, not a conclusion. Evidence outside the database that would
 settle it: {v['payee']}; a confirmation from the customer of the credit and the refund; the receiving and inspection
@@ -2088,7 +2132,7 @@ def m2(b):
                        lambda r: sum(1 for x in r.col("TestID") if x == "CM CashAndCredit")),
                  Check("Milestone 2: refunds above the limit", v["rf_above"],
                        lambda r: sum(1 for x in r.col("TestID") if x == "RF AboveLimit")),
-                 Check("Milestone 2: refunds before the customer's payment", v["before"],
+                 Check("Milestone 2: refunds before the last application of the payments", v["before"],
                        lambda r: sum(1 for x in r.col("TestID") if x == "RF BeforePayment"))]
 
 

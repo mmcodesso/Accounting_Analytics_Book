@@ -324,7 +324,7 @@ def ex6(d, claim):
     top5, top10 = sum(c[2] for c in ranked[:5]) / revenue, sum(c[2] for c in ranked[:10]) / revenue
     segments = {c[1] for c in ranked[:10]}
     claim(len(segments) == 1, "the ten largest customers are all in one segment")
-    claim(top10 < 0.20, "concentration is low (the ten largest customers hold less than a fifth of revenue)")
+    claim(top10 < 0.20, "concentration is modest (the ten largest customers hold less than a fifth of revenue)")
     methods = {}
     for r in rows:
         m = methods.setdefault(r["method"], [0, 0.0])

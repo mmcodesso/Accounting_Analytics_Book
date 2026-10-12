@@ -20,9 +20,9 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (3) Choose a method for each item group, and explain the choice in one or two sentences per group. Consider whether the first quarter of 2024, which contains the start-up month, should be left out of the fit.
 
-(4) Forecast the first quarter of 2027 for each item group with your chosen method, give a range for each, and compare the sum of the item-group forecasts with the company-level forecast from Tutorial 7.1.
+(4) Forecast the first quarter of 2027 for each item group with your chosen method, give a range for each, as in Tutorial 7.1, and compare the sum of the item-group forecasts with the company-level forecast from Tutorial 7.1.
 
-**Deliverable.** A backtest table by item group, the chosen methods with reasons, and a forecast of the first quarter of 2027 by item group with ranges.
+**Deliverable.** A backtest table by item group, the chosen methods with reasons, and a forecast of the first quarter of 2027 by item group with ranges, labeled as billed revenue by invoice date, the basis of InvoiceLines.
 
 
 
@@ -62,9 +62,9 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Requirements.**
 
-(1) Calculate the 2026 contribution margin ratio as revenue minus the standard cost of the products sold and minus the sales commission expense, divided by revenue. Use InvoiceLines for revenue and standard cost, and the GLOpex query from Tutorial 7.2 for commissions.
+(1) Calculate the 2026 contribution margin ratio as revenue minus the standard cost of the products sold and minus the sales commission expense, divided by revenue. Use InvoiceLines for revenue and standard cost, and the GLOpex query from Tutorial 7.2 for commissions. As in Tutorial 7.3, this treats the whole standard cost as variable.
 
-(2) Use the 2026 operating-expense budget, excluding sales commissions, as the fixed costs. Explain in two sentences why the budget is a reasonable source for them.
+(2) Use the 2026 operating-expense budget, excluding sales commissions and interest expense (account 7030, which the income statement of Chapter 6 places below operating income), as the fixed costs. Explain in two sentences why the budget is a reasonable source for them.
 
 (3) Calculate the break-even revenue and the margin of safety in dollars and as a percentage of 2026 revenue.
 
@@ -96,7 +96,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (4) Use Solver with the Simplex LP method to maximize the total contribution, subject to hours used within capacity at every work center and production between zero and demand for every item. Do not require whole units, so that Solver can produce its Sensitivity report.
 
-(5) Using the answer and the Sensitivity report, identify the work centers whose capacity binds, the shadow price of their hours, the items Solver reduces, and the contribution lost compared with meeting all demand.
+(5) Using the answer and the Sensitivity report, identify the work centers whose capacity binds, the shadow price of their hours and the range over which it holds, the items Solver reduces, and the contribution lost compared with meeting all demand.
 
 **Deliverable.** A Solver model, its Answer and Sensitivity reports, and a half-page recommendation to the operations manager.
 
@@ -116,11 +116,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (1) Build a monthly table for 2024 through 2026 with revenue from InvoiceLines and the number of invoices from the SalesInvoice Table. GLOpex holds only 2026, so import the T3_GLEntry Table again as a new query named `GLCommission`, clicking **Transform Data**, and filter AccountID to 104 (account 6290, Sales Commission Expense) and SourceDocumentType to exclude JournalEntry, whose only rows on this account are the three year-end closing entries. Add the monthly commission expense to the table.
 
-(2) Regress monthly revenue on the number of invoices, with and without January 2024, and compare R Square and the standard error with the average monthly revenue. Explain whether the expectation would be precise enough to detect a misstatement of 5 percent of a month's revenue.
+(2) Regress monthly revenue on the number of invoices, with and without January 2024, and compare R Square and the standard error with the average monthly revenue. Explain whether the expectation would be precise enough to detect a misstatement of 5 percent of a month's revenue, the amount your senior wants the procedure to detect.
 
 (3) Regress monthly commission expense on monthly revenue for 2024 and 2025, and use the fitted line to set an expectation for each month of 2026.
 
-(4) Flag the 2026 months whose recorded commission expense differs from the expectation by more than 3 percent, and describe the evidence you would examine for each. Look at the signs of the differences in consecutive months.
+(4) Flag the 2026 months whose recorded commission expense differs from the expectation by more than 3 percent, your senior's threshold for follow-up, and describe the evidence you would examine for each. Look at the signs of the differences in consecutive months.
 
 (5) Import the T27_SalesCommissionAccrual Table, total the CommissionAmount of the accruals dated in 2026, and reconcile the total to the 2026 commission expense in GLCommission. Identify the source document type that explains the difference.
 
@@ -138,15 +138,15 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Requirements.**
 
-(1) Import the T78_DemandForecast Table with Power Query, keeping the rows whose IsCurrent is 1, the current version. Merge in ItemGroup from the Item query without the prefix, and total ForecastQuantity by item group and by the year of ForecastWeekStartDate.
+(1) Import the T78_DemandForecast Table with Power Query, keeping the rows whose IsCurrent is 1, the current version. Merge in ItemGroup from the Item query without the prefix, and total ForecastQuantity by item group and by the year of ForecastWeekStartDate, for 2024 through 2026. The forecast also covers the first weeks of 2027, which have no orders yet to compare with.
 
-(2) Import the T10_SalesOrderLine Table as a query named `OrderLines`. Merge in OrderDate from the SalesOrder query of Tutorial 5.2 and ItemGroup from the Item query, both without the prefix, total Quantity by item group and by the year of OrderDate, and calculate the ratio of forecast to orders for each year and item group.
+(2) Import the T10_SalesOrderLine Table as a query named `OrderLines`. Merge in OrderDate from the SalesOrder query of Tutorial 5.2 and ItemGroup from the Item query, both without the prefix, total Quantity by item group and by the year of OrderDate, and calculate the ratio of forecast to orders for each year and item group. Keep Services, whose forecasts and orders are hours of design work, in a row of its own, and add a total for the four product groups.
 
 (3) Describe how the ratio has changed over the three years, and whether it differs among the item groups.
 
-(4) Compare the 2026 budget's quantities with the 2026 forecast and with the 2026 orders.
+(4) Compare the 2026 budget's quantities with the 2026 forecast and with the 2026 orders of the four product groups, which are all the budget plans.
 
-(5) Each forecast records the baseline quantity that the forecasting method produced, the quantity after any planner adjustment, the planner, and the employee who approved it. Add a column with the ratio of ForecastQuantity to BaselineForecastQuantity, and list the forecasts adjusted by more than half of their baseline. Import the T74_Employee Table as a query named `Employees`, and look up the planners and approvers of the listed forecasts in it. Explain which control the list tests and what it shows.
+(5) Each forecast records the baseline quantity that the forecasting method produced, the quantity after any planner adjustment, the planner, and the employee who approved it. Add a column with the ratio of ForecastQuantity to BaselineForecastQuantity, and list the forecasts adjusted up or down by more than half of their baseline. Import the T74_Employee Table as a query named `Employee`, and look up the planners and approvers of the listed forecasts in it. Explain which control the list tests and what it shows.
 
 (6) Write a memo of half a page that states whether the forecast is consistent with historical experience, the consequences for any estimate or plan that relies on it, what the adjusted forecasts show about the review of planners' changes, and the evidence and explanations you would request from management.
 
