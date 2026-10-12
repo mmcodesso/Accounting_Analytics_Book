@@ -286,5 +286,126 @@ class FingerprintTests(unittest.TestCase):
             self.assertEqual(1, release.check(root, root / '_book', FakeGitHub(exists=False), None))
 
 
+BOOK_PDF = 'Accounting_Analytics_First_Edition_Rev_2001_1.pdf'
+TABLE = """
+| Chapter | Slides | Companion files | Solutions |
+|:--------------|:------------|:--------------|:--------------------------|
+| Chapter 1: Intro | [PowerPoint]{.slides data-chapter="chapter-01"} | [Start files](/supplementary/start-files/Chapter01-companion.zip) | [Excel](/supplementary/solutions/Chapter01-exercises.zip) · [SQL](/supplementary/solutions/Chapter01-sql.zip) |
+| Part I case: A Case | [PowerPoint]{.slides data-chapter="case-part-1"} | — | — |
+| Appendix: Extras | — | — | — |
+"""
+DATASET = {'version': 'v2000.1', 'window': 'fiscal 2000-2002', 'release': 'https://example.com/dataset/tag/v2000.1',
+           'download': 'https://example.com/dataset/download/v2000.1', 'sha256': {'sqlite': 'a1', 'xlsx': 'b2', 'csv': 'c3'}}
+MANIFEST = {'updated': '2001-02-03T04:05:06+00:00', 'assets': {
+    BOOK_PDF: {'kind': 'book', 'size': 18_500_000, 'sha256': 'pdfhash'},
+    'Accounting_Analytics_First_Edition_Rev_2001_1.epub': {'kind': 'book', 'size': 2_000_000, 'sha256': 'epubhash'},
+    'chapter-01.pptx': {'kind': 'deck', 'sha256': 'deckhash'},
+    'Chapter01-companion.zip': {'kind': 'companion', 'sha256': 'starthash'},
+    'Chapter01-exercises.zip': {'kind': 'companion', 'sha256': 'exhash'},
+    'Instructor-Notes.zip': {'kind': 'companion', 'sha256': 'inshash'},
+    'Extra.zip': {'kind': 'companion', 'sha256': 'extrahash'}}}
+
+
+class PublishingGitHub(FakeGitHub):
+    """The fake release also records the text it is given."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text = None
+
+    def authenticated(self):
+        pass
+
+    def edit_notes(self, tag, notes):
+        self.text = Path(notes).read_text(encoding='utf-8')
+
+
+class ReleasePageTests(unittest.TestCase):
+    def revision(self):
+        return release.Revision('2001.1', 'book-v2001.1', f'{REPO}/releases/tag/book-v2001.1',
+                                f'{REPO}/releases/download/book-v2001.1')
+
+    def test_the_rows_are_read_from_the_downloads_table(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book(root)
+            self.assertEqual([], release.downloads_rows(root))
+            write(root, 'front-matter/downloads.qmd', TABLE)
+            rows = release.downloads_rows(root)
+            self.assertEqual(['Chapter 1: Intro', 'Part I case: A Case', 'Appendix: Extras'], [r.chapter for r in rows])
+            self.assertEqual(['chapter-01', 'case-part-1', None], [r.deck for r in rows])
+            self.assertEqual([('Start files', 'Chapter01-companion.zip')], rows[0].companion)
+            self.assertEqual([('Excel', 'Chapter01-exercises.zip'), ('SQL', 'Chapter01-sql.zip')], rows[0].solutions)
+            self.assertEqual(([], []), (rows[2].companion, rows[2].solutions))
+
+    def test_the_dataset_block_is_optional(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            write(root, '_variables.yml', VARIABLES)
+            self.assertIsNone(release.read_dataset(root))
+            write(root, '_variables.yml', VARIABLES + '  download: "https://example.com/d"\n')
+            self.assertEqual('v2000.1', release.read_dataset(root)['version'])
+
+    def test_the_page_links_the_book_the_dataset_and_the_files_by_chapter(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book(root)
+            write(root, 'front-matter/downloads.qmd', TABLE)
+            text = release.release_notes(self.revision(), 'abc1234def', MANIFEST, rows=release.downloads_rows(root),
+                                         dataset=DATASET)
+            # The book's website and the newest revision, to reach the latest version from any revision's page.
+            self.assertIn(f'<a href="{release.SITE}/">', text)
+            self.assertIn('https://github.com/owner/book/releases/latest', text)
+            self.assertIn('First edition · Revision 2001.1', text)
+            # The book, with sizes; a format the release lacks is left out.
+            self.assertIn(f'[**PDF**]({DOWNLOAD}/{BOOK_PDF}) | Reading on a screen, and printing | 18.5 MB', text)
+            self.assertIn('2.0 MB', text)
+            self.assertNotIn('DOCX', text)
+            # The dataset from its own release, with checksums.
+            self.assertIn('[**SQLite**](https://example.com/dataset/download/v2000.1/CharlesRiver.sqlite)', text)
+            self.assertIn('| `CharlesRiver.xlsx` (dataset v2000.1) | `b2` |', text)
+            # The Downloads table: a deck in the browser and as PowerPoint, files from the release, dashes.
+            self.assertIn(f'| Chapter 1: Intro | [PowerPoint]({DOWNLOAD}/chapter-01.pptx) '
+                          f'| [Start files]({DOWNLOAD}/Chapter01-companion.zip) '
+                          f'| [Excel]({DOWNLOAD}/Chapter01-exercises.zip) |', text)
+            # Only this revision's files are linked: no row for the website's newest text, no deck in the browser.
+            self.assertNotIn('Read online', text)
+            self.assertNotIn('/slides/', text)
+            self.assertIn('Download revision 2001.1 of the book', text)
+            self.assertNotIn('Chapter01-sql.zip)', text)      # linked by the table but not on the release
+            self.assertIn('| Part I case: A Case | — | — | — |', text)       # its deck is not on the release
+            self.assertIn('| Appendix: Extras | — | — | — |', text)
+            self.assertIn(f'[**Instructor-Notes.zip**]({DOWNLOAD}/Instructor-Notes.zip)', text)
+            self.assertIn(f'[Extra.zip]({DOWNLOAD}/Extra.zip)', text)          # a file no row lists is still linked
+            self.assertIn('https://github.com/owner/book/commit/abc1234def', text)
+            self.assertIn('on 2001-02-03', text)
+            self.assertEqual(1, text.count('<details>'))
+            self.assertEqual(text.count('<details>'), text.count('</details>'))
+            self.assertLess(text.index(f'`{BOOK_PDF}` | `pdfhash`'), text.index('`chapter-01.pptx` | `deckhash`'))
+
+    def test_a_page_without_rows_or_dataset_still_lists_every_file(self) -> None:
+        text = release.release_notes(self.revision(), 'abc1234', MANIFEST)
+        self.assertNotIn('Charles River dataset', text)
+        for name in ('chapter-01.pptx', 'Chapter01-companion.zip', 'Chapter01-exercises.zip', 'Extra.zip'):
+            self.assertIn(f'[{name}]({DOWNLOAD}/{name})', text)
+
+    def test_notes_writes_the_page_and_only_updates_the_release_when_asked(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            book(root)
+            write(root, 'front-matter/downloads.qmd', TABLE)
+            github = PublishingGitHub(manifest={**MANIFEST, 'commit': 'feedbeef00'})
+            path = release.notes(root, github=github)
+            self.assertEqual(root / release.STAGE / 'release-notes.md', path)
+            self.assertIn('commit/feedbeef00', path.read_text(encoding='utf-8'))
+            self.assertIsNone(github.text)
+            release.notes(root, update=True, github=github)
+            self.assertEqual(path.read_text(encoding='utf-8'), github.text)
+            with self.assertRaisesRegex(ValueError, 'does not exist'):
+                release.notes(root, github=PublishingGitHub(exists=False))
+            with self.assertRaisesRegex(ValueError, 'has no manifest.json'):
+                release.notes(root, github=PublishingGitHub())
+
+
 if __name__ == '__main__':
     unittest.main()

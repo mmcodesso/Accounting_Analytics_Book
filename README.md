@@ -87,6 +87,10 @@ To preview the website locally as well, run the full build,
 `python scripts/build_all.py`; `publish` then reuses its files if nothing changed
 since.
 
+The release's page lists the book, the dataset, and the slides, companion files, and solutions by chapter, as the
+Downloads page does, with a link to this website for the latest version. `publish` writes it each time;
+`python scripts/release.py notes` previews it (`--update` puts it on the release without publishing).
+
 `python scripts/release.py status` lists every file: whether it is built, whether
 it was built from the current text, and whether the release has the same copy. A
 plain `git push` also deploys the website but leaves the downloads as they were;

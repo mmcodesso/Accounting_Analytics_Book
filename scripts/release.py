@@ -5,10 +5,12 @@ GitHub Actions renders the site: the book's HTML and the Reveal decks. The files
 are built locally and published as the assets of the revision's release (the book block of _variables.yml): the PDF,
 EPUB and DOCX, a PowerPoint file per deck, and the companion and solution files. filters/slide-links.lua points the
 links at the release. A new revision is a new tag and release; publishing the same revision again uploads only the
-files that changed.
+files that changed. The release's text is a page in the manner of the book's Downloads page: links to the book,
+the dataset, and the slides, companion and solution files by chapter, written by publish (or by notes).
 
   python scripts/release.py status                    what is built, current, and on the release
   python scripts/release.py publish [--dry-run]       build what is stale, upload what changed, push main
+  python scripts/release.py notes [--update]          write the release page (--update puts it on the release)
   python scripts/release.py bump 2027.2               start a new revision (then commit _variables.yml)
   python scripts/release.py check --site _book        GitHub Actions: the release holds every file the site links
 
@@ -50,6 +52,17 @@ DECK_INPUTS = ('_variables.yml', 'slides/_quarto.yml', 'slides/theme', 'slides/s
 BOOK_SOURCES = ('index.qmd', 'front-matter', 'chapters', 'cases', 'appendices', 'back-matter', 'shared/fragments')
 SOURCE_LINK = re.compile(r'\]\((/(?:downloads|supplementary)/[^)\s]+)\)')
 HREF = re.compile(r'href="([^"]*)"')
+# The release page (release_notes): the book's website shows the newest text; the Downloads page's table is read for
+# the rows; the dataset files are the three the Downloads page links (the key is the one of dataset.sha256).
+SITE = 'https://aa.accountinganalyticshub.com'
+DATASET_SITE = 'https://charlesriver.accountinganalyticshub.com/'
+DOWNLOADS_PAGE = 'front-matter/downloads.qmd'
+INSTRUCTOR_NOTES = 'Instructor-Notes.zip'
+TABLE_LINK = re.compile(r'\[([^\]]+)\]\((/supplementary/[^)\s]+)\)')
+DECK_ATTRIBUTE = re.compile(r'data-chapter="([^"]+)"')
+DATASET_FILES = (('sqlite', 'SQLite', 'CharlesRiver.sqlite', 'The SQL chapters, in DB Browser for SQLite'),
+                 ('xlsx', 'Excel', 'CharlesRiver.xlsx', 'The Excel and Power BI chapters'),
+                 ('csv', 'CSV package', 'CharlesRiver_csv.zip', 'The same tables as plain CSV files'))
 
 
 # --- The revision ---------------------------------------------------------------------------------------------------
@@ -423,21 +436,168 @@ def plan_uploads(entries: dict[str, dict], remote_names: set[str], remote_manife
     return uploads, deletes, kept
 
 
-def release_notes(revision: Revision, commit: str, manifest: dict) -> str:
+# --- The release page -----------------------------------------------------------------------------------------------
+# The text of the release is built from the Downloads page (its Supplementary Material table, so the two stay in step),
+# the dataset block of _variables.yml, and the release's own manifest, and it links only files the manifest lists.
+
+class Row:
+    """A row of the Downloads page's table: a chapter, a case or an appendix with its deck and its files (release
+    names)."""
+
+    def __init__(self, chapter: str, deck: str | None, companion: list[tuple[str, str]],
+                 solutions: list[tuple[str, str]]):
+        self.chapter, self.deck, self.companion, self.solutions = chapter, deck, companion, solutions
+
+
+def downloads_rows(root: Path, revision: Revision | None = None) -> list[Row]:
+    """The rows of the Supplementary Material table of front-matter/downloads.qmd, in the page's order."""
+    path = root / DOWNLOADS_PAGE
+    if not path.is_file():
+        return []
+    revision = revision or read_revision(root)
+    rows = []
+    for line in path.read_text(encoding='utf-8').splitlines():
+        line = line.strip()
+        if not (line.startswith('|') and line.endswith('|')):
+            continue
+        cells = [cell.strip() for cell in line.strip('|').split('|')]
+        if len(cells) != 4 or cells[1] == 'Slides' or set(cells[0]) <= set(':- '):
+            continue
+        deck = DECK_ATTRIBUTE.search(cells[1])
+        links = [[(label, asset_name(target, revision)) for label, target in TABLE_LINK.findall(cell)]
+                 for cell in cells[2:]]
+        rows.append(Row(cells[0], deck.group(1) if deck else None, *links))
+    return rows
+
+
+def read_dataset(root: Path) -> dict | None:
+    """The dataset block of _variables.yml (version, window, release, download, sha256), or None."""
+    import yaml
+    data = yaml.safe_load((root / '_variables.yml').read_text(encoding='utf-8')) or {}
+    dataset = data.get('dataset') or {}
+    return dataset if dataset.get('version') and dataset.get('download') else None
+
+
+def release_notes(revision: Revision, commit: str, manifest: dict, *, rows: list[Row] | tuple = (),
+                  dataset: dict | None = None) -> str:
+    """The text of the revision's release page: the book, the dataset, the slides, companion and solution files by
+    chapter (as the Downloads page lists them), and the checksums. GitHub shows the files themselves below it."""
     assets = manifest['assets']
-    decks = sorted(name for name, entry in assets.items() if entry['kind'] == 'deck')
-    companion = sum(1 for entry in assets.values() if entry['kind'] == 'companion')
-    return '\n'.join([
-        f'Revision {revision.revision} of the {revision.edition} edition of *Accounting Analytics: An Integrated '
-        'Approach*.',
+    edition = f'{revision.edition[:1].upper()}{revision.edition[1:]} edition'
+    repo = f'https://github.com/{revision.repo}'
+    downloads = f'{SITE}/front-matter/downloads.html'
+    used: set[str] = set()
+
+    def link(label: str, name: str) -> str:
+        used.add(name)
+        return f'[{label}]({revision.url(name)})'
+
+    def links(files: list[tuple[str, str]]) -> str:
+        return ' · '.join(link(label, name) for label, name in files if name in assets) or '—'
+
+    page = [
+        '<p align="center">',
+        f'  <a href="{SITE}/"><img src="{SITE}/visuals/cover/cover-web.png" width="220" '
+        'alt="Cover of Accounting Analytics: An Integrated Approach"></a>',
+        '</p>',
         '',
-        f'- The book: {", ".join(f"`{revision.book_name}.{ext}`" for ext in BOOK_FORMATS)}.',
-        f'- The slides: {len(decks)} PowerPoint decks (`chapter-NN.pptx`, and `case-part-N.pptx` for the comprehensive cases).',
-        f'- The companion and solution files: {companion} files, listed on the book\'s Downloads page.',
+        '<h1 align="center">Accounting Analytics: An Integrated Approach</h1>',
         '',
-        f'Last published from commit {commit[:7]} on {dt.date.today().isoformat()}. `manifest.json` lists each '
-        'file\'s size, SHA-256, and the commit it was built from.',
-        ''])
+        '<p align="center">',
+        f'  <strong>{edition} · Revision {revision.revision}</strong><br>',
+        '  Mauricio Codesso, Ph.D.',
+        '</p>',
+        '',
+        '<p align="center">',
+        f'  <a href="{SITE}/"><strong>Read the latest version online</strong></a> &nbsp;·&nbsp;',
+        f'  <a href="{downloads}">Downloads page</a> &nbsp;·&nbsp;',
+        f'  <a href="{repo}/releases/latest">Newest revision</a> &nbsp;·&nbsp;',
+        f'  <a href="{repo}/releases">All revisions</a>',
+        '</p>',
+        '',
+        f'> **Looking for the latest version?** [The book\'s website]({SITE}/) always shows the newest text. This page '
+        f'holds the files of revision {revision.revision}, and each new revision of the book gets a release page of '
+        f'its own: [the newest one is always here]({repo}/releases/latest).',
+        '',
+        '## 📖 The book',
+        '',
+        f'Download revision {revision.revision} of the book in the format you prefer. Every link on this page '
+        'downloads a file of this revision.',
+        '',
+        '| Format | Best for | Size |',
+        '|:--|:--|--:|']
+    for ext, icon, label, use in (('pdf', '📄', 'PDF', 'Reading on a screen, and printing'),
+                                  ('epub', '📱', 'EPUB', 'E-readers, tablets, and phones'),
+                                  ('docx', '📝', 'DOCX', 'Editing, annotating, and quoting')):
+        name = f'{revision.book_name}.{ext}'
+        if name in assets:
+            page.append(f'| {icon} {link(f"**{label}**", name)} | {use} | {megabytes(assets[name]["size"])} |')
+
+    if dataset:
+        download = str(dataset['download']).rstrip('/')
+        page += ['', '## 🗄️ The Charles River dataset', '',
+                 f'Every chapter works with the Charles River Accounting Dataset. This edition is verified against '
+                 f'release **{dataset["version"]}**, which covers {dataset.get("window", "its fiscal years")}. '
+                 'Use these files, so that your results match the chapters: a later release can hold different '
+                 'values.', '',
+                 '| Format | Used for |', '|:--|:--|']
+        for _key, label, file, use in DATASET_FILES:
+            page.append(f'| [**{label}**]({download}/{file}) | {use} |')
+        page += ['', f'The [dataset website]({DATASET_SITE}) has its documentation and every update'
+                 + (f', and the [release page]({dataset["release"]}) lists the files.' if dataset.get('release')
+                    else '.')]
+
+    page += ['', '## 🎞️ Slides, companion files, and solutions', '',
+             '**Slides** are the PowerPoint deck of each chapter or case. **Start files** hold the work as it stands at the end of the previous tutorial, so you can '
+             'begin a tutorial without the one before it or check your own work. **Solutions** cover the exercises, '
+             'the comprehensive cases, and the capstone cases, so try the work first. Every file explains itself, in '
+             'a Solution Notes worksheet, a Power BI Notes page with a Checks query, or a SQL script\'s header and '
+             'notes block.']
+    if rows:
+        page += ['', '| Chapter | Slides | Start files | Solutions |', '|:--|:--|:--|:--|']
+        for row in rows:
+            deck = f'{row.deck}.pptx'
+            slides = link('PowerPoint', deck) if row.deck and deck in assets else '—'
+            page.append(f'| {row.chapter} | {slides} | {links(row.companion)} | {links(row.solutions)} |')
+    more = sorted((name for name, entry in assets.items() if entry.get('kind') in ('deck', 'companion')
+                   and name not in used and name != INSTRUCTOR_NOTES))
+    if more:
+        page += ['', f'More files: ' + ' · '.join(link(name, name) for name in more) + '.']
+    if INSTRUCTOR_NOTES in assets:
+        page += ['', '## 👩‍🏫 For instructors', '',
+                 f'{link(f"**{INSTRUCTOR_NOTES}**", INSTRUCTOR_NOTES)} collects the instructor notes, the expected '
+                 'values of the tutorials, and the answer keys of the multiple-choice questions for every chapter, '
+                 'case, and appendix, as Markdown and Word files.']
+    page += ['', '## 🧭 Opening a companion file', '',
+             'The Excel and Power BI files read CharlesRiver.xlsx from the folder `C:\\CharlesRiver`. If your copy '
+             'is there, a file is ready to refresh; otherwise, point the file at your copy once before you refresh '
+             f'it. The [Downloads page]({downloads}#sec-companion-files) explains each step for Excel and for Power '
+             'BI Desktop.']
+
+    published = str(manifest.get('updated') or '')[:10]
+    page += ['', '## ℹ️ About this release', '',
+             f'- **Revision:** {revision.revision} of the {revision.edition} edition (tag `{revision.tag}`).',
+             f'- **Published** from commit [`{commit[:7]}`]({repo}/commit/{commit})'
+             + (f' on {published}' if published else '') + '. `manifest.json` lists the size, the SHA-256, and the '
+             'build commit of each file.',
+             '- **License:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/): share and adapt the '
+             'book with attribution, under the same terms.',
+             '', '<details>', '<summary><strong>Checksums</strong> (SHA-256)</summary>', '',
+             '| File | SHA-256 |', '|:--|:--|']
+    for key, _label, file, _use in DATASET_FILES if dataset else ():
+        digest = (dataset.get('sha256') or {}).get(key)
+        if digest:
+            page.append(f'| `{file}` (dataset {dataset["version"]}) | `{digest}` |')
+    # The book in the order of its formats, then the decks, then the companion files.
+    order = [f'{revision.book_name}.{ext}' for ext in BOOK_FORMATS]
+    kinds = ('deck', 'companion')
+    for name, entry in sorted(assets.items(), key=lambda item: (
+            order.index(item[0]) if item[0] in order else len(order),
+            kinds.index(item[1]['kind']) if item[1].get('kind') in kinds else len(kinds), item[0])):
+        if entry.get('sha256'):
+            page.append(f'| `{name}` | `{entry["sha256"]}` |')
+    page += ['', '</details>', '']
+    return '\n'.join(page)
 
 
 def stage(root: Path, assets: dict[str, Asset], names: list[str]) -> Path:
@@ -484,7 +644,7 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
     remote_names = {asset['name'] for asset in (release or {}).get('assets', [])}
     remote_manifest = github.manifest(revision.tag) if MANIFEST in remote_names else None
     uploads, deletes, kept = plan_uploads(entries, remote_names, remote_manifest, force)
-    manifest = {'revision': revision.revision, 'tag': revision.tag,
+    manifest = {'revision': revision.revision, 'tag': revision.tag, 'commit': head,
                 'updated': dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
                 'assets': {name: kept.get(name, entries[name]) for name in sorted(entries)}}
 
@@ -499,13 +659,18 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
         print(f'  delete  {name} (no longer linked by the book)')
     deploy = 'run the deploy workflow' if remote_main == head else f'push main ({remote_main[:7]}..{head[:7]})'
     print(f'Then {deploy}.', flush=True)
+    text = release_notes(revision, head, manifest, rows=downloads_rows(root, revision), dataset=read_dataset(root))
     if dry_run:
+        preview = root / STAGE / 'release-notes.md'
+        preview.parent.mkdir(parents=True, exist_ok=True)
+        preview.write_text(text, encoding='utf-8')
+        print(f'The release page is previewed in {preview.relative_to(root)}.')
         print('Dry run: nothing was tagged, uploaded, or pushed.')
         return
 
     folder = stage(root, assets, uploads)
     notes = folder / 'release-notes.md'
-    notes.write_text(release_notes(revision, head, manifest), encoding='utf-8')
+    notes.write_text(text, encoding='utf-8')
     if release is None:
         if not git(root, 'ls-remote', '--tags', 'origin', f'refs/tags/{revision.tag}'):
             if subprocess.run(['git', 'rev-parse', '--verify', '--quiet', f'refs/tags/{revision.tag}'], cwd=root,
@@ -528,6 +693,30 @@ def publish(root: Path, *, build: bool = True, dry_run: bool = False, force: boo
         subprocess.run(['git', 'push', 'origin', 'HEAD:refs/heads/main'], cwd=root, check=True)
     print(f'Published the {revision.edition} edition, revision {revision.revision}: {revision.release}')
     print('GitHub Actions now renders and deploys the site.')
+
+
+def notes(root: Path, *, update: bool = False, github: GitHub | None = None) -> Path:
+    """Write the release page from the revision's published manifest to outputs/release/release-notes.md, and with
+    update replace the text of the release with it (the files are not touched). publish does the same at its end."""
+    revision = read_revision(root)
+    github = github or GitHub(revision.repo)
+    github.authenticated()
+    if github.release(revision.tag) is None:
+        raise ValueError(f'The release {revision.tag} does not exist yet: publish the revision first.')
+    manifest = github.manifest(revision.tag)
+    if manifest is None:
+        raise ValueError(f'The release {revision.tag} has no {MANIFEST}: publish the revision first.')
+    text = release_notes(revision, manifest.get('commit') or git(root, 'rev-parse', 'HEAD'), manifest,
+                         rows=downloads_rows(root, revision), dataset=read_dataset(root))
+    path = root / STAGE / 'release-notes.md'
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding='utf-8')
+    if update:
+        github.edit_notes(revision.tag, path)
+        print(f'Replaced the text of the release {revision.tag}: {revision.release}')
+    else:
+        print(f'Wrote {path.relative_to(root)}; add --update to put it on the release.')
+    return path
 
 
 # --- Status and the check on GitHub Actions -------------------------------------------------------------------------
@@ -625,6 +814,8 @@ def main(argv: list[str] | None = None) -> int:
     publishing.add_argument('--no-build', action='store_true', help='refuse instead of building stale files')
     publishing.add_argument('--dry-run', action='store_true', help='show the plan; tag, upload and push nothing')
     publishing.add_argument('--force', action='store_true', help='upload every file, changed or not')
+    describing = commands.add_parser('notes', help='write the release page (--update puts it on the release)')
+    describing.add_argument('--update', action='store_true', help='replace the text of the release with it')
     bumping = commands.add_parser('bump', help='start a new revision in _variables.yml')
     bumping.add_argument('revision', help='for example 2027.2')
     checking = commands.add_parser('check', help='GitHub Actions: the release holds every file the site links')
@@ -635,6 +826,8 @@ def main(argv: list[str] | None = None) -> int:
             status(ROOT)
         elif args.command == 'publish':
             publish(ROOT, build=not args.no_build, dry_run=args.dry_run, force=args.force)
+        elif args.command == 'notes':
+            notes(ROOT, update=args.update)
         elif args.command == 'bump':
             revision = bump(ROOT, args.revision)
             print(f'_variables.yml now names revision {revision.revision} ({revision.tag}). Commit it, then run '

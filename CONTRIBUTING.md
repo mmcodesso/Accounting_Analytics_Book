@@ -245,7 +245,15 @@ python scripts/release.py status            # built, current, and on the release
 python scripts/release.py publish --dry-run # the plan: what would be built and uploaded
 python scripts/release.py publish           # build what is stale, upload what changed, push main
 python scripts/release.py bump 2027.2       # start a new revision, then commit and publish
+python scripts/release.py notes             # preview the release page (--update puts it on the release)
 ```
+
+The text of the release is a page in the manner of the Downloads page: the book (with a link to the website, which
+always shows the newest text, and to the newest revision), the dataset, the slides, companion and solution files by
+chapter, and the checksums. `release_notes` in `scripts/release.py` builds it from the Supplementary Material table
+of `front-matter/downloads.qmd`, the `dataset` block of `_variables.yml`, and the release's manifest, so a new row on
+the Downloads page appears on the release too. `publish` writes it every time (`publish --dry-run` previews it in
+`outputs/release/release-notes.md`); `notes` rewrites it without publishing.
 
 `publish` needs a clean `main` and the GitHub CLI, signed in. A local build
 records what its files were built from (`outputs/build/fingerprints.json`), so
