@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Predictive analytics estimates what is likely to happen, and prescriptive analytics recommends what to do. Both depend on assumptions that cannot be checked against the records until the future arrives, so every model in this chapter was paired with a test: residuals and influential points for a regression, a backtest for a forecast, a flexible budget for a plan, and a documented, sensitivity-tested list of assumptions for a decision model.

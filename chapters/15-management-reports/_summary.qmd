@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 A report page serves one reader, one question, and one decision. Design starts with that reader: what they must decide, what they must compare to decide it, and how much detail they need. A key performance indicator is a measure that tracks progress toward an objective, shown with the comparison that gives it meaning, such as a budget, the prior year, or a target. Research on performance reports shows that readers rely on measures common to the units they compare and that markers of good and bad performance change how they weight measures, so a package defines shared measures the same way, makes sure the measures unique to a unit are not passed over, and uses markers deliberately. The KPI goes where the eye starts, the breakdown next, and the detail on demand.

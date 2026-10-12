@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Descriptive analytics summarizes what happened, and diagnostic analytics explains why. Much of what accountants produce, from comparative statements to variance reports, is descriptive, and diagnostic work begins when a summary shows a change that nobody expected. This chapter moved from one to the other with four families of Excel tools: statistical functions, conditional aggregation, PivotTables, and a margin bridge. It also charted the results and built the year's income statement from the ledger.

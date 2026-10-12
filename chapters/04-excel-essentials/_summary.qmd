@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 An analysis that supports a decision or an audit conclusion must be accurate and reviewable, and the structure of the workbook that holds it is one of the controls that make it so. Research on operational spreadsheets finds errors in a small percentage of cells, which in a large workbook makes some errors close to certain, and it finds that the quality control around spreadsheets is usually informal. Structured design practices remove common opportunities for error and make the remaining logic visible to a reviewer, although they do not replace careful review.

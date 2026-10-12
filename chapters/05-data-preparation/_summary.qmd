@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Data preparation transforms data from the form in which it was recorded into the form an analysis needs. In accounting, it usually means bringing attributes that live in related tables onto the transactions being analyzed. A preparation error changes every number that follows without announcing itself. Every preparation step should therefore be paired with a check, such as a count of unmatched rows or a total that must agree with its source, and the whole procedure should be documented so that someone else can repeat it.

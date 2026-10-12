@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 A business intelligence tool serves readers who want to ask the next question themselves. Power BI Desktop, a free Windows application, is where a report is built: data is loaded and prepared with Power Query, the tables are related in a semantic model, and interactive visuals are laid out on report pages. The Power BI service is where reports are published, shared, and read in a browser, and where dashboards, single pages of tiles pinned from reports, can be built. Most Excel features of Part II have a Power BI counterpart. A matrix visual plays the part of a PivotTable, a slicer filters the other visuals on its page that the relationships reach, and a relationship between tables does the work of a merge.

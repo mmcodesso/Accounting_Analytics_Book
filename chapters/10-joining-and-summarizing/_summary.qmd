@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 A relational database stores each fact once and links its tables through keys, so most accounting questions require joining tables. An inner join returns the pairs of rows whose keys match. Columns are qualified with their table or alias, which is required when a name appears in both tables. Because the Charles River database declares no foreign keys, every join is tested by comparing the number of rows it returns with the number it should return. A join to a source document names both the document type and its ID, because each document table numbers its own rows.

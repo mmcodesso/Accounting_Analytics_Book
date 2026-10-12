@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Internal and external auditors differ in purpose, but they rely more and more on the same analytics. Analytics lets them test every record in a population instead of a sample. Testing a whole population produces exceptions, and most of them are false positives. The auditor's judgment therefore goes into designing each test, investigating each exception, and recording a disposition for it. The work follows a workflow: state the objective, reconcile the population to the ledger, run the tests, investigate the exceptions, record their dispositions, and document the whole in a workpaper.

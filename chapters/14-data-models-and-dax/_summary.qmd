@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 A semantic model is easiest to use and most reliable when it is arranged as a star schema. Fact tables record events at a stated grain, one row for each event, with the keys of the things involved and the amounts to be added up. Dimension tables describe the things, one row for each, with the attributes a reader filters and groups by. The invoice header and its lines, designed in the database to avoid repeating facts, form a snowflake in Power BI, in which the customer reaches the lines only through the header. Merging the header's date, number, and customer key into the lines turns them into one fact table that every dimension filters directly. The invoice number stays in the fact table as a degenerate dimension. The restructured model is accepted only when the Validation page shows the same totals as before.

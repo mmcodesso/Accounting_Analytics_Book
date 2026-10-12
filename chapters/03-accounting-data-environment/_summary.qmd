@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Accounting data in modern organizations is stored in relational databases, which organize information into tables connected by defined relationships. Understanding this structure is a prerequisite for writing SQL queries, building Power BI data models, and preparing data for analysis in Excel. The relational model, first proposed by Codd (1970), has become the standard approach to data storage in business information systems and underlies virtually every ERP system and accounting software package in use today.

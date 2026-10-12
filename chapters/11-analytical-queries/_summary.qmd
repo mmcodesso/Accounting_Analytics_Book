@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Many analytical questions need more than grouping. A CASE expression classifies each row by conditions tested in order, and its ELSE decides what happens to rows that meet none of them; the simple form compares one expression with a list of values, and never matches NULL. The Charles River dates are stored as text, and SQLite's date functions work on that text. strftime formats a date into a period such as a year and month, and date moves a date with modifiers, applied in order, such as start of month; `'start of month', '+1 month', '-1 day'` gives a month's last day. julianday turns a date into a number of days, so that the difference between two dates is a subtraction. strftime and date return text, and julianday a number, so their results must be compared with values of the same kind or converted with CAST. Placed inside an aggregate, CASE turns categories into columns, which is conditional aggregation, the SQL counterpart of SUMIFS and of a PivotTable.

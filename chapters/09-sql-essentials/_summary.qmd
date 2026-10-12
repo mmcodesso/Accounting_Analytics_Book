@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 A query is a written request for data that the database answers where the data is stored. Querying suits an accounting analysis when the data is large, when it spans related tables, and when the procedure must be repeated. The query text itself documents what was extracted, so it can be reviewed and run again. SQL is the standard language of relational databases, and it is declarative: you state the result you want, and the database decides how to produce it. This book uses SQLite, which keeps a whole database in one file, and DB Browser for SQLite, whose Database Structure tab shows every table and column and whose Execute SQL tab runs queries. Because DB Browser can change a database as well as read it, you work in a copy of the download, CharlesRiver_Work.sqlite. Write Changes stays grayed out while you only read.

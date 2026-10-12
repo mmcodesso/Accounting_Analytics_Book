@@ -1,3 +1,5 @@
+{{< pagebreak >}}
+
 ## Chapter Summary
 
 Monitoring runs audit tests every period on new data and keeps the results over time. Continuous auditing is internal audit's ongoing, technology-based assessment of risks and controls; continuous monitoring is management's ongoing review of its own controls, on which continuous auditing depends. Rule tests produce exceptions, records that meet a deterministic rule's criteria and so need an explanation, while analytical tests produce anomalies, records or periods that differ from what is expected and call for a closer look. A monitoring system must keep its exceptions reviewable, through tests that state their rule, population, frequency, and expected result, and its full results go to the people who oversee the controls, while the people whose transactions it tests hear of the exceptions they must explain or correct.
