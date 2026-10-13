@@ -1,0 +1,2611 @@
+- id: IF-01-0-A
+  unit: chapter-01-role-of-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Which table groups each exercise's model answer draws on.
+  shows: A matrix with the table groups of Table 1.3 as rows and Exercises 1.1 to 1.6 as columns. A filled cell marks a group
+    whose tables the model answer names as the main evidence; an outlined cell marks a group that the answer mentions only
+    as support. The Accounting Core and Order-to-Cash rows are filled most often, and the legend says that a filled cell is
+    not a count of tables.
+  data: The tables named in the solution steps of the six exercise files, assigned to groups by Table 1.3 and the dataset
+    documentation.
+  status: planned
+- id: IF-01-0-B
+  unit: chapter-01-role-of-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A decision aid for sorting a question into one of the four types of analytics.
+  shows: A vertical flow of four yes/no questions (does it summarize what happened, does it explain why, does it project what
+    might happen, does it recommend what to do under constraints) that lead to the four type labels. Each label carries one
+    Charles River example question from Table 1.1 and the kind of evidence the answer needs (a summary, a decomposition or
+    trace, an expectation or forecast, a recommendation with its constraints). A side note says that most real questions combine
+    two types.
+  data: none; the example questions come from Table 1.1 and from the model questions of Exercise 1.4.
+  status: planned
+- id: IF-01-2-A
+  unit: chapter-01-role-of-analytics
+  file: ex-1.2-tracing-the-revenue-path-from-order-to-ledger.md
+  kind: diagram
+  purpose: The path of the traced sale through the seven worksheets, with the one-to-many links and the ledger postings.
+  shows: Left to right, boxes for SalesOrder (with its lines), Shipment, SalesInvoice, CashReceipt and CashReceiptApplication,
+    each carrying the document number and date of the traced sale. Labels on the arrows give how many shipments and invoices
+    the order has and how many invoices the receipt paid. Beneath them a GLEntry box receives dashed amber arrows from the
+    shipment, the invoice, the receipt and the application, each labeled with the accounts debited and credited. The sales
+    order and its lines have no arrow to the ledger, and a note says so.
+  data: The traced sale of Figure 1.6 and its order, shipment, receipt and application, from the Expected results table of
+    this guide.
+  status: planned
+- id: IF-01-2-B
+  unit: chapter-01-role-of-analytics
+  file: ex-1.2-tracing-the-revenue-path-from-order-to-ledger.md
+  kind: excel-mock
+  purpose: The GLEntry worksheet filtered to the four rows of the traced invoice, the model answer to requirement 3.
+  shows: The GLEntry worksheet with the SourceDocumentType filter open and SalesInvoice ticked, and the table narrowed to
+    the four rows of the traced invoice. Columns GLEntryID through SourceLineID are visible, with the receivables debit equal
+    to the three credits. The SourceDocumentType header and the revenue row's SourceLineID cell are outlined.
+  data: The four GLEntry rows of the traced invoice (the table in Step 4).
+  status: planned
+- id: IF-01-3-A
+  unit: chapter-01-role-of-analytics
+  file: ex-1.3-evaluating-table-groups-for-cost-analysis.md
+  kind: diagram
+  purpose: How a budget row lines up with the ledger rows that give its actual spending.
+  shows: On the left, one row of the Budget worksheet with the columns FiscalYear, Month, CostCenterID, AccountID and BudgetAmount;
+    on the right, a stack of GLEntry rows with the columns CostCenterID, AccountID, FiscalYear, FiscalPeriod, Debit and Credit.
+    Three labeled connectors (same cost center, same account, same period) join them, and a note says that many ledger rows
+    add up to one budget row and that spending is debits less credits. The CostCenter and Account worksheets sit above the
+    two sides as the name lookups.
+  data: The columns of Budget, GLEntry, CostCenter and Account, with one budget row and its ledger rows chosen from the current
+    fiscal year; amounts are named, not shown.
+  status: planned
+- id: IF-01-6-A
+  unit: chapter-01-role-of-analytics
+  file: ex-1.6-evaluating-journal-entry-data-for-audit-purposes.md
+  kind: excel-mock
+  purpose: What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements
+    3 and 4.
+  shows: The JournalEntry worksheet scrolled to rows whose ReversesJournalEntryID is filled, with the columns EntryNumber,
+    PostingDate, EntryType, TotalAmount, CreatedByEmployeeID, CreatedDate, ApprovedByEmployeeID, ApprovedDate and ReversesJournalEntryID
+    visible. The time part of CreatedDate reads the same on every row shown, and the ReversesJournalEntryID cells are outlined.
+    The EntryType of the rows shown is Accrual Adjustment.
+  data: A few JournalEntry rows of the Accrual Adjustment type and their columns, taken from the current dataset.
+  status: planned
+- id: IF-02-0-A
+  unit: chapter-02-understanding-data
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Where each finding of the two tutorials sits among the four data quality dimensions, and whether it is an error.
+  shows: A matrix with the findings as rows (blank tracking numbers, shipments still In Transit after their delivery date,
+    invoices dated before the first shipment, same-name customers, freight outliers, blank list prices, ledger rows with no
+    amount, partial first and last periods) and the four dimensions as columns. A filled cell marks the dimension the test
+    examines and an outlined cell marks a second dimension the finding also touches (the In Transit rows are filled under
+    consistency and outlined under timeliness). A last column says error, judgment or by design, with a symbol as well as
+    a color, and a note says that one finding can touch two dimensions.
+  data: The findings of Tutorials 2.1 and 2.2 as listed in the tutorial guide; the diagram carries no counts.
+  status: planned
+- id: IF-02-0-B
+  unit: chapter-02-understanding-data
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The four combinations of tidy or messy and clean or dirty, each with an accounting example.
+  shows: A two by two grid with tidy and messy as the columns and clean and dirty as the rows. Each cell holds a small table
+    sketch and a one-line example from budget data. A long Budget table with every amount right is tidy and clean. The same
+    table with one amount keyed wrongly is tidy but dirty. A report with the months across the top and every amount right
+    is clean but messy. The same report with a wrong amount is messy and dirty. An arrow says that reshaping moves a dataset
+    across the grid and correcting values moves it up, and that these are different jobs.
+  data: none; the layout follows Figure 2.6 of the chapter and the Budget table's columns.
+  status: planned
+- id: IF-02-1-A
+  unit: chapter-02-understanding-data
+  file: ex-2.1-assessing-revenue-data-quality-in-the-charles.md
+  kind: excel-mock
+  purpose: The SalesInvoiceLine worksheet with the Difference helper column of Step 6, sorted largest first.
+  shows: The SalesInvoiceLine Table with Quantity, UnitPrice, Discount and LineTotal visible (the other columns hidden) and
+    a helper column headed Difference to the right, sorted from largest to smallest. The first rows show differences of half
+    a cent and less, and none is above one cent. The formula bar shows the Difference formula in the first data row, the largest
+    value is outlined, and two cells below the Table show the maximum and the count of lines above one cent.
+  data: SalesInvoiceLine, with the Difference formula of Step 6 computed from the lines.
+  status: planned
+- id: IF-02-2-A
+  unit: chapter-02-understanding-data
+  file: ex-2.2-evaluating-general-ledger-completeness-at.md
+  kind: excel-mock
+  purpose: The PivotTable of ledger rows by fiscal year and fiscal period, with the three small periods marked.
+  shows: A PivotTable with FiscalYear and FiscalPeriod in the rows area and the count of GLEntryID in the values area, scrolled
+    to show the first period of the first year and the last periods of the data. The first period and the last two periods
+    are outlined, and each count is visibly smaller than the periods around it. A note beside the table says that the outlined
+    periods sit at the edges of the extract.
+  data: GLEntry, counted by FiscalYear and FiscalPeriod (the Step 3 PivotTable).
+  status: planned
+- id: IF-02-3-A
+  unit: chapter-02-understanding-data
+  file: ex-2.3-data-quality-assessment-for-product-cost.md
+  kind: excel-mock
+  purpose: The WorkOrder worksheet with the Operations helper column of Step 5, filtered to zero.
+  shows: The WorkOrder Table with WorkOrderNumber, ItemID, ReleasedDate, ClosedDate and Status visible (other columns hidden)
+    and a helper column headed Operations at the right, filtered to show only the value 0. Three rows remain, with the row
+    numbers in blue because the Table is filtered, each with the status Closed. The formula bar shows the COUNTIFS formula
+    and the status bar shows how many records match the filter.
+  data: WorkOrder and WorkOrderOperation, with the COUNTIFS formula of Step 5.
+  status: planned
+- id: IF-02-4-A
+  unit: chapter-02-understanding-data
+  file: ex-2.4-evaluating-budget-data-for-budget-versus-actual.md
+  kind: diagram
+  purpose: How BudgetLine rolls up to Budget, and what Budget leaves out.
+  shows: Two boxes joined by arrows. The left box, BudgetLine, is divided into three bands. The first band holds revenue,
+    cost of goods sold and operating expense lines that have a cost center, with an arrow to the right box labeled sum by
+    fiscal year, month, cost center and account. The second band holds operating expense lines with no cost center, and the
+    third band holds balance sheet rollforward lines; the arrows from both stop before the right box with a mark that says
+    not in Budget. The right box, Budget, shows one row per fiscal year, month, cost center and account. A note says that
+    adding the two tables counts the first band twice.
+  data: Budget and BudgetLine, with the row counts of each band for the current fiscal year from the Step 2 test and the blank
+    counts of Step 4.
+  status: planned
+- id: IF-02-6-A
+  unit: chapter-02-understanding-data
+  file: ex-2.6-testing-for-duplicate-payments.md
+  kind: excel-mock
+  purpose: The PurchaseInvoice worksheet with the Count helper column of Step 2, filtered to the value 2.
+  shows: The PurchaseInvoice Table with PurchaseInvoiceID, InvoiceNumber, InvoiceDate, SupplierID and GrandTotal visible (other
+    columns hidden) and a helper column headed Count at the right, filtered to show only the value 2. The remaining rows come
+    in adjacent pairs that share a supplier and an invoice number but differ in date and amount, and the row numbers are blue
+    because the Table is filtered. The formula bar shows the COUNTIFS formula and the status bar shows how many records match
+    the filter.
+  data: PurchaseInvoice, with the COUNTIFS formula of Step 2 on SupplierID and InvoiceNumber.
+  status: planned
+- id: IF-03-0-A
+  unit: chapter-03-accounting-data-environment
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What a join of Customer to SalesOrder to SalesOrderLine does to one customer's rows, and why counting customers
+    by row overstates them.
+  shows: Three boxes from left to right. The first holds one Customer row with a real CustomerID and name. The second holds
+    the customer's orders, drawn as a short column of order numbers, and the third the order lines of those orders, a longer
+    column. Arrows between the boxes carry the join columns (CustomerID, then SalesOrderID). Below them is a sketch of the
+    joined result in which the customer's name repeats on every line row. Two counters beside the sketch compare the rows
+    of the result with the one customer, and a note says that summing line amounts by line is right and counting customers
+    by row is wrong.
+  data: The customer chosen by the Difficult ideas context (one with about ten orders), with its numbers of orders and lines;
+    the diagram carries those two counts and no amounts.
+  status: planned
+- id: IF-03-0-B
+  unit: chapter-03-accounting-data-environment
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.
+  shows: A vertical tree of four yes-or-no questions. Does the column identify the rows of its own table? Yes leads to primary
+    key, with SalesOrderID in SalesOrder as the example. Does it hold the key values of another table? Yes leads to foreign
+    key, with CustomerID in SalesOrder, and a side branch asks whether the same column reaches into another table group, which
+    makes it a bridge key, with ItemID in SalesOrderLine. Does the meaning of its value depend on another column? Yes leads
+    to a logical reference, not a key, with SourceDocumentID in GLEntry read together with SourceDocumentType. Each leaf shows
+    its example as a small two-line table header, and the leaf for the logical reference is drawn with the dashed amber style
+    that the chapter's diagrams use for the trace.
+  data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry); no counts.
+  status: planned
+- id: IF-03-1-A
+  unit: chapter-03-accounting-data-environment
+  file: ex-3.1-tracing-a-purchase-transaction-through-the.md
+  kind: diagram
+  purpose: The model purchase traced from the supplier through the order, the receipt and the invoice to the payment, with
+    the key on each link and the ledger postings of the three documents.
+  shows: A left-to-right chain of seven boxes (Supplier, PurchaseOrder, PurchaseOrderLine, GoodsReceiptLine with its GoodsReceipt,
+    PurchaseInvoiceLine with its PurchaseInvoice, and DisbursementPayment), each carrying the document number and date of
+    the model purchase. Labels on the arrows name the key (SupplierID, PurchaseOrderID, POLineID, GoodsReceiptLineID, PurchaseInvoiceID).
+    Beneath, a GLEntry box receives dashed amber arrows from the receipt, the invoice and the payment, each labeled with the
+    accounts debited and credited, so the goods received not invoiced account is visible as the account the receipt credits
+    and the invoice debits.
+  data: The model invoice of this guide, with its receipt, order and payment (the tables of Steps 2, 3 and 6).
+  status: planned
+- id: IF-03-3-A
+  unit: chapter-03-accounting-data-environment
+  file: ex-3.3-mapping-the-charles-river-manufacturing-group.md
+  kind: diagram
+  purpose: The path from a finished product to its components, with the Item table at both ends.
+  shows: On the left an Item box holding the model product (its code and name) with ItemID. An arrow labeled ParentItemID
+    leads to a BillOfMaterial box, an arrow labeled BOMID leads to a BillOfMaterialLine box listing the model product's component
+    lines, and an arrow labeled ComponentItemID leads back to a second Item box on the right that lists the component items
+    with their standard costs. The two Item boxes are drawn identically, joined by a dotted line and a note that they are
+    one table in two roles. Under the lines, a calculation strip shows quantity per unit times one plus the scrap factor times
+    the component cost, added up to the material cost and then to the standard cost with the conversion cost.
+  data: The model product of this guide, its bill, its component lines and the roll-up of Step 3.
+  status: planned
+- id: IF-03-4-A
+  unit: chapter-03-accounting-data-environment
+  file: ex-3.4-mapping-the-keys-behind-a-budget-versus-actual.md
+  kind: diagram
+  purpose: The join path from the Budget table to the ledger, drawn as two tables that share four columns and no key.
+  shows: Two table boxes side by side, Budget and GLEntry, each listing only the columns that matter (FiscalYear, Month or
+    FiscalPeriod, CostCenterID, AccountID, and the amount). Four horizontal connectors pair FiscalYear with FiscalYear, Month
+    with FiscalPeriod, CostCenterID with CostCenterID and AccountID with AccountID, drawn in one style and labeled as a match
+    on four columns, not a key. Above and below, solid lines lead from each box to CostCenter and to Account, with crow's
+    foot endpoints computed from the data, and the circle at the CostCenter end of the GLEntry line is marked. A note says
+    that Month and FiscalPeriod hold the same month number under two names.
+  data: The relationships of Steps 2 and 3 (the Budget and GLEntry columns, and the cardinality of the two cost center links).
+  status: planned
+- id: IF-03-5-A
+  unit: chapter-03-accounting-data-environment
+  file: ex-3.5-planning-a-data-extraction-strategy-for-the.md
+  kind: diagram
+  purpose: The three extraction plans on one page, each with its population, the tables joined, the keys and the direction
+    of the test.
+  shows: Three horizontal lanes, one for each procedure. The revenue lane starts at the Shipment and ShipmentLine boxes (the
+    independent population), with an arrow to SalesInvoiceLine labeled ShipmentLineID and a second arrow from SalesInvoice
+    to GLEntry labeled SourceDocumentType and SourceDocumentID, so the two directions of the test are visible and labeled
+    completeness and posting. The purchasing lane shows PurchaseOrderLine in the center with GoodsReceiptLine and PurchaseInvoiceLine
+    each joined to it by POLineID, and the invoice line also joined to the receipt line by GoodsReceiptLineID. The journal
+    entry lane shows JournalEntry and GLEntry joined by the dashed amber trace, with Employee joined to JournalEntry by the
+    approver's key. Each lane ends in a small box for its control total.
+  data: The tables and keys of Steps 1 to 7; the diagram carries no counts.
+  status: planned
+- id: IF-03-6-A
+  unit: chapter-03-accounting-data-environment
+  file: ex-3.6-assessing-referential-integrity-across-the.md
+  kind: excel-mock
+  purpose: The test log of a finished answer, one row for each relationship, with the counts that the memo reports.
+  shows: A worksheet named Integrity Tests with the columns Child table, Foreign key, Parent table, Primary key, Rows, Blank,
+    Orphans, Blank allowed because, and Verdict, and one row for each relationship of the Step 4 log. The Orphans column shows
+    no orphans and the Verdict column reads Maintained. Rows with a blank count have a short reason in the Blank allowed because
+    column. Beside the table sits a small PivotTable of the distinct AccountID values of the ledger, with a column that shows
+    the lookup result for each, all ok. The formula bar shows the COUNTIFS lookup of the helper column.
+  data: The relationships of this guide's Step 4 log, with their counts, and the distinct accounts of the ledger.
+  status: planned
+- id: IF-C1-0-A
+  unit: case-part-1
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the six requirements feed the memo and its appendix, and which workflow stages the case completes.
+  shows: Six boxes in a row for the requirements, each tagged with the chapter it draws on (Chapter 1, Chapter 3, Chapter
+    2, Chapters 2 and 3, none, none). Arrows run from Requirements 2 and 4 into a box labeled "Appendix with the data map
+    and the reconciliation table", from Requirements 3 and 4 into the memo section "Financial reporting", from Requirement
+    5 into "Managerial accounting" and "Auditing", and from all of them into the memo. Beneath the boxes, a strip of the six
+    workflow stages with stages 1 to 3 and the readiness part of stage 6 filled and stages 4 and 5 outlined and labeled "Part
+    II".
+  data: none; the boxes and tags come from the case's requirements and the stage list of Chapter 1.
+  status: planned
+- id: IF-C1-0-B
+  unit: case-part-1
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: Where the quarter to analyze sits on the extract's timeline, and why the latest rows of the ledger are not it.
+  shows: A horizontal timeline from the first posting date of the ledger to its last. Three bars sit above it, for the sales
+    invoices, the shipments and the ledger. The invoice and shipment bars end at the last day of the current fiscal year,
+    and the ledger bar runs on past it to a short tail labeled "only supplier payments". The third and fourth quarters of
+    the current fiscal year are shaded as the quarters to compare, and a marker on the last day of the year is labeled "year-end
+    close".
+  data: The first and last PostingDate of GLEntry, the last InvoiceDate and the last ShipmentDate, and the posting date of
+    the year-end close (the Expected results of Requirements 3 and 5).
+  status: planned
+- id: IF-C1-2-A
+  unit: case-part-1
+  file: req-2-map-the-data.md
+  kind: diagram
+  purpose: The model data map of the Furniture margin, from the documents to the two Furniture accounts.
+  shows: Six tables in Chapter 3's crow's foot notation, drawn left to right. SalesInvoiceLine joins SalesInvoice on SalesInvoiceID
+    and Item on ItemID; ShipmentLine joins Shipment on ShipmentID and Item on ItemID; Item reaches Account three times through
+    RevenueAccountID, COGSAccountID and InventoryAccountID, with the Furniture values labeled as account numbers; GLEntry
+    joins Account on AccountID. Two dashed amber lines, in the figure standard's style for the source-document trace, run
+    from SalesInvoiceLine and ShipmentLine to GLEntry through SourceDocumentType, SourceDocumentID and SourceLineID. Each
+    solid line carries its cardinality at both ends, and the Furniture accounts are highlighted.
+  data: The cardinality and optionality of each join, computed from the data as in the Expected results, and the account numbers
+    of the Furniture items.
+  status: planned
+- id: IF-C1-4-A
+  unit: case-part-1
+  file: req-4-reconcile-the-sub-ledger-to-the-ledger.md
+  kind: excel-mock
+  purpose: The reconciliation table of the appendix, as a student's worksheet would show it.
+  shows: A worksheet named Reconciliation with two blocks. The revenue block has a row for each of the two quarters and the
+    columns Invoice lines, Sum of LineTotal, Ledger credits to the Furniture revenue account from SalesInvoice, and Difference.
+    The cost block has the columns Shipment lines, Standard cost, Ledger debits to the Furniture cost account from Shipment,
+    and Difference. Every Difference cell shows zero and is outlined. A note row beneath names the other source document types
+    that post to the cost account.
+  data: The Expected results of this requirement (sub-ledger and ledger totals of the two quarters).
+  status: planned
+- id: IF-C1-5-A
+  unit: case-part-1
+  file: req-5-find-what-could-mislead.md
+  kind: excel-mock
+  purpose: The PivotTable that shows what sits behind the naive fourth-quarter revenue.
+  shows: A PivotTable on GLEntry with AccountID set to the Furniture revenue account and the quarter's three fiscal periods
+    selected in the filters. Rows list SourceDocumentType, with VoucherNumber expanded under JournalEntry; Values show Sum
+    of Debit and Sum of Credit. Two rows appear, JournalEntry with a very large debit and SalesInvoice with a credit of about
+    the quarter's invoicing, and a grand total that is negative. The JournalEntry row and its voucher number are outlined,
+    and the grand total is outlined in a second color.
+  data: The GLEntry rows of the Furniture revenue account in the fourth quarter of the current fiscal year, by source document
+    type (the Expected results of this requirement).
+  status: planned
+- id: IF-C1-5-B
+  unit: case-part-1
+  file: req-5-find-what-could-mislead.md
+  kind: chart
+  purpose: The naive and the corrected Furniture margin for the two quarters, side by side.
+  shows: A clustered bar chart for the third and fourth quarters with two bars in each, "all ledger rows" and "year-end close
+    excluded", and the percentage printed on each bar. The third quarter's bars match; in the fourth the all-rows bar equals
+    the third quarter's and the corrected bar is lower, with a note that the all-rows totals are negative. The series differ
+    by pattern as well as color.
+  data: The naive and the corrected margins of the Expected results of this requirement.
+  status: planned
+- id: IF-C1-6-A
+  unit: case-part-1
+  file: req-6-write-the-data-readiness-memo.md
+  kind: diagram
+  purpose: A page layout of the model memo and its appendix, with the word budget of each part.
+  shows: Two page outlines side by side. The first is the memo, with a header block (To, From, Date, Re), a short opening
+    paragraph stating the bottom line, three labeled sections (Financial reporting, Managerial accounting, Auditing), and
+    a closing recommendation, each block with its approximate word budget. The second is the one-page appendix, with the data
+    map on its upper half and the reconciliation table on its lower half. Small tags on the sections name the requirements
+    whose results each part uses.
+  data: none; the layout follows the case's Requirement 6 and Deliverable.
+  status: planned
+- id: IF-04-0-A
+  unit: chapter-04-excel-essentials
+  file: 00-chapter-notes.md
+  kind: excel-mock
+  purpose: What a fill across does to a structured reference, and the two ways to avoid it.
+  shows: The right edge of the SalesInvoiceLine Table with the headers Discount, PromotionID and PricingMethod, then ListAmount
+    and DiscountAmount. Below it three grid cells, each with its formula bar. The first holds a COUNTIFS on the PricingMethod
+    column. The second is the same formula after a fill one column to the right, and its formula bar names the next column
+    of the Table. The third is the pasted formula, which still names PricingMethod. A note shows the locked form that stays
+    put when filled.
+  data: The SalesInvoiceLine Table and the grid of Tutorial 4.2; the Table's own column names only.
+  status: planned
+- id: IF-04-0-B
+  unit: chapter-04-excel-essentials
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Why a zero difference in a control total does not show that the import is complete.
+  shows: Two boxes, the SalesInvoice Table and the SalesInvoiceLine Table, each drawn as a short stack of rows with one invoice
+    and its lines missing from both. Between them a cell shows the difference of the two totals as zero. On the left, in dashed
+    amber, a third box, the source Table in CharlesRiver.xlsx, with a count of its rows compared with the count in the import.
+    A caption says that agreement inside the import cannot reveal what both sides lack.
+  data: No values; the structure of Tutorial 4.1, Step 10 and the Control total key term.
+  status: planned
+- id: IF-04-1-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.1-a-billing-schedule-by-fiscal-year.md
+  kind: excel-mock
+  purpose: The Ex 4.1 worksheet at the end of the exercise, with the period cells, the period's billing and the billing schedule
+    by fiscal year.
+  shows: Rows 3 to 5 hold the two named parameter cells in blue font with their descriptions. Rows 7 to 14 hold the invoice
+    count and the four totals for the period, then the difference check. Rows 16 to 23 hold the grid with the fiscal years
+    down column A and SubTotal, FreightAmount, TaxAmount and GrandTotal across, a Total row, an Entire SalesInvoice Table
+    row and a Difference row of zeros. Cell E18 is selected and the formula bar shows the GrandTotal formula, with the InvoiceDate
+    column locked.
+  data: SalesInvoice grouped by the year of InvoiceDate (the Expected results table).
+  status: planned
+- id: IF-04-2-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.2-reviewing-promotional-discounts.md
+  kind: excel-mock
+  purpose: The promotion summary on Ex 4.2 with data bars, the rate test and the lookup of the largest promotion.
+  shows: A table with one row for each PromotionID and a Total row. Its columns are PromotionID, PromotionCode, PromotionName,
+    Invoice lines, LineTotal, DiscountAmount, Share of discount dollars, DiscountPct and Lines at another rate. Data bars
+    sit in the DiscountAmount column, the longest bar on the row of the largest promotion. Below the table a three-line block
+    reports the rate test with a result sentence, and a block lists the largest promotion's code, name, scope, rate and dates.
+  data: SalesInvoiceLine and PromotionProgram, by promotion (the Expected results table).
+  status: planned
+- id: IF-04-3-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.3-list-price-margins-by-product-group.md
+  kind: excel-mock
+  purpose: The Item worksheet after requirements (1) to (4), with the calculated columns, the sort, the color scale and the
+    highlighted rows below the target.
+  shows: The Item Table filtered to finished goods and sorted by ItemGroup and then MarginPct from largest to smallest, scrolled
+    to the boundary between two groups. Columns A to K are the tutorial's columns, then UnitMargin and MarginPct. A color
+    scale shades the MarginPct column. Rows whose MarginPct is below the target carry a light fill across columns A to L only,
+    so the scale stays visible in the last column. The status bar reports how many records are in view.
+  data: Item rows with a ListPrice, for Furniture and Lighting (the Expected results table).
+  status: planned
+- id: IF-04-4-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.4-freight-billed-versus-freight-incurred.md
+  kind: excel-mock
+  purpose: The freight grid on Ex 4.4 with its total, entire-Table and difference rows, and the FreightTerms slicer beside
+    the SUBTOTAL cells.
+  shows: A grid with FreightTerms down column A (two values) and the columns Shipments, FreightCost, BillableFreightAmount
+    and FreightMargin. Under the two rows sit a Total row, an Entire Shipment Table row and a Difference row of zeros. Further
+    down are the SUBTOTAL cells for shipments in view and average FreightCost in view, and a FreightTerms slicer with one
+    button selected.
+  data: Shipment joined to SalesOrder by SalesOrderID (the Expected results table).
+  status: planned
+- id: IF-04-5-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.5-a-refreshable-shipment-exception-report.md
+  kind: excel-mock
+  purpose: The shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.
+  shows: Two panes of one window. The left pane shows the top of the Shipment Table with amber rows for a blank TrackingNumber
+    and coral rows for In Transit shipments with a DeliveryDate before the review date, and the Status filter set. The right
+    pane shows the Analysis worksheet with the review date, the three exception counts, the blank tracking numbers by Status,
+    the In Transit shipments by year, and the SUBTOTAL cells beside a Status slicer with In Transit selected.
+  data: Shipment at the review date, the last day of the extract (the Expected results table).
+  status: planned
+- id: IF-04-6-A
+  unit: chapter-04-excel-essentials
+  file: ex-4.6-reviewing-price-override-approvals.md
+  kind: excel-mock
+  purpose: The requester grid on Ex 4.6, with the Status slicer and the SUBTOTAL cells that show the Pending requests have
+    no approver.
+  shows: A grid with the requesting employees down the rows, each with an EmployeeName and JobTitle, and the columns Requests,
+    Approved by someone else, Approved by the requester and Pending, with a Total row. The row of the requester who is also
+    the approver is outlined, and its Approved by the requester cell is outlined. Above the grid a block gives the counts
+    of requests, blank approvers, self-approved requests and distinct approvers, and a Status slicer sits beside two SUBTOTAL
+    cells with Pending selected.
+  data: PriceOverrideApproval and Employee (the Expected results table).
+  status: planned
+- id: IF-05-0-A
+  unit: chapter-05-data-preparation
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Which way a lookup may follow a relationship, and what to use instead when the other table is on the many side.
+  shows: 'Three boxes in a row: SalesInvoiceLine, SalesInvoice and SalesOrder, joined by two arrows labeled with the lookup
+    keys SalesInvoiceID and SalesOrderID and marked many-to-one, the arrows pointing toward the one side and labeled XLOOKUP.
+    Below SalesOrder a fourth box, Shipment, joined by a one-to-many line labeled with the key SalesOrderID. Two short rows
+    of shipment dates under it stand for two shipments of one order. Beside that box, a note reads MINIFS, SUMIFS or COUNTIFS
+    instead of a lookup, with a crossed-out XLOOKUP. A legend gives the line styles from Chapter 3''s notation.'
+  data: No values. The relationships of the SalesInvoiceLine, SalesInvoice, SalesOrder and Shipment tables, from the notation
+    of Chapter 3.
+  status: planned
+- id: IF-05-0-B
+  unit: chapter-05-data-preparation
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The row-count test for a merge, and what a repeated key in the second table does to it.
+  shows: 'Two panels side by side. On the left a left outer merge of SalesInvoice with Customer on CustomerID: a row count
+    box before and the same row count after, labeled each key appears once. On the right a merge of SalesInvoice with Shipment
+    on SalesOrderID: a row count box before and a larger one after, labeled the key repeats in the second table, with one
+    invoice drawn as two rows after the merge. Under each panel a verdict reads count unchanged, merge safe, or count grew,
+    key repeats.'
+  data: The row counts of SalesInvoice, and of SalesInvoice merged with Shipment on SalesOrderID (the Difficult ideas section).
+  status: planned
+- id: IF-05-1-A
+  unit: chapter-05-data-preparation
+  file: ex-5.1-net-furniture-revenue-by-quarter.md
+  kind: excel-mock
+  purpose: The quarterly grid of Exercise 5.1 with its check row and the earlier-year credits beneath it.
+  shows: Rows labeled Furniture revenue billed, Furniture credit memo lines and Net Furniture revenue, with the four period
+    labels of the fiscal year in the header row and a Total column. Below the three rows sit a count of credit memo lines,
+    the credits as a share of revenue billed, and a cell for credit memo lines not matched that reads zero. Under a second
+    heading sit the count of credit memos for invoices of earlier years, the Furniture credits they carry, and the net revenue
+    with those credits moved to their invoice's year. The net revenue row is bold.
+  data: InvoiceLines, CreditMemoLine and CreditMemo (the Expected results table).
+  status: planned
+- id: IF-05-2-A
+  unit: chapter-05-data-preparation
+  file: ex-5.2-testing-document-numbers-against-dates.md
+  kind: excel-mock
+  purpose: The invoices flagged by either test, beside Tutorial 2.1's list of invoices dated before their first shipment.
+  shows: 'A list headed InvoiceNumber, InvoiceDate, OrderDate, NumberYear, NumberYearMatches, BeforeOrder and In Tutorial
+    2.1 list, with one row for each flagged invoice, sorted by number. Beside it, separated by a blank column, a second list
+    headed Tutorial 2.1 InvoiceNumber, InvoiceDate and First ShipmentDate. In the first list the rows whose NumberYearMatches
+    is FALSE are outlined as one group and the rows whose BeforeOrder is TRUE as another, so no row is in both. Above the
+    lists sit four counts: invoices whose number year differs, invoices dated before their order, invoices flagged by either
+    test, and Tutorial 2.1 invoices that neither test flags.'
+  data: SalesInvoice, SalesOrder and the first shipment of each order (the Expected results table).
+  status: planned
+- id: IF-05-3-A
+  unit: chapter-05-data-preparation
+  file: ex-5.3-the-furniture-product-mix.md
+  kind: excel-mock
+  purpose: The product mix grid with the highlight threshold lowered to one percentage point, which shows that the rule works.
+  shows: 'A grid with a row for each of the eight Furniture product types and a Total row. Columns: Code, Product type, revenue
+    and quantity for each of two quarters, each quarter''s share, and the change in share. Below the grid, a labeled threshold
+    cell holds one percentage point, a count of product types highlighted reads four, and two cells count the Furniture lines
+    of the two quarters and those with a fractional quantity. Four rows, those whose change in share is more than one point
+    in either direction, are shaded across all nine columns.'
+  data: InvoiceLines, Furniture lines of the two quarters, by product type (the Expected results table).
+  status: planned
+- id: IF-05-4-A
+  unit: chapter-05-data-preparation
+  file: ex-5.4-how-long-orders-take-to-be-invoiced.md
+  kind: excel-mock
+  purpose: The promotion table of Exercise 5.4, with the dates that need a question before the counts can be read.
+  shows: 'A table with one row for each promotion and the columns PromotionID, PromotionCode, EffectiveStartDate, EffectiveEndDate,
+    Invoice lines, Invoiced after end date and Share after end date. Three rows are outlined: the promotion whose start and
+    end dates are the same day, and the two whose end date comes before their start date. In those three rows the share reads
+    100 percent; in the other six it is between about a quarter and a half. Above the table, a block shows the lag for all
+    invoices: the count, the average, the median and the 90th percentile, with the average above the median.'
+  data: SalesInvoice with its lag column, PromotionProgram and SalesInvoiceLine (the Expected results table).
+  status: planned
+- id: IF-05-5-A
+  unit: chapter-05-data-preparation
+  file: ex-5.5-testing-for-related-party-suppliers.md
+  kind: excel-mock
+  purpose: The Supplier Table with its match key and the matched employee, filtered to the suppliers that match.
+  shows: 'The right-hand columns of the Supplier Table: MatchKey, EmployeeMatches, MatchedEmployeeID, MatchedEmployee, MatchedJobTitle,
+    PaymentCount and PaymentTotal, with the filter buttons on and the Table filtered to the rows where EmployeeMatches is
+    greater than zero. Each match key reads in capitals as the address, a comma and a space, and the city. The formula bar
+    shows the match key formula. Beside the Table, a result block lists the matched suppliers with the employee and job title
+    for each.'
+  data: Supplier, Employee and DisbursementPayment (the Expected results table).
+  status: planned
+- id: IF-06-0-A
+  unit: chapter-06-descriptive-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The revenue ladder of the chapter, from the invoice lines of the Profile worksheet to the net revenue of the income
+    statement.
+  shows: 'A vertical ladder of four boxes joined by arrows, each box holding a label and an amount: invoice lines of the report
+    year (the Profile control total), product revenue accounts, operating revenue, net revenue. Each arrow carries its signed
+    adjustment: the three cutoff invoices, freight revenue (account 4050, no invoice line) and sales returns (account 4060).'
+  data: Invoice lines total, cutoff invoices, freight revenue and returns, from the Expected results of Exercises 6.1 and
+    6.2.
+  status: planned
+- id: IF-06-0-B
+  unit: chapter-06-descriptive-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Why a calculated field cannot multiply two fields, and what to do instead.
+  shows: 'Two panels with the same three invented lines (quantity and unit price). Left, a calculated field Quantity*UnitPrice:
+    the quantities are added, the prices are added, and the two sums are multiplied, giving a number marked wrong. Right,
+    a custom column in the source: each line is multiplied first and the PivotTable adds the products, giving a number marked
+    correct.'
+  data: Three invented round-number lines, labeled as an illustration and not Charles River values.
+  status: planned
+- id: IF-06-0-C
+  unit: chapter-06-descriptive-analytics
+  file: 00-chapter-notes.md
+  kind: chart
+  purpose: The same change in the Furniture margin decomposed at two levels, for the discussion of Exercise 6.4.
+  shows: A grouped bar chart. The horizontal axis holds the effects volume, mix, price and cost; each group has two bars,
+    Furniture as a whole (Tutorial 6.3, price as price lists plus promotions) and product type by product type (Exercise 6.4).
+    The value axis starts at zero, bars carry signed dollar labels, and the Furniture-level cost bar is labeled zero.
+  data: The effects of Tutorial 6.3 and of Exercise 6.4 (the Expected results of Exercise 6.4).
+  status: planned
+- id: IF-06-1-A
+  unit: chapter-06-descriptive-analytics
+  file: ex-6.1-from-the-ledger-to-the-income-statement.md
+  kind: excel-mock
+  purpose: The Power Query Editor with the applied steps of the TrialBalance query after Step 4.
+  shows: 'The Power Query Editor with TrialBalance selected. Applied Steps: Source, Navigation, Filtered Rows, Filtered Rows1,
+    Grouped Rows, Merged Queries, Expanded ChartOfAccounts, Sorted Rows. The preview grid shows the first accounts with their
+    debit, credit, number, name, type and subtype.'
+  data: The first rows of the trial balance and the applied steps (the Expected results of this exercise).
+  status: planned
+- id: IF-06-1-B
+  unit: chapter-06-descriptive-analytics
+  file: ex-6.1-from-the-ledger-to-the-income-statement.md
+  kind: excel-mock
+  purpose: The reconciliation of Requirement 5 on the worksheet Ex 6.1.
+  shows: A grid with columns Account, Item group, Account balance, InvoiceLines of the report year, Difference, Explained
+    and Unexplained, five rows for the product revenue accounts and a Total row; the three rows with a difference are outlined.
+    Below it, the three invoices numbered in the report year but dated in the year before, with number, date, item group and
+    line total.
+  data: The reconciliation and invoice rows of the Expected results.
+  status: planned
+- id: IF-06-2-A
+  unit: chapter-06-descriptive-analytics
+  file: ex-6.2-disaggregating-revenue-by-segment-and-product.md
+  kind: excel-mock
+  purpose: The second PivotTable of Requirement 2, with the year above the item group in the columns and the change as a second
+    value row.
+  shows: 'A PivotTable on the worksheet Ex 6.2. Columns: the two years, each with the five item groups and a year total. Rows:
+    the five customer segments, each with two value rows, Revenue and Change from the previous year. The change row is blank
+    under the earlier year and filled under the report year. The Field List shows FiscalYear above ItemGroup in Columns, CustomerSegment
+    in Rows, and LineTotal twice in Values.'
+  data: Revenue by segment, item group and year, and the percentage changes (the Expected results).
+  status: planned
+- id: IF-06-4-A
+  unit: chapter-06-descriptive-analytics
+  file: ex-6.4-the-margin-bridge-by-product-type.md
+  kind: excel-mock
+  purpose: The two bridges of Exercise 6.4 side by side, which is the comparison of requirement 4.
+  shows: 'A two-column table on the worksheet Ex 6.4 with the header Product types and Tutorial 6.3 (Furniture). Rows: third-quarter
+    margin, fourth-quarter margin, change in margin, price, cost, volume, mix, the sum of the four effects, a check row that
+    reads zero in both columns, and a last row for the promotional discounts inside the price effect. The cost cell of the
+    Furniture column reads zero and the cost cell of the product-type column is outlined.'
+  data: The effects of both bridges (the Expected results).
+  status: planned
+- id: IF-06-5-A
+  unit: chapter-06-descriptive-analytics
+  file: ex-6.5-a-substantive-analytical-procedure-on-quarterly.md
+  kind: excel-mock
+  purpose: The expectation worksheet of Requirements 2 and 3, with the flagged rows highlighted and the list of flagged differences
+    beside the grid.
+  shows: The worksheet Ex 6.5 Expectation. Two input cells in blue at the top, a percentage threshold and a dollar threshold.
+    Below, a grid with columns item group, quarter, expectation, recorded, difference, difference percent and flagged, one
+    row for each group and quarter, with the flagged rows shaded. To the right, a list of the flagged differences filled by
+    a formula, and a cell that counts them.
+  data: The expectation grid and the flagged rows (the Expected results).
+  status: planned
+- id: IF-07-0-A
+  unit: chapter-07-analysis-and-modeling
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Which what-if tool answers which question, as a decision tree for the discussion of Tutorial 7.3 and Exercise 7.4.
+  shows: 'A top-down decision tree. The root asks what you want to know. Four branches end in a tool: results under a few
+    named sets of inputs (Scenario Manager), results across a range of one or two inputs (data table), the input that reaches
+    a target (Goal Seek), the best values of several inputs within limits (Solver). Under each tool, one example from the
+    chapter, named without numbers.'
+  data: The chapter's table of what-if tools, with the examples of Tutorial 7.3 and Exercise 7.4.
+  status: planned
+- id: IF-07-0-B
+  unit: chapter-07-analysis-and-modeling
+  file: 00-chapter-notes.md
+  kind: chart
+  purpose: How the break-even lift of the promotion depends on the discount, for the discussion of the assumptions table.
+  shows: 'A line chart. The horizontal axis is the discount rate from zero to 15 percent, the vertical axis the volume lift
+    at which the promotion breaks even, both as percentages, starting at zero. Three points are labeled: 5 percent, 10 percent
+    (the promotion as it ran) and 15 percent.'
+  data: The break-even lift computed from the inputs of the Model worksheet (units, price before discount, variable cost,
+    commission rate) at each discount.
+  status: planned
+- id: IF-07-0-C
+  unit: chapter-07-analysis-and-modeling
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The static budget, the flexible budget and the actual margin of the four product lines in one walk.
+  shows: 'A bridge with six bars: static budget margin, sales-volume variance, flexible budget margin, price gap before discounts,
+    promotional discounts, actual margin. The totals are blue, the three variances coral, each with a signed dollar label,
+    and the sales-volume bar is drawn to scale so the others look small.'
+  data: The Total column of the BudgetReport worksheet (Tutorial 7.2), rows for the three margins, the sales-volume variance,
+    the price gap and the discounts.
+  status: planned
+- id: IF-07-1-A
+  unit: chapter-07-analysis-and-modeling
+  file: ex-7.1-forecasting-revenue-by-product-line.md
+  kind: excel-mock
+  purpose: The backtest grid of Requirement 2, with the lowest error of each item group outlined.
+  shows: 'The worksheet Ex 7.1, rows 42 to 49. A header row with the five item groups. Five rows of percentages, one for each
+    method: trend, mean, same quarter last year, trend without the first quarter, mean without the first quarter. The lowest
+    value in each column outlined, and the two rows below that name the lowest method of the first three and of all five.'
+  data: The mean absolute percentage errors of the backtest (the Expected results).
+  status: planned
+- id: IF-07-3-A
+  unit: chapter-07-analysis-and-modeling
+  file: ex-7.3-company-break-even-and-margin-of-safety.md
+  kind: excel-mock
+  purpose: The two-variable data table of Requirement 5, with the cell nearest the model's own assumptions outlined.
+  shows: The worksheet Ex 7.3, D2:O12. A title row, the corner cell D3 showing the break-even revenue, the percentages 40
+    to 50 across row 3, fixed costs from 6 to 10 million in steps of half a million down column D, and a grid of break-even
+    revenues with thousands separators. The cell nearest the contribution margin ratio and fixed costs of Requirement 4 is
+    outlined.
+  data: The break-even revenue at each ratio and fixed-cost pair (fixed costs divided by the ratio) and the model's own ratio
+    and fixed costs of Requirement 4.
+  status: planned
+- id: IF-07-4-A
+  unit: chapter-07-analysis-and-modeling
+  file: ex-7.4-the-product-mix-under-a-capacity-constraint.md
+  kind: chart
+  purpose: Why Solver cuts the items it cuts, ranked by contribution per Assembly hour against the shadow price.
+  shows: A bar chart of the manufactured items sold, sorted by contribution per Assembly hour from the highest to the lowest,
+    one thin bar each. A horizontal line marks the shadow price of an Assembly hour. The bars below the line are shaded coral
+    and labeled as the items Solver reduces, the one bar on the line is the item made in part, and the vertical axis starts
+    at zero.
+  data: The contribution per Assembly hour of each item (the column beside the routing hours of the Ex 7.4 sheet) and the
+    shadow price of the Sensitivity report.
+  status: planned
+- id: IF-07-5-A
+  unit: chapter-07-analysis-and-modeling
+  file: ex-7.5-regression-based-expectations-for-revenue-and.md
+  kind: chart
+  purpose: The 2026 commission differences against the senior's threshold, to show the offsetting pair and the quiet months.
+  shows: A column chart of the twelve months of the report year. Each column is the difference between recorded commission
+    expense and the expectation, as a percentage of the expectation, with two horizontal lines at plus and minus 3 percent.
+    The columns beyond the lines are coral, the others gray, and the two consecutive flagged months of opposite sign are bracketed.
+    The axis includes zero.
+  data: The Difference % column of the Ex 7.5 sheet for the report year (the Expected results).
+  status: planned
+- id: IF-07-6-A
+  unit: chapter-07-analysis-and-modeling
+  file: ex-7.6-evaluating-management-s-forecast.md
+  kind: chart
+  purpose: The forecast against orders by item group and year, which carries the finding of Requirement 3.
+  shows: A grouped bar chart. The horizontal axis holds the four product groups, each with three bars for the three years
+    of the window; the vertical axis is the ratio of forecast units to ordered units, starting at zero, with a reference line
+    at 1. The bars rise from the first year to the last in every group. A separate small panel shows the Services ratio on
+    the same scale, below the line.
+  data: The forecast-to-orders ratios of the Ex 7.6 sheet, rows for the four product groups and for Services (the Expected
+    results).
+  status: planned
+- id: IF-08-0-A
+  unit: chapter-08-audit-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: One journal entry reached by three different tests, for the discussion at the end of Tutorial 8.3.
+  shows: A hub with three spokes. In the centre, a box for the opening balance entry, labeled with its entry number and with
+    the chief financial officer as creator. Three boxes around it, each joined to the hub by an arrow. The receivables reconciliation
+    of Tutorial 8.2, whose difference is the entry's line to account 1020. The journal entry tests of Tutorial 8.3, where
+    it is the only entry that scores four. The payables reconciliation of Exercise 8.2, whose difference is the entry's credit
+    to account 2010, balanced by a debit to cash of the same amount. Each outer box names its dollar amount.
+  data: JournalEntry and GLEntry for the opening entry; the receivables and payables lines are the opening amounts in the
+    Expected results of Exercises 8.1 and 8.2.
+  status: planned
+- id: IF-08-0-B
+  unit: chapter-08-audit-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: Choosing a test by the kind of records, for the discussion of the exercises.
+  shows: A decision tree read from left to right. The root asks what the records are. Five branches. Amounts with no upper
+    limit lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness check,
+    then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could repeat
+    lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account leads
+    to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement that
+    practices it.
+  data: The chapter's own tests; no dataset values.
+  status: planned
+- id: IF-08-1-A
+  unit: chapter-08-audit-analytics
+  file: ex-8.1-estimating-the-allowance-for-credit-losses.md
+  kind: excel-mock
+  purpose: The Aging worksheet after requirement 1, with the expected credit loss beside the aging and the loss rates in the
+    Buckets Table.
+  shows: 'The Aging worksheet: columns A to D as in Tutorial 8.2, then column E, Expected credit loss, with an amount for
+    each bucket and the total outlined, and the E4 formula in the formula bar. To the right, the Buckets Table with its LossRate
+    column as percentages.'
+  data: The aging of the open invoices at the as-of date and the five proposed rates (the Expected results table).
+  status: planned
+- id: IF-08-2-A
+  unit: chapter-08-audit-analytics
+  file: ex-8.2-reconciling-accounts-payable-to-the-ledger.md
+  kind: excel-mock
+  purpose: The reconciliation workpaper of account 2010 to the open supplier invoices, with every reconciling item explained.
+  shows: 'The Ex 8.2 worksheet from the ledger balance down to the unexplained difference. Columns Item, Voucher, Entry description,
+    PurchaseInvoiceID, InvoiceNumber, Amount, What it is and Correction belongs in. Three reconciling rows: the opening entry
+    as a negative amount and the two reclassifications as positive amounts. The unexplained difference of zero is outlined.'
+  data: GLEntry for account 2010 by journal entry, and the open supplier invoices at the as-of date (the Expected results
+    table).
+  status: planned
+- id: IF-08-4-A
+  unit: chapter-08-audit-analytics
+  file: ex-8.4-supplier-concentration-and-payment-timing.md
+  kind: excel-mock
+  purpose: The supplier PivotTable with the running share of spending, the step where students most often go wrong.
+  shows: A PivotTable with FiscalYear in the filter area set to the current year, SupplierName in rows from the largest payment
+    total down, and the columns Sum of Amount and Running share of spending. The row where the share first reaches 50 percent
+    is outlined. Beside it, the number of suppliers that make up 50, 80 and 90 percent.
+  data: DisbursementPayment by supplier for the current fiscal year (the Expected results table).
+  status: planned
+- id: IF-08-5-A
+  unit: chapter-08-audit-analytics
+  file: ex-8.5-testing-purchasing-and-payment-controls.md
+  kind: chart
+  purpose: Requisitions by 50-dollar band around the 5,000-dollar approval limit, the chart of requirement 4.
+  shows: A column chart of the eight bands, each labeled with its range and its count. The band just below the approval limit
+    is about twice as tall as any other and is drawn in the highlight color; the rest are gray.
+  data: PurchaseRequisition, RequisitionValue as Quantity times EstimatedUnitCost, counted in 50-dollar bands (the Expected
+    results table).
+  status: planned
+- id: IF-08-5-B
+  unit: chapter-08-audit-analytics
+  file: ex-8.5-testing-purchasing-and-payment-controls.md
+  kind: excel-mock
+  purpose: The flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.
+  shows: The flagged orders sorted by RiskScore, with the three flag columns, RiskScore, Disposition and Design or operation.
+    The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up.
+  data: POApprovals filtered to RiskScore 1 or more (the Expected results table).
+  status: planned
+- id: IF-08-6-A
+  unit: chapter-08-audit-analytics
+  file: ex-8.6-testing-pricing-controls.md
+  kind: diagram
+  purpose: The three flagged promotions, with the dates they were approved for and the months in which their lines were ordered.
+  shows: A timeline with a row for each flagged promotion. A short outlined segment marks the recorded effective window (a
+    point for the one-day promotion, a backward arrow for the other two). A solid bar marks the months in which its lines
+    were ordered, and a lighter bar extends to the last month in which they were invoiced.
+  data: PromotionProgram and the order and invoice dates of its invoice lines (the Expected results table).
+  status: planned
+- id: IF-08-6-B
+  unit: chapter-08-audit-analytics
+  file: ex-8.6-testing-pricing-controls.md
+  kind: chart
+  purpose: Order lines dated after the end of their price list, by list and year, for the discussion of requirement 4.
+  shows: A clustered column chart with a group for each expired price list and a column for each fiscal year, counting order
+    lines. Each group is labeled with the list's end date.
+  data: SalesOrderLine, PriceListLine, PriceList and SalesOrder, counted by list and year (the Expected results table).
+  status: planned
+- id: IF-C2-0-A
+  unit: case-part-2
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the six requirements build the memo and its appendix, and the chapter each one draws on.
+  shows: Six boxes in a row for the requirements, each tagged with the chapters it uses (Chapters 4 and 5, Chapter 6, Chapters
+    6 and 7, Chapter 7, Chapter 8, none). Arrows run from Requirement 1 into every other box, from Requirements 2 to 5 into
+    boxes for the memo's sections Financial reporting, Managerial accounting and Auditing, and from all of them into the memo.
+    Five exhibit boxes beneath the memo are tagged with the requirement that produces each.
+  data: none; the boxes and tags come from the case's requirements and deliverable.
+  status: planned
+- id: IF-C2-0-B
+  unit: case-part-2
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount
+    reaches revenue.
+  shows: A twelve-month timeline of the report year. For each of the three proposed promotions a solid bar marks the months
+    in which its lines were ordered and a lighter bar extends over the months in which they were invoiced. Beneath the timeline
+    four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end
+    date of the collection promotion, which falls before its own start.
+  data: The proposed promotions' order months, invoice months and discount billed by quarter (Requirement 2 Step 6, Requirement
+    3 Step 1).
+  status: planned
+- id: IF-C2-1-A
+  unit: case-part-2
+  file: req-1-build-and-validate-the-case-workbook.md
+  kind: excel-mock
+  purpose: The completeness checks of the Documentation sheet, as a student's workbook shows them after a refresh.
+  shows: 'A block headed Completeness checks with the columns Check, Compared with, Query, Source and Agrees: a row for each
+    source Table, the LineTotal and OrderTotal totals, the no-discount rows, the discount rates, the lookups and the postings.
+    Every Agrees cell reads TRUE.'
+  data: The Expected results of this requirement (row counts and control totals).
+  status: planned
+- id: IF-C2-2-A
+  unit: case-part-2
+  file: req-2-measure-what-the-promotions-cost-and-where-the.md
+  kind: excel-mock
+  purpose: The PivotTable of promotional discount and billed lines by promotion and invoice year.
+  shows: A PivotTable with PromotionID down the rows and the three invoice years across, each holding Sum of DiscountAmount
+    and Count of lines, with grand totals and no blank row. A column chart of the yearly totals sits beside it.
+  data: The Expected results of this requirement (discount and lines by promotion and year, from BilledLines).
+  status: planned
+- id: IF-C2-2-B
+  unit: case-part-2
+  file: req-2-measure-what-the-promotions-cost-and-where-the.md
+  kind: chart
+  purpose: The report year's gross-to-net walk, from list amount to net billed.
+  shows: 'A waterfall chart with five labeled bars: List amount, Price lists and overrides and Promotional discounts as decreases,
+    Line rounding as a sliver, and Net billed.'
+  data: The report year's gross-to-net totals (the Expected results, Step 3).
+  status: planned
+- id: IF-C2-3-A
+  unit: case-part-2
+  file: req-3-test-whether-the-promotions-brought-in-sales.md
+  kind: excel-mock
+  purpose: The comparison table of the volume test, one row for each promotion.
+  shows: A worksheet block with a row for each promotion and the columns Months, Volume in the promotion's months, Expectation,
+    Difference, The same months a year earlier, Difference from a year earlier, Standard deviation of the other months, Difference
+    in standard deviations and Beyond two standard deviations. The largest and smallest differences are outlined, the first-year
+    promotions read n/a for the year earlier, and every last cell reads FALSE.
+  data: The Expected results of this requirement (volume by promotion and month from OrderLines, ListAmount).
+  status: planned
+- id: IF-C2-4-A
+  unit: case-part-2
+  file: req-4-model-the-proposed-2027-calendar.md
+  kind: excel-mock
+  purpose: The Furniture promotion's data table, with the positive cells highlighted.
+  shows: A grid of the difference in contribution, discounts of 5, 8, 10 and 12 percent across and lifts of 0 to 40 percent
+    in steps of 5 points down, with the positive cells shaded in a staircase and a row of break-even lifts beneath. The two
+    input cells and the result cell sit above it.
+  data: The Furniture promotion's units, price before discount, standard cost and the commission rate (the Expected results).
+  status: planned
+- id: IF-C2-4-B
+  unit: case-part-2
+  file: req-4-model-the-proposed-2027-calendar.md
+  kind: chart
+  purpose: Each promotion's measured difference against its break-even lift, for the discussion of requirement 4.
+  shows: A horizontal bar chart with a row for each promotion, the measured difference as a bar and the break-even lift as
+    a marker to its right, the proposed promotions marked.
+  data: The break-even lift and the measured difference of each promotion (R4 Model, second block).
+  status: planned
+- id: IF-C2-5-A
+  unit: case-part-2
+  file: req-5-test-the-controls-over-promotions.md
+  kind: excel-mock
+  purpose: The four tests counted by promotion, as the student's R5 Controls sheet shows them.
+  shows: A table with a row for each promotion and the columns Lines, Outside the recorded dates, Outside the scope, Rate
+    differs, Window start, Window end and In scope and window without the promotion, and a total row. The collection promotions'
+    date counts equal their line counts and are outlined, as are the two scope exceptions; every other count is zero.
+  data: The Expected results of this requirement (the tests by promotion).
+  status: planned
+- id: IF-C2-5-B
+  unit: case-part-2
+  file: req-5-test-the-controls-over-promotions.md
+  kind: chart
+  purpose: The evidence from outside the record under test for one failing promotion, to place beside its recorded dates.
+  shows: 'A twelve-month strip for one collection promotion''s year: a short outlined segment for the recorded window with
+    a backward arrow for its end date, a solid bar for the months its lines were ordered, and beneath it a line of the budget''s
+    price as a share of list, dipping in those months.'
+  data: The promotion's recorded dates, the months its lines were ordered, and the budget's monthly ratio for its collection
+    (Step 3).
+  status: planned
+- id: IF-C2-6-A
+  unit: case-part-2
+  file: req-6-write-the-decision-memo.md
+  kind: diagram
+  purpose: How the memo and its one-page appendix are laid out, and which requirement supplies each part.
+  shows: Two page outlines side by side with a third, smaller page for the appendix. The memo pages show the header lines,
+    an opening paragraph, the three headed sections (Financial reporting, Managerial accounting, Auditing) and the recommendation.
+    The appendix page shows five numbered exhibit boxes. Arrows tag each section and exhibit with the requirement that produced
+    it, Requirement 2 for exhibits 1 and 2, 3 for exhibit 3, 4 for exhibit 4 and 5 for exhibit 5.
+  data: none; the layout and tags come from the case's Requirement 6 and Deliverable.
+  status: planned
+- id: IF-09-0-A
+  unit: chapter-09-sql-essentials
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A path from the symptom of a wrong result to its usual cause and its check, for the discussion of logical errors.
+  shows: 'A decision path read from top to bottom. The top box asks whether the query that ran is right. Four branches by
+    symptom: no rows, far too many rows, one column instead of two, and blank cells. Each names the usual cause (a comparison
+    with NULL, text in the wrong case, a text year compared with a number, AND and OR without parentheses, a missing comma,
+    a NULL in a calculation) and the check (IS NULL, DISTINCT, quotes or CAST, parentheses and a row count, an alias read
+    as a column, COALESCE). Each leaf cites the tutorial step or exercise that practices it.'
+  data: None; the leaves cite the chapter's tutorials and exercises.
+  status: planned
+- id: IF-09-0-B
+  unit: chapter-09-sql-essentials
+  file: 00-chapter-notes.md
+  kind: sql-mock
+  purpose: The in-class calculator demonstration, a statement with no table.
+  shows: The Execute SQL tab with the statement of the check slide, a division of whole numbers, a division with a decimal
+    and a text year compared with a number. The grid shows one row with three values, and the message pane reports one row
+    returned.
+  data: The expressions of the check slide and of question 15, evaluated by SQLite.
+  status: planned
+- id: IF-09-1-A
+  unit: chapter-09-sql-essentials
+  file: ex-9.1-reviewing-the-chart-of-accounts.md
+  kind: sql-mock
+  purpose: The result students should reach in Step 6, with the parenthesized condition visible beside it.
+  shows: The Execute SQL tab of DB Browser for SQLite on the tab Ex 9.1.sql. The editor holds the two comment lines and the
+    query of Step 6 with the two parenthesized groups. The result grid shows the contra accounts with AccountID, AccountNumber,
+    AccountName, AccountType, AccountSubType and NormalBalance, and the message pane reports the number of rows returned.
+  data: Account, the opposite-balance query of Step 6, run read-only on the dataset (the Expected results give the accounts).
+  status: planned
+- id: IF-09-2-A
+  unit: chapter-09-sql-essentials
+  file: ex-9.2-the-purchase-price-variance-in-the-ledger.md
+  kind: sql-mock
+  purpose: The ten largest unfavorable purchase variances of the year, with the tie-break visible.
+  shows: The Execute SQL tab on the tab Ex 9.2.sql. The editor holds the comment lines and the query of Step 5 with ORDER
+    BY Debit DESC, PostingDate, VoucherNumber and LIMIT 10. The grid shows GLEntryID, PostingDate, VoucherNumber, Debit and
+    Description for ten rows, with the two rows that share an amount outlined. The message pane reports ten rows returned.
+  data: GLEntry for the purchase price variance account in the current fiscal year, the Step 5 query, run read-only on the
+    dataset.
+  status: planned
+- id: IF-09-4-A
+  unit: chapter-09-sql-essentials
+  file: ex-9.4-open-work-orders-at-year-end.md
+  kind: sql-mock
+  purpose: The oldest past-due work orders that are still marked Released, for the discussion of what a status proves.
+  shows: The Execute SQL tab on the tab Ex 9.4.sql. The editor holds the comment lines and the query of Step 5 with ClosedDate
+    IS NULL, the DueDate condition and ORDER BY DueDate, WorkOrderNumber. The grid shows WorkOrderNumber, Status, ReleasedDate,
+    DueDate and the Completed column, scrolled to the first rows, with the first row outlined. The message pane reports the
+    number of rows returned.
+  data: WorkOrder, the Step 5 query, run read-only on the dataset (the Expected results give the oldest work order).
+  status: planned
+- id: IF-09-6-A
+  unit: chapter-09-sql-essentials
+  file: ex-9.6-missing-values-in-time-and-labor-records.md
+  kind: sql-mock
+  purpose: The time clock entries with no clock-out, shown with the COALESCE label that makes the gap visible.
+  shows: The Execute SQL tab on the tab Ex 9.6.sql. The editor holds the comment lines and the query of Step 5 with COALESCE(ClockOutTime,
+    'missing') AS ClockOut and ClockOutTime IS NULL. The grid shows the entries with TimeClockEntryID, EmployeeID, WorkDate,
+    ClockInTime, ClockOut, RegularHours, OvertimeHours and ClockStatus, with the word missing in the ClockOut column outlined
+    and Pending in the last column. The message pane reports the number of rows returned.
+  data: TimeClockEntry, the Step 5 query, run read-only on the dataset (the Expected results give the entries).
+  status: planned
+- id: IF-10-0-A
+  unit: chapter-10-joining-and-summarizing
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A chooser that takes a question about two or more tables to the right join or summary and to its row-count test.
+  shows: 'A decision path from a question to the join or summary that fits: inner join, left join, anti-join (IS NULL on the
+    second table''s key, or NOT EXISTS) and GROUP BY with HAVING. Each leaf names its row-count test and cites the tutorial
+    step or exercise that practices it; a side box warns that a header amount repeats on every line.'
+  data: None; the leaves cite the chapter's tutorials and exercises.
+  status: planned
+- id: IF-10-0-B
+  unit: chapter-10-joining-and-summarizing
+  file: 00-chapter-notes.md
+  kind: sql-mock
+  purpose: The in-class demonstration of fan-out, one total summed over a join and again from the header table alone.
+  shows: 'The Execute SQL tab with two queries for the current fiscal year: SUM(GrandTotal) over SalesInvoice joined to SalesInvoiceLine,
+    and over SalesInvoice alone. The grid shows both totals, the joined one outlined and nearly twice the other.'
+  data: SalesInvoice and SalesInvoiceLine for the current fiscal year, run read-only (the two values are in the Difficult
+    ideas).
+  status: planned
+- id: IF-10-1-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.1-reconciling-invoice-lines-to-the-ledger-in-sql.md
+  kind: sql-mock
+  purpose: The two totals side by side, for the discussion of what the difference means.
+  shows: The tab Ex 10.1.sql at the side-by-side query of Requirement (4). The grid shows one row, Ledger, InvoiceLines and
+    Difference, with Difference outlined.
+  data: GLEntry, Account, SalesInvoice and SalesInvoiceLine for the current fiscal year, the query run read-only (the Expected
+    results give the three values).
+  status: planned
+- id: IF-10-1-B
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.1-reconciling-invoice-lines-to-the-ledger-in-sql.md
+  kind: sql-mock
+  purpose: The invoices that explain the difference.
+  shows: The tab Ex 10.1.sql at the query that joins the year's ledger postings to SalesInvoice. The grid shows InvoiceNumber,
+    InvoiceDate, PostingDate, AccountNumber and Revenue for the three invoices, InvoiceDate outlined.
+  data: GLEntry, SalesInvoice and Account, the query run read-only (the Expected results list the invoices).
+  status: planned
+- id: IF-10-2-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.2-tracing-a-sale-from-the-ledger-to-its-documents.md
+  kind: sql-mock
+  purpose: The four ledger rows of the traced sale, joined to the invoice and the accounts.
+  shows: The tab Ex 10.2.sql at the query of Requirement (1). The grid shows the four rows with GLEntryID, PostingDate, AccountNumber,
+    AccountName, Debit, Credit, SourceLineID and Description, the revenue row's SourceLineID outlined and the other three
+    blank.
+  data: GLEntry, SalesInvoice and Account for the traced invoice, run read-only (the Expected results give the rows).
+  status: planned
+- id: IF-10-2-B
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.2-tracing-a-sale-from-the-ledger-to-its-documents.md
+  kind: sql-mock
+  purpose: An anti-join that returns no rows, for the discussion of what an empty result proves.
+  shows: The tab Ex 10.2.sql at the anti-join of Requirement (3). The grid shows the column headings and no rows, and the
+    message pane reports zero rows returned.
+  data: GLEntry and SalesInvoiceLine for the current fiscal year, run read-only (the Expected results give the number of postings
+    tested).
+  status: planned
+- id: IF-10-3-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.3-average-order-value-by-customer.md
+  kind: sql-mock
+  purpose: The grouping by name that merges two customers, for the discussion of grouping by key.
+  shows: The tab Ex 10.3.sql at the Requirement (2) query grouped by CustomerName. The grid shows CustomerName, Orders, TotalOrdered
+    and AverageOrder with the Brown LLC row outlined, and the message pane reports one row fewer than the grouping by CustomerID.
+  data: SalesOrder and Customer, the Requirement (2) query run read-only (the Expected results give the merged row and the
+    row counts).
+  status: planned
+- id: IF-10-4-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.4-purchase-price-variance-by-supplier.md
+  kind: sql-mock
+  purpose: The variance and the amount invoiced by year, for the discussion of price against volume.
+  shows: The tab Ex 10.4.sql at the Requirement (4) query. The grid shows InvoiceYear, InvoiceLines, AmountInvoiced, LineTotals,
+    PriceVariance and VariancePct for three years, VariancePct outlined.
+  data: PurchaseInvoiceLine, PurchaseInvoice and PurchaseOrderLine, the Requirement (4) query run read-only (the Expected
+    results give the amounts, variances and rates).
+  status: planned
+- id: IF-10-5-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.5-testing-referential-integrity-with-anti-joins.md
+  kind: sql-mock
+  purpose: The ledger rows that point to no payroll payment, for the discussion of what an integrity failure looks like.
+  shows: The tab Ex 10.5.sql at the anti-join of Requirement (2). The grid shows GLEntryID, PostingDate, SourceDocumentID,
+    Debit, Credit and Description for six rows, three debit and credit pairs, SourceDocumentID outlined, and the message pane
+    reports six rows.
+  data: GLEntry and PayrollPayment, the Requirement (2) query run read-only (the Expected results list the rows).
+  status: planned
+- id: IF-10-6-A
+  unit: chapter-10-joining-and-summarizing
+  file: ex-10.6-suppliers-that-share-an-employee-s-address.md
+  kind: sql-mock
+  purpose: The fan-out of joining a supplier's invoices to its payments, for the discussion of summarizing before joining.
+  shows: The tab Ex 10.6.sql at the fan-out query for the first matching supplier. The grid shows one row, JoinedRows, with
+    a very large value outlined.
+  data: PurchaseInvoice and DisbursementPayment for the first matching supplier, the query run read-only (the Expected results
+    give the invoice and payment counts that multiply to it).
+  status: planned
+- id: IF-11-0-A
+  unit: chapter-11-analytical-queries
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A chooser from a question about rows to the SQL feature that answers it.
+  shows: Five questions lead to CASE, a CASE inside SUM, the date functions, a window (partition, order, frame), and a CTE
+    chain or view. Each leaf names its check and the tutorial step.
+  data: None; the leaves cite the tutorials and exercises.
+  status: planned
+- id: IF-11-0-B
+  unit: chapter-11-analytical-queries
+  file: 00-chapter-notes.md
+  kind: sql-mock
+  purpose: The demonstration of tied rows, the default window against ROWS UNBOUNDED PRECEDING.
+  shows: The Furniture items ranked by StandardLaborHoursPerUnit with RANK, ROW_NUMBER and both running totals, the first
+    ten rows, the first tied pair outlined.
+  data: Item, Furniture group, read-only.
+  status: planned
+- id: IF-11-0-C
+  unit: chapter-11-analytical-queries
+  file: 00-chapter-notes.md
+  kind: chart
+  purpose: The monthly ratio against the trailing twelve months, for the discussion of delay.
+  shows: Monthly hours per standard hour against the trailing total, direct and indirect lines; the peak labeled and the last
+    point marked provisional.
+  data: The view MonthlyLaborEfficiency, read-only.
+  status: planned
+- id: IF-11-1-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.1-the-financial-statements-from-the-ledger.md
+  kind: sql-mock
+  purpose: The saved view queried in statement order, the exercise's end state.
+  shows: The tab Ex 11.1.sql at the Requirement (5) query. The grid lists the seventeen statement lines in statement order
+    with their Amount, from Operating revenue to Liabilities, equity, and net income; the Net income and Total assets rows
+    are outlined.
+  data: The view Ex11_1_IncomeStatement at the current fiscal year-end, run read-only (the Expected results give the amounts).
+  status: planned
+- id: IF-11-2-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.2-monthly-revenue-with-year-to-date-and-prior-year.md
+  kind: sql-mock
+  purpose: Furniture's months of the current year ranked by the change against the prior year, the result the memo discusses.
+  shows: The tab Ex 11.2.sql at the Requirement (5) query. The grid shows the twelve months with Revenue, PriorYear, PctChange
+    and DeclineRank; the October row (rank 1) and the November row (rank 12) are outlined.
+  data: GLEntry and Account for the Furniture account, the Requirement (5) query run read-only (the Expected results give
+    the two months).
+  status: planned
+- id: IF-11-3-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.3-ranking-items-by-unit-margin-within-each-product.md
+  kind: sql-mock
+  purpose: The three ranking functions disagreeing when items are ranked by the rounded margin percentage, for the discussion
+    of ties.
+  shows: The tab Ex 11.3.sql with a variant of the Requirement (2) query that ranks by MarginPct in place of UnitMargin. The
+    grid shows the first rows of one item group with MarginPct, MarginRank, MarginDenseRank and MarginRowNumber; a run of
+    tied percentages is outlined, with the three numbers differing.
+  data: Item, ranked within the Furniture group by margin percentage, run read-only (the Common mistakes give the counts).
+  status: planned
+- id: IF-11-4-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.4-is-overtime-concentrated.md
+  kind: chart
+  purpose: The running share of overtime by employee rank, the picture behind the memo's answer to the plant manager.
+  shows: A line chart of the cumulative share of the year's manufacturing overtime (vertical, zero to the whole) against the
+    employee's rank from the highest total (horizontal), with a straight diagonal for a perfectly even spread. The curve hugs
+    the diagonal; a marker shows the rank where it passes one half.
+  data: The Requirement (2) result, the running share by rank, from LaborTimeEntry and Employee run read-only.
+  status: planned
+- id: IF-11-5-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.5-journal-entry-tests-in-sql.md
+  kind: sql-mock
+  purpose: The entries that score two or more, ranked for review, the list the audit senior opens first.
+  shows: The tab Ex 11.5.sql at the Requirement (4) query. The grid lists the flagged entries with ReviewRank, EntryNumber,
+    EntryType, PostingDate, TotalAmount, RiskScore and the five flag columns; the first row, the opening entry with the highest
+    score, is outlined.
+  data: JournalEntry and Employee, the Requirement (4) query run read-only (the Expected results give the entries).
+  status: planned
+- id: IF-11-6-A
+  unit: chapter-11-analytical-queries
+  file: ex-11.6-requisitions-just-under-the-approval-threshold.md
+  kind: sql-mock
+  purpose: The two runs of three equal requisitions, the evidence that the memo cites.
+  shows: The tab Ex 11.6.sql at the Requirement (3) query. The grid lists six requisitions with MiddleID, RequisitionID, RequisitionNumber,
+    RequestDate, Amount, RequestedByEmployeeID, ApprovedByEmployeeID and Status. The Amount cells are all the same; the empty
+    ApprovedByEmployeeID cells are outlined.
+  data: PurchaseRequisition, the Requirement (3) query run read-only (the Expected results give the runs).
+  status: planned
+- id: IF-12-0-A
+  unit: chapter-12-sql-audit-analytics
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The audit cycle of the chapter, from a population to a disposition, with the positive control that makes a clean
+    result mean something.
+  shows: 'Five boxes in a row: population, reconcile and profile, test (anti-join, match, expectation), exceptions list, disposition.
+    A loop from the test back to a planted known exception labeled positive control. Under each box, the tutorial step or
+    exercise that practices it.'
+  data: None; the boxes cite the tutorials and exercises.
+  status: planned
+- id: IF-12-0-B
+  unit: chapter-12-sql-audit-analytics
+  file: 00-chapter-notes.md
+  kind: sql-mock
+  purpose: The demonstration that a clean result may mean nothing, the anti-join of test L4 written two ways.
+  shows: Two Execute SQL tabs side by side on Audit.sql. The left tab holds test L4 with LEFT JOIN and a result grid of three
+    registers; the right holds the same query with INNER JOIN and an empty grid whose message pane reads a result of no rows.
+    The join keyword is outlined in both.
+  data: Test L4, read-only, written both ways.
+  status: planned
+- id: IF-12-0-C
+  unit: chapter-12-sql-audit-analytics
+  file: 00-chapter-notes.md
+  kind: chart
+  purpose: The growth of surge days, for the discussion of the audit's central finding.
+  shows: Surge days per month from the first month to the last, as columns, with the first surge day marked and the three
+    year totals labeled.
+  data: The PlantDays query of test H8, grouped by month, read-only.
+  status: planned
+- id: IF-12-1-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.1-cutoff-at-each-year-end.md
+  kind: sql-mock
+  purpose: The net effect of cutoff on each fiscal year, the result that carries the memo.
+  shows: The tab Ex 12.1.sql at the test C3 query. One row for each fiscal year with FromYearBefore, ToNextYear, NeverInvoiced
+    and NetEffect; the NetEffect column is outlined.
+  data: The test C3 query, run read-only.
+  status: planned
+- id: IF-12-2-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.2-aging-the-open-balances.md
+  kind: sql-mock
+  purpose: The reconciliation of the open invoices to account 1020, the first finding of the receivables work.
+  shows: The tab Ex 12.2.sql at the test A3 query. One result row with OpenInvoices, Account1020, Difference and OpeningEntryLine;
+    the Difference and OpeningEntryLine cells are outlined and equal.
+  data: The test A3 query, run read-only.
+  status: planned
+- id: IF-12-3-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.3-where-did-the-time-go.md
+  kind: sql-mock
+  purpose: The two work-center ratios side by side for the last year, the comparison the plant manager asked for.
+  shows: The tab Ex 12.3.sql at the test T2 query, rows of the last year. Columns EndYear, WorkCenterName, Planned, Recorded,
+    WhileOpen, RecordedPerPlanned and OpenPerPlanned; the Packing row is outlined.
+  data: The test T2 query, run read-only.
+  status: planned
+- id: IF-12-3-B
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.3-where-did-the-time-go.md
+  kind: chart
+  purpose: The first-year stock build, which explains the months with little indirect time.
+  shows: Clustered columns for units completed and manufactured units shipped, January to July of the first year, with the
+    months of the build marked and the month the late share passed a quarter labeled.
+  data: The test T4 and T5 queries, run read-only.
+  status: planned
+- id: IF-12-4-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.4-is-the-overtime-approval-doing-its-job.md
+  kind: sql-mock
+  purpose: Overtime on surge days and on other days by year, the result that shows where the growth sits.
+  shows: The tab Ex 12.4.sql at the test O5 query. One row for each year with SurgeDayOvertime, OtherDayOvertime and Overtime;
+    the SurgeDayOvertime column rises and the OtherDayOvertime column is flat, both outlined.
+  data: The test O5 query, run read-only.
+  status: planned
+- id: IF-12-5-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.5-who-was-paid-and-who-approved-the-pay.md
+  kind: sql-mock
+  purpose: The registers paid after the termination date, the list the chief audit executive opens first.
+  shows: The tab Ex 12.5.sql at the test R1 query. Three result rows with PayrollRegisterID, JobTitle, EmployeeCenter, RegisterCenter,
+    TerminationDate, PayDate, GrossPay and UsualGrossPay; the GrossPay and UsualGrossPay cells of the first row are outlined.
+  data: The test R1 query, run read-only.
+  status: planned
+- id: IF-12-6-A
+  unit: chapter-12-sql-audit-analytics
+  file: ex-12.6-chapter-8-s-tests-in-sql.md
+  kind: sql-mock
+  purpose: The first-digit result for the three payment groups, the check against Tutorial 8.1.
+  shows: The tab Ex 12.6.sql at the test B1 query. Three result rows with PaymentGroup, Payments, Digits and MAD for all,
+    full and partial payments; the MAD column is outlined and the partial row stands out.
+  data: The test B1 query, run read-only.
+  status: planned
+- id: IF-C3-0-A
+  unit: case-part-3
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the six requirements build the memo and its appendix, and the chapters each one draws on.
+  shows: Six boxes in a row for the requirements, each tagged with its chapters (Chapters 9 and 10, Chapters 10 to 12, Chapters
+    10 and 11, Chapter 11 with Chapter 7, Chapters 11 and 12, none). Arrows run from Requirement 1 into every other box, from
+    Requirements 2 to 5 into the memo's three sections (Auditing, Managerial accounting, Financial reporting), and from all
+    of them into the memo. Five exhibit boxes under the memo are tagged with the requirement that produces each.
+  data: none; the boxes and tags come from the case's requirements and deliverable.
+  status: planned
+- id: IF-C3-0-B
+  unit: case-part-3
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: The three calendars of the case, which must not be mixed.
+  shows: Three horizontal timelines over the same years. Time records follow the work date and stop before the end of the
+    last fiscal year, marked at the last day. The payroll and the ledger follow the pay date, with the pay dates of the first
+    and last years counted. Output follows the completion date, runs to the year-end and includes weekends. A bracket below
+    says to compare hours with output on work dates and to measure cost on the ledger.
+  data: The last day with time records, the pay dates by year and the completions on weekends (Requirement 3, Steps 1 to 3).
+  status: planned
+- id: IF-C3-1-A
+  unit: case-part-3
+  file: req-1-build-the-case-script-and-its-populations.md
+  kind: sql-mock
+  purpose: The reconciliation of the two views to Tutorial 12.3, the check students must pass before Requirement 2.
+  shows: The tab Case.sql at the reconciliation query. Columns WorkYear, SurgeDays, SurgeEntries, OrdinaryDays and OrdinaryEntries,
+    one row for each fiscal year; the SurgeDays and SurgeEntries cells are outlined; the message pane reports three rows.
+  data: The reconciliation query, run read-only.
+  status: planned
+- id: IF-C3-1-B
+  unit: case-part-3
+  file: req-1-build-the-case-script-and-its-populations.md
+  kind: sql-mock
+  purpose: The dispositions of the attendance exceptions, where the misattributed rows stand out.
+  shows: The tab Case.sql at the disposition query. Columns AttendanceExceptionID, ExceptionType, EmployeeID, EntryEmployeeID,
+    TimeClockEntryID and Disposition; the rows whose EmployeeID differs from EntryEmployeeID are outlined.
+  data: The disposition query, run read-only.
+  status: planned
+- id: IF-C3-2-A
+  unit: case-part-3
+  file: req-2-test-whether-other-records-support-the-surge.md
+  kind: diagram
+  purpose: The corroboration matrix, the exhibit that carries this requirement into the memo.
+  shows: One row for each test (attendance, punches, clock-in times, roster against clock, approvals, planned load, calendar,
+    output, absences), three result columns (Supports, Contradicts or unexplained, Silent) with one mark each, and a column
+    that says in a word and a symbol whether the record is independent of the Production Manager and the time clock.
+  data: The results of Steps 1 to 6 and of Requirement 3's weekly comparison.
+  status: planned
+- id: IF-C3-3-A
+  unit: case-part-3
+  file: req-3-what-the-hours-produced-and-what-they-cost.md
+  kind: chart
+  purpose: The bridge of account 5080 from the first fiscal year to the last, the exhibit that carries the cost story into
+    the memo.
+  shows: A waterfall. The first bar is 5080 in the first year, then one step for each ledger line (payroll charged to 1090,
+    journal entries, standard cost released, change in 1090, material variance, direct postings), signed and labeled, and
+    a last bar for 5080 in the last year. Increases and decreases differ in fill and in the sign of the label.
+  data: The bridge query of Step 5, run read-only.
+  status: planned
+- id: IF-C3-4-A
+  unit: case-part-3
+  file: req-4-plan-the-2027-hours-and-conversion-cost.md
+  kind: chart
+  purpose: The hours each scenario needs against the plant's regular capacity, the picture behind the decision to allow no
+    routine overtime.
+  shows: Three columns for the scenarios (standard hours, the first year's level, the last year's level with its overtime),
+    labeled with the hours needed, and a horizontal line for regular capacity well above all three, labeled with its value
+    and with the share of capacity the standard-hours scenario uses.
+  data: The scenarios query of Step 4, run read-only.
+  status: planned
+- id: IF-C3-5-A
+  unit: case-part-3
+  file: req-5-close-the-fiscal-2026-statements.md
+  kind: diagram
+  purpose: Why recording both payroll accruals moves the liability far more than income.
+  shows: Two columns, Income and Balance sheet. Under Income, two bars side by side, the expense for the work after the time
+    records end and the expense for the prior year's work paid in the year, nearly equal, with the small net difference marked.
+    Under Balance sheet, one tall bar for the liability at the year-end and one bar for the fall in opening retained earnings.
+  data: The accrual and prior-year queries of Steps 1 and 3.
+  status: planned
+- id: IF-C3-6-A
+  unit: case-part-3
+  file: req-6-write-the-decision-memo.md
+  kind: diagram
+  purpose: How the memo and its one-page appendix are laid out, and which requirement supplies each part.
+  shows: 'Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines,
+    an opening paragraph, three headed sections (Auditing, Managerial accounting, Financial reporting) and a recommendation.
+    The appendix shows five numbered exhibit boxes. Arrows tag each section and exhibit with its source: Requirement 2 for
+    Auditing and the matrix, 3 and 4 for Managerial accounting and exhibits 2 to 4, 5 for Financial reporting and exhibit
+    5.'
+  data: none; the layout and tags come from the case's Requirement 6 and Deliverable.
+  status: planned
+- id: IF-13-0-A
+  unit: chapter-13-power-bi-essentials
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: The build sequence of the chapter and the pages of the model answer, so an instructor sees where each tutorial
+    and exercise sits.
+  shows: 'Left to right: the four Tables, the queries in Power Query, the model with three relationships, then the three report
+    pages (Validation, Sales and Discounts, Review). Branches from the model lead to the six exercise pages, each labeled
+    with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load for
+    13.5) and with the tutorial it extends.'
+  data: None; the boxes cite the tutorials, exercises and the model answer's queries and pages.
+  status: planned
+- id: IF-13-0-B
+  unit: chapter-13-power-bi-essentials
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: Model view of the model answer, with the unrelated control table beside the related ones.
+  shows: Model view with six tables. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice
+    related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with
+    no relationship line. Key columns are listed in each table.
+  data: None; the tables, columns and relationships of the model answer.
+  status: planned
+- id: IF-13-0-C
+  unit: chapter-13-power-bi-essentials
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: DAX query view with the Checks tab, the fast way to check a student's number against the model answer.
+  shows: DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid whose columns are
+    Section, Check, Expected, Actual and Agrees, scrolled to the rows of Exercise 13.2, with Agrees true in each.
+  data: The Checks tab of the solution project, run after a refresh; the rows of Exercise 13.2.
+  status: planned
+- id: IF-13-1-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.1-revenue-control-totals-by-year-and-item-group.md
+  kind: pbi-mock
+  purpose: The Ex 13.1 page at its end state, the matrix and the header table together.
+  shows: Report view, page tab Ex 13.1. A matrix with fiscal years on rows, the five item groups on columns and row and column
+    totals, and below it a table of InvoiceHeaders with fiscal year, SubTotal, FreightAmount, TaxAmount and GrandTotal. The
+    latest year's row of each is outlined and the GrandTotal column is marked.
+  data: The Expected results quantities (line totals by year and group, header amounts by year), read-only.
+  status: planned
+- id: IF-13-1-B
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.1-revenue-control-totals-by-year-and-item-group.md
+  kind: pbi-mock
+  purpose: The Power Query Editor on InvoiceHeaders, with FreightAmount corrected before Choose Columns.
+  shows: The Power Query Editor with the query InvoiceHeaders selected. Applied Steps lists the navigation step, Changed Type,
+    Removed Other Columns, Added Custom and Changed Type1; the Changed Type step is outlined. The FreightAmount header shows
+    the decimal number icon.
+  data: None; the steps and columns of the model answer's InvoiceHeaders query.
+  status: planned
+- id: IF-13-2-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.2-customer-concentration-by-name-or-by-key.md
+  kind: pbi-mock
+  purpose: The two ranked lists side by side, which differ by one customer.
+  shows: 'Report view, page tab Ex 13.2. Two table visuals with Top N filters: on the left the top ten by CustomerName, with
+    CustomerName and LineTotal and a total row; on the right the top ten by CustomerID, with CustomerID, CustomerName and
+    LineTotal and a total row. Brown LLC is outlined in the left table and Willis and Sons in the right one.'
+  data: The Expected results quantities (the two top-ten lists of the latest year), read-only.
+  status: planned
+- id: IF-13-3-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.3-promotions-in-the-report.md
+  kind: pbi-mock
+  purpose: The promotion matrix with the dates under each name, the end state of Requirements 2 and 3.
+  shows: Report view, page tab Ex 13.3. A matrix with PromotionName on rows, expanded to show each promotion's start and end
+    dates, the months of the latest year on columns, and two values, the discount and the count of invoice lines. The row
+    labeled (Blank) is outlined, and the row of the promotion whose end date precedes its start date is marked.
+  data: The Expected results quantities (promotion lines and discounts by month, with the promotion dates), read-only.
+  status: planned
+- id: IF-13-4-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.4-a-page-for-the-sales-manager.md
+  kind: pbi-mock
+  purpose: The Ex 13.4 page with one segment's bar selected, to show what the card and the matrix do.
+  shows: Report view, page tab Ex 13.4. A Region drop-down slicer and a card of discounts across the top, a clustered bar
+    chart of revenue by customer segment sorted from the largest with data labels, and a matrix of segments by regions with
+    totals. The largest segment's bar is selected, so the other bars are faded, the card reads that segment's discounts and
+    the matrix still shows every segment.
+  data: The Expected results quantities (revenue and discounts by segment, revenue by region), read-only.
+  status: planned
+- id: IF-13-5-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.5-profiling-the-sales-tables-on-the-entire-data.md
+  kind: pbi-mock
+  purpose: One column of Profile_Invoices profiled on the two bases, the contrast the exercise measures.
+  shows: 'Two panels of the Power Query Editor on Profile_Invoices with Column quality and Column distribution on. Left: the
+    PaymentDate column and the Status column profiled on the top 1000 rows, with the status bar message naming that basis.
+    Right: the same two columns on the entire data set, with that message. The empty share of PaymentDate and the number of
+    distinct Status values are outlined in both.'
+  data: The census of Profile_Invoices (PaymentDate empty values and Status values on each basis), read-only.
+  status: planned
+- id: IF-13-6-A
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.6-reviewing-a-draft-report-page.md
+  kind: pbi-mock
+  purpose: The draft page as the exercise describes it, before any correction.
+  shows: Report view, page tab Ex 13.6 Draft. A pie chart of revenue by item group with five slices and no labels, a card
+    titled Average discount, a line chart of monthly revenue over three years on the default axis, and a line and clustered
+    column chart of monthly revenue and discounts for one year with a second axis on the right.
+  data: The Expected results quantities (revenue by item group, average discount, monthly revenue, monthly discounts), read-only.
+  status: planned
+- id: IF-13-6-B
+  unit: chapter-13-power-bi-essentials
+  file: ex-13.6-reviewing-a-draft-report-page.md
+  kind: pbi-mock
+  purpose: The revised page, each draft element replaced by an honest equivalent.
+  shows: Report view, page tab Ex 13.6 Revised. A sorted bar chart of revenue by item group with data labels, two cards (discounts
+    and revenue at list price), a column chart of revenue by fiscal year with data labels, a line chart of monthly revenue
+    on an axis from zero, and a line chart of revenue and discounts on one axis. Every visual has a title naming the measure
+    and the period.
+  data: The same quantities as the draft page, read-only.
+  status: planned
+- id: IF-14-0-A
+  unit: chapter-14-data-models-and-dax
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What each tutorial adds to the model, so an instructor sees where each exercise attaches.
+  shows: 'Left to right: the Chapter 13 report, Tutorial 14.1 (star and Date table), Tutorial 14.2 (Key Measures and the Tests
+    tab), Tutorial 14.3 (ledger star, income statement, Test 3). Below the line, the six exercises as branches, each labeled
+    with what it adds.'
+  data: None; the boxes cite the tutorials, exercises and the model answer's queries, measures and tabs.
+  status: planned
+- id: IF-14-0-B
+  unit: chapter-14-data-models-and-dax
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: Model view of the model answer, with both stars, the shared Date table and the dashed relationship.
+  shows: Model view with SalesInvoiceLine, Item, Customer, Date, GLEntry, Account, CostCenter, ShippedLines and Key Measures.
+    Each line shows 1 at the dimension and an asterisk at the fact table. The line from ShippedLines.ShipmentDate to Date
+    is dashed. Key Measures stands apart.
+  data: None; the tables and relationships of the model answer.
+  status: planned
+- id: IF-14-0-C
+  unit: chapter-14-data-models-and-dax
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: The Checks tab, the quick way to compare a student's number with the model answer.
+  shows: DAX query view with the tab Checks, a Run button and a grid with the columns Section, Check, Expected, Actual and
+    Agrees, scrolled to the rows of Exercise 14.4, Agrees true in each.
+  data: The Checks tab of the solution project, run after a refresh; the rows of Exercise 14.4.
+  status: planned
+- id: IF-14-0-D
+  unit: chapter-14-data-models-and-dax
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A board sketch of filter context, row context and context transition.
+  shows: 'Three panels. First, a matrix cell (Furniture, one quarter) with its three filters flowing along relationships to
+    the invoice lines, where SUM adds what remains. Second, a calculated column on Customer with a row context and no arrow
+    to the lines. Third, the same column in CALCULATE: the current customer becomes a filter and the arrow appears.'
+  data: None; the chapter's own examples, with no values on the board.
+  status: planned
+- id: IF-14-1-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.1-the-balance-sheet-at-any-month-end.md
+  kind: pbi-mock
+  purpose: The Ex 14.1 page at the selected month-end, the end state of Requirements 2 and 4.
+  shows: Report view, page tab Ex 14.1. A Month-end dropdown slicer set to the latest year's December, a matrix of AccountType
+    and AccountSubType with the Balance measure and a total row of zero, and a second matrix by AccountType with the three
+    columns Balance, Balance with Closes and Balance on GL Amount, the Equity, Revenue and Expense cells outlined.
+  data: The Expected results quantities (balances by account type for the three measures at the latest December), read-only.
+  status: planned
+- id: IF-14-1-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.1-the-balance-sheet-at-any-month-end.md
+  kind: diagram
+  purpose: Which closing entries each balance measure keeps at the latest year-end, the idea behind Requirement 4.
+  shows: 'Three rows (Balance, Balance with Closes, Balance on GL Amount) against the six closing entries grouped by year.
+    Each cell is marked kept or left out, with a word and a symbol, and a last column names what the row gives: a pre-closing
+    balance sheet, a post-closing one, or neither.'
+  data: None; the rule of each measure from the model answer's DAX.
+  status: planned
+- id: IF-14-2-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.2-revenue-by-invoice-date-and-by-ship-date.md
+  kind: pbi-mock
+  purpose: Model view with the second date relationship drawn dashed, the end state of Requirement 3.
+  shows: Model view with the Date table in the middle. SalesInvoiceLine and GLEntry sit on one side, each joined to Date by
+    a solid line, and ShippedLines on the other, joined to Date by a solid line from InvoiceDate and a dashed line from ShipmentDate.
+    ShippedLines also joins Item. Each line shows 1 at Date and an asterisk at the fact table, with the filter arrow toward
+    the fact table.
+  data: None; the tables and relationships of the model answer (the dashed one is inactive).
+  status: planned
+- id: IF-14-2-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.2-revenue-by-invoice-date-and-by-ship-date.md
+  kind: pbi-mock
+  purpose: The year matrix of Requirement 4, with the (Blank) row that students are asked to explain.
+  shows: Report view, page Ex 14.2. A matrix with Year on rows and three columns, Revenue, Shipped Revenue and Revenue by
+    Ship Date. The first two agree in every year. The third is lower in every year, and a last row labeled (Blank) holds an
+    amount only in the ship-date column.
+  data: The Expected results quantities (revenue by invoice date, by ship date and with no ship date, by year), read-only.
+  status: planned
+- id: IF-14-3-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.3-monthly-comparisons-with-the-prior-year.md
+  kind: pbi-mock
+  purpose: The year-on-year matrix of Requirement 2, the end state students compare with Exercise 11.2.
+  shows: Report view, page Ex 14.3. A matrix with the five item groups on rows and the twelve months of the latest year on
+    columns, each cell a percentage change against the same month of the year before. The Furniture row is outlined, with
+    its largest decline and largest increase marked, and Services and Textiles show the widest swings.
+  data: The Expected results quantities (revenue against the same month of the prior year, by item group and month), read-only.
+  status: planned
+- id: IF-14-3-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.3-monthly-comparisons-with-the-prior-year.md
+  kind: pbi-mock
+  purpose: The unfiltered year table of Requirement 5 before and after the change to Revenue PY.
+  shows: Report view, two small tables side by side with Year, Revenue and Revenue PY and no filter. In the left one the year
+    after the window has a Revenue PY and no revenue, and the first year has revenue and no Revenue PY. In the right one the
+    year after the window has no Revenue PY.
+  data: The Expected results quantities (the revenue of the latest year as the prior year of the next one), read-only.
+  status: planned
+- id: IF-14-4-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.4-the-furniture-bridge-as-measures.md
+  kind: pbi-mock
+  purpose: The Furniture bridge matrix of Requirement 4 with Bridge Check at zero in every row.
+  shows: Report view, page Ex 14.4. A matrix with the four quarters of the latest year on rows and the columns Margin PQ,
+    Volume Effect, Mix Effect, Price List Effect, Promotion Effect, Gross Margin and Bridge Check. The last quarter's row
+    is outlined with its promotion effect larger than the whole decline, and the Bridge Check column reads zero in every row.
+  data: The Expected results quantities (the bridge by quarter for Furniture), read-only.
+  status: planned
+- id: IF-14-4-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.4-the-furniture-bridge-as-measures.md
+  kind: diagram
+  purpose: How the four effects add up from one quarter's margin to the next, the picture to draw on the board before students
+    write the measures.
+  shows: 'A waterfall from Margin PQ to Gross Margin for the last quarter of the latest year: a start bar, four steps (volume,
+    mix, price lists, promotions) each labeled with its formula in words, and an end bar. The promotion step is the large
+    downward one, the other three are small. A note says the cost effect is absent because each item has one standard cost.'
+  data: The Expected results quantities for the last quarter (Margin PQ, the four effects and Gross Margin), read-only.
+  status: planned
+- id: IF-14-5-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.5-testing-the-model-s-relationships.md
+  kind: pbi-mock
+  purpose: The result of the first query in DAX query view, the three customer counts side by side.
+  shows: DAX query view with the tab Ex 14.5, the DEFINE block and the SUMMARIZECOLUMNS query in the editor, and a results
+    grid below with the columns ItemGroup, Customer Rows, Customers Invoiced and Customer Rows Both and one row for each of
+    the five item groups. The Customer Rows column holds the same number in every row, and the other two agree with each other.
+  data: The Expected results quantities (customers by item group, counted three ways), read-only.
+  status: planned
+- id: IF-14-5-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.5-testing-the-model-s-relationships.md
+  kind: diagram
+  purpose: The path a selection on Item takes into the ledger when the Date relationship is set to Both.
+  shows: Four boxes in a row, Item, SalesInvoiceLine, Date and GLEntry, with arrows. A solid arrow from Item to SalesInvoiceLine
+    and one from Date to SalesInvoiceLine and to GLEntry carry the normal filters. A second arrow from SalesInvoiceLine back
+    to Date is drawn dashed and labeled Both, and an amber arrow from Date on to GLEntry is labeled the ledger follows. A
+    note says the selection came from the sales star and the result lands in the ledger.
+  data: None; the relationships of the model answer and the setting the exercise tests.
+  status: planned
+- id: IF-14-6-A
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.6-a-library-of-control-totals.md
+  kind: pbi-mock
+  purpose: The Control Totals tab after Requirement 2, every test passing.
+  shows: DAX query view with the tab Control Totals. The editor holds the UNION of ROW tests and the closing ADDCOLUMNS, and
+    the results grid shows seven rows with the columns Test, Expected, Actual, Difference and Result, every Result reading
+    Pass and every Difference zero. The row for the reconciling item is outlined.
+  data: The Expected results quantities (the seven tests with their expected and actual values), read-only.
+  status: planned
+- id: IF-14-6-B
+  unit: chapter-14-data-models-and-dax
+  file: ex-14.6-a-library-of-control-totals.md
+  kind: pbi-mock
+  purpose: The same grid after GL Amount is changed to keep the closing entries, the failure students are asked to find in
+    Requirement 3.
+  shows: The same grid with two rows reading Fail, the net income and the manufacturing variance, each with an Actual of zero
+    and a Difference equal to minus the expected value, and the other five rows still Pass.
+  data: The Expected results quantities for the two failing tests and the five that pass, read-only.
+  status: planned
+- id: IF-15-0-A
+  unit: chapter-15-management-reports
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What each tutorial adds to the model and where each exercise attaches, so an instructor sees the build at a glance.
+  shows: 'Left to right: the Chapter 14 report, Tutorial 15.1 (promotions and the Steps table, three hidden detail pages),
+    Tutorial 15.2 (the budget as a second fact table, the flexed budget, the cost-center detail page), Tutorial 15.3 (labor
+    time and completions, the plant page, the About page and navigator). Below the line, the six exercises as branches, each
+    labeled with the page or tab it adds.'
+  data: None; the boxes cite the tutorials, the exercises and the model answer's pages and tabs.
+  status: planned
+- id: IF-15-0-B
+  unit: chapter-15-management-reports
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: Model view of the model answer, with the five fact tables around the shared Date table.
+  shows: Model view with SalesInvoiceLine, GLEntry, BudgetLine, LaborTimeEntry and ProductionCompletionLine as fact tables
+    around Date; Account, CostCenter, Item, Customer, PromotionProgram, Employee and WorkCenter as dimensions; LaborPaths
+    related to Date; and Steps, Discount and Plant Measure standing alone with no lines. Each line shows 1 at the dimension
+    and an asterisk at the fact table.
+  data: None; the tables and relationships of the model answer.
+  status: planned
+- id: IF-15-0-C
+  unit: chapter-15-management-reports
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What the Checks tab proves in each item and what only Desktop shows, the map an instructor needs before grading.
+  shows: 'A two-column board. Left, proved by the Checks tab: the entries and amounts of Exercise 15.1, the monthly net income
+    and the measure of Exercise 15.2, the three plant measures of Exercise 15.3, the lifts of Exercise 15.4, the actual quarter
+    and the benchmarks of Exercise 15.5, the disagreement counts of Exercise 15.6. Right, visible only in Desktop: the drill-through
+    click, the visual calculations of Exercise 15.2 and Tutorial 15.3, the field-parameter slicer, the Analytics-pane forecast.'
+  data: None; the Checks tab's sections and the exercises' pages.
+  status: planned
+- id: IF-15-0-D
+  unit: chapter-15-management-reports
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A board sketch of the budget variance, from the static budget to the actual, by cause.
+  shows: 'A waterfall for fiscal year operating expense. Start bar, the static budget. Steps: the volume effect in the commission
+    budget, the classification effect (drawn as an up arrow in one cost center and a down arrow of the same size in another,
+    netting to zero), the remaining variance. End bar, the actual. A note says what the remaining variance holds: the payroll
+    burden rate and the months with three pay dates.'
+  data: The Tutorial 15.2 quantities (budget, volume effect, classification effect, remaining, actual), from the generated
+    note.
+  status: planned
+- id: IF-15-1-A
+  unit: chapter-15-management-reports
+  file: ex-15.1-from-the-income-statement-to-the-entry.md
+  kind: pbi-mock
+  purpose: The Ledger Detail page as the model answer is saved, with the subtype passed and no year, so it lists both loss
+    entries.
+  shows: Report view, page Ledger Detail. A back button at the top left, a table titled Postings to the drilled-through subtype
+    with the columns PostingDate, VoucherNumber, SourceDocumentType, AccountNumber, AccountName and P&L Amount, and two rows,
+    one for each loss entry, both with negative P&L Amount. A label above the table reads the drill-through filter, AccountSubType
+    Other Income or Expense.
+  data: The Expected results quantities (the two loss entries, their dates and P&L Amounts), read-only.
+  status: planned
+- id: IF-15-1-B
+  unit: chapter-15-management-reports
+  file: ex-15.1-from-the-income-statement-to-the-entry.md
+  kind: diagram
+  purpose: The two disposal entries side by side, each with the loss worked out from its own lines.
+  shows: 'Two T-account style entries. Left, the current year''s entry: a debit to the loss account, a debit to accumulated
+    depreciation, a credit to the equipment account, no cash line. Right, the prior year''s entry: the same three lines plus
+    a debit to cash for the proceeds. Under each, the line loss equals cost less accumulated depreciation less proceeds, with
+    the amounts.'
+  data: The Expected results quantities (every posting of the two entries), read-only.
+  status: planned
+- id: IF-15-2-A
+  unit: chapter-15-management-reports
+  file: ex-15.2-month-and-year-to-date-with-visual-calculations.md
+  kind: pbi-mock
+  purpose: The two tables of the model answer, the full year and the second half, where the two year-to-date columns part.
+  shows: Report view, page Ex 15.2. Top, a table of the twelve months with the columns YearMonth, Net Income, YTD, Change
+    and Net Income YTD, the two YTD columns equal in every row. Bottom, the same table filtered to July through December,
+    where the YTD column starts again at July and the Net Income YTD column does not; the December cells of both columns are
+    outlined.
+  data: The Expected results quantities (net income by month, the running sum and the TOTALYTD figure), read-only.
+  status: planned
+- id: IF-15-3-A
+  unit: chapter-15-management-reports
+  file: ex-15.3-one-chart-three-measures.md
+  kind: pbi-mock
+  purpose: The model answer's page, a slicer choosing the measure that one column chart shows, above the table of the three
+    measures.
+  shows: Report view, page Ex 15.3. At the left a slicer titled Plant Measure with three entries (Hours per Standard Hour,
+    Overtime Share, Labor Cost per Standard Hour), the last selected. To its right a clustered column chart with three columns,
+    one for each year, titled The plant measure chosen in the slicer, by year. Below, a table with Year and the three measures,
+    one row for each year.
+  data: The Expected results quantities (the three measures by year), read-only.
+  status: planned
+- id: IF-15-3-B
+  unit: chapter-15-management-reports
+  file: ex-15.3-one-chart-three-measures.md
+  kind: diagram
+  purpose: A board sketch of why the cost per standard hour rose faster than the hours per standard hour.
+  shows: 'Three rows, one for each year. Each row is a multiplication: hours per standard hour, a times sign, the labor cost
+    per labor hour, an equals sign, the labor cost per standard hour. The first two factors are drawn as bars; the hours bar
+    grows steadily and the cost-per-hour bar grows slightly. A note under the rows says the straight-time rate barely moves
+    and the overtime share grows.'
+  data: The Expected results quantities (the three measures, the cost per labor hour and the straight-time rates), read-only.
+  status: planned
+- id: IF-15-4-A
+  unit: chapter-15-management-reports
+  file: ex-15.4-what-would-the-design-trade-promotion-need.md
+  kind: pbi-mock
+  purpose: 'The model answer''s what-if page: the slider, the cards and the table of the lift at every discount.'
+  shows: 'Report view, page Ex 15.4. A slicer titled Discount with a slider, set to the default. To its right a row of five
+    cards: Design Trade Units, Design Trade Price per Unit, Design Trade Cost per Unit, Discount Value and Break-even Lift.
+    Below, a table titled Break-even lift at each discount with one row for every whole discount from the smallest to the
+    largest, and the five discounts of Requirement 4 outlined.'
+  data: The Expected results quantities (the promotion's units, price and cost per unit, and the lift at each discount), read-only.
+  status: planned
+- id: IF-15-4-B
+  unit: chapter-15-management-reports
+  file: ex-15.4-what-would-the-design-trade-promotion-need.md
+  kind: chart
+  purpose: The lift the promotion needs at each discount, set against the largest lift ever measured, the picture behind the
+    recommendation.
+  shows: A line chart with the discount on the horizontal axis, from the smallest to the largest whole percent, and the break-even
+    lift on the vertical axis. Markers at the five discounts of Requirement 4. A horizontal band, labeled measured lifts in
+    the promotion months, runs from the lowest to the highest lift of the Part II case; the lift at the smallest discount
+    of the exercise sits at the band's top edge.
+  data: The Expected results quantities (the lift at each discount and the range of measured lifts), read-only.
+  status: planned
+- id: IF-15-5-A
+  unit: chapter-15-management-reports
+  file: ex-15.5-testing-the-forecast-before-trusting-it.md
+  kind: pbi-mock
+  purpose: The hindcast chart, revenue through the month before the quarter, with the forecast drawn forward over the known
+    quarter.
+  shows: Report view, page Ex 15.5. A line chart of monthly revenue on a continuous date axis, titled with its first and last
+    month, ending in the month before the last quarter. A shaded band continues the line over the next three months, drawn
+    with no numbers. Below the chart, a table titled Actual revenue of the quarter forecast with the quarter and its revenue.
+  data: The Expected results quantities (monthly revenue and the actual quarter), read-only. The forecast is drawn as a band
+    without values.
+  status: planned
+- id: IF-15-5-B
+  unit: chapter-15-management-reports
+  file: ex-15.5-testing-the-forecast-before-trusting-it.md
+  kind: chart
+  purpose: The same three benchmarks measured two ways, which changes their ranking.
+  shows: A grouped bar chart. Three groups, one for each benchmark (trend, mean, same quarter last year). Each group has two
+    bars, the error of the quarter total and the average error of the three months, with the percent labeled. An empty fourth
+    group is labeled the Power BI forecast, to be filled by the student from Desktop.
+  data: The Expected results quantities (each benchmark's quarter error and monthly error), read-only.
+  status: planned
+- id: IF-15-6-A
+  unit: chapter-15-management-reports
+  file: ex-15.6-which-work-center-did-the-time-belong-to.md
+  kind: pbi-mock
+  purpose: The matrix of the model answer, direct hours of the latest year by the operation's work center against the time
+    clock's.
+  shows: Report view, page Ex 15.6. A matrix titled with the year, the operation's work center on the rows and the time clock's
+    on the columns, the five work centers on each side, hours in the cells. The diagonal cells, where the two agree, are outlined;
+    the largest off-diagonal cell of the Packing row is highlighted. A second small table to its right shows the lines on
+    which the paths agree and disagree and the share recorded after the operation ended.
+  data: The Expected results quantities (the matrix cells and the shares), read-only.
+  status: planned
+- id: IF-15-6-B
+  unit: chapter-15-management-reports
+  file: ex-15.6-which-work-center-did-the-time-belong-to.md
+  kind: diagram
+  purpose: The two routes from one labor line to a work center, which the exercise compares.
+  shows: Left, a labor time line. Two arrows leave it. The upper arrow goes through the work order operation to the work center,
+    labeled what the time was charged to. The lower arrow goes through the time clock entry to the work center, labeled where
+    the employee clocked in. Beside the upper route a note says indirect and non-manufacturing lines have no operation, so
+    their route ends blank.
+  data: None; the tables and keys of the two paths, no values.
+  status: planned
+- id: IF-16-0-A
+  unit: chapter-16-audit-monitoring
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What each tutorial adds to Audit Monitoring and where each exercise attaches, so an instructor sees the build at
+    a glance.
+  shows: 'Left to right: Tutorial 16.1 (journal entry flags, the score, ledger lines, JE Exceptions, Test 1), Tutorial 16.2
+    (purchase order and payroll flags, the appended register, the Tests table, measures, the Monitoring and Exception Detail
+    pages, Test 2), Tutorial 16.3 (Dispositions, open exceptions, Review page, Tests 3 and 4, Data Through, the package''s
+    tests, the memo). Below the line, the six exercises as branches, each labeled with the query or page it adds.'
+  data: None; the boxes cite the tutorials, the exercises and the model answer's queries and pages.
+  status: planned
+- id: IF-16-0-B
+  unit: chapter-16-audit-monitoring
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: Model view of the monitoring model, the register beside the populations it tests.
+  shows: Model view with Exceptions related to Tests on TestID, to Date on EventDate and to Employee on EmployeeID; JournalEntry,
+    PurchaseOrder and PayrollRegister as populations related to Date; JournalEntry also related to Employee through the approver,
+    with JournalLines related to JournalEntry; PurchaseOrder and PayrollRegister with no line to Employee. Dispositions stands
+    alone and hidden. Each line shows 1 at the dimension and an asterisk at the fact table.
+  data: None; the tables and relationships of the model answer.
+  status: planned
+- id: IF-16-0-C
+  unit: chapter-16-audit-monitoring
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: What the Checks tab proves and what only Desktop shows, the map an instructor needs before grading.
+  shows: 'A two-column board. Left, proved by the Checks tab: the counts, totals, buckets, rates, shares and dates of the
+    tutorials and the six exercises. Right, visible only in Desktop: the heat map''s shading, the drill-through click, the
+    edited interactions as a reader meets them, the Data Through card under a slicer, and the Power Query step names a student
+    chose.'
+  data: None; the Checks tab's sections and the exercises' pages.
+  status: planned
+- id: IF-16-0-D
+  unit: chapter-16-audit-monitoring
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A board sketch of the order in which a reviewer takes the register's exceptions.
+  shows: 'A short decision list from top to bottom. Expected every period, such as the year-end closes: disposition and evidence
+    once, then check that it recurs. Recurs by design, such as registers approved by their own employee: one finding, change
+    the control. Fails several tests, such as the opening entry: first. New this month: next. Everything else: by amount and
+    age. Each box names its example from the register.'
+  data: None; the chapter's rules for ordering the review, with examples from the register.
+  status: planned
+- id: IF-16-1-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.1-monitoring-the-receivables.md
+  kind: pbi-mock
+  purpose: The model answer's page, the aging beside its reconciliation to the ledger.
+  shows: Report view, page Ex 16.1. A table titled Receivables aged at the as-of date with Bucket, Open Balance and Open Invoices
+    in bucket order and a total row. A card visual with Open Balance, Ledger Receivables and Unreconciled Difference, and
+    a second with Credit Balances and Credit Balance Invoices. A small table titled Account 1020 by source document, with
+    the JournalEntry row outlined.
+  data: The Expected results quantities (buckets, ledger, difference, credit balances), read-only.
+  status: planned
+- id: IF-16-2-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.2-year-end-cutoff-on-the-monitoring-report.md
+  kind: diagram
+  purpose: One invoice, four dates, and which test can see it.
+  shows: 'A horizontal timeline across a year-end. Four markers for the extra invoice: invoice date in December, shipment
+    date a few days later, delivery date, and the ledger posting on the first day of January. Brackets above show the year
+    each date falls in. Two boxes below: the test by invoice date finds nothing here; a test by posting date would.'
+  data: The dates of the extra invoice named in the Expected results (invoice, shipment, delivery and posting dates), read-only.
+  status: planned
+- id: IF-16-3-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.3-surge-days-by-month.md
+  kind: pbi-mock
+  purpose: The model answer's page, surge days by month with the surge overtime and its share of the plant's overtime.
+  shows: Report view, page Ex 16.3. A clustered column chart titled Surge days by month, with the months of the window on
+    the axis and columns from mid-window on. Below it a combo chart with the surge-day overtime hours as columns and their
+    share of the plant's overtime as a line on a second axis. At the bottom a table titled By year with Year, Surge Days,
+    Surge Overtime Hours, Plant Overtime Hours and Surge Share of Overtime.
+  data: The Expected results quantities (surge days, hours and shares by month and year), read-only.
+  status: planned
+- id: IF-16-4-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.4-exception-rates-over-time.md
+  kind: pbi-mock
+  purpose: The model answer's page, the rates by process and year with the unexplained rate beside them.
+  shows: 'Report view, page Ex 16.4. At the top a matrix titled Exceptions, population, and rates by process and year, with
+    the three processes on rows, the years of the window on columns, and four values for each year: Exceptions, Population,
+    Rate per 1,000 and Unexplained Rate per 1,000; the grand total row shows no rate. Below, two line charts side by side,
+    Rate per 1,000 by year and Unexplained rate per 1,000 by year, with one line for each process. At the bottom a table titled
+    with the current fiscal year, by test.'
+  data: The Expected results quantities (exceptions, populations and both rates by process and year), read-only.
+  status: planned
+- id: IF-16-4-B
+  unit: chapter-16-audit-monitoring
+  file: ex-16.4-exception-rates-over-time.md
+  kind: diagram
+  purpose: Three numerators for one process, so students see why the measures differ.
+  shows: 'Three small groups of bars, one for each process (journal entries, purchase orders, payroll), for the current fiscal
+    year. Each group has three bars: all exceptions, unexplained exceptions (expected and recurring left out), and open exceptions
+    (no disposition). The payroll group shows the unexplained bar far below the other two; the purchase order group shows
+    the three bars close together.'
+  data: The register's counts for the current fiscal year, by process, for the three numerators, read-only.
+  status: planned
+- id: IF-16-5-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.5-benford-s-law-in-dax.md
+  kind: pbi-mock
+  purpose: The model answer's page, observed and expected first digits with the deviation by kind of payment.
+  shows: Report view, page Ex 16.5. At the left a slicer titled PaymentKind. To its right a clustered column chart titled
+    First digits of the payments, observed and Benford's expected share, with the digits 1 to 9 on the axis and two columns
+    for each digit. Below, a table titled Mean absolute deviation by kind of payment with Full and Partial rows, their payment
+    counts and Benford MAD, and a total row for all payments.
+  data: The Expected results quantities (counts and the three deviations), read-only.
+  status: planned
+- id: IF-16-6-A
+  unit: chapter-16-audit-monitoring
+  file: ex-16.6-near-duplicates-and-the-concentration-of.md
+  kind: pbi-mock
+  purpose: The model answer's page, the near-duplicate pairs and the table of approval shares.
+  shows: Report view, page Ex 16.6. At the top left three cards, Pairs, Pairs Within 30 Days and Pairs on the Same Invoice,
+    the last showing 0. Under them a column chart titled Near-duplicate pairs by days apart. At the right a table titled Documents
+    approved, and their share of each process, with EmployeeName, JobTitle and, for entries, orders and registers, the number
+    approved and its share; the Chief Financial Officer's orders row and the Accounting Manager's registers row show shares
+    near or at 100 percent.
+  data: The Expected results quantities (pairs, and the approvers' counts and shares), read-only.
+  status: planned
+- id: IF-16-6-B
+  unit: chapter-16-audit-monitoring
+  file: ex-16.6-near-duplicates-and-the-concentration-of.md
+  kind: diagram
+  purpose: What a table merged with itself holds, and which filter removes which rows.
+  shows: 'Two payments, A and B, of one supplier and one amount, on different dates. A four-cell grid shows the rows of the
+    merge: A with A, A with B, B with A, B with B. The two diagonal cells are crossed out and labeled paired with itself,
+    removed by comparing the keys and the dates; the cell B with A is crossed out and labeled the same pair in the other order,
+    removed by keeping the lower key first. One cell, A with B, remains.'
+  data: None; a schematic with two example payments.
+  status: planned
+- id: IF-C4-0-A
+  unit: case-part-4
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the six requirements build the memo and its appendix, and the chapters each one draws on.
+  shows: Six boxes in a row for the requirements, each tagged with its chapters (Chapters 13, 14 and 16; 14 and 15; 14 and
+    15; 13 to 15; 14 to 16; none). Arrows run from Requirement 1 into every other box. Requirements 2 to 5 feed the memo's
+    three sections (Financial reporting, Managerial accounting, Auditing); all six feed the memo. Five exhibit boxes under
+    the memo are tagged with the requirement and report page that produce each.
+  data: none; the boxes and tags come from the case's requirements and deliverable.
+  status: planned
+- id: IF-C4-0-B
+  unit: case-part-4
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: The three dates of the case, which students must not mix.
+  shows: 'One horizontal timeline from the last payroll posting through the last day of the current fiscal year to the ledger''s
+    last posting. Three marks are labeled: the last payroll posting, Data Through, and the last posting in the ledger. A bracket
+    after the second mark reads supplier payments of the year''s invoices, the only postings after the year. Under the first
+    mark a note says the last two pay periods are open.'
+  data: The last payroll posting, Data Through and the ledger's last posting (Requirement 1, Step 8).
+  status: planned
+- id: IF-C4-1-A
+  unit: case-part-4
+  file: req-1-build-and-validate-the-case-file.md
+  kind: pbi-mock
+  purpose: The Validation page the model answer ends Requirement 1 with, the evidence a student must reproduce before Requirement
+    2.
+  shows: 'Report view, page Validation. A table titled Control totals by fiscal year with one row for each fiscal year and
+    seven columns: Year, Net Income, Total Assets, Materials Received, Receipts to 1045, Materials Issued and Issues from
+    1045; the Materials Received and Receipts to 1045 columns are outlined because they agree. Below it a row of five cards
+    titled Links tested: Receipt Lines, Receipts without a Requisition, Issue Lines, Issues without a Work Order and Requisition
+    Count. The two link cards that count exceptions read zero.'
+  data: The Expected results quantities (net income, total assets, materials received and issued by fiscal year; the link
+    counts), read-only.
+  status: planned
+- id: IF-C4-2-A
+  unit: case-part-4
+  file: req-2-explain-where-the-cash-went.md
+  kind: pbi-mock
+  purpose: The Cash Bridge page of the model answer, the exhibit that answers the committee's first question.
+  shows: Report view, page Cash Bridge. A tile slicer of the fiscal years; a waterfall of ten steps from Net income to Debt
+    and equity, the Inventories step far below the others; a matrix of the bridge by year; and a matrix of the sections by
+    activity with As recorded and Restated Cash Flow.
+  data: The Expected results quantities (the bridge steps by year and the sections as recorded and restated), read-only.
+  status: planned
+- id: IF-C4-3-A
+  unit: case-part-4
+  file: req-3-measure-how-fast-working-capital-turns.md
+  kind: pbi-mock
+  purpose: The Working Capital page of the model answer, the exhibit with the measures at each quarter-end.
+  shows: Report view, page Working Capital. A slicer of the six measures with the cycle selected; a line chart of the chosen
+    measure by quarter; a matrix with a row for each quarter-end and columns for DSO, DIO, materials and finished goods days
+    with their targets, and DPO, the days of supply carrying icons; a table of year-end measures beside their average-balance
+    versions.
+  data: The Expected results quantities (the measures by quarter and the average-balance versions), read-only.
+  status: planned
+- id: IF-C4-3-B
+  unit: case-part-4
+  file: req-3-measure-how-fast-working-capital-turns.md
+  kind: chart
+  purpose: Which component moved the cycle, so students see that receivables and payables are flat beside inventory.
+  shows: A chart by quarter-end with three lines, DSO, DIO and DPO, and the cash conversion cycle as a fourth, heavier line.
+    DIO and the cycle rise steeply; DSO and DPO stay nearly flat. A note marks the first quarter, where the opening entry's
+    lines are in the balances.
+  data: The Expected results quantities (DSO, DIO, DPO and the cycle at each quarter-end), read-only.
+  status: planned
+- id: IF-C4-4-A
+  unit: case-part-4
+  file: req-4-trace-the-materials-build-and-set-a-target-for.md
+  kind: pbi-mock
+  purpose: The Materials Build page of the model answer, which shows the channel and the items that carry the build.
+  shows: Report view, page Materials Build. A line and clustered column chart by month with two columns for each month, supply
+    plan receipts and work-order shortfall receipts, and a line for materials issued; a table of the yearly totals; a matrix
+    by item group and item, expanded and sorted by the build, with six raw materials at the top; and a matrix of the approver
+    titles for each channel.
+  data: The Expected results quantities (receipts by channel and year, the build by item, the approvals), read-only.
+  status: planned
+- id: IF-C4-4-B
+  unit: case-part-4
+  file: req-4-trace-the-materials-build-and-set-a-target-for.md
+  kind: chart
+  purpose: The excess at each target next to the year's fall in cash, the comparison the requirement asks for.
+  shows: 'Four horizontal bars of dollars: the excess at 28 days, at 60 days and at 90 days, and the year''s fall in cash.
+    The three excess bars are each many times the length of the fall; labels give the months of issues the excess represents.'
+  data: The Expected results quantities (the excess at each target, the months of issues and the fall in cash), read-only.
+  status: planned
+- id: IF-C4-5-A
+  unit: case-part-4
+  file: req-5-test-the-balances-behind-the-report.md
+  kind: pbi-mock
+  purpose: The Reconciliations page of the model answer, where each difference sits beside the findings that explain it.
+  shows: Report view, page Reconciliations. A matrix of six working-capital accounts on rows and source document types on
+    columns with the balance in each cell, the JournalEntry column outlined; a row of cards for receivables, open receivables,
+    their difference, payables, open payables and their difference; a table of billing by invoice date against the ledger
+    by year; the aged open payables; and the Findings table with account, finding, amount and disposition.
+  data: The Expected results quantities (the balances by source, the two differences, the billing differences and the findings),
+    read-only.
+  status: planned
+- id: IF-C4-5-B
+  unit: case-part-4
+  file: req-5-test-the-balances-behind-the-report.md
+  kind: diagram
+  purpose: The two reconciliations as one picture, so students see that each difference is a short list of recorded items.
+  shows: 'Two columns of stacked bars. Receivables: the ledger balance, then the open invoices with one segment for the opening
+    line. Payables: the ledger balance, then the open invoices with two segments, the opening payables and the two note invoices,
+    the second drawn below the axis. Each segment carries its disposition, Follow up or Expected.'
+  data: The Expected results quantities (the balances, open items and findings), read-only.
+  status: planned
+- id: IF-C4-6-A
+  unit: case-part-4
+  file: req-6-write-the-decision-memo.md
+  kind: diagram
+  purpose: How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.
+  shows: 'Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines,
+    three headed sections in the order Financial reporting, Managerial accounting, Auditing, and a closing Recommendation.
+    The appendix shows five numbered exhibit boxes. Tags name the source of each section and exhibit: Requirement 2 and the
+    Cash Bridge page, Requirement 3 and the Working Capital page, Requirement 4 and the Materials pages, Requirement 5 and
+    the Reconciliations page.'
+  data: none; the layout and tags come from the case's Requirement 6 and Deliverable.
+  status: planned
+- id: IF-17-0-A
+  unit: chapter-17-statements-for-a-lender
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the nine requirements, the three files and the four milestones fit together, for the kickoff.
+  shows: 'Four columns, one for each phase, holding nine boxes for the requirements in order (1 and 2; 3 to 5; 6 and 7; 8
+    and 9). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses more than one.
+    Arrows run from the SQL results to the workbook, from the workbook''s adjustment lines to the Review file, and from all
+    three files to the memo. Four checkpoints, one for each milestone, sit under the columns.'
+  data: none; the boxes and tags come from the case's requirements and its tools table.
+  status: planned
+- id: IF-17-0-B
+  unit: chapter-17-statements-for-a-lender
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: The dates of the case, which students must not mix.
+  shows: 'One horizontal timeline from the opening entry on the first day of the first fiscal year through the three year-ends
+    to the ledger''s last posting. Each year-end carries two marks for its two closes. After the last year-end, three dates
+    are labeled in order: the last pay date with registers, the last day of the year (the data-through date) and the ledger''s
+    last posting, with a bracket after the second date labeled supplier payments only.'
+  data: The opening entry's date, the three year-ends, the last pay date, and the ledger's last posting, from the ledger (Requirement
+    1).
+  status: planned
+- id: IF-17-1-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-1-build-the-trial-balances-and-the-recorded.md
+  kind: sql-mock
+  purpose: The trial-balance query for the last year-end with its result, the check students make before they map anything.
+  shows: 'The tab LenderPackage.sql at the first query of Requirement 1: the two comment lines, the Params and Closes CTEs,
+    the SELECT and the WHERE clause with its NOT (...) test. The result grid shows AccountNumber, AccountName, AccountType,
+    AccountSubType, Balance, DebitBalance, CreditBalance and Postings for the first accounts, the cash row outlined; the message
+    pane reports one row for each account with postings.'
+  data: The trial-balance query for the last year-end, run read-only.
+  status: planned
+- id: IF-17-2-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-2-review-the-recorded-statements-before-adjusting.md
+  kind: pbi-mock
+  purpose: The Review page the model answer ends Part 2 with, the picture of a correct flagged list.
+  shows: Report view, page Review. A slicer titled Threshold (what-if) at the top left, a card titled Threshold and materiality,
+    a matrix of statement lines and accounts with the three year-end balances, the change from the prior year to the current
+    one and a Flag column, and a table of the changes above the threshold sorted by size. The flagged rows of the matrix read
+    Above threshold.
+  data: The Expected results quantities (materiality, the flagged accounts and their changes), read-only.
+  status: planned
+- id: IF-17-3-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-3-rebuild-accrued-expenses-at-each-year-end.md
+  kind: sql-mock
+  purpose: The reconciliation of account 2040 to the ledger at the three year-ends, the result every student must reach before
+    deciding anything.
+  shows: The tab LenderPackage.sql at the reconciliation query. Three rows, one for each year-end, with the columns AsOfDate,
+    Opening, FreightNotSettled, DecemberFreight, YoungAccruals, OldAccruals, Parts, Ledger and Difference. The Difference
+    cells are outlined; the message pane reports three rows.
+  data: The reconciliation query, run read-only after the view OpenAccruals is created.
+  status: planned
+- id: IF-17-4-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-4-test-cutoff-at-each-year-end.md
+  kind: excel-mock
+  purpose: The payroll block of the Cutoff worksheet, where the proration is visible to a reviewer.
+  shows: The Cutoff worksheet scrolled to its payroll block, with one column for each year-end. Rows give the pay period paid
+    in the next year, the period that crosses the year-end with its working days and its working days within the year, the
+    share within the year, the cost from the registers, and the payroll owed with its gross pay, employer taxes, benefits,
+    manufacturing and other parts. The last year-end column shows the eight processed periods, their cost per working day
+    and the working days left.
+  data: The payroll owed at each year-end and its parts (the Expected results).
+  status: planned
+- id: IF-17-5-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-5-classify-measure-and-judge-the-adjustments.md
+  kind: excel-mock
+  purpose: The schedule of adjustments, the one exhibit the CFO approves entry by entry.
+  shows: 'The Adjustments worksheet at its top block. Rows A1 to A4 with a total row, then R1 and R2, then P1 to P3 and a
+    row for the passed items in aggregate. Columns: No., Adjustment, Accounts, Evidence, retained earnings at the start of
+    the comparative year, income for each of the two years, balance at each year-end, Type and Decision. The total row and
+    the adjusted net income row are outlined.'
+  data: The effects of A1 to A4, R1, R2 and P1 to P3 (the Expected results).
+  status: planned
+- id: IF-17-6-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-6-prepare-the-statements.md
+  kind: excel-mock
+  purpose: The statement of cash flows, where the adjustments must change no total.
+  shows: 'The cash flow block of the Statements worksheet: columns for the last year, the comparative year restated and each
+    year as recorded; rows from net income to the change in cash and the two check rows, with the operating totals outlined.'
+  data: The cash flow quantities of the Expected results.
+  status: planned
+- id: IF-17-8-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-8-look-past-the-balance-sheet-date-and-at-the-year.md
+  kind: sql-mock
+  purpose: The search for unrecorded liabilities, the query whose empty answer is the finding.
+  shows: 'DB Browser for SQLite on the Execute SQL tab: the search query for the payments after the year-end and the invoices
+    they paid, and its one-row result with the payments, amount, invoices, suppliers, first and last received dates, invoices
+    paid in full and invoices received after the year-end.'
+  data: The 2027 payments and the invoices they paid (the Expected results).
+  status: planned
+- id: IF-17-9-A
+  unit: chapter-17-statements-for-a-lender
+  file: req-9-assemble-the-package-and-write-the-memo-to-the.md
+  kind: diagram
+  purpose: The memo and its appendix at a glance, so students see what goes where before they write.
+  shows: 'Two page outlines and an appendix strip. Page one: header, an opening that holds the recommendation, and a table
+    of the four required matters with four columns. Page two: the other matters, the passed items, the close changes and the
+    closing recommendation. Under them, three exhibits of one page each: the schedule of adjustments, the matters'' numbers
+    and the going-concern conditions.'
+  data: none; the layout follows the requirement's page limits and its outline.
+  status: planned
+- id: IF-18-0-A
+  unit: chapter-18-make-buy-or-reprice
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the ten requirements, the three files and the four milestones fit together, for the kickoff.
+  shows: 'Four columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 and 5; 6 to 8; 9 and
+    10). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses more than one. Arrows
+    run from the SQL results to the workbook, from the workbook''s item costs to the explorer, and from all three files to
+    the memo. Four checkpoints, one for each milestone, sit under the columns.'
+  data: none; the boxes and tags come from the case's requirements and its tools table.
+  status: planned
+- id: IF-18-0-B
+  unit: chapter-18-make-buy-or-reprice
+  file: 00-case-notes.md
+  kind: chart
+  purpose: The same inputs to the clearing account cut three ways, the picture behind the three costing views.
+  shows: 'Three horizontal bars of equal length, each the year''s inputs to the clearing account. Standard: the part released
+    to products at standard, the rest the variance. Actual absorption: one segment, every dollar spread over the units made.
+    Time-driven: the products'' conversion and the unused capacity, with the crew''s part of the unused capacity marked. Dollar
+    labels on the segments.'
+  data: The inputs to the clearing account, the standard cost released, the products' conversion and the unused capacity (Requirements
+    2 and 4).
+  status: planned
+- id: IF-18-10-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-10-write-the-decision-memo.md
+  kind: excel-mock
+  purpose: The Memo sheet's decision table, the exhibit the memo's recommendation rests on.
+  shows: Nine family rows with the action, the annual effect, the one-time cost and what the decision depends on, and two
+    totals rows below; the three families to buy are grouped first, the three to make next, and the other families below the
+    floor last.
+  data: The Memo sheet of the model workbook, the decision table and its totals.
+  status: planned
+- id: IF-18-10-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-10-write-the-decision-memo.md
+  kind: diagram
+  purpose: The page plan of the memo and its appendix, for the kickoff and for grading.
+  shows: 'Two columns of boxes: a memo of two pages with seven short sections in order (the finding, the two views, the decisions,
+    the whole paths, the prices, the standards and statements, the production manager''s decision), and an appendix of three
+    pages with three exhibits, each tagged with the sheet of the workbook it comes from.'
+  data: none; the sections and exhibits come from the requirement and from the sheets of the model workbook.
+  status: planned
+- id: IF-18-2-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-2-take-the-overhead-apart.md
+  kind: chart
+  purpose: Two scatter plots that show the finding before any regression is run.
+  shows: 'Two panels with the standard hours completed each month on the horizontal axis, February to the last month of the
+    data. Left: the Factory Overhead entries with the fitted line rising. Right: the payroll to 1090 with a flat fitted line
+    and the six three-pay-date months marked. The start-up month is plotted apart from the line in both.'
+  data: The monthly extract of Q14 (Factory Overhead, Payroll, StandardHours, PayDates).
+  status: planned
+- id: IF-18-3-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-3-measure-the-activities-and-the-capacity.md
+  kind: sql-mock
+  purpose: The capacity query with its six-row result, the table every later requirement reads.
+  shows: The tab MakeBuy.sql at Q20, scrolled to its last CTE and the final SELECT; the grid shows one row for each work center
+    and a Plant row, with the available, practical and routing hours and the two shares, the Plant row outlined; the message
+    pane reports six rows.
+  data: Query Q20, run read-only on the capstone copy.
+  status: planned
+- id: IF-18-3-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-3-measure-the-activities-and-the-capacity.md
+  kind: chart
+  purpose: Where the plant's hours go, work center by work center.
+  shows: 'A clustered bar chart with one group for each of the five work centers and three bars in each: available hours,
+    practical capacity and routing time used. A reference note marks that the Quality Assurance bar for routing time is a
+    small fraction of its practical bar. Hours on the axis, no value labels beyond the Plant total.'
+  data: The result of Q20 (the five work-center rows).
+  status: planned
+- id: IF-18-4-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-4-compute-three-costs-for-each-family.md
+  kind: excel-mock
+  purpose: The reconciliation block of the Costs sheet, where the products and the unused capacity are tied to the inputs
+    to 1090.
+  shows: 'Rows from the routing time used to the difference, in two columns of label and value: the products'' conversion,
+    the unused capacity and its crew part, the products plus unused capacity beside the inputs to 1090 with a difference of
+    zero, then the three lines of the setup-allocation bridge and its own zero difference.'
+  data: The Costs sheet of the model workbook, rows for the reconciliation.
+  status: planned
+- id: IF-18-5-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-5-build-the-explorer-for-the-meeting.md
+  kind: pbi-mock
+  purpose: The Families page that the CFO and the production manager will use in the meeting.
+  shows: 'The Families page: a Costing view slicer with the three views, one card row with revenue, product cost, margin and
+    margin percent, a matrix of item groups and families by view with margin percent and cost per unit, a bar chart of items
+    ranked by margin, and a table of totals by view. Time-driven selected.'
+  data: The Product Costs model, base year, finished goods only.
+  status: planned
+- id: IF-18-5-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-5-build-the-explorer-for-the-meeting.md
+  kind: pbi-mock
+  purpose: The Tests tab in DAX query view, the check students run before they present.
+  shows: 'DAX query view with the query tab Tests, Test 1 in the editor and its three-row result beneath: the view, revenue,
+    the workbook''s revenue, margin, the workbook''s margin and a difference of zero for each view; the Run button and the
+    Update model with changes banner in place.'
+  data: Test 1 of the Tests tab, evaluated on the refreshed model.
+  status: planned
+- id: IF-18-6-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-6-decide-make-or-buy-family-by-family.md
+  kind: excel-mock
+  purpose: The Make or Buy table, where each quoted family's delivered quote meets its relevant cost under both crew cases.
+  shows: Six family rows with the delivered quote, the relevant cost with the crew kept and reduced, the annual effect of
+    buying under the absorption view, the crew kept and the crew reduced, and the decision; negative effects show a minus
+    sign and the three families to buy are outlined.
+  data: The Make or Buy sheet of the model workbook, the rows of the six quoted families.
+  status: planned
+- id: IF-18-6-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-6-decide-make-or-buy-family-by-family.md
+  kind: excel-mock
+  purpose: The two-way Data Table of the quote against the share of the freed crew time removed.
+  shows: The two sensitivity inputs above the table, a corner cell, three quote adjustments across, three crew shares down
+    and nine results, with the cell for all the crew time removed at the quote as it is outlined.
+  data: The sensitivity inputs and the two-way Data Table of the Make or Buy sheet.
+  status: planned
+- id: IF-18-7-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-7-value-the-capacity-that-buying-would-free.md
+  kind: excel-mock
+  purpose: The Capacity sheet's table of hours freed at each work center, with the plant's use before and after buying.
+  shows: One row for each work center and a Plant row, with the routing time used, the hours freed, the hours used after buying,
+    the practical capacity and the use of practical capacity before and after; the Plant row is outlined and the Quality Assurance
+    row shows nothing freed.
+  data: The Capacity sheet of the model workbook, the first table.
+  status: planned
+- id: IF-18-7-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-7-value-the-capacity-that-buying-would-free.md
+  kind: excel-mock
+  purpose: The growth sheet that holds Solver's model, with its variable cells, constraints and objective marked.
+  shows: The work-center block with practical capacity, load at growth, hours used after buying, slack and status, the binding
+    row outlined; the family block with the units bought as amber variable cells and the added cost; the total added cost
+    cell marked as the objective.
+  data: The sheet Growth 40% of the model workbook.
+  status: planned
+- id: IF-18-8-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-8-reprice-the-families-below-the-floor.md
+  kind: excel-mock
+  purpose: The Prices sheet's table of floor prices, increases and the volume each increase can lose.
+  shows: One row for each manufactured family with units, price, time-driven cost and margin, a Below the floor flag, the
+    target price, the increase, the contribution per unit, the volume the increase can lose and the revenue a year; the rows
+    below the floor are outlined, and a totals block below the table.
+  data: The Prices sheet of the model workbook, the first table and its totals.
+  status: planned
+- id: IF-18-9-A
+  unit: chapter-18-make-buy-or-reprice
+  file: req-9-revise-the-standards-and-measure-what-they-mean.md
+  kind: excel-mock
+  purpose: The top of the Standards sheet, where the proposed rate is built and set beside the other rates.
+  shows: Five component rows (direct labor, the overhead that varies, indirect labor, supervision, depreciation) with their
+    basis, then the proposed rate, the labor-content case, the current standard, the time-driven rate, the base year's actual
+    cost and the two rates at the ends of the normal-capacity range; the proposed rate is outlined.
+  data: The Standards sheet of the model workbook, rows for the rate and its comparisons.
+  status: planned
+- id: IF-18-9-B
+  unit: chapter-18-make-buy-or-reprice
+  file: req-9-revise-the-standards-and-measure-what-they-mean.md
+  kind: chart
+  purpose: The revaluation of the stock at the two year-ends against each year's materiality screen, the picture behind the
+    recommendation.
+  shows: Two groups of bars, one for each year-end, with the revaluation at the proposed rate, with no indirect hours, and
+    at each end of the normal-capacity range; a horizontal mark in each group shows that year's screen, so the one bar below
+    it, the earlier year with no indirect hours, is visible. Dollar labels on the bars.
+  data: The revaluation rows and the materiality screens of the Standards sheet.
+  status: planned
+- id: IF-19-0-A
+  unit: chapter-19-customer-credits-audit
+  file: 00-case-notes.md
+  kind: diagram
+  purpose: How the ten requirements, the four model files and the three milestones fit, for the kickoff.
+  shows: 'Three columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 to 7; 8 to 10). Each
+    box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses both. Arrows run from the query
+    results to the workbook, from the refund flags exported by Requirement 4 to the Power BI report, from the workbook''s
+    evaluation to the report to the committee, and from Chapter 16''s register to Requirement 10. Three checkpoints, one for
+    each milestone, sit under the columns.'
+  data: none; the boxes and tags come from the case's requirements and its tools table.
+  status: planned
+- id: IF-19-0-B
+  unit: chapter-19-customer-credits-audit
+  file: 00-case-notes.md
+  kind: chart
+  purpose: The deficiencies' exposure against the three thresholds, the picture behind classifying by likelihood and magnitude
+    and not by counts.
+  shows: 'Horizontal bars for the last fiscal year: credits above the approver''s authority, the credits that fail the authority
+    or the cash test counted once, refunds above authority, refunds before the payment, the refunds that fail either counted
+    once, and all credits of the year as the potential magnitude. Three vertical reference lines mark the clearly trivial
+    threshold, performance materiality and overall materiality, each labeled. Dollar labels on the bars.'
+  data: The exposures of Requirement 8 and the thresholds of Requirement 3.
+  status: planned
+- id: IF-19-1-A
+  unit: chapter-19-customer-credits-audit
+  file: req-1-map-the-cycle-from-its-records.md
+  kind: diagram
+  purpose: The book's map of the cycle marked up the way Part 4 asks, the end state of the requirement.
+  shows: 'The five documents of the cycle with their departments and the hub account, and the nine control-point badges in
+    three styles: the records evidence it, the records evidence part of it (the missing evidence written beside the badge),
+    the evidence lies outside the database. A legend names the styles and does not rely on color alone.'
+  data: The nine control-point rows of the Cycle Map worksheet (what the records evidence, what they cannot show).
+  status: planned
+- id: IF-19-10-A
+  unit: chapter-19-customer-credits-audit
+  file: req-10-keep-the-tests-running.md
+  kind: pbi-mock
+  purpose: The Credits Cycle page, where the new tests and the design findings show.
+  shows: 'The Credits Cycle page of Audit Monitoring: a matrix of the four new tests by year with exceptions, population and
+    rate per 1,000, a row of cards for the exceptions, the reviewed exceptions, the exceptions covered by a design finding
+    and the open exceptions, and a table of the design findings with the period each covers and the date it is to be fixed.'
+  data: The Audit Monitoring model answer on the pinned dataset.
+  status: planned
+- id: IF-19-10-B
+  unit: chapter-19-customer-credits-audit
+  file: req-10-keep-the-tests-running.md
+  kind: diagram
+  purpose: How the flags reach the register, the picture a student needs when a rate comes out blank.
+  shows: 'A left-to-right flow: the applications and the credit memos and refunds feed two flag queries, which are unpivoted
+    into two exception queries, appended into the register with the dispositions and the design findings, and tied by the
+    test identifier to the Tests table and by the process name to the Population measure. A side branch marks the anomaly
+    columns that stop at the refund table.'
+  data: none; the flow follows the model answer's queries.
+  status: planned
+- id: IF-19-2-A
+  unit: chapter-19-customer-credits-audit
+  file: req-2-reconcile-each-population-to-the-ledger.md
+  kind: excel-mock
+  purpose: The roll-forward of account 2060 in the Reconciliation worksheet, the picture of a hub account.
+  shows: 'The block of the Reconciliation sheet for account 2060: columns for the three fiscal years and rows for the opening
+    balance, receipts held, applied to invoices, credits on paid invoices, refunds paid, the closing balance rolled forward,
+    the ledger balance and the difference. The flows are large and the balances small; the difference row reads zero. The
+    first line of the block is the title.'
+  data: The 2060 roll-forward of test G6 and the ledger balance at each year-end.
+  status: planned
+- id: IF-19-3-A
+  unit: chapter-19-customer-credits-audit
+  file: req-3-assess-the-risks-and-set-materiality.md
+  kind: excel-mock
+  purpose: The Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and
+    2.
+  shows: 'The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance
+    materiality and the clearly trivial threshold in cells whose names are written beside them; below it the three-year block
+    of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the two comparisons and
+    the conclusion text.'
+  data: The Materiality worksheet of Credits Audit.xlsx on the pinned dataset (income, thresholds, revenue and returns by
+    year).
+  status: planned
+- id: IF-19-4-A
+  unit: chapter-19-customer-credits-audit
+  file: req-4-test-the-controls-on-every-document.md
+  kind: diagram
+  purpose: The dates around one refund, the picture behind the definition of a refund paid before the customer's payment.
+  shows: 'A horizontal time line for one invoice: the invoice date, the due date, two receipts, the applications of those
+    receipts a day or two after each, and the refund date between the receipts and the last application. Three brackets name
+    the three readings: the last application (the case''s definition), the last receipt, and the same-day case in which the
+    order is unknown because the records hold dates and not times. A note says that the bank clearing date is in no table.'
+  data: One refund of the BeforePayment test (T6) chosen from the refunds the two definitions part on, with its invoice, receipts
+    and applications.
+  status: planned
+- id: IF-19-5-A
+  unit: chapter-19-customer-credits-audit
+  file: req-5-explain-the-returns-and-rank-the-refunds.md
+  kind: pbi-mock
+  purpose: The Timing page, the page that shows why the last months and the first year mislead.
+  shows: 'The Timing page: a line chart by month with two lines, the return rate by the month of the credit and by the month
+    of the shipment, the second falling toward zero in the last month; a table of the rate by year on both bases; a table
+    of the last fiscal year by month of the shipment; a row of cards with the days after shipment and the lines returned in
+    a later year.'
+  data: The Credits Analytics model on the pinned dataset, all three years.
+  status: planned
+- id: IF-19-5-B
+  unit: chapter-19-customer-credits-audit
+  file: req-5-explain-the-returns-and-rank-the-refunds.md
+  kind: pbi-mock
+  purpose: The Refund Ranking page a reviewer starts from.
+  shows: 'The Refund Ranking page: a bar chart of the refunds at each score from 0 to 5, a matrix of refunds and amounts by
+    flag and year, a table of the refunds by approver''s job title, two cards for the refunds scoring 4 or 5 and their amount,
+    and the table of every refund with its five flags and score sorted from the highest score, one row selected.'
+  data: The refunds with their flags (RefundFlags.csv) and scores.
+  status: planned
+- id: IF-19-6-A
+  unit: chapter-19-customer-credits-audit
+  file: req-6-sample-what-the-database-cannot-show.md
+  kind: excel-mock
+  purpose: The plan a student hands in before testing anything.
+  shows: 'The Sample worksheet: named parameter cells, the table of sizes with the used cell outlined, the key items with
+    the reason each is key, and the rule table for zero to three deviations with the limit and Yes or No.'
+  data: The case's parameters and the refunds of Requirement 4's Refunds Table.
+  status: planned
+- id: IF-19-6-B
+  unit: chapter-19-customer-credits-audit
+  file: req-6-sample-what-the-database-cannot-show.md
+  kind: chart
+  purpose: Why almost any draw gives the same answer.
+  shows: Bars of the probability of each deviation count in a draw from the remainder, the plausible range shaded, the model
+    answer's frozen draw marked, and the upper deviation limit labeled at each end of the range.
+  data: The hypergeometric distribution for the remainder and its deviating refunds, and the model workbook's frozen draw.
+  status: planned
+- id: IF-19-7-A
+  unit: chapter-19-customer-credits-audit
+  file: req-7-test-the-balances-and-follow-the-largest-refund.md
+  kind: diagram
+  purpose: The picture behind the disposition.
+  shows: A time line from the shipment to the settling of the invoice, one lane for each department, with the shipment, invoice,
+    receipts, return, credit, clawbacks and refund at their dates, and the unpaid balance marked on the credit date and on
+    the refund date.
+  data: Test S6 of Credits.sql for the largest refund.
+  status: planned
+- id: IF-19-8-A
+  unit: chapter-19-customer-credits-audit
+  file: req-8-evaluate-the-deficiencies.md
+  kind: excel-mock
+  purpose: The evaluation matrix the committee's ratings rest on.
+  shows: 'The Deficiencies worksheet: the three threshold cells at the top, then one row for each of D1 to D8 with its control
+    point, design or operation, the exposure of the last year, the band against the thresholds, the compensating control and
+    the classification, and below it the combined groups with their exposure and potential magnitude.'
+  data: The Deficiencies worksheet of the model workbook, linked to the Tests sheet.
+  status: planned
+- id: IF-19-9-A
+  unit: chapter-19-customer-credits-audit
+  file: req-9-report-to-the-audit-committee.md
+  kind: diagram
+  purpose: The report's page budget, the plan a student fits the work into.
+  shows: 'Four page outlines side by side. Page one: the executive summary, the overall conclusion and the scope with the
+    reconciliations. Page two: the six findings in a table of condition, criteria, cause, effect, rating and recommendation.
+    Page three: the clean results and the action plans with owners and dates. The appendix of three pages: the map with what
+    the records evidence, the reconciliation, the test results, the sample plan, the evaluation and the action plans.'
+  data: none; the layout follows the requirement's page limits.
+  status: planned
+- id: IF-AB-0-A
+  unit: appendix-b-publishing-security
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A decision path that helps an instructor choose how much of the appendix to teach.
+  shows: 'A decision tree. Start: students have Power BI Desktop and the Charles River Reports project. First question: do
+    you and a partner have Pro or Premium Per User licenses and a shared workspace where you are Admin? No leads to Scope
+    1 (Tutorial B.1, both exercises, Step 5 of Tutorial B.2 as a reading task); a sub-branch asks whether to add the Publishing
+    and Sharing section as reading, giving Scope 2. Yes leads to Scope 3 (Steps 1 to 4 of Tutorial B.2 added). Each end box
+    lists its class minutes and the questions it covers.'
+  data: None; the scopes, minutes and question numbers of the Teaching approaches section.
+  status: planned
+- id: IF-AB-0-B
+  unit: appendix-b-publishing-security
+  file: 00-chapter-notes.md
+  kind: pbi-mock
+  purpose: The Checks tab of the model answer, the fast way to compare a student's numbers with what each manager should see.
+  shows: 'DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid with the columns
+    Section, Check, Expected, Actual and Agrees, scrolled to the rows that start ''as employee006 (Sales Manager)''. Each
+    row has Agrees true: Cost Centers Shown, the budget, the actual, the flexed budget, the net income, and Manufacturing
+    Hours as blank.'
+  data: The Checks tab of the solution project after a refresh; the rows of Guided Tutorial B.1 for the Sales Manager.
+  status: planned
+- id: IF-AB-1-A
+  unit: appendix-b-publishing-security
+  file: ex-B.1-securing-pay-data.md
+  kind: pbi-mock
+  purpose: The model answer's page Ex B.1 as the Finance role sees it, the table every student builds in requirement (1).
+  shows: 'Report view, page Ex B.1. A table titled ''Hours and labor cost by job title, fiscal'' with the year, with the columns
+    JobTitle, Manufacturing Hours and Labor Cost, sorted by Labor Cost, largest first. Seven rows: Assembler, Machine Operator
+    and Quality Technician with hours and cost, then four non-manufacturing job titles with a cost and an empty hours cell.
+    Above the table, a bar names the role Finance.'
+  data: The Expected results quantities (hours and cost by job title for the current fiscal year), read-only.
+  status: planned
+- id: IF-AB-1-B
+  unit: appendix-b-publishing-security
+  file: ex-B.1-securing-pay-data.md
+  kind: pbi-mock
+  purpose: The same page viewed as the Production Manager after the column permission is applied, so an instructor knows what
+    a correct failure looks like.
+  shows: Report view, page Ex B.1, with the bar above the page naming the role Cost Center Managers and the user. The table
+    and the card are replaced by an error message that says a field cannot be found or used; the rest of the page, a text
+    box, is unchanged. A small inset shows the Plant page of the same view, with its hours and its hours per standard hour
+    visible.
+  data: The Plant page values of the Production Manager (hours and hours per standard hour for the current fiscal year), read-only.
+  status: planned
+- id: IF-AB-2-A
+  unit: appendix-b-publishing-security
+  file: ex-B.2-reviewing-access-with-a-query.md
+  kind: pbi-mock
+  purpose: The result of query (4), the review a student runs every quarter, so an instructor sees what a clean review looks
+    like.
+  shows: 'DAX query view on the model answer, the tab Ex B.2 selected, the third query in the editor and a result grid under
+    it with nine rows, one for each user of the security table. Columns: the user name, CostCenterID, EmployeeID, EmployeeName,
+    JobTitle, EmploymentStatus, TerminationDate, OwnCostCenterID and Flag. TerminationDate and Flag are empty in every row,
+    and CostCenterID equals OwnCostCenterID in every row.'
+  data: The security table of Guided Tutorial B.1 and the employee records (the Expected results quantities), read-only.
+  status: planned
+- id: IF-AB-2-B
+  unit: appendix-b-publishing-security
+  file: ex-B.2-reviewing-access-with-a-query.md
+  kind: pbi-mock
+  purpose: The page Ex B.2 viewed as the Sales Manager, the leak that requirement (5) asks students to find.
+  shows: Report view, page Ex B.2, with the bar above the page naming the role Cost Center Managers and the Sales Manager.
+    A table titled 'AccessEmployees, as any role member sees it' lists EmployeeName, JobTitle, EmploymentStatus and TerminationDate
+    for every employee, with the terminated employees' dates filled in, and a scroll bar showing that the list is long. A
+    text box beside it reads 'Model answer'.
+  data: The Employee table (all employees, with status and termination date), read-only.
+  status: planned
+- id: IF-AC-0-A
+  unit: appendix-c-power-bi-browser
+  file: 00-chapter-notes.md
+  kind: diagram
+  purpose: A decision path from a student's account to the plan that fits, so an instructor can see what a class can do before
+    the first session.
+  shows: 'A decision tree. Start: can the student sign in at app.powerbi.com with a school account? No leads to Desktop in
+    a lab or a Windows virtual machine. Yes leads to: may the student edit semantic models and upload to OneDrive for work
+    or school? No leads to Plan C (instructor demonstration) or Desktop. Yes leads to: is there a Pro license? No leads to
+    Plan A or B with Exercise C.3 done by hand (steps 2, 3 and 5, formula retyped). Yes leads to Plan A or B with every step.
+    Each end box lists the tutorials and exercises that can be done.'
+  data: None; the plans, the tutorials and the exercises of this note.
+  status: planned
+- id: IF-AC-1-A
+  unit: appendix-c-power-bi-browser
+  file: ex-C.1-control-totals-by-quarter.md
+  kind: pbi-mock
+  purpose: DAX query view after the Exercise C.1 query has run, the end state of Requirement 2.
+  shows: 'DAX query view of the model editor in the Power BI service: the banner that DAX queries are discarded on close,
+    the query in the editor, and the Results grid with one row for each fiscal quarter of the three years (fiscal year, period,
+    invoice lines, revenue, list amount, discounts), the four rows of the current year outlined, and the status with the number
+    of columns and rows. The Data pane lists Key Measures first, with Revenue, List Amount, Discounts and Invoice Lines inside
+    it.'
+  data: The four quarters of the current year from the Expected results quantities, and the other rows from the same read-only
+    twin.
+  status: planned
+- id: IF-AC-2-A
+  unit: appendix-c-power-bi-browser
+  file: ex-C.2-which-customers-got-the-discounts-and-when.md
+  kind: pbi-mock
+  purpose: The Ex C.2 page at its end state, where the Design Services row and the peaks can be read.
+  shows: 'The report editor of the Power BI service on the page Ex C.2: a tile slicer with the current year selected; a matrix
+    of Discounts with five segment rows and the twelve months as columns, the Design Services row reading zero in every month
+    and each other segment''s largest month outlined; and a line chart of Discounts by month in month order with a legend
+    of the five segments, the Design Services line flat along the axis. The Data pane lists Key Measures first.'
+  data: Discounts by segment and month for the current year, as in the Expected results, read-only.
+  status: planned
+- id: IF-AC-3-A
+  unit: appendix-c-power-bi-browser
+  file: ex-C.3-a-change-recorded-and-restored.md
+  kind: diagram
+  purpose: The three runs of the test, and what the pages did and did not show.
+  shows: A left-to-right timeline of three boxes joined by arrows labeled Save a version, Change the Revenue formula, and
+    Restore the version. Each box shows the test's revenue for the current year and, under it, the revenue card of the Sales
+    and Discounts page. The first and third boxes show the same revenue; the second shows a higher test revenue while the
+    card is unchanged. A side box lists what version history keeps and what a Power BI project under version control adds.
+  data: The three test results of the Expected results table.
+  status: planned
