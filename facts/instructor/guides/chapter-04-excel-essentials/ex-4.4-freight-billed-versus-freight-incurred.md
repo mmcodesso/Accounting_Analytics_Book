@@ -13,7 +13,7 @@ figures:
   - id: IF-04-4-A
     kind: excel-mock
     purpose: The freight grid on Ex 4.4 with its total, entire-Table and difference rows, and the FreightTerms slicer beside the SUBTOTAL cells.
-    shows: "A grid with FreightTerms down column A (two values) and the columns Shipments, FreightCost, BillableFreightAmount and FreightMargin. Under the two rows sit a Total row, an Entire Shipment Table row and a Difference row of zeros. Further down are the SUBTOTAL cells for shipments in view and average FreightCost in view, and a FreightTerms slicer with one button selected."
+    shows: "A grid with FreightTerms down column A (two values) and the columns Shipments, FreightCost, BillableFreightAmount and FreightMargin. Cell D10 is selected and its formula bar shows the locked FreightTerms column. Under the two rows sit a Total row, an Entire Shipment Table row and a Difference row of zeros. Further down are the SUBTOTAL cells for shipments in view and average FreightCost in view, and a FreightTerms slicer with one button selected."
     data: Shipment joined to SalesOrder by SalesOrderID (the Expected results table).
 ---
 {% set g = ch04_g4 %}

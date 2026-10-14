@@ -107,8 +107,7 @@ b. Filter the column for 0.
 
 All are Closed, and each is the first work order numbered in its year. The others have three or four operations.
 
-> **[Figure placeholder IF-02-3-A]** The WorkOrder worksheet with the Operations helper column of Step 5, filtered to zero.
-> Kind: excel-mock · Shows: The WorkOrder Table with WorkOrderNumber, ItemID, ReleasedDate, ClosedDate and Status visible (other columns hidden) and a helper column headed Operations at the right, filtered to show only the value 0. Three rows remain, with the row numbers in blue because the Table is filtered, each with the status Closed. The formula bar shows the COUNTIFS formula and the status bar shows how many records match the filter. · Data: WorkOrder and WorkOrderOperation, with the COUNTIFS formula of Step 5. · Status: planned
+![A mock of the WorkOrder worksheet with the Operations helper column of Step 5, filtered to zero.](../figures/chapter-02-understanding-data/IF-02-3-A.pdf)
 
 **Step 6. Say why this makes the cost figures unreliable.** A model answer: the operations give the planned hours, the work center and the sequence against which actual labor and overhead are compared. Without them, a standard labor and overhead cost cannot be assigned step by step, and the labor recorded cannot be tied to a work center. The data confirms it: these work orders have 18 labor entries for 45.86 hours, none of which is tied to an operation that exists, and each has a close that posted a variance, $2,063.41 in all.
 

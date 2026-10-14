@@ -32,8 +32,7 @@ Students can:
 
 Individual work, about 150 minutes: 35 for costs and effects, 20 for one-time costs, 40 for Goal Seek and the Data Table, 20 for the CFO's view, 20 for the query and the terms, 15 for documentation. Hold back the crew-reduced column until students see that the crew-kept case buys nothing. **Collect** the workbook and MakeBuy.sql.
 
-> **[Figure placeholder IF-18-6-A]** The Make or Buy table, where each quoted family's delivered quote meets its relevant cost under both crew cases.
-> Kind: excel-mock · Shows: Six family rows with the delivered quote, the relevant cost with the crew kept and reduced, the annual effect of buying under the absorption view, the crew kept and the crew reduced, and the decision; negative effects show a minus sign and the three families to buy are outlined. · Data: The Make or Buy sheet of the model workbook, the rows of the six quoted families. · Status: planned
+![A mock of the Make or Buy table, where each quoted family's delivered quote meets its relevant cost under both crew cases.](../figures/chapter-18-make-buy-or-reprice/IF-18-6-A.pdf)
 
 ## Step-by-step solution
 
@@ -106,8 +105,7 @@ Column V   =(I10+CrewRemoved*CrewRate*K10-F10*(1+QuoteAdjustment)*(1+Freight))*C
 
 **Check:** the bottom row's middle cell, all the crew time removed at the quote as it is, equals the annual effect, $255,481; the top row's, none removed, is -$334,636. **Watch for:** the two input cells swapped. That cell then reads -$3,328,369, because the table doubles the quote instead of removing the crew.
 
-> **[Figure placeholder IF-18-6-B]** The two-way Data Table of the quote against the share of the freed crew time removed.
-> Kind: excel-mock · Shows: The two sensitivity inputs above the table, a corner cell, three quote adjustments across, three crew shares down and nine results, with the cell for all the crew time removed at the quote as it is outlined. · Data: The sensitivity inputs and the two-way Data Table of the Make or Buy sheet. · Status: planned
+![A mock of the two-way Data Table of the quote against the share of the freed crew time removed.](../figures/chapter-18-make-buy-or-reprice/IF-18-6-B.pdf)
 
 ### Part 4: The CFO's view beside the answer
 

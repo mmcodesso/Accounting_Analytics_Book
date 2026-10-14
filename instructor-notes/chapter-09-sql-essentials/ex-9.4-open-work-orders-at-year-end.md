@@ -126,8 +126,7 @@ WHERE ClosedDate IS NULL AND DueDate <= '2026-12-31'
 ORDER BY DueDate, WorkOrderNumber;
 ```
 
-> **[Figure placeholder IF-09-4-A]** The oldest past-due work orders that are still marked Released, for the discussion of what a status proves.
-> Kind: sql-mock · Shows: The Execute SQL tab on the tab Ex 9.4.sql. The editor holds the comment lines and the query of Step 5 with ClosedDate IS NULL, the DueDate condition and ORDER BY DueDate, WorkOrderNumber. The grid shows WorkOrderNumber, Status, ReleasedDate, DueDate and the Completed column, scrolled to the first rows, with the first row outlined. The message pane reports the number of rows returned. · Data: WorkOrder, the Step 5 query, run read-only on the dataset (the Expected results give the oldest work order). · Status: planned
+![A mock of the oldest past-due work orders that are still marked Released, for the discussion of what a status proves.](../figures/chapter-09-sql-essentials/IF-09-4-A.pdf)
 
 **Check:** 471 rows; the oldest is WO-2026-011512, released 2026-05-23 and due 2026-06-07, then WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due 2026-08-30). **Watch for:** `<` and `<=` return the same 471 rows here, because no open work order is due on the last day; that is a property of this data, not a rule. A date typed as `12/31/2026` returns 0 rows, because the stored dates begin with the year.
 

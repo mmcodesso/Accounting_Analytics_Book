@@ -55,8 +55,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Reversal (slides 39 to 41). A student who takes each year-end's amount as the year's effect gets the wrong sign for the last year.
 - Wording. Students may reach for hidden, unpaid or fraud. The controller's third condition is that findings read as what the records show.
 
-> **[Figure placeholder IF-17-0-B]** The dates of the case, which students must not mix.
-> Kind: diagram · Shows: One horizontal timeline from the opening entry on the first day of the first fiscal year through the three year-ends to the ledger's last posting. Each year-end carries two marks for its two closes. After the last year-end, three dates are labeled in order: the last pay date with registers, the last day of the year (the data-through date) and the ledger's last posting, with a bracket after the second date labeled supplier payments only. · Data: The opening entry's date, the three year-ends, the last pay date, and the ledger's last posting, from the ledger (Requirement 1). · Status: planned
+![The dates of the case, which students must not mix.](../figures/chapter-17-statements-for-a-lender/IF-17-0-B.pdf)
 
 ## Teaching approaches
 
@@ -189,8 +188,7 @@ Students hold the review of later events, the going-concern conditions and the m
 
 Every requirement is part of the case, and each phase depends on the one before it. The figure shows how the files feed one another and the memo.
 
-> **[Figure placeholder IF-17-0-A]** How the nine requirements, the three files and the four milestones fit together, for the kickoff.
-> Kind: diagram · Shows: Four columns, one for each phase, holding nine boxes for the requirements in order (1 and 2; 3 to 5; 6 and 7; 8 and 9). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses more than one. Arrows run from the SQL results to the workbook, from the workbook's adjustment lines to the Review file, and from all three files to the memo. Four checkpoints, one for each milestone, sit under the columns. · Data: none; the boxes and tags come from the case's requirements and its tools table. · Status: planned
+![How the nine requirements, the three files and the four milestones fit together, for the kickoff.](../figures/chapter-17-statements-for-a-lender/IF-17-0-A.pdf)
 
 Four bundles:
 

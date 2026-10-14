@@ -58,8 +58,7 @@ a. Insert a PivotTable from **GLEntry** with FiscalYear and FiscalPeriod in the 
 b. Read the counts and compare each with its neighbors.
 c. Filter to the latest fiscal year and read the SourceDocumentType of its rows.
 
-> **[Figure placeholder IF-02-2-A]** The PivotTable of ledger rows by fiscal year and fiscal period, with the three small periods marked.
-> Kind: excel-mock · Shows: A PivotTable with FiscalYear and FiscalPeriod in the rows area and the count of GLEntryID in the values area, scrolled to show the first period of the first year and the last periods of the data. The first period and the last two periods are outlined, and each count is visibly smaller than the periods around it. A note beside the table says that the outlined periods sit at the edges of the extract. · Data: GLEntry, counted by FiscalYear and FiscalPeriod (the Step 3 PivotTable). · Status: planned
+![A mock of the PivotTable of ledger rows by fiscal year and fiscal period, with the three small periods marked.](../figures/chapter-02-understanding-data/IF-02-2-A.pdf)
 
 **Check:** 38 periods. The ordinary ones hold between 17,555 and 28,605 rows, and the typical one about 22,601. Three are far smaller:
 

@@ -16,7 +16,7 @@ figures:
     kind: diagram
     purpose: The four combinations of tidy or messy and clean or dirty, each with an accounting example.
     shows: A two by two grid with tidy and messy as the columns and clean and dirty as the rows. Each cell holds a small table sketch and a one-line example from budget data. A long Budget table with every amount right is tidy and clean. The same table with one amount keyed wrongly is tidy but dirty. A report with the months across the top and every amount right is clean but messy. The same report with a wrong amount is messy and dirty. An arrow says that reshaping moves a dataset across the grid and correcting values moves it up, and that these are different jobs.
-    data: none; the layout follows Figure 2.6 of the chapter and the Budget table's columns.
+    data: The Budget table's salaries budgets of three cost centers for the prior fiscal year, as in Figure 2.6 of the chapter; the wrong amount is a transposition added for the illustration and is not in the data.
 ---
 # Chapter 2: Understanding Data in Accounting
 

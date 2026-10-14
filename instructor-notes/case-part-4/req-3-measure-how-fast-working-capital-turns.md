@@ -106,8 +106,7 @@ d. Add a **Matrix** titled "The measures at each quarter-end (icons: days of sup
 
 **Check:** the slicer, titled "Measure", changes the line; hovering shows a balance and its flow. **Watch for:** a missing guard. 2024-Q1 then reads 253.7 days of DSO, with under a year of billing behind it, and 2027-Q1, which lies after Data Through, reads 73.5 where the model answer is blank. Test 5 of Requirement 5 finds the second.
 
-> **[Figure placeholder IF-C4-3-A]** The Working Capital page of the model answer, the exhibit with the measures at each quarter-end.
-> Kind: pbi-mock · Shows: Report view, page Working Capital. A slicer of the six measures with the cycle selected; a line chart of the chosen measure by quarter; a matrix with a row for each quarter-end and columns for DSO, DIO, materials and finished goods days with their targets, and DPO, the days of supply carrying icons; a table of year-end measures beside their average-balance versions. · Data: The Expected results quantities (the measures by quarter and the average-balance versions), read-only. · Status: planned
+![A mock of the Working Capital page of the model answer, the exhibit with the measures at each quarter-end.](../figures/case-part-4/IF-C4-3-A.pdf)
 
 ### Part 4: The comparison
 
@@ -129,8 +128,7 @@ IF (
 
 **Check:** without the opening line DSO runs 57.4 to 50.5 and DPO 66.2 to 65.7. The cycle moves 252.0 days as recorded and 233.4 without the opening line; DIO moves 239.9, DSO -7.3 and DPO -19.5. The average-balance materials days are 76.7 in 2024 and 288.9 in 2026.
 
-> **[Figure placeholder IF-C4-3-B]** Which component moved the cycle, so students see that receivables and payables are flat beside inventory.
-> Kind: chart · Shows: A chart by quarter-end with three lines, DSO, DIO and DPO, and the cash conversion cycle as a fourth, heavier line. DIO and the cycle rise steeply; DSO and DPO stay nearly flat. A note marks the first quarter, where the opening entry's lines are in the balances. · Data: The Expected results quantities (DSO, DIO, DPO and the cycle at each quarter-end), read-only. · Status: planned
+![Which component moved the cycle, so students see that receivables and payables are flat beside inventory.](../figures/case-part-4/IF-C4-3-B.pdf)
 
 **Instructor check.** In **DAX query view**, compare this with the Expected results.
 

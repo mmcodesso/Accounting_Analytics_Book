@@ -171,8 +171,7 @@ Students hold the evaluation of the deficiencies, the report to the committee an
 - **A pattern is not an act.** A refund method unlike the customer's payments is an anomaly to follow up: a method chosen at random would mismatch about as often. Ask what evidence would turn it into a finding.
 - **Inference is not a forecast.** An upper deviation limit says what the population could be, not what will happen.
 
-> **[Figure placeholder IF-19-0-B]** The deficiencies' exposure against the three thresholds, the picture behind classifying by likelihood and magnitude and not by counts.
-> Kind: chart · Shows: Horizontal bars for the last fiscal year: credits above the approver's authority, the credits that fail the authority or the cash test counted once, refunds above authority, refunds before the payment, the refunds that fail either counted once, and all credits of the year as the potential magnitude. Three vertical reference lines mark the clearly trivial threshold, performance materiality and overall materiality, each labeled. Dollar labels on the bars. · Data: The exposures of Requirement 8 and the thresholds of Requirement 3. · Status: planned
+![The deficiencies' exposure against the three thresholds, the picture behind classifying by likelihood and magnitude and not by counts.](../figures/chapter-19-customer-credits-audit/IF-19-0-B.pdf)
 
 ## Discussion prompts
 
@@ -201,8 +200,7 @@ Students hold the evaluation of the deficiencies, the report to the committee an
 
 Every requirement is part of the case, and each phase uses what the one before found. The figure shows how the files feed one another and the report.
 
-> **[Figure placeholder IF-19-0-A]** How the ten requirements, the four model files and the three milestones fit, for the kickoff.
-> Kind: diagram · Shows: Three columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 to 7; 8 to 10). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses both. Arrows run from the query results to the workbook, from the refund flags exported by Requirement 4 to the Power BI report, from the workbook's evaluation to the report to the committee, and from Chapter 16's register to Requirement 10. Three checkpoints, one for each milestone, sit under the columns. · Data: none; the boxes and tags come from the case's requirements and its tools table. · Status: planned
+![How the ten requirements, the four model files and the three milestones fit, for the kickoff.](../figures/chapter-19-customer-credits-audit/IF-19-0-A.pdf)
 
 Four bundles:
 

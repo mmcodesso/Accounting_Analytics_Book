@@ -12,7 +12,7 @@ figures:
   - id: IF-C1-6-A
     kind: diagram
     purpose: A page layout of the model memo and its appendix, with the word budget of each part.
-    shows: Two page outlines side by side. The first is the memo, with a header block (To, From, Date, Re), a short opening paragraph stating the bottom line, three labeled sections (Financial reporting, Managerial accounting, Auditing), and a closing recommendation, each block with its approximate word budget. The second is the one-page appendix, with the data map on its upper half and the reconciliation table on its lower half. Small tags on the sections name the requirements whose results each part uses.
+    shows: Two page outlines side by side. The first is the memo, with a header block (To, From, Date, Re), a short opening paragraph stating the bottom line, three labeled sections (Financial reporting, Managerial accounting, Auditing), and a closing recommendation, each block with its approximate word budget (the header shares the opening paragraph's) and a height that follows the budget. The second is the one-page appendix, with a sketch of the data map on its upper half and the reconciliation table on its lower half. Small tags on each part name the requirements whose results it uses.
     data: none; the layout follows the case's Requirement 6 and Deliverable.
 ---
 {% set m = case1_g6 %}

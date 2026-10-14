@@ -105,8 +105,7 @@ WITH Output AS (
     GROUP BY gl.FiscalYear
 ```
 
-> **[Figure placeholder IF-C3-3-A]** The bridge of account 5080 from the first fiscal year to the last, the exhibit that carries the cost story into the memo.
-> Kind: chart · Shows: A waterfall. The first bar is 5080 in the first year, then one step for each ledger line (payroll charged to 1090, journal entries, standard cost released, change in 1090, material variance, direct postings), signed and labeled, and a last bar for 5080 in the last year. Increases and decreases differ in fill and in the sign of the label. · Data: The bridge query of Step 5, run read-only. · Status: planned
+![The bridge of account 5080 from the first fiscal year to the last, the exhibit that carries the cost story into the memo.](../figures/case-part-3/IF-C3-3-A.pdf)
 
 **Check:** 5080 grew 947,709.56: payroll charged to 1090 +966,846.03, journal entries -8,473.29, standard cost released +91,787.08, change in 1090 -72,196.35, material variance -9,378.15, direct postings -20,875.76. The direct postings are the first year's January payroll (11,520.94) and JE-2024-000005 (9,354.82). **Watch for:** with the closes left in, 5080 nets to zero in every year, because each close credits it with the year's total; and `AccountID IN (1090, 5080)` returns 0 rows, since no AccountID is that large.
 

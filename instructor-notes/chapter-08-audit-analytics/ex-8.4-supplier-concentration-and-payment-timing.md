@@ -33,8 +33,7 @@ By the end, students can:
 
 Individual or pairs, about 75 minutes: 25 for the queries and the PivotTable (1), 15 for the marks and categories (2), 20 for timing (3) and 15 for the memo (4). Hold back the hint about the page filter until a student's marks differ from the answer. Collect the worksheet and the memo.
 
-> **[Figure placeholder IF-08-4-A]** The supplier PivotTable with the running share of spending, the step where students most often go wrong.
-> Kind: excel-mock · Shows: A PivotTable with FiscalYear in the filter area set to the current year, SupplierName in rows from the largest payment total down, and the columns Sum of Amount and Running share of spending. The row where the share first reaches 50 percent is outlined. Beside it, the number of suppliers that make up 50, 80 and 90 percent. · Data: DisbursementPayment by supplier for the current fiscal year (the Expected results table). · Status: planned
+![A mock of the supplier PivotTable with the running share of spending, the step where students most often go wrong.](../figures/chapter-08-audit-analytics/IF-08-4-A.pdf)
 
 ## Step-by-step solution
 

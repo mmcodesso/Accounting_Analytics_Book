@@ -53,8 +53,7 @@ a. On **Budget**, in the first free column, enter this formula, which finds the 
 
 b. Copy it down and filter the column for anything other than 0.
 
-> **[Figure placeholder IF-02-4-A]** How BudgetLine rolls up to Budget, and what Budget leaves out.
-> Kind: diagram · Shows: Two boxes joined by arrows. The left box, BudgetLine, is divided into three bands. The first band holds revenue, cost of goods sold and operating expense lines that have a cost center, with an arrow to the right box labeled sum by fiscal year, month, cost center and account. The second band holds operating expense lines with no cost center, and the third band holds balance sheet rollforward lines; the arrows from both stop before the right box with a mark that says not in Budget. The right box, Budget, shows one row per fiscal year, month, cost center and account. A note says that adding the two tables counts the first band twice. · Data: Budget and BudgetLine, with the row counts of each band for the current fiscal year from the Step 2 test and the blank counts of Step 4. · Status: planned
+![How BudgetLine rolls up to Budget, and what Budget leaves out.](../figures/chapter-02-understanding-data/IF-02-4-A.pdf)
 
 **Check:** no rows. Every Budget row equals the sum of its BudgetLine rows, so Budget is a roll-up of BudgetLine for the 21 accounts it carries (4 revenue and 17 expense), and the two tables cannot be added: the amounts would be counted twice. BudgetLine holds more than Budget: item and warehouse detail, 14 operating expense accounts that have no cost center (168 lines, $2,024,273.70 in 2026), and balance sheet rollforward lines. Budget has 348 rows in 2026. **Watch for:** students who test only one row.
 

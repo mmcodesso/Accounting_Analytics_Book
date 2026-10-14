@@ -33,8 +33,7 @@ Students can:
 
 Individual or pairs, about 150 minutes: 45 for the model, 30 for Balance and the matrix, 25 for the threshold and flags, 20 for the drill-through, 20 for the sources, 10 for the questions. Hold back the Sources page until the Review page works. **Collect** the .pbix.
 
-> **[Figure placeholder IF-17-2-A]** The Review page the model answer ends Part 2 with, the picture of a correct flagged list.
-> Kind: pbi-mock · Shows: Report view, page Review. A slicer titled Threshold (what-if) at the top left, a card titled Threshold and materiality, a matrix of statement lines and accounts with the three year-end balances, the change from the prior year to the current one and a Flag column, and a table of the changes above the threshold sorted by size. The flagged rows of the matrix read Above threshold. · Data: The Expected results quantities (materiality, the flagged accounts and their changes), read-only. · Status: planned
+![A mock of the Review page the model answer ends Part 2 with, the picture of a correct flagged list.](../figures/chapter-17-statements-for-a-lender/IF-17-2-A.pdf)
 
 ## Step-by-step solution
 

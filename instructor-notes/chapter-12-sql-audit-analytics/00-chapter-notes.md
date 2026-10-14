@@ -50,8 +50,7 @@ The chapter depends on these conditions of the data:
 - **Exact equality on REAL sums.** Test H2 flags 2 periods that agree, until a tolerance is added.
 - **Nothing selected.** Running with no selection runs the whole script and shows only the last result.
 
-> **[Figure placeholder IF-12-0-B]** The demonstration that a clean result may mean nothing, the anti-join of test L4 written two ways.
-> Kind: sql-mock · Shows: Two Execute SQL tabs side by side on Audit.sql. The left tab holds test L4 with LEFT JOIN and a result grid of three registers; the right holds the same query with INNER JOIN and an empty grid whose message pane reads a result of no rows. The join keyword is outlined in both. · Data: Test L4, read-only, written both ways. · Status: planned
+![A mock of the demonstration that a clean result may mean nothing, the anti-join of test L4 written two ways.](../figures/chapter-12-sql-audit-analytics/IF-12-0-B.pdf)
 
 ## Teaching approaches
 
@@ -99,8 +98,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest, because the stumbles of this chapter are about reading a result, and a demonstration shows how. Plan B gives students the findings and needs a lab. Plan C leaves no time to demonstrate and fails for students who arrive without a finished script.
 
-> **[Figure placeholder IF-12-0-A]** The audit cycle of the chapter, from a population to a disposition, with the positive control that makes a clean result mean something.
-> Kind: diagram · Shows: Five boxes in a row: population, reconcile and profile, test (anti-join, match, expectation), exceptions list, disposition. A loop from the test back to a planted known exception labeled positive control. Under each box, the tutorial step or exercise that practices it. · Data: None; the boxes cite the tutorials and exercises. · Status: planned
+![The audit cycle of the chapter, from a population to a disposition, with the positive control that makes a clean result mean something.](../figures/chapter-12-sql-audit-analytics/IF-12-0-A.pdf)
 
 ## Tutorial guide
 
@@ -165,8 +163,7 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 **The checkpoint to look for.** The eight bullets. A strong student says surge-day records cannot show the hours were worked as recorded, and does not say they were not.
 
-> **[Figure placeholder IF-12-0-C]** The growth of surge days, for the discussion of the audit's central finding.
-> Kind: chart · Shows: Surge days per month from the first month to the last, as columns, with the first surge day marked and the three year totals labeled. · Data: The PlantDays query of test H8, grouped by month, read-only. · Status: planned
+![The growth of surge days, for the discussion of the audit's central finding.](../figures/chapter-12-sql-audit-analytics/IF-12-0-C.pdf)
 
 ## Difficult ideas and misconceptions
 

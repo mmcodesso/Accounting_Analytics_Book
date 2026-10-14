@@ -59,8 +59,7 @@ c. Add the band as a formula that reads the exposure against the three threshold
 
 **Step 2. State the likelihood and the compensating controls.** For each row, write the likelihood in words ("reasonably possible", "an anomaly", "an evidence gap") and name each compensating control with the requirement that supports it and the evidence that it operates.
 
-> **[Figure placeholder IF-19-8-A]** The evaluation matrix the committee's ratings rest on.
-> Kind: excel-mock · Shows: The Deficiencies worksheet: the three threshold cells at the top, then one row for each of D1 to D8 with its control point, design or operation, the exposure of the last year, the band against the thresholds, the compensating control and the classification, and below it the combined groups with their exposure and potential magnitude. · Data: The Deficiencies worksheet of the model workbook, linked to the Tests sheet. · Status: planned
+![A mock of the evaluation matrix the committee's ratings rest on.](../figures/chapter-19-customer-credits-audit/IF-19-8-A.pdf)
 
 **Check:** each control cited rests on a result of Requirements 4 to 7 (every credit traces to a return received in the warehouse, refunds are approved outside customer service, no lapping), and none is shown to operate, since the receiving records and the delegation of authority lie outside the database. **Watch for:** a compensating control assumed precise. A warehouse receipt shows that goods came back, not that the credit's amount or the customer's cash was right.
 

@@ -109,8 +109,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 
 The timeline shows the second idea at a glance, and is worth putting on the board when students choose their quarters.
 
-> **[Figure placeholder IF-C1-0-B]** Where the quarter to analyze sits on the extract's timeline, and why the latest rows of the ledger are not it.
-> Kind: diagram · Shows: A horizontal timeline from the first posting date of the ledger to its last. Three bars sit above it, for the sales invoices, the shipments and the ledger. The invoice and shipment bars end at the last day of the current fiscal year, and the ledger bar runs on past it to a short tail labeled "only supplier payments". The third and fourth quarters of the current fiscal year are shaded as the quarters to compare, and a marker on the last day of the year is labeled "year-end close". · Data: The first and last PostingDate of GLEntry, the last InvoiceDate and the last ShipmentDate, and the posting date of the year-end close (the Expected results of Requirements 3 and 5). · Status: planned
+![Where the quarter to analyze sits on the extract's timeline, and why the latest rows of the ledger are not it.](../figures/case-part-1/IF-C1-0-B.pdf)
 
 ## Discussion prompts
 
@@ -135,8 +134,7 @@ The timeline shows the second idea at a glance, and is worth putting on the boar
 
 Every requirement is part of the case; none is optional, and each depends on the one before. The figure shows how their results feed the memo and its appendix.
 
-> **[Figure placeholder IF-C1-0-A]** How the six requirements feed the memo and its appendix, and which workflow stages the case completes.
-> Kind: diagram · Shows: Six boxes in a row for the requirements, each tagged with the chapter it draws on (Chapter 1, Chapter 3, Chapter 2, Chapters 2 and 3, none, none). Arrows run from Requirements 2 and 4 into a box labeled "Appendix with the data map and the reconciliation table", from Requirements 3 and 4 into the memo section "Financial reporting", from Requirement 5 into "Managerial accounting" and "Auditing", and from all of them into the memo. Beneath the boxes, a strip of the six workflow stages with stages 1 to 3 and the readiness part of stage 6 filled and stages 4 and 5 outlined and labeled "Part II". · Data: none; the boxes and tags come from the case's requirements and the stage list of Chapter 1. · Status: planned
+![How the six requirements feed the memo and its appendix, and which workflow stages the case completes.](../figures/case-part-1/IF-C1-0-A.pdf)
 
 Three bundles:
 

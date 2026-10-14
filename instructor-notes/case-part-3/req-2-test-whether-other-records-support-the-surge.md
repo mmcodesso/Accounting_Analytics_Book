@@ -140,8 +140,7 @@ ORDER BY pe.DayType DESC;
 
 **Step 7. Grade each test for independence, and name two explanations.** Place every test in one result column and mark whether its record is independent of the Production Manager and the time clock. Attendance and punches support the hours but come from the clock; clock-in times, rosters and approvals contradict them and come from the clock or the Production Manager; the calendar, the plan and the output are outside, and none supports the hours as recorded; absences are silent. Two explanations fit: the hours were worked and entered for the plant as a block, or they were not worked as recorded. Gate logs, supervisor statements, security video, machine data and the system's own entry log would separate them.
 
-> **[Figure placeholder IF-C3-2-A]** The corroboration matrix, the exhibit that carries this requirement into the memo.
-> Kind: diagram · Shows: One row for each test (attendance, punches, clock-in times, roster against clock, approvals, planned load, calendar, output, absences), three result columns (Supports, Contradicts or unexplained, Silent) with one mark each, and a column that says in a word and a symbol whether the record is independent of the Production Manager and the time clock. · Data: The results of Steps 1 to 6 and of Requirement 3's weekly comparison. · Status: planned
+![The corroboration matrix, the exhibit that carries this requirement into the memo.](../figures/case-part-3/IF-C3-2-A.pdf)
 
 ## Expected results
 

@@ -13,7 +13,7 @@ figures:
   - id: IF-C3-2-A
     kind: diagram
     purpose: The corroboration matrix, the exhibit that carries this requirement into the memo.
-    shows: "One row for each test (attendance, punches, clock-in times, roster against clock, approvals, planned load, calendar, output, absences), three result columns (Supports, Contradicts or unexplained, Silent) with one mark each, and a column that says in a word and a symbol whether the record is independent of the Production Manager and the time clock."
+    shows: "One row for each test (attendance, punches, clock-in times, roster against clock, approvals, planned load, calendar, output, absences), three result columns (Supports, Contradicts or unexplained, Silent) with one mark each, a column that says in a word and a symbol whether the record is independent of the Production Manager and the time clock, and a last column with what the test found."
     data: The results of Steps 1 to 6 and of Requirement 3's weekly comparison.
 ---
 {% set g = case3_g2 %}

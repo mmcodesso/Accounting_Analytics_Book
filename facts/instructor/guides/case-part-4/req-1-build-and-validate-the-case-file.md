@@ -13,7 +13,7 @@ figures:
   - id: IF-C4-1-A
     kind: pbi-mock
     purpose: The Validation page the model answer ends Requirement 1 with, the evidence a student must reproduce before Requirement 2.
-    shows: "Report view, page Validation. A table titled Control totals by fiscal year with one row for each fiscal year and seven columns: Year, Net Income, Total Assets, Materials Received, Receipts to 1045, Materials Issued and Issues from 1045; the Materials Received and Receipts to 1045 columns are outlined because they agree. Below it a row of five cards titled Links tested: Receipt Lines, Receipts without a Requisition, Issue Lines, Issues without a Work Order and Requisition Count. The two link cards that count exceptions read zero."
+    shows: "Report view, page Validation. A table titled Control totals by fiscal year with one row for each fiscal year and seven columns: Year, Net Income, Total Assets, Materials Received, Receipts to 1045, Materials Issued and Issues from 1045; each materials pair, Materials Received with Receipts to 1045 and Materials Issued with Issues from 1045, is outlined because it agrees. Below it a row of five cards titled Links tested: Receipt Lines, Receipts without a Requisition, Issue Lines, Issues without a Work Order and Requisition Count. The two link cards that count exceptions read zero and are outlined."
     data: The Expected results quantities (net income, total assets, materials received and issued by fiscal year; the link counts), read-only.
 ---
 {% set g = case4_g1 %}

@@ -13,7 +13,7 @@ figures:
   - id: IF-19-1-A
     kind: diagram
     purpose: The book's map of the cycle marked up the way Part 4 asks, the end state of the requirement.
-    shows: "The five documents of the cycle with their departments and the hub account, and the nine control-point badges in three styles: the records evidence it, the records evidence part of it (the missing evidence written beside the badge), the evidence lies outside the database. A legend names the styles and does not rely on color alone."
+    shows: "The five documents of the cycle with their departments and the hub account, and the nine control-point badges in three styles: the records evidence it, the records evidence part of it, the evidence lies outside the database. Below the map the nine control points are listed with the missing evidence written beside each badge. A legend names the styles and does not rely on color alone."
     data: The nine control-point rows of the Cycle Map worksheet (what the records evidence, what they cannot show).
 ---
 {% set g = ch19_g1 %}

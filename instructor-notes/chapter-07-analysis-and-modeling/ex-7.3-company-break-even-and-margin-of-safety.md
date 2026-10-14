@@ -84,8 +84,7 @@ a. In D3 enter `=B24`. In E3:O3 type the ratios `0.40` to `0.50` in steps of `0.
 b. Select D3:O12 and choose **Data > What-If Analysis > Data Table**.
 c. Enter B9 as the **Row input cell** and B23 as the **Column input cell**, and click **OK**.
 
-> **[Figure placeholder IF-07-3-A]** The two-variable data table of Requirement 5, with the cell nearest the model's own assumptions outlined.
-> Kind: excel-mock · Shows: The worksheet Ex 7.3, D2:O12. A title row, the corner cell D3 showing the break-even revenue, the percentages 40 to 50 across row 3, fixed costs from 6 to 10 million in steps of half a million down column D, and a grid of break-even revenues with thousands separators. The cell nearest the contribution margin ratio and fixed costs of Requirement 4 is outlined. · Data: The break-even revenue at each ratio and fixed-cost pair (fixed costs divided by the ratio) and the model's own ratio and fixed costs of Requirement 4. · Status: planned
+![A mock of the two-variable data table of Requirement 5, with the cell nearest the model's own assumptions outlined.](../figures/chapter-07-analysis-and-modeling/IF-07-3-A.pdf)
 
 **Check:** the corners read $15,000,000 (40 percent, 6 million) and $20,000,000 (50 percent, 10 million), and the cell for 45 percent and 9 million reads $20,000,000. **Watch for:** the inputs swapped. The ratios are then substituted as fixed costs and the fixed costs as ratios, and the grid shows values near zero.
 

@@ -190,8 +190,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 **A calculated field works on totals.** Question 7's option A, a formula applied to each row, is the intuitive wrong answer. Tutorial 6.2 adds StdCostAmount in the source for that reason.
 
-> **[Figure placeholder IF-06-0-B]** Why a calculated field cannot multiply two fields, and what to do instead.
-> Kind: diagram · Shows: Two panels with the same three invented lines (quantity and unit price). Left, a calculated field Quantity*UnitPrice: the quantities are added, the prices are added, and the two sums are multiplied, giving a number marked wrong. Right, a custom column in the source: each line is multiplied first and the PivotTable adds the products, giving a number marked correct. · Data: Three invented round-number lines, labeled as an illustration and not Charles River values. · Status: planned
+![Why a calculated field cannot multiply two fields, and what to do instead.](../figures/chapter-06-descriptive-analytics/IF-06-0-B.pdf)
 
 **A control total shows coverage, not accuracy.** A difference of zero means the parts add up to the whole of the same source, not that the source is right, and a SUM range that does not grow after a row is inserted defeats it (Step 7). Question 4's option D is the silent zero, and question 14's rising margin before discounts shows the discounts offset every other effect.
 
@@ -201,13 +200,11 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 **Which date decides the period?** In Exercise 6.1 the ledger exceeds the invoice lines by $3,233.18 in account 4010 and two smaller amounts, because three invoices are dated in the earlier year. Students pick the invoice date or the number. The answer is delivery, when control passes, and only one of the three shipped in the earlier year.
 
-> **[Figure placeholder IF-06-0-A]** The revenue ladder of the chapter, from the invoice lines of the Profile worksheet to the net revenue of the income statement.
-> Kind: diagram · Shows: A vertical ladder of four boxes joined by arrows, each box holding a label and an amount: invoice lines of the report year (the Profile control total), product revenue accounts, operating revenue, net revenue. Each arrow carries its signed adjustment: the three cutoff invoices, freight revenue (account 4050, no invoice line) and sales returns (account 4060). · Data: Invoice lines total, cutoff invoices, freight revenue and returns, from the Expected results of Exercises 6.1 and 6.2. · Status: planned
+![The revenue ladder of the chapter, from the invoice lines of the Profile worksheet to the net revenue of the income statement.](../figures/chapter-06-descriptive-analytics/IF-06-0-A.pdf)
 
 **The cost effect is zero by construction.** Every unit carries one standard cost, so a Furniture-level bridge cannot show a cost effect (question 13). A product-type bridge shows one, because the items sold change (Exercise 6.4). Ask: is the cost effect a finding or a consequence of the level?
 
-> **[Figure placeholder IF-06-0-C]** The same change in the Furniture margin decomposed at two levels, for the discussion of Exercise 6.4.
-> Kind: chart · Shows: A grouped bar chart. The horizontal axis holds the effects volume, mix, price and cost; each group has two bars, Furniture as a whole (Tutorial 6.3, price as price lists plus promotions) and product type by product type (Exercise 6.4). The value axis starts at zero, bars carry signed dollar labels, and the Furniture-level cost bar is labeled zero. · Data: The effects of Tutorial 6.3 and of Exercise 6.4 (the Expected results of Exercise 6.4). · Status: planned
+![The same change in the Furniture margin decomposed at two levels, for the discussion of Exercise 6.4.](../figures/chapter-06-descriptive-analytics/IF-06-0-C.pdf)
 
 **An expectation that is the prior year.** Question 15 rules out replacing the expectation with last year's recorded amount, yet Exercise 6.5 uses last year as its expectation. The exercise names the weakness (no growth, no known events), and the question concerns what the auditor must do first: develop the expectation and set the acceptable difference in advance.
 

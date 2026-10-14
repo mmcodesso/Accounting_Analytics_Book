@@ -61,8 +61,7 @@ c. On **PurchaseInvoiceLine**, filter PurchaseInvoiceID for that number. Confirm
 | PurchaseOrder | SupplierID 65 | Supplier | Bell, Pruitt and David |
 | PurchaseInvoiceLine | ItemID 177 | Item | RAW-CTN-0010, Cotton Fabric Roll |
 
-> **[Figure placeholder IF-03-1-A]** The model purchase traced from the supplier through the order, the receipt and the invoice to the payment, with the key on each link and the ledger postings of the three documents.
-> Kind: diagram · Shows: A left-to-right chain of seven boxes (Supplier, PurchaseOrder, PurchaseOrderLine, GoodsReceiptLine with its GoodsReceipt, PurchaseInvoiceLine with its PurchaseInvoice, and DisbursementPayment), each carrying the document number and date of the model purchase. Labels on the arrows name the key (SupplierID, PurchaseOrderID, POLineID, GoodsReceiptLineID, PurchaseInvoiceID). Beneath, a GLEntry box receives dashed amber arrows from the receipt, the invoice and the payment, each labeled with the accounts debited and credited, so the goods received not invoiced account is visible as the account the receipt credits and the invoice debits. · Data: The model invoice of this guide, with its receipt, order and payment (the tables of Steps 2, 3 and 6). · Status: planned
+![The model purchase traced from the supplier through the order, the receipt and the invoice to the payment, with the key on each link and the ledger postings of the three documents.](../figures/chapter-03-accounting-data-environment/IF-03-1-A.pdf)
 
 **Check:** the keys agree three ways. The invoice line and the receipt line name the same POLineID, and the invoice, the receipt and the order name the same PurchaseOrderID and the same supplier. The invoice bills 18.67 units at $44.43 against the order's $44.23, and the receipt covers the same 18.67 units. **Watch for:** a student who follows the header's PurchaseOrderID and misses the line-level keys. The line carries the keys that matter, and the header repeats the order.
 

@@ -33,8 +33,7 @@ By the end, students can:
 
 Pairs, about 135 minutes, best over two sessions: 10 for requirement (1), 30 for (2), 20 for (3), 30 for (4), 15 for (5), 10 for (6) and 20 for the memo (7). Hold back the guard hint until a price-list count is far too large. Collect the workbook and the memo.
 
-> **[Figure placeholder IF-08-6-A]** The three flagged promotions, with the dates they were approved for and the months in which their lines were ordered.
-> Kind: diagram · Shows: A timeline with a row for each flagged promotion. A short outlined segment marks the recorded effective window (a point for the one-day promotion, a backward arrow for the other two). A solid bar marks the months in which its lines were ordered, and a lighter bar extends to the last month in which they were invoiced. · Data: PromotionProgram and the order and invoice dates of its invoice lines (the Expected results table). · Status: planned
+![The three flagged promotions, with the dates they were approved for and the months in which their lines were ordered.](../figures/chapter-08-audit-analytics/IF-08-6-A.pdf)
 
 ## Step-by-step solution
 
@@ -96,8 +95,7 @@ b. In OrderLines merge PriceListLines (PriceListID) and PriceLists (the list's E
 
 Three Active lists (12, 13, 14) copy list 3 and have no lines. **Watch for:** the guard left out. The 239 order lines with no price list line then count as after the end, because an empty date is earlier than any date.
 
-> **[Figure placeholder IF-08-6-B]** Order lines dated after the end of their price list, by list and year, for the discussion of requirement 4.
-> Kind: chart · Shows: A clustered column chart with a group for each expired price list and a column for each fiscal year, counting order lines. Each group is labeled with the list's end date. · Data: SalesOrderLine, PriceListLine, PriceList and SalesOrder, counted by list and year (the Expected results table). · Status: planned
+![Order lines dated after the end of their price list, by list and year, for the discussion of requirement 4.](../figures/chapter-08-audit-analytics/IF-08-6-B.pdf)
 
 ### Requirement (5): Customers with their own list
 

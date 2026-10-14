@@ -58,8 +58,7 @@ The chapter depends on these conditions of the data:
 - **The closes.** A measure that keeps them shows a net income of zero.
 - **The year after the window.** A prior-year measure shows a row for it.
 
-> **[Figure placeholder IF-14-0-B]** Model view of the model answer, with both stars, the shared Date table and the dashed relationship.
-> Kind: pbi-mock · Shows: Model view with SalesInvoiceLine, Item, Customer, Date, GLEntry, Account, CostCenter, ShippedLines and Key Measures. Each line shows 1 at the dimension and an asterisk at the fact table. The line from ShippedLines.ShipmentDate to Date is dashed. Key Measures stands apart. · Data: None; the tables and relationships of the model answer. · Status: planned
+![A mock of the Model view of the model answer, with both stars, the shared Date table and the dashed relationship.](../figures/chapter-14-data-models-and-dax/IF-14-0-B.pdf)
 
 ## Teaching approaches
 
@@ -115,8 +114,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest: the stumbles are about reading context, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished model.
 
-> **[Figure placeholder IF-14-0-A]** What each tutorial adds to the model, so an instructor sees where each exercise attaches.
-> Kind: diagram · Shows: Left to right: the Chapter 13 report, Tutorial 14.1 (star and Date table), Tutorial 14.2 (Key Measures and the Tests tab), Tutorial 14.3 (ledger star, income statement, Test 3). Below the line, the six exercises as branches, each labeled with what it adds. · Data: None; the boxes cite the tutorials, exercises and the model answer's queries, measures and tabs. · Status: planned
+![What each tutorial adds to the model, so an instructor sees where each exercise attaches.](../figures/chapter-14-data-models-and-dax/IF-14-0-A.pdf)
 
 ## Tutorial guide
 
@@ -192,8 +190,7 @@ Plan A is the safest: the stumbles are about reading context, and a demonstratio
 
 ## Difficult ideas and misconceptions
 
-> **[Figure placeholder IF-14-0-D]** A board sketch of filter context, row context and context transition.
-> Kind: diagram · Shows: Three panels. First, a matrix cell (Furniture, one quarter) with its three filters flowing along relationships to the invoice lines, where SUM adds what remains. Second, a calculated column on Customer with a row context and no arrow to the lines. Third, the same column in CALCULATE: the current customer becomes a filter and the arrow appears. · Data: None; the chapter's own examples, with no values on the board. · Status: planned
+![A board sketch of filter context, row context and context transition.](../figures/chapter-14-data-models-and-dax/IF-14-0-D.pdf)
 
 **The grain decides the table.** Tutorial 14.1 Step 1, questions 1 to 3. A student who keeps SalesInvoice beside the lines has two grains in one model. Ask: what does one row of this table represent?
 
@@ -248,8 +245,7 @@ All six exercises are Power BI work with a model answer in Chapter14-exercises-p
 
 **Grading and discussion.** The pages of Exercises 14.1 to 14.4 suit grading from the saved report, and the tabs of Exercises 14.5 and 14.6 from the query text, with the Checks tab to compare a number. The notes suit class discussion, and Exercise 14.6's conclusion suits peer review. Collect the .pbix, not screenshots: the measures, the display folders and the query tabs are the evidence.
 
-> **[Figure placeholder IF-14-0-C]** The Checks tab, the quick way to compare a student's number with the model answer.
-> Kind: pbi-mock · Shows: DAX query view with the tab Checks, a Run button and a grid with the columns Section, Check, Expected, Actual and Agrees, scrolled to the rows of Exercise 14.4, Agrees true in each. · Data: The Checks tab of the solution project, run after a refresh; the rows of Exercise 14.4. · Status: planned
+![A mock of the Checks tab, the quick way to compare a student's number with the model answer.](../figures/chapter-14-data-models-and-dax/IF-14-0-C.pdf)
 
 ## Multiple-choice questions
 

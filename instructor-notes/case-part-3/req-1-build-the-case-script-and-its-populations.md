@@ -108,8 +108,7 @@ FROM AttendanceException AS ae
 ORDER BY ae.AttendanceExceptionID;
 ```
 
-> **[Figure placeholder IF-C3-1-B]** The dispositions of the attendance exceptions, where the misattributed rows stand out.
-> Kind: sql-mock · Shows: The tab Case.sql at the disposition query. Columns AttendanceExceptionID, ExceptionType, EmployeeID, EntryEmployeeID, TimeClockEntryID and Disposition; the rows whose EmployeeID differs from EntryEmployeeID are outlined. · Data: The disposition query, run read-only. · Status: planned
+![A mock of the dispositions of the attendance exceptions, where the misattributed rows stand out.](../figures/case-part-3/IF-C3-1-B.pdf)
 
 **Check:** 18 rows: Isolated, 11; Names another employee, 4; Paid on a Pending entry (test H1), 3. Exceptions 2, 3, 8, 9 name employee 86 on entries that belong to employee 85, so the exception report misattributes its own rows. The order of the first two tests does not change a count here, because no exception is both. The isolated rows are recorded and closed, not pursued.
 
@@ -174,8 +173,7 @@ GROUP BY WorkYear
 ORDER BY WorkYear;
 ```
 
-> **[Figure placeholder IF-C3-1-A]** The reconciliation of the two views to Tutorial 12.3, the check students must pass before Requirement 2.
-> Kind: sql-mock · Shows: The tab Case.sql at the reconciliation query. Columns WorkYear, SurgeDays, SurgeEntries, OrdinaryDays and OrdinaryEntries, one row for each fiscal year; the SurgeDays and SurgeEntries cells are outlined; the message pane reports three rows. · Data: The reconciliation query, run read-only. · Status: planned
+![A mock of the reconciliation of the two views to Tutorial 12.3, the check students must pass before Requirement 2.](../figures/case-part-3/IF-C3-1-A.pdf)
 
 **Check:** three rows (year, surge days, surge entries, ordinary days, ordinary entries): 2024, 12, 768, 235, 15,033; 2025, 32, 2,048, 223, 14,145; 2026, 49, 3,136, 194, 11,796. The surge figures are those of Tutorial 12.3's test H8.
 

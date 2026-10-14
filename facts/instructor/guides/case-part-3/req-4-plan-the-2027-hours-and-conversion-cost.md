@@ -13,7 +13,7 @@ figures:
   - id: IF-C3-4-A
     kind: chart
     purpose: The hours each scenario needs against the plant's regular capacity, the picture behind the decision to allow no routine overtime.
-    shows: "Three columns for the scenarios (standard hours, the first year's level, the last year's level with its overtime), labeled with the hours needed, and a horizontal line for regular capacity well above all three, labeled with its value and with the share of capacity the standard-hours scenario uses."
+    shows: "Three columns for the scenarios (standard hours, the first year's level, the last year's level with its overtime), labeled with the hours needed and the share of regular capacity each uses (the standard-hours scenario about half), and a horizontal line for regular capacity well above all three, labeled with its value."
     data: The scenarios query of Step 4, run read-only.
 ---
 {% set g = case3_g4 %}

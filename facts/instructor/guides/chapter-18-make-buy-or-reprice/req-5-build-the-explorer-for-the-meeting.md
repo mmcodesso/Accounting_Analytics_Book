@@ -13,12 +13,12 @@ figures:
   - id: IF-18-5-A
     kind: pbi-mock
     purpose: The Families page that the CFO and the production manager will use in the meeting.
-    shows: "The Families page: a Costing view slicer with the three views, one card row with revenue, product cost, margin and margin percent, a matrix of item groups and families by view with margin percent and cost per unit, a bar chart of items ranked by margin, and a table of totals by view. Time-driven selected."
+    shows: "The Families page: a Costing view slicer with the three views, one card row with revenue, product cost, margin and margin percent, a matrix of item groups and families by view with margin percent and cost per unit, a bar chart of items ranked by margin, and a table of totals by view, drawn below the matrix to fit the frame. Time-driven selected."
     data: The Product Costs model, base year, finished goods only.
   - id: IF-18-5-B
     kind: pbi-mock
     purpose: The Tests tab in DAX query view, the check students run before they present.
-    shows: "DAX query view with the query tab Tests, Test 1 in the editor and its three-row result beneath: the view, revenue, the workbook's revenue, margin, the workbook's margin and a difference of zero for each view; the Run button and the Update model with changes banner in place."
+    shows: "DAX query view with the query tab Tests, Test 1 in the editor and its three-row result beneath (the grid scrolled one column to the right to fit the frame): the view, revenue, the workbook's revenue, margin, the workbook's margin and a difference of zero for each view; the Run button and the Update model with changes banner in place."
     data: Test 1 of the Tests tab, evaluated on the refreshed model.
 ---
 {% set g = ch18_g5 %}

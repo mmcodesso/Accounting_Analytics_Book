@@ -35,8 +35,7 @@ By the end, students can:
 
 Individual or pairs, about 80 minutes: 25 on the tests, 15 on the evidence, 10 on scope, 15 on approvals and stacking, 15 on dispositions and conditions. Hold back the evidence hint ("what other records say when the promotion ran?") until a student has counted the exceptions. **Collect** the table of tests and the dispositions; they are Exhibit 5 of the memo.
 
-> **[Figure placeholder IF-C2-5-A]** The four tests counted by promotion, as the student's R5 Controls sheet shows them.
-> Kind: excel-mock · Shows: A table with a row for each promotion and the columns Lines, Outside the recorded dates, Outside the scope, Rate differs, Window start, Window end and In scope and window without the promotion, and a total row. The collection promotions' date counts equal their line counts and are outlined, as are the two scope exceptions; every other count is zero. · Data: The Expected results of this requirement (the tests by promotion). · Status: planned
+![A mock of the four tests counted by promotion, as the student's R5 Controls sheet shows them.](../figures/case-part-2/IF-C2-5-A.pdf)
 
 ## Step-by-step solution
 
@@ -96,8 +95,7 @@ The window is the recorded dates, except for a promotion whose lines all fail th
 
 Each end date is on or before its start date, yet every line was ordered in March and April, every collection line of those months carries the promotion, and the budget planned the lower price in those months. The evidence points to a window entered with a wrong end date: a master-data error to correct, not discounts given without authority. Present it as the best reading of the evidence, not a certainty.
 
-> **[Figure placeholder IF-C2-5-B]** The evidence from outside the record under test for one failing promotion, to place beside its recorded dates.
-> Kind: chart · Shows: A twelve-month strip for one collection promotion's year: a short outlined segment for the recorded window with a backward arrow for its end date, a solid bar for the months its lines were ordered, and beneath it a line of the budget's price as a share of list, dipping in those months. · Data: The promotion's recorded dates, the months its lines were ordered, and the budget's monthly ratio for its collection (Step 3). · Status: planned
+![The evidence from outside the record under test for one failing promotion, to place beside its recorded dates.](../figures/case-part-2/IF-C2-5-B.pdf)
 
 **Step 4. Investigate the lines outside scope.** Filter `OrderLines` where ScopeOK is FALSE, or list them with a formula, and look at the item in `Items`.
 

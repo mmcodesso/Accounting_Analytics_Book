@@ -66,8 +66,7 @@ WITH Periods AS (
 
 **Check:** Manufacturing is debited to account 1090 alone (197,970.68); each of the other 9 cost centers goes to one salary account for gross pay (Administration 6030, Customer Service 6040, Design Services 6280, Executive 6050, Marketing 6240, Purchasing 6230, Research and Development 6250, Sales 6010, Warehouse 6020) and to 6060 Payroll Taxes and Benefits for the employer costs. The credits are 2030 Accrued Payroll for gross pay, 2032 for employer taxes and 2033 for benefits. No completion releases standard cost against the Manufacturing part, so it ends in account 5080 and cost of goods sold.
 
-> **[Figure placeholder IF-C3-5-A]** Why recording both payroll accruals moves the liability far more than income.
-> Kind: diagram · Shows: Two columns, Income and Balance sheet. Under Income, two bars side by side, the expense for the work after the time records end and the expense for the prior year's work paid in the year, nearly equal, with the small net difference marked. Under Balance sheet, one tall bar for the liability at the year-end and one bar for the fall in opening retained earnings. · Data: The accrual and prior-year queries of Steps 1 and 3. · Status: planned
+![Why recording both payroll accruals moves the liability far more than income.](../figures/case-part-3/IF-C3-5-A.pdf)
 
 ### Part 2: The year before
 

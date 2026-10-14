@@ -55,8 +55,7 @@ The chapter depends on these conditions of the data:
 - **Display units.** A card shows its amounts abbreviated until **Display units** is set to **None**.
 - **A forgotten basis.** The profile returns to the top rows when the editor is reopened: read the status bar first.
 
-> **[Figure placeholder IF-13-0-B]** Model view of the model answer, with the unrelated control table beside the related ones.
-> Kind: pbi-mock · Shows: Model view with six tables. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with no relationship line. Key columns are listed in each table. · Data: None; the tables, columns and relationships of the model answer. · Status: planned
+![A mock of the model answer in Model view, with the unrelated control table beside the related ones.](../figures/chapter-13-power-bi-essentials/IF-13-0-B.pdf)
 
 ## Teaching approaches
 
@@ -105,8 +104,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest: the stumbles of this chapter are about reading what a visual summarizes, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished report.
 
-> **[Figure placeholder IF-13-0-A]** The build sequence of the chapter and the pages of the model answer, so an instructor sees where each tutorial and exercise sits.
-> Kind: diagram · Shows: Left to right: the four Tables, the queries in Power Query, the model with three relationships, then the three report pages (Validation, Sales and Discounts, Review). Branches from the model lead to the six exercise pages, each labeled with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load for 13.5) and with the tutorial it extends. · Data: None; the boxes cite the tutorials, exercises and the model answer's queries and pages. · Status: planned
+![The build sequence of the chapter and the pages of the model answer, so an instructor sees where each tutorial and exercise sits.](../figures/chapter-13-power-bi-essentials/IF-13-0-A.pdf)
 
 ## Tutorial guide
 
@@ -228,8 +226,7 @@ All six exercises are Power BI pages with a model answer in Chapter13-exercises-
 
 **Grading and discussion.** The pages of Exercises 13.1 to 13.4 suit grading from the saved report, with the Checks tab to compare a number. The notes, memos and review notes suit class discussion, and Exercise 13.6's review notes suit peer review. Collect the .pbix, not screenshots: the Applied Steps and the Filters pane show choices a screenshot hides.
 
-> **[Figure placeholder IF-13-0-C]** DAX query view with the Checks tab, the fast way to check a student's number against the model answer.
-> Kind: pbi-mock · Shows: DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid whose columns are Section, Check, Expected, Actual and Agrees, scrolled to the rows of Exercise 13.2, with Agrees true in each. · Data: The Checks tab of the solution project, run after a refresh; the rows of Exercise 13.2. · Status: planned
+![A mock of the Checks tab in DAX query view, the fast way to check a student's number against the model answer.](../figures/chapter-13-power-bi-essentials/IF-13-0-C.pdf)
 
 ## Multiple-choice questions
 

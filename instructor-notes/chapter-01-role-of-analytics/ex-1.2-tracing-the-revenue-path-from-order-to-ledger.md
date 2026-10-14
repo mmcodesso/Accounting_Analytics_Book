@@ -62,8 +62,7 @@ A model answer, with the traced sale as the example:
 | CashReceiptApplication | Staff apply all or part of a receipt to an invoice | ApplicationDate | 787.48 applied to this invoice on 2025-04-17 |
 | GLEntry | A document is posted to the ledger | PostingDate | Four rows for the invoice |
 
-> **[Figure placeholder IF-01-2-A]** The path of the traced sale through the seven worksheets, with the one-to-many links and the ledger postings.
-> Kind: diagram · Shows: Left to right, boxes for SalesOrder (with its lines), Shipment, SalesInvoice, CashReceipt and CashReceiptApplication, each carrying the document number and date of the traced sale. Labels on the arrows give how many shipments and invoices the order has and how many invoices the receipt paid. Beneath them a GLEntry box receives dashed amber arrows from the shipment, the invoice, the receipt and the application, each labeled with the accounts debited and credited. The sales order and its lines have no arrow to the ledger, and a note says so. · Data: The traced sale of Figure 1.6 and its order, shipment, receipt and application, from the Expected results table of this guide. · Status: planned
+![The path of the traced sale through the seven worksheets, with the one-to-many links and the ledger postings.](../figures/chapter-01-role-of-analytics/IF-01-2-A.pdf)
 
 **Check:** each answer is an event ("the warehouse ships goods"), not a description ("stores shipments"). **Watch for:** students who treat the invoice as the first event. The order comes first, and nothing in the ledger records it.
 
@@ -97,8 +96,7 @@ b. Click the filter button on **SourceDocumentType** and choose SalesInvoice onl
 c. Read SourceDocumentID and SourceLineID, the next two columns.
 d. To see one invoice, also filter SourceDocumentID to 7947.
 
-> **[Figure placeholder IF-01-2-B]** The GLEntry worksheet filtered to the four rows of the traced invoice, the model answer to requirement 3.
-> Kind: excel-mock · Shows: The GLEntry worksheet with the SourceDocumentType filter open and SalesInvoice ticked, and the table narrowed to the four rows of the traced invoice. Columns GLEntryID through SourceLineID are visible, with the receivables debit equal to the three credits. The SourceDocumentType header and the revenue row's SourceLineID cell are outlined. · Data: The four GLEntry rows of the traced invoice (the table in Step 4). · Status: planned
+![A mock of the GLEntry worksheet filtered to the four rows of the traced invoice, the model answer to requirement 3.](../figures/chapter-01-role-of-analytics/IF-01-2-B.pdf)
 
 The four rows of the traced invoice:
 

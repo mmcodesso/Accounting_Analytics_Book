@@ -181,5 +181,62 @@ class ScaffoldTests(unittest.TestCase):
         self.assertEqual(ex.item_no, "1")
 
 
+class PdfTests(unittest.TestCase):
+    """The PDF build: its cache key, the README, and the pandoc filter (the filter test needs Quarto's pandoc)."""
+
+    def test_pdf_key_follows_the_markdown_and_its_figures(self):
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            md = root / "x.md"
+            md.write_text("# T\n\n![A figure.](../figures/chapter-01-role/IF-01-1-A.pdf)\n", encoding="utf-8")
+            with mock.patch.object(guides, "FIGURE_PDF_DIR", root / "pdf"):
+                before = guides.pdf_key(md, "pandoc 1")
+                self.assertEqual(before, guides.pdf_key(md, "pandoc 1"))
+                self.assertNotEqual(before, guides.pdf_key(md, "pandoc 2"))
+                (root / "pdf" / "chapter-01-role").mkdir(parents=True)
+                (root / "pdf" / "chapter-01-role" / "IF-01-1-A.pdf").write_bytes(b"%PDF one")
+                with_figure = guides.pdf_key(md, "pandoc 1")
+                self.assertNotEqual(before, with_figure)
+                (root / "pdf" / "chapter-01-role" / "IF-01-1-A.pdf").write_bytes(b"%PDF two")
+                self.assertNotEqual(with_figure, guides.pdf_key(md, "pandoc 1"))
+                md.write_text("# T\n\nchanged\n", encoding="utf-8")
+                self.assertNotEqual(with_figure, guides.pdf_key(md, "pandoc 1"))
+
+    def test_figure_pattern(self):
+        found = guides.PDF_FIGURE.findall("![a](../figures/chapter-06-x/IF-06-1-A.pdf) and ![b](../figures/case-part-1/IF-C1-0-B.pdf)")
+        self.assertEqual(found, [("chapter-06-x", "IF-06-1-A"), ("case-part-1", "IF-C1-0-B")])
+
+    def test_filter_sizes_tables_and_swaps_figures(self):
+        import shutil
+        import subprocess
+        if shutil.which("quarto") is None:
+            self.skipTest("Quarto's pandoc is not available")
+        import package as pk
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "pdf" / "chapter-01-role").mkdir(parents=True)
+            (root / "pdf" / "chapter-01-role" / "IF-01-1-A.pdf").write_bytes(b"%PDF-1.4\n")
+            md = root / "x.md"
+            md.write_text(
+                "| | |\n|---|---|\n| Unit | A long description that needs most of the line because it says a great deal about the unit |\n"
+                "| Item | Exercise 1.1 |\n\nText with `a.b.c` code.\n\n"
+                "![A figure of the sale.](../figures/chapter-01-role/IF-01-1-A.pdf)\n", encoding="utf-8")
+            cmd = [*pk.pandoc_command(), str(md), "-f", "commonmark+pipe_tables", "-t", "latex",
+                   "--lua-filter", str(guides.PDF_ASSETS / "instructor.lua"),
+                   "-M", f"figure-dir={(root / 'pdf').as_posix()}"]
+            out = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(out.returncode, 0, out.stderr)
+            tex = out.stdout
+            self.assertIn("IF-01-1-A.pdf", tex)
+            self.assertIn("\\caption*{A figure of the sale.}", tex)
+            self.assertIn("\\aacode{", tex)
+            import re
+            widths = [float(w) for w in re.findall(r"\\real\{([0-9.]+)\}", tex)]
+            self.assertEqual(len(widths), 2)
+            self.assertGreater(widths[1], 2 * widths[0])        # the long column gets the room
+            self.assertNotIn("\\midrule", tex.split("\\begin{longtable}")[1].split("\\endhead")[0])   # no empty header row
+
+
 if __name__ == "__main__":
     unittest.main()

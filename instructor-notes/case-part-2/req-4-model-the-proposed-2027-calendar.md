@@ -34,8 +34,7 @@ By the end, students can:
 
 Individual work, about 100 minutes: 30 on the model, 10 on the break-evens and Goal Seek, 15 on the data table, 10 on the second Goal Seek, 20 on the budgets, 15 on the cost and the volume basis. Hold back the input-cell hint until a student has an error. **Collect** the model sheet and the cost table; they feed Exhibit 4.
 
-> **[Figure placeholder IF-C2-4-A]** The Furniture promotion's data table, with the positive cells highlighted.
-> Kind: excel-mock · Shows: A grid of the difference in contribution, discounts of 5, 8, 10 and 12 percent across and lifts of 0 to 40 percent in steps of 5 points down, with the positive cells shaded in a staircase and a row of break-even lifts beneath. The two input cells and the result cell sit above it. · Data: The Furniture promotion's units, price before discount, standard cost and the commission rate (the Expected results). · Status: planned
+![A mock of the Furniture promotion's data table, with the positive cells highlighted.](../figures/case-part-2/IF-C2-4-A.pdf)
 
 ## Step-by-step solution
 
@@ -81,8 +80,7 @@ With the commission rate of 1.903%, the three differences add to -$347,840.88. *
 
 The break-evens run from 23.3% to 39.7%, and no measured difference reached half of its own.
 
-> **[Figure placeholder IF-C2-4-B]** Each promotion's measured difference against its break-even lift, for the discussion of requirement 4.
-> Kind: chart · Shows: A horizontal bar chart with a row for each promotion, the measured difference as a bar and the break-even lift as a marker to its right, the proposed promotions marked. · Data: The break-even lift and the measured difference of each promotion (R4 Model, second block). · Status: planned
+![Each promotion's measured difference against its break-even lift, for the discussion of requirement 4.](../figures/case-part-2/IF-C2-4-B.pdf)
 
 ### Phase 2: The data table and the second Goal Seek
 

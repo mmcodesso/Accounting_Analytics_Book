@@ -13,12 +13,12 @@ figures:
   - id: IF-08-5-A
     kind: chart
     purpose: Requisitions by 50-dollar band around the 5,000-dollar approval limit, the chart of requirement 4.
-    shows: "A column chart of the eight bands, each labeled with its range and its count. The band just below the approval limit is about twice as tall as any other and is drawn in the highlight color; the rest are gray."
+    shows: "A column chart of the eight bands, each labeled with its range and its count. The band just below the approval limit is about twice as tall as any other and is drawn in the highlight color; the rest are gray. A dashed line marks the 5,000 dollar limit between the fourth and fifth bands."
     data: PurchaseRequisition, RequisitionValue as Quantity times EstimatedUnitCost, counted in 50-dollar bands (the Expected results table).
   - id: IF-08-5-B
     kind: excel-mock
     purpose: The flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.
-    shows: "The flagged orders sorted by RiskScore, with the three flag columns, RiskScore, Disposition and Design or operation. The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up."
+    shows: "The flagged orders sorted by RiskScore, with PONumber, the three flag columns, RiskScore, Disposition and Design or operation (the other columns are hidden). The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up, cut at two lines as a fixed row height shows it."
     data: POApprovals filtered to RiskScore 1 or more (the Expected results table).
 ---
 {% set x = ch08_g5 %}

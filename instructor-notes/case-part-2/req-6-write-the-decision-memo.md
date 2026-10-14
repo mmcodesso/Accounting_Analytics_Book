@@ -32,8 +32,7 @@ By the end, students can:
 
 Individual, about 60 minutes in class or as a take-home: 10 to plan the evidence, 35 to draft, 15 to check every number against its source and the length. In a workshop (the third plan of the case note), students swap drafts and review them against the grading guide below. **Collect** the memo, the appendix and the workbook.
 
-> **[Figure placeholder IF-C2-6-A]** How the memo and its one-page appendix are laid out, and which requirement supplies each part.
-> Kind: diagram · Shows: Two page outlines side by side with a third, smaller page for the appendix. The memo pages show the header lines, an opening paragraph, the three headed sections (Financial reporting, Managerial accounting, Auditing) and the recommendation. The appendix page shows five numbered exhibit boxes. Arrows tag each section and exhibit with the requirement that produced it, Requirement 2 for exhibits 1 and 2, 3 for exhibit 3, 4 for exhibit 4 and 5 for exhibit 5. · Data: none; the layout and tags come from the case's Requirement 6 and Deliverable. · Status: planned
+![How the memo and its one-page appendix are laid out, and which requirement supplies each part.](../figures/case-part-2/IF-C2-6-A.pdf)
 
 ## Step-by-step solution
 

@@ -33,8 +33,7 @@ By the end, students can:
 
 Individual, about 90 minutes: 25 on requirement (1), 15 on (2), 15 on (3), 15 on (4) and 20 on the memo (5). Hold back the point of requirement (2) until a student has the larger allowance, then ask who the customer is. Give the write-off sequencing hint for (4) only after students post the entry. Collect the workbook and the memo.
 
-> **[Figure placeholder IF-08-1-A]** The Aging worksheet after requirement 1, with the expected credit loss beside the aging and the loss rates in the Buckets Table.
-> Kind: excel-mock · Shows: The Aging worksheet: columns A to D as in Tutorial 8.2, then column E, Expected credit loss, with an amount for each bucket and the total outlined, and the E4 formula in the formula bar. To the right, the Buckets Table with its LossRate column as percentages. · Data: The aging of the open invoices at the as-of date and the five proposed rates (the Expected results table). · Status: planned
+![A mock of the Aging worksheet after requirement 1, with the expected credit loss beside the aging and the loss rates in the Buckets Table.](../figures/chapter-08-audit-analytics/IF-08-1-A.pdf)
 
 ## Step-by-step solution
 

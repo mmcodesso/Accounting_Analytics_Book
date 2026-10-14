@@ -60,8 +60,7 @@ Row 10 sums the four product groups (rows 5 to 8) without Services.
 
 **Step 5. Describe it.** The forecast ran 2.33 times the orders in 2024, 2.57 in 2025 and 2.88 in 2026, more than twice in every product group and every year, and rising. The groups move together, so the bias is systematic. Services runs the other way: its forecast is 0.28 to 0.31 of the hours ordered.
 
-> **[Figure placeholder IF-07-6-A]** The forecast against orders by item group and year, which carries the finding of Requirement 3.
-> Kind: chart · Shows: A grouped bar chart. The horizontal axis holds the four product groups, each with three bars for the three years of the window; the vertical axis is the ratio of forecast units to ordered units, starting at zero, with a reference line at 1. The bars rise from the first year to the last in every group. A separate small panel shows the Services ratio on the same scale, below the line. · Data: The forecast-to-orders ratios of the Ex 7.6 sheet, rows for the four product groups and for Services (the Expected results). · Status: planned
+![The forecast against orders by item group and year, which carries the finding of Requirement 3.](../figures/chapter-07-analysis-and-modeling/IF-07-6-A.pdf)
 
 ### Requirement (4): The budget
 

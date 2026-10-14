@@ -32,8 +32,7 @@ Students can:
 
 Individual work or pairs, about 150 minutes: 30 for the model, 20 for the measures, 45 for the two pages, 35 for About, Validation and Tests, 20 for documentation. Hold back the year filter and the blank row until the totals disagree with the workbook. **Collect** the .pbix and a screenshot of the Tests tab.
 
-> **[Figure placeholder IF-18-5-A]** The Families page that the CFO and the production manager will use in the meeting.
-> Kind: pbi-mock · Shows: The Families page: a Costing view slicer with the three views, one card row with revenue, product cost, margin and margin percent, a matrix of item groups and families by view with margin percent and cost per unit, a bar chart of items ranked by margin, and a table of totals by view. Time-driven selected. · Data: The Product Costs model, base year, finished goods only. · Status: planned
+![A mock of the Families page that the CFO and the production manager will use in the meeting.](../figures/chapter-18-make-buy-or-reprice/IF-18-5-A.pdf)
 
 ## Step-by-step solution
 
@@ -111,8 +110,7 @@ ROW (
 
 **Check:** a difference of zero and 439 lines. The Checks tab proves the values and each view's tie to the workbook; the layout, the slicer state and how (Blank) displays show only in Desktop.
 
-> **[Figure placeholder IF-18-5-B]** The Tests tab in DAX query view, the check students run before they present.
-> Kind: pbi-mock · Shows: DAX query view with the query tab Tests, Test 1 in the editor and its three-row result beneath: the view, revenue, the workbook's revenue, margin, the workbook's margin and a difference of zero for each view; the Run button and the Update model with changes banner in place. · Data: Test 1 of the Tests tab, evaluated on the refreshed model. · Status: planned
+![A mock of the Tests tab in DAX query view, the check students run before they present.](../figures/chapter-18-make-buy-or-reprice/IF-18-5-B.pdf)
 
 ## Expected results
 

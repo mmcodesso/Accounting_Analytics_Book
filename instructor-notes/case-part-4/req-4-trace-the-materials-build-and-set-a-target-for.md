@@ -56,8 +56,7 @@ Shortfall Receipts = CALCULATE ( [Materials Received], Receipts[Channel] = "Work
 
 **Check:** receipts of the supply plan and the shortfall channel by year are $5,681,207.72 and $2,141,872.90; $7,017,928.00 and $6,472,674.93; $6,358,142.79 and $11,219,993.21, while issues stay near $10,161,204.64. The build of 2026 is $7,416,931.36, 96% of it six raw materials, led by RAW-CTN-0010 at $2,959,318.29. **Watch for:** a stock by item. The opening materials carry no item detail, so only a flow can be shown by item.
 
-> **[Figure placeholder IF-C4-4-A]** The Materials Build page of the model answer, which shows the channel and the items that carry the build.
-> Kind: pbi-mock · Shows: Report view, page Materials Build. A line and clustered column chart by month with two columns for each month, supply plan receipts and work-order shortfall receipts, and a line for materials issued; a table of the yearly totals; a matrix by item group and item, expanded and sorted by the build, with six raw materials at the top; and a matrix of the approver titles for each channel. · Data: The Expected results quantities (receipts by channel and year, the build by item, the approvals), read-only. · Status: planned
+![A mock of the Materials Build page of the model answer, which shows the channel and the items that carry the build.](../figures/case-part-4/IF-C4-4-A.pdf)
 
 ### Part 2: The groups, the key and the approvals
 
@@ -101,8 +100,7 @@ Months of Issues in Excess = DIVIDE ( [Excess Materials], DIVIDE ( [Issues TTM],
 
 **Check:** at the year's issues the target allows $779,489.67, $1,670,335.01, $2,505,502.51 and the excess is $10,972,164.25, $10,081,318.91, $9,246,151.41, or 12.96, 11.91, 10.92 months of issues. Even at 90 days the excess is about ten times the year's fall in cash. **Watch for:** the excess measured on all the inventories, which reads $23,202,961.33 at 28 days because finished goods and work in process are in it, and a slider left at the series' first value of 7 days, which reads $11,556,781.50.
 
-> **[Figure placeholder IF-C4-4-B]** The excess at each target next to the year's fall in cash, the comparison the requirement asks for.
-> Kind: chart · Shows: Four horizontal bars of dollars: the excess at 28 days, at 60 days and at 90 days, and the year's fall in cash. The three excess bars are each many times the length of the fall; labels give the months of issues the excess represents. · Data: The Expected results quantities (the excess at each target, the months of issues and the fall in cash), read-only. · Status: planned
+![The excess at each target next to the year's fall in cash, the comparison the requirement asks for.](../figures/case-part-4/IF-C4-4-B.pdf)
 
 ### Part 4: What the estimate leaves out
 

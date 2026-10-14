@@ -88,8 +88,7 @@ Individual work, 60 minutes: 20 on the revenue side, 20 on the cost side, 10 on 
 | 2026 Q3 | 864 | $2,459,120.72 | $2,459,120.72 | $0.00 |
 | 2026 Q4 | 866 | $2,475,813.68 | $2,475,813.68 | $0.00 |
 
-> **[Figure placeholder IF-C1-4-A]** The reconciliation table of the appendix, as a student's worksheet would show it.
-> Kind: excel-mock · Shows: A worksheet named Reconciliation with two blocks. The revenue block has a row for each of the two quarters and the columns Invoice lines, Sum of LineTotal, Ledger credits to the Furniture revenue account from SalesInvoice, and Difference. The cost block has the columns Shipment lines, Standard cost, Ledger debits to the Furniture cost account from Shipment, and Difference. Every Difference cell shows zero and is outlined. A note row beneath names the other source document types that post to the cost account. · Data: The Expected results of this requirement (sub-ledger and ledger totals of the two quarters). · Status: planned
+![A mock of the reconciliation table of the appendix, as a student's worksheet would show it.](../figures/case-part-1/IF-C1-4-A.pdf)
 
 **Step 8. Say what agreement shows, and what it does not.** Agreement to the cent shows that the Furniture invoice lines and shipment lines reached the ledger in full in both quarters, at the same amounts, so either source can support the analysis. It leaves three things open:
 

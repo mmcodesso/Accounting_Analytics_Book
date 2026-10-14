@@ -99,8 +99,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest. Plan B gives students ownership of the models and needs a lab and a homework habit. Plan C leaves no time for demonstration and relies on the check clinic to catch what home work missed.
 
-> **[Figure placeholder IF-07-0-A]** Which what-if tool answers which question, as a decision tree for the discussion of Tutorial 7.3 and Exercise 7.4.
-> Kind: diagram · Shows: A top-down decision tree. The root asks what you want to know. Four branches end in a tool: results under a few named sets of inputs (Scenario Manager), results across a range of one or two inputs (data table), the input that reaches a target (Goal Seek), the best values of several inputs within limits (Solver). Under each tool, one example from the chapter, named without numbers. · Data: The chapter's table of what-if tools, with the examples of Tutorial 7.3 and Exercise 7.4. · Status: planned
+![Which what-if tool answers which question, as a decision tree for the discussion of Tutorial 7.3 and Exercise 7.4.](../figures/chapter-07-analysis-and-modeling/IF-07-0-A.pdf)
 
 ## Tutorial guide
 ### Guided Tutorial 7.1: Forecasting Revenue and Testing the Forecast
@@ -174,8 +173,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 
 **The checkpoint to look for.** The four bullets. A strong student states the recommendation with its condition: do not repeat as it ran unless a lift near 31% is credible, and the orders show no such lift without proving what the promotion caused.
 
-> **[Figure placeholder IF-07-0-B]** How the break-even lift of the promotion depends on the discount, for the discussion of the assumptions table.
-> Kind: chart · Shows: A line chart. The horizontal axis is the discount rate from zero to 15 percent, the vertical axis the volume lift at which the promotion breaks even, both as percentages, starting at zero. Three points are labeled: 5 percent, 10 percent (the promotion as it ran) and 15 percent. · Data: The break-even lift computed from the inputs of the Model worksheet (units, price before discount, variable cost, commission rate) at each discount. · Status: planned
+![How the break-even lift of the promotion depends on the discount, for the discussion of the assumptions table.](../figures/chapter-07-analysis-and-modeling/IF-07-0-B.pdf)
 
 ## Difficult ideas and misconceptions
 **One point can flip a result.** Questions 2 and 4, and Tutorial 7.1: the correlation with customers falls from 0.77 to 0.43 and the slope loses its significance. Ask: what would you report to the controller, and what would you ask about the first month?
@@ -188,8 +186,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 
 **The simplest method is a benchmark, not a rival.** The mean beats the trend in Tutorial 7.1, and no method wins in every group of Exercise 7.1. Question 6's option B ("always more accurate") overstates it.
 
-> **[Figure placeholder IF-07-0-C]** The static budget, the flexible budget and the actual margin of the four product lines in one walk.
-> Kind: diagram · Shows: A bridge with six bars: static budget margin, sales-volume variance, flexible budget margin, price gap before discounts, promotional discounts, actual margin. The totals are blue, the three variances coral, each with a signed dollar label, and the sales-volume bar is drawn to scale so the others look small. · Data: The Total column of the BudgetReport worksheet (Tutorial 7.2), rows for the three margins, the sales-volume variance, the price gap and the discounts. · Status: planned
+![The static budget, the flexible budget and the actual margin of the four product lines in one walk.](../figures/chapter-07-analysis-and-modeling/IF-07-0-C.pdf)
 
 **Flex what varies.** Question 8's option B scales every line by one percentage, and question 10's option D calls commissions fixed. Tutorial 7.2 flexes the commission and leaves rent at its budget.
 

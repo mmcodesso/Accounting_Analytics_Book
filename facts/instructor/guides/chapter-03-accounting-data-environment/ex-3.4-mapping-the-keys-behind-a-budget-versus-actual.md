@@ -13,7 +13,7 @@ figures:
   - id: IF-03-4-A
     kind: diagram
     purpose: The join path from the Budget table to the ledger, drawn as two tables that share four columns and no key.
-    shows: Two table boxes side by side, Budget and GLEntry, each listing only the columns that matter (FiscalYear, Month or FiscalPeriod, CostCenterID, AccountID, and the amount). Four horizontal connectors pair FiscalYear with FiscalYear, Month with FiscalPeriod, CostCenterID with CostCenterID and AccountID with AccountID, drawn in one style and labeled as a match on four columns, not a key. Above and below, solid lines lead from each box to CostCenter and to Account, with crow's foot endpoints computed from the data, and the circle at the CostCenter end of the GLEntry line is marked. A note says that Month and FiscalPeriod hold the same month number under two names.
+    shows: Two table boxes side by side, Budget and GLEntry, each listing only the columns that matter (FiscalYear, Month or FiscalPeriod, CostCenterID, AccountID, and the amount). Four horizontal connectors pair FiscalYear with FiscalYear, Month with FiscalPeriod, CostCenterID with CostCenterID and AccountID with AccountID, drawn in one style (a line with round ends) and labeled as a match on four columns, not a key. Above and below, solid lines lead from each box to CostCenter and to Account, with crow's foot endpoints computed from the data, and the circle at the CostCenter end of the GLEntry line is marked. A note says that Month and FiscalPeriod hold the same month number under two names.
     data: The relationships of Steps 2 and 3 (the Budget and GLEntry columns, and the cardinality of the two cost center links).
 ---
 # Exercise 3.4: Mapping the Keys Behind a Budget-Versus-Actual Report

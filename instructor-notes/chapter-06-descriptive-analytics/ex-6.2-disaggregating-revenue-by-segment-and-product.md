@@ -53,8 +53,7 @@ b. Open the **Column Labels** filter and clear 2024, so that 2025 and 2026 remai
 c. Open **Value Field Settings** of the second LineTotal field, type `Change from 2025` in **Custom Name**, and on **Show Values As** choose **% Difference From** with FiscalYear as the **Base field** and **(previous)** as the **Base item**.
 d. Drag **Σ Values** from **Columns** to **Rows**, below CustomerSegment.
 
-> **[Figure placeholder IF-06-2-A]** The second PivotTable of Requirement 2, with the year above the item group in the columns and the change as a second value row.
-> Kind: excel-mock · Shows: A PivotTable on the worksheet Ex 6.2. Columns: the two years, each with the five item groups and a year total. Rows: the five customer segments, each with two value rows, Revenue and Change from the previous year. The change row is blank under the earlier year and filled under the report year. The Field List shows FiscalYear above ItemGroup in Columns, CustomerSegment in Rows, and LineTotal twice in Values. · Data: Revenue by segment, item group and year, and the percentage changes (the Expected results). · Status: planned
+![A mock of the second PivotTable of Requirement 2, with the year above the item group in the columns and the change as a second value row.](../figures/chapter-06-descriptive-analytics/IF-06-2-A.pdf)
 
 **Check:** the change appears only under 2026.
 

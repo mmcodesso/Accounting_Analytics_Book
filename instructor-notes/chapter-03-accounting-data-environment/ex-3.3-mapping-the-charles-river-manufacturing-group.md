@@ -67,8 +67,7 @@ c. For each line, look up ComponentItemID in **Item**.
 | 2 | RAW-CTN-0007 Cotton Fabric Roll | Raw Materials | $25.36 | 2.94 | 0.0032 |
 | 3 | PKG-PLW-0004 Pallet Wrap Large | Packaging | $3.25 | 1.04 | 0.0033 |
 
-> **[Figure placeholder IF-03-3-A]** The path from a finished product to its components, with the Item table at both ends.
-> Kind: diagram · Shows: On the left an Item box holding the model product (its code and name) with ItemID. An arrow labeled ParentItemID leads to a BillOfMaterial box, an arrow labeled BOMID leads to a BillOfMaterialLine box listing the model product's component lines, and an arrow labeled ComponentItemID leads back to a second Item box on the right that lists the component items with their standard costs. The two Item boxes are drawn identically, joined by a dotted line and a note that they are one table in two roles. Under the lines, a calculation strip shows quantity per unit times one plus the scrap factor times the component cost, added up to the material cost and then to the standard cost with the conversion cost. · Data: The model product of this guide, its bill, its component lines and the roll-up of Step 3. · Status: planned
+![The path from a finished product to its components, with the Item table at both ends.](../figures/chapter-03-accounting-data-environment/IF-03-3-A.pdf)
 
 **Check:** the same Item table appears at both ends. ParentItemID and ComponentItemID are two foreign keys to ItemID, so a product and its components are rows of one table, and the bill says which row is made of which. **Watch for:** a student who looks for a Component table.
 

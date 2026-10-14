@@ -10,12 +10,12 @@ figures:
   - id: IF-10-0-A
     kind: diagram
     purpose: A chooser that takes a question about two or more tables to the right join or summary and to its row-count test.
-    shows: "A decision path from a question to the join or summary that fits: inner join, left join, anti-join (IS NULL on the second table's key, or NOT EXISTS) and GROUP BY with HAVING. Each leaf names its row-count test and cites the tutorial step or exercise that practices it; a side box warns that a header amount repeats on every line."
+    shows: "A decision path from a question to the join or summary that fits: inner join, left join, anti-join (IS NULL on the second table's key, or NOT EXISTS) and GROUP BY with HAVING. Each leaf names its row-count test and cites the tutorial step or exercise that practices it; a box beneath the four paths warns that a header amount repeats on every line it is joined to."
     data: None; the leaves cite the chapter's tutorials and exercises.
   - id: IF-10-0-B
     kind: sql-mock
     purpose: The in-class demonstration of fan-out, one total summed over a join and again from the header table alone.
-    shows: "The Execute SQL tab with two queries for the current fiscal year: SUM(GrandTotal) over SalesInvoice joined to SalesInvoiceLine, and over SalesInvoice alone. The grid shows both totals, the joined one outlined and nearly twice the other."
+    shows: "The Execute SQL tab with one query for the current fiscal year that returns SUM(GrandTotal) over SalesInvoice joined to SalesInvoiceLine and, as a scalar subquery, over SalesInvoice alone, because DB Browser keeps only the last statement's grid. The grid shows both totals, the joined one outlined and nearly twice the other."
     data: SalesInvoice and SalesInvoiceLine for the current fiscal year, run read-only (the two values are in the Difficult ideas).
 ---
 # Chapter 10: Joining and Summarizing Data in SQL

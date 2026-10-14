@@ -95,8 +95,7 @@ Scenarios AS (
 )
 ```
 
-> **[Figure placeholder IF-C3-4-A]** The hours each scenario needs against the plant's regular capacity, the picture behind the decision to allow no routine overtime.
-> Kind: chart · Shows: Three columns for the scenarios (standard hours, the first year's level, the last year's level with its overtime), labeled with the hours needed, and a horizontal line for regular capacity well above all three, labeled with its value and with the share of capacity the standard-hours scenario uses. · Data: The scenarios query of Step 4, run read-only. · Status: planned
+![The hours each scenario needs against the plant's regular capacity, the picture behind the decision to allow no routine overtime.](../figures/case-part-3/IF-C3-4-A.pdf)
 
 **Check:** conversion cost 3,996,855, 4,373,789, 5,371,136; expected variance 730,432, 1,107,366, 2,104,714; the last is close to 2026's actual conversion variance of 2,159,138.03. Its overtime premium is 266,521 before burden. **Watch for:** `UNION` gives the same rows here, because the ratios differ; write `UNION ALL` anyway, because a repeated scenario would vanish.
 

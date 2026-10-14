@@ -13,12 +13,12 @@ figures:
   - id: IF-C1-5-A
     kind: excel-mock
     purpose: The PivotTable that shows what sits behind the naive fourth-quarter revenue.
-    shows: A PivotTable on GLEntry with AccountID set to the Furniture revenue account and the quarter's three fiscal periods selected in the filters. Rows list SourceDocumentType, with VoucherNumber expanded under JournalEntry; Values show Sum of Debit and Sum of Credit. Two rows appear, JournalEntry with a very large debit and SalesInvoice with a credit of about the quarter's invoicing, and a grand total that is negative. The JournalEntry row and its voucher number are outlined, and the grand total is outlined in a second color.
+    shows: A PivotTable on GLEntry with AccountID set to the Furniture revenue account and the quarter's three fiscal periods selected in the filters. Rows list SourceDocumentType, with VoucherNumber expanded under JournalEntry; Values show Sum of Debit and Sum of Credit. Two rows appear, JournalEntry (expanded to its voucher number) with a very large debit and SalesInvoice with a credit of about the quarter's invoicing. The grand total row shows debits far above credits, and a note gives credits less debits, which is negative. The JournalEntry row and its voucher number are outlined, and the grand total row is outlined in a second color.
     data: The GLEntry rows of the Furniture revenue account in the fourth quarter of the current fiscal year, by source document type (the Expected results of this requirement).
   - id: IF-C1-5-B
     kind: chart
     purpose: The naive and the corrected Furniture margin for the two quarters, side by side.
-    shows: A clustered bar chart for the third and fourth quarters with two bars in each, "all ledger rows" and "year-end close excluded", and the percentage printed on each bar. The third quarter's bars match; in the fourth the all-rows bar equals the third quarter's and the corrected bar is lower, with a note that the all-rows totals are negative. The series differ by pattern as well as color.
+    shows: A clustered bar chart for the third and fourth quarters with two bars in each, "all ledger rows" and "year-end close excluded", and the percentage printed on each bar. The third quarter's bars match; in the fourth the all-rows bar is about the third quarter's and the corrected bar is lower, with a marker on the all-rows bar and a note that its totals are negative. The series differ by pattern (solid and hatched) as well as color.
     data: The naive and the corrected margins of the Expected results of this requirement.
 ---
 {% set g = case1_g5 %}

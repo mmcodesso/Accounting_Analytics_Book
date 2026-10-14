@@ -13,7 +13,7 @@ figures:
   - id: IF-19-3-A
     kind: excel-mock
     purpose: The Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and 2.
-    shows: "The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance materiality and the clearly trivial threshold in cells whose names are written beside them; below it the three-year block of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the two comparisons and the conclusion text."
+    shows: "The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance materiality and the clearly trivial threshold in cells whose names are written beside them as labels (in the workbook the Name Box shows them); below it the three-year block of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the two comparisons and the conclusion text."
     data: The Materiality worksheet of Credits Audit.xlsx on the pinned dataset (income, thresholds, revenue and returns by year).
 ---
 {% set g = ch19_g3 %}

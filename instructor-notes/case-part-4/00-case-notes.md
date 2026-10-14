@@ -54,8 +54,7 @@ The case depends on these conditions of the data, all visible in the file studen
 - The Date table ends before the debt schedule does, so a filter through it drops later payments silently.
 - Word choice. Students may reach for unpaid, withheld or fraud. Slide 10 sets the rule; repeat it at Requirement 5.
 
-> **[Figure placeholder IF-C4-0-B]** The three dates of the case, which students must not mix.
-> Kind: diagram · Shows: One horizontal timeline from the last payroll posting through the last day of the current fiscal year to the ledger's last posting. Three marks are labeled: the last payroll posting, Data Through, and the last posting in the ledger. A bracket after the second mark reads supplier payments of the year's invoices, the only postings after the year. Under the first mark a note says the last two pay periods are open. · Data: The last payroll posting, Data Through and the ledger's last posting (Requirement 1, Step 8). · Status: planned
+![The three dates of the case, which students must not mix.](../figures/case-part-4/IF-C4-0-B.pdf)
 
 ## Teaching approaches
 
@@ -130,8 +129,7 @@ The case depends on these conditions of the data, all visible in the file studen
 
 Every requirement is part of the case, and each depends on the first. The figure shows how their results feed the memo and its appendix.
 
-> **[Figure placeholder IF-C4-0-A]** How the six requirements build the memo and its appendix, and the chapters each one draws on.
-> Kind: diagram · Shows: Six boxes in a row for the requirements, each tagged with its chapters (Chapters 13, 14 and 16; 14 and 15; 14 and 15; 13 to 15; 14 to 16; none). Arrows run from Requirement 1 into every other box. Requirements 2 to 5 feed the memo's three sections (Financial reporting, Managerial accounting, Auditing); all six feed the memo. Five exhibit boxes under the memo are tagged with the requirement and report page that produce each. · Data: none; the boxes and tags come from the case's requirements and deliverable. · Status: planned
+![How the six requirements build the memo and its appendix, and the chapters each one draws on.](../figures/case-part-4/IF-C4-0-A.pdf)
 
 Three bundles:
 

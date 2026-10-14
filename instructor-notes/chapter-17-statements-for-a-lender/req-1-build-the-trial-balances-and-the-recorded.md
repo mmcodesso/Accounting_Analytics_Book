@@ -32,8 +32,7 @@ Students can:
 
 Pairs, about 90 minutes: 25 for the query, 10 for the reruns and the net income check, 35 for the mapping and statements, 10 for the control totals, 10 for the anti-join. The routine for every query: type it at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Hold back the mapping formula until students have listed the subtypes, and Chapter 6's control totals until their balance sheet balances. **Collect** the script and the workbook.
 
-> **[Figure placeholder IF-17-1-A]** The trial-balance query for the last year-end with its result, the check students make before they map anything.
-> Kind: sql-mock · Shows: The tab LenderPackage.sql at the first query of Requirement 1: the two comment lines, the Params and Closes CTEs, the SELECT and the WHERE clause with its NOT (...) test. The result grid shows AccountNumber, AccountName, AccountType, AccountSubType, Balance, DebitBalance, CreditBalance and Postings for the first accounts, the cash row outlined; the message pane reports one row for each account with postings. · Data: The trial-balance query for the last year-end, run read-only. · Status: planned
+![A mock of the trial-balance query for the last year-end with its result, the check students make before they map anything.](../figures/chapter-17-statements-for-a-lender/IF-17-1-A.pdf)
 
 ## Step-by-step solution
 

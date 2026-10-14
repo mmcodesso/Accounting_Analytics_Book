@@ -81,8 +81,7 @@ ORDER BY SalesInvoice[FiscalYear], SalesInvoice[Period]
 
 **Check:** the status reports 6 columns and 12 rows, ordered by year and quarter, and the four rows of fiscal 2026 are those of the Expected results.
 
-> **[Figure placeholder IF-AC-1-A]** DAX query view after the Exercise C.1 query has run, the end state of Requirement 2.
-> Kind: pbi-mock · Shows: DAX query view of the model editor in the Power BI service: the banner that DAX queries are discarded on close, the query in the editor, and the Results grid with one row for each fiscal quarter of the three years (fiscal year, period, invoice lines, revenue, list amount, discounts), the four rows of the current year outlined, and the status with the number of columns and rows. The Data pane lists Key Measures first, with Revenue, List Amount, Discounts and Invoice Lines inside it. · Data: The four quarters of the current year from the Expected results quantities, and the other rows from the same read-only twin. · Status: planned
+![A mock of DAX query view after the Exercise C.1 query has run, the end state of Requirement 2.](../figures/appendix-c-power-bi-browser/IF-AC-1-A.pdf)
 
 **Watch for:** grouping by FiscalQuarter alone, which returns four rows that add the three years (the fourth reads 7,135 lines and $22,032,440.83), so no fiscal 2026 row can be read. Counting with DISTINCTCOUNT instead of COUNTROWS returns invoices, not lines: 1,845 in the first quarter against 2,472 lines.
 

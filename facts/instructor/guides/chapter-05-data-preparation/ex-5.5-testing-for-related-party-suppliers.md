@@ -13,7 +13,7 @@ figures:
   - id: IF-05-5-A
     kind: excel-mock
     purpose: The Supplier Table with its match key and the matched employee, filtered to the suppliers that match.
-    shows: "The right-hand columns of the Supplier Table: MatchKey, EmployeeMatches, MatchedEmployeeID, MatchedEmployee, MatchedJobTitle, PaymentCount and PaymentTotal, with the filter buttons on and the Table filtered to the rows where EmployeeMatches is greater than zero. Each match key reads in capitals as the address, a comma and a space, and the city. The formula bar shows the match key formula. Beside the Table, a result block lists the matched suppliers with the employee and job title for each."
+    shows: "The right-hand columns of the Supplier Table, in two strips of the same rows because the Table is wider than the window: MatchKey, EmployeeMatches and MatchedEmployeeID, then MatchedEmployee, MatchedJobTitle, PaymentCount and PaymentTotal, with the filter buttons on and the Table filtered to the rows where EmployeeMatches is greater than zero. Each match key reads in capitals as the address, a comma and a space, and the city. The formula bar shows the match key formula. Below the Table, on the Ex 5.5 worksheet, a result block lists the matched suppliers with the employee and job title for each."
     data: Supplier, Employee and DisbursementPayment (the Expected results table).
 ---
 {% set g = ch05_g5 %}

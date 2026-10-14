@@ -96,7 +96,7 @@ Every step: a short imperative title in bold (**Step 3. Group by account.**), th
 
 ## Figure placeholders
 
-Declare each figure once in the front matter and place it with `{{ figure('IF-06-1-A') }}` where it belongs. The build shows a placeholder block until `instructor-notes/figures/<unit folder>/IF-06-1-A.png` exists, then the image, so the figure phase edits no guide.
+Declare each figure once in the front matter and place it with `{{ figure('IF-06-1-A') }}` where it belongs. The build shows a placeholder block until `instructor-notes/figures/<unit folder>/IF-06-1-A.pdf` (the figure's vector PDF) exists, then links that PDF, so the figure phase edits no guide.
 
 ```yaml
 figures:

@@ -109,8 +109,7 @@ ORDER BY Debit DESC, PostingDate, VoucherNumber
 LIMIT 10;
 ```
 
-> **[Figure placeholder IF-09-2-A]** The ten largest unfavorable purchase variances of the year, with the tie-break visible.
-> Kind: sql-mock · Shows: The Execute SQL tab on the tab Ex 9.2.sql. The editor holds the comment lines and the query of Step 5 with ORDER BY Debit DESC, PostingDate, VoucherNumber and LIMIT 10. The grid shows GLEntryID, PostingDate, VoucherNumber, Debit and Description for ten rows, with the two rows that share an amount outlined. The message pane reports ten rows returned. · Data: GLEntry for the purchase price variance account in the current fiscal year, the Step 5 query, run read-only on the dataset. · Status: planned
+![A mock of the ten largest unfavorable purchase variances of the year, with the tie-break visible.](../figures/chapter-09-sql-essentials/IF-09-2-A.pdf)
 
 **Check:** 10 rows, the largest $796.29 dated 2026-01-31 on voucher V0101-2026-020853, then $783.75 and $752.40. Two postings share $670.89, so their order depends on the tie-break; the tenth amount is not tied, so the ten postings are the same for everyone. **Watch for:** without the year condition the ranking mixes fiscal years and starts at $858.99. `ORDER BY Debit` without DESC starts at $0.01. Sorting on Credit leaves the rows in no order, because every unfavorable posting has a credit of zero. The description must be typed exactly as stored; `'Unfavorable purchase variance'` returns no rows.
 

@@ -31,8 +31,7 @@ Students can:
 
 Individual work, about 90 minutes: 25 for the decision table, 45 for the memo, 10 for the appendix, 10 for a read-aloud check. Do not hand out the outline until students have a draft; then give it as a checklist. Peer review works well: each student reads a classmate's decision table first and says what to do with each family, before reading the memo. **Collect** the memo with its appendix.
 
-> **[Figure placeholder IF-18-10-B]** The page plan of the memo and its appendix, for the kickoff and for grading.
-> Kind: diagram · Shows: Two columns of boxes: a memo of two pages with seven short sections in order (the finding, the two views, the decisions, the whole paths, the prices, the standards and statements, the production manager's decision), and an appendix of three pages with three exhibits, each tagged with the sheet of the workbook it comes from. · Data: none; the sections and exhibits come from the requirement and from the sheets of the model workbook. · Status: planned
+![The page plan of the memo and its appendix, for the kickoff and for grading.](../figures/chapter-18-make-buy-or-reprice/IF-18-10-B.pdf)
 
 ## Step-by-step solution
 
@@ -48,8 +47,7 @@ One-time cost =XLOOKUP($A5,'Make or Buy'!$A$10:$A$15,'Make or Buy'!$W$10:$W$15)+
 
 **Check:** 9 rows; the annual effects, the path that buys, add up to $501,792 and the one-time costs to $172,660. **Watch for:** the saving from buying added to the increases of the families bought as well: $812,016, more than either honest path. And one-time costs of tooling alone: $70,000.
 
-> **[Figure placeholder IF-18-10-A]** The Memo sheet's decision table, the exhibit the memo's recommendation rests on.
-> Kind: excel-mock · Shows: Nine family rows with the action, the annual effect, the one-time cost and what the decision depends on, and two totals rows below; the three families to buy are grouped first, the three to make next, and the other families below the floor last. · Data: The Memo sheet of the model workbook, the decision table and its totals. · Status: planned
+![A mock of the Memo sheet's decision table, the exhibit the memo's recommendation rests on.](../figures/chapter-18-make-buy-or-reprice/IF-18-10-A.pdf)
 
 **Step 2. Lead with the finding that changes the question.** Evidence: Requirements 3, 4 and 7. The plant already pays for about 17.8 positions of capacity it does not use ($997,574 of crew cost a year), which is more than buying would free (10.6 positions). Fitting the crew to the work is the larger question, and the two reductions add up only if both can be made.
 

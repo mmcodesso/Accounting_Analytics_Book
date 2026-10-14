@@ -79,8 +79,7 @@ Change in Cash = CALCULATE ( [GL Amount], Account[Step] = "Cash" )
 
 **Check:** 2026: net income $4,503,611.24, inventories -$8,754,515.25, change in cash -$941,310.30, from $9,383,566.10 to $8,442,255.80. 2025: inventories -$5,022,322.02 and cash up $3,494,591.86. **Watch for:** reading 2024 like 2025. The opening entry is a 2024 posting, so the bridge starts from zero cash, shows $5,888,974.24 and puts $11,010,680.97 in financing; without it the change is $3,792,603.12 from an opening cash line of $2,096,371.12.
 
-> **[Figure placeholder IF-C4-2-A]** The Cash Bridge page of the model answer, the exhibit that answers the committee's first question.
-> Kind: pbi-mock · Shows: Report view, page Cash Bridge. A tile slicer of the fiscal years; a waterfall of ten steps from Net income to Debt and equity, the Inventories step far below the others; a matrix of the bridge by year; and a matrix of the sections by activity with As recorded and Restated Cash Flow. · Data: The Expected results quantities (the bridge steps by year and the sections as recorded and restated), read-only. · Status: planned
+![A mock of the Cash Bridge page of the model answer, the exhibit that answers the committee's first question.](../figures/case-part-4/IF-C4-2-A.pdf)
 
 ### Part 4: The entries that moved no cash
 

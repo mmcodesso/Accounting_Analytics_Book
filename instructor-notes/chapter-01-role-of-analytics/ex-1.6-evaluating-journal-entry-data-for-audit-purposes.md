@@ -71,8 +71,7 @@ b. Click the **GLEntry** worksheet tab. It has 16 columns: GLEntryID, PostingDat
 
 **Just below an approval threshold.** JournalEntry holds no threshold. The limit sits in Employee, by approver, so the test needs ApprovedByEmployeeID joined to MaxApprovalAmount. With that, 9 entries are above their approver's limit and 2 are within ten percent below it, and the near ones are ordinary rent entries. The data are sufficient once Employee is added, and the written authority policy should be confirmed.
 
-> **[Figure placeholder IF-01-6-A]** What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements 3 and 4.
-> Kind: excel-mock · Shows: The JournalEntry worksheet scrolled to rows whose ReversesJournalEntryID is filled, with the columns EntryNumber, PostingDate, EntryType, TotalAmount, CreatedByEmployeeID, CreatedDate, ApprovedByEmployeeID, ApprovedDate and ReversesJournalEntryID visible. The time part of CreatedDate reads the same on every row shown, and the ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is Accrual Adjustment. · Data: A few JournalEntry rows of the Accrual Adjustment type and their columns, taken from the current dataset. · Status: planned
+![A mock of What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements 3 and 4.](../figures/chapter-01-role-of-analytics/IF-01-6-A.pdf)
 
 The approvers and their limits:
 

@@ -12,8 +12,8 @@ solution: "PartII-case.zip: Charles River Promotion Case.xlsx, sheets R2 Cost (P
 figures:
   - id: IF-C2-2-A
     kind: excel-mock
-    purpose: The PivotTable of promotional discount and billed lines by promotion and invoice year.
-    shows: "A PivotTable with PromotionID down the rows and the three invoice years across, each holding Sum of DiscountAmount and Count of lines, with grand totals and no blank row. A column chart of the yearly totals sits beside it."
+    purpose: The PivotTable of promotional discount and billed lines by promotion and invoice year, with a chart of the yearly totals beneath it.
+    shows: "A PivotTable with PromotionID down the rows and the three invoice years across, each holding Sum of DiscountAmount and Count of lines, with grand totals and no blank row. The second column of discount of the promotions invoiced in the year after they ran is outlined. A column chart of the yearly totals, with each year's share of billed revenue, sits beneath it."
     data: The Expected results of this requirement (discount and lines by promotion and year, from BilledLines).
   - id: IF-C2-2-B
     kind: chart

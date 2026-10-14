@@ -63,8 +63,7 @@ ROW (
 
 Use these rows to read what a correct role shows. To grade a student's role, ask for the screens of **View as** or look at the role in **Manage roles**.
 
-> **[Figure placeholder IF-AB-0-B]** The Checks tab of the model answer, the fast way to compare a student's numbers with what each manager should see.
-> Kind: pbi-mock · Shows: DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid with the columns Section, Check, Expected, Actual and Agrees, scrolled to the rows that start 'as employee006 (Sales Manager)'. Each row has Agrees true: Cost Centers Shown, the budget, the actual, the flexed budget, the net income, and Manufacturing Hours as blank. · Data: The Checks tab of the solution project after a refresh; the rows of Guided Tutorial B.1 for the Sales Manager. · Status: planned
+![A mock of the Checks tab of the model answer, the fast way to compare a student's numbers with what each manager should see.](../figures/appendix-b-publishing-security/IF-AB-0-B.pdf)
 
 **Pitfalls that cost class time**
 
@@ -74,8 +73,7 @@ Use these rows to read what a correct role shows. To grade a student's role, ask
 - **IDs typed in sequence.** In the security table the cost center IDs are 1 to 7, 9 and 10. Typed as 1 to 9, the Marketing Manager sees Research and Development and the Design Services Manager sees Marketing. Exercise B.2's review catches both.
 - **A role written from scratch.** Exercise B.1 replaces the role if its script starts from nothing, and the rules are lost (see that guide).
 
-> **[Figure placeholder IF-AB-0-A]** A decision path that helps an instructor choose how much of the appendix to teach.
-> Kind: diagram · Shows: A decision tree. Start: students have Power BI Desktop and the Charles River Reports project. First question: do you and a partner have Pro or Premium Per User licenses and a shared workspace where you are Admin? No leads to Scope 1 (Tutorial B.1, both exercises, Step 5 of Tutorial B.2 as a reading task); a sub-branch asks whether to add the Publishing and Sharing section as reading, giving Scope 2. Yes leads to Scope 3 (Steps 1 to 4 of Tutorial B.2 added). Each end box lists its class minutes and the questions it covers. · Data: None; the scopes, minutes and question numbers of the Teaching approaches section. · Status: planned
+![A decision path that helps an instructor choose how much of the appendix to teach.](../figures/appendix-b-publishing-security/IF-AB-0-A.pdf)
 
 ## Teaching approaches
 

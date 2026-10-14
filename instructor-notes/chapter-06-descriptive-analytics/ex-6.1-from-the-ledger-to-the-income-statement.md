@@ -53,8 +53,7 @@ a. In ChartOfAccounts, use **Home > Choose Columns** to keep AccountID, AccountN
 b. In TrialBalance choose **Home > Merge Queries**, match AccountID with AccountID and expand the four other columns, clearing **Use original column name as prefix**.
 c. Sort by AccountNumber.
 
-> **[Figure placeholder IF-06-1-A]** The Power Query Editor with the applied steps of the TrialBalance query after Step 4.
-> Kind: excel-mock · Shows: The Power Query Editor with TrialBalance selected. Applied Steps: Source, Navigation, Filtered Rows, Filtered Rows1, Grouped Rows, Merged Queries, Expanded ChartOfAccounts, Sorted Rows. The preview grid shows the first accounts with their debit, credit, number, name, type and subtype. · Data: The first rows of the trial balance and the applied steps (the Expected results of this exercise). · Status: planned
+![A mock of the Power Query Editor with the applied steps of the TrialBalance query after Step 4.](../figures/chapter-06-descriptive-analytics/IF-06-1-A.pdf)
 
 **Step 5. Load the result.**
 
@@ -118,8 +117,7 @@ B10  =B8+B9
 
 **Step 12. Find the invoices and the dates.** Filter SalesInvoice to fiscal 2025 with an invoice number that starts `SI-2026`: 3 invoices, which Exercise 5.2 found. Sum their lines by item group and match each to a difference. For each, read ShipmentLineID on InvoiceLines and follow it through ShipmentLine to Shipment for the delivery date.
 
-> **[Figure placeholder IF-06-1-B]** The reconciliation of Requirement 5 on the worksheet Ex 6.1.
-> Kind: excel-mock · Shows: A grid with columns Account, Item group, Account balance, InvoiceLines of the report year, Difference, Explained and Unexplained, five rows for the product revenue accounts and a Total row; the three rows with a difference are outlined. Below it, the three invoices numbered in the report year but dated in the year before, with number, date, item group and line total. · Data: The reconciliation and invoice rows of the Expected results. · Status: planned
+![A mock of the reconciliation of Requirement 5 on the worksheet Ex 6.1.](../figures/chapter-06-descriptive-analytics/IF-06-1-B.pdf)
 
 **Check:** each difference equals one invoice, and the ledger posted all of them on 2026-01-01. SI-2026-013742 shipped on 2025-12-06, in fiscal 2025, so its $3,233.18 is a cutoff error. The other two shipped on 2026-01-01, so only their dates are wrong. **Watch for:** the invoice number taken as evidence. Delivery decides, because control passes then.
 

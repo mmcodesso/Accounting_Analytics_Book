@@ -13,7 +13,7 @@ figures:
   - id: IF-C4-6-A
     kind: diagram
     purpose: How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.
-    shows: "Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines, three headed sections in the order Financial reporting, Managerial accounting, Auditing, and a closing Recommendation. The appendix shows five numbered exhibit boxes. Tags name the source of each section and exhibit: Requirement 2 and the Cash Bridge page, Requirement 3 and the Working Capital page, Requirement 4 and the Materials pages, Requirement 5 and the Reconciliations page."
+    shows: "Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines, three headed sections in the order Financial reporting, Managerial accounting, Auditing, and a closing Recommendation. The appendix shows five numbered exhibit boxes. Tags name the source of each section and exhibit: Requirement 2 and the Cash Bridge page, Requirement 3 and the Working Capital page, Requirement 4 and the Materials pages, Requirement 5 and the Reconciliations page. The Auditing section also names Requirement 1 and its Validation and About pages."
     data: none; the layout and tags come from the case's Requirement 6 and Deliverable.
 ---
 {% macro sm(x) %}{{ "-" if x < 0 else "" }}${{ (x|abs)|money }}{% endmacro %}

@@ -17,7 +17,7 @@ figures:
   - id: IF-01-2-B
     kind: excel-mock
     purpose: The GLEntry worksheet filtered to the four rows of the traced invoice, the model answer to requirement 3.
-    shows: The GLEntry worksheet with the SourceDocumentType filter open and SalesInvoice ticked, and the table narrowed to the four rows of the traced invoice. Columns GLEntryID through SourceLineID are visible, with the receivables debit equal to the three credits. The SourceDocumentType header and the revenue row's SourceLineID cell are outlined.
+    shows: The GLEntry worksheet with the SourceDocumentType filter list open and SalesInvoice ticked, and the table narrowed to the four rows of the traced invoice by that filter and a filter on SourceDocumentID. The filter list is drawn below the rows, joined to its filter button, so that it does not cover them. Columns B (PostingDate) and F (VoucherType) are hidden so that the text stays legible; the other columns from GLEntryID to SourceLineID are visible, with the receivables debit equal to the three credits. The SourceDocumentType header and the revenue row's SourceLineID cell are outlined.
     data: The four GLEntry rows of the traced invoice (the table in Step 4).
 ---
 # Exercise 1.2: Tracing the Revenue Path from Order to Ledger

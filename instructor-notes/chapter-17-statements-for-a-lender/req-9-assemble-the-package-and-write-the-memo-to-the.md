@@ -27,8 +27,7 @@ Students can assemble the package as a PDF from the workbook (Part 1), tabulate 
 
 Individual work, because the memo is one voice; pairs can build the matters table together. About 120 minutes: 20 for the PDF, 25 for the matters table, 55 for the memo, 10 for the appendix, 10 to edit. Plan C of the case notes drafts from the Requirement 9 outline in Part 3 and swaps drafts against the Requirement 9 grading guide below. Hold back the four-part table until students have a first draft of their own. **Collect** the PDF, the memo with its appendix and the Memo worksheet.
 
-> **[Figure placeholder IF-17-9-A]** The memo and its appendix at a glance, so students see what goes where before they write.
-> Kind: diagram · Shows: Two page outlines and an appendix strip. Page one: header, an opening that holds the recommendation, and a table of the four required matters with four columns. Page two: the other matters, the passed items, the close changes and the closing recommendation. Under them, three exhibits of one page each: the schedule of adjustments, the matters' numbers and the going-concern conditions. · Data: none; the layout follows the requirement's page limits and its outline. · Status: planned
+![The memo and its appendix at a glance, so students see what goes where before they write.](../figures/chapter-17-statements-for-a-lender/IF-17-9-A.pdf)
 
 ## Step-by-step solution
 

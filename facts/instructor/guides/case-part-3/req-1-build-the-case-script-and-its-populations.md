@@ -18,7 +18,7 @@ figures:
   - id: IF-C3-1-B
     kind: sql-mock
     purpose: The dispositions of the attendance exceptions, where the misattributed rows stand out.
-    shows: "The tab Case.sql at the disposition query. Columns AttendanceExceptionID, ExceptionType, EmployeeID, EntryEmployeeID, TimeClockEntryID and Disposition; the rows whose EmployeeID differs from EntryEmployeeID are outlined."
+    shows: "The tab Case.sql at the disposition query, its CASE expression in the editor. The grid is scrolled right so that the columns EmployeeID, EntryEmployeeID, TimeClockEntryID, ClockStatus and Disposition fit the frame (the row numbers are the AttendanceExceptionIDs); the rows whose EmployeeID differs from EntryEmployeeID are outlined, and the message pane reports 18 rows."
     data: The disposition query, run read-only.
 ---
 {% set g = case3_g1 %}

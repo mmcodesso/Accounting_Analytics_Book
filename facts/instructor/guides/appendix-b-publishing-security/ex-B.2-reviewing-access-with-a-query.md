@@ -13,12 +13,12 @@ figures:
   - id: IF-AB-2-A
     kind: pbi-mock
     purpose: The result of query (4), the review a student runs every quarter, so an instructor sees what a clean review looks like.
-    shows: "DAX query view on the model answer, the tab Ex B.2 selected, the third query in the editor and a result grid under it with nine rows, one for each user of the security table. Columns: the user name, CostCenterID, EmployeeID, EmployeeName, JobTitle, EmploymentStatus, TerminationDate, OwnCostCenterID and Flag. TerminationDate and Flag are empty in every row, and CostCenterID equals OwnCostCenterID in every row."
+    shows: "DAX query view on the model answer, the tab Ex B.2 selected, the third query selected in the editor with the lines it leaves out marked, and a result grid under it with nine rows, one for each user of the security table. Columns: the user name, CostCenterID, EmployeeID, EmployeeName, JobTitle, EmploymentStatus, TerminationDate, OwnCostCenterID and Flag. The grid is wider than the window, so it is drawn twice, before and after scrolling right. TerminationDate and Flag are empty in every row, and CostCenterID equals OwnCostCenterID in every row."
     data: The security table of Guided Tutorial B.1 and the employee records (the Expected results quantities), read-only.
   - id: IF-AB-2-B
     kind: pbi-mock
     purpose: The page Ex B.2 viewed as the Sales Manager, the leak that requirement (5) asks students to find.
-    shows: "Report view, page Ex B.2, with the bar above the page naming the role Cost Center Managers and the Sales Manager. A table titled 'AccessEmployees, as any role member sees it' lists EmployeeName, JobTitle, EmploymentStatus and TerminationDate for every employee, with the terminated employees' dates filled in, and a scroll bar showing that the list is long. A text box beside it reads 'Model answer'."
+    shows: "Report view, page Ex B.2, with the bar above the page naming the role Cost Center Managers and the Sales Manager. A table titled 'AccessEmployees, as any role member sees it' lists EmployeeName, JobTitle, EmploymentStatus and TerminationDate for every employee, with the terminated employees' dates filled in, and a scroll bar showing that the list is long (the picture shows the top of the list). A text box beside it reads 'Model answer'."
     data: The Employee table (all employees, with status and termination date), read-only.
 ---
 {% set x = appB_g2 %}

@@ -13,7 +13,7 @@ figures:
   - id: IF-08-2-A
     kind: excel-mock
     purpose: The reconciliation workpaper of account 2010 to the open supplier invoices, with every reconciling item explained.
-    shows: "The Ex 8.2 worksheet from the ledger balance down to the unexplained difference. Columns Item, Voucher, Entry description, PurchaseInvoiceID, InvoiceNumber, Amount, What it is and Correction belongs in. Three reconciling rows: the opening entry as a negative amount and the two reclassifications as positive amounts. The unexplained difference of zero is outlined."
+    shows: "The Ex 8.2 worksheet from the ledger balance down to the unexplained difference, in two views of the same rows because the columns do not fit one window. First columns A to F: Item, Voucher, Entry description, PurchaseInvoiceID, InvoiceNumber and Amount, then the same rows after scrolling right, columns G and H: What it is and Correction belongs in. Three reconciling rows: the opening entry as a negative amount and the two reclassifications as positive amounts. The unexplained difference of zero is outlined, and its formula is in the formula bar."
     data: GLEntry for account 2010 by journal entry, and the open supplier invoices at the as-of date (the Expected results table).
 ---
 {% set g = ch08_g2 %}

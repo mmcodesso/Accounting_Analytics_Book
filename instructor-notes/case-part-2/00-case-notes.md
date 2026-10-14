@@ -114,8 +114,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 
 The timeline separates the two dates and is worth putting on the board before Requirement 2.
 
-> **[Figure placeholder IF-C2-0-B]** The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount reaches revenue.
-> Kind: diagram · Shows: A twelve-month timeline of the report year. For each of the three proposed promotions a solid bar marks the months in which its lines were ordered and a lighter bar extends over the months in which they were invoiced. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date of the collection promotion, which falls before its own start. · Data: The proposed promotions' order months, invoice months and discount billed by quarter (Requirement 2 Step 6, Requirement 3 Step 1). · Status: planned
+![The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount reaches revenue.](../figures/case-part-2/IF-C2-0-B.pdf)
 
 ## Discussion prompts
 
@@ -140,8 +139,7 @@ The timeline separates the two dates and is worth putting on the board before Re
 
 Every requirement is part of the case, and each depends on the first. The figure shows how their results feed the memo and its appendix.
 
-> **[Figure placeholder IF-C2-0-A]** How the six requirements build the memo and its appendix, and the chapter each one draws on.
-> Kind: diagram · Shows: Six boxes in a row for the requirements, each tagged with the chapters it uses (Chapters 4 and 5, Chapter 6, Chapters 6 and 7, Chapter 7, Chapter 8, none). Arrows run from Requirement 1 into every other box, from Requirements 2 to 5 into boxes for the memo's sections Financial reporting, Managerial accounting and Auditing, and from all of them into the memo. Five exhibit boxes beneath the memo are tagged with the requirement that produces each. · Data: none; the boxes and tags come from the case's requirements and deliverable. · Status: planned
+![How the six requirements build the memo and its appendix, and the chapter each one draws on.](../figures/case-part-2/IF-C2-0-A.pdf)
 
 Three bundles:
 

@@ -64,8 +64,7 @@ Actual    =Inputs1090/StdHours
 
 **Check:** the proposed rate $63.46 against $47.40 today, $61.81 time-driven and $78.77 actual. A standard on actual cost would carry the idle capacity and the hours paid beyond the work into inventory, and Topic 330 charges abnormal costs of that kind to the period.
 
-> **[Figure placeholder IF-18-9-A]** The top of the Standards sheet, where the proposed rate is built and set beside the other rates.
-> Kind: excel-mock · Shows: Five component rows (direct labor, the overhead that varies, indirect labor, supervision, depreciation) with their basis, then the proposed rate, the labor-content case, the current standard, the time-driven rate, the base year's actual cost and the two rates at the ends of the normal-capacity range; the proposed rate is outlined. · Data: The Standards sheet of the model workbook, rows for the rate and its comparisons. · Status: planned
+![A mock of the top of the Standards sheet, where the proposed rate is built and set beside the other rates.](../figures/chapter-18-make-buy-or-reprice/IF-18-9-A.pdf)
 
 ### Part 2: The stock and its revaluation
 
@@ -112,8 +111,7 @@ Q31 returns the opening entry's finished goods, $4,111,795.76, which has no item
 
 **Check:** normal capacity at 90% and 110% of the plan volume gives rates of 64.42 and 62.68, and balance effects of +$499,387 and +$447,987 at the last year-end, above the screen. With no indirect hours the rate is 58.00: the prior year's balance, +$243,171, falls below its screen and the last year's, +$309,655, stays above.
 
-> **[Figure placeholder IF-18-9-B]** The revaluation of the stock at the two year-ends against each year's materiality screen, the picture behind the recommendation.
-> Kind: chart · Shows: Two groups of bars, one for each year-end, with the revaluation at the proposed rate, with no indirect hours, and at each end of the normal-capacity range; a horizontal mark in each group shows that year's screen, so the one bar below it, the earlier year with no indirect hours, is visible. Dollar labels on the bars. · Data: The revaluation rows and the materiality screens of the Standards sheet. · Status: planned
+![The revaluation of the stock at the two year-ends against each year's materiality screen, the picture behind the recommendation.](../figures/chapter-18-make-buy-or-reprice/IF-18-9-B.pdf)
 
 ### Part 4: Error or estimate
 

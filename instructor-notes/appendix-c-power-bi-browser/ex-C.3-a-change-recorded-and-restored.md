@@ -83,8 +83,7 @@ Revenue = SUM ( SalesInvoiceLine[ListAmount] )
 
 **Check:** every row now equals its list amount: fiscal 2026 reads $33,589,137.45, higher by $3,832,717.37, the price reductions and discounts. Open the Sales and Discounts page: its cards still read the old revenue, because they sum the columns. The test is the only place the change shows. **Watch for:** a result that has not moved, which usually means the formula was not committed with Enter; look at the formula bar.
 
-> **[Figure placeholder IF-AC-3-A]** The three runs of the test, and what the pages did and did not show.
-> Kind: diagram · Shows: A left-to-right timeline of three boxes joined by arrows labeled Save a version, Change the Revenue formula, and Restore the version. Each box shows the test's revenue for the current year and, under it, the revenue card of the Sales and Discounts page. The first and third boxes show the same revenue; the second shows a higher test revenue while the card is unchanged. A side box lists what version history keeps and what a Power BI project under version control adds. · Data: The three test results of the Expected results table. · Status: planned
+![The three runs of the test, and what the pages did and did not show.](../figures/appendix-c-power-bi-browser/IF-AC-3-A.pdf)
 
 ### Requirement (4): The restore
 

@@ -83,8 +83,7 @@ LastReceipt AS (
 
 The test keeps the refunds with `lp.LastPaymentDate > rf.RefundDate`.
 
-> **[Figure placeholder IF-19-4-A]** The dates around one refund, the picture behind the definition of a refund paid before the customer's payment.
-> Kind: diagram · Shows: A horizontal time line for one invoice: the invoice date, the due date, two receipts, the applications of those receipts a day or two after each, and the refund date between the receipts and the last application. Three brackets name the three readings: the last application (the case's definition), the last receipt, and the same-day case in which the order is unknown because the records hold dates and not times. A note says that the bank clearing date is in no table. · Data: One refund of the BeforePayment test (T6) chosen from the refunds the two definitions part on, with its invoice, receipts and applications. · Status: planned
+![The dates around one refund, the picture behind the definition of a refund paid before the customer's payment.](../figures/chapter-19-customer-credits-audit/IF-19-4-A.pdf)
 
 **Check:** 58 refunds ($71,306.30), 10, 29 and 19 by year; by the receipts' dates 51 ($67,833.13), accepted when stated; 41 before any application. T7 gives the cause: 225 credits post a part to `2060`, 106 of them when nothing had been paid. **Watch for:** `>=`, which flags 64. The order within a day is unknown for the 7 refunds dated the day of the last receipt, and no table shows when a payment cleared the bank.
 

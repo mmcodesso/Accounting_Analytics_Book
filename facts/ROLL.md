@@ -95,9 +95,12 @@ Machine time, mostly unattended; one Excel build at a time, one Desktop verifica
 | Power BI start files | `... build.py --tool pbi` (then `--chapter A`, then `--chapter 16` for the shared folders) | about 40 minutes |
 | Power BI solutions | `... build.py --solutions --tool pbi` | about 1 hour |
 | Instructor guides (templates in `facts/instructor/guides/`; values come from the dataset) | `python facts/instructor/guides.py render --all`, then `check --all` | about 10 minutes |
+| Instructor figures (generators in `scripts/figures/instructor/`, sources in `facts/instructor/figures/`, vector PDFs in `instructor-notes/figures/`) | `python scripts/figures/instructor/build_instructor.py --check` (drift), then `build_instructor.py` (rebuild what changed; Draw.io) and `guides.py render --all` | about 40 minutes |
 | Instructor notes package (the flat legacy package, until the guides replace it) | `python facts/instructor/package.py` | a few minutes |
 
-`guides.py check --all` lists, per guide, every claim that fails on the new window (wording a person must revisit) and every quoted query or measure that no longer matches a rebuilt solution file; the authored prose holds no data values, so a roll changes only values and quotes. Then `python facts/instructor/guides.py package` builds `Instructor-Notes.zip` (Markdown and Word).
+Rebuild the SQL, Excel and Power BI solution files and the companion files first: many figures quote the solution scripts and read the model workbooks and projects (each drawn value is asserted, so a figure built from a stale solution fails loudly). `build_instructor.py --check` regenerates every figure in memory and lists those that now draw something else; `--verify` (no dataset, no Draw.io) lists stale images.
+
+`guides.py check --all` lists, per guide, every claim that fails on the new window (wording a person must revisit) and every quoted query or measure that no longer matches a rebuilt solution file; the authored prose holds no data values, so a roll changes only values and quotes. Then `python facts/instructor/guides.py package` builds `Instructor-Notes.zip`: PDF files only (pandoc and LuaLaTeX, with the figures as Draw.io vector PDFs; about 15 minutes for all 180 files).
 
 A build that stops names the failing check: a value that no longer agrees is a storyline to investigate, not a build to force.
 

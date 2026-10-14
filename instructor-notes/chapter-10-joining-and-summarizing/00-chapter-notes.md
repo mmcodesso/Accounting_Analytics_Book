@@ -107,8 +107,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest, because this chapter's stumbles are about reading a result, and a demonstration shows how. Plan B gives students ownership of the findings and needs a lab. Plan C leaves no time for demonstration and fails for students who arrive without a finished script.
 
-> **[Figure placeholder IF-10-0-A]** A chooser that takes a question about two or more tables to the right join or summary and to its row-count test.
-> Kind: diagram · Shows: A decision path from a question to the join or summary that fits: inner join, left join, anti-join (IS NULL on the second table's key, or NOT EXISTS) and GROUP BY with HAVING. Each leaf names its row-count test and cites the tutorial step or exercise that practices it; a side box warns that a header amount repeats on every line. · Data: None; the leaves cite the chapter's tutorials and exercises. · Status: planned
+![A chooser that takes a question about two or more tables to the right join or summary and to its row-count test.](../figures/chapter-10-joining-and-summarizing/IF-10-0-A.pdf)
 
 ## Tutorial guide
 
@@ -177,8 +176,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **The checkpoint to look for.** The seven bullets. A strong student says that output was about the same and direct labor stayed within its standards, while indirect time, which is overhead, grew, so the answer to the volume question is mostly no.
 
-> **[Figure placeholder IF-10-0-B]** The in-class demonstration of fan-out, one total summed over a join and again from the header table alone.
-> Kind: sql-mock · Shows: The Execute SQL tab with two queries for the current fiscal year: SUM(GrandTotal) over SalesInvoice joined to SalesInvoiceLine, and over SalesInvoice alone. The grid shows both totals, the joined one outlined and nearly twice the other. · Data: SalesInvoice and SalesInvoiceLine for the current fiscal year, run read-only (the two values are in the Difficult ideas). · Status: planned
+![A mock of the in-class demonstration of fan-out, one total summed over a join and again from the header table alone.](../figures/chapter-10-joining-and-summarizing/IF-10-0-B.pdf)
 
 ## Difficult ideas and misconceptions
 

@@ -103,8 +103,7 @@ Setup difference         =(SetupHoursUsed-SetupHoursAssigned)*TDRate
 
 **Check:** products' conversion $4,259,206.41, unused 29,243.7 hours at $1,168,726.42 (the crew's part $997,573.76), together $5,427,932.83, the inputs to `1090`. The item costs applied to the year's completions give $4,258,921.01, and the setup that the family-average batch leaves out, $285.41, closes the gap: a line of its own, not rounding. **Watch for:** a rate built on the committed cost plus the Factory Overhead entries, with those entries charged again per standard hour: the total misses by exactly $1,308,869.06.
 
-> **[Figure placeholder IF-18-4-A]** The reconciliation block of the Costs sheet, where the products and the unused capacity are tied to the inputs to 1090.
-> Kind: excel-mock · Shows: Rows from the routing time used to the difference, in two columns of label and value: the products' conversion, the unused capacity and its crew part, the products plus unused capacity beside the inputs to 1090 with a difference of zero, then the three lines of the setup-allocation bridge and its own zero difference. · Data: The Costs sheet of the model workbook, rows for the reconciliation. · Status: planned
+![A mock of the reconciliation block of the Costs sheet, where the products and the unused capacity are tied to the inputs to 1090.](../figures/chapter-18-make-buy-or-reprice/IF-18-4-A.pdf)
 
 ### Part 4: The summary by family
 

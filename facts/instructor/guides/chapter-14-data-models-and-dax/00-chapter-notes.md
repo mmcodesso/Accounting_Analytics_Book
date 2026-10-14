@@ -14,7 +14,7 @@ figures:
     data: None; the boxes cite the tutorials, exercises and the model answer's queries, measures and tabs.
   - id: IF-14-0-B
     kind: pbi-mock
-    purpose: Model view of the model answer, with both stars, the shared Date table and the dashed relationship.
+    purpose: The Model view of the model answer, with both stars, the shared Date table and the dashed relationship.
     shows: "Model view with SalesInvoiceLine, Item, Customer, Date, GLEntry, Account, CostCenter, ShippedLines and Key Measures. Each line shows 1 at the dimension and an asterisk at the fact table. The line from ShippedLines.ShipmentDate to Date is dashed. Key Measures stands apart."
     data: None; the tables and relationships of the model answer.
   - id: IF-14-0-C

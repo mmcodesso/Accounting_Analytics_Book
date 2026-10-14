@@ -14,12 +14,12 @@ figures:
     data: None; the boxes cite the tutorials, exercises and the model answer's queries and pages.
   - id: IF-13-0-B
     kind: pbi-mock
-    purpose: Model view of the model answer, with the unrelated control table beside the related ones.
+    purpose: The model answer in Model view, with the unrelated control table beside the related ones.
     shows: "Model view with six tables. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with no relationship line. Key columns are listed in each table."
     data: None; the tables, columns and relationships of the model answer.
   - id: IF-13-0-C
     kind: pbi-mock
-    purpose: DAX query view with the Checks tab, the fast way to check a student's number against the model answer.
+    purpose: The Checks tab in DAX query view, the fast way to check a student's number against the model answer.
     shows: "DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid whose columns are Section, Check, Expected, Actual and Agrees, scrolled to the rows of Exercise 13.2, with Agrees true in each."
     data: The Checks tab of the solution project, run after a refresh; the rows of Exercise 13.2.
 ---

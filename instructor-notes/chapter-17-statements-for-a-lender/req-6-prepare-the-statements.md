@@ -64,8 +64,7 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 Purchases paid in cash are additions less equipment financed by a note. The script's first Requirement 6 query gives the change in cash and interest paid by year, an independent check.
 
-> **[Figure placeholder IF-17-6-A]** The statement of cash flows, where the adjustments must change no total.
-> Kind: excel-mock · Shows: The cash flow block of the Statements worksheet: columns for the last year, the comparative year restated and each year as recorded; rows from net income to the change in cash and the two check rows, with the operating totals outlined. · Data: The cash flow quantities of the Expected results. · Status: planned
+![A mock of the statement of cash flows, where the adjustments must change no total.](../figures/chapter-17-statements-for-a-lender/IF-17-6-A.pdf)
 
 **Check:** 2026 operating -$807,189.75, investing $0.00, financing -$134,120.55, change in cash -$941,310.30; 2025 $3,975,026.14, -$397,000.00, -$83,434.28, $3,494,591.86. Adjusted and recorded operating totals agree, which proves no adjustment moves cash. **Watch for:** three slips, each caught by the check row. Starting from recorded income leaves the sections $68,475.84 short in 2026; adding back only the expense account's depreciation, $303,666.63 short; leaving out the loss, $92,500.00 short.
 

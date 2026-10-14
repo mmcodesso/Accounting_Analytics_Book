@@ -13,7 +13,7 @@ With --exports it also checks visuals/svg (light color scheme, no light-dark(), 
 and visuals/pdf (a vector PDF for every source).
 
 Usage:
-    python scripts/figures/check_figures.py [--exports] [name-prefix ...]
+    python scripts/figures/check_figures.py [--exports] [--src-dir DIR] [name-prefix ...]
 """
 
 from __future__ import annotations
@@ -227,9 +227,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("prefix", nargs="*", help="Only check figures whose name starts with this.")
     parser.add_argument("--exports", action="store_true", help="Also check the SVG and PDF exports.")
+    parser.add_argument("--src-dir", type=Path, default=SRC_DIR,
+                        help="Folder of .drawio sources, searched recursively (default visuals/src).")
     args = parser.parse_args()
 
-    sources = sorted(p for p in SRC_DIR.glob("*.drawio")
+    sources = sorted(p for p in args.src_dir.glob("**/*.drawio")
                      if not args.prefix or any(p.stem.startswith(x) for x in args.prefix))
     failures = 0
     print(f"{'figure':44} {'size':>9} {'min px':>6} {'PDF pt':>6} {'HTML px':>7} "

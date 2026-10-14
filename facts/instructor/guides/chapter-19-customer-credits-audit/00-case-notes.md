@@ -9,7 +9,7 @@ figures:
   - id: IF-19-0-A
     kind: diagram
     purpose: How the ten requirements, the four model files and the three milestones fit, for the kickoff.
-    shows: "Three columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 to 7; 8 to 10). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses both. Arrows run from the query results to the workbook, from the refund flags exported by Requirement 4 to the Power BI report, from the workbook's evaluation to the report to the committee, and from Chapter 16's register to Requirement 10. Three checkpoints, one for each milestone, sit under the columns."
+    shows: "Three columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 to 7; 8 to 10). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses both. Three checkpoints, one for each milestone, sit under the columns. Below them the four model files are joined by arrows: from the query results (Copy with Headers) to the workbook, from the refund flags exported by Requirement 4 to the Power BI report, from Chapter 16's register to the updated monitoring file, and from the workbook, the report and the register to the report to the committee."
     data: none; the boxes and tags come from the case's requirements and its tools table.
   - id: IF-19-0-B
     kind: chart

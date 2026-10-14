@@ -14,7 +14,7 @@ figures:
   - id: IF-C2-0-B
     kind: diagram
     purpose: The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount reaches revenue.
-    shows: "A twelve-month timeline of the report year. For each of the three proposed promotions a solid bar marks the months in which its lines were ordered and a lighter bar extends over the months in which they were invoiced. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date of the collection promotion, which falls before its own start."
+    shows: "A twelve-month timeline of the report year. For each of the three proposed promotions solid cells mark the months in which its lines were ordered and lighter cells mark each month in which they were invoiced. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date of the collection promotion, which falls before its own start."
     data: The proposed promotions' order months, invoice months and discount billed by quarter (Requirement 2 Step 6, Requirement 3 Step 1).
 ---
 {% set g = case2_chapter %}

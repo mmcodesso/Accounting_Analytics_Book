@@ -85,8 +85,7 @@ c. Double-click the Sum of Amount for JournalEntry. **Show Details** lists three
 
 The model answer's items are the opening entry (less the credit that has no invoice detail) and the two reclassifications (added back, because the detail still shows the invoices as open).
 
-> **[Figure placeholder IF-08-2-A]** The reconciliation workpaper of account 2010 to the open supplier invoices, with every reconciling item explained.
-> Kind: excel-mock · Shows: The Ex 8.2 worksheet from the ledger balance down to the unexplained difference. Columns Item, Voucher, Entry description, PurchaseInvoiceID, InvoiceNumber, Amount, What it is and Correction belongs in. Three reconciling rows: the opening entry as a negative amount and the two reclassifications as positive amounts. The unexplained difference of zero is outlined. · Data: GLEntry for account 2010 by journal entry, and the open supplier invoices at the as-of date (the Expected results table). · Status: planned
+![A mock of the reconciliation workpaper of account 2010 to the open supplier invoices, with every reconciling item explained.](../figures/chapter-08-audit-analytics/IF-08-2-A.pdf)
 
 **Check:** the unexplained difference is 0. **Watch for:** the signs. A student who subtracts the reclassifications ends $1,280,000.00 away.
 

@@ -7,7 +7,8 @@
     python facts/instructor/guides.py render [--unit U | --all]   # templates -> instructor-notes/<unit>/
     python facts/instructor/guides.py check [--unit U | --all]    # the rules in facts/instructor/STANDARD.md
     python facts/instructor/guides.py figures                     # instructor-notes/figures.yml
-    python facts/instructor/guides.py package [--no-docx]         # outputs/companion/solutions/Instructor-Notes.zip
+    python facts/instructor/guides.py pdf [--unit U | --all]      # instructor-notes/ -> outputs/instructor/pdf/ (vector figures)
+    python facts/instructor/guides.py package                     # outputs/companion/solutions/Instructor-Notes.zip (PDF files only)
 
 A unit U is a chapter number (1..19), a comprehensive case (case1..case4) or an appendix (appB, appC).
 
@@ -19,11 +20,15 @@ matter and a Jinja body (the same engine, filters and context functions as the g
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 import shutil
+import subprocess
 import sqlite3
 import sys
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -37,8 +42,12 @@ for _p in (REPO / "scripts", REPO / "facts", HERE):
 
 GUIDES = HERE / "guides"
 OUT = REPO / "instructor-notes"
+FIGURE_SOURCES = HERE / "figures"
 SOLUTIONS = REPO / "outputs" / "companion" / "solutions"
 ZIP_OUT = SOLUTIONS
+PDF_DIR = REPO / "outputs" / "instructor" / "pdf"
+FIGURE_PDF_DIR = OUT / "figures"          # the figures of the notes, as vector PDFs (tracked)
+PDF_ASSETS = HERE / "pdf"
 ZIP_NAME = "Instructor-Notes.zip"
 
 TOOLS = ("conceptual", "excel", "sql", "powerbi", "mixed")
@@ -412,6 +421,15 @@ def header_table(g: GUnit, meta: dict) -> str:
     return "| | |\n|---|---|\n" + "\n".join(f"| {a} | {b} |" for a, b in rows)
 
 
+def alt_text(figure: dict) -> str:
+    """The alt text of a built figure: its purpose, and for a mock of an interface, "A mock of ..." (the book's rule)."""
+    purpose = figure["purpose"].strip().replace("[", "(").replace("]", ")")
+    if str(figure.get("kind", "")).endswith("-mock"):
+        first = purpose.split(" ", 1)[0]
+        return "A mock of " + (purpose[0].lower() + purpose[1:] if first in ("The", "A", "An") else purpose)
+    return purpose
+
+
 def render_template(env: Env, g: GUnit, path: Path) -> tuple[str, dict, list[str], str]:
     """(rendered Markdown, front matter, failed claims, the body with fences protected for scans)."""
     meta, body = split_front(path.read_text(encoding="utf-8"))
@@ -430,9 +448,9 @@ def render_template(env: Env, g: GUnit, path: Path) -> tuple[str, dict, list[str
             raise KeyError(f"figure {fid} is used but not declared in the front matter")
         used.append(fid)
         f = figs[fid]
-        image = OUT / "figures" / g.folder / f"{fid}.png"
+        image = OUT / "figures" / g.folder / f"{fid}.pdf"
         if image.is_file():
-            return f"![{f['purpose']}](../figures/{g.folder}/{fid}.png)"
+            return f"![{alt_text(f)}](../figures/{g.folder}/{fid}.pdf)"
         return (f"> **[Figure placeholder {fid}]** {f['purpose']}\n"
                 f"> Kind: {f['kind']} · Shows: {f.get('shows', '')} · Data: {f.get('data', 'none')} · Status: planned")
 
@@ -516,7 +534,7 @@ def write_readme(units: list[GUnit]) -> None:
         "These files are public, like the rest of the book. Try an exercise first, then compare your work. The values were "
         "computed from the dataset release named above; on another release or build, expect different values.", "",
         "| Folder | Unit | Files written |", "|---|---|---|", *rows, "",
-        "Figures marked *placeholder* are mock screens and diagrams planned for a later release of these notes.", ""])
+        "The figures are drawn from the dataset: mocks of Excel, DB Browser for SQLite and Power BI Desktop (labeled \"A mock of\"), diagrams and charts. A mock shows the layout and values a correct answer produces, not a screenshot of the application.", ""])
     (OUT / "README.md").write_text(text, encoding="utf-8", newline="\n")
 
 
@@ -548,6 +566,15 @@ def stray_numbers(protected_body: str, allowed_text: str) -> list[str]:
             continue
         out.append(tok)
     return sorted(set(out))
+
+
+def figure_manifest() -> dict:
+    """The figures recorded in instructor-notes/figures/manifest.json (id -> entry), empty when there is none."""
+    path = OUT / "figures" / "manifest.json"
+    if not path.is_file():
+        return {}
+    import json
+    return json.loads(path.read_text(encoding="utf-8")).get("figures", {})
 
 
 def solution_corpus() -> str:
@@ -652,6 +679,14 @@ def check_unit(env: Env, g: GUnit, corpus: str) -> tuple[list[str], list[str]]:
         if stray:
             errors.append(f"{tag}: literal data values in the prose (use a context value): {', '.join(stray[:12])}")
         figs = meta.get("figures") or []
+        manifest = figure_manifest()
+        for f in figs:
+            pdf = OUT / "figures" / g.folder / f"{f.get('id')}.pdf"
+            if pdf.is_file():
+                if f.get("id") not in manifest:
+                    errors.append(f"{tag}: figure {f.get('id')} has a PDF but no entry in figures/manifest.json")
+                if not (FIGURE_SOURCES / g.folder / f"{f.get('id')}.drawio").is_file():
+                    errors.append(f"{tag}: figure {f.get('id')} has a PDF but no Draw.io source")
         limit = MAX_FIGURES["note" if is_note else "item"]
         if len(figs) > limit:
             errors.append(f"{tag}: {len(figs)} figures declared (at most {limit})")
@@ -702,15 +737,24 @@ def collect_figures(units: list[GUnit]) -> list[dict]:
         for path in sorted(folder.glob("*.md")) if folder.is_dir() else []:
             meta, _ = split_front(path.read_text(encoding="utf-8"))
             for f in meta.get("figures") or []:
-                built = (OUT / "figures" / g.folder / f"{f['id']}.png").is_file()
+                built = (OUT / "figures" / g.folder / f"{f['id']}.pdf").is_file()
                 rows.append({"id": f["id"], "unit": g.folder, "file": path.name, "kind": f.get("kind"),
                              "purpose": f.get("purpose"), "shows": f.get("shows"), "data": f.get("data"),
                              "status": "built" if built else "planned"})
     return rows
 
 
-def cmd_figures(units: list[GUnit]) -> int:
+def cmd_figures(units: list[GUnit], uid: str | None = None) -> int:
     rows = collect_figures(units)
+    if uid:
+        code = find_unit(units, uid).fig
+        for r in rows:
+            if r["id"].startswith(f"IF-{code}-"):
+                print(f"{r['id']}  [{r['kind']}]  {r['status']}  ({r['file']})")
+                for key in ("purpose", "shows", "data"):
+                    print(f"    {key}: {r[key]}")
+                print()
+        return 0
     OUT.mkdir(exist_ok=True)
     (OUT / "figures.yml").write_text(yaml.safe_dump(rows, sort_keys=False, allow_unicode=True, width=120), encoding="utf-8")
     kinds: dict[str, int] = {}
@@ -840,39 +884,141 @@ def cmd_list(units: list[GUnit], uid: str | None) -> int:
     return 0
 
 
-# --- package -------------------------------------------------------------------------------------------------------------
+# --- PDF files and the package ----------------------------------------------------------------------------------------------
+#
+# The instructor notes ship as PDF files only.  Each rendered file of instructor-notes/ becomes a PDF through pandoc
+# and LuaLaTeX (facts/instructor/pdf/instructor.tex and instructor.lua: the book's fonts and colors, code on the book's
+# gray, tables sized from their content), and each figure is its Draw.io vector PDF, exported the way the book exports
+# its figures (build_instructor.py), so a figure's text stays text at any zoom.
 
-def cmd_package(units: list[GUnit], docx: bool) -> int:
+PDF_FIGURE = re.compile(r"figures/([^/\s)]+)/(IF-[A-Za-z0-9-]+)\.pdf")
+PDF_SETTINGS = [
+    ("-V", "documentclass=scrartcl"), ("-V", "classoption=parskip=half"), ("-V", "fontsize=10pt"),
+    ("-V", "papersize=letter"), ("-V", "geometry=margin=0.85in"), ("-V", "lang=en-US"),
+    ("-V", "mainfont=TeX Gyre Pagella"), ("-V", "sansfont=TeX Gyre Heros"), ("-V", "monofont=Latin Modern Mono"),
+    ("-V", "monofontoptions=Scale=0.9")]
+
+
+def pandoc_version(pk) -> str:
+    out = subprocess.run([*pk.pandoc_command(), "--version"], capture_output=True, text=True, encoding="utf-8")
+    return out.stdout.split("\n", 1)[0].strip()
+
+
+def pdf_key(md: Path, version: str) -> str:
+    """What a PDF is built from: the Markdown, the vector PDFs of the figures it shows, the template and filter, pandoc."""
+    h = hashlib.sha256()
+    data = md.read_bytes().replace(b"\r\n", b"\n")
+    h.update(data)
+    for folder, fid in sorted(set(PDF_FIGURE.findall(data.decode("utf-8")))):
+        pdf = FIGURE_PDF_DIR / folder / f"{fid}.pdf"
+        h.update(pdf.read_bytes() if pdf.is_file() else b"-")
+    for name in ("instructor.tex", "instructor.lua"):
+        h.update((PDF_ASSETS / name).read_bytes().replace(b"\r\n", b"\n"))
+    h.update(version.encode())
+    return h.hexdigest()
+
+
+def pandoc_pdf(pk, md: Path, out: Path) -> tuple[bool, str]:
+    out.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [*pk.pandoc_command(), str(md), "-f", "commonmark+pipe_tables+smart+fancy_lists", "-o", str(out),
+           "--pdf-engine=lualatex", "--shift-heading-level-by=-1", "--syntax-highlighting=tango"]
+    for flag, value in PDF_SETTINGS:
+        cmd += [flag, value]
+    cmd += ["-H", str(PDF_ASSETS / "instructor.tex"), "--lua-filter", str(PDF_ASSETS / "instructor.lua"),
+            "-M", f"figure-dir={FIGURE_PDF_DIR.as_posix()}",
+            "--resource-path", str(md.parent)]
+    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    ok = result.returncode == 0 and out.is_file()
+    return ok, (result.stderr or "")[-1500:]
+
+
+def missing_figure_pdfs(targets: list[GUnit]) -> list[str]:
+    """The figures the rendered notes link whose PDF is not in instructor-notes/figures/ (build them with
+    scripts/figures/instructor/build_instructor.py, which needs Draw.io and the dataset)."""
+    missing = []
+    for g in targets:
+        for md in sorted((OUT / g.folder).glob("*.md")):
+            for folder, fid in sorted(set(PDF_FIGURE.findall(md.read_text(encoding="utf-8")))):
+                if not (FIGURE_PDF_DIR / folder / f"{fid}.pdf").is_file():
+                    missing.append(f"{md.name}: {folder}/{fid}.pdf")
+    return missing
+
+
+def readme_pdf_source(units: list[GUnit]) -> Path:
+    """The README of the PDF package as Markdown (the index of instructor-notes/README.md, without its links)."""
+    text = (OUT / "README.md").read_text(encoding="utf-8")
+    text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
+    text = text.replace("Each folder holds a chapter (or case) note,", "Each folder holds PDF files: a chapter (or case) note,")
+    path = PDF_DIR / "README.md"
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return path
+
+
+def cmd_pdf(units: list[GUnit], targets: list[GUnit], force: bool = False, jobs: int = 4) -> int:
     import package as pk
+    if shutil.which("lualatex") is None:
+        raise SystemExit("lualatex not found: the PDF files need a TeX distribution (MiKTeX or TeX Live) on PATH")
     if not OUT.is_dir():
         raise SystemExit("nothing rendered: run render --all first")
-    pandoc_ok = docx and pk.pandoc_command() is not None
-    stage = ZIP_OUT / "Instructor-Notes"
-    if stage.exists():
-        shutil.rmtree(stage)
-    stage.mkdir(parents=True)
-    problems = 0
-    for src in sorted(OUT.rglob("*")):
-        if not src.is_file() or src.name == "figures.yml":
-            continue
-        rel = src.relative_to(OUT)
-        dest = stage / rel
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
-        if pandoc_ok and src.suffix == ".md":
-            tmp = dest.with_suffix(".docx")
-            # figures are relative to the unit folder; resolve them for the Word file
-            if pk.pandoc_docx(dest, tmp):
-                if not pk.check_docx(dest, tmp):
-                    problems += 1
-                    print(f"the .docx of {rel} does not read back as its Markdown")
-    zpath = ZIP_OUT / ZIP_NAME
-    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in sorted(stage.rglob("*")):
-            if f.is_file():
-                z.write(f, "Instructor-Notes/" + f.relative_to(stage).as_posix())
-    print(f"wrote {zpath} ({sum(1 for _ in stage.rglob('*') if _.is_file())} files)")
+    missing = missing_figure_pdfs(targets)
+    for line in missing:
+        print(f"MISSING figure PDF {line}")
+    problems = len(missing)
+    version = pandoc_version(pk)
+    manifest_path = PDF_DIR / "manifest.json"
+    done = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
+    work: list[tuple[str, Path, Path, str]] = []
+    for g in targets:
+        for md in sorted((OUT / g.folder).glob("*.md")):
+            rel = f"{g.folder}/{md.stem}"
+            out = PDF_DIR / g.folder / f"{md.stem}.pdf"
+            key = pdf_key(md, version)
+            if force or not out.is_file() or done.get(rel) != key:
+                work.append((rel, md, out, key))
+    if len(targets) == len(units):
+        readme = readme_pdf_source(units)
+        key = pdf_key(readme, version)
+        if force or not (PDF_DIR / "README.pdf").is_file() or done.get("README") != key:
+            work.append(("README", readme, PDF_DIR / "README.pdf", key))
+    print(f"{len(work)} PDF file(s) to build")
+    results: list[tuple[str, bool, str, str]] = []
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        for (rel, md, out, key), (ok, log) in zip(work, pool.map(lambda w: pandoc_pdf(pk, w[1], w[2]), work)):
+            results.append((rel, ok, log, key))
+            if ok:
+                done[rel] = key
+            else:
+                problems += 1
+                print(f"FAILED  {rel}\n{log}")
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(dict(sorted(done.items())), indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(f"{sum(1 for r in results if r[1])} built, {sum(1 for r in results if not r[1])} failed "
+          f"(PDF files in {PDF_DIR.relative_to(REPO)})")
     return 1 if problems else 0
+
+
+def cmd_package(units: list[GUnit], force: bool = False, jobs: int = 4) -> int:
+    """Instructor-Notes.zip: the PDF files only, one folder per unit, and a README.pdf."""
+    rc = cmd_pdf(units, units, force, jobs)
+    if rc:
+        print("package stopped: some PDF files did not build", file=sys.stderr)
+        return rc
+    zpath = ZIP_OUT / ZIP_NAME
+    ZIP_OUT.mkdir(parents=True, exist_ok=True)
+    stale = ZIP_OUT / "Instructor-Notes"
+    if stale.is_dir():
+        shutil.rmtree(stale)                 # the folder the flat legacy package left beside the zip
+    count = 0
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(PDF_DIR / "README.pdf", "Instructor-Notes/README.pdf")
+        count += 1
+        for g in units:
+            for md in sorted((OUT / g.folder).glob("*.md")):
+                z.write(PDF_DIR / g.folder / f"{md.stem}.pdf", f"Instructor-Notes/{g.folder}/{md.stem}.pdf")
+                count += 1
+    print(f"wrote {zpath} ({count} PDF files, {zpath.stat().st_size / 1048576:.1f} MB)")
+    return 0
 
 
 # --- main ----------------------------------------------------------------------------------------------------------------
@@ -891,11 +1037,18 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--force", action="store_true")
         if name == "sources":
             p.add_argument("--out", required=True)
-    sub.add_parser("figures")
+    fg = sub.add_parser("figures")
+    fg.add_argument("--unit")
     c = sub.add_parser("context")
     c.add_argument("key")
+    pf = sub.add_parser("pdf")
+    pf.add_argument("--unit")
+    pf.add_argument("--all", action="store_true")
+    pf.add_argument("--force", action="store_true")
+    pf.add_argument("--jobs", type=int, default=4)
     pk = sub.add_parser("package")
-    pk.add_argument("--no-docx", action="store_true")
+    pk.add_argument("--force", action="store_true")
+    pk.add_argument("--jobs", type=int, default=4)
     args = ap.parse_args(argv)
     if args.cmd == "context":
         return cmd_context(args.key)
@@ -907,9 +1060,13 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit("scaffold needs --unit")
         return cmd_scaffold(units, args.unit, args.force)
     if args.cmd == "figures":
-        return cmd_figures(units)
+        return cmd_figures(units, args.unit)
     if args.cmd == "package":
-        return cmd_package(units, not args.no_docx)
+        return cmd_package(units, args.force, args.jobs)
+    if args.cmd == "pdf":
+        if not args.all and not args.unit:
+            raise SystemExit("pdf needs --unit or --all")
+        return cmd_pdf(units, units if args.all else [find_unit(units, args.unit)], args.force, args.jobs)
     if args.cmd == "sources":
         return cmd_sources(units, find_unit(units, args.unit), Path(args.out))
     if not args.all and not args.unit:

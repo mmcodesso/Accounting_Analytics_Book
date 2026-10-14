@@ -14,7 +14,7 @@ figures:
   - id: IF-12-0-B
     kind: sql-mock
     purpose: The demonstration that a clean result may mean nothing, the anti-join of test L4 written two ways.
-    shows: "Two Execute SQL tabs side by side on Audit.sql. The left tab holds test L4 with LEFT JOIN and a result grid of three registers; the right holds the same query with INNER JOIN and an empty grid whose message pane reads a result of no rows. The join keyword is outlined in both."
+    shows: "Two Execute SQL tabs side by side on Audit.sql. The left tab holds test L4 with LEFT JOIN and a result grid of three registers; the right holds the same query with INNER JOIN and an empty grid whose message pane reads a result of no rows. Each editor is scrolled to the join to the payments and each grid to its first three columns. The join keyword is outlined in both."
     data: Test L4, read-only, written both ways.
   - id: IF-12-0-C
     kind: chart

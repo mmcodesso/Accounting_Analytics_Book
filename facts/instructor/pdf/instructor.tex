@@ -1,0 +1,92 @@
+% Preamble additions for the instructor PDFs (pandoc, LuaLaTeX; facts/instructor/guides.py pdf).
+% The look follows the book's PDF (styles/book-pdf.tex): Palatino text, Helvetica headings in the book's
+% blue, ink-colored body, code on the gray of the book's code blocks.  Fonts are set by pandoc's mainfont,
+% sansfont and monofont variables (TeX Gyre Pagella, TeX Gyre Heros, Latin Modern Mono).
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{etoolbox}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{framed}
+\usepackage{luacolor}
+\usepackage{lua-ul}
+\usepackage{fvextra}
+\usepackage{fancyhdr}
+
+\definecolor{PrimaryBlue}{HTML}{1A5276}
+\definecolor{Ink}{HTML}{2C3E50}
+\definecolor{RuleGray}{HTML}{D5D8DC}
+\providecolor{shadecolor}{RGB}{241,243,245}
+\color{Ink}
+
+% Headings in Helvetica bold, blue, as in the book.
+\setkomafont{disposition}{\normalfont\sffamily\bfseries\color{PrimaryBlue}}
+\setkomafont{title}{\sffamily\bfseries\color{PrimaryBlue}\LARGE}
+\setkomafont{section}{\Large\sffamily\bfseries\color{PrimaryBlue}}
+\setkomafont{subsection}{\large\sffamily\bfseries\color{PrimaryBlue}}
+\setkomafont{subsubsection}{\normalsize\sffamily\bfseries\color{PrimaryBlue}}
+\setkomafont{captionlabel}{\sffamily\bfseries\color{PrimaryBlue}}
+\setkomafont{caption}{\small\itshape}
+\captionsetup{font=small,skip=4pt}
+
+% Page: a running head and the page number, no first-page exception.
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\footnotesize\color{Ink} Accounting Analytics: An Integrated Approach \textbullet\ Instructor notes}
+\fancyfoot[C]{\sffamily\footnotesize\color{Ink}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{RuleGray}\leaders\hrule height \headrulewidth\hfill}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\sffamily\footnotesize\color{Ink}\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% Tables are longtables (pandoc writes every table that way): small type, room in the rows, cells at the top.
+\AtBeginEnvironment{longtable}{\small\renewcommand{\arraystretch}{1.18}}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{8pt}
+
+% Code: blocks and inline code on the same gray, as in the book.  Verbatim blocks (DAX, M, formulas) and
+% highlighted SQL wrap at the margin; inline code is highlighted with lua-ul so a long formula can still break.
+\makeatletter
+\@ifundefined{Shaded}{\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}}{}
+\DeclareRobustCommand{\aacode}[1]{\leavevmode\highLight[shadecolor]{\hbox{}\nobreak\hskip1.5pt minus 1.5pt\nobreak
+  #1\nobreak\hskip1.5pt minus 1.5pt\hbox{}}}
+\AtBeginDocument{\@ifundefined{pdfstringdefDisableCommands}{}{\pdfstringdefDisableCommands{\let\aacode\@firstofone}}}
+\makeatother
+\AtBeginDocument{%
+  \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}%
+    \begin{Verbatim}[breaklines,breakafter={,*},breakaftersymbolpre={},fontsize=\small]}{\end{Verbatim}\end{Shaded}}%
+  \ifcsname Highlighting\endcsname
+    \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},breaklines,breakaftersymbolpre={},fontsize=\small}%
+  \fi}
+
+% A quotation (the generated instructor note) gets a blue bar on its left.
+\renewenvironment{quote}{%
+  \def\FrameCommand{{\color{PrimaryBlue}\vrule width 2.5pt}\hspace{9pt}}%
+  \MakeFramed{\advance\hsize-\width \FrameRestore}\small}{\endMakeFramed}
+
+% Figures: where the text calls them if they fit, otherwise the top of the next page.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+\raggedbottom
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\tolerance=2000
+\setlength{\emergencystretch}{3em}
+
+% The title: left-aligned, with a rule under it, instead of a centered title block with a page of air above it.
+\makeatletter
+\renewcommand{\maketitle}{\par\begingroup\raggedright
+  {\usekomafont{title}\@title\par}\vspace{5pt}{\color{RuleGray}\hrule height 0.9pt}\vspace{12pt}\endgroup}
+\makeatother
+
+% longtable resets LaTeX's room for text on the page (\@colroom) to the full page when a table starts and never sets
+% it back, so on a page whose top holds a figure the rows after it can run into the foot (the book patches this too).
+\usepackage{needspace}
+\makeatletter
+\apptocmd{\endlongtable}{\global\@colroom\vsize}{}{\PackageWarning{instructor}{Could not patch the end of longtable}}
+\makeatother

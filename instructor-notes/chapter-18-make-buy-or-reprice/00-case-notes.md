@@ -57,8 +57,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Statements (slides 57 to 58). A plan for the next year applied to earlier stock is a sensitivity, not a finding of error; the memo must name the evidence that would show an error.
 - Wording. Both decision makers are right about part of the cost. The memo should say so in their terms.
 
-> **[Figure placeholder IF-18-0-B]** The same inputs to the clearing account cut three ways, the picture behind the three costing views.
-> Kind: chart · Shows: Three horizontal bars of equal length, each the year's inputs to the clearing account. Standard: the part released to products at standard, the rest the variance. Actual absorption: one segment, every dollar spread over the units made. Time-driven: the products' conversion and the unused capacity, with the crew's part of the unused capacity marked. Dollar labels on the segments. · Data: The inputs to the clearing account, the standard cost released, the products' conversion and the unused capacity (Requirements 2 and 4). · Status: planned
+![The same inputs to the clearing account cut three ways, the picture behind the three costing views.](../figures/chapter-18-make-buy-or-reprice/IF-18-0-B.pdf)
 
 ## Teaching approaches
 
@@ -211,8 +210,7 @@ Students hold the proposed rate with its comparisons, the effect on the statemen
 
 Every requirement is part of the case, and each phase uses what the one before found. The figure shows how the files feed one another and the memo.
 
-> **[Figure placeholder IF-18-0-A]** How the ten requirements, the three files and the four milestones fit together, for the kickoff.
-> Kind: diagram · Shows: Four columns, one for each phase, holding ten boxes for the requirements in order (1 to 3; 4 and 5; 6 to 8; 9 and 10). Each box carries a tag for its tool: SQL, Excel or Power BI, two tags where a requirement uses more than one. Arrows run from the SQL results to the workbook, from the workbook's item costs to the explorer, and from all three files to the memo. Four checkpoints, one for each milestone, sit under the columns. · Data: none; the boxes and tags come from the case's requirements and its tools table. · Status: planned
+![How the ten requirements, the three files and the four milestones fit together, for the kickoff.](../figures/chapter-18-make-buy-or-reprice/IF-18-0-A.pdf)
 
 Four bundles:
 

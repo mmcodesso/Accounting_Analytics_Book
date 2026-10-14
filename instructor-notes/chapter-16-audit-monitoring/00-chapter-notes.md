@@ -55,8 +55,7 @@ The chapter depends on these conditions of the data:
 - **Edit interactions.** Tutorial 16.2 Step 12c: a click on the departed approver shows PO AfterTermination at 0.16 per 1,000 of all orders. Tutorial 16.3 Step 7c keeps a click from moving the Data Through card.
 - **Closing without saving.** Step 8 tests the package and must not change it.
 
-> **[Figure placeholder IF-16-0-B]** Model view of the monitoring model, the register beside the populations it tests.
-> Kind: pbi-mock · Shows: Model view with Exceptions related to Tests on TestID, to Date on EventDate and to Employee on EmployeeID; JournalEntry, PurchaseOrder and PayrollRegister as populations related to Date; JournalEntry also related to Employee through the approver, with JournalLines related to JournalEntry; PurchaseOrder and PayrollRegister with no line to Employee. Dispositions stands alone and hidden. Each line shows 1 at the dimension and an asterisk at the fact table. · Data: None; the tables and relationships of the model answer. · Status: planned
+![A mock of Model view of the monitoring model, the register beside the populations it tests.](../figures/chapter-16-audit-monitoring/IF-16-0-B.pdf)
 
 ## Teaching approaches
 
@@ -109,8 +108,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest: the stumbles are in a merge key and a filter, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished file.
 
-> **[Figure placeholder IF-16-0-A]** What each tutorial adds to Audit Monitoring and where each exercise attaches, so an instructor sees the build at a glance.
-> Kind: diagram · Shows: Left to right: Tutorial 16.1 (journal entry flags, the score, ledger lines, JE Exceptions, Test 1), Tutorial 16.2 (purchase order and payroll flags, the appended register, the Tests table, measures, the Monitoring and Exception Detail pages, Test 2), Tutorial 16.3 (Dispositions, open exceptions, Review page, Tests 3 and 4, Data Through, the package's tests, the memo). Below the line, the six exercises as branches, each labeled with the query or page it adds. · Data: None; the boxes cite the tutorials, the exercises and the model answer's queries and pages. · Status: planned
+![What each tutorial adds to Audit Monitoring and where each exercise attaches, so an instructor sees the build at a glance.](../figures/chapter-16-audit-monitoring/IF-16-0-A.pdf)
 
 ## Tutorial guide
 
@@ -198,8 +196,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 
 **A disposition belongs to an exception.** Tutorial 16.3 Step 5. The departed approver's three orders are reviewed for one test and open for another. Ask: how many exceptions does one order hold?
 
-> **[Figure placeholder IF-16-0-D]** A board sketch of the order in which a reviewer takes the register's exceptions.
-> Kind: diagram · Shows: A short decision list from top to bottom. Expected every period, such as the year-end closes: disposition and evidence once, then check that it recurs. Recurs by design, such as registers approved by their own employee: one finding, change the control. Fails several tests, such as the opening entry: first. New this month: next. Everything else: by amount and age. Each box names its example from the register. · Data: None; the chapter's rules for ordering the review, with examples from the register. · Status: planned
+![A board sketch of the order in which a reviewer takes the register's exceptions.](../figures/chapter-16-audit-monitoring/IF-16-0-D.pdf)
 
 **More exceptions than reviewers can examine.** Tutorial 16.3, question 10. Li and colleagues and Alles and colleagues describe alarm floods. The chapter's answer is a simple order and one disposition for what is expected or recurs. Ask: what would you change in the rules before adding reviewers?
 
@@ -245,8 +242,7 @@ All six exercises are Power BI work with a model answer in Chapter16-exercises-p
 
 **Grading and discussion.** Exercises 16.1 to 16.4 suit grading from the saved report, with the Checks tab to compare a number. Exercises 16.5 and 16.6 are graded on their notes: the classification and the design question are the judgment. Exercises 16.3, 16.5 and 16.6 suit class discussion. Collect the .pbix, not screenshots: the queries, measures and display folders are the evidence.
 
-> **[Figure placeholder IF-16-0-C]** What the Checks tab proves and what only Desktop shows, the map an instructor needs before grading.
-> Kind: diagram · Shows: A two-column board. Left, proved by the Checks tab: the counts, totals, buckets, rates, shares and dates of the tutorials and the six exercises. Right, visible only in Desktop: the heat map's shading, the drill-through click, the edited interactions as a reader meets them, the Data Through card under a slicer, and the Power Query step names a student chose. · Data: None; the Checks tab's sections and the exercises' pages. · Status: planned
+![What the Checks tab proves and what only Desktop shows, the map an instructor needs before grading.](../figures/chapter-16-audit-monitoring/IF-16-0-C.pdf)
 
 ## Multiple-choice questions
 

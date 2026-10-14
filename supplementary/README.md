@@ -57,7 +57,7 @@ Try the work first, then compare it with the solution. Every file explains itsel
 | Chapter19-capstone-pbi.zip | Credits Analytics, with RefundFlags.csv (put it in C:\CharlesRiver) |
 | Chapter19-capstone-pbi-monitoring.zip | Audit Monitoring updated with the credits cycle's continuing tests |
 | Chapter19-capstone-sql.zip | Credits.sql, the SQL part of the Chapter 19 capstone |
-| Instructor-Notes.zip | The instructor notes, the tutorials' expected values, and the multiple-choice answer keys of every chapter, case, and appendix, as Markdown and Word files |
+| Instructor-Notes.zip | PDF files for every chapter, case, and appendix with exercises: a teaching note (approaches, a guide to each tutorial, the multiple-choice answer key) and a file for each exercise or requirement (purpose, step-by-step solution, expected values, common mistakes, grading guide), with mock screens and diagrams |
 
 Every file reads CharlesRiver.xlsx from C:\CharlesRiver (or point it at your copy with Change Source: Data > Get Data > Data Source Settings in Excel, Home > Transform data > Data source settings in Power BI Desktop). The Power BI projects hold no data until you refresh them, and the capstone projects read the solution workbook of the same capstone from the same folder.
 

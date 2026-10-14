@@ -155,8 +155,7 @@ ORDER BY p.Document, Documents DESC
 | C8 | The refund's method against the receipts', open balances | The payee, the account, the request |
 | C9 | Receipt, deposit and application dates | Remittance advices, bank records |
 
-> **[Figure placeholder IF-19-1-A]** The book's map of the cycle marked up the way Part 4 asks, the end state of the requirement.
-> Kind: diagram · Shows: The five documents of the cycle with their departments and the hub account, and the nine control-point badges in three styles: the records evidence it, the records evidence part of it (the missing evidence written beside the badge), the evidence lies outside the database. A legend names the styles and does not rely on color alone. · Data: The nine control-point rows of the Cycle Map worksheet (what the records evidence, what they cannot show). · Status: planned
+![The book's map of the cycle marked up the way Part 4 asks, the end state of the requirement.](../figures/chapter-19-customer-credits-audit/IF-19-1-A.pdf)
 
 **Check:** the Cycle Map worksheet holds the same table beside the exceptions the later tests find; C1, C3, C5, C9 show none. Its populations and matrix are formulas on the Tables loaded from CharlesRiver.xlsx, for example a matrix cell:
 

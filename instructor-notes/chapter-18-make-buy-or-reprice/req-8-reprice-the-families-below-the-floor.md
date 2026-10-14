@@ -68,8 +68,7 @@ Volume lost   =IF(F6,1-L6/(L6+G6-C6),"")
 
 **Check:** BNH needs 9.21% and can lose 16.9% of its volume; the table of Expected results gives the rest. **Watch for:** contribution over the time-driven cost: BNH then reads 21.1% against 16.9%, an overstated threshold, because the committed costs inside the time-driven cost stay when volume is lost.
 
-> **[Figure placeholder IF-18-8-A]** The Prices sheet's table of floor prices, increases and the volume each increase can lose.
-> Kind: excel-mock · Shows: One row for each manufactured family with units, price, time-driven cost and margin, a Below the floor flag, the target price, the increase, the contribution per unit, the volume the increase can lose and the revenue a year; the rows below the floor are outlined, and a totals block below the table. · Data: The Prices sheet of the model workbook, the first table and its totals. · Status: planned
+![A mock of the Prices sheet's table of floor prices, increases and the volume each increase can lose.](../figures/chapter-18-make-buy-or-reprice/IF-18-8-A.pdf)
 
 ### Part 2: What the records say about customers' response
 

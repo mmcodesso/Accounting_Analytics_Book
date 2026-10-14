@@ -103,8 +103,7 @@ High-Score Refunds = CALCULATE ( [Refunds], CustomerRefund[Score] >= 4 )
 
 **Step 5. Build Returns and Timing.** Returns shows credits and the rate by year, item group, reason, segment and the largest group's families: Furniture grows from $73,312.97 to $161,086.15 (0.468% to 0.926% of its revenue), damaged returns from $22,547.39 to $73,617.40. On Timing, the line chart "Return rate by month of the credit and by month of the shipment" puts both rates by YearMonth.
 
-> **[Figure placeholder IF-19-5-A]** The Timing page, the page that shows why the last months and the first year mislead.
-> Kind: pbi-mock · Shows: The Timing page: a line chart by month with two lines, the return rate by the month of the credit and by the month of the shipment, the second falling toward zero in the last month; a table of the rate by year on both bases; a table of the last fiscal year by month of the shipment; a row of cards with the days after shipment and the lines returned in a later year. · Data: The Credits Analytics model on the pinned dataset, all three years. · Status: planned
+![A mock of the Timing page, the page that shows why the last months and the first year mislead.](../figures/chapter-19-customer-credits-audit/IF-19-5-A.pdf)
 
 **Check:** the last month by shipment month reads 0.05% against 0.51% to 1.35% for the other months of that year; the first month by credit month reads 0.04%. **Watch for:** reading either as good news. The last shipments' returns arrive after the data end, and the first year had nothing earlier to return; compare over complete windows.
 
@@ -120,8 +119,7 @@ CALCULATE (
 )
 ```
 
-> **[Figure placeholder IF-19-5-B]** The Refund Ranking page a reviewer starts from.
-> Kind: pbi-mock · Shows: The Refund Ranking page: a bar chart of the refunds at each score from 0 to 5, a matrix of refunds and amounts by flag and year, a table of the refunds by approver's job title, two cards for the refunds scoring 4 or 5 and their amount, and the table of every refund with its five flags and score sorted from the highest score, one row selected. · Data: The refunds with their flags (RefundFlags.csv) and scores. · Status: planned
+![A mock of the Refund Ranking page a reviewer starts from.](../figures/chapter-19-customer-credits-audit/IF-19-5-B.pdf)
 
 **Check:** the largest refund, RF-2025-000097, scores 4, so it is not at the top of the list although it is the largest.
 

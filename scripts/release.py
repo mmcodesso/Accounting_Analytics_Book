@@ -565,9 +565,11 @@ def release_notes(revision: Revision, commit: str, manifest: dict, *, rows: list
         page += ['', f'More files: ' + ' · '.join(link(name, name) for name in more) + '.']
     if INSTRUCTOR_NOTES in assets:
         page += ['', '## 👩‍🏫 For instructors', '',
-                 f'{link(f"**{INSTRUCTOR_NOTES}**", INSTRUCTOR_NOTES)} collects the instructor notes, the expected '
-                 'values of the tutorials, and the answer keys of the multiple-choice questions for every chapter, '
-                 'case, and appendix, as Markdown and Word files.']
+                 f'{link(f"**{INSTRUCTOR_NOTES}**", INSTRUCTOR_NOTES)} holds PDF files for every chapter, case, and '
+                 'appendix with exercises: a note on how to teach it, with a guide to each tutorial and the answer key '
+                 'of the multiple-choice questions, and a file for each exercise or requirement with its purpose, a '
+                 'step-by-step solution, the expected values, common mistakes, and a grading guide, illustrated with '
+                 'mock screens and diagrams.']
     page += ['', '## 🧭 Opening a companion file', '',
              'The Excel and Power BI files read CharlesRiver.xlsx from the folder `C:\\CharlesRiver`. If your copy '
              'is there, a file is ready to refresh; otherwise, point the file at your copy once before you refresh '

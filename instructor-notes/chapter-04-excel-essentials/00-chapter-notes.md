@@ -189,13 +189,11 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 
 **A zero difference is not completeness.** Tutorial 4.1 compares two Tables that came through the same import. If an invoice and all its lines were dropped, the difference would still be zero. Only evidence from outside the import, such as the row count of the source Table, can show that nothing is missing. Ask: what would have to be true for the difference to be zero and the import to be wrong?
 
-> **[Figure placeholder IF-04-0-B]** Why a zero difference in a control total does not show that the import is complete.
-> Kind: diagram · Shows: Two boxes, the SalesInvoice Table and the SalesInvoiceLine Table, each drawn as a short stack of rows with one invoice and its lines missing from both. Between them a cell shows the difference of the two totals as zero. On the left, in dashed amber, a third box, the source Table in CharlesRiver.xlsx, with a count of its rows compared with the count in the import. A caption says that agreement inside the import cannot reveal what both sides lack. · Data: No values; the structure of Tutorial 4.1, Step 10 and the Control total key term. · Status: planned
+![Why a zero difference in a control total does not show that the import is complete.](../figures/chapter-04-excel-essentials/IF-04-0-B.pdf)
 
 **Filling is not copying.** A structured reference moves to the next column of the Table when filled across, with no error. In Tutorial 4.2 a COUNTIFS on the PricingMethod column drifts to ListAmount. In Exercise 4.4 the grid's amounts are not adjacent (FreightCost is column J, then BillableFreightAmount, FreightTerms and FreightMargin), so a fill gives text in the last column. Ask: where did this formula come from?
 
-> **[Figure placeholder IF-04-0-A]** What a fill across does to a structured reference, and the two ways to avoid it.
-> Kind: excel-mock · Shows: The right edge of the SalesInvoiceLine Table with the headers Discount, PromotionID and PricingMethod, then ListAmount and DiscountAmount. Below it three grid cells, each with its formula bar. The first holds a COUNTIFS on the PricingMethod column. The second is the same formula after a fill one column to the right, and its formula bar names the next column of the Table. The third is the pasted formula, which still names PricingMethod. A note shows the locked form that stays put when filled. · Data: The SalesInvoiceLine Table and the grid of Tutorial 4.2; the Table's own column names only. · Status: planned
+![A mock of the grid formula of Tutorial 4.2 typed, filled across and pasted, with the locked form that stays put.](../figures/chapter-04-excel-essentials/IF-04-0-A.pdf)
 
 **A filter hides rows; it does not remove them from a formula.** Question 2 tempts with a conditional SUMIFS and with a formula that uses `[@LineTotal]` outside the Table. Exercise 4.3 and 4.5 show it: COUNTIFS counts hidden rows, SUBTOTAL does not. Ask: which cells on this sheet change when I click the slicer?
 

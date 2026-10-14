@@ -13,7 +13,7 @@ figures:
   - id: IF-05-2-A
     kind: excel-mock
     purpose: The invoices flagged by either test, beside Tutorial 2.1's list of invoices dated before their first shipment.
-    shows: "A list headed InvoiceNumber, InvoiceDate, OrderDate, NumberYear, NumberYearMatches, BeforeOrder and In Tutorial 2.1 list, with one row for each flagged invoice, sorted by number. Beside it, separated by a blank column, a second list headed Tutorial 2.1 InvoiceNumber, InvoiceDate and First ShipmentDate. In the first list the rows whose NumberYearMatches is FALSE are outlined as one group and the rows whose BeforeOrder is TRUE as another, so no row is in both. Above the lists sit four counts: invoices whose number year differs, invoices dated before their order, invoices flagged by either test, and Tutorial 2.1 invoices that neither test flags."
+    shows: "A list headed InvoiceNumber, InvoiceDate, OrderDate, NumberYear, NumberYearMatches, BeforeOrder and In Tutorial 2.1 list, with one row for each flagged invoice, sorted by number. Below it, after a blank row, a second list headed Tutorial 2.1 InvoiceNumber, InvoiceDate and First ShipmentDate, typed as values. In the first list the rows whose NumberYearMatches is FALSE are outlined as one group and the rows whose BeforeOrder is TRUE as another, so no row is in both. Above the first list sit four counts: invoices whose number year differs, invoices dated before their order, invoices flagged by either test, and Tutorial 2.1 invoices that neither test flags."
     data: SalesInvoice, SalesOrder and the first shipment of each order (the Expected results table).
 ---
 {% set g = ch05_g2 %}

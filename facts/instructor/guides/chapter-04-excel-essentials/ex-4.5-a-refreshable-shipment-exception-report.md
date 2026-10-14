@@ -13,7 +13,7 @@ figures:
   - id: IF-04-5-A
     kind: excel-mock
     purpose: The shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.
-    shows: "Two panes of one window. The left pane shows the top of the Shipment Table with amber rows for a blank TrackingNumber and coral rows for In Transit shipments with a DeliveryDate before the review date, and the Status filter set. The right pane shows the Analysis worksheet with the review date, the three exception counts, the blank tracking numbers by Status, the In Transit shipments by year, and the SUBTOTAL cells beside a Status slicer with In Transit selected."
+    shows: "Two panes of one window. The left pane shows the top of the Shipment Table (ShipmentID, TrackingNumber, Status and DeliveryDate) with amber rows for a blank TrackingNumber and coral rows for In Transit shipments with a DeliveryDate before the review date, and the Status filter set to In Transit. The right pane shows the Analysis worksheet with the review date, the three exception counts, the blank tracking numbers by Status, the In Transit shipments by year, and the SUBTOTAL cells beside a Status slicer with In Transit selected."
     data: Shipment at the review date, the last day of the extract (the Expected results table).
 ---
 {% set g = ch04_g5 %}

@@ -106,8 +106,7 @@ c. Write the disposition and the evidence outside the database.
 =TEXT(B6,"dddd")
 ```
 
-> **[Figure placeholder IF-19-7-A]** The picture behind the disposition.
-> Kind: diagram · Shows: A time line from the shipment to the settling of the invoice, one lane for each department, with the shipment, invoice, receipts, return, credit, clawbacks and refund at their dates, and the unpaid balance marked on the credit date and on the refund date. · Data: Test S6 of Credits.sql for the largest refund. · Status: planned
+![The picture behind the disposition.](../figures/chapter-19-customer-credits-audit/IF-19-7-A.pdf)
 
 **Check:** RF-2025-000097, $17,745.96, the largest refund, of the largest credit; $13,081.41 of the invoice was unpaid on the refund date (the sequence is in the note below). The disposition is follow up, not a conclusion; the evidence to request is the wire confirmation's beneficiary and account against the customer's known bank details, and an explanation of why the refund went by wire to a customer who paid this invoice by check, and why before its checks arrived. **Watch for:** the Sunday read as evidence. Weekend dates hold 62 of the 222 refunds, about the share of the week they are. The timeline shows what the records say and proves no act.
 

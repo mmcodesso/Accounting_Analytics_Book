@@ -33,8 +33,7 @@ By the end, students can:
 
 Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 to write the conclusion. Ask "is that big?" about the largest difference before giving any hint about variation. Hold back the scaling by the square root of the months until a student calls a promotion unusual. **Collect** the comparison table, which is Exhibit 3 of the memo.
 
-> **[Figure placeholder IF-C2-3-A]** The comparison table of the volume test, one row for each promotion.
-> Kind: excel-mock · Shows: A worksheet block with a row for each promotion and the columns Months, Volume in the promotion's months, Expectation, Difference, The same months a year earlier, Difference from a year earlier, Standard deviation of the other months, Difference in standard deviations and Beyond two standard deviations. The largest and smallest differences are outlined, the first-year promotions read n/a for the year earlier, and every last cell reads FALSE. · Data: The Expected results of this requirement (volume by promotion and month from OrderLines, ListAmount). · Status: planned
+![A mock of the comparison table of the volume test, one row for each promotion.](../figures/case-part-2/IF-C2-3-A.pdf)
 
 ## Step-by-step solution
 

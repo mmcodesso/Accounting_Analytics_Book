@@ -18,7 +18,7 @@ figures:
   - id: IF-18-7-B
     kind: excel-mock
     purpose: The growth sheet that holds Solver's model, with its variable cells, constraints and objective marked.
-    shows: "The work-center block with practical capacity, load at growth, hours used after buying, slack and status, the binding row outlined; the family block with the units bought as amber variable cells and the added cost; the total added cost cell marked as the objective."
+    shows: "The work-center block with practical capacity, the load of the base year's sales and at growth, hours used after buying, slack and status, the binding row outlined; the family block with the base-year units, the units at growth, the delivered quote, the relevant cost, the added cost per unit and the Cutting hours per unit, then the units bought as amber variable cells and their added cost; the constraint cells shaded, the total added cost cell outlined as the objective, and a key. Solver's own dialog is not drawn."
     data: The sheet Growth 40% of the model workbook.
 ---
 {% set g = ch18_g7 %}

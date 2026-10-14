@@ -13,7 +13,7 @@ figures:
   - id: IF-18-3-A
     kind: sql-mock
     purpose: The capacity query with its six-row result, the table every later requirement reads.
-    shows: "The tab MakeBuy.sql at Q20, scrolled to its last CTE and the final SELECT; the grid shows one row for each work center and a Plant row, with the available, practical and routing hours and the two shares, the Plant row outlined; the message pane reports six rows."
+    shows: "The tab MakeBuy.sql at Q20, scrolled to its last CTE and the final SELECT; the grid, scrolled one column to the right to fit the frame, shows one row for each work center and a Plant row, with the available, practical and routing hours and the two shares, the Plant row outlined; the message pane reports six rows."
     data: Query Q20, run read-only on the capstone copy.
   - id: IF-18-3-B
     kind: chart

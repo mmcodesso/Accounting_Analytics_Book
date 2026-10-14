@@ -10,13 +10,13 @@ figures:
   - id: IF-01-0-A
     kind: diagram
     purpose: Which table groups each exercise's model answer draws on.
-    shows: A matrix with the table groups of Table 1.3 as rows and Exercises 1.1 to 1.6 as columns. A filled cell marks a group whose tables the model answer names as the main evidence; an outlined cell marks a group that the answer mentions only as support. The Accounting Core and Order-to-Cash rows are filled most often, and the legend says that a filled cell is not a count of tables.
-    data: The tables named in the solution steps of the six exercise files, assigned to groups by Table 1.3 and the dataset documentation.
+    shows: A matrix with the table groups of Table 1.3 as rows and Exercises 1.1 to 1.6 as columns, with the three perspectives as a band above the headings. A filled cell marked main is a group whose tables the model answer names as the main evidence; an outlined cell marked support is a group that the answer mentions only as support. A last column counts the exercises in which each group is the main evidence. The Accounting Core and Order-to-Cash rows are filled most often, and the legend says that a filled cell is not a count of tables.
+    data: The tables named in the solution steps of the six exercise files, assigned to groups by Table 1.3 and the dataset documentation. The main and support lists are in scripts/figures/instructor/fig_01.py.
   - id: IF-01-0-B
     kind: diagram
     purpose: A decision aid for sorting a question into one of the four types of analytics.
-    shows: A vertical flow of four yes/no questions (does it summarize what happened, does it explain why, does it project what might happen, does it recommend what to do under constraints) that lead to the four type labels. Each label carries one Charles River example question from Table 1.1 and the kind of evidence the answer needs (a summary, a decomposition or trace, an expectation or forecast, a recommendation with its constraints). A side note says that most real questions combine two types.
-    data: none; the example questions come from Table 1.1 and from the model questions of Exercise 1.4.
+    shows: A vertical flow of four yes/no questions, asked from the most demanding type down so that a mixed question takes the highest type it asks for (does the answer recommend what to do under constraints, does it project what might happen, does it explain why it happened, does it summarize what happened). Each yes leads to a type label with one Charles River example question and the kind of evidence the answer needs (a recommendation with its constraints, an expectation or forecast, a decomposition or trace, a summary). A no on the last question leads to a box that says to reword the question. A side note says that most real questions combine two types.
+    data: The example questions are the model questions of Exercise 1.4 (the quarters and fiscal years come from that guide's context); the evidence lines follow its Step 1 table.
 ---
 # Chapter 1: The Role of Analytics in Accounting
 

@@ -69,8 +69,7 @@ The appendix depends on these conditions of the data:
 
 ## Teaching approaches
 
-> **[Figure placeholder IF-AC-0-A]** A decision path from a student's account to the plan that fits, so an instructor can see what a class can do before the first session.
-> Kind: diagram · Shows: A decision tree. Start: can the student sign in at app.powerbi.com with a school account? No leads to Desktop in a lab or a Windows virtual machine. Yes leads to: may the student edit semantic models and upload to OneDrive for work or school? No leads to Plan C (instructor demonstration) or Desktop. Yes leads to: is there a Pro license? No leads to Plan A or B with Exercise C.3 done by hand (steps 2, 3 and 5, formula retyped). Yes leads to Plan A or B with every step. Each end box lists the tutorials and exercises that can be done. · Data: None; the plans, the tutorials and the exercises of this note. · Status: planned
+![A decision path from a student's account to the plan that fits, so an instructor can see what a class can do before the first session.](../figures/appendix-c-power-bi-browser/IF-AC-0-A.pdf)
 
 **Plan A: instructor-led lab (two sessions, 180 minutes).** It fits a lab where every student has an account that works.
 

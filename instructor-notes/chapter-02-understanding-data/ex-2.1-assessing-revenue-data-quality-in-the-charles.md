@@ -106,8 +106,7 @@ a. On **SalesInvoiceLine**, add a column headed `Difference` with the unrounded 
 b. Copy it down, then read the largest value with `=MAX(P:P)` and the count above one cent with `=COUNTIF(P:P,">0.01")`.
 c. Sort the column from largest to smallest and look at the top rows.
 
-> **[Figure placeholder IF-02-1-A]** The SalesInvoiceLine worksheet with the Difference helper column of Step 6, sorted largest first.
-> Kind: excel-mock · Shows: The SalesInvoiceLine Table with Quantity, UnitPrice, Discount and LineTotal visible (the other columns hidden) and a helper column headed Difference to the right, sorted from largest to smallest. The first rows show differences of half a cent and less, and none is above one cent. The formula bar shows the Difference formula in the first data row, the largest value is outlined, and two cells below the Table show the maximum and the count of lines above one cent. · Data: SalesInvoiceLine, with the Difference formula of Step 6 computed from the lines. · Status: planned
+![A mock of the SalesInvoiceLine worksheet with the Difference helper column of Step 6, sorted largest first.](../figures/chapter-02-understanding-data/IF-02-1-A.pdf)
 
 **Check:** the largest difference is 0.005, half a cent, and 0 of 27,933 lines differ by more than a cent. The columns are all filled, so the table holds what is needed to calculate revenue: LineTotal is the amount billed before freight, tax and later credits. **Watch for:** a formula that uses Discount in place of 1 − Discount, which flags thousands of lines, and an `=` comparison that flags rounding.
 

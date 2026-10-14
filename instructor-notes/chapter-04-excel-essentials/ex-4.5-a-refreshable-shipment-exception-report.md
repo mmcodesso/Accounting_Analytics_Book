@@ -121,8 +121,7 @@ c. Set ReviewDate back to December 31, 2026.
 | In Transit by year shipped | 2024: 234; 2025: 254; 2026: 252 | Step 4 |
 | Late at 2026-12-01; change | 722; -17 | Step 6 |
 
-> **[Figure placeholder IF-04-5-A]** The shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.
-> Kind: excel-mock · Shows: Two panes of one window. The left pane shows the top of the Shipment Table with amber rows for a blank TrackingNumber and coral rows for In Transit shipments with a DeliveryDate before the review date, and the Status filter set. The right pane shows the Analysis worksheet with the review date, the three exception counts, the blank tracking numbers by Status, the In Transit shipments by year, and the SUBTOTAL cells beside a Status slicer with In Transit selected. · Data: Shipment at the review date, the last day of the extract (the Expected results table). · Status: planned
+![A mock of the shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.](../figures/chapter-04-excel-essentials/IF-04-5-A.pdf)
 
 > **Instructor notes, Exercise 4.5:** 9,707 shipments. Blank TrackingNumber: 392 (368 Delivered, 24 In Transit). In Transit: 740 shipments from every year of the data (2024: 234, 2025: 254, 2026: 252). With ReviewDate 2026-12-31, 739 In Transit shipments have a DeliveryDate before the review date (the other is due on the review date itself); with ReviewDate 2026-12-01 the count is 722. A slicer on Status shows all 740 In Transit shipments, so it confirms the late count only together with a filter on DeliveryDate before the review date. All 24 In Transit shipments with a blank tracking number are in both categories. No ShipmentDate or DeliveryDate is blank. The Status conflict is a consistency and timeliness problem (Chapter 2); the blank tracking numbers are a completeness problem.
 

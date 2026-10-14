@@ -13,7 +13,7 @@ figures:
   - id: IF-C3-5-A
     kind: diagram
     purpose: Why recording both payroll accruals moves the liability far more than income.
-    shows: "Two columns, Income and Balance sheet. Under Income, two bars side by side, the expense for the work after the time records end and the expense for the prior year's work paid in the year, nearly equal, with the small net difference marked. Under Balance sheet, one tall bar for the liability at the year-end and one bar for the fall in opening retained earnings."
+    shows: "Two columns, Income and Balance sheet. Under Income, two bars side by side, the expense for the work after the time records end and the expense for the prior year's work paid in the year, nearly equal, with the small net difference marked. Under Balance sheet, one tall bar for the liability at the year-end and one bar for the fall in opening retained earnings, with the small fall in the year's income stacked on it in the same amber as the net difference, so the two together reach the height of the liability."
     data: The accrual and prior-year queries of Steps 1 and 3.
 ---
 {% set g = case3_g5 %}

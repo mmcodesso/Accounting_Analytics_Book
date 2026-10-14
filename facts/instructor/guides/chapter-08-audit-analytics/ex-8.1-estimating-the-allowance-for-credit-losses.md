@@ -13,7 +13,7 @@ figures:
   - id: IF-08-1-A
     kind: excel-mock
     purpose: The Aging worksheet after requirement 1, with the expected credit loss beside the aging and the loss rates in the Buckets Table.
-    shows: "The Aging worksheet: columns A to D as in Tutorial 8.2, then column E, Expected credit loss, with an amount for each bucket and the total outlined, and the E4 formula in the formula bar. To the right, the Buckets Table with its LossRate column as percentages."
+    shows: "The Aging worksheet: columns A to D as in Tutorial 8.2, then column E, Expected credit loss, with an amount for each bucket and the total outlined, and the E4 formula in the formula bar. To the right, the Buckets Table with its LossRate column as percentages. Below the aging, the three reconciliation rows of Tutorial 8.2 show that the opening line is in neither the aging nor the estimate."
     data: The aging of the open invoices at the as-of date and the five proposed rates (the Expected results table).
 ---
 {% set g = ch08_g1 %}

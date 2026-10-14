@@ -75,8 +75,7 @@ b. Read one row of each and say what it represents.
 
 **Step 3. Name the GLEntry columns that give the actuals.** Open **GLEntry**. The actual spending for a budget row is the sum of debits less credits of the rows with the same CostCenterID and AccountID in the same fiscal year and period. The columns are CostCenterID, AccountID, FiscalYear, FiscalPeriod (or PostingDate), Debit and Credit.
 
-> **[Figure placeholder IF-01-3-A]** How a budget row lines up with the ledger rows that give its actual spending.
-> Kind: diagram · Shows: On the left, one row of the Budget worksheet with the columns FiscalYear, Month, CostCenterID, AccountID and BudgetAmount; on the right, a stack of GLEntry rows with the columns CostCenterID, AccountID, FiscalYear, FiscalPeriod, Debit and Credit. Three labeled connectors (same cost center, same account, same period) join them, and a note says that many ledger rows add up to one budget row and that spending is debits less credits. The CostCenter and Account worksheets sit above the two sides as the name lookups. · Data: The columns of Budget, GLEntry, CostCenter and Account, with one budget row and its ledger rows chosen from the current fiscal year; amounts are named, not shown. · Status: planned
+![How a budget row lines up with the ledger rows that give its actual spending.](../figures/chapter-01-role-of-analytics/IF-01-3-A.pdf)
 
 **Check:** the three join columns are named, and the amount is debits less credits. **Watch for:** blank cost centers. 1,005 of the 142,869 expense rows in GLEntry, 0.7%, have no CostCenterID, and 1,625 rows of BudgetLine have none, so a comparison by department leaves a small remainder. Mention it, but do not let it derail the exercise.
 

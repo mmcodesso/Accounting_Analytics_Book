@@ -97,8 +97,7 @@ ORDER BY gl.FiscalYear;
 =IF(ABS(B21)>PerformanceMateriality,"Investigate: the difference exceeds performance materiality",IF(ABS(B21)>ClearlyTrivial,"Investigate (Requirement 5): above clearly trivial, below performance materiality","Accept: the difference is clearly trivial"))
 ```
 
-> **[Figure placeholder IF-19-3-A]** The Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and 2.
-> Kind: excel-mock · Shows: The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance materiality and the clearly trivial threshold in cells whose names are written beside them; below it the three-year block of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the two comparisons and the conclusion text. · Data: The Materiality worksheet of Credits Audit.xlsx on the pinned dataset (income, thresholds, revenue and returns by year). · Status: planned
+![A mock of the Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and 2.](../figures/chapter-19-customer-credits-audit/IF-19-3-A.pdf)
 
 **Check:** expected $203,762.47 against $242,764.56 recorded, a difference of $39,002.09 (19.1%); the conclusion text reads "Investigate (Requirement 5)". **Watch for:**
 

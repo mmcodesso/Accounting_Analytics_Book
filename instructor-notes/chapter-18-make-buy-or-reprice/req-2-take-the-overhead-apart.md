@@ -102,8 +102,7 @@ Paid AS (
 
 **Step 6. Write a sentence for each input.** Test each part of payroll the same way (the rows below the payroll test), then classify. The model's sentences follow in the strong answer.
 
-> **[Figure placeholder IF-18-2-B]** Two scatter plots that show the finding before any regression is run.
-> Kind: chart · Shows: Two panels with the standard hours completed each month on the horizontal axis, February to the last month of the data. Left: the Factory Overhead entries with the fitted line rising. Right: the payroll to 1090 with a flat fitted line and the six three-pay-date months marked. The start-up month is plotted apart from the line in both. · Data: The monthly extract of Q14 (Factory Overhead, Payroll, StandardHours, PayDates). · Status: planned
+![Two scatter plots that show the finding before any regression is run.](../figures/chapter-18-make-buy-or-reprice/IF-18-2-B.pdf)
 
 ## Expected results
 

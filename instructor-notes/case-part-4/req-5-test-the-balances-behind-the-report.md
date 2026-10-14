@@ -58,8 +58,7 @@ b. Add cards titled "Ledger against open items at the end of fiscal 2026" with t
 
 **Check:** 1,079 open invoices total $4,418,804.32 against $4,798,804.32 in the ledger, a difference of $380,000.00, the opening line. The 225 negative balances (-$220,131.88) are credit memos on paid invoices, refunded except 3 ($3,413.46) still in account `2060` at the year-end. Payables: 3,462 invoices total $4,781,095.54 against $6,237,466.66, a difference of $1,456,371.12: the opening payables, $2,096,371.12, less $640,000.00 on PI 3160 and 21692. **Watch for:** two silent errors. A subtraction that lets a null through returns null: only 6 open invoices ($6,413.86) keep a balance, because almost every invoice has no credit memo (20,302 of 20,914). The Payables step of the bridge includes account `2020`, so reconciling it to the open invoices adds -$1,020,992.06 of goods received and not invoiced and a difference of $2,477,363.18.
 
-> **[Figure placeholder IF-C4-5-A]** The Reconciliations page of the model answer, where each difference sits beside the findings that explain it.
-> Kind: pbi-mock · Shows: Report view, page Reconciliations. A matrix of six working-capital accounts on rows and source document types on columns with the balance in each cell, the JournalEntry column outlined; a row of cards for receivables, open receivables, their difference, payables, open payables and their difference; a table of billing by invoice date against the ledger by year; the aged open payables; and the Findings table with account, finding, amount and disposition. · Data: The Expected results quantities (the balances by source, the two differences, the billing differences and the findings), read-only. · Status: planned
+![A mock of the Reconciliations page of the model answer, where each difference sits beside the findings that explain it.](../figures/case-part-4/IF-C4-5-A.pdf)
 
 ### Part 3: Cutoff and aging
 
@@ -106,8 +105,7 @@ Unexplained Payables = [Payables Difference] - [Payables Findings]
 
 **Check:** both differences equal their findings to the cent, and in Test 5 the 4 quarters after Data Through show no value. The dispositions follow Chapter 8: expected, follow up, or a misstatement to report. **Watch for:** the note invoices entered as +$640,000.00. The payables findings read $2,736,371.12 against $1,456,371.12, and Test 4 shows -$1,280,000.00 unexplained.
 
-> **[Figure placeholder IF-C4-5-B]** The two reconciliations as one picture, so students see that each difference is a short list of recorded items.
-> Kind: diagram · Shows: Two columns of stacked bars. Receivables: the ledger balance, then the open invoices with one segment for the opening line. Payables: the ledger balance, then the open invoices with two segments, the opening payables and the two note invoices, the second drawn below the axis. Each segment carries its disposition, Follow up or Expected. · Data: The Expected results quantities (the balances, open items and findings), read-only. · Status: planned
+![The two reconciliations as one picture, so students see that each difference is a short list of recorded items.](../figures/case-part-4/IF-C4-5-B.pdf)
 
 **Instructor check.** In **DAX query view**, compare this with the Expected results.
 

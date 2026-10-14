@@ -33,8 +33,7 @@ By the end, students can:
 
 Individual work, about 90 minutes: 10 on the Documentation and Parameters sheets, 45 on the queries, 25 on the checks and 10 on documenting the result. In a lab, give the case's Watch out (the three duplicate column names) at the start, because it costs the most time. Hold back the row-count hint until a count is far too small, the symptom of an inner join. **Collect** the workbook; the checks live on its Documentation sheet.
 
-> **[Figure placeholder IF-C2-1-A]** The completeness checks of the Documentation sheet, as a student's workbook shows them after a refresh.
-> Kind: excel-mock · Shows: A block headed Completeness checks with the columns Check, Compared with, Query, Source and Agrees: a row for each source Table, the LineTotal and OrderTotal totals, the no-discount rows, the discount rates, the lookups and the postings. Every Agrees cell reads TRUE. · Data: The Expected results of this requirement (row counts and control totals). · Status: planned
+![A mock of the completeness checks of the Documentation sheet, as a student's workbook shows them after a refresh.](../figures/case-part-2/IF-C2-1-A.pdf)
 
 ## Step-by-step solution
 

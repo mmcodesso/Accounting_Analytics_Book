@@ -98,8 +98,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest, because this chapter's stumbles are about reading a result, and a demonstration shows how. Plan B gives students ownership of the findings and needs a lab. Plan C leaves no time for demonstration and fails for students who arrive without a finished script.
 
-> **[Figure placeholder IF-11-0-A]** A chooser from a question about rows to the SQL feature that answers it.
-> Kind: diagram · Shows: Five questions lead to CASE, a CASE inside SUM, the date functions, a window (partition, order, frame), and a CTE chain or view. Each leaf names its check and the tutorial step. · Data: None; the leaves cite the tutorials and exercises. · Status: planned
+![A chooser from a question about rows to the SQL feature that answers it.](../figures/chapter-11-analytical-queries/IF-11-0-A.pdf)
 
 ## Tutorial guide
 
@@ -165,8 +164,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **The checkpoint to look for.** The seven bullets. A strong student says that the trailing ratio shows a trend only while coverage and definitions hold, and that the last month is provisional.
 
-> **[Figure placeholder IF-11-0-C]** The monthly ratio against the trailing twelve months, for the discussion of delay.
-> Kind: chart · Shows: Monthly hours per standard hour against the trailing total, direct and indirect lines; the peak labeled and the last point marked provisional. · Data: The view MonthlyLaborEfficiency, read-only. · Status: planned
+![The monthly ratio against the trailing twelve months, for the discussion of delay.](../figures/chapter-11-analytical-queries/IF-11-0-C.pdf)
 
 ## Difficult ideas and misconceptions
 
@@ -180,8 +178,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **Tied rows share a total.** Question 11, slide 27. In the demonstration below, the Furniture items ranked by standard labor hours tie at 1.99 from row 7: both rows read a default running total of 16.50 and rank 7, while ROW_NUMBER gives 8 and 7 and the ROWS totals 16.50 and 14.51, in the order the window met the pair, which can differ from the result's order and between SQLite versions. Ask: what does the data decide, and what does the engine decide?
 
-> **[Figure placeholder IF-11-0-B]** The demonstration of tied rows, the default window against ROWS UNBOUNDED PRECEDING.
-> Kind: sql-mock · Shows: The Furniture items ranked by StandardLaborHoursPerUnit with RANK, ROW_NUMBER and both running totals, the first ten rows, the first tied pair outlined. · Data: Item, Furniture group, read-only. · Status: planned
+![A mock of the demonstration of tied rows, the default window against ROWS UNBOUNDED PRECEDING.](../figures/chapter-11-analytical-queries/IF-11-0-B.pdf)
 
 **A rank cannot be filtered where it is made.** Question 10, Tutorial 11.2 Step 3, Exercise 11.3 (3). WHERE runs before windows, so the filter belongs in an outer query. The same rule makes a year filter beside a LAG leave every prior year NULL (Exercise 11.2). Ask: when does WHERE run?
 

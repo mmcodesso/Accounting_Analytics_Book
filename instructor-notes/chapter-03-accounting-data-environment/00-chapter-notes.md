@@ -164,8 +164,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 **A key's role depends on the table.** CustomerID is the primary key of Customer and a foreign key in SalesOrder. Question 2 tempts with composite key, and question 1's option C describes a foreign key. Ask: whose rows does this column identify?
 
-> **[Figure placeholder IF-03-0-B]** A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.
-> Kind: diagram · Shows: A vertical tree of four yes-or-no questions. Does the column identify the rows of its own table? Yes leads to primary key, with SalesOrderID in SalesOrder as the example. Does it hold the key values of another table? Yes leads to foreign key, with CustomerID in SalesOrder, and a side branch asks whether the same column reaches into another table group, which makes it a bridge key, with ItemID in SalesOrderLine. Does the meaning of its value depend on another column? Yes leads to a logical reference, not a key, with SourceDocumentID in GLEntry read together with SourceDocumentType. Each leaf shows its example as a small two-line table header, and the leaf for the logical reference is drawn with the dashed amber style that the chapter's diagrams use for the trace. · Data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry); no counts. · Status: planned
+![A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.](../figures/chapter-03-accounting-data-environment/IF-03-0-B.pdf)
 
 **An identifier is not a quantity.** Account numbers and IDs are integers that tools will add. Exercise 3.6 shows the practical error: testing GLEntry.AccountID against Account.AccountNumber flags every one of the 71 accounts the ledger uses. Ask: would the sum or the average mean anything?
 
@@ -177,8 +176,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 **The join multiplies rows.** Question 10 tempts with 10 (the orders) and 55 (the orders added to the lines). A customer with 12 orders has 33 lines, so a join of customers to orders to lines returns 33 rows for that customer. Across the database it returns 22,269 rows, one for each order line, for 211 customers. Counting customers by row overstates them; summing line amounts by line is right.
 
-> **[Figure placeholder IF-03-0-A]** What a join of Customer to SalesOrder to SalesOrderLine does to one customer's rows, and why counting customers by row overstates them.
-> Kind: diagram · Shows: Three boxes from left to right. The first holds one Customer row with a real CustomerID and name. The second holds the customer's orders, drawn as a short column of order numbers, and the third the order lines of those orders, a longer column. Arrows between the boxes carry the join columns (CustomerID, then SalesOrderID). Below them is a sketch of the joined result in which the customer's name repeats on every line row. Two counters beside the sketch compare the rows of the result with the one customer, and a note says that summing line amounts by line is right and counting customers by row is wrong. · Data: The customer chosen by the Difficult ideas context (one with about ten orders), with its numbers of orders and lines; the diagram carries those two counts and no amounts. · Status: planned
+![What a join of Customer to SalesOrder to SalesOrderLine does to one customer's rows, and why counting customers by row overstates them.](../figures/chapter-03-accounting-data-environment/IF-03-0-A.pdf)
 
 **The trace is not a foreign key.** Question 12 tempts with it uses two columns. The point is that the target table depends on the type, so the key alone is ambiguous, as the live filter in Tutorial 3.2 shows. 6 PayrollPayment rows point to a payment that does not exist.
 

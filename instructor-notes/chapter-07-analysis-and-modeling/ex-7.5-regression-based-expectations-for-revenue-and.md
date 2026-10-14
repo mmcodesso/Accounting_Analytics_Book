@@ -68,8 +68,7 @@ Add control totals in row 40 against the Tables.
 
 **Check:** 3 months are flagged: January -$2,187.32 (-4.3%); February +$2,067.33 (+4.8%); March +$1,634.59 (+3.3%). Every other month is within 2.5%. **Watch for:** the percentage divided by the recorded amount, not the expectation.
 
-> **[Figure placeholder IF-07-5-A]** The 2026 commission differences against the senior's threshold, to show the offsetting pair and the quiet months.
-> Kind: chart · Shows: A column chart of the twelve months of the report year. Each column is the difference between recorded commission expense and the expectation, as a percentage of the expectation, with two horizontal lines at plus and minus 3 percent. The columns beyond the lines are coral, the others gray, and the two consecutive flagged months of opposite sign are bracketed. The axis includes zero. · Data: The Difference % column of the Ex 7.5 sheet for the report year (the Expected results). · Status: planned
+![The 2026 commission differences against the senior's threshold, to show the offsetting pair and the quiet months.](../figures/chapter-07-analysis-and-modeling/IF-07-5-A.pdf)
 
 **Step 6. Read the signs.** January and February are consecutive months with opposite signs that nearly offset: a shift between the two months is one explanation, and the records test it.
 

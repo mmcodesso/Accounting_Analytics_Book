@@ -121,8 +121,7 @@ RETURN
     )
 ```
 
-> **[Figure placeholder IF-AB-2-A]** The result of query (4), the review a student runs every quarter, so an instructor sees what a clean review looks like.
-> Kind: pbi-mock · Shows: DAX query view on the model answer, the tab Ex B.2 selected, the third query in the editor and a result grid under it with nine rows, one for each user of the security table. Columns: the user name, CostCenterID, EmployeeID, EmployeeName, JobTitle, EmploymentStatus, TerminationDate, OwnCostCenterID and Flag. TerminationDate and Flag are empty in every row, and CostCenterID equals OwnCostCenterID in every row. · Data: The security table of Guided Tutorial B.1 and the employee records (the Expected results quantities), read-only. · Status: planned
+![A mock of the result of query (4), the review a student runs every quarter, so an instructor sees what a clean review looks like.](../figures/appendix-b-publishing-security/IF-AB-2-A.pdf)
 
 **Check:** nine rows, the Flag blank in every row. The matched employees are 1 (Chief Executive Officer), 6 (Sales Manager), 7 (Warehouse Manager), 4 (Production Manager), 10 (Purchasing Manager), 5 (Accounting Manager), 11 (Customer Service Manager), 12 (Marketing Manager), 14 (Design Services Manager). Each is in the cost center the table gives. **Watch for:** a flag that passes here and fails elsewhere. Every user is clean on this data, so a flag with a missing or misordered test also reads blank. Test it with three rows added to a copy of Security:
 
@@ -142,8 +141,7 @@ a. Add a page named `Ex B.2` with a **Table** visual of EmployeeName, JobTitle, 
 b. Choose **Modeling > View as**, select **Other user**, type `employee006@charlesriver.example`, select **Cost Center Managers**, and click **OK**.
 c. Read the table, then choose **Stop viewing**.
 
-> **[Figure placeholder IF-AB-2-B]** The page Ex B.2 viewed as the Sales Manager, the leak that requirement (5) asks students to find.
-> Kind: pbi-mock · Shows: Report view, page Ex B.2, with the bar above the page naming the role Cost Center Managers and the Sales Manager. A table titled 'AccessEmployees, as any role member sees it' lists EmployeeName, JobTitle, EmploymentStatus and TerminationDate for every employee, with the terminated employees' dates filled in, and a scroll bar showing that the list is long. A text box beside it reads 'Model answer'. · Data: The Employee table (all employees, with status and termination date), read-only. · Status: planned
+![A mock of the page Ex B.2 viewed as the Sales Manager, the leak that requirement (5) asks students to find.](../figures/appendix-b-publishing-security/IF-AB-2-B.pdf)
 
 **Check:** all 120 employees appear, with their termination dates, while Employee itself shows only the 8 of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers closes it, or the table is kept out of the published file. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
 

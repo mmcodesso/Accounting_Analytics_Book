@@ -14,7 +14,7 @@ figures:
   - id: IF-17-0-B
     kind: diagram
     purpose: The dates of the case, which students must not mix.
-    shows: "One horizontal timeline from the opening entry on the first day of the first fiscal year through the three year-ends to the ledger's last posting. Each year-end carries two marks for its two closes. After the last year-end, three dates are labeled in order: the last pay date with registers, the last day of the year (the data-through date) and the ledger's last posting, with a bracket after the second date labeled supplier payments only."
+    shows: "One horizontal timeline from the opening entry on the first day of the first fiscal year through the three year-ends to the ledger's last posting. Each year-end carries two marks for its two closes. An enlarged strip of the last weeks labels three dates in order: the last pay date with registers, which falls before the last year-end, the last day of the year (the data-through date) and the ledger's last posting, with a bracket after the second date labeled supplier payments only."
     data: The opening entry's date, the three year-ends, the last pay date, and the ledger's last posting, from the ledger (Requirement 1).
 ---
 {% macro sm(x) %}{{ "-" if x < 0 else "" }}${{ (x|abs)|money }}{% endmacro %}

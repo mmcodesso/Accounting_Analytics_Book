@@ -76,8 +76,7 @@ ROUND(SUM(NetChange) OVER (ORDER BY FiscalYear) - NetChange, 2)
 
 **Check:** 3 rows; the closing balances are $3,105.75, $1,008.67 and $3,413.46, the Other column is zero, and the last year's receipts alone are $31,688,081.73. A balance that small hides large flows, so each flow ties in Steps 1 to 4.
 
-> **[Figure placeholder IF-19-2-A]** The roll-forward of account 2060 in the Reconciliation worksheet, the picture of a hub account.
-> Kind: excel-mock · Shows: The block of the Reconciliation sheet for account 2060: columns for the three fiscal years and rows for the opening balance, receipts held, applied to invoices, credits on paid invoices, refunds paid, the closing balance rolled forward, the ledger balance and the difference. The flows are large and the balances small; the difference row reads zero. The first line of the block is the title. · Data: The 2060 roll-forward of test G6 and the ledger balance at each year-end. · Status: planned
+![A mock of the roll-forward of account 2060 in the Reconciliation worksheet, the picture of a hub account.](../figures/chapter-19-customer-credits-audit/IF-19-2-A.pdf)
 
 **Step 6. Name the items in each balance (G7).** The credits' postings to `2060` less the refunds dated by each year-end, kept when more than half a cent is left.
 

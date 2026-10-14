@@ -18,7 +18,7 @@ figures:
   - id: IF-19-5-B
     kind: pbi-mock
     purpose: The Refund Ranking page a reviewer starts from.
-    shows: "The Refund Ranking page: a bar chart of the refunds at each score from 0 to 5, a matrix of refunds and amounts by flag and year, a table of the refunds by approver's job title, two cards for the refunds scoring 4 or 5 and their amount, and the table of every refund with its five flags and score sorted from the highest score, one row selected."
+    shows: "The Refund Ranking page: a bar chart of the refunds at each score from 0 to 5, a matrix of refunds and amounts by flag and year, a matrix of the refunds by approver's job title and year, two cards for the refunds scoring 4 or 5 and their amount, and the table of every refund with its five flags and score sorted from the highest score, one row selected."
     data: The refunds with their flags (RefundFlags.csv) and scores.
 ---
 {% set g = ch19_g5 %}

@@ -12,8 +12,8 @@ solution: ''
 figures:
   - id: IF-02-6-A
     kind: excel-mock
-    purpose: The PurchaseInvoice worksheet with the Count helper column of Step 2, filtered to the value 2.
-    shows: The PurchaseInvoice Table with PurchaseInvoiceID, InvoiceNumber, InvoiceDate, SupplierID and GrandTotal visible (other columns hidden) and a helper column headed Count at the right, filtered to show only the value 2. The remaining rows come in adjacent pairs that share a supplier and an invoice number but differ in date and amount, and the row numbers are blue because the Table is filtered. The formula bar shows the COUNTIFS formula and the status bar shows how many records match the filter.
+    purpose: The PurchaseInvoice worksheet with the Count helper column of Step 2, filtered to the repeated invoice numbers.
+    shows: The PurchaseInvoice Table with PurchaseInvoiceID, InvoiceNumber, InvoiceDate, SupplierID and GrandTotal visible (other columns hidden) and a helper column headed Count at the right, filtered for a Count above 1, which leaves only the value 2, and sorted by SupplierID and InvoiceNumber as Step 2 asks. The remaining rows come in adjacent pairs that share a supplier and an invoice number but differ in date and amount, and the row numbers are blue because the Table is filtered. The formula bar shows the COUNTIFS formula and the status bar shows how many records match the filter.
     data: PurchaseInvoice, with the COUNTIFS formula of Step 2 on SupplierID and InvoiceNumber.
 ---
 # Exercise 2.6: Testing for Duplicate Payments

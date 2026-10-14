@@ -83,8 +83,7 @@ c. Count the misses.
 
 **Check:** the result is 0 orphans. Repeat for CostCenterID: the PivotTable lists 10 cost centers and a (blank) row for the 115,623 ledger rows with none, which is the optional relationship of Exercise 2.4. **Watch for:** testing AccountID against the AccountNumber column. AccountID and AccountNumber are different numbers, and the test flags all 71 accounts the ledger uses. The pair to match is the key in both tables.
 
-> **[Figure placeholder IF-03-6-A]** The test log of a finished answer, one row for each relationship, with the counts that the memo reports.
-> Kind: excel-mock · Shows: A worksheet named Integrity Tests with the columns Child table, Foreign key, Parent table, Primary key, Rows, Blank, Orphans, Blank allowed because, and Verdict, and one row for each relationship of the Step 4 log. The Orphans column shows no orphans and the Verdict column reads Maintained. Rows with a blank count have a short reason in the Blank allowed because column. Beside the table sits a small PivotTable of the distinct AccountID values of the ledger, with a column that shows the lookup result for each, all ok. The formula bar shows the COUNTIFS lookup of the helper column. · Data: The relationships of this guide's Step 4 log, with their counts, and the distinct accounts of the ledger. · Status: planned
+![A mock of the test log of a finished answer, one row for each relationship, with the counts that the memo reports.](../figures/chapter-03-accounting-data-environment/IF-03-6-A.pdf)
 
 **Step 4. Decide whether each blank is allowed.** The model log, with the reason for each blank:
 

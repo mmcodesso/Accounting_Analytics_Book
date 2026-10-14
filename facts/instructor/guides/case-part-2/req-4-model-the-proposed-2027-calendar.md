@@ -18,7 +18,7 @@ figures:
   - id: IF-C2-4-B
     kind: chart
     purpose: Each promotion's measured difference against its break-even lift, for the discussion of requirement 4.
-    shows: "A horizontal bar chart with a row for each promotion, the measured difference as a bar and the break-even lift as a marker to its right, the proposed promotions marked."
+    shows: "A horizontal bar chart with a row for each promotion, the measured difference as a bar and the break-even lift as a marker to its right, the proposed promotions marked, and at the right the share of its break-even that each difference reaches."
     data: The break-even lift and the measured difference of each promotion (R4 Model, second block).
 ---
 {% set x = case2_g4 %}

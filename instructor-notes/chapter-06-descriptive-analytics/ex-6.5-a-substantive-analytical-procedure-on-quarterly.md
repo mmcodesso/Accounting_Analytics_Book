@@ -66,8 +66,7 @@ b. In the expectation column read the prior year's revenue from the PivotTable, 
 
 **Step 5. List the flagged differences.** Filter the grid on the flag, or use a formula that returns the flagged rows, and count them with `=COUNTIF(G7:G26,TRUE)`.
 
-> **[Figure placeholder IF-06-5-A]** The expectation worksheet of Requirements 2 and 3, with the flagged rows highlighted and the list of flagged differences beside the grid.
-> Kind: excel-mock · Shows: The worksheet Ex 6.5 Expectation. Two input cells in blue at the top, a percentage threshold and a dollar threshold. Below, a grid with columns item group, quarter, expectation, recorded, difference, difference percent and flagged, one row for each group and quarter, with the flagged rows shaded. To the right, a list of the flagged differences filled by a formula, and a cell that counts them. · Data: The expectation grid and the flagged rows (the Expected results). · Status: planned
+![A mock of the expectation worksheet of Requirements 2 and 3, with the flagged rows highlighted and the list of flagged differences beside the grid.](../figures/chapter-06-descriptive-analytics/IF-06-5-A.pdf)
 
 **Check:** 6 flagged: Lighting Q1 +$215,084.80 (+15.9%); Textiles Q4 +$166,764.46 (+24.4%); Accessories Q2 -$76,547.35 (-15.0%); Services Q2 -$66,187.40 (-20.9%); Services Q3 -$52,688.80 (-16.4%); Services Q4 +$77,195.65 (+26.9%). **Watch for:** `ABS` missing. The test then flags only the increases and misses the decreases.
 

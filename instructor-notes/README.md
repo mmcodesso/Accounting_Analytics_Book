@@ -34,4 +34,4 @@ These files are public, like the rest of the book. Try an exercise first, then c
 | [appendix-b-publishing-security](appendix-b-publishing-security/00-chapter-notes.md) | Appendix B: Publishing, Securing, and Sharing Reports | 3 of 3 |
 | [appendix-c-power-bi-browser](appendix-c-power-bi-browser/00-chapter-notes.md) | Appendix C: Power BI in the Browser | 4 of 4 |
 
-Figures marked *placeholder* are mock screens and diagrams planned for a later release of these notes.
+The figures are drawn from the dataset: mocks of Excel, DB Browser for SQLite and Power BI Desktop (labeled "A mock of"), diagrams and charts. A mock shows the layout and values a correct answer produces, not a screenshot of the application.

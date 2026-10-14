@@ -13,7 +13,7 @@ figures:
   - id: IF-19-2-A
     kind: excel-mock
     purpose: The roll-forward of account 2060 in the Reconciliation worksheet, the picture of a hub account.
-    shows: "The block of the Reconciliation sheet for account 2060: columns for the three fiscal years and rows for the opening balance, receipts held, applied to invoices, credits on paid invoices, refunds paid, the closing balance rolled forward, the ledger balance and the difference. The flows are large and the balances small; the difference row reads zero. The first line of the block is the title."
+    shows: "The block of the Reconciliation sheet for account 2060: columns for the three fiscal years and rows for the opening balance, receipts held, applied to invoices, credits on paid invoices, refunds paid, the closing balance rolled forward, the ledger balance and the difference. The flows are large and the balances small; the difference row shows -0.00, a floating-point residue far below a cent. The first line of the block is the title."
     data: The 2060 roll-forward of test G6 and the ledger balance at each year-end.
 ---
 {% set g = ch19_g2 %}

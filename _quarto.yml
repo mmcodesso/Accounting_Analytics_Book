@@ -77,11 +77,11 @@ book:
 # without hyphens; a wrong check digit fails the render. They live here, not in _variables.yml, because
 # _variables.yml is an input of every slide deck (scripts/release.py), and _quarto.yml only of the book.
 isbn:
-  pdf: ""
-  epub: ""
-  paperback-bw: ""
-  paperback-color: ""
-  hardcover: ""
+  pdf: "978-65-978221-9-5"
+  epub: "978-65-978221-8-8"
+  paperback-bw: "978-65-978221-7-1"
+  paperback-color: "978-65-978221-4-0"
+  hardcover: "978-65-978221-5-7"
 
 format:
   html:

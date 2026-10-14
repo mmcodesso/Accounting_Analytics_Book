@@ -171,8 +171,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 
 **The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries and the year-end closes are expected, with the evidence still to examine, that the approval weaknesses go to follow-up, and that one entry is the first item for the audit committee.
 
-> **[Figure placeholder IF-08-0-A]** One journal entry reached by three different tests, for the discussion at the end of Tutorial 8.3.
-> Kind: diagram · Shows: A hub with three spokes. In the centre, a box for the opening balance entry, labeled with its entry number and with the chief financial officer as creator. Three boxes around it, each joined to the hub by an arrow. The receivables reconciliation of Tutorial 8.2, whose difference is the entry's line to account 1020. The journal entry tests of Tutorial 8.3, where it is the only entry that scores four. The payables reconciliation of Exercise 8.2, whose difference is the entry's credit to account 2010, balanced by a debit to cash of the same amount. Each outer box names its dollar amount. · Data: JournalEntry and GLEntry for the opening entry; the receivables and payables lines are the opening amounts in the Expected results of Exercises 8.1 and 8.2. · Status: planned
+![One journal entry reached by three different tests, for the discussion at the end of Tutorial 8.3.](../figures/chapter-08-audit-analytics/IF-08-0-A.pdf)
 
 ## Difficult ideas and misconceptions
 **Agreeing totals is not completeness.** Question 1 and Tutorial 8.1 Step 2. Students write "complete" after a zero difference. Ask: what two errors would leave the totals equal, and what could the ledger itself have missed?
@@ -223,8 +222,7 @@ All six exercises are Excel builds with a model answer in the solution workbook 
 
 **Grading and discussion.** Each exercise guide holds a rubric. Exercises 8.3 and 8.4 suit grading from the workbook, because their numbers have one answer. Exercises 8.1, 8.2, 8.5 and 8.6 end in a judgment and suit class discussion, with the workbook still graded for its numbers. Collect the workbook, not a screenshot: the formulas show the work.
 
-> **[Figure placeholder IF-08-0-B]** Choosing a test by the kind of records, for the discussion of the exercises.
-> Kind: diagram · Shows: A decision tree read from left to right. The root asks what the records are. Five branches. Amounts with no upper limit lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness check, then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could repeat lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account leads to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement that practices it. · Data: The chapter's own tests; no dataset values. · Status: planned
+![Choosing a test by the kind of records, for the discussion of the exercises.](../figures/chapter-08-audit-analytics/IF-08-0-B.pdf)
 
 ## Multiple-choice questions
 

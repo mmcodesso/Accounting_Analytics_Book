@@ -14,7 +14,7 @@ figures:
   - id: IF-AC-3-A
     kind: diagram
     purpose: The three runs of the test, and what the pages did and did not show.
-    shows: "A left-to-right timeline of three boxes joined by arrows labeled Save a version, Change the Revenue formula, and Restore the version. Each box shows the test's revenue for the current year and, under it, the revenue card of the Sales and Discounts page. The first and third boxes show the same revenue; the second shows a higher test revenue while the card is unchanged. A side box lists what version history keeps and what a Power BI project under version control adds."
+    shows: "A left-to-right timeline of three boxes, the first entered by an arrow labeled Save a version and the others joined by arrows labeled Change the Revenue formula, and Restore the version. Each box shows the test's revenue for the current year and, under it, the revenue card of the Sales and Discounts page. The first and third boxes show the same revenue; the second shows a higher test revenue while the card is unchanged. Below the timeline three columns list what version history keeps, what it does not record, and what a Power BI project under version control adds."
     data: The three test results of the Expected results table.
 ---
 {% set g = appC_g3 %}

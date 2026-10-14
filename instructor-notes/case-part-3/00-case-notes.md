@@ -54,8 +54,7 @@ The case depends on these conditions of the data, all visible in the working cop
 - Correlated subqueries on TimeClockPunch, which has no index on TimeClockEntryID. A query that runs for minutes is almost always one of these, or a join that was not summarized.
 - Word choice. Students reach for fictitious, fraud or proof. The deck's slide 10 sets the rule; repeat it at Requirement 2.
 
-> **[Figure placeholder IF-C3-0-B]** The three calendars of the case, which must not be mixed.
-> Kind: diagram · Shows: Three horizontal timelines over the same years. Time records follow the work date and stop before the end of the last fiscal year, marked at the last day. The payroll and the ledger follow the pay date, with the pay dates of the first and last years counted. Output follows the completion date, runs to the year-end and includes weekends. A bracket below says to compare hours with output on work dates and to measure cost on the ledger. · Data: The last day with time records, the pay dates by year and the completions on weekends (Requirement 3, Steps 1 to 3). · Status: planned
+![The three calendars of the case, which must not be mixed.](../figures/case-part-3/IF-C3-0-B.pdf)
 
 ## Teaching approaches
 
@@ -134,8 +133,7 @@ The case depends on these conditions of the data, all visible in the working cop
 
 Every requirement is part of the case, and each depends on the first. The figure shows how their results feed the memo and its appendix.
 
-> **[Figure placeholder IF-C3-0-A]** How the six requirements build the memo and its appendix, and the chapters each one draws on.
-> Kind: diagram · Shows: Six boxes in a row for the requirements, each tagged with its chapters (Chapters 9 and 10, Chapters 10 to 12, Chapters 10 and 11, Chapter 11 with Chapter 7, Chapters 11 and 12, none). Arrows run from Requirement 1 into every other box, from Requirements 2 to 5 into the memo's three sections (Auditing, Managerial accounting, Financial reporting), and from all of them into the memo. Five exhibit boxes under the memo are tagged with the requirement that produces each. · Data: none; the boxes and tags come from the case's requirements and deliverable. · Status: planned
+![How the six requirements build the memo and its appendix, and the chapters each one draws on.](../figures/case-part-3/IF-C3-0-A.pdf)
 
 Three bundles:
 

@@ -12,7 +12,7 @@ figures:
   - id: IF-03-6-A
     kind: excel-mock
     purpose: The test log of a finished answer, one row for each relationship, with the counts that the memo reports.
-    shows: A worksheet named Integrity Tests with the columns Child table, Foreign key, Parent table, Primary key, Rows, Blank, Orphans, Blank allowed because, and Verdict, and one row for each relationship of the Step 4 log. The Orphans column shows no orphans and the Verdict column reads Maintained. Rows with a blank count have a short reason in the Blank allowed because column. Beside the table sits a small PivotTable of the distinct AccountID values of the ledger, with a column that shows the lookup result for each, all ok. The formula bar shows the COUNTIFS lookup of the helper column.
+    shows: A worksheet named Integrity Tests with the columns Child table, Foreign key, Parent table, Primary key, Rows, Blank, Orphans, Blank allowed because, and Verdict, and one row for each relationship of the Step 4 log. The Orphans column shows no orphans and the Verdict column reads Maintained. Rows with a blank count have a short reason in the Blank allowed because column. Below the log, on the same sheet, sits a small PivotTable of the distinct AccountID values of the ledger (its first rows and its last), with a column that shows the lookup result for each, all ok, and a count of the misses. The formula bar shows the COUNTIFS lookup of the helper column.
     data: The relationships of this guide's Step 4 log, with their counts, and the distinct accounts of the ledger.
 ---
 # Exercise 3.6: Assessing Referential Integrity Across the Charles River Database

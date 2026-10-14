@@ -12,7 +12,7 @@ figures:
   - id: IF-01-6-A
     kind: excel-mock
     purpose: What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements 3 and 4.
-    shows: The JournalEntry worksheet scrolled to rows whose ReversesJournalEntryID is filled, with the columns EntryNumber, PostingDate, EntryType, TotalAmount, CreatedByEmployeeID, CreatedDate, ApprovedByEmployeeID, ApprovedDate and ReversesJournalEntryID visible. The time part of CreatedDate reads the same on every row shown, and the ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is Accrual Adjustment.
+    shows: The JournalEntry worksheet filtered to the rows whose ReversesJournalEntryID is filled, with the columns JournalEntryID, EntryNumber, PostingDate, EntryType, TotalAmount, CreatedDate and ReversesJournalEntryID visible (Description and the creator and approver columns are hidden so that the text stays legible). The time part of CreatedDate reads the same on every row shown, and the CreatedDate and ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is Accrual Adjustment.
     data: A few JournalEntry rows of the Accrual Adjustment type and their columns, taken from the current dataset.
 ---
 # Exercise 1.6: Evaluating Journal Entry Data for Audit Purposes

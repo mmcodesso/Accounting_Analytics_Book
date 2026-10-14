@@ -66,8 +66,7 @@ d. Repeat the trend and the mean in rows 32 to 39, fitted to rows 5 to 11, which
 =INDEX($B$43:$B$45,MATCH(MIN(C43:C45),C43:C45,0))
 ```
 
-> **[Figure placeholder IF-07-1-A]** The backtest grid of Requirement 2, with the lowest error of each item group outlined.
-> Kind: excel-mock · Shows: The worksheet Ex 7.1, rows 42 to 49. A header row with the five item groups. Five rows of percentages, one for each method: trend, mean, same quarter last year, trend without the first quarter, mean without the first quarter. The lowest value in each column outlined, and the two rows below that name the lowest method of the first three and of all five. · Data: The mean absolute percentage errors of the backtest (the Expected results). · Status: planned
+![A mock of the backtest grid of Requirement 2, with the lowest error of each item group outlined.](../figures/chapter-07-analysis-and-modeling/IF-07-1-A.pdf)
 
 **Check:** the errors are those of the Expected results. **Watch for:** a trend fitted to all twelve quarters (the forecast has then seen the answer, and the errors shrink), a MAPE without `ABS` (positive and negative errors cancel), and a same-quarter block that points at the wrong year.
 

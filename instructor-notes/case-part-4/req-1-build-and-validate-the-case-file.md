@@ -96,8 +96,7 @@ c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
 
 **Check:** net income and total assets are Tutorial 14.3's and Exercise 14.1's, and each materials pair agrees. **Watch for:** two silent errors. A filter on AccountID `1045` finds no account, and receipts of every item read $21,554,113.46 in 2026 against $17,578,136.00 of materials.
 
-> **[Figure placeholder IF-C4-1-A]** The Validation page the model answer ends Requirement 1 with, the evidence a student must reproduce before Requirement 2.
-> Kind: pbi-mock · Shows: Report view, page Validation. A table titled Control totals by fiscal year with one row for each fiscal year and seven columns: Year, Net Income, Total Assets, Materials Received, Receipts to 1045, Materials Issued and Issues from 1045; the Materials Received and Receipts to 1045 columns are outlined because they agree. Below it a row of five cards titled Links tested: Receipt Lines, Receipts without a Requisition, Issue Lines, Issues without a Work Order and Requisition Count. The two link cards that count exceptions read zero. · Data: The Expected results quantities (net income, total assets, materials received and issued by fiscal year; the link counts), read-only. · Status: planned
+![A mock of the Validation page the model answer ends Requirement 1 with, the evidence a student must reproduce before Requirement 2.](../figures/case-part-4/IF-C4-1-A.pdf)
 
 **Step 7. Write the Tests tab.** In **DAX query view**, type each test under a comment and choose **Run**. Test 1 is the table above in `SUMMARIZECOLUMNS`; Test 2 returns Data Through, the last ledger posting and what follows it. Requirements 2 and 5 add Tests 3 to 5.
 

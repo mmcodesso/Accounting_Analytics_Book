@@ -131,15 +131,13 @@ ORDER BY COALESCE(WorkCenterID, 99)
 
 **Check:** the plant row: available 128,833.25, practical 103,066.60, routing time 73,822.9, 57.3% of the available hours and 71.6% of the practical. Paste Q16 and Q19 into the Activities sheet as the Tables Activity and Calendar, and compute the shares there with formulas over the Assumptions share. **Watch for:** the direct hours recorded at Packing, 33,026.9, as a measure of use: 3.0 times its practical capacity and above its available hours, which cannot be use. Routing time never exceeds a center's capacity here.
 
-> **[Figure placeholder IF-18-3-A]** The capacity query with its six-row result, the table every later requirement reads.
-> Kind: sql-mock · Shows: The tab MakeBuy.sql at Q20, scrolled to its last CTE and the final SELECT; the grid shows one row for each work center and a Plant row, with the available, practical and routing hours and the two shares, the Plant row outlined; the message pane reports six rows. · Data: Query Q20, run read-only on the capstone copy. · Status: planned
+![A mock of the capacity query with its six-row result, the table every later requirement reads.](../figures/chapter-18-make-buy-or-reprice/IF-18-3-A.pdf)
 
 ### Part 3: Say what routing time measures
 
 **Step 5. Write the two sentences.** Routing time is the right measure because it is what the products should take, measured independently of the time recorded, which drifted toward Packing and Quality Assurance and was often recorded after the operation ended. It leaves out the indirect time and the hours paid beyond the work that Part III found, which are what the unused capacity of Requirement 4 will hold, and it takes the routings as right.
 
-> **[Figure placeholder IF-18-3-B]** Where the plant's hours go, work center by work center.
-> Kind: chart · Shows: A clustered bar chart with one group for each of the five work centers and three bars in each: available hours, practical capacity and routing time used. A reference note marks that the Quality Assurance bar for routing time is a small fraction of its practical bar. Hours on the axis, no value labels beyond the Plant total. · Data: The result of Q20 (the five work-center rows). · Status: planned
+![Where the plant's hours go, work center by work center.](../figures/chapter-18-make-buy-or-reprice/IF-18-3-B.pdf)
 
 ## Expected results
 

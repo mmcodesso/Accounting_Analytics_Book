@@ -55,8 +55,7 @@ Use after        =D6/E6
 
 **Check:** the sheet agrees with Q23 center by center: Cutting 3,884, Assembly 7,607, Finishing 4,596, Packing 1,708, and nothing at Quality Assurance. The hours freed here use the year's completions; Requirement 6's positions use the routing time of the year's sales (17,299 hours), a different base, so both numbers are right.
 
-> **[Figure placeholder IF-18-7-A]** The Capacity sheet's table of hours freed at each work center, with the plant's use before and after buying.
-> Kind: excel-mock · Shows: One row for each work center and a Plant row, with the routing time used, the hours freed, the hours used after buying, the practical capacity and the use of practical capacity before and after; the Plant row is outlined and the Quality Assurance row shows nothing freed. · Data: The Capacity sheet of the model workbook, the first table. · Status: planned
+![A mock of the Capacity sheet's table of hours freed at each work center, with the plant's use before and after buying.](../figures/chapter-18-make-buy-or-reprice/IF-18-7-A.pdf)
 
 ### Part 2: Freed hours against the unused capacity
 
@@ -95,8 +94,7 @@ Hours used after buying      =D6-SUMPRODUCT(G$14:G$19,$L$14:$L$19)
 
 **Watch for:** Solver set to maximize (it then buys all 6 families, added cost $1,172,949), the units bought left unbounded (at 50% it buys 4,435 BNH, more than twice its demand of 2,182), and the limit set at the available hours (it buys nothing).
 
-> **[Figure placeholder IF-18-7-B]** The growth sheet that holds Solver's model, with its variable cells, constraints and objective marked.
-> Kind: excel-mock · Shows: The work-center block with practical capacity, load at growth, hours used after buying, slack and status, the binding row outlined; the family block with the units bought as amber variable cells and the added cost; the total added cost cell marked as the objective. · Data: The sheet Growth 40% of the model workbook. · Status: planned
+![A mock of the growth sheet that holds Solver's model, with its variable cells, constraints and objective marked.](../figures/chapter-18-make-buy-or-reprice/IF-18-7-B.pdf)
 
 **Step 6. Test the answer against the quote.** The model leaves out the minimum purchase and the tooling. **Check:** the relaxed plan buys BNH below the minimum at 40% and NGT at 50%, which the supplier would not accept. Solved with the minimum and the tooling, the plan the supplier would accept is 1,160 BNH at 40% ($24,017 over the two years, no work center binding) and 1,940 BNH and 2,560 NGT at 50% ($228,417, Assembly binding at $3.63). The relaxed model's shadow prices do not carry over to it.
 

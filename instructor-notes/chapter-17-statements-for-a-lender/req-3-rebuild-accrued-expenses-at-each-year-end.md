@@ -33,8 +33,7 @@ Students can:
 
 Pairs, about 150 minutes: 20 for the populations, 40 for the clearing and the view, 15 for the lag, 30 for the parts, 35 for the aging and the decision, 10 to write the assumption. The routine for every query: type it at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Hold back the view until students have tried to subtract invoice totals. **Collect** the script and the written assumption.
 
-> **[Figure placeholder IF-17-3-A]** The reconciliation of account 2040 to the ledger at the three year-ends, the result every student must reach before deciding anything.
-> Kind: sql-mock · Shows: The tab LenderPackage.sql at the reconciliation query. Three rows, one for each year-end, with the columns AsOfDate, Opening, FreightNotSettled, DecemberFreight, YoungAccruals, OldAccruals, Parts, Ledger and Difference. The Difference cells are outlined; the message pane reports three rows. · Data: The reconciliation query, run read-only after the view OpenAccruals is created. · Status: planned
+![A mock of the reconciliation of account 2040 to the ledger at the three year-ends, the result every student must reach before deciding anything.](../figures/chapter-17-statements-for-a-lender/IF-17-3-A.pdf)
 
 ## Step-by-step solution
 

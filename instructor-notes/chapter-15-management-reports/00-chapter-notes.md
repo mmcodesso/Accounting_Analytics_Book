@@ -57,8 +57,7 @@ No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest m
 - **KEEPFILTERS.** Without it Direct Hours reads 101,237 for fiscal 2026 in place of 62,764.
 - **The forecast.** Desktop computes it, so a new release can move it. Do not hand students a number to match.
 
-> **[Figure placeholder IF-15-0-B]** Model view of the model answer, with the five fact tables around the shared Date table.
-> Kind: pbi-mock · Shows: Model view with SalesInvoiceLine, GLEntry, BudgetLine, LaborTimeEntry and ProductionCompletionLine as fact tables around Date; Account, CostCenter, Item, Customer, PromotionProgram, Employee and WorkCenter as dimensions; LaborPaths related to Date; and Steps, Discount and Plant Measure standing alone with no lines. Each line shows 1 at the dimension and an asterisk at the fact table. · Data: None; the tables and relationships of the model answer. · Status: planned
+![A mock of Model view of the model answer, with the five fact tables around the shared Date table.](../figures/chapter-15-management-reports/IF-15-0-B.pdf)
 
 ## Teaching approaches
 
@@ -112,8 +111,7 @@ No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest m
 
 Plan A is the safest: the stumbles are in reading a variance and a filter, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished package.
 
-> **[Figure placeholder IF-15-0-A]** What each tutorial adds to the model and where each exercise attaches, so an instructor sees the build at a glance.
-> Kind: diagram · Shows: Left to right: the Chapter 14 report, Tutorial 15.1 (promotions and the Steps table, three hidden detail pages), Tutorial 15.2 (the budget as a second fact table, the flexed budget, the cost-center detail page), Tutorial 15.3 (labor time and completions, the plant page, the About page and navigator). Below the line, the six exercises as branches, each labeled with the page or tab it adds. · Data: None; the boxes cite the tutorials, the exercises and the model answer's pages and tabs. · Status: planned
+![What each tutorial adds to the model and where each exercise attaches, so an instructor sees the build at a glance.](../figures/chapter-15-management-reports/IF-15-0-A.pdf)
 
 ## Tutorial guide
 
@@ -197,8 +195,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 
 **A variance is a difference, not a cause.** Tutorial 15.2, questions 7 to 9. Sales reads -62.7% and looks like thrift; the commission budget was built on a volume that never came. Ask: what was the budget built on?
 
-> **[Figure placeholder IF-15-0-D]** A board sketch of the budget variance, from the static budget to the actual, by cause.
-> Kind: diagram · Shows: A waterfall for fiscal year operating expense. Start bar, the static budget. Steps: the volume effect in the commission budget, the classification effect (drawn as an up arrow in one cost center and a down arrow of the same size in another, netting to zero), the remaining variance. End bar, the actual. A note says what the remaining variance holds: the payroll burden rate and the months with three pay dates. · Data: The Tutorial 15.2 quantities (budget, volume effect, classification effect, remaining, actual), from the generated note. · Status: planned
+![A board sketch of the budget variance, from the static budget to the actual, by cause.](../figures/chapter-15-management-reports/IF-15-0-D.pdf)
 
 **A classification effect nets to zero.** Question 9. It moves cost between cost centers: $101,828.64 each way, so it explains none of the company's total. Ask: what is the total of the column?
 
@@ -245,8 +242,7 @@ All six exercises are Power BI work with a model answer in Chapter15-exercises-p
 
 **Grading and discussion.** Exercises 15.1 to 15.4 suit grading from the saved report, and Exercise 15.6 from its queries, with the Checks tab to compare a number. Exercise 15.5 is graded on its audit note: Desktop computes the forecast, so a student's value need not match. Exercises 15.4 and 15.5 suit class discussion. Collect the .pbix, not screenshots: the measures, the display folders and the query text are the evidence.
 
-> **[Figure placeholder IF-15-0-C]** What the Checks tab proves in each item and what only Desktop shows, the map an instructor needs before grading.
-> Kind: diagram · Shows: A two-column board. Left, proved by the Checks tab: the entries and amounts of Exercise 15.1, the monthly net income and the measure of Exercise 15.2, the three plant measures of Exercise 15.3, the lifts of Exercise 15.4, the actual quarter and the benchmarks of Exercise 15.5, the disagreement counts of Exercise 15.6. Right, visible only in Desktop: the drill-through click, the visual calculations of Exercise 15.2 and Tutorial 15.3, the field-parameter slicer, the Analytics-pane forecast. · Data: None; the Checks tab's sections and the exercises' pages. · Status: planned
+![What the Checks tab proves in each item and what only Desktop shows, the map an instructor needs before grading.](../figures/chapter-15-management-reports/IF-15-0-C.pdf)
 
 ## Multiple-choice questions
 

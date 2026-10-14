@@ -13,8 +13,8 @@ figures:
   - id: IF-01-3-A
     kind: diagram
     purpose: How a budget row lines up with the ledger rows that give its actual spending.
-    shows: On the left, one row of the Budget worksheet with the columns FiscalYear, Month, CostCenterID, AccountID and BudgetAmount; on the right, a stack of GLEntry rows with the columns CostCenterID, AccountID, FiscalYear, FiscalPeriod, Debit and Credit. Three labeled connectors (same cost center, same account, same period) join them, and a note says that many ledger rows add up to one budget row and that spending is debits less credits. The CostCenter and Account worksheets sit above the two sides as the name lookups.
-    data: The columns of Budget, GLEntry, CostCenter and Account, with one budget row and its ledger rows chosen from the current fiscal year; amounts are named, not shown.
+    shows: In the middle, one row of the Budget worksheet with the columns FiscalYear, Month, CostCenterID, AccountID and BudgetAmount; beneath it, a stack of GLEntry rows with the columns FiscalYear, FiscalPeriod, CostCenterID, AccountID, Debit and Credit, laid out so that the matching columns sit under each other. Three labeled connectors (same period, same cost center, same account) join the two, and a note says that many ledger rows add up to one budget row and that spending is debits less credits. The CostCenter and Account worksheets sit above the budget row as the name lookups, each with an arrow to the key column it names.
+    data: The columns of Budget, GLEntry, CostCenter and Account, with one budget row and its ledger rows chosen from the current fiscal year (the first June budget row of an expense account whose ledger match runs from four to six rows); amounts are named, not shown.
 ---
 # Exercise 1.3: Evaluating Table Groups for Cost Analysis
 

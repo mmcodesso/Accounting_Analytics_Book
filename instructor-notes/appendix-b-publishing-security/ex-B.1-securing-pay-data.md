@@ -54,8 +54,7 @@ a. Add a page named `Ex B.1` and a **Table** visual.
 b. Put JobTitle, Manufacturing Hours and Labor Cost in it, sorted by Labor Cost.
 c. Under **Filters on this visual**, filter Year to 2026, and title the visual "Hours and labor cost by job title, fiscal 2026".
 
-> **[Figure placeholder IF-AB-1-A]** The model answer's page Ex B.1 as the Finance role sees it, the table every student builds in requirement (1).
-> Kind: pbi-mock · Shows: Report view, page Ex B.1. A table titled 'Hours and labor cost by job title, fiscal' with the year, with the columns JobTitle, Manufacturing Hours and Labor Cost, sorted by Labor Cost, largest first. Seven rows: Assembler, Machine Operator and Quality Technician with hours and cost, then four non-manufacturing job titles with a cost and an empty hours cell. Above the table, a bar names the role Finance. · Data: The Expected results quantities (hours and cost by job title for the current fiscal year), read-only. · Status: planned
+![A mock of the model answer's page Ex B.1 as the Finance role sees it, the table every student builds in requirement (1).](../figures/appendix-b-publishing-security/IF-AB-1-A.pdf)
 
 **Check:** Seven rows. The first three are Assembler ($1,051,663.65, 37,199 hours), Machine Operator ($1,019,655.73, 35,285 hours), Quality Technician ($890,423.13, 28,753 hours); then four non-manufacturing titles with cost and blank hours, $3,344,393.44 in all. **Watch for:** the year filter. Without it the table adds all three fiscal years, $9,176,404.49. Blank hours are correct: Manufacturing Hours leaves out the NonManufacturing labor type, with KEEPFILTERS.
 
@@ -93,8 +92,7 @@ a. Choose **Modeling > View as**, select **Other user**, type `employee004@charl
 b. Open the page Ex B.1, and then the Plant page. Record both.
 c. Choose **Stop viewing**, and repeat with **Finance** selected in place of the role.
 
-> **[Figure placeholder IF-AB-1-B]** The same page viewed as the Production Manager after the column permission is applied, so an instructor knows what a correct failure looks like.
-> Kind: pbi-mock · Shows: Report view, page Ex B.1, with the bar above the page naming the role Cost Center Managers and the user. The table and the card are replaced by an error message that says a field cannot be found or used; the rest of the page, a text box, is unchanged. A small inset shows the Plant page of the same view, with its hours and its hours per standard hour visible. · Data: The Plant page values of the Production Manager (hours and hours per standard hour for the current fiscal year), read-only. · Status: planned
+![A mock of the same page viewed as the Production Manager after the column permission is applied, so an instructor knows what a correct failure looks like.](../figures/appendix-b-publishing-security/IF-AB-1-B.pdf)
 
 **Check:** as the Production Manager the table and the card of Labor Cost fail, the table as a whole with its hours column. The Plant page works: 101,237 hours and 1.51 hours per standard hour, because no measure on it reads the cost. With Finance the table shows all seven titles, $3,344,393.44. **Watch for:** the wording of the error. The model answer's note records that the field cannot be found; this guide has not verified the text in your build, so ask students to quote what they see. A student who selects the role without **Other user** sees an empty Plant page, because their own sign-in is not in the security table.
 

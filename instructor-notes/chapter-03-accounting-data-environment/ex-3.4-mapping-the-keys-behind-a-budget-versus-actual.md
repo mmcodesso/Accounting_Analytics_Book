@@ -102,8 +102,7 @@ c. Beside the Budget list, use XLOOKUP or COUNTIFS to look each AccountID up in 
 
 The join: Budget and GLEntry are not related by a key. Match them on four columns, FiscalYear to FiscalYear, Month to FiscalPeriod, CostCenterID to CostCenterID and AccountID to AccountID, after excluding the year-end close entries from the ledger. Each table also relates to CostCenter and to Account through its own foreign keys.
 
-> **[Figure placeholder IF-03-4-A]** The join path from the Budget table to the ledger, drawn as two tables that share four columns and no key.
-> Kind: diagram · Shows: Two table boxes side by side, Budget and GLEntry, each listing only the columns that matter (FiscalYear, Month or FiscalPeriod, CostCenterID, AccountID, and the amount). Four horizontal connectors pair FiscalYear with FiscalYear, Month with FiscalPeriod, CostCenterID with CostCenterID and AccountID with AccountID, drawn in one style and labeled as a match on four columns, not a key. Above and below, solid lines lead from each box to CostCenter and to Account, with crow's foot endpoints computed from the data, and the circle at the CostCenter end of the GLEntry line is marked. A note says that Month and FiscalPeriod hold the same month number under two names. · Data: The relationships of Steps 2 and 3 (the Budget and GLEntry columns, and the cardinality of the two cost center links). · Status: planned
+![The join path from the Budget table to the ledger, drawn as two tables that share four columns and no key.](../figures/chapter-03-accounting-data-environment/IF-03-4-A.pdf)
 
 The gaps: no cost center hierarchy; ledger rows with no cost center; budget lines with no cost center that Budget omits; accounts with ledger rows and no budget; budgeted combinations with no ledger row; no actuals for the next year; and the month stored under two names.
 

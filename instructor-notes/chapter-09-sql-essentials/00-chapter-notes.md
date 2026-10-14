@@ -99,8 +99,7 @@ The chapter depends on these conditions of the data:
 
 Plan A is the safest, because most stumbles are mechanical. Plan B gives students ownership of the findings and needs a lab. Plan C leaves no time for demonstration and fails for students who arrive without a working copy.
 
-> **[Figure placeholder IF-09-0-B]** The in-class calculator demonstration, a statement with no table.
-> Kind: sql-mock · Shows: The Execute SQL tab with the statement of the check slide, a division of whole numbers, a division with a decimal and a text year compared with a number. The grid shows one row with three values, and the message pane reports one row returned. · Data: The expressions of the check slide and of question 15, evaluated by SQLite. · Status: planned
+![A mock of the in-class calculator demonstration, a statement with no table.](../figures/chapter-09-sql-essentials/IF-09-0-B.pdf)
 
 ## Tutorial guide
 ### Guided Tutorial 9.1: Opening the Database and Writing Your First Queries
@@ -195,8 +194,7 @@ Plan A is the safest, because most stumbles are mechanical. Plan B gives student
 
 **ORDER BY decides which rows LIMIT keeps.** Questions 8 and 9, and Exercise 9.2 Step 5, where two amounts tie inside the ten. Ask: what happens at the tenth place if two amounts are equal?
 
-> **[Figure placeholder IF-09-0-A]** A path from the symptom of a wrong result to its usual cause and its check, for the discussion of logical errors.
-> Kind: diagram · Shows: A decision path read from top to bottom. The top box asks whether the query that ran is right. Four branches by symptom: no rows, far too many rows, one column instead of two, and blank cells. Each names the usual cause (a comparison with NULL, text in the wrong case, a text year compared with a number, AND and OR without parentheses, a missing comma, a NULL in a calculation) and the check (IS NULL, DISTINCT, quotes or CAST, parentheses and a row count, an alias read as a column, COALESCE). Each leaf cites the tutorial step or exercise that practices it. · Data: None; the leaves cite the chapter's tutorials and exercises. · Status: planned
+![A path from the symptom of a wrong result to its usual cause and its check, for the discussion of logical errors.](../figures/chapter-09-sql-essentials/IF-09-0-A.pdf)
 
 ## Discussion prompts
 1. **The controller asks for the year's manufacturing variance, and the ledger holds a closing entry. Do you include it?** A good discussion reaches the entry's description, the fact that the year nets to zero with it, and the rule that an entry which adjusts the variance belongs in the analysis.

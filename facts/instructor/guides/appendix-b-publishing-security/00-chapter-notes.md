@@ -10,12 +10,12 @@ figures:
   - id: IF-AB-0-A
     kind: diagram
     purpose: A decision path that helps an instructor choose how much of the appendix to teach.
-    shows: "A decision tree. Start: students have Power BI Desktop and the Charles River Reports project. First question: do you and a partner have Pro or Premium Per User licenses and a shared workspace where you are Admin? No leads to Scope 1 (Tutorial B.1, both exercises, Step 5 of Tutorial B.2 as a reading task); a sub-branch asks whether to add the Publishing and Sharing section as reading, giving Scope 2. Yes leads to Scope 3 (Steps 1 to 4 of Tutorial B.2 added). Each end box lists its class minutes and the questions it covers."
-    data: None; the scopes, minutes and question numbers of the Teaching approaches section.
+    shows: "A decision tree. Start: students have Power BI Desktop and the Charles River Reports project. First question: do you and a partner have Pro or Premium Per User licenses and a shared workspace where you are Admin? Yes leads to Scope 3 (Scope 2 plus Steps 1 to 4 of Tutorial B.2 with a colleague). No leads to a second question, whether to add the Publishing and Sharing section as reading with Step 5 of Tutorial B.2 as a workshop. No gives Scope 1 (Tutorial B.1, both exercises), yes gives Scope 2. Each end box lists what students do, what it needs, its class minutes and the questions it covers, as the Teaching approaches table does."
+    data: None; the scopes, minutes and question numbers are read from the Teaching approaches table of this guide.
   - id: IF-AB-0-B
     kind: pbi-mock
     purpose: The Checks tab of the model answer, the fast way to compare a student's numbers with what each manager should see.
-    shows: "DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid with the columns Section, Check, Expected, Actual and Agrees, scrolled to the rows that start 'as employee006 (Sales Manager)'. Each row has Agrees true: Cost Centers Shown, the budget, the actual, the flexed budget, the net income, and Manufacturing Hours as blank."
+    shows: "DAX query view on the model answer with the tab Checks selected, a Run button, and a result grid with the columns Section, Check, Expected, Actual and Agrees, scrolled to the eight rows that start 'as employee006 (Sales Manager)'. Each row has Agrees true: Cost Centers Shown, the budget, the actual, the flexed budget, the net income, the revenue of every sale, Manufacturing Hours as blank, and the employees. The outline marks the Agrees column."
     data: The Checks tab of the solution project after a refresh; the rows of Guided Tutorial B.1 for the Sales Manager.
 ---
 {% set t1 = appendix_b_t1 %}

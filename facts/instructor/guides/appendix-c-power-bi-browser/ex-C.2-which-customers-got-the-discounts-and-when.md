@@ -14,7 +14,7 @@ figures:
   - id: IF-AC-2-A
     kind: pbi-mock
     purpose: The Ex C.2 page at its end state, where the Design Services row and the peaks can be read.
-    shows: "The report editor of the Power BI service on the page Ex C.2: a tile slicer with the current year selected; a matrix of Discounts with five segment rows and the twelve months as columns, the Design Services row reading zero in every month and each other segment's largest month outlined; and a line chart of Discounts by month in month order with a legend of the five segments, the Design Services line flat along the axis. The Data pane lists Key Measures first."
+    shows: "The report editor of the Power BI service on the page Ex C.2: a tile slicer with the current year selected; a matrix of Discounts with five segment rows and the twelve months as columns, the Design Services row reading zero in every month and each other segment's largest month outlined; and a line chart of Discounts by month in month order with a legend of the five segments, the Design Services line flat along the axis. The Data pane, drawn as an inset because twelve months of amounts need the window's width, lists Key Measures first."
     data: Discounts by segment and month for the current year, as in the Expected results, read-only.
 ---
 {% set g = appC_g2 %}

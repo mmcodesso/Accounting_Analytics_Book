@@ -13,7 +13,7 @@ figures:
   - id: IF-04-3-A
     kind: excel-mock
     purpose: The Item worksheet after requirements (1) to (4), with the calculated columns, the sort, the color scale and the highlighted rows below the target.
-    shows: "The Item Table filtered to finished goods and sorted by ItemGroup and then MarginPct from largest to smallest, scrolled to the boundary between two groups. Columns A to K are the tutorial's columns, then UnitMargin and MarginPct. A color scale shades the MarginPct column. Rows whose MarginPct is below the target carry a light fill across columns A to L only, so the scale stays visible in the last column. The status bar reports how many records are in view."
+    shows: "The Item Table filtered to finished goods and sorted by ItemGroup and then MarginPct from largest to smallest, scrolled to the boundary between two groups. Of the tutorial's columns A to K, ItemID, ItemName and the last four are hidden to fit the figure, and UnitMargin and MarginPct follow in columns L and M. A color scale, drawn in three steps, shades the MarginPct column. Rows whose MarginPct is below the target carry a light fill across columns A to L only, so the scale stays visible in the last column. The status bar reports how many records are in view."
     data: Item rows with a ListPrice, for Furniture and Lighting (the Expected results table).
 ---
 {% set g = ch04_g3 %}

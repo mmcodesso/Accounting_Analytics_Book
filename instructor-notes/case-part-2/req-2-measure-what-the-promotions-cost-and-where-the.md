@@ -33,8 +33,7 @@ By the end, students can:
 
 Individual work, about 75 minutes: 20 on the PivotTable and chart, 20 on gross to net, 20 on the tie and the discount account, 15 on the quarters. Hold back the cutoff hint until a student has a difference and cannot place it. **Collect** the three tables (cost by year, gross to net, the tie) for the appendix.
 
-> **[Figure placeholder IF-C2-2-A]** The PivotTable of promotional discount and billed lines by promotion and invoice year.
-> Kind: excel-mock · Shows: A PivotTable with PromotionID down the rows and the three invoice years across, each holding Sum of DiscountAmount and Count of lines, with grand totals and no blank row. A column chart of the yearly totals sits beside it. · Data: The Expected results of this requirement (discount and lines by promotion and year, from BilledLines). · Status: planned
+![A mock of the PivotTable of promotional discount and billed lines by promotion and invoice year, with a chart of the yearly totals beneath it.](../figures/case-part-2/IF-C2-2-A.pdf)
 
 ## Step-by-step solution
 
@@ -97,8 +96,7 @@ Add a total row and, optionally, a waterfall from the total row.
 
 List less reductions less promotions is $29,756,419.39; the $0.69 to the net is the rounding of LineTotal line by line. **Watch for:** reductions computed as list less LineTotal. That counts the promotional discount twice, once in the reductions and once in its own column, so the schedule is off by exactly the discount.
 
-> **[Figure placeholder IF-C2-2-B]** The report year's gross-to-net walk, from list amount to net billed.
-> Kind: chart · Shows: A waterfall chart with five labeled bars: List amount, Price lists and overrides and Promotional discounts as decreases, Line rounding as a sliver, and Net billed. · Data: The report year's gross-to-net totals (the Expected results, Step 3). · Status: planned
+![The report year's gross-to-net walk, from list amount to net billed.](../figures/case-part-2/IF-C2-2-B.pdf)
 
 ### Phase 3: The ledger and where the cost appears
 

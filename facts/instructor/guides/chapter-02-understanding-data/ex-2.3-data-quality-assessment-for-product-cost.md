@@ -13,7 +13,7 @@ figures:
   - id: IF-02-3-A
     kind: excel-mock
     purpose: The WorkOrder worksheet with the Operations helper column of Step 5, filtered to zero.
-    shows: The WorkOrder Table with WorkOrderNumber, ItemID, ReleasedDate, ClosedDate and Status visible (other columns hidden) and a helper column headed Operations at the right, filtered to show only the value 0. Three rows remain, with the row numbers in blue because the Table is filtered, each with the status Closed. The formula bar shows the COUNTIFS formula and the status bar shows how many records match the filter.
+    shows: The WorkOrder Table with WorkOrderNumber, ItemID, ReleasedDate, ClosedDate and Status visible (other columns hidden) and a helper column headed Operations at the right, filtered to show only the value 0. Three rows remain, with the row numbers in blue because the Table is filtered, each with the status Closed. The formula bar shows the COUNTIFS formula, the filter list of the Operations header is open with only the value 0 checked, and the status bar shows how many records match the filter.
     data: WorkOrder and WorkOrderOperation, with the COUNTIFS formula of Step 5.
 ---
 # Exercise 2.3: Data Quality Assessment for Product Cost Analysis

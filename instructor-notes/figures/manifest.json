@@ -1,0 +1,1682 @@
+{
+ "version": 1,
+ "settings": {
+  "format": "pdf",
+  "crop": true
+ },
+ "figures": {
+  "IF-01-0-A": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "cb79e8a0cec54d322d4211662a72fef6de289222136109f056115e9afdfddca1",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "78e5cbf663b789d5fbc739e48aa922138374f4c8ab2fa1c03ec5515b2def1ada",
+   "pdf_bytes": 97183
+  },
+  "IF-01-0-B": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "5bef572705b036c08ffc42a333fbe5474c16d74762a328d0a593b73df052665a",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "4ab4527fa7cadd236c852431cc139b7be86341dffe823a90cb69fca7bfe2ef95",
+   "pdf_bytes": 76776
+  },
+  "IF-01-2-A": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "d1d8405cb0f31af777a485b279230fc3ccd76b5860d96ff73c81173d292dcf02",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "5a4b7b435d332c008197c0cc4f7636fee42d54be836812f55f9f26ea5d67e809",
+   "pdf_bytes": 65996
+  },
+  "IF-01-2-B": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "b8c9e9ff749180f3acdf121d8eaf756ab0e7945554350a2dd48706645998780b",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "7371016cb0510adb2e25ac5db98b83185bf4aefcf1985c0de4ed0a54789f058f",
+   "pdf_bytes": 120961
+  },
+  "IF-01-3-A": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "8c911d7f2854956576a450b6c8d57149a816eb95d056388ffee826c4555c612f",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "be581d06a2b71ab48d81cc8d8d62db59f67cc909cf29fa3d1f26199f763567e5",
+   "pdf_bytes": 83515
+  },
+  "IF-01-6-A": {
+   "unit": "chapter-01-role-of-analytics",
+   "source": "fb2c878be53dd2be6896f4c8abfd65d03afccc5fd45384c07bacd5ae024be66a",
+   "generator": "abcbdd68d5b38d84ccb8fb1c69f73ed77fdf91097d608d60f5791f9146705df4",
+   "pdf_sha256": "922bbac462e8db8af1b489e51c572f7a4bdbf9a548d16560a79eaf26e69af806",
+   "pdf_bytes": 96863
+  },
+  "IF-02-0-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "f138933a0ec44b67cd9d42696874f6567b92d5bb637f1e70124078855c6deec3",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "3a5678f861642a9818635c2cff80401898eed2a0143c01d93db549c3ddbe233b",
+   "pdf_bytes": 90651
+  },
+  "IF-02-0-B": {
+   "unit": "chapter-02-understanding-data",
+   "source": "2fc61d3470d72c9c2fb934ae6fe895649eafa109122f0837c4b3db0ba9581af3",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "2de8da4a517eee3f2603ba0eb35b58f9c10f03bb5757a662ac5017ba8b62dfbc",
+   "pdf_bytes": 114576
+  },
+  "IF-02-1-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "2c01162c9c2f1ae1af96bce12461215739daba56ef711f1e21c4c65447086c5c",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "a520f3c483a88669d4f6eaeca20a50da6b1e261110cd2cd0a6ace1a8754f7910",
+   "pdf_bytes": 92949
+  },
+  "IF-02-2-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "ee7daf296bb095bc3c67574e8f3fd634d3a35a0966418908006d8851d4b454b5",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "e966ce98bb301c4629d36d156673fd499d3ed2b99487440361afc6bbbc3b9b9c",
+   "pdf_bytes": 87658
+  },
+  "IF-02-3-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "a95ab440006f7b46c0efc90c9f84441e1239dc4cb010c3471951f0120ed39d55",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "1ea0625ce3a104f7ef2480697efa9461b819798147a6f131be0a6a28f6842c2e",
+   "pdf_bytes": 117515
+  },
+  "IF-02-4-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "a20fded963b1fda62773b8c0e891b44297214f30db38fef66ecb1b02901fe214",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "cebf1f8ac4ac07a0dd94a6133d7d4c7b4e195cc0ac0d5186c08625183c1f1691",
+   "pdf_bytes": 86297
+  },
+  "IF-02-6-A": {
+   "unit": "chapter-02-understanding-data",
+   "source": "ff440752ce2000041f9eb3744bfbe5f4384c3d095072b2d8fc7ac3cbce231692",
+   "generator": "d38367235a411abc43b2f80754caf0913b4796f55051b9bcf4ebc2f476e22087",
+   "pdf_sha256": "0f3ed08303b6ea677a3f14c12b7a6541b040a94d8a4b2977e56a08c611158e6e",
+   "pdf_bytes": 101178
+  },
+  "IF-03-0-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "5e5416e9b8711a018dbd3acf10a1fcea100b17960b49849c71f8af6daa8c4018",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "fd6594bb5cefd3c8266a9b618a359fdaa3fc61781c85441b6fd019a337f82b40",
+   "pdf_bytes": 92812
+  },
+  "IF-03-0-B": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "cb2c63c73d5654917862127131960fe9508bbd7de0e46fda50e91aa78fdefa57",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "82edea358a6ba70b25a4ab70d3503422e2c84a59d0c8d3b06a280ebdb0c4dbcc",
+   "pdf_bytes": 91606
+  },
+  "IF-03-1-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "3d6f000c397d23cb53c0603dcb62198908a6e7ddaa68c1cce7c49cb6bc9638b7",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "b43d41189cbc9a7c70760fda38cd1582b1a2992adb931bbc954e2f2ab0f297c0",
+   "pdf_bytes": 86305
+  },
+  "IF-03-3-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "23788cde47c49051c4fc4f560aaddc4b92dbcdd1eb48f858dc905a4e6e219375",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "fe0f2d80a68713734fa906832330d52e5b6c3a09f5385393d9b009e4278ddf1c",
+   "pdf_bytes": 95240
+  },
+  "IF-03-4-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "3e1bd03cc08997383ee3c7e31c6e48b5e39095cbb64818753659c4fb4c3a6d8f",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "965c02ea1e579aed992524fa04a55377b55802ef3e84c5b4b5fdef2d8e4021e0",
+   "pdf_bytes": 106635
+  },
+  "IF-03-5-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "7e97a06d885dfe6b662bfe4d45f7b29cd4a2e66e3b9353c7c29ebc780f6f83a2",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "20df600476e180c61db535d8285becf6445f38334ed16efe0b544f551ec74726",
+   "pdf_bytes": 78898
+  },
+  "IF-03-6-A": {
+   "unit": "chapter-03-accounting-data-environment",
+   "source": "ed6df0bd1eec0b95cc14929eb6dfae79c8d4d0ee6822723847960b08a231bee5",
+   "generator": "7ccb55c14d724834c15fd412ba4ed74f1155575fea6d7ccdad6949ae7e254946",
+   "pdf_sha256": "f3f1e9c07409cfcce007b7a8aea8741b185c8f7ae008d0f38214724c774db815",
+   "pdf_bytes": 120357
+  },
+  "IF-04-0-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "4fd96088a6edb30eaf4e485a1aeacf5618176e6037fc55a32e22a0ad15981119",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "e7d1f6699a2958e7f89804d60d18effff15938c94df62ce9cc699b1165f47ea6",
+   "pdf_bytes": 141921
+  },
+  "IF-04-0-B": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "7b8a9ebe5b3fae411608539e961bcf41d89bf272870d5a1c2215e26000761a40",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "18616f3569bb4af933fac261429c0da5605f0f0abe2263ebe209c345bbe42187",
+   "pdf_bytes": 95015
+  },
+  "IF-04-1-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "9f58ea3c494425c02ef3736e04522b9b925e19647c38d43b319129c2238633c9",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "b7d8dff295381d3af76a663813fd0a5ab770f36afeecb8254cc532b1d30ad997",
+   "pdf_bytes": 110228
+  },
+  "IF-04-2-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "c585aeed8719b6aabf4fe593fe42607595fc1f0e0125b2c6ce97cd76abb4867c",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "40c96d179ee203a872e80d6a16c51990fe169340f92b4e7db76659c3c56926da",
+   "pdf_bytes": 101417
+  },
+  "IF-04-3-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "5c0477e786a21285d73da62356a35c03831dcfac686041b3f81e2ad48d1a39ba",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "771e7aff7ad7cc0a176ec01a81661769c04f1cab9a5a55819b1db9619dd46855",
+   "pdf_bytes": 94904
+  },
+  "IF-04-4-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "a4120e8ea2e3d7f443cc5c3a3d5af6e509fe9c84ca804c2a8fac9bf8449f168a",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "aeaff5b4bd68edd93cec28208006ac01117b0ad1bbe550af5901ed0f6effb1c2",
+   "pdf_bytes": 111731
+  },
+  "IF-04-5-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "c1d9b62f16aca105c7abab63dacf47af2d800d748bd1329c2454f574f789ed00",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "bde958b373b24d06877468cd324cec8712d0a56144fc7944241d009c68fb9a2a",
+   "pdf_bytes": 135480
+  },
+  "IF-04-6-A": {
+   "unit": "chapter-04-excel-essentials",
+   "source": "c84e5212751fd8b8b68e13439c7d98fab3143002b4aaefca680742f14c0a88b5",
+   "generator": "fd2bf90509caa40a880c8b631f186661659ba9ee02b5af52e0c8e8b3d11fc67f",
+   "pdf_sha256": "ba95e87692c20b913459e21721d180f44f3c063c0e34d1ef39158b59558b377c",
+   "pdf_bytes": 114503
+  },
+  "IF-05-0-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "41cdaeba9d6f869fb03f3747325e0a6bb8086aa637079aa94662d052ac481953",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "c7fc2e2a7c7ae88e9e03d169b91781786b890da169bf3d1fde7bcfa77c89b436",
+   "pdf_bytes": 107045
+  },
+  "IF-05-0-B": {
+   "unit": "chapter-05-data-preparation",
+   "source": "5feb9a9c9ee34ff8a708675dae5e02aa1feaa49eec7c2858a70f62e2bdfdd0b4",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "2503db938c3c26d1c5e7c78a43d93aa24454daf80cd1cb1a30361389bb009089",
+   "pdf_bytes": 85700
+  },
+  "IF-05-1-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "66a772036dcefd3ffa8842f7b5a3bfdabe3cadc443b3ce40bce414f7ff725211",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "d359fd007b13df28a5753480e0429df96c391a31e1fa7e28c0d1e5bd5abbc153",
+   "pdf_bytes": 109879
+  },
+  "IF-05-2-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "db2d19da8c8566ebd39fcae8919c9e4bfc33a37468a3993026ba548d76f45a51",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "7cfe3cc0a7bd7c7a109e4d8843c34de233332c943a833abd57cd426d5018dc0f",
+   "pdf_bytes": 96162
+  },
+  "IF-05-3-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "c3634223c6552ba41ca64e765af2b9ba7fb9bb450a4a6c7e708c33fcd0bbaedf",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "4877d43839d475c67e474deefeee5da0eebb4c14d1992b600f5b6b80ae8bba9d",
+   "pdf_bytes": 113192
+  },
+  "IF-05-4-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "43b33f79780011023e5fbba7d9ea2597dfb8050ced1f75344706e6ddd301fd9a",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "4e3562d938fb6362afe3a1f84e982cc22d952aef8b309c55cc6b166d1d359fdd",
+   "pdf_bytes": 93871
+  },
+  "IF-05-5-A": {
+   "unit": "chapter-05-data-preparation",
+   "source": "358ab78502905002cc17315fcdc0470a5e348cfa38925798e03655eaffbdb382",
+   "generator": "a52a853813eddf01a99281367ed54838460c9bac1b8117dd85d0376aede1ecd7",
+   "pdf_sha256": "b10164f6e8626fcef618aef1654c2ba45350ea9d646568bf26706cb2160cbeea",
+   "pdf_bytes": 133390
+  },
+  "IF-06-0-A": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "1429a74590a5eb17c3722e3f14a27c8161cc343003ca42423a3778d817f5e107",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "f02fef36a2025476e1490c618e1b06bb846870f1bcce556e14026790e8e352d4",
+   "pdf_bytes": 66231
+  },
+  "IF-06-0-B": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "f948358dd49e7a2b025065cada715087e92dc0d6aebeb67b4f952e8e851da83a",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "7eb3347e9d40e3161cf47eecfb7afaa6dda9582564e3f455108ed99ade777342",
+   "pdf_bytes": 94434
+  },
+  "IF-06-0-C": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "f7b8fa7b647d3725f9cdf4bbcc5c7f29f05a51c3191c82ba45520af5d7fc918c",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "3c05ffec444fe05551673a57662b2e05c7feacfa49b54beb39fd5153c138b55d",
+   "pdf_bytes": 79705
+  },
+  "IF-06-1-A": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "90d1b77c3a8120228dfccdaae70d2639ed468d23c9cc418836137fa2d8de9fda",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "120c0e7c6b90b22d0539e90745470644dcd35b2259b624c68988a184c00780d5",
+   "pdf_bytes": 95534
+  },
+  "IF-06-1-B": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "b501f156cd2ca11e5904cb2631e07968ccf88dcf4c20375ce5b3291f6509b990",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "eb3df18a51c56fa49bd37f87b17d8c8f94ac9aad3aad819ba938574f74131629",
+   "pdf_bytes": 95354
+  },
+  "IF-06-2-A": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "dd9e329c11e72181e4ff6a7f5bcff411041a48a05e670b0c1d302bab35a38000",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "0b3e60b79759a7a214d5680f34da787b4efda1fcd3ff4c5859ab22ff6129684c",
+   "pdf_bytes": 132164
+  },
+  "IF-06-4-A": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "b7609d8eb640beb735ba996409d9bc9b22c120e480ecf90b574700d9f43a50ab",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "96b7367c13107c065d1e53c46bdb5cdfcd2dc80b9c9447ffdd9a4e7120ce5f5e",
+   "pdf_bytes": 95351
+  },
+  "IF-06-5-A": {
+   "unit": "chapter-06-descriptive-analytics",
+   "source": "aeb49c68da9fc869ff69e5389fed244f33582fba7e21d2f09b9935da3f34477c",
+   "generator": "7625b690ed081e2b1cd4d010eaa211dc55b30cc9f8c5efc04a490c5164aab0bf",
+   "pdf_sha256": "d80b7b3351dbb43373b23df745782b9cfb42c63240fd97e8429c8358ec9ebd53",
+   "pdf_bytes": 103367
+  },
+  "IF-07-0-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "c01403a75c777da3653f7dc83196383015b55bea397d62dc9deeef67d022b697",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "8dcbe0db7522afd96f3462fa1eee04d710c7c5c8c1813da04797d6c5885818e1",
+   "pdf_bytes": 83422
+  },
+  "IF-07-0-B": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "1a603a7b89fb7071aeaec791df9a808f3da53e9de26e28a4f6ce0e6116b6892f",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "e5a9cb69dcbd6c357d9517510136e6f0ba5f25ed0f1dc9aa74fbf2d179e5bd8c",
+   "pdf_bytes": 111270
+  },
+  "IF-07-0-C": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "4734720fccb4ac8dd6e9eebf56fceb522023f1862e2f5f005e2a14680806783c",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "9db9e9440dc6595562545ef5b58d03960366a5d774414970c99c1cd9763ce598",
+   "pdf_bytes": 93300
+  },
+  "IF-07-1-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "fac7731e92924948d00b4c8f43c51ebe7390b099cd3bacea59d451786ad8910c",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "0c15f3f6098e1d880c928c2908ddf9fd969a97e9961b2eca0c96c9a3e8786129",
+   "pdf_bytes": 90116
+  },
+  "IF-07-3-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "aa97605495aabe4539f6c919906009483a035ec16cd3076d91a49620aaa2e72b",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "d2afda8384f19abe8443aab517b5c2634d03c993985dfa91f0482da95faa5d25",
+   "pdf_bytes": 98943
+  },
+  "IF-07-4-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "5678de44dbf6fdf30129f7a1cf4fbcbf5def8c4722975bd7c86d8e77201ca3a5",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "a10f9f7426add59159461a1d95d529244308509534eb59015847245fdecd9567",
+   "pdf_bytes": 67571
+  },
+  "IF-07-5-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "9e5b558fdc608f30e2798a01f64375c60aef566f26a954d7528c2cef119a4844",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "e138748c27fa75d8bc5374022b9631065773c238c2e35267c3dc007c9d279992",
+   "pdf_bytes": 84860
+  },
+  "IF-07-6-A": {
+   "unit": "chapter-07-analysis-and-modeling",
+   "source": "b70198073d5f5b7c6b1731f929f884cb2860c48c0352e4fbc0485b4fe7744c5b",
+   "generator": "c51056f7b6068ccdf9c7c27f671a194c10817b0bb4ec033879b6058f0fe7eff4",
+   "pdf_sha256": "c3bce426c32b532fe4c52bd62db27d83944039af89544e1c6157a8a741611e91",
+   "pdf_bytes": 77277
+  },
+  "IF-08-0-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "6800daea05a04af015934a8e7403cb8f3ee499f3328edc004421736bf58c1b6e",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "7d4b264fe82f1b562948723769d687c9cbf721658803db92299151cf22d8fe1e",
+   "pdf_bytes": 66295
+  },
+  "IF-08-0-B": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "d8709eea8d0a8a95854f69647c085f728ef5774dfb3ef6160c99f5e7b221b0ca",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "5367b3e3397ca9e81f7653d34314bea305ee3d1e7080f67ffc62b6fb17be71c1",
+   "pdf_bytes": 70911
+  },
+  "IF-08-1-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "04cd94be0cd067d41b2c27a646116413b84531da5c5643ca7091d1807421f77a",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "32a5550b04aa290357b3c9e848cbfc0ed74cd79432c7652cd405bfac022eef84",
+   "pdf_bytes": 113126
+  },
+  "IF-08-2-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "5b4394e7e18edcbc9832dba2f39fa0aae53886c84fac98a9ede3cc1ddb51c1ce",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "5126ef580a85fb0e33c5785ecad63ed22afb7e43dc646ef50f3bdb4bef50fe0c",
+   "pdf_bytes": 98036
+  },
+  "IF-08-4-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "0a7a4467d17ec48fcb9277dc628054c0bb35a96a8d5152c80358264fc4023128",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "679b5ec36a2296996af964c8fb8cf4413fc25fe9642b25fd7f591ef8bd82a3e7",
+   "pdf_bytes": 114390
+  },
+  "IF-08-5-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "e40b806fec2dd3929dbec94a508f6dd5540aaba12f4edc3560c5f85b4bb40952",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "2ca9a899cb24b19a064490a8d698cae671c885dfe62116c4f6e56f769d3f383d",
+   "pdf_bytes": 77852
+  },
+  "IF-08-5-B": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "e250687f391d0cffee774186455ffd8e3c7d91c11ee181a73384fa29904ae566",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "be3a574c266ae5d7051f472b446860d5ee68f98aa353635346aa253aa9e4ec64",
+   "pdf_bytes": 114089
+  },
+  "IF-08-6-A": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "1a5ce3daece14395bfcc64a2ee6d628c11e481fe1a3c1022b3776579ba811656",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "5c9924057df29698595a34de4ff0f538a3e897e7789ed28ee6e70ff44f67644a",
+   "pdf_bytes": 77369
+  },
+  "IF-08-6-B": {
+   "unit": "chapter-08-audit-analytics",
+   "source": "2f741fa1b469474a4f7fe5ea97775364a9ddb8bed915840e4dbc6039de36e669",
+   "generator": "e462dabafdd2b40e6589c7295c0e53232083a360a4a72d850b5169f9f921219a",
+   "pdf_sha256": "f4d5d2191ba5bfb6258be5b685128f8929420e333d54147b36cdea1bf05a36ba",
+   "pdf_bytes": 70542
+  },
+  "IF-09-0-A": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "e53ce9b038a74168eb9f5d70374caa596dfb1b08a9cae60662fd31ce79c03253",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "930ef67213a67156fbd736c5071bb893fdf760705f723a6d6d5f90ce60713c65",
+   "pdf_bytes": 73970
+  },
+  "IF-09-0-B": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "1e33a0ea7556db0006210b95bb284098a234d777a828dd9c07e1219144582bdd",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "43c25a22b03646bca4e078d5c474c5ef1248439116530e68f016eedb35f27974",
+   "pdf_bytes": 136712
+  },
+  "IF-09-1-A": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "05649e54317528cbdd7b62fa9445e63f40b2248bff08886fd18c0269c46edede",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "f22b0a7520d1bce6e5057cc133c0b9549216aaab55b2a8a9f1afa6975b5f732e",
+   "pdf_bytes": 159880
+  },
+  "IF-09-2-A": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "e22070008e91259b2f8ce950bb3bd5d76b1028753d876cc76ef4b7a5bb5de805",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "3b5d1cbfdd9e9bce02c503bb53b01023d29fe03f9148b1723a6bfcd56d74cff7",
+   "pdf_bytes": 161213
+  },
+  "IF-09-4-A": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "a4eddf49121ff752cd9811441512451f36943b0ba3518d0d190036f4da5db3b0",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "761d1483b5c413dca44e4e84245a06e2023f9653f440f4ac06e57460649d2e1f",
+   "pdf_bytes": 157720
+  },
+  "IF-09-6-A": {
+   "unit": "chapter-09-sql-essentials",
+   "source": "a0bcee2ee0dc22d8240fe0eae7914348763d670b40699fb6ecbbd589d55d0a36",
+   "generator": "cf465dc51116c6b66f6bd8ce1b8a2011a8be1187680e23797b6e00cb2add44f4",
+   "pdf_sha256": "e59430c7523e9a092662f845d96c4defbc75fc26c4fecd48da978c8f622351dc",
+   "pdf_bytes": 154721
+  },
+  "IF-10-0-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "32ce125efa627d91bf6d5f6656c43fe9ec32cc55bedebbab01cff6efe526f9bc",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "3b2315f7e17c43f15cb4ae8195a0c74a181df5838e6c0b3756c4e33f6cf59d79",
+   "pdf_bytes": 90569
+  },
+  "IF-10-0-B": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "2f6b43837b2ea0eb288c4637b6012b080f9d78ceecaebfeb701b4062792dbe72",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "97886d4cf33e24a147f5af49d9943542144401f5e130bd7107f81c0281649e34",
+   "pdf_bytes": 143642
+  },
+  "IF-10-1-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "1b7f44732b4fcfc0b67fd5891780f0fab6ac849500a4a2db45477eeda093cdbd",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "281f9347848a0e4828fe21f43b07aac51a9f4eeb116d28fd77dc72b68aee300e",
+   "pdf_bytes": 155821
+  },
+  "IF-10-1-B": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "eb675f484686233ee775dc5ea544853900d5c9e21c12d0dc4e4b3501661573bd",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "50b95f77198af208a803ff32a85dce3cbcf1a167201006bd435d374ee97dc95f",
+   "pdf_bytes": 160035
+  },
+  "IF-10-2-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "974d3471e7a90b8db7bb94527c4e2d266614d51bdd514fa67dbec4e924598284",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "191e57524978013f78fbf18feb85b470e69452561a538613e7804a372f124146",
+   "pdf_bytes": 162098
+  },
+  "IF-10-2-B": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "826f17332c335faf51dda47b9b1adb39b19756f9da885b25e9edf2f2492ef9b0",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "de8d4e4a7a9b65dcec283f12905f934b1fa07e64395b425776fba7944904d10f",
+   "pdf_bytes": 155115
+  },
+  "IF-10-3-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "a6aa7f59cd35f7a4733b7ade44ab046b128f1234a0b5378a3e263ae2db7c5997",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "18bccdc004435a75952f433b6b23dbd61e035fc2b1e573f288dcb2f290564cf3",
+   "pdf_bytes": 144337
+  },
+  "IF-10-4-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "f458dbe2f734bb5a718e0618f8ee99fa87263406736ba834757949924f7b8056",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "092fc93622e259b404816ebf514bd190a91cfa959fa098b3d7d3520385ffbf5a",
+   "pdf_bytes": 154098
+  },
+  "IF-10-5-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "2f87ea90ea6cfd8725eb50f696393a4f76286626b06bcaf486e8cd50f900107e",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "55c6ef070f8a95869a5945b6601d1f759968718e4a5c273aa92d04efe1e12e1a",
+   "pdf_bytes": 157139
+  },
+  "IF-10-6-A": {
+   "unit": "chapter-10-joining-and-summarizing",
+   "source": "17f0640665f392850216a50b539d275966caf4a5b9f61350a89c74d8755e8533",
+   "generator": "09d7f54d98cd6837a17ba8b81f85859d63bfc2e0bd535034321f6d3310075e9d",
+   "pdf_sha256": "6c95791ad0a2b9df042439d8b3b8ba4a3b6888ee5538f58b8b5e40b19b208a85",
+   "pdf_bytes": 147685
+  },
+  "IF-11-0-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "7faab674f2743bdb5349d2a62832d51e680a7b5eed74137de0dedb6e3963c1cc",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "369aa35e5d3d22f0a99c5e2483c19925d271e07f7c90b0798e656de87595b5cf",
+   "pdf_bytes": 61430
+  },
+  "IF-11-0-B": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "ca278c850b855aff6aa45569110ec9100bba1e7c504d08329cae005150b5efa7",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "d6d4a611e6e95ea75a8f795e0b7ded4fcaab94bb831feb854f6c8deb58d520ac",
+   "pdf_bytes": 158366
+  },
+  "IF-11-0-C": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "fff3407aaa8b8e11c3b1b76c92de93a65e59cc7a0415148ec8d9d7fa1fe71f6a",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "e658b0092a8a5cfad9ad27275da982713d7722747dc7570a6d96b8f90231c85d",
+   "pdf_bytes": 91882
+  },
+  "IF-11-1-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "01b87b32dc43525ba5b277929c18b2b4bdd46a5a61bf4148b1d741d2668047d6",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "fb0690ac84bb98f9c14b2650f824d7049c94f2a08d3392403930056b4abc4044",
+   "pdf_bytes": 158803
+  },
+  "IF-11-2-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "a13b88f6c7f114e17c0d1b8f922b6ec66f1ef95a36f48de11ffc1c17e171b2b1",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "869c00f0e1e8dbac891d112fa1b10427738c1b67072b8c2bc4e6dea9c269b8f8",
+   "pdf_bytes": 158382
+  },
+  "IF-11-3-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "6f32a896160bf863763b0cd7dc3dbd430f2bf75f5d7ff31f8a509810cc1b2371",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "0d4596b18d9e58389949f7a6a6aa8dfae87e4878377552775b67f3b7a7260be3",
+   "pdf_bytes": 148746
+  },
+  "IF-11-4-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "d74ea908114d31ab4a3590abf6985ef7edd535143526d0e734b5de833611114e",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "596fdc30d6a6a09a3a5a9d8cec0dfb91c0844559bf1c1689d70efd5ab8c5939f",
+   "pdf_bytes": 86759
+  },
+  "IF-11-5-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "fb1f515b53fcf3d1826bc50bf6b16a60856e623a45bc25426339ee0b2351bbdb",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "98cf854f126003206ae3abe04aad44ac216f38124e87d44722a9e94f53f9d06b",
+   "pdf_bytes": 147255
+  },
+  "IF-11-6-A": {
+   "unit": "chapter-11-analytical-queries",
+   "source": "efe239d086e07585fdab59a5011cdddbe77f1f65b3308047912d38fc020d6e85",
+   "generator": "3668f60f6a66d37edff0417e9b46007d84c86f5c8caa1072b13d3c43e5bfad61",
+   "pdf_sha256": "4d50fcf7a9ed4663b63fd5d7ca2707ddab86fad7efa5f1e776f9f808a91262fc",
+   "pdf_bytes": 146363
+  },
+  "IF-12-0-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "a18c3b710055b76e0449ed710146f9fd497dee9cefcea9fc03c0059d17d3d501",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "48148ae918f01b18d65a52625f31fa9a465ab67851031ad1d44620837d0b4fb2",
+   "pdf_bytes": 67415
+  },
+  "IF-12-0-B": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "ae73c60c732d972ab718c518480bb6352ff6c7b415dfaa578b58edc9773db566",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "13a4af041809cf93340be2adb37af7ef9609c562d2387540429682d0d2bce124",
+   "pdf_bytes": 107357
+  },
+  "IF-12-0-C": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "bbbe9b324964d6620c9b7c7d098707fe5c1732f13dd83ef90bf3d3cd260aa40a",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "c3266cd4092d8954aad19df058892a6b810cd27925179532efa16a6415c25692",
+   "pdf_bytes": 84116
+  },
+  "IF-12-1-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "7beec44bd70d5badadde979608a1be0c328ddd6cd64b4bd37e014f6d834c48a6",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "750e52e39d55f8d126bb941b5a93a7ca40415996d739394ead426fb6acf61b0b",
+   "pdf_bytes": 141786
+  },
+  "IF-12-2-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "55b8cb7d373b4617ed1e8e6035bd077a695495e80a47be52a4b1bd36a2aae8ca",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "089a92596defb0bfdf1165d38abf99a0f03e7d82845ff88710c793d59debb6a9",
+   "pdf_bytes": 150962
+  },
+  "IF-12-3-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "5a6236223db3f1d28de867059b7f9426f6698bc72f8ba87aea1e1335cdd7cd32",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "8712a9d3feb9786b94e1a759a34f546562c922b81e66dfeee29d85fbc8419114",
+   "pdf_bytes": 160685
+  },
+  "IF-12-3-B": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "69a7385b8661afbc38eb2961983047874b1ad792835f67a08292d810e96b9e9a",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "c3c09e3bd427efa7dffcc291191eea3e8655f894a7307869043e2769033136d0",
+   "pdf_bytes": 81625
+  },
+  "IF-12-4-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "2c0f28af3794353ea9c0a21a00b4776b57adeec5688114c568f84ac0c9976c2b",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "6a2cc5edbcc4355c6ed5e0a2f9ee43bbda812793b148c2b78cc84ab779344391",
+   "pdf_bytes": 159519
+  },
+  "IF-12-5-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "a9d33a82a84d8bfca7220a60607f3eb8219c198a1d97d8600f24882fed1c337a",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "78969461ec4a0b2ebc886f4ea02a95f646d9c7f325173dc568d39f3f92e9fcc2",
+   "pdf_bytes": 144970
+  },
+  "IF-12-6-A": {
+   "unit": "chapter-12-sql-audit-analytics",
+   "source": "3800ac558084f40c47edad7bca044d81f05b0656ddc01bb2775674bfa662a2c9",
+   "generator": "38dc3ffc1d72b377337ac91614542c7e79a3ae572cba0ad899018920b97ef614",
+   "pdf_sha256": "e73c43060a2ef640af288a4fd4cf5a7506cae6d6f9ecdb9e947658ce71758f9b",
+   "pdf_bytes": 159239
+  },
+  "IF-13-0-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "dfba3c2bea03da2feaf49a9d5e86e96394086d3b025082e55e73a753de53338c",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "8e9cd136942bfe0eec7f0c57dd98ef5fff4fe086fdd16a919e12100b77c6780b",
+   "pdf_bytes": 86860
+  },
+  "IF-13-0-B": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "12494d4ec7629c3e95c5a282b2c169ee7ee72baeec26c62295194283e407b581",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "6af1608d322b2c6645e08cf15135a0632dd2657ea7e9773fdffd7de9522c51ae",
+   "pdf_bytes": 94268
+  },
+  "IF-13-0-C": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "44b5c55816eafad533d4acffa48528371c1284e94465edc68232ad9fad2fec65",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "a1f0ccacdbc2498a4d6d50ab48cf74b0b03ed863d0533c6103bf604da717575c",
+   "pdf_bytes": 162856
+  },
+  "IF-13-1-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "55ce2c9d96b348b5df813c82ebc2f70d096a180530d4e06e174f3f49491b5b8b",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "9b8851a9047b318b74b2a318c2f7f786135ae0b00820e9287469f0c0c593679f",
+   "pdf_bytes": 77460
+  },
+  "IF-13-1-B": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "7a7c8f1ff08a7c0bc0523301f6a7093b4459b3864f23a92ccb733c1e895802c0",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "71735f8396195d5148f9a7dee2cc4e1ca846d00ed057d53f75040a70b27e1767",
+   "pdf_bytes": 95924
+  },
+  "IF-13-2-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "6248dcc83954c09a71abc9b87de7ca6713b3e3182f63ec899eaa593cc1388fbc",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "ae309fd175bed9a17e94051ec028b84e3995a3ba072345a487602fcfc77b93bc",
+   "pdf_bytes": 80326
+  },
+  "IF-13-3-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "70060929aca7c00da370c2a3f8dd5721d89f5a544853ac34310c7ef24690669c",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "4d3d5bf25568d2bb8a233f27ae7cc283d58cd3d3b39c951709591b8590809e14",
+   "pdf_bytes": 75701
+  },
+  "IF-13-4-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "3e14b9eb9f894fcb26d17c0ef5141a3146643aa8744071a325e697299aa7d503",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "ef083a1fe48016f1a57da1dfb5e138c514327c87eafe6b7c127137f9f64a52a6",
+   "pdf_bytes": 98771
+  },
+  "IF-13-5-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "cf47effdb825d8ef25a86c292cf6e6bf4ae75cb06c7ab7de84831f85bd26427f",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "c66bdd9629eb8dbde39dda3835eefa20a8eb02b93a2436da3c9d8d1341e8afc5",
+   "pdf_bytes": 87832
+  },
+  "IF-13-6-A": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "b94bb80bc1f68e89b1bae93d1d11d495d2e6d3e8e7b123305fb292a578a0a0a9",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "92280daefa73d353933b8239f63b40c3bfeac1e3d564feacf4e50247da691da4",
+   "pdf_bytes": 99919
+  },
+  "IF-13-6-B": {
+   "unit": "chapter-13-power-bi-essentials",
+   "source": "8bc84c7f9ef0dc6b9a02bf9250b8530555e36691594b12ef6fad2a10a6032395",
+   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
+   "pdf_sha256": "bcf625c889589b0861df80b01919743dc9a3d78c64adac075a4a32cfea2b2bf4",
+   "pdf_bytes": 97345
+  },
+  "IF-14-0-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "388ceecf6277019ea8714bfc792e41ae0f1a9a172a17924923380dcf70a7b194",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "b1508aa73a9f6806c10137f2875abaa37eb34884244e1713d7e21ed22d547049",
+   "pdf_bytes": 94831
+  },
+  "IF-14-0-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "079b8fec3367a17237e51fb52dbc9acf7fc367d0d9e9d4421891d61e43cce000",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "54e6f40a9406c4bf45d4225ab4b01933969b523d2272166cfb5f71f552816676",
+   "pdf_bytes": 98771
+  },
+  "IF-14-0-C": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "e58d161850144b70f2464d3ea2a5110181923017bf681e30cbcc46ba431adee3",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "5467809e6602176e89450503543b2296b6a31d8bc2b511f98abb56e27e950151",
+   "pdf_bytes": 163692
+  },
+  "IF-14-0-D": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "bab7e1e13ee00c104b6d60ff97c84a4444e0dc3205323004d5826b07209755c7",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "e850bc82ea5b7f8ad4fc9f70986124efcbd7a8efa61ddc8fb9b7fc68ec8d7373",
+   "pdf_bytes": 110595
+  },
+  "IF-14-1-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "07ab2d2ae20b054fc3bc1948675b15b6e2fffcaccde1ee417df858001be3bb8f",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "1681f359007ec323421d03c2a6dc9313526488d2f91c4cae92b98715b7947ad0",
+   "pdf_bytes": 90338
+  },
+  "IF-14-1-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "da212e585cf38c6549bea46fe7fc590fba165a5b4c072463497840dea2fd596b",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "3e5f0bbee233d9367e63e8926c4a9027464cc99242865fe803c6d3907bb7c526",
+   "pdf_bytes": 87710
+  },
+  "IF-14-2-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "bd6982752b45a01978e8f89c64ac0c3b03b277a8aeb6e1255b776ed4d5e6cbe8",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "8747322173f386014547e8e3ca3870229821e9c772b0131789497ce862a5f121",
+   "pdf_bytes": 92915
+  },
+  "IF-14-2-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "7fa58ebe0a1ad512ce523a618f5fcf06cd011cddc364eb76f9b03b069ad05c35",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "7bfba4f8ab60509672afd960ee5cf73ad8a3f2c30507e0f5b1debe577509817f",
+   "pdf_bytes": 75285
+  },
+  "IF-14-3-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "3a398ae6fa3c36e11a1af1c8674c4e5eb5ded80f8718db3d56b3a784a692703b",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "553d10e41601c2469543e6c3a6568b02f7200dcf30819c9e60d8738dcd85760f",
+   "pdf_bytes": 73680
+  },
+  "IF-14-3-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "a90fec8ee5dbdd62669b4e96cb84fe3e0d1c05d035252313ccbb7af46ae22527",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "1e85c476ece437977d9b94e489113fa18fe17d34d8a2af00514036bb8a3455b8",
+   "pdf_bytes": 64329
+  },
+  "IF-14-4-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "6f2ae618939cfb469cda18eeea9a73b3c24e7ed811b87fb86286c201ddb6103f",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "689132e92ef005acddcbdb147aa5425c06eb71a6315bc31884a1a42e1d00ba25",
+   "pdf_bytes": 81522
+  },
+  "IF-14-4-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "60596401a6ff7732ffddf42f7ae8e37cf5074b334dade50e2c606ac9aa3f7fa7",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "e393bd408d11ae23dbb7859a0455e3cd6576aa7a4ae9000f11c1eb4b5ff3eae2",
+   "pdf_bytes": 82209
+  },
+  "IF-14-5-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "78097ebefaf6a012a5b894e1a03e13f747909fbb879f0521bf0c1da71e6d83bb",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "27cd89208f2a258b8f4a2a9979d32b93d5b520162404a128ff2ccd3af1e9e47d",
+   "pdf_bytes": 163323
+  },
+  "IF-14-5-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "30f4a6cdcba1895f6df0fa5e18e418e1938c1631ff375f75adb522e0475c0137",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "82bfb56edf7e397a9c3e442f6c27c746fc272960e3433f2ae7e4c317e3381136",
+   "pdf_bytes": 54925
+  },
+  "IF-14-6-A": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "bf9791a8595b8adb02284ec1056b701666b77bafcd5e9c5a7d2bc3dbfd23359f",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "cfb788f08725100b74f2ca819d4327f4b9bcfbafa56f33d1e1478ea4c186ca9a",
+   "pdf_bytes": 169054
+  },
+  "IF-14-6-B": {
+   "unit": "chapter-14-data-models-and-dax",
+   "source": "b45e19a029e5059754b7faf0f9aa111d972286cb39a258be80efc553de6e41ac",
+   "generator": "2727b7196794b83e3d0e962092f760f909fddea8bde4e3afa3b90717c0c2f80a",
+   "pdf_sha256": "7553ca7d0449ad129c08d498a7a7bb908dfde617568db7a5fbf7598e5af163bd",
+   "pdf_bytes": 164022
+  },
+  "IF-15-0-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "d7b0d2d15e9c6fc0d6999a7dd9efac11737325c6852096d8a05f87c4fe7cd11e",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "205d20e66cf163a5cdfbf62e197b397c14f1d83e4aba8449e94ae75ecc5debef",
+   "pdf_bytes": 90387
+  },
+  "IF-15-0-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "ea10b4bce0059bcba70e297e9cfa38ebfc6ecf814e7b9a4d55248b7baae3e4c7",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "fc85d63ad66eccc15ef4d7d4da4837e3d4c8c798ec3178518c5f6cea4d7d06b4",
+   "pdf_bytes": 102839
+  },
+  "IF-15-0-C": {
+   "unit": "chapter-15-management-reports",
+   "source": "fbd1a612946b7491add780304f9730444b8f9661f774b3c5f98e7bde7e169196",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "355da422f93e9c295b8ac39b1c7b2f5136398da4d1e33eab4404c02679095c54",
+   "pdf_bytes": 98905
+  },
+  "IF-15-0-D": {
+   "unit": "chapter-15-management-reports",
+   "source": "f74ba6dba793a05137722b92a61bb40da4551d94791fe50455e0b7d0f98a392f",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "3b5e18d2aefb3a568899c1a3a15e63e9f575282874c8b67a97340101b024f297",
+   "pdf_bytes": 81857
+  },
+  "IF-15-1-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "aa41d59eb718c6c92e372f68c20b6e05d84dc8e954a248c05154c7d8968b2d6a",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "3b0853320e97f7851dd93932ef9716594032c172c411a2a6a5e7df785850d560",
+   "pdf_bytes": 82346
+  },
+  "IF-15-1-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "4e9e36257b8dea97f2bed4826165e3b43584898863ec701c4c88f492d22aae0c",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "82de9f09759a46d847c9db1ce23af320c48927695fd8fba0fe231f0ddabd68ee",
+   "pdf_bytes": 105168
+  },
+  "IF-15-2-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "de5538f3777b05fbd2ed3a27638d29fd0f399d0fbc4705b67ebc8fd9ac12c53c",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "32f003a3301af1d87e254c2e461a48ad46205ea97f30a94eaaa4507e16a19d08",
+   "pdf_bytes": 82973
+  },
+  "IF-15-3-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "a9291a120151d789ac1adf7614423fd0d0efbd7229b92ec9faa321f5a55b9386",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "05f7cbcc85e95bd797f0d64360cd02448a284b3c694cbe3398b46519f6afe58c",
+   "pdf_bytes": 95828
+  },
+  "IF-15-3-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "4202294714695593d70253100139803a3e8da444217ec81987780824ec4ccc5b",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "ac18003b073bf81d339e03ab3cbb327ecae4fb1467860d07b400743c3b10f2b7",
+   "pdf_bytes": 48243
+  },
+  "IF-15-4-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "85147ab5e65daad1526abaf4c6ccc0e69748672f208b86c5f51ec95dc84f0bc6",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "f4150bdb17b2ba20ebf434232e8c2fce70a714d2d87c88ff5881807a8c6136fc",
+   "pdf_bytes": 105298
+  },
+  "IF-15-4-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "e566b020fa0bed880b2692cb4c0d5d303f4d5ee06588942351c988e365e5488f",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "23d458d047fde9d24da8b18557141015cde859eea9cf9ce627300d5e4ac9371a",
+   "pdf_bytes": 92849
+  },
+  "IF-15-5-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "383391a918f799a587eee2690c0d2596067a6e3088d7353d1c232f48fce3bceb",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "55a9ac9289b31a4a0e8d5ebdd888846fdd4a885f7bfe4bd57042fc961dd75ccf",
+   "pdf_bytes": 103922
+  },
+  "IF-15-5-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "3981d68db3311b9ff13ef9c3d8ecbc0495718d4f1a3cc79192222bca9284c30b",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "0687cf93197ff59499e5d4a2406a92aff644a1bf46b7bdefaed76812cb8a0af2",
+   "pdf_bytes": 82363
+  },
+  "IF-15-6-A": {
+   "unit": "chapter-15-management-reports",
+   "source": "f58f118761e280a2633029c333493919959bce3304ea57812a7959647c9f2e71",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "4de38a71a2c37cab22af1a5f26962904e8baeb7fb22383333cc14d019eda0b4c",
+   "pdf_bytes": 83650
+  },
+  "IF-15-6-B": {
+   "unit": "chapter-15-management-reports",
+   "source": "bf00e3e8ea36c031fa86dfb69c2670fb7e5f1448680aae78172e4e6f972bab45",
+   "generator": "08f009ff98f56acf75801154d60e698b6cbb522eb2bcc45412b7179c7534dc7e",
+   "pdf_sha256": "a504153bb1b26b13900b7c37189d1242ac895fced3ad564f02bb261fa4653e39",
+   "pdf_bytes": 94098
+  },
+  "IF-16-0-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "09d9ec987e100e4ebf2652a4654fe18cd53eb756ba3a8c183cf58865aae89077",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "1ffa51ae43c1006392ad0bc7921f27235e7d18f341e5a69730f39f5be3be20ca",
+   "pdf_bytes": 89947
+  },
+  "IF-16-0-B": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "86fecf8810d89cb8b91180e3330d90d3995d9785facd878eecad2395c15efaf9",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "ca90df69c1f5403e527e361b98bf4ec97201848613b30d8e7ad071f6e22c3b9b",
+   "pdf_bytes": 98429
+  },
+  "IF-16-0-C": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "215f951ad70b30fd23f0efb95f22631781933615b787309c560de1cb71eb9b43",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "6b12b45dd76c453176cb007febe90db6c5aa5be9d14855dcd5100eef8b967d4f",
+   "pdf_bytes": 98800
+  },
+  "IF-16-0-D": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "c31244ad43cbd74c4d234d8f83a8ea26da102237c169b17132b27d587da38086",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "6b16ac7a085b963e2ff1625356bd1f7fe6321f731eef770f1df72d217fdec54b",
+   "pdf_bytes": 86287
+  },
+  "IF-16-1-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "d26132ff0d8f568d5651caa64fb81ad08e911d53344b9a0682ca10c0174862b8",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "e84ff46f6a068fc145be22624665425e2721a8525c417013007ba1063f2259f0",
+   "pdf_bytes": 100868
+  },
+  "IF-16-2-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "49e59f53d854915d627e739b0cd3b708bd0e51a87c01ec8148f5fc987e17e41e",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "410052d5eb275e29ae8f963bec4a82c7890bdae37f3991fbf93c590b392a804f",
+   "pdf_bytes": 67734
+  },
+  "IF-16-3-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "7fc096fdbba49465ba81d88f3bca2021c7712bd966f1934314b75d2b0bb09a7f",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "43b75c33aecf27afc9491199b45f2c0949ef055f027773126d47a17110961faf",
+   "pdf_bytes": 88589
+  },
+  "IF-16-4-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "8587a54591a9a8b5e10108da863a6a3f5efa910edde6b3bfa63aecb936c01fe5",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "6b1ca7db1efd4c478ca05deb7ed6674a8abdf5c9c29cb0958ff18e7dd67e6a1d",
+   "pdf_bytes": 91483
+  },
+  "IF-16-4-B": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "878e4a3493e1a5313b5100f8bd883539d3dbfe1ea30138e1930883bea6936279",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "0c3a0870a8f3daf0acca88b03ebcf22b64bcd272356c53cb35ac86c0199b9582",
+   "pdf_bytes": 80529
+  },
+  "IF-16-5-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "83824216c3cd21d2def24b4bd4e67a8b6e1bdadea88526b9952163afecd7f88b",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "1832a5d6bd6210bc1ee1728664c8d233d187393336721fd78c49b04a91642987",
+   "pdf_bytes": 93155
+  },
+  "IF-16-6-A": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "a597f74607e4b39da9c68412695e5d682e9b71b7cf244a59d002fe2f6d3d75a0",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "8dcc6eb1bbcaedde85bdd129c1e40b1bd3268d11f9d9d8a9dd293006f36eeb09",
+   "pdf_bytes": 108322
+  },
+  "IF-16-6-B": {
+   "unit": "chapter-16-audit-monitoring",
+   "source": "14125461d20ac5f093d0347b15a9a64463fd2f761e90dfa0c3d64db0eb645c69",
+   "generator": "2f50bd55dddf3fe2e6db5605a35bda77e0b9d7e40eddbf84503c4a3d3a378721",
+   "pdf_sha256": "a0a36cb95ef2e06a2cfc5c84e9ade5a3f84de47fbe6836d8a28d525920db574d",
+   "pdf_bytes": 94727
+  },
+  "IF-17-0-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "45709bd231d741b030d8ce1822ddba5ded5278503ca95a9d8907f0aa1228607b",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "dd241bd7b034811449e0fb97693f2bd8629ec21ae8af8cec796d151581e922ee",
+   "pdf_bytes": 103803
+  },
+  "IF-17-0-B": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "ad1a33f3189b7b26728fb04c749ded1f427266b7dbd7b75821a52e369c0a512d",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "ffdeb1d3bc8892f47f2b21ec9c34065478b0eef78593502fcd96fcf5b5dac088",
+   "pdf_bytes": 77498
+  },
+  "IF-17-1-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "9989b4f1fe82b07aa959734e62da4a8f66be75085bed2a66ff299fe549972a14",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "04d9e91d3eb712278e1e84c7bb774f8d0f11da84704c3e1fdb370fa4f70d6e29",
+   "pdf_bytes": 163671
+  },
+  "IF-17-2-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "773530c3d504039d52c51e654100c02ee99c6d002e3f323e794bff9ab11571fe",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "b3352de56b21a59efb94369efb635a2c5175770a0b812d52d4ec59e537cd1989",
+   "pdf_bytes": 105360
+  },
+  "IF-17-3-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "0148a353991893c1d058c3c0be2b321bc5225d01419088d9ea539495cade0e13",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "31a63d2b35d12b745b5b955f33828a6522fd86f3d07ecb3dae644817091222dc",
+   "pdf_bytes": 140010
+  },
+  "IF-17-4-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "930b145e7fdee5c18da07b2fdbd7ab03a5d1095588d8dbfff6e336a5b291aa9c",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "a112f8e7702a0ae33241db18b1c1ae8707cf6bc3072c1d70901ce6a0a0be246e",
+   "pdf_bytes": 101621
+  },
+  "IF-17-5-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "d170d3fdcb62b4e70e82025354c2d191de0b724fe90807004b293227b4f9d2a6",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "6d1580dbcc87af95e5e6b17ed6b67b12556e41a40ac007b2255194cb26ecb97b",
+   "pdf_bytes": 106379
+  },
+  "IF-17-6-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "e1a5e0a81d32e4fef5cfb404e98ab85e4cf819aad82816811a45d50ead3d59e5",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "ce63da79a58a5b436f078c302c84a3cd6f11ec2bf20966a9f302098ff3686bd3",
+   "pdf_bytes": 103322
+  },
+  "IF-17-8-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "fedfb3923d75bd9a82e28fc11eecaa6b3f0c7c66234c0f9353186ed6d9e8838d",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "a46d8cf02ccfe4a3293c67e6ae2e379c87e7aeb43e80fb7af5cefc2377b3a3f6",
+   "pdf_bytes": 153399
+  },
+  "IF-17-9-A": {
+   "unit": "chapter-17-statements-for-a-lender",
+   "source": "5a756fcf3b0cb86e9b5f39b44adfaa4ad6ed0224da749d9d97991367c4c2b820",
+   "generator": "148c0f88f0f8e5493fc6e9b2373e93bbc906e2430f04550b1196461da9cb549b",
+   "pdf_sha256": "1f5ec43dccb388721f43d993e46979ebfcd4dc09c949597172cb2ccf1b80b28e",
+   "pdf_bytes": 90853
+  },
+  "IF-18-0-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "66e4f21cc66c263336b5a5eea7b92baa697fa15404a24f67ed448ae52eaa12da",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "91437db05894b1b87da830d8ff5bf6744dee9b7ae32b6b27a5dd0bea341bc159",
+   "pdf_bytes": 105392
+  },
+  "IF-18-0-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "b9855d78a0e88dbd9513beef3f9a84093d60c9ee88d2488d303e291912488a2b",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "68d90c019a28e1fe64cbbc3bc6693d9c3c62044700baf085591d6eb9052c6034",
+   "pdf_bytes": 116167
+  },
+  "IF-18-10-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "c5b25874a450cb85d5e19d12f7d099f6ec8dd3c2e7b40960af98b999231d4ec2",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "994ad3c59a4fc2cb8dd5d35375fde1b5c4a72064323ee0512e0cfd9bfae03f6a",
+   "pdf_bytes": 99770
+  },
+  "IF-18-10-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "809b958633fd1712ab78c15dfb21275bad0a2cff5a490a75cfdf84c55eb5cacd",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "1d7a502ec4fdffd75b36cc567258f257c27125c6c9f390621ab008f938f8ee98",
+   "pdf_bytes": 107440
+  },
+  "IF-18-2-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "d759ae84bb75df4ea5463a9c3b04671b82cdc360a4aa645b4dc367b8ccf87183",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "4d6a9504d2f5796264c6f91a0d634039a2af123a60aa7b6bad051de38a37c9b3",
+   "pdf_bytes": 104936
+  },
+  "IF-18-3-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "12ffa08378ac3571484fb4db51d9fafbad09b13320d020981a216d88ef720acd",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "56815999fc0821185415b0eed79e02c6b630d7c180c6d455fd7375556dbe9528",
+   "pdf_bytes": 154348
+  },
+  "IF-18-3-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "5e6f3a0a164fac78ee5925ad3db5f3999e7b48e110cc6745611de58d80666e1f",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "7414c90dd512c6b1045ca062695ef570f16424bdc221d38f865fe7677ad152c6",
+   "pdf_bytes": 82255
+  },
+  "IF-18-4-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "04984a263392e067874a4065f7aa6ecdea907b5c2220c2e7d6bd5a70187ced3c",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "c7ec42338d840bc189691395a47343e4aa196cdc2bc8971038ef60d8d0956f89",
+   "pdf_bytes": 96772
+  },
+  "IF-18-5-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "233d87087ef5abee61733bb4437a8374b6249a1027b1076afa9d67c2c6a03f7a",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "3c4a1f8bb7d3fa6742f04bcdf2b5a25b0a007d0b288b1fdc57cd94169c5b0342",
+   "pdf_bytes": 117721
+  },
+  "IF-18-5-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "6f165235238f5b898fa95868329d94e13fa745c5e2273d4af0b971ec3d1796c3",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "f18e2e677f93937df99ecd3de8ea5e95ed5806d90d1439775f7542ee32a62d82",
+   "pdf_bytes": 163061
+  },
+  "IF-18-6-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "a6437e0d2d8876eb879221668d9aa6d3cf8b87c50bbbf1b133595e3eafcdae25",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "9560158090932297549f0361cda2f1ba4fbfb5fdaf6ec3a48c1d2082207be5e7",
+   "pdf_bytes": 102931
+  },
+  "IF-18-6-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "d7ed5ef18b0785830f864da2126045c25981805889c146431f3339a3d5f625a6",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "8265fabf1ca12e9c9cf74e644758ceb2fd7de661acc4ebe4eb6bca23874be3cb",
+   "pdf_bytes": 104233
+  },
+  "IF-18-7-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "52c35992b58160b488dd02607b7ed5d0c6c8f582f63f4f48ab343a655d70f886",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "3ec0b5b33cf6c700c411141cdba515fb64d41bea2012ee4f0d07e9bc30d74fb5",
+   "pdf_bytes": 109470
+  },
+  "IF-18-7-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "47b8d66731afe381e3402fd7b4eca68f844cff6389d68fa4366fe15039e6e0be",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "592127563c37d2d6283df320b1e96519c39532ab791429c9bfacda5183064e28",
+   "pdf_bytes": 112938
+  },
+  "IF-18-8-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "0f2181ae87ee205524f19e51f750b773c926f10830b7dd63baa490160f0a93b9",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "36d43949a691ffa8643849ac7fcf35a257fc583145df0d79a71deb566aee81cc",
+   "pdf_bytes": 110749
+  },
+  "IF-18-9-A": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "a722482aab7a581710f9e07e017b1eec087073bcfadf1bd952d9b135db4d9f78",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "e476f7eff2fe80b072f3166b8d27321c576e224ef20daebd2e49038615749cc3",
+   "pdf_bytes": 100169
+  },
+  "IF-18-9-B": {
+   "unit": "chapter-18-make-buy-or-reprice",
+   "source": "418bb1de89e15f9484e6b57df89a9dfffb7d3368288bef8fd2317feec2af28fa",
+   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
+   "pdf_sha256": "e5002473498b70276ff6a5f7756153c2cc83c4132c084cd5d1a26735d095e5d1",
+   "pdf_bytes": 101709
+  },
+  "IF-19-0-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "3c18fad6b6d45638c0af2983537f35b7d44d527e449c772cbd9b38f953a14c05",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "b7d009197100bc11fa8bf95228e395f043c6a90c23d042fd0e4a526df7cd946e",
+   "pdf_bytes": 101377
+  },
+  "IF-19-0-B": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "bb00d418f1b59233264f83e0fb236c6363971ca798c52aaa9039317bbd294bb7",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "d47cde752136b28f1ad795ce8e75ba3d157022a7382d645c95ca6e9fa1dd8584",
+   "pdf_bytes": 75699
+  },
+  "IF-19-1-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "a1e67261915f2c90a6e85021a647a5afea8d24105900d1428d66bff5f44550ee",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "eba0cca41146a5752c5743d52dfd88f5c01da10bafd3a662116f1cc93b3f1be9",
+   "pdf_bytes": 126846
+  },
+  "IF-19-10-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "a3628087ef3a9ab3e5d2f9de43b7b40668b06780a2f406496d335f79394163af",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "c12750ba19c93f49a0f9fdad58e2f39d07bd17b9f15c24267528c6997a6d73bf",
+   "pdf_bytes": 101758
+  },
+  "IF-19-10-B": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "ca8d5f42345bead40bc3b846be115659e5862aa9b711d9cbd82d2d991a602a4a",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "239615c7ef87b0a511a606f9e9af2bd2d36fea1ca7647849a284e51c51526a49",
+   "pdf_bytes": 70716
+  },
+  "IF-19-2-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "75ef88a47a90a3176f8cb0b10490bbddbced5453a916cca596f223fdac04bd59",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "200952beb56223af7039618ab5b77c56b6cf9520fce47e75ea53be3b2069b82f",
+   "pdf_bytes": 100409
+  },
+  "IF-19-3-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "89b8b89f488481c14ff2782a0c525d63efb3be32e335ad0788ca189d55500fc3",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "5905a5d3ee185409d7ec87ef5117be9e35aa877b4254edc0f6e9728b2faf358b",
+   "pdf_bytes": 119527
+  },
+  "IF-19-4-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "886b65cb859dd3ae25390df378529a2dcfa4d86338e12c06d9a1301fcf4e56b3",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "933960361049f070ae15d5f0265419d7d1121677fc46aa81ad977879c32a06c0",
+   "pdf_bytes": 87244
+  },
+  "IF-19-5-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "bdd9c2b1c652c4ad7bcfc570c9c114c508456648fa4cd0086dfa383c4a510d50",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "70a64e001ec7f4bc20192ec2c2c6b1fced261c15f43243c36c03799bfd8a64a6",
+   "pdf_bytes": 117187
+  },
+  "IF-19-5-B": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "761c913244e5c83a615ce12812d4d876c558194d9e0ea1e01eb17a5005130f22",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "1406faeb3c8aa20e8480fcfbbcb25c5e5a0b72ba9d3ff77657ebab9eac4aab69",
+   "pdf_bytes": 104758
+  },
+  "IF-19-6-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "cd99c44cf61f02238e9c2f1b65a915341a447aca56b0e95ef791e98569411378",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "b29295b65dd78c9b8758a3e0d98ad29337899d3fe682fc59223f7d71c7f74024",
+   "pdf_bytes": 137688
+  },
+  "IF-19-6-B": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "66966de0ebfe007f12482436d71afc581d206acb7af105f1fdab10bd6c5d2a8f",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "150cf7a32bea32c4f90436591ab2475d8b63da8f59f9874ccd290389aab45b88",
+   "pdf_bytes": 86932
+  },
+  "IF-19-7-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "93f7b7126d1a991cd57ad84bfa0955698ea3f9b25613c1bd7afe6be3404af72b",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "ce346d3baa5737843e45d6d44235aec6107c20caa9242d52eb61a5d737f7aee3",
+   "pdf_bytes": 91569
+  },
+  "IF-19-8-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "07d32d7ff5fbf4f2358e28c303b018dbb8eb12f4d7eda9adff91629039e777e5",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "77d1d5f8d28a0af3c4bc2c4d685c8e4dfcb793bb3744fa8bbc516db4577a9439",
+   "pdf_bytes": 128265
+  },
+  "IF-19-9-A": {
+   "unit": "chapter-19-customer-credits-audit",
+   "source": "75e5ed0fab547664a0cd94fa8a5fdef3908ecbcd84ef9629c043d2327a29d08b",
+   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
+   "pdf_sha256": "3d59ccd3811a3f1989bd77de4da5d623f437b3e182a39f1ec188c718ce750368",
+   "pdf_bytes": 94533
+  },
+  "IF-AB-0-A": {
+   "unit": "appendix-b-publishing-security",
+   "source": "bc25f4feee683111964fdc7969c17de86a43b6293ab76da763173e0a91193d5e",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "bfd45a5ca358ad66a28923189ea3066b30ce50060643cdfda93ac3bf261f3361",
+   "pdf_bytes": 80170
+  },
+  "IF-AB-0-B": {
+   "unit": "appendix-b-publishing-security",
+   "source": "88931e31584d15fd20f6fb18b51464976495c427d89a4d8430f7ee785847a27b",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "3db73b66df76a2781269b6a15a5f0d3d7d22ed13c34b9869ce30ca98407dc677",
+   "pdf_bytes": 163019
+  },
+  "IF-AB-1-A": {
+   "unit": "appendix-b-publishing-security",
+   "source": "ccb4e5babcb55712e3a2b398359af6d980298789f013cea89489b2195542897c",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "fd2f6eab86b7e328bfcc5308df8472159ea5fa3b0e72055ed4cf08fc4fd74369",
+   "pdf_bytes": 97716
+  },
+  "IF-AB-1-B": {
+   "unit": "appendix-b-publishing-security",
+   "source": "2f88fd43464f9f69820ef8b1de5882b2b07ddf1789d3fc95d2e57a94226c9476",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "97c78fb249fd86c42ecdcf4e27e189b72ac598109490879f0b6607980b910998",
+   "pdf_bytes": 128628
+  },
+  "IF-AB-2-A": {
+   "unit": "appendix-b-publishing-security",
+   "source": "a287e272fb8e6ece17d73913723706ee292ae54899064ab9e9f0fef38cc92a53",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "c10816cdaf9fdfac2ce3745f6be27cd93bd26768da8f2b7b29f34e581d428c81",
+   "pdf_bytes": 156713
+  },
+  "IF-AB-2-B": {
+   "unit": "appendix-b-publishing-security",
+   "source": "22d2cab8d7f93ed9b1cb627a66d10378395bb5272785613fbbecb085f3a0ef39",
+   "generator": "94c8f369e2941a5a2705a87589aba5febc5cd89188ad73724265788055daeff3",
+   "pdf_sha256": "06a612d456a98d73db447a4248ff2f5745b668af487a7fdaf42b210614ceca69",
+   "pdf_bytes": 84738
+  },
+  "IF-AC-0-A": {
+   "unit": "appendix-c-power-bi-browser",
+   "source": "00b52ce167a479f9edec5c5fc8df7053a3a6599ec1acc87b8002a8cf877c2057",
+   "generator": "ea73f15475f1d305e2ccb861ce437fcb2ddf574f2ef0cad74b34efc9306d1f34",
+   "pdf_sha256": "c2ba99f470d13d654094c07f1afb51ee611be69e954b25041f8ea11b7f64a225",
+   "pdf_bytes": 82650
+  },
+  "IF-AC-1-A": {
+   "unit": "appendix-c-power-bi-browser",
+   "source": "8d884625736311dc7ec20300ff9324640dfa2de5bd0b8da35e9feb51aa3f791e",
+   "generator": "ea73f15475f1d305e2ccb861ce437fcb2ddf574f2ef0cad74b34efc9306d1f34",
+   "pdf_sha256": "8041c1cb8055b290b0806a8bb0684e53b1935b4a078beb2c50ab22506bc42de0",
+   "pdf_bytes": 160810
+  },
+  "IF-AC-2-A": {
+   "unit": "appendix-c-power-bi-browser",
+   "source": "e3a90ba1fe081b0d3c2f84b4a4604f83a716902ef0a85ffe7392844cfc5674bd",
+   "generator": "ea73f15475f1d305e2ccb861ce437fcb2ddf574f2ef0cad74b34efc9306d1f34",
+   "pdf_sha256": "2d8a32e0990db97fff88553b0b616707170658a236a6d4eae096616c10226437",
+   "pdf_bytes": 133689
+  },
+  "IF-AC-3-A": {
+   "unit": "appendix-c-power-bi-browser",
+   "source": "7dc5e463dd9327a7fcd282fce2702b04e2dbfe8eedbed3ac0d745674bdd01230",
+   "generator": "ea73f15475f1d305e2ccb861ce437fcb2ddf574f2ef0cad74b34efc9306d1f34",
+   "pdf_sha256": "15ea353a92f518f8d9855a9787bb7d2b96e8b95bc8d16bba8bd2337163f1aaf5",
+   "pdf_bytes": 104392
+  },
+  "IF-C1-0-A": {
+   "unit": "case-part-1",
+   "source": "3de8488614ea49ea173290ec31a0fa5250689b58038fa44f7362cd3c7af581f7",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "49f6546286f6b5a3384bcfadeb1a2c33210f726ff976e6590f6c348125724fab",
+   "pdf_bytes": 121925
+  },
+  "IF-C1-0-B": {
+   "unit": "case-part-1",
+   "source": "dda26edb04b52489a26a855ba263662efc30810d37b78ee77d0e91e15d37e5dc",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "a8975b7c573fd3505d09e8d4715562dd5b46785f03b15f0dc829b4ef66d274de",
+   "pdf_bytes": 98164
+  },
+  "IF-C1-2-A": {
+   "unit": "case-part-1",
+   "source": "5e4ca664bd2609e8b58b8e558e5c7d908a8d9d9f3fd6fe0b0238477f74d8eba5",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "26147e72b2e70604ec4281538b093649ee7b700810ce8db96de18a2c1e9e888e",
+   "pdf_bytes": 125942
+  },
+  "IF-C1-4-A": {
+   "unit": "case-part-1",
+   "source": "5d42ec331da8eecdacd138662131ce945f2acda992a6ed9470831f46594bbe5f",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "d00bd5a7246e2d79e8a0cec4ed4df315fa0e7cabec2a44c99a22745e8c261dc9",
+   "pdf_bytes": 104711
+  },
+  "IF-C1-5-A": {
+   "unit": "case-part-1",
+   "source": "f3b166f5d52b6251af398e700641884f319824156c8dbf9c044e03f401355ceb",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "29e020acfff2e54ada8f468aa3a81e6b5aac3adc1c768b97afcdba814804099b",
+   "pdf_bytes": 97673
+  },
+  "IF-C1-5-B": {
+   "unit": "case-part-1",
+   "source": "d460404949345b79a760a38981ae3437e74b1b73c87ce5573ad04869cdcfcaa7",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "3c121088f693f341f279573a326441dec5100af91fcafb84d2b9a9aaa58d6955",
+   "pdf_bytes": 100106
+  },
+  "IF-C1-6-A": {
+   "unit": "case-part-1",
+   "source": "b3f660dd4655ae7d12f65eb929febb2b10f23336d27d63df2f21d29a1a8874a7",
+   "generator": "9e1a5c29fcd2aa77c04819aff70731c5b056544ba5c0d13d29be3e0cd6e4fd51",
+   "pdf_sha256": "6b29828b9429c8cbb93d532461b495d07130d21203d5f4bc5617349b6f2e613e",
+   "pdf_bytes": 95813
+  },
+  "IF-C2-0-A": {
+   "unit": "case-part-2",
+   "source": "88174a3ad8883c096191c16b0d467023617848af3ba137a3aa20a2e10ff55ec7",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "aaff20dcd29e8dae40acd379bbe1fa468b037555ec3c7d9917cb9a71c8df72ee",
+   "pdf_bytes": 107080
+  },
+  "IF-C2-0-B": {
+   "unit": "case-part-2",
+   "source": "12355618d49172604d9c4f48a2dfc6f546d3b0ae8db31f8c5c4031f76804f6cf",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "b4bfc17129a5f38172259e83469094b4b359421aba9e426055d8e2fb7673a37c",
+   "pdf_bytes": 79976
+  },
+  "IF-C2-1-A": {
+   "unit": "case-part-2",
+   "source": "43602d5ff642085a7c6c5703f2f905e8f8006ee61905487e607a25d20c89a3c0",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "4fed5f59af524272212cfd483d4d334e3d18a94f71ff9ded6ff4b7f6576ce11b",
+   "pdf_bytes": 101319
+  },
+  "IF-C2-2-A": {
+   "unit": "case-part-2",
+   "source": "04dfdc60281e4557a072037848d31016ca8b0c8e9eaa7e3bbb0c565dc021b2a8",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "f9c99ca335a2232a17821fda523a08bf6c7dbf7fa5bda3a32d9370d9e2756275",
+   "pdf_bytes": 100735
+  },
+  "IF-C2-2-B": {
+   "unit": "case-part-2",
+   "source": "a7a56d15af7ba70e69dd94b0054820e1cd52e7810627aa6f8aa20f965d340b5a",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "44af952a285654b7e045f10523f87b88b82f7245799749ed3386286ccf8ae5ad",
+   "pdf_bytes": 89655
+  },
+  "IF-C2-3-A": {
+   "unit": "case-part-2",
+   "source": "a628fbfb186703ac5075eea9b6332862331a33ad4f1c63ee298d493cb9bb0dfa",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "c0f584a04c85fb60cb96088f1ce99005021239654ef3064d13bb8e6100d1247c",
+   "pdf_bytes": 100311
+  },
+  "IF-C2-4-A": {
+   "unit": "case-part-2",
+   "source": "ea80f3e8776b489be15e8753f75ccba62fa9ad2fec006c898f962314b2caa73b",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "30ba8c507511397e1767f71342efaa21a0eec409b1f185e9722bf1a8fd385a73",
+   "pdf_bytes": 100179
+  },
+  "IF-C2-4-B": {
+   "unit": "case-part-2",
+   "source": "ca5d8e5d2a4e467888793ec07087204cae0b9ec97542c9c390dd367b1481a705",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "61fd3f45d6154bbd87ff00b091dbfefb4b01f06f8c02cdeaacf16444c49fb3b3",
+   "pdf_bytes": 87318
+  },
+  "IF-C2-5-A": {
+   "unit": "case-part-2",
+   "source": "3c98254e5d2b3b204010b3aa68cf96b9a93f97f2fbe3b1f51a13de7771ddb53c",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "b695816945a0c68d0d5a72470a1a075f3b0aa4737b1445dc51de73e652a0c8ff",
+   "pdf_bytes": 100934
+  },
+  "IF-C2-5-B": {
+   "unit": "case-part-2",
+   "source": "e55afac73280f729d2f6fd0afbc0cc6bb4b2be54be1cc23ce8502de56c19fd8f",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "7a05c547137b753e9009501c1fbda57582649b233df295403f7e9a8a8d8dc29e",
+   "pdf_bytes": 103683
+  },
+  "IF-C2-6-A": {
+   "unit": "case-part-2",
+   "source": "5c2d04da822648b238e994556da252754de0c2b8228b20033d43507873c116c7",
+   "generator": "b7f372e6a56c8a0ce9578d11d900307f097ca5303186d46975bbc835d280073e",
+   "pdf_sha256": "daf2b2a9da57aa304cc7d125864719c75444bfa8c885fc672a7883262825745d",
+   "pdf_bytes": 66598
+  },
+  "IF-C3-0-A": {
+   "unit": "case-part-3",
+   "source": "543677d0328aeaa8d0bc2087492405df903942360b3255cc1fa682ddf36ac700",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "00eb002e61fab45285343acb47203a9a3c43a21e27ec46abfe0c92515f904a7c",
+   "pdf_bytes": 106566
+  },
+  "IF-C3-0-B": {
+   "unit": "case-part-3",
+   "source": "b1704d3df01d1020daba52c39c50eecc10161cee5e1c4f1cbf2ebc7bb788e21d",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "a43ee91ac3705d238eb51d1c86c65778a5589392902fc6b5c467f87ac2e6f0a2",
+   "pdf_bytes": 131927
+  },
+  "IF-C3-1-A": {
+   "unit": "case-part-3",
+   "source": "976bbdf6a8922b4126a9a2852dd6e1ca0bf4ad90d8b796ce3662f75d9992b647",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "eefbd02292b19870473d93ff068eb9f8d14e361220f9f3cb3ec27f0d396ccffd",
+   "pdf_bytes": 158585
+  },
+  "IF-C3-1-B": {
+   "unit": "case-part-3",
+   "source": "bf2c417d16d60119c6dc67b9ca95e63a6a3314dde88e02b2f003ebafd20fa36c",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "cca5f9560b2cde929b6a151e45f266846bb09a556423c30df598137ff14574a1",
+   "pdf_bytes": 160817
+  },
+  "IF-C3-2-A": {
+   "unit": "case-part-3",
+   "source": "34f99051ce1a28b83569c7b56f921be3adbbc93a45b80c5f3e303e090f7be394",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "3ac6c4754cf9eaf84dda7da1d245ef8aef30ad3be84b741d7a99ad1d7d713ee1",
+   "pdf_bytes": 115030
+  },
+  "IF-C3-3-A": {
+   "unit": "case-part-3",
+   "source": "56f2b1b82c9ba77c95090ad5039212f55c995192d36b834f29d7b60b83d57d04",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "307b2b6989cb45d0a205209f18ae7d0d651c466f26fd5c7a190cbc328eeef4a2",
+   "pdf_bytes": 73988
+  },
+  "IF-C3-4-A": {
+   "unit": "case-part-3",
+   "source": "a2cacd323a9e6bb1d901187dbaec152cc8a3163f3ef0110f8104baaf24e14eca",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "e478056705ebcc9204ad9ac236ecddd662ad6d690a64f8916f79b0c620e3fd92",
+   "pdf_bytes": 95512
+  },
+  "IF-C3-5-A": {
+   "unit": "case-part-3",
+   "source": "d180693c0e680dd48f73dbef43e9a5b3cabf61b5478120f0deb67bd50c07a553",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "8c7d498f14a339ba8ed7f16d1d77aae503b0d16094825f9319e0f5fce5706211",
+   "pdf_bytes": 119850
+  },
+  "IF-C3-6-A": {
+   "unit": "case-part-3",
+   "source": "af6ecd081dfe6f496aa13acce3cb8f8ac171d41aa5e4a1001562ebcbb68ba396",
+   "generator": "a5e22f7c090020d97257e6973a39ed6763aaa5581e5d1591d8b03ab8f44f17a1",
+   "pdf_sha256": "0405e15f0d68a50b67c1d9cfc53b0a425fb6ca0f2660f9ac3af240ea55c912b9",
+   "pdf_bytes": 64499
+  },
+  "IF-C4-0-A": {
+   "unit": "case-part-4",
+   "source": "a8210d6b53ebd17ed05b77d74afbfbdd90bd1fabe9efb48f2a3adb2c1a9c8622",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "fb3cbe5ec7ec564fe2e723296d093bc84563c174f15343d39f161a8357c354ab",
+   "pdf_bytes": 111646
+  },
+  "IF-C4-0-B": {
+   "unit": "case-part-4",
+   "source": "0e33fc4a2bbeafda03508eef450f720f9cc81f32a0f814ec3d8764b0fa92440a",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "cddf23abd64cd4d092e81c5e9a3dac8fce9a9bac0eb512216826eb738df01b68",
+   "pdf_bytes": 81019
+  },
+  "IF-C4-1-A": {
+   "unit": "case-part-4",
+   "source": "82be36547d28c00dbd4b225e1d328e013d21c1697eeff7f2385e43fddb140fab",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "cb51323b8a29942ea313a5f9ddc2258f2cc59164d1608372617c175fd118fda9",
+   "pdf_bytes": 100190
+  },
+  "IF-C4-2-A": {
+   "unit": "case-part-4",
+   "source": "b97e1902f044bf4b8321b349cef499ef152b14e80f233d150df7527d33ca8129",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "17800855fc9e12393cdde0dc524b9535f1763b718e282cb159a5c3d118d43703",
+   "pdf_bytes": 120889
+  },
+  "IF-C4-3-A": {
+   "unit": "case-part-4",
+   "source": "59598230ad2ea85e501bd65ff8d48c88d286cf4a0b9a0b1faa5db03756698552",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "a0dd69d1567e2521b1ca782e708868166dfba93592dbef7006d085af83208ea1",
+   "pdf_bytes": 104747
+  },
+  "IF-C4-3-B": {
+   "unit": "case-part-4",
+   "source": "26f0dd310a9595b66b553da85536b30f34781ca32677847894ff48c0fdd5ac73",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "7cda28159fe72a478bc140ff00f1589eae77dfd5c03f283c94d1746db40f71d5",
+   "pdf_bytes": 92615
+  },
+  "IF-C4-4-A": {
+   "unit": "case-part-4",
+   "source": "2b3b58f7c59bbac5d53ba4f01d6cc8032130be9cb1b2c64913df5e2792f76c5e",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "a770184c14200e5975fa7136464999470895b9204d2447d7a46faef6ff4f736f",
+   "pdf_bytes": 106097
+  },
+  "IF-C4-4-B": {
+   "unit": "case-part-4",
+   "source": "d7974f65698cfcdf42c13c3f45c41ddff1cf43931241463de85feda3f5fb4665",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "ee5629770d2ead6de177e7fb7deb209592f56790244d88672468eda46c25a9b3",
+   "pdf_bytes": 70233
+  },
+  "IF-C4-5-A": {
+   "unit": "case-part-4",
+   "source": "e2f9a6a72c7fb639e3d8b7ac29fe3da837a7a6ddb507763e95dd0090f17220de",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "edd3c6063ca1ab411f063f16743f6db95bf36901269e40de340af6d8bc453f5d",
+   "pdf_bytes": 106042
+  },
+  "IF-C4-5-B": {
+   "unit": "case-part-4",
+   "source": "2825b859f4980cf77ccfe1b919c9e4587015055555ac9b18e8ac60490d6ffcea",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "156eefb5ffd3f6c86bb1fadee1bac34cc1261fde52307e4bd7697d7f36c3e844",
+   "pdf_bytes": 104029
+  },
+  "IF-C4-6-A": {
+   "unit": "case-part-4",
+   "source": "386d1f168a1099815eaf7c65c493a0244387367f9dca200db502ee6a1a8f757b",
+   "generator": "0dce9d169d0f4754dd0c9fdfc882df45214be87615c44442209ff62c982b63e1",
+   "pdf_sha256": "d32399db6058f92bbbb125d899148726c69c726929887dc639fbccdc8d19a364",
+   "pdf_bytes": 70264
+  }
+ }
+}

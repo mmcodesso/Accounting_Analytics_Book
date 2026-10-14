@@ -444,11 +444,13 @@ def model_table(d: Diagram, name: str, x: float, y: float, columns: list[str],
 
 
 def relationship(d: Diagram, one: tuple[float, float], many: tuple[float, float],
-                 points: list[tuple[float, float]] | None = None, jump: bool = False) -> None:
+                 points: list[tuple[float, float]] | None = None, jump: bool = False,
+                 dashed: bool = False) -> None:
     """A one-to-many relationship as Model view draws it: a line with 1 at the table that holds
     the key, an asterisk at the table that refers to it, and an arrow in the middle pointing in
     the direction the filter flows, from the one side to the many side. With jump, the line
-    hops over the lines drawn before it where they cross."""
+    hops over the lines drawn before it where they cross. With dashed, the line is drawn dashed, as
+    Model view draws an inactive relationship."""
     meta = "edgeStyle=none;" + ("jumpStyle=arc;jumpSize=10;" if jump else "")
     path = [one, *(points or []), many]
     # Split the longest segment at its midpoint and put the arrowhead there.
@@ -460,9 +462,9 @@ def relationship(d: Diagram, one: tuple[float, float], many: tuple[float, float]
     second = [d.anchor(*mid)] + [d.anchor(px, py) for px, py in path[k + 1:]]
     for a, b in zip(first, first[1:]):
         last = b == first[-1]
-        d.edge(a, b, color=GRAY, end="blockThin" if last else "none", meta=meta)
+        d.edge(a, b, color=GRAY, end="blockThin" if last else "none", meta=meta, dashed=dashed)
     for a, b in zip(second, second[1:]):
-        d.edge(a, b, color=GRAY, meta=meta)
+        d.edge(a, b, color=GRAY, meta=meta, dashed=dashed)
 
     def tag(point: tuple[float, float], nxt: tuple[float, float], text: str) -> None:
         dx = 10 if nxt[0] > point[0] else -26 if nxt[0] < point[0] else 4

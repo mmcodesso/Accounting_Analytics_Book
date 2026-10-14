@@ -134,8 +134,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Predictive and prescriptive.** In question 3 an auditor builds an expected range for monthly revenue. Students who choose prescriptive hear "expected range" as a recommendation. An expectation says what to expect; a recommendation chooses an action under an objective and constraints, as Solver does in question 4.
 
-> **[Figure placeholder IF-01-0-B]** A decision aid for sorting a question into one of the four types of analytics.
-> Kind: diagram · Shows: A vertical flow of four yes/no questions (does it summarize what happened, does it explain why, does it project what might happen, does it recommend what to do under constraints) that lead to the four type labels. Each label carries one Charles River example question from Table 1.1 and the kind of evidence the answer needs (a summary, a decomposition or trace, an expectation or forecast, a recommendation with its constraints). A side note says that most real questions combine two types. · Data: none; the example questions come from Table 1.1 and from the model questions of Exercise 1.4. · Status: planned
+![A decision aid for sorting a question into one of the four types of analytics.](../figures/chapter-01-role-of-analytics/IF-01-0-B.pdf)
 
 **The workflow as a straight line.** Students guess that analysis takes longest (question 12), and the slide notes anticipate it. The chapter says preparation and cleaning often take longest. Use the controller's question: an invoice line not linked to a product has to be fixed before any margin is calculated.
 
@@ -171,8 +170,7 @@ All six exercises are conceptual: students browse the workbook, write short answ
 | 1.5 Assessing Data Availability for Audit Testing | Auditing | Workbook and memo | 70 | Intermediate | 4, 5, 6 |
 | 1.6 Evaluating Journal Entry Data for Audit Purposes | Auditing | Workbook and written work | 50 | Advanced | 6 |
 
-> **[Figure placeholder IF-01-0-A]** Which table groups each exercise's model answer draws on.
-> Kind: diagram · Shows: A matrix with the table groups of Table 1.3 as rows and Exercises 1.1 to 1.6 as columns. A filled cell marks a group whose tables the model answer names as the main evidence; an outlined cell marks a group that the answer mentions only as support. The Accounting Core and Order-to-Cash rows are filled most often, and the legend says that a filled cell is not a count of tables. · Data: The tables named in the solution steps of the six exercise files, assigned to groups by Table 1.3 and the dataset documentation. · Status: planned
+![Which table groups each exercise's model answer draws on.](../figures/chapter-01-role-of-analytics/IF-01-0-A.pdf)
 
 **Assignment bundles**
 

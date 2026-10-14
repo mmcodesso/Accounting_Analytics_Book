@@ -62,8 +62,7 @@ b. Drag CustomerSegment from the Customer table into **Rows**, and Month from Sa
 
 **Check:** five segment rows and twelve month columns. The Design Services row reads zero in every month, not blank, because it has invoice lines every month and each has a discount of zero. **Watch for:** the slicer left unselected, which gives 36 month columns, or left as **Between**, a range with two handles.
 
-> **[Figure placeholder IF-AC-2-A]** The Ex C.2 page at its end state, where the Design Services row and the peaks can be read.
-> Kind: pbi-mock · Shows: The report editor of the Power BI service on the page Ex C.2: a tile slicer with the current year selected; a matrix of Discounts with five segment rows and the twelve months as columns, the Design Services row reading zero in every month and each other segment's largest month outlined; and a line chart of Discounts by month in month order with a legend of the five segments, the Design Services line flat along the axis. The Data pane lists Key Measures first. · Data: Discounts by segment and month for the current year, as in the Expected results, read-only. · Status: planned
+![A mock of the Ex C.2 page at its end state, where the Design Services row and the peaks can be read.](../figures/appendix-c-power-bi-browser/IF-AC-2-A.pdf)
 
 ### Requirement (3): The line chart
 

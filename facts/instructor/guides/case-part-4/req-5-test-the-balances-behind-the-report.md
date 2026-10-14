@@ -13,7 +13,7 @@ figures:
   - id: IF-C4-5-A
     kind: pbi-mock
     purpose: The Reconciliations page of the model answer, where each difference sits beside the findings that explain it.
-    shows: "Report view, page Reconciliations. A matrix of six working-capital accounts on rows and source document types on columns with the balance in each cell, the JournalEntry column outlined; a row of cards for receivables, open receivables, their difference, payables, open payables and their difference; a table of billing by invoice date against the ledger by year; the aged open payables; and the Findings table with account, finding, amount and disposition."
+    shows: "Report view, page Reconciliations. A matrix of six working-capital accounts on rows and source document types on columns with the balance in each cell and a Total column, drawn in two panes because it is wider than the frame, the JournalEntry column outlined; a row of cards for receivables, open receivables, their difference, payables, open payables and their difference; a table of billing by invoice date against the ledger by year; the aged open payables; and the Findings table with account, finding, amount and disposition."
     data: The Expected results quantities (the balances by source, the two differences, the billing differences and the findings), read-only.
   - id: IF-C4-5-B
     kind: diagram

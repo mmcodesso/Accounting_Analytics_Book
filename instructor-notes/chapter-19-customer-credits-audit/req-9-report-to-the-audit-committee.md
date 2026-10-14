@@ -68,8 +68,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Step 5. Build the action plans.** A table of action, owner by role, date, the response expected and where disagreement is expected, with the evidence that answers it.
 
-> **[Figure placeholder IF-19-9-A]** The report's page budget, the plan a student fits the work into.
-> Kind: diagram · Shows: Four page outlines side by side. Page one: the executive summary, the overall conclusion and the scope with the reconciliations. Page two: the six findings in a table of condition, criteria, cause, effect, rating and recommendation. Page three: the clean results and the action plans with owners and dates. The appendix of three pages: the map with what the records evidence, the reconciliation, the test results, the sample plan, the evaluation and the action plans. · Data: none; the layout follows the requirement's page limits. · Status: planned
+![The report's page budget, the plan a student fits the work into.](../figures/chapter-19-customer-credits-audit/IF-19-9-A.pdf)
 
 **Check:** the model has 10 plans with 8 owners by role, dated 2027-10-31 to 2028-06-30, and each finding has at least one. The model expects three answers:
 

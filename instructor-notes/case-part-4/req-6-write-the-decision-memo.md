@@ -32,8 +32,7 @@ Students can:
 
 Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence, 50 to draft, 25 to check every number against its page and the length. In a workshop, students swap drafts and review them against the grading guide. **Collect** the memo, the appendix and the .pbix.
 
-> **[Figure placeholder IF-C4-6-A]** How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.
-> Kind: diagram · Shows: Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines, three headed sections in the order Financial reporting, Managerial accounting, Auditing, and a closing Recommendation. The appendix shows five numbered exhibit boxes. Tags name the source of each section and exhibit: Requirement 2 and the Cash Bridge page, Requirement 3 and the Working Capital page, Requirement 4 and the Materials pages, Requirement 5 and the Reconciliations page. · Data: none; the layout and tags come from the case's Requirement 6 and Deliverable. · Status: planned
+![How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.](../figures/case-part-4/IF-C4-6-A.pdf)
 
 ## Step-by-step solution
 

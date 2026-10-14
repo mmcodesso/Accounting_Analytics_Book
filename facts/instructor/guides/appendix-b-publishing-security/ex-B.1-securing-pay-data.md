@@ -12,12 +12,12 @@ figures:
   - id: IF-AB-1-A
     kind: pbi-mock
     purpose: The model answer's page Ex B.1 as the Finance role sees it, the table every student builds in requirement (1).
-    shows: "Report view, page Ex B.1. A table titled 'Hours and labor cost by job title, fiscal' with the year, with the columns JobTitle, Manufacturing Hours and Labor Cost, sorted by Labor Cost, largest first. Seven rows: Assembler, Machine Operator and Quality Technician with hours and cost, then four non-manufacturing job titles with a cost and an empty hours cell. Above the table, a bar names the role Finance."
+    shows: "Report view, page Ex B.1. A table titled 'Hours and labor cost by job title, fiscal' with the year, with the columns JobTitle, Manufacturing Hours and Labor Cost, sorted by Labor Cost, largest first. Seven rows: Assembler, Machine Operator and Quality Technician with hours and cost, then four non-manufacturing job titles with a cost and an empty hours cell, and a total row. Under it the card of Labor Cost, and beside both the text box Model answer. Above the page, a bar names the role Finance."
     data: The Expected results quantities (hours and cost by job title for the current fiscal year), read-only.
   - id: IF-AB-1-B
     kind: pbi-mock
     purpose: The same page viewed as the Production Manager after the column permission is applied, so an instructor knows what a correct failure looks like.
-    shows: "Report view, page Ex B.1, with the bar above the page naming the role Cost Center Managers and the user. The table and the card are replaced by an error message that says a field cannot be found or used; the rest of the page, a text box, is unchanged. A small inset shows the Plant page of the same view, with its hours and its hours per standard hour visible."
+    shows: "Report view, page Ex B.1, with the bar above the page naming the role Cost Center Managers and the user. The table and the card are replaced by an error message that says a field cannot be found or used; the rest of the page, a text box, is unchanged. A small inset shows the Plant page of the same view, with its two hours per standard hour cards and its direct hours by work center visible, and a note beside it says what a correct failure is."
     data: The Plant page values of the Production Manager (hours and hours per standard hour for the current fiscal year), read-only.
 ---
 {% set x = appB_g1 %}

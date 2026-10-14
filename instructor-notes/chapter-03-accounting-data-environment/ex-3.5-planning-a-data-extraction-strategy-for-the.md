@@ -66,8 +66,7 @@ Individual work, followed by a pair swap in which each student critiques a class
 - *Design services.* The invoice lines with no shipment line are the 439 service billing lines. The independent population is ServiceTimeEntry: its billable hours (19,627.49) equal the hours billed on ServiceBillingLine.
 - *Orders.* SalesOrder is a third population, a commitment that should end in an invoice.
 
-> **[Figure placeholder IF-03-5-A]** The three extraction plans on one page, each with its population, the tables joined, the keys and the direction of the test.
-> Kind: diagram · Shows: Three horizontal lanes, one for each procedure. The revenue lane starts at the Shipment and ShipmentLine boxes (the independent population), with an arrow to SalesInvoiceLine labeled ShipmentLineID and a second arrow from SalesInvoice to GLEntry labeled SourceDocumentType and SourceDocumentID, so the two directions of the test are visible and labeled completeness and posting. The purchasing lane shows PurchaseOrderLine in the center with GoodsReceiptLine and PurchaseInvoiceLine each joined to it by POLineID, and the invoice line also joined to the receipt line by GoodsReceiptLineID. The journal entry lane shows JournalEntry and GLEntry joined by the dashed amber trace, with Employee joined to JournalEntry by the approver's key. Each lane ends in a small box for its control total. · Data: The tables and keys of Steps 1 to 7; the diagram carries no counts. · Status: planned
+![The three extraction plans on one page, each with its population, the tables joined, the keys and the direction of the test.](../figures/chapter-03-accounting-data-environment/IF-03-5-A.pdf)
 
 **Check:** the answer reverses the direction (from events to invoices) and names a table of events. **Watch for:** the plan that tests completeness by counting invoices.
 

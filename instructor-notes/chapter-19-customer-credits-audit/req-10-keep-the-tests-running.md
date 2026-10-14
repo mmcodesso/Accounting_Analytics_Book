@@ -62,8 +62,7 @@ CustomerRefund merges the limit, the credit's invoice and the last application, 
     #"Added Custom" = Table.AddColumn(#"Filtered Rows", "TestID", each "CM " & [Attribute])
 ```
 
-> **[Figure placeholder IF-19-10-B]** How the flags reach the register, the picture a student needs when a rate comes out blank.
-> Kind: diagram · Shows: A left-to-right flow: the applications and the credit memos and refunds feed two flag queries, which are unpivoted into two exception queries, appended into the register with the dispositions and the design findings, and tied by the test identifier to the Tests table and by the process name to the Population measure. A side branch marks the anomaly columns that stop at the refund table. · Data: none; the flow follows the model answer's queries. · Status: planned
+![How the flags reach the register, the picture a student needs when a rate comes out blank.](../figures/chapter-19-customer-credits-audit/IF-19-10-B.pdf)
 
 **Check:** the register grows from 151 to 992 rows, and each test and document pair is still unique. **Watch for:** a TestID that differs from the one in the Tests table.
 
@@ -111,8 +110,7 @@ Open Exceptions = CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ),
 Design Finding Exceptions = CALCULATE ( [Exceptions], Exceptions[Covered] = 1 )
 ```
 
-> **[Figure placeholder IF-19-10-A]** The Credits Cycle page, where the new tests and the design findings show.
-> Kind: pbi-mock · Shows: The Credits Cycle page of Audit Monitoring: a matrix of the four new tests by year with exceptions, population and rate per 1,000, a row of cards for the exceptions, the reviewed exceptions, the exceptions covered by a design finding and the open exceptions, and a table of the design findings with the period each covers and the date it is to be fixed. · Data: The Audit Monitoring model answer on the pinned dataset. · Status: planned
+![A mock of the Credits Cycle page, where the new tests and the design findings show.](../figures/chapter-19-customer-credits-audit/IF-19-10-A.pdf)
 
 **Check:** the findings cover exceptions dated through the end of the audited year and are to be fixed by 2027-12-31; 841 exceptions are covered, 15 reviewed, and 136 open, as before. Exceptions dated later stay open for review, and a finding closes when a retest after the fix shows the control works, not on its planned date. **Watch for:** the open measure without the Covered condition, which reads 977, and the covered period set to the fix-by date, which would hide later exceptions until then. After remediation the two authority tests should fall to zero; the other two would catch the next case.
 

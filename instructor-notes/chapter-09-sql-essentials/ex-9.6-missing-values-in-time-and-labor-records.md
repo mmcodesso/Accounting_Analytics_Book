@@ -112,8 +112,7 @@ WHERE ClockOutTime IS NULL
 ORDER BY WorkDate;
 ```
 
-> **[Figure placeholder IF-09-6-A]** The time clock entries with no clock-out, shown with the COALESCE label that makes the gap visible.
-> Kind: sql-mock · Shows: The Execute SQL tab on the tab Ex 9.6.sql. The editor holds the comment lines and the query of Step 5 with COALESCE(ClockOutTime, 'missing') AS ClockOut and ClockOutTime IS NULL. The grid shows the entries with TimeClockEntryID, EmployeeID, WorkDate, ClockInTime, ClockOut, RegularHours, OvertimeHours and ClockStatus, with the word missing in the ClockOut column outlined and Pending in the last column. The message pane reports the number of rows returned. · Data: TimeClockEntry, the Step 5 query, run read-only on the dataset (the Expected results give the entries). · Status: planned
+![A mock of the time clock entries with no clock-out, shown with the COALESCE label that makes the gap visible.](../figures/chapter-09-sql-essentials/IF-09-6-A.pdf)
 
 **Check:** 3 rows, all employee 85, one on the first day of each fiscal year, all Pending, each with 8.64 to 9.1 hours recorded and the word missing in ClockOut. **Watch for:** `= NULL` and `= ''` both return no rows. Pending is a related test, not the same one: 5 entries are Pending, and 2 of them have a clock-out.
 

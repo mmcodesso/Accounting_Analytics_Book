@@ -18,7 +18,7 @@ figures:
   - id: IF-C2-5-B
     kind: chart
     purpose: The evidence from outside the record under test for one failing promotion, to place beside its recorded dates.
-    shows: "A twelve-month strip for one collection promotion's year: a short outlined segment for the recorded window with a backward arrow for its end date, a solid bar for the months its lines were ordered, and beneath it a line of the budget's price as a share of list, dipping in those months."
+    shows: "A twelve-month strip for one failing collection promotion's year: a short outlined segment for the recorded window with its two dates written beside it and an arrow from the start back to the end date, a solid bar for the months its lines were ordered, and beneath it a line of the budget's price as a share of list, dipping in those months."
     data: The promotion's recorded dates, the months its lines were ordered, and the budget's monthly ratio for its collection (Step 3).
 ---
 {% set x = case2_g5 %}

@@ -28,8 +28,7 @@ Students can profile an extract and state its limits (Part 1), search later paym
 
 Individual or pairs, about 90 minutes: 20 to profile and compare, 20 to search, 10 for the events, 25 for the conditions, 15 to write. Hold back the weeks the extract covers until a student reads the drop in payments as a change in behavior. **Collect** the queries, the Later Events worksheet and half a page on what the CFO needs.
 
-> **[Figure placeholder IF-17-8-A]** The search for unrecorded liabilities, the query whose empty answer is the finding.
-> Kind: sql-mock · Shows: DB Browser for SQLite on the Execute SQL tab: the search query for the payments after the year-end and the invoices they paid, and its one-row result with the payments, amount, invoices, suppliers, first and last received dates, invoices paid in full and invoices received after the year-end. · Data: The 2027 payments and the invoices they paid (the Expected results). · Status: planned
+![A mock of the search for unrecorded liabilities, the query whose empty answer is the finding.](../figures/chapter-17-statements-for-a-lender/IF-17-8-A.pdf)
 
 ## Step-by-step solution
 

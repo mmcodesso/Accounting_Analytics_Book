@@ -158,8 +158,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **One finding, two dimensions.** Shipments still In Transit are a consistency problem (two columns disagree) and a timeliness problem (the status was not updated). Question 6 asks about an extract taken before the final entries were posted, which is also a completeness problem. Students who want one right answer lose marks. Teach them to name the dimension the test examines and to add the second when it applies.
 
-> **[Figure placeholder IF-02-0-A]** Where each finding of the two tutorials sits among the four data quality dimensions, and whether it is an error.
-> Kind: diagram · Shows: A matrix with the findings as rows (blank tracking numbers, shipments still In Transit after their delivery date, invoices dated before the first shipment, same-name customers, freight outliers, blank list prices, ledger rows with no amount, partial first and last periods) and the four dimensions as columns. A filled cell marks the dimension the test examines and an outlined cell marks a second dimension the finding also touches (the In Transit rows are filled under consistency and outlined under timeliness). A last column says error, judgment or by design, with a symbol as well as a color, and a note says that one finding can touch two dimensions. · Data: The findings of Tutorials 2.1 and 2.2 as listed in the tutorial guide; the diagram carries no counts. · Status: planned
+![Where each finding of the two tutorials sits among the four data quality dimensions, and whether it is an error.](../figures/chapter-02-understanding-data/IF-02-0-A.pdf)
 
 **A blank is not an error.** The blank TrackingNumber is information that should exist. The blank ListPrice of a raw material is expected. The notes of an order and the payment date of an unpaid invoice are blank by design. Students who flag every blank, or none, miss the sorting that the assessment is for. Ask for the reason a value would be blank, then the evidence for it.
 
@@ -171,8 +170,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Tidy is not clean.** A dataset can have each variable in a column and still hold wrong amounts, and a report with months across the top can be accurate and hard to analyze. Question 11 tests the first, question 5 the second, and Exercise 2.4 the layout.
 
-> **[Figure placeholder IF-02-0-B]** The four combinations of tidy or messy and clean or dirty, each with an accounting example.
-> Kind: diagram · Shows: A two by two grid with tidy and messy as the columns and clean and dirty as the rows. Each cell holds a small table sketch and a one-line example from budget data. A long Budget table with every amount right is tidy and clean. The same table with one amount keyed wrongly is tidy but dirty. A report with the months across the top and every amount right is clean but messy. The same report with a wrong amount is messy and dirty. An arrow says that reshaping moves a dataset across the grid and correcting values moves it up, and that these are different jobs. · Data: none; the layout follows Figure 2.6 of the chapter and the Budget table's columns. · Status: planned
+![The four combinations of tidy or messy and clean or dirty, each with an accounting example.](../figures/chapter-02-understanding-data/IF-02-0-B.pdf)
 
 **Same name is not same customer.** Two customers with one name are two companies here, and grouping by name merges them (question 12). The chapter also raises the opposite problem, one customer under several spellings, which these tests do not look for.
 

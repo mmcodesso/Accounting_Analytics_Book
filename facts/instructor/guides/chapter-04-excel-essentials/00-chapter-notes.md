@@ -9,13 +9,13 @@ tool: excel
 figures:
   - id: IF-04-0-A
     kind: excel-mock
-    purpose: What a fill across does to a structured reference, and the two ways to avoid it.
-    shows: "The right edge of the SalesInvoiceLine Table with the headers Discount, PromotionID and PricingMethod, then ListAmount and DiscountAmount. Below it three grid cells, each with its formula bar. The first holds a COUNTIFS on the PricingMethod column. The second is the same formula after a fill one column to the right, and its formula bar names the next column of the Table. The third is the pasted formula, which still names PricingMethod. A note shows the locked form that stays put when filled."
+    purpose: The grid formula of Tutorial 4.2 typed, filled across and pasted, with the locked form that stays put.
+    shows: "The right edge of the SalesInvoiceLine Table (columns J, K, M, O, P and Q, with the others hidden) with the headers Discount, LineTotal, PromotionID, PricingMethod, ListAmount and DiscountAmount, and the columns the filled formula reads outlined. Below it three grid cells, each with its formula bar and its result. The first holds the COUNTIFS of Tutorial 4.2 on the PricingMethod and Discount columns. The second is the same formula after a fill one column to the right, and its formula bar names the next columns of the Table, ListAmount and LineTotal. The third is the pasted formula, which still names PricingMethod and Discount. A note shows the locked form that stays put when filled."
     data: The SalesInvoiceLine Table and the grid of Tutorial 4.2; the Table's own column names only.
   - id: IF-04-0-B
     kind: diagram
     purpose: Why a zero difference in a control total does not show that the import is complete.
-    shows: "Two boxes, the SalesInvoice Table and the SalesInvoiceLine Table, each drawn as a short stack of rows with one invoice and its lines missing from both. Between them a cell shows the difference of the two totals as zero. On the left, in dashed amber, a third box, the source Table in CharlesRiver.xlsx, with a count of its rows compared with the count in the import. A caption says that agreement inside the import cannot reveal what both sides lack."
+    shows: "Two boxes, the SalesInvoice Table and the SalesInvoiceLine Table, each drawn as a short stack of rows with one generic invoice and its lines missing from both. Between them a cell shows the difference of the two totals as zero. On the left, in dashed amber, a third box, the source Table in CharlesRiver.xlsx, with a count of its rows compared with the count in the import. A caption says that agreement inside the import cannot reveal what both sides lack."
     data: No values; the structure of Tutorial 4.1, Step 10 and the Control total key term.
 ---
 # Chapter 4: Excel Essentials for Accounting Analytics

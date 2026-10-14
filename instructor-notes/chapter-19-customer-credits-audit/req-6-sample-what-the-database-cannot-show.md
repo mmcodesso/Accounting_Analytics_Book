@@ -78,8 +78,7 @@ c. Record the date, the parameters and the method next to the selection.
 
 **Check:** 4.95%, 7.79%, 10.29% and 12.62%. Only no deviation supports reliance at the tolerable rate. **Watch for:** a rule written after the count, which ends at the count it found. Date it before the draw is frozen. BETA.INV fails when every item deviates; the model guards it with an IF.
 
-> **[Figure placeholder IF-19-6-A]** The plan a student hands in before testing anything.
-> Kind: excel-mock · Shows: The Sample worksheet: named parameter cells, the table of sizes with the used cell outlined, the key items with the reason each is key, and the rule table for zero to three deviations with the limit and Yes or No. · Data: The case's parameters and the refunds of Requirement 4's Refunds Table. · Status: planned
+![A mock of the plan a student hands in before testing anything.](../figures/chapter-19-customer-credits-audit/IF-19-6-A.pdf)
 
 ### Part 5: Apply D1 to the sample and compare it with the population
 
@@ -94,8 +93,7 @@ c. Record the date, the parameters and the method next to the selection.
 
 **Watch for:** the draw's rate offered as the population's, or the limit as a forecast. Where the data hold the evidence, the query replaces the sample.
 
-> **[Figure placeholder IF-19-6-B]** Why almost any draw gives the same answer.
-> Kind: chart · Shows: Bars of the probability of each deviation count in a draw from the remainder, the plausible range shaded, the model answer's frozen draw marked, and the upper deviation limit labeled at each end of the range. · Data: The hypergeometric distribution for the remainder and its deviating refunds, and the model workbook's frozen draw. · Status: planned
+![Why almost any draw gives the same answer.](../figures/chapter-19-customer-credits-audit/IF-19-6-B.pdf)
 
 ### Part 6: Plan A3 on its own population, and deliver no results
 

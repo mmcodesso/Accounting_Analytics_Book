@@ -114,8 +114,7 @@ c. Click each term in turn, record the two results, and click **Clear Filter**. 
 | Prepaid and Add: above cost; below cost; at cost | 2,070; 2,608; 5 | Step 4 |
 | Prepaid and Add: billed over cost, in total; average of the shipments' ratios | 99.0%; 95.7% | Step 7 |
 
-> **[Figure placeholder IF-04-4-A]** The freight grid on Ex 4.4 with its total, entire-Table and difference rows, and the FreightTerms slicer beside the SUBTOTAL cells.
-> Kind: excel-mock · Shows: A grid with FreightTerms down column A (two values) and the columns Shipments, FreightCost, BillableFreightAmount and FreightMargin. Under the two rows sit a Total row, an Entire Shipment Table row and a Difference row of zeros. Further down are the SUBTOTAL cells for shipments in view and average FreightCost in view, and a FreightTerms slicer with one button selected. · Data: Shipment joined to SalesOrder by SalesOrderID (the Expected results table). · Status: planned
+![A mock of the freight grid on Ex 4.4 with its total, entire-Table and difference rows, and the FreightTerms slicer beside the SUBTOTAL cells.](../figures/chapter-04-excel-essentials/IF-04-4-A.pdf)
 
 > **Instructor notes, Exercise 4.4:** 9,707 shipments. FreightTerms values are Prepaid (5,024 shipments) and Prepaid and Add (4,683). Every Prepaid shipment has BillableFreightAmount 0, so all are negative by design: FreightMargin -849,739.09 (average FreightCost 169.14). Prepaid and Add shipments bill freight: 2,070 above cost, 2,608 below, 5 equal; FreightMargin -6,391.63 (average FreightCost 134.03; billed freight totals about 99 percent of cost, while the shipments' ratios average about 96 percent). Total FreightMargin -856,130.72; 7,632 negative shipments. FreightCost ranges from 23.24 to 873.95. The finding: freight is absorbed by design on Prepaid orders, and freight billed under Prepaid and Add recovers most but not all of the carrier cost.
 

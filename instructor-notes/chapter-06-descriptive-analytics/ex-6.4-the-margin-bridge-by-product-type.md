@@ -86,8 +86,7 @@ In the model answer B39 holds the sum of the four effects and B34 the change in 
 
 **Step 4. Set the two bridges side by side.** In two columns, list the effects of this exercise and those of the Bridge worksheet, with price in Tutorial 6.3 as price lists plus promotions.
 
-> **[Figure placeholder IF-06-4-A]** The two bridges of Exercise 6.4 side by side, which is the comparison of requirement 4.
-> Kind: excel-mock · Shows: A two-column table on the worksheet Ex 6.4 with the header Product types and Tutorial 6.3 (Furniture). Rows: third-quarter margin, fourth-quarter margin, change in margin, price, cost, volume, mix, the sum of the four effects, a check row that reads zero in both columns, and a last row for the promotional discounts inside the price effect. The cost cell of the Furniture column reads zero and the cost cell of the product-type column is outlined. · Data: The effects of both bridges (the Expected results). · Status: planned
+![A mock of the two bridges of Exercise 6.4 side by side, which is the comparison of requirement 4.](../figures/chapter-06-descriptive-analytics/IF-06-4-A.pdf)
 
 **Check:** volume is the same in both ($7,885.63). Price is -$119,613.77 at the Furniture level, with +$1,073.25 from price lists and -$120,687.02 from promotions, and -$183,737.35 by type. Cost is zero against +$43,345.66. Mix is -$3,317.93 against +$17,459.98. The promotions inside the price effect are -$119,768.52 by type.
 

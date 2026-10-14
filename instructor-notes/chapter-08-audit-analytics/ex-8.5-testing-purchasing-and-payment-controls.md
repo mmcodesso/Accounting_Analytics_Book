@@ -34,8 +34,7 @@ By the end, students can:
 
 Pairs, about 150 minutes, best over two sessions: 20 for requirement (1), 25 for (2), 20 for (3), 25 for (4), 15 for (5), 10 for (6) and 35 for the memo (7). Hold back the blank-date hint until a flag count is far too large, and the consecutive-numbers hint until the band count is charted. Collect the workbook and the memo.
 
-> **[Figure placeholder IF-08-5-A]** Requisitions by 50-dollar band around the 5,000-dollar approval limit, the chart of requirement 4.
-> Kind: chart · Shows: A column chart of the eight bands, each labeled with its range and its count. The band just below the approval limit is about twice as tall as any other and is drawn in the highlight color; the rest are gray. · Data: PurchaseRequisition, RequisitionValue as Quantity times EstimatedUnitCost, counted in 50-dollar bands (the Expected results table). · Status: planned
+![Requisitions by 50-dollar band around the 5,000-dollar approval limit, the chart of requirement 4.](../figures/chapter-08-audit-analytics/IF-08-5-A.pdf)
 
 ## Step-by-step solution
 
@@ -70,8 +69,7 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 - 1 order created and approved by the purchasing manager within the limit: follow up at low risk, a design gap in segregation of duties.
 - 2 orders approved above the approver's limit by someone with a limit above $0: follow up, operation.
 
-> **[Figure placeholder IF-08-5-B]** The flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.
-> Kind: excel-mock · Shows: The flagged orders sorted by RiskScore, with the three flag columns, RiskScore, Disposition and Design or operation. The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up. · Data: POApprovals filtered to RiskScore 1 or more (the Expected results table). · Status: planned
+![A mock of the flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.](../figures/chapter-08-audit-analytics/IF-08-5-B.pdf)
 
 ### Requirement (3): Supplier invoices
 

@@ -61,8 +61,7 @@ a. On **PurchaseInvoice**, in the first free column, enter this formula and copy
 
 b. Filter the column for values above 1, and sort by SupplierID and InvoiceNumber.
 
-> **[Figure placeholder IF-02-6-A]** The PurchaseInvoice worksheet with the Count helper column of Step 2, filtered to the value 2.
-> Kind: excel-mock · Shows: The PurchaseInvoice Table with PurchaseInvoiceID, InvoiceNumber, InvoiceDate, SupplierID and GrandTotal visible (other columns hidden) and a helper column headed Count at the right, filtered to show only the value 2. The remaining rows come in adjacent pairs that share a supplier and an invoice number but differ in date and amount, and the row numbers are blue because the Table is filtered. The formula bar shows the COUNTIFS formula and the status bar shows how many records match the filter. · Data: PurchaseInvoice, with the COUNTIFS formula of Step 2 on SupplierID and InvoiceNumber. · Status: planned
+![A mock of the PurchaseInvoice worksheet with the Count helper column of Step 2, filtered to the repeated invoice numbers.](../figures/chapter-02-understanding-data/IF-02-6-A.pdf)
 
 **Check:** six invoice numbers appear twice, for suppliers 1 and 2, one pair each in every fiscal year.
 

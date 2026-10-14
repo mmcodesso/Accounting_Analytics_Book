@@ -89,8 +89,7 @@ d. Click **Solve**, choose **Keep Solver Solution**, and select **Answer** and *
 
 **Step 7. Read the Sensitivity report.** In the Constraints block, the Assembly row shows a shadow price of $166.98, with an allowable increase of 212 hours and a decrease of 97: the value holds for capacity from 27,492 to 27,800 hours. It equals the contribution per Assembly hour of LGT-FLR-0006, the one item made in part (224.8 of 717.0).
 
-> **[Figure placeholder IF-07-4-A]** Why Solver cuts the items it cuts, ranked by contribution per Assembly hour against the shadow price.
-> Kind: chart · Shows: A bar chart of the manufactured items sold, sorted by contribution per Assembly hour from the highest to the lowest, one thin bar each. A horizontal line marks the shadow price of an Assembly hour. The bars below the line are shaded coral and labeled as the items Solver reduces, the one bar on the line is the item made in part, and the vertical axis starts at zero. · Data: The contribution per Assembly hour of each item (the column beside the routing hours of the Ex 7.4 sheet) and the shadow price of the Sensitivity report. · Status: planned
+![Why Solver cuts the items it cuts, ranked by contribution per Assembly hour against the shadow price.](../figures/chapter-07-analysis-and-modeling/IF-07-4-A.pdf)
 
 **Step 8. Write the recommendation.** An outline: which center binds and by how much; the plan and the items cut, with the reason (the lowest contribution per Assembly hour, not per unit); the shadow price and its range; what to do with it; the limits.
 

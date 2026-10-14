@@ -13,7 +13,7 @@ figures:
   - id: IF-04-2-A
     kind: excel-mock
     purpose: The promotion summary on Ex 4.2 with data bars, the rate test and the lookup of the largest promotion.
-    shows: "A table with one row for each PromotionID and a Total row. Its columns are PromotionID, PromotionCode, PromotionName, Invoice lines, LineTotal, DiscountAmount, Share of discount dollars, DiscountPct and Lines at another rate. Data bars sit in the DiscountAmount column, the longest bar on the row of the largest promotion. Below the table a three-line block reports the rate test with a result sentence, and a block lists the largest promotion's code, name, scope, rate and dates."
+    shows: "A table with one row for each PromotionID and a Total row. Its columns are PromotionID, PromotionName, Invoice lines, LineTotal, DiscountAmount, Share of discount dollars, DiscountPct and Lines at another rate, with PromotionCode (column B) hidden to fit the figure. Data bars sit in the DiscountAmount column, the longest bar on the row of the largest promotion. Below the table a three-line block reports the rate test with a result sentence, and a block lists the largest promotion's code, name, scope, rate and dates."
     data: SalesInvoiceLine and PromotionProgram, by promotion (the Expected results table).
 ---
 {% set g = ch04_g2 %}

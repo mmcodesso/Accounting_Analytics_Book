@@ -121,8 +121,7 @@ WHERE (AccountType IN ('Asset', 'Expense')
 ORDER BY AccountNumber;
 ```
 
-> **[Figure placeholder IF-09-1-A]** The result students should reach in Step 6, with the parenthesized condition visible beside it.
-> Kind: sql-mock · Shows: The Execute SQL tab of DB Browser for SQLite on the tab Ex 9.1.sql. The editor holds the two comment lines and the query of Step 6 with the two parenthesized groups. The result grid shows the contra accounts with AccountID, AccountNumber, AccountName, AccountType, AccountSubType and NormalBalance, and the message pane reports the number of rows returned. · Data: Account, the opposite-balance query of Step 6, run read-only on the dataset (the Expected results give the accounts). · Status: planned
+![A mock of the result students should reach in Step 6, with the parenthesized condition visible beside it.](../figures/chapter-09-sql-essentials/IF-09-1-A.pdf)
 
 **Check:** 8 rows, 5 assets with a credit balance and 3 liability, equity or revenue accounts with a debit balance, and every one a contra account. **Watch for:** types listed with OR and no parentheses (`AccountType = 'Asset' OR AccountType = 'Expense' AND ...`) return 53 rows, because AND binds first. Only one half of the test returns 5 or 3 rows. The model query is correct even without its outer groups; the habit is the lesson.
 

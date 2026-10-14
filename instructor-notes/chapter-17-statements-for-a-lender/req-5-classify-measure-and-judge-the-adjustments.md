@@ -32,8 +32,7 @@ Students can:
 
 Individual or pairs, about 180 minutes: 60 for the schedule and entries, 25 for the classification, 35 for the reclassifications and passed items, 40 for materiality and the judgment, 20 for the checks. Hold back the reversal point until students have totaled the year-end balances. **Collect** the schedule and the Table.
 
-> **[Figure placeholder IF-17-5-A]** The schedule of adjustments, the one exhibit the CFO approves entry by entry.
-> Kind: excel-mock · Shows: The Adjustments worksheet at its top block. Rows A1 to A4 with a total row, then R1 and R2, then P1 to P3 and a row for the passed items in aggregate. Columns: No., Adjustment, Accounts, Evidence, retained earnings at the start of the comparative year, income for each of the two years, balance at each year-end, Type and Decision. The total row and the adjusted net income row are outlined. · Data: The effects of A1 to A4, R1, R2 and P1 to P3 (the Expected results). · Status: planned
+![A mock of the schedule of adjustments, the one exhibit the CFO approves entry by entry.](../figures/chapter-17-statements-for-a-lender/IF-17-5-A.pdf)
 
 ## Step-by-step solution
 

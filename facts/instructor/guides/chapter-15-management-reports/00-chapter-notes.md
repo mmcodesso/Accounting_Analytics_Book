@@ -10,12 +10,12 @@ figures:
   - id: IF-15-0-A
     kind: diagram
     purpose: What each tutorial adds to the model and where each exercise attaches, so an instructor sees the build at a glance.
-    shows: "Left to right: the Chapter 14 report, Tutorial 15.1 (promotions and the Steps table, three hidden detail pages), Tutorial 15.2 (the budget as a second fact table, the flexed budget, the cost-center detail page), Tutorial 15.3 (labor time and completions, the plant page, the About page and navigator). Below the line, the six exercises as branches, each labeled with the page or tab it adds."
+    shows: "Left to right: the Chapter 14 report, Tutorial 15.1 (promotions and the Steps table, the Promotions page and two detail pages), Tutorial 15.2 (the budget as a second fact table, the flexed budget, the Budget page and the cost-center detail page), Tutorial 15.3 (labor time and completions, the plant page, the About page and navigator, the three detail pages hidden). Below the line, the six exercises as branches, each labeled with the page or tab it adds."
     data: None; the boxes cite the tutorials, the exercises and the model answer's pages and tabs.
   - id: IF-15-0-B
     kind: pbi-mock
     purpose: Model view of the model answer, with the five fact tables around the shared Date table.
-    shows: "Model view with SalesInvoiceLine, GLEntry, BudgetLine, LaborTimeEntry and ProductionCompletionLine as fact tables around Date; Account, CostCenter, Item, Customer, PromotionProgram, Employee and WorkCenter as dimensions; LaborPaths related to Date; and Steps, Discount and Plant Measure standing alone with no lines. Each line shows 1 at the dimension and an asterisk at the fact table."
+    shows: "Model view with SalesInvoiceLine, GLEntry, BudgetLine, LaborTimeEntry and ProductionCompletionLine as fact tables around Date; Account, CostCenter, Item, Customer, PromotionProgram, Employee and WorkCenter as dimensions; LaborPaths related to Date; and Steps, Discount, Plant Measure and Key Measures standing alone with no lines. Each line shows 1 at the dimension and an asterisk at the fact table."
     data: None; the tables and relationships of the model answer.
   - id: IF-15-0-C
     kind: diagram
@@ -25,7 +25,7 @@ figures:
   - id: IF-15-0-D
     kind: diagram
     purpose: A board sketch of the budget variance, from the static budget to the actual, by cause.
-    shows: "A waterfall for fiscal year operating expense. Start bar, the static budget. Steps: the volume effect in the commission budget, the classification effect (drawn as an up arrow in one cost center and a down arrow of the same size in another, netting to zero), the remaining variance. End bar, the actual. A note says what the remaining variance holds: the payroll burden rate and the months with three pay dates."
+    shows: "A waterfall for fiscal year operating expense. Start bar, the static budget. Steps: the volume effect in the commission budget, the classification effect (drawn as an up bar in one cost center and a down bar of the same size in another, netting to zero), the remaining variance. End bar, the actual. A note says what the remaining variance holds: the payroll burden rate and the months with three pay dates."
     data: The Tutorial 15.2 quantities (budget, volume effect, classification effect, remaining, actual), from the generated note.
 ---
 {% set t1 = ch15_t1 %}

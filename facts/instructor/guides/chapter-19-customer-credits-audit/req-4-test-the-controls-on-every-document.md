@@ -13,7 +13,7 @@ figures:
   - id: IF-19-4-A
     kind: diagram
     purpose: The dates around one refund, the picture behind the definition of a refund paid before the customer's payment.
-    shows: "A horizontal time line for one invoice: the invoice date, the due date, two receipts, the applications of those receipts a day or two after each, and the refund date between the receipts and the last application. Three brackets name the three readings: the last application (the case's definition), the last receipt, and the same-day case in which the order is unknown because the records hold dates and not times. A note says that the bank clearing date is in no table."
+    shows: "A time line for one invoice in three lanes: the invoice date and the due date, two receipts with the applications of those receipts a day or two after each, and the credit and the refund, with the refund date (the day of the last receipt) marked through the lanes. An enlarged strip of the days around the refund carries three brackets that name the three readings: the last application (the case's definition), the last receipt, and the same-day case in which the order is unknown because the records hold dates and not times. A note says that the bank clearing date is in no table."
     data: One refund of the BeforePayment test (T6) chosen from the refunds the two definitions part on, with its invoice, receipts and applications.
 ---
 {% set g = ch19_g4 %}

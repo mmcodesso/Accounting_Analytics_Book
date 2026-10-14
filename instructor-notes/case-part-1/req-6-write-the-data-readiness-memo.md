@@ -49,8 +49,7 @@ The model memo follows a fixed order, and its parts take these words:
 
 **Check:** the paragraph answers "can I use this data, and for what?" before any detail. **Watch for:** an opening that says what the student did ("I examined the data") instead of what the controller needs.
 
-> **[Figure placeholder IF-C1-6-A]** A page layout of the model memo and its appendix, with the word budget of each part.
-> Kind: diagram · Shows: Two page outlines side by side. The first is the memo, with a header block (To, From, Date, Re), a short opening paragraph stating the bottom line, three labeled sections (Financial reporting, Managerial accounting, Auditing), and a closing recommendation, each block with its approximate word budget. The second is the one-page appendix, with the data map on its upper half and the reconciliation table on its lower half. Small tags on the sections name the requirements whose results each part uses. · Data: none; the layout follows the case's Requirement 6 and Deliverable. · Status: planned
+![A page layout of the model memo and its appendix, with the word budget of each part.](../figures/case-part-1/IF-C1-6-A.pdf)
 
 ### Phase 2: Financial reporting
 

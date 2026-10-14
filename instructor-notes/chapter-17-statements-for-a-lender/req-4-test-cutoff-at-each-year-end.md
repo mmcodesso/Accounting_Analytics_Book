@@ -32,8 +32,7 @@ Students can:
 
 Pairs, about 150 minutes: 40 for revenue, 60 for payroll, 25 for interest, 25 for the entries' effects. The routine for every query: type it at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Hold back the one-method rule until students meet the last year-end's missing registers. **Collect** the queries and the Cutoff worksheet.
 
-> **[Figure placeholder IF-17-4-A]** The payroll block of the Cutoff worksheet, where the proration is visible to a reviewer.
-> Kind: excel-mock · Shows: The Cutoff worksheet scrolled to its payroll block, with one column for each year-end. Rows give the pay period paid in the next year, the period that crosses the year-end with its working days and its working days within the year, the share within the year, the cost from the registers, and the payroll owed with its gross pay, employer taxes, benefits, manufacturing and other parts. The last year-end column shows the eight processed periods, their cost per working day and the working days left. · Data: The payroll owed at each year-end and its parts (the Expected results). · Status: planned
+![A mock of the payroll block of the Cutoff worksheet, where the proration is visible to a reviewer.](../figures/chapter-17-statements-for-a-lender/IF-17-4-A.pdf)
 
 ## Step-by-step solution
 

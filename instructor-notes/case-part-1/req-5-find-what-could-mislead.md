@@ -52,8 +52,7 @@ Individual work, 45 minutes: 10 for the all-rows margin, 15 for finding the entr
 
 **Step 2. Open up the fourth quarter.** In the revenue PivotTable for 2026 Q4, put SourceDocumentType in **Rows**. Two rows appear.
 
-> **[Figure placeholder IF-C1-5-A]** The PivotTable that shows what sits behind the naive fourth-quarter revenue.
-> Kind: excel-mock · Shows: A PivotTable on GLEntry with AccountID set to the Furniture revenue account and the quarter's three fiscal periods selected in the filters. Rows list SourceDocumentType, with VoucherNumber expanded under JournalEntry; Values show Sum of Debit and Sum of Credit. Two rows appear, JournalEntry with a very large debit and SalesInvoice with a credit of about the quarter's invoicing, and a grand total that is negative. The JournalEntry row and its voucher number are outlined, and the grand total is outlined in a second color. · Data: The GLEntry rows of the Furniture revenue account in the fourth quarter of the current fiscal year, by source document type (the Expected results of this requirement). · Status: planned
+![A mock of the PivotTable that shows what sits behind the naive fourth-quarter revenue.](../figures/case-part-1/IF-C1-5-A.pdf)
 
 | Source document type | Rows | Debit | Credit |
 |---|---:|---:|---:|
@@ -101,8 +100,7 @@ A cross-check from the sub-ledger at standard cost: add a helper column in Sales
 
 The margin at standard cost is 42.26% in 2026 Q3 and 40.78% in 2026 Q4.
 
-> **[Figure placeholder IF-C1-5-B]** The naive and the corrected Furniture margin for the two quarters, side by side.
-> Kind: chart · Shows: A clustered bar chart for the third and fourth quarters with two bars in each, "all ledger rows" and "year-end close excluded", and the percentage printed on each bar. The third quarter's bars match; in the fourth the all-rows bar equals the third quarter's and the corrected bar is lower, with a note that the all-rows totals are negative. The series differ by pattern as well as color. · Data: The naive and the corrected margins of the Expected results of this requirement. · Status: planned
+![The naive and the corrected Furniture margin for the two quarters, side by side.](../figures/case-part-1/IF-C1-5-B.pdf)
 
 **Step 7. State what the margins show.** The Furniture margin fell from 43.33% to 41.06%, a drop of 2.27 points, and the standard-cost view agrees, with a drop of 1.48 points. Revenue fell 3.0% from 2026 Q3 to 2026 Q4 while cost rose 0.9%. That is the descriptive answer. Why it fell is the Part II question.
 
