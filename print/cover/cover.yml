@@ -1,0 +1,49 @@
+# The words on the print covers (scripts/print/cover.py reads this file; the layout is in
+# scripts/print/cover_design.py). The edition ("First Edition") comes from _variables.yml (book.edition),
+# the ISBNs and their barcodes from _quarto.yml and IngramSpark's cover templates.
+#
+# Written for the back cover from the book's own text (the Preface, the landing page and the README), with
+# no counts of chapters, tables or exercises, which change as the book grows. Delete `bio` to leave the
+# author's note off the back cover.
+
+front:
+  title: [ACCOUNTING, ANALYTICS]
+  subtitle: AN INTEGRATED APPROACH
+  author: Mauricio Codesso, Ph.D.
+  publisher: Accounting Analytics Hub
+
+spine:
+  title: ACCOUNTING ANALYTICS
+  subtitle: AN INTEGRATED APPROACH
+  author: Mauricio Codesso, Ph.D.
+  publisher: Accounting Analytics Hub
+
+back:
+  headline: [Learn analytics through, accounting questions.]
+  paragraphs:
+    - >-
+      Accounting now runs on data. Every transaction, journal entry, payment, and production order sits in a
+      database, and auditors, management accountants, and financial reporting teams are expected to work with
+      that data directly.
+    - >-
+      <i>Accounting Analytics: An Integrated Approach</i> teaches you to extract, prepare, analyze, and
+      visualize it with Microsoft Excel, SQL, and Microsoft Power BI, three tools widely used in professional
+      practice. Every technique is taught through an accounting question, and every example draws on the
+      records of one company, so a customer order you analyze in Excel is the same one you find in the
+      general ledger with SQL and report on in Power BI.
+  features:
+    - Guided tutorials in Excel, SQL, and Power BI, with step-by-step instructions
+    - "Exercises from three perspectives: financial accounting, managerial accounting, and auditing"
+    - Capstone cases in financial reporting, managerial accounting, and auditing that bring all three tools together
+    - "One integrated dataset: Charles River, a fictional company whose transactions trace from source documents to the general ledger"
+  audience: >-
+    Written for undergraduate and graduate accounting and business students. No prior analytics or
+    programming experience is needed, only introductory financial and managerial accounting.
+  bio: >-
+    <b>Mauricio Codesso</b> is an Associate Teaching Professor of Accounting at Northeastern University's
+    <span style="white-space:nowrap">D'Amore-McKim</span> School of Business in Boston. His teaching and research focus on accounting analytics,
+    accounting information systems, managerial accounting, and auditing.
+  footer:
+    - Open educational resource, licensed CC BY-SA 4.0
+    - Read it online, with the dataset, slides, companion files, and solutions, at
+    - aa.accountinganalyticshub.com
