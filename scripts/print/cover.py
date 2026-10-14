@@ -51,7 +51,7 @@ VARIANTS = {
     'paperback-bw': ('paperback-bw', 'Cover_Paperback_BW'),
     'hardcover': ('hardcover', 'Cover_Hardcover'),
 }
-TEMPLATE_DIR = ROOT / 'drafts/cover-print-template'
+TEMPLATE_DIR = ROOT / 'print/cover-print-template'
 SOURCE_DIR = ROOT / 'print/cover'
 BACKGROUND = ROOT / 'visuals/cover/background.png'
 OUTPUT = ROOT / 'outputs/print'

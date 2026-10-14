@@ -1,7 +1,9 @@
 """The print covers (scripts/print/cover*.py): the ISBN barcode's encoding and decoder, the IDML template
-reader against IngramSpark's templates (skipped when drafts/cover-print-template is absent), the artwork's
-mirrored wrap and ink limit, the Draw.io export's recoloring, and the words on the cover. The PDF tests need
-PyMuPDF and are skipped without it."""
+reader against IngramSpark's templates (print/cover-print-template, tracked, so CI runs them), the artwork's
+mirrored wrap and ink limit, the Draw.io export's recoloring, and the words on the cover. CI installs only
+what scripts/slides/requirements.txt lists, so the tests that need NumPy, Pillow, SciPy or PyMuPDF (the
+artwork and the Draw.io overlay) are skipped without them; the barcode, template and copy tests use only
+the standard library and PyYAML."""
 from __future__ import annotations
 
 import importlib.util
@@ -11,17 +13,21 @@ import sys
 import unittest
 from pathlib import Path
 
-import numpy as np
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.print import cover_art  # noqa: E402
 from scripts.print.cover_barcode import decode_ean13, decode_scanline, ean13_modules  # noqa: E402
 from scripts.print.cover_template import find_templates, isbn13_valid, read_template  # noqa: E402
 
-TEMPLATES = ROOT / 'drafts/cover-print-template'
-HAS_FITZ = importlib.util.find_spec('fitz') is not None
+TEMPLATES = ROOT / 'print/cover-print-template'
+
+def available(*modules: str) -> bool:
+    return all(importlib.util.find_spec(name) is not None for name in modules)
+
+
+HAS_ART = available('numpy', 'PIL', 'scipy')            # scripts/print/cover_art.py
+HAS_OVERLAY = HAS_ART and available('fitz')             # scripts/print/cover.py
 CONFIG = yaml.safe_load((ROOT / '_quarto.yml').read_text(encoding='utf-8'))
 ISBNS = {key: re.sub(r'\D', '', str(value)) for key, value in CONFIG['isbn'].items()}
 
@@ -106,7 +112,14 @@ class TemplateTest(unittest.TestCase):
             self.assertAlmostEqual(t.page.h / 72, 12.0, places=2)
 
 
+@unittest.skipUnless(HAS_ART, 'NumPy, Pillow and SciPy not installed')
 class ArtTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        global np, cover_art
+        import numpy as np
+        from scripts.print import cover_art
+
     def test_reflect_mirrors_at_the_edges(self):
         index = np.array([-3, -1, 0, 4, 5, 6, 9])
         self.assertEqual(cover_art._reflect(index, 5).tolist(), [2, 0, 0, 4, 4, 3, 0])
@@ -135,7 +148,7 @@ class ArtTest(unittest.TestCase):
         self.assertEqual(cmyk[0, 1].tolist(), [0, 0, 0, 0])      # paper white stays paper
 
 
-@unittest.skipUnless(HAS_FITZ, 'PyMuPDF not installed')
+@unittest.skipUnless(HAS_OVERLAY, 'NumPy, Pillow, SciPy and PyMuPDF not installed')
 class OverlayTest(unittest.TestCase):
     def test_white_page_background_is_removed(self):
         from scripts.print.cover import remove_page_background
