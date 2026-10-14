@@ -28,6 +28,9 @@
         <mxCell id="publisher" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#FFFFFF;fontSize=19;fontStyle=1;fontFamily=Helvetica;align=left;verticalAlign=middle;spacing=0;spacingLeft=0;" value="Accounting Analytics Hub" vertex="1">
           <mxGeometry height="36" width="420" x="66" y="944" as="geometry" />
         </mxCell>
+        <mxCell id="edition" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#FFFFFF;fontSize=17;fontStyle=1;fontFamily=Helvetica;align=left;verticalAlign=middle;spacing=0;spacingLeft=0;" value="&lt;span style=&quot;letter-spacing:5px&quot;&gt;FIRST EDITION&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="520" x="66" y="44" as="geometry" />
+        </mxCell>
         <mxCell id="safe-area-note" parent="1" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FFFFFF;dashed=1;dashPattern=8 8;opacity=0;fontColor=#FFFFFF;fontSize=10;locked=0;" value="" vertex="1">
           <mxGeometry height="984" width="744" x="36" y="36" as="geometry" />
         </mxCell>

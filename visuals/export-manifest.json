@@ -1,33 +1,33 @@
 {
   "outputs": {
     "visuals/cover/cover-web.png": {
-      "output_sha256": "f7d64558b0d53b5f359120f5ed745bf1e409751165e27d4cae4d71f9eb8401e8",
+      "output_sha256": "6221c171dade61e4eb082919320637e048c5af660d12cf96afe94766bca8ce46",
       "recipe": 1,
       "settings": {
         "height": 660,
         "width": 510
       },
       "source": "visuals/cover/accounting_analytics_cover.drawio",
-      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+      "source_sha256": "8d2f56f89bb30ab5a565123c2944c1e81e06b2eae6814c090a2cecea4e5f3831"
     },
     "visuals/cover/cover.pdf": {
-      "output_sha256": "2bf9cccb586cf6993fc85e2c8bea01258935b9ccc2c701b24820e326195e0008",
+      "output_sha256": "072388bcf27f6de2ed3eba96d491a9774f72ed5eba5b718eb1af241f75717b59",
       "recipe": 1,
       "settings": {
         "crop": false
       },
       "source": "visuals/cover/accounting_analytics_cover.drawio",
-      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+      "source_sha256": "8d2f56f89bb30ab5a565123c2944c1e81e06b2eae6814c090a2cecea4e5f3831"
     },
     "visuals/cover/cover.png": {
-      "output_sha256": "fb195e26441214b83c0530fa8026126182895206e5ce5ccc30068aebcade0b0d",
+      "output_sha256": "2ce9a0ff6369cf73ff9f773febb69a41e0e79522ecb276dd99474bff4a0eea67",
       "recipe": 1,
       "settings": {
         "height": 1430,
         "width": 1105
       },
       "source": "visuals/cover/accounting_analytics_cover.drawio",
-      "source_sha256": "77959587b029515ca712fde92375f1e8d35019dba394ca28ad5d7a33e2af71ec"
+      "source_sha256": "8d2f56f89bb30ab5a565123c2944c1e81e06b2eae6814c090a2cecea4e5f3831"
     },
     "visuals/pdf/fig-01-01-analytics-continuum.pdf": {
       "output_sha256": "f4577fdbad5a2d50b0f16d25b315a1dbe49200ad7ca90d904a71439ef2d052cb",
