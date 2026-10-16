@@ -102,11 +102,17 @@ format:
       - twoside
       - open=right
       - numbers=noendperiod
+    # The same page as the print interiors (print/book-print.tex), so the digital PDF and the printed book
+    # break their pages alike: the printer's safe area of 0.5in from every trim edge plus 0.125in of no ink at
+    # the spine, room past the outer edge of the text for microtype's protrusion and the code shading (about
+    # 0.04in), the running head (styles/book-pdf.tex, 0.12in above the text) 0.5in from the top edge, and the
+    # page numbers 0.6in above the bottom edge.
     geometry:
       - inner=0.75in
-      - outer=0.5in
-      - top=0.65in
-      - bottom=0.75in
+      - outer=0.625in
+      - top=0.8in
+      - bottom=0.9in
+      - footskip=0.3in
     include-in-header: styles/book-pdf.tex
     colorlinks: true
     number-sections: true

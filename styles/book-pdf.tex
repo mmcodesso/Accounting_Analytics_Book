@@ -180,6 +180,14 @@
 % for breakable callouts, so the breakable style is emptied for every box; the longest callout is about
 % a dozen lines, far less than a page.
 \tcbset{breakable@true/.code={}}
+% Callouts are drawn opaque, the same in the digital PDF and the print interiors, because PDF/X allows no
+% transparency. Quarto asks tcolorbox for a transparent background (opacityback=0) and a 60% title band
+% (opacitybacktitle=0.6); white over the white page looks the same, and the band is a 10% tint of its
+% color instead of 6%.
+\makeatletter
+\tcbset{opacityback/.code={\def\kvtcb@opacityback{1}},
+        @opacitybacktitle/.code={\def\kvtcb@opacitybacktitle{1}}}
+\makeatother
 % With boxes kept whole, a page can end early; leave that space at the foot of the page instead of
 % stretching the gaps between paragraphs and headings to fill it.
 \raggedbottom
@@ -241,8 +249,8 @@
 % unnumbered ones. A chapter outside the Parts (the preface, the closing thoughts, the appendices) must not
 % show the Part before it: Quarto writes \bookmarksetup{startatroot} before such a chapter, and \appendix
 % starts the appendices, so each sets a flag that the next chapter's mark uses to clear the Part. A left-hand
-% page outside the Parts has no head. The head sits in the top margin, \headsep above the text, so the print
-% interior (print/book-print.tex) makes the top margin 0.8in to keep it inside the printer's safe area.
+% page outside the Parts has no head. The head sits in the top margin, \headsep above the text, so the top
+% margin (0.8in, the geometry in _quarto.yml) keeps it inside the printer's safe area.
 \makeatletter
 \NewMarkClass{aapart}
 \NewMarkClass{aachap}
@@ -269,7 +277,9 @@
 
 \captionsetup[figure]{position=bottom, justification=raggedright, singlelinecheck=false}
 \captionsetup[table]{position=top, justification=raggedright, singlelinecheck=false}
-\setlength{\emergencystretch}{3em}
+% A paragraph that cannot be set within the tolerance (a long unbreakable inline formula) gets a loose
+% line rather than one that runs into the margin, toward the trim in the print interiors.
+\setlength{\emergencystretch}{6em}
 % A higher tolerance lets a line with an unbreakable inline formula be set loosely
 % instead of running into the margin.
 \tolerance=3000

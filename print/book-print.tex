@@ -1,29 +1,12 @@
 % The print interiors of the book (IngramSpark, US Letter, no bleed): loaded after styles/book-pdf.tex
 % by the print profiles (_quarto-print-color.yml, _quarto-print-bw.yml), with book-print-color.tex or
-% book-print-bw.tex after it. scripts/print/build.py renders them; the digital PDF is unchanged.
+% book-print-bw.tex after it. scripts/print/build.py renders them. The page (the geometry in _quarto.yml),
+% the emergency stretch and the opaque callouts (styles/book-pdf.tex) are shared with the digital PDF, so
+% both break their pages alike; this file holds only what differs on paper.
 
 % No full-bleed cover: the printer takes the cover as a file of its own, so the interior opens on the
 % title page (page 1), then the copyright page (2) and the table of contents (3).
 \renewcommand{\maketitle}{}
-
-% The printer's safe area: at least 0.5in from every trim edge, plus 0.125in of no ink at the spine.
-% The outer margin leaves room for microtype's protrusion and the code shading, which reach about 0.04in
-% past the text block, and the footskip lifts the page numbers to 0.6in above the bottom edge. The running
-% head (styles/book-pdf.tex) sits 0.12in above the text, so the top margin of 0.8in keeps its ink at least
-% 0.5in from the top edge.
-\geometry{inner=0.75in, outer=0.625in, top=0.8in, bottom=0.9in, footskip=0.3in}
-
-% A paragraph that cannot be set within the tolerance (a long unbreakable inline formula) gets a loose line
-% rather than one that runs into the margin, toward the trim.
-\setlength{\emergencystretch}{6em}
-
-% PDF/X allows no transparency. Quarto's callouts ask tcolorbox for a transparent background
-% (opacityback=0) and a 60% title band (opacitybacktitle=0.6); draw both opaque. White over the white
-% page looks the same, and the band is a 10% tint of its color instead of 6%.
-\makeatletter
-\tcbset{opacityback/.code={\def\kvtcb@opacityback{1}},
-        @opacitybacktitle/.code={\def\kvtcb@opacitybacktitle{1}}}
-\makeatother
 
 % An even page count (IngramSpark); the printer adds its barcode page after the last page.
 \AtEndDocument{\cleardoubleemptypage}
